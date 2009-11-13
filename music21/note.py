@@ -90,7 +90,7 @@ class Beam(object):
         self.number = None 
 
     def __str__(self):
-        return '<music21.note.Beam %s/%s/%s>' % (number, type, direction)        
+        return '<music21.note.Beam %s/%s/%s>' % (self.number, self.type, self.direction)        
 
 
     def _getMX(self):
@@ -174,11 +174,11 @@ class Beams(object):
     def __len__(self):
         return len(self.beamsList)
 
-    def __str__(self):
+    def __repr__(self):
         msg = []
-        for beam in beamsList:
+        for beam in self.beamsList:
             msg.append(str(beam))        
-        return '/'.join(msg)
+        return '<music21.note.Beams %s>' % '/'.join(msg)
 
 
     def addNext(self, type=None, direction=None):
@@ -214,13 +214,15 @@ class Beams(object):
         else:
             raise BeamException('cannot fill beams for level %s' % level)
 
-        for i in range(count):
+        for i in range(1, count+1):
+            if i == 0: raise Exception
+
             obj = Beam()
             obj.number = i
             self.beamsList.append(obj)
 
 
-    def setAll(self, type=None, direction=None):
+    def setAll(self, type, direction=None):
         '''Convenience method to set all beam objects within Beams
 
         >>> a = Beams()
@@ -236,6 +238,49 @@ class Beams(object):
             beam.type = type
             beam.direction = direction
 
+    def setByNumber(self, number, type, direction=None):
+        '''Set an internal beam object by number, or rhythmic symbol level
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.setByNumber(1, 'continue')
+        >>> a.beamsList[0].type
+        'continue'
+        >>> a.setByNumber(2, 'stop')
+        >>> a.beamsList[1].type
+        'stop'
+
+        '''
+        if type not in ['start', 'stop', 'continue', 'partial']:
+            raise BeamException('beam type cannot be %' %  type)
+
+        if number not in self.getNumbers():
+            raise IndexError('beam number %s cannot be accessed' % number)
+
+        for i in range(len(self)):
+            if self.beamsList[i].number == number:
+                self.beamsList[i].type = type
+                self.beamsList[i].direction = direction
+
+
+    def getByNumber(self, number):
+        '''Set an internal beam object by number, or rhythmic symbol level
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.getByNumber(2).type
+        'start'
+        '''
+        if number not in self.getNumbers():
+            raise IndexError('beam number %s cannot be accessed' % number)
+
+        for i in range(len(self)):
+            if self.beamsList[i].number == number:
+                return self.beamsList[i]
+
+
     def getTypes(self):
         '''Retur a lost of all types
 
@@ -246,6 +291,16 @@ class Beams(object):
         ['start', 'start']
         '''
         return [x.type for x in self.beamsList]
+
+    def getNumbers(self):
+        '''Retrun a lost of all defind numbers
+
+        >>> a = Beams()
+        >>> a.fill('32nd')
+        >>> a.getNumbers()
+        [1, 2, 3]
+        '''
+        return [x.number for x in self.beamsList]
 
 
     #---------------------------------------------------------------------------
@@ -954,7 +1009,8 @@ class Note(GeneralNote):
         # this is setting the same beams for each part of this 
         # note; this may not be correct, as we may be dividing the note
         for mxNote in mxNoteList:
-            mxNote.beamList = self.beams.mx
+            if self.beams != None:
+                mxNote.beamList = self.beams.mx
 
 
         return mxNoteList

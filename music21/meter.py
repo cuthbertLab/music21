@@ -1023,9 +1023,29 @@ class MeterSequence(MeterTerminal):
         return match
 
 
+    def positionToSpan(self, qLenPos):
+        '''Given a lenPos, return the span of the active region
 
+        >>> a = MeterSequence('3/4', 3)
+        >>> a.positionToSpan(.5)
+        (0, 1.0)
+        >>> a.positionToSpan(1.5)
+        (1.0, 2.0)
 
-
+        '''
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+        
+        iMatch = self.positionToIndex(qLenPos)
+        
+        pos = 0
+        for i in range(len(self)):
+            if i == iMatch:
+                start = pos
+                end = pos + self[i].duration.quarterLength
+            else:
+                pos += self[i].duration.quarterLength
+        return start, end
 
 
 #-------------------------------------------------------------------------------
@@ -1064,6 +1084,29 @@ class TimeSignature(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
+    def _setDefaultPartitions(self):
+
+        # 4/4 with lower divisions
+        if (self.numerator, self.denominator) == (4, 4):
+            self.beam.partition(4)
+            for i in range(4):
+                self.beam[i] = self.beam[i].subdivide(2)
+
+        # more general, based only on numerator
+        elif self.numerator in [2, 3, 4]:
+            self.beam.partition(self.numerator)
+
+        elif self.numerator == 5:
+            self.beam.partition(2)
+
+        elif self.numerator == 7:
+            self.beam.partition(3)
+
+        elif self.numerator in [6,9,12,15,18,21]:
+            self.beam.partition(self.numerator / 3)
+
+        # doing nothing will beam all together
+
     def load(self, value, partitionRequest=None):
         '''Loading a meter destroys all internal representations
         '''
@@ -1079,6 +1122,9 @@ class TimeSignature(music21.Music21Object):
         self.beat = MeterSequence(value, partitionRequest)
         # used for setting one level of accents
         self.accent = MeterSequence(value, partitionRequest)
+
+        if partitionRequest == None: # set default groups
+            self._setDefaultPartitions()
 
 
     def loadRatio(self, numerator, denominator, partitionRequest=None):
@@ -1161,6 +1207,10 @@ class TimeSignature(music21.Music21Object):
     def getBeams(self, durList):
         '''Given a qLen position and a list of Duration objects, return a list of Beams object.
 
+        Duration objects are assumed to be adjoining; offsets are not used.
+
+        This can be modified to take lists of rests and notes
+
         Must process a list at  time, because we cannot tell when a beam ends
         unless we see the context of adjoining durations.
 
@@ -1169,31 +1219,115 @@ class TimeSignature(music21.Music21Object):
         >>> a.beam[1] = a.beam[1].subdivide(2)
         >>> a.beam
         {{1/8+1/8}+{1/8+1/8}}
+        >>> b = [duration.Duration('16th')] * 8
+        >>> c = a.getBeams(b)
+        >>> len(c) == len(b)
+        True
+        >>> print c
+        [<music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>]
         '''
+
+        if len(durList) <= 1:
+            raise MeterException('length of durList must be 2 or greater, not %s' % len(durList))
+
         pos = 0 # assume we are always starting at zero w/n this meter
-        beams = [] # hold complted Beams objects
+        beamsList = [] # hold complted Beams objects
         for dur in durList:
-            start = pos
-            end = pos + dur.quarterLength
             if dur.type not in self._beamableDurationTypes:
+                beamsList.append(None) # placeholder
+            else:
+                # we have a beamable duration
+                b = note.Beams()
+                # set the necessary number of internal beamsList, that is, one for
+                # each horizontal line in the beams group
+                # this does not set type or direction
+                b.fill(dur.type) 
+                beamsList.append(b)
+
+        # iter over each beams line, from top to bottom (1 thourgh 5)
+        for depth in range(len(self._beamableDurationTypes)):
+            beamNumber = depth + 1 # increment to count from 1 not 0
+            pos = 0
+            for i in range(len(durList)):
+
+                dur = durList[i]
+                beams = beamsList[i]
+
+                if beams == None: # if a place holder
+                    pos += dur.quarterLength
+                    continue
+
+                # see if there is a component defined for this beam number
+                # if not, continue
+                if beamNumber not in beams.getNumbers(): 
+                    pos += dur.quarterLength
+                    continue
+
+                start = pos
+                end = pos + dur.quarterLength
+
+                startNext = pos + dur.quarterLength
+                endPrevious = pos
+
+                if i == len(durList) - 1: # last
+                    durNext = None
+                    beamNext = None
+                else:
+                    durNext = durList[i+1]
+                    beamNext = beamsList[i+1]
+
+                if i == 0: # previous
+                    durPrevious = None
+                    beamPrevious = None
+                else:
+                    durPrevious = durList[i-1]
+                    beamPrevious = beamsList[i-1]
+
+                # TODO: need to do this for sub-level groups
+                # so that the archetype is for the specified 
+                # internal level
+                archetypeSpan = self.beam.positionToSpan(start)
+                if beamNext == None: # last
+                    archetypeSpanNext = None
+                else:
+                    archetypeSpanNext = self.beam.positionToSpan(startNext)
+
+                # determine beamType
+                if i == 0: # if the first, we always start
+                    beamType = 'start'
+                elif i == len(durList) - 1: # last is always stop
+                    beamType = 'stop'
+
+                # here on we know that it is neither the first nor last
+                # if last was stoped or does not exist
+                elif (beamPrevious == None or 
+                    beamPrevious.getByNumber(beamNumber).type == 'stop'):
+                    beamType = 'start'
+                # if no beam is defined next (we know this already)
+                # then must stop
+                elif beamNext == None:
+                    beamType = 'stop'
+                    
+                # the last cases are when to stop, or when to continue
+                # when we know we have a beam next
+
+                # we continue if the next beam is in the same beaming archetype
+                # as this one.
+                # if endNext is outside of the archetype span,
+                # not sure what to do
+                elif startNext < archetypeSpan[1]: # if next w/n this span
+                    beamType = 'continue'
+
+                # we stop if the next beam is not in the sme beaming archetyp
+                elif startNext >= archetypeSpanNext[0]: # if next w/n this span
+                    beamType = 'stop'
+
+                beams.setByNumber(beamNumber, beamType)
+
+                # increment position and continue loop
                 pos += dur.quarterLength
-                continue
-            # we have a beamable duration
-            b = Beams()
-            # set the necessary number of internam beams, that is, one for
-            # each horizontal line in the beam group
-            b.fill(dur.type) 
 
-            # depending on what happened last, determine settings for all
-            # beams; assumes that all internal beams are the same type
-            if len(beams) == 0 or 'stop' in beams[-1].getTypes():
-                b.setAll('start')
-
-
-            # increment position and continue loop
-            pos += dur.quarterLength
-
-
+        return beamsList
 
 
     def getAccent(self, qLenPos):
@@ -1715,7 +1849,7 @@ class Test(unittest.TestCase):
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 
 
 

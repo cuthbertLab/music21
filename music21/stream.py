@@ -454,6 +454,45 @@ def makeTies(streamObj, meterStream=None):
 
 
 
+def makeBeams(streamObj, meterStream=None):
+    '''Given a stream containing measures, create beams based on 
+    TimeSignature objects.
+
+    Edits the current stream in-place. 
+
+    >>> d = Stream()
+    >>> n = note.Note()
+    >>> n.quarterLength = .25
+    >>> d.repeatAdd(n, 16)
+    >>> x = makeMeasures(d)
+    >>> y = makeBeams(x)
+
+    '''
+    if len(streamObj) == 0:
+        raise StreamException('cannot process an empty stream')        
+
+    # get measures from this stream
+    measureStream = streamObj.getElementsByClass(Measure)
+    if len(measureStream) == 0:
+        raise StreamException('cannot process a stream without measures')        
+
+    
+    for m in streamObj.getElementsByClass(Measure): 
+        ts = m.timeSignature
+        noteStream = m.getNotes()
+        durList = []
+
+        for n in noteStream:
+            durList.append(n.duration)
+        if len(durList) <= 1: 
+            continue
+
+        beamsList = ts.getBeams(durList)
+        for i in range(len(noteStream)):
+            noteStream[i].beams = beamsList[i]
+
+    return streamObj
+
 
 
 
@@ -2223,6 +2262,7 @@ class Stream(Element):
             # try to add measures if none defined
             measureStream = makeMeasures(self, meterStream, refStream)
             measureStream = makeTies(measureStream, meterStream)
+            measureStream = makeBeams(measureStream)
 
             if len(measureStream) == 0:            
                 raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -3228,6 +3268,41 @@ class TestExternal(unittest.TestCase):
         s.show()
 
 
+
+    def testBeamsStream(self):
+        '''An approach to setting TimeSignature measures in offsets and durations
+        '''
+        q = Stream()
+        r = Stream()
+        p = Stream()
+
+        for x in ['c3','a3','c#4','d3'] * 30:
+            n = note.Note(x)
+            n.quarterLength = .25
+            q.addNext(n)
+
+            m = note.Note(x)
+            m.quarterLength = .5
+            r.addNext(m)
+
+            o = note.Note(x)
+            o.quarterLength = .125
+            p.addNext(o)
+
+
+        s = Stream() # container
+        s.append(q)
+        s.append(r)
+        s.append(p)
+
+        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
+        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
+        s.insertAtOffset(meter.TimeSignature("4/4"), 8)
+        self.assertEqual(len(s.flat.notes), 360)
+
+        s.show()
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -3538,5 +3613,9 @@ class Test(unittest.TestCase):
         s.append(c)
         s.append(d)
 
+
+
+
+
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
