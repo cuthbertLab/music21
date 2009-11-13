@@ -20,6 +20,10 @@ from music21 import note
 from music21 import musicxml
 musicxmlMod = musicxml # alias as to avoid name conflicts
 
+
+# TODO: it seems that this module might be better named bar
+# as it defines measure attributes and not Measures
+
 #-------------------------------------------------------------------------------
 class Barline(music21.Music21Object):
     valid_styles = ["regular", "dotted", "dashed", "heavy", "light-light", "light-heavy",
@@ -46,46 +50,48 @@ class Repeat(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class Part(object):
-    '''Terminal, non stream representation of a Part. Does not contain
-    notes, measures, Streams, ora ny other attributes that will occur 
-    more than once. 
+# this is now defined n Stream.
 
-    Should be able ot represent MusicXML Parts and PartGroups?
-
-        self.groupName = None
-        self.groupAbbreviaton = None
-        self.groupBarline = None
-
-    '''
-    
-    def __init__(self):
-
-        # should be .name
-        self.partName = None
-        self.partAbbreviation = None
-
-
-    def _getMX(self):
-        '''
-        Returns an incomplete mxSorePart object
-        '''
-        mxScorePart = musicxmlMod.ScorePart()
-        mxScorePart.set('partName', self.partName)
-        mxScorePart.set('partAbbreviation', self.partAbbreviation)
-        return mxScorePart
-
-    def _setMX(self, mxNote):
-        '''
-        Given a lost of one or more MusicXML Note objects, read in and create
-        Duration
-
-        '''
-        pass
-
-    mx = property(_getMX, _setMX)
-
-
+# class Part(object):
+#     '''Terminal, non stream representation of a Part. Does not contain
+#     notes, measures, Streams, ora ny other attributes that will occur 
+#     more than once. 
+# 
+#     Should be able ot represent MusicXML Parts and PartGroups?
+# 
+#         self.groupName = None
+#         self.groupAbbreviaton = None
+#         self.groupBarline = None
+# 
+#     '''
+#     
+#     def __init__(self):
+# 
+#         # should be .name
+#         self.partName = None
+#         self.partAbbreviation = None
+# 
+# 
+#     def _getMX(self):
+#         '''
+#         Returns an incomplete mxSorePart object
+#         '''
+#         mxScorePart = musicxmlMod.ScorePart()
+#         mxScorePart.set('partName', self.partName)
+#         mxScorePart.set('partAbbreviation', self.partAbbreviation)
+#         return mxScorePart
+# 
+#     def _setMX(self, mxNote):
+#         '''
+#         Given a lost of one or more MusicXML Note objects, read in and create
+#         Duration
+# 
+#         '''
+#         pass
+# 
+#     mx = property(_getMX, _setMX)
+# 
+# 
 
 
 
