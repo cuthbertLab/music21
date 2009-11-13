@@ -1067,7 +1067,7 @@ class _TimeSignature(music21.Music21Object):
         # these all refer to the same .numerator/.denominator 
         # relationship
 
-        # used for drawing the time signature
+        # used for drawing the time signature symbol
         self.display = MeterSequence(value, partitionRequest)
         # used for beaming
         self.beam = MeterSequence(value, partitionRequest)
@@ -1155,12 +1155,37 @@ class _TimeSignature(music21.Music21Object):
     # not implemented
 
     def getBeam(self, qLenPos):
+        '''Given a qLen position
+
+        >>> a = _TimeSignature('2/4', 2)
+        >>> a.beam[0] = a.beam[0].subdivide(2)
+        >>> a.beam[1] = a.beam[1].subdivide(2)
+        '''
         pass
+
+
 
     def getAccent(self, qLenPos):
         '''Return true or false if the qLenPos is at the start of an accent
+        division
+        >>> a = _TimeSignature('3/4', 3)
+        >>> a.accent.partition([2,1])
+        >>> a.accent
+        {2/4+1/4}
+        >>> a.getAccent(0)
+        True
+        >>> a.getAccent(1)
+        False
+        >>> a.getAccent(2)
+        True
         '''
-        pass
+        pos = 0
+        for i in range(len(self.accent)):
+            if common.almostEquals(pos, qLenPos):
+                return True
+            pos += self.accent[i].duration.quarterLength
+        return False
+
 
     def getBeat(self, qLenPos):
         '''Get the beat, where beats count from 1
@@ -1181,7 +1206,8 @@ class _TimeSignature(music21.Music21Object):
     def quarterPositionToBeat(self, currentQtrPosition = 0):
         '''For backward compatibility.
         '''
-        return self_getBeat(qLenPos)
+        #return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
+        return self.getBeat(qLenPos)
     
 
 

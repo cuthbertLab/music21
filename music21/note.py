@@ -77,9 +77,12 @@ class BeamException(Exception):
     pass
 
 class Beam(object):
+    '''An object representation of a beam, where each beam objects exists
+    for each horizontal line in a total beam structure for one note. 
+    '''
 
     def __init__(self, type = None, direction = None):
-        self.type = type # start, stop, partial
+        self.type = type # start, stop, continue, partial
         self.direction = direction # left or right for partial
         self.independentAngle = None
         # represents which beam line referred to
@@ -127,7 +130,6 @@ class Beam(object):
         return mxBeam
 
 
-
     def _setMX(self, mxBeam):
         '''given a list of mxBeam objects, set beamsList
 
@@ -159,13 +161,73 @@ class Beam(object):
 
 
 class Beams(object):
+    '''A group of beams applied to a single note that represents the partial beam structure of many notes beamed together.
+    '''
     
     def __init__(self):
         self.beamsList = []
         self.feathered = False
         
-    def addNext(self, type = None, direction = None):
-        self.beamsList.append(Beam(type, direction))
+
+    def __len__(self):
+        return len(self.beamsList)
+
+    def addNext(self, type=None, direction=None):
+        obj = Beam(type, direction)
+        obj.number = len(self.beamsList) + 1
+        self.beamsList.append(obj)
+
+
+    def fill(self, level=None):
+        '''Clear an fill the beams list as commonly needed for various durations
+        do not set type or direction
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> len(a)
+        2
+        >>> a.fill('32nd')
+        >>> len(a)
+        3
+        '''
+        self.beamsList = []
+        # 8th, 16th, etc represetned as 1, 2, ...
+        if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
+            count = 1
+        elif level in [2, duration.typeFromNumDict[16]]:
+            count = 2
+        elif level in [3, duration.typeFromNumDict[32]]:
+            count = 3
+        elif level in [4, duration.typeFromNumDict[64]]:
+            count = 4
+        elif level in [5, duration.typeFromNumDict[128]]:
+            count = 5
+        elif level in [6, duration.typeFromNumDict[256]]:
+            count = 6
+        elif level in [7, duration.typeFromNumDict[512]]:
+            count = 7
+
+        for i in range(count):
+            obj = Beam()
+            obj.number = i
+            self.beamsList.append(obj)
+
+
+    def setAll(self, type=None, direction=None):
+        '''Convenience method to set all beam objects within Beams
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> [x.type for x in a.beamsList]
+        ['start', 'start']
+
+        '''
+        if type not in ['start', 'stop', 'continue', 'partial']:
+            raise BeamException('beam type cannot be %' %  type)
+        for beam in self.beamsList:
+            beam.type = type
+            beam.direction = direction
 
     def _getMX(self):
         '''
@@ -189,6 +251,8 @@ class Beams(object):
             self.beamsList.append(beamObj)
 
     mx = property(_getMX, _setMX)    
+
+
 
 
 
