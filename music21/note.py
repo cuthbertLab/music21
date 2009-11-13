@@ -1,0 +1,1164 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         note.py
+# Purpose:      music21 classes for representing notes
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    (c) 2009 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+'''
+Classes and functions for creating and manipulating notes, ties, and durations.
+Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.
+'''
+
+import string, copy, math
+import unittest, doctest
+
+import music21
+from music21 import common
+from music21 import defaults
+from music21 import duration
+from music21 import instrument
+from music21 import editorial
+from music21.lily import LilyString
+from music21 import musicxml
+musicxmlMod = musicxml # alias
+from music21 import notationMod
+from music21 import pitch
+from music21.pitch import Pitch, Accidental
+
+
+
+from music21 import environment
+_MOD = "note.py"  
+environLocal = environment.Environment(_MOD)
+
+
+#-------------------------------------------------------------------------------
+class Tie(music21.Music21Object):
+    '''Object added to notes that are tied to other notes
+
+    note1.tie = Tie("start")
+    note1.tieStyle = "normal" # could be dotted or dashed
+    print note1.tie.type # prints start
+
+    Differences from MusicXML:
+       notes do not need to know if they are tied from a
+       previous note.  i.e., you can tie n1 to n2 just with
+       a tie start on n1.  However, if you want proper musicXML output
+       you need a tie stop on n2
+
+       one tie with "continue" implies tied from and tied to
+
+       optional (to know what notes are next:)
+          .to = note()   # not implimented yet, b/c of garbage coll.
+          .from = note()
+
+    (question: should notes be able to be tied to multiple notes
+    for the case where a single note is tied both voices of a
+    two-note-head unison?)
+    '''
+
+    def __init__(self, tievalue = "start"):
+        music21.Music21Object.__init__(self)
+        self.type = tievalue
+
+    ### NOTE: READ UP ON weak references BEFORE adding .to and .from
+    ### THESE MUST BE WEAK otherwise garbage collection will not take 
+        # place properly
+
+
+
+#-------------------------------------------------------------------------------
+class BeamException(Exception):
+    pass
+
+class Beam(object):
+
+    def __init__(self, type = None, direction = None):
+        self.type = type # start, stop, partial
+        self.direction = direction # left or right for partial
+        self.independentAngle = None
+        # represents which beam line referred to
+        # 8th, 16th, etc represetned as 1, 2, ...
+        self.number = None 
+
+
+    def _getMX(self):
+        '''
+        Returns a Beams object
+
+        >>> a = Beam()
+        >>> a.type = 'start'
+        >>> a.number = 1
+        >>> b = a.mx
+        >>> b.get('charData')
+        'begin'
+        >>> b.get('number')
+        1
+
+        >>> a.type = 'partial'
+        >>> a.direction = 'left'
+        >>> b = a.mx
+        >>> b.get('charData')
+        'backward hook'
+        '''
+        mxBeam = musicxmlMod.Beam()
+        if self.type == 'start':
+            mxBeam.set('charData', 'begin') 
+        elif self.type == 'continue':
+            mxBeam.set('charData', 'continue') 
+        elif self.type == 'stop':
+            mxBeam.set('charData', 'end') 
+        elif self.type == 'partial':
+            if self.direction == 'left':
+                mxBeam.set('charData', 'backward hook')
+            elif self.direction == 'right':
+                mxBeam.set('charData', 'forward hook') 
+            else:
+                raise BeamException('partial beam defined without a direction set (set to %s)' % self.direction)
+        else:
+            raise BeamException('unexpected beam type encountered (%s)' % self.type)
+
+        mxBeam.set('number', self.number)
+        return mxBeam
+
+
+
+    def _setMX(self, mxBeam):
+        '''given a list of mxBeam objects, set beamsList
+
+        >>> mxBeam = musicxmlMod.Beam()
+        >>> mxBeam.set('charData', 'begin')
+        >>> a = Beam()
+        >>> a.mx = mxBeam
+        >>> a.type
+        'start'
+        '''
+
+        mxType = mxBeam.get('charData')
+        if mxType == 'begin':
+            self.type = 'start'
+        elif mxType == 'continue':
+            self.type = 'continue'
+        elif mxType == 'end':
+            self.type = 'stop'
+        elif mxType == 'forward hook':
+            self.type = 'partial'
+            self.direction = 'right'
+        elif mxType == 'backward hook':
+            self.type = 'partial'
+            self.direction = 'left'
+        else:
+            raise BeamException('unexpected beam type encountered (%s)' % mxType)
+
+    mx = property(_getMX, _setMX)    
+
+
+class Beams(object):
+    
+    def __init__(self):
+        self.beamsList = []
+        self.feathered = False
+        
+    def addNext(self, type = None, direction = None):
+        self.beamsList.append(Beam(type, direction))
+
+    def _getMX(self):
+        '''
+        Returns a list of mxBeam objects
+        '''
+        mxBeamList = []
+        for beamObj in self.beamsList:
+            mxBeamList.append(beamObj.mx)
+        return mxBeamList
+
+    def _setMX(self, mxBeamList):
+        '''given a list of mxBeam objects, set beamsList
+
+        >>> mxBeamList = []
+        >>> a = Beams()
+        >>> a.mx = mxBeamList
+        '''
+        for mxBeam in mxBeamList:
+            beamObj = Beam()
+            beamObj.mx = mxBeam
+            self.beamsList.append(beamObj)
+
+    mx = property(_getMX, _setMX)    
+
+
+
+#-------------------------------------------------------------------------------
+class LyricException(Exception):
+    pass
+
+
+class Lyric(object):
+    def __init__(self, text=None, number=1, syllabic=None):
+        self.text = text
+        if not common.isNum(number):
+            raise LyricException('Number best be number')
+        self.number = number
+        self.syllabic = None # can be begin, middle, or end
+
+
+    #---------------------------------------------------------------------------
+    def _getMX(self):
+        '''
+        Returns an mxLyric
+
+        >>> a = Lyric()
+        >>> a.text = 'hello'
+        >>> mxLyric = a.mx
+        >>> mxLyric.get('text')
+        'hello'
+        '''
+        mxLyric = musicxml.Lyric()
+        mxLyric.set('text', self.text)
+        mxLyric.set('number', self.number)
+        mxLyric.set('syllabic', self.syllabic)
+        return mxLyric
+
+    def _setMX(self, mxLyric):
+        '''Given an mxLyric, fill the necessary parameters
+        
+        >>> mxLyric = musicxml.Lyric()
+        >>> mxLyric.set('text', 'hello')
+        >>> a = Lyric()
+        >>> a.mx = mxLyric
+        >>> a.text
+        'hello'
+        '''
+        self.text = mxLyric.get('text')
+        self.number = mxLyric.get('number')
+        self.syllabic = mxLyric.get('syllabic')
+
+    mx = property(_getMX, _setMX)    
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class GeneralNote(music21.Music21Object):
+    '''
+    A GeneralNote object is the parent object for the Note, Rest, Unpitched, and 
+    SimpleNote, etc. objects
+    It contains duration, notations, editorial, and tie fields.
+    '''    
+
+#	### commented out because it is not working due to circular imports
+#        def __new__(classname, *shortcut, **arguments):
+#        if len(shortcut) == 1:
+#            try:
+#                newnote = tinyNotation.TinyNotationNote(shortcut[0]).note
+#                return newnote
+#            except Exception:
+#                return object.__new__(classname, *shortcut, **arguments)
+#        else:
+#            return object.__new__(classname, *shortcut, **arguments)
+#        #doesn't actually work yet, can't import tinyNotation because of 
+# circular imports
+
+    isChord = False
+    
+    def __init__(self, *arguments, **keywords):
+        #super(GeneralNote, self).__init__(**keywords)
+        music21.Music21Object.__init__(self)
+
+        self.duration = duration.Duration(**keywords)
+        self.lyrics = [] # a list of lyric objects
+
+        self.notations = []
+        self.articulations = []
+        self.editorial = editorial.NoteEditorial()
+        self.tie = None
+        self.reinit()
+
+    def clone(self):
+        return copy.deepcopy(self)
+        
+    def reinit(self):
+        pass
+    
+    #---------------------------------------------------------------------------
+    def _getColor(self):
+        return self.editorial.color
+
+    def _setColor(self, value): 
+        '''should check data here
+        uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
+        No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
+
+        >>> a = GeneralNote()
+        >>> a.duration.type = 'whole'
+        >>> a.color = '#235409'
+        >>> a.color
+        '#235409'
+        >>> a.editorial.color
+        '#235409'
+
+        '''
+        self.editorial.color = value
+
+    color = property(_getColor, _setColor)
+
+
+    def _getLyric(self):
+        if len(self.lyrics) > 0:
+            return self.lyrics[0].text
+        else:
+            return None
+
+    def _setLyric(self, value): 
+        '''should check data here
+
+        >>> a = GeneralNote()
+        >>> a.lyric = 'test'
+        >>> a.lyric
+        'test'
+        '''
+        # this presently only creates one lyric, and destroys any existing
+        # lyric
+        self.lyrics = [] 
+        self.lyrics.append(Lyric(value))
+
+    lyric = property(_getLyric, _setLyric)
+
+
+
+
+    #---------------------------------------------------------------------------
+    # properties common to Notes, Rests, 
+    def _getQuarterLength(self):
+        '''Return quarter length
+
+        >>> n = Note()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        '''
+        return self.duration.quarterLength
+
+    def _setQuarterLength(self, value):
+        self.duration.quarterLength = value
+
+    quarterLength = property(_getQuarterLength, _setQuarterLength)
+
+
+
+
+    def _getMusicXML(self):
+        '''This must call _getMX to get basic mxNote objects
+        '''
+        mxNoteList = self._getMX() # can be rest, note, or chord
+
+        mxMeasure = musicxml.Measure()
+        mxMeasure.setDefaults()
+        for mxNote in mxNoteList:
+            mxMeasure.append(mxNote)
+        mxPart = musicxml.Part()
+        mxPart.setDefaults()
+        mxPart.append(mxMeasure)
+
+        # see if an instrument is defined in this or a parent stream
+        if hasattr(self.parent, 'getInstrument'):
+            instObj = self.parent.getInstrument()
+        else:
+            instObj = instrument.Instrument()
+            instObj.partId = defaults.partId # give a default id
+            instObj.partName = defaults.partName # give a default id
+
+        mxScorePart = musicxmlMod.ScorePart()
+        mxScorePart.set('partName', instObj.partName)
+        mxScorePart.set('id', instObj.partId)
+
+        # must set this part to the same id
+        mxPart.set('id', instObj.partId)
+
+        mxPartList = musicxml.PartList()
+        mxPartList.append(mxScorePart)
+
+        mxIdentification = musicxml.Identification()
+        mxIdentification.setDefaults() # will create a composer
+        mxScore = musicxml.Score()
+        mxScore.setDefaults()
+        mxScore.set('partList', mxPartList)
+        mxScore.set('identification', mxIdentification)
+        mxScore.append(mxPart)
+        return mxScore.xmlStr()
+
+
+    def _setMusicXML(self, xmlString):
+        pass
+
+    musicxml = property(_getMusicXML, _setMusicXML)    
+
+
+
+
+
+    #---------------------------------------------------------------------------
+    # duration
+
+    def appendDuration(self, durationObject):
+        '''
+        Sets the duration of the note to the supplied duration.Duration object
+
+        >>> a = Note()
+        >>> a.duration.clear() # remove default
+        >>> a.appendDuration(duration.Duration('half'))
+        >>> a.duration.quarterLength
+        2.0
+        >>> a.appendDuration(duration.Duration('whole'))
+        >>> a.duration.quarterLength
+        6.0
+
+        '''
+        # note: the lower level interface has changed here
+        self.duration.addDuration(durationObject)
+
+
+    def clearDurations(self):
+        '''
+        clears all the durations stored in the note.
+        After performing this, it's probably not wise to print the note until 
+        at least one duration.Duration is added
+        '''
+        #self.componentDurations = []
+        #self.durationLinkages = []
+        #self.duration = ComplexDuration(components = self.componentDurations,
+        #                                linkages = self.durationLinkages)
+        self.duration = duration.Duration(components=[], linkages=[])
+
+
+    def splitAtDurations(self):
+        '''
+        Takes a Note and returns a list of notes with only a single
+        duration.Duration each.
+
+        >>> a = Note()
+        >>> a.duration.clear() # remove defaults
+        >>> a.appendDuration(duration.Duration('half'))
+        >>> a.duration.quarterLength
+        2.0
+        >>> a.appendDuration(duration.Duration('whole'))
+        >>> a.duration.quarterLength
+        6.0
+        >>> b = a.splitAtDurations()
+        >>> b[0].pitch == b[1].pitch
+        True
+        >>> b[0].duration.type
+        'half'
+        >>> b[1].duration.type
+        'whole'
+        '''
+        returnNotes = []
+
+        # but a simple note does not have a self.componentDurations 
+        # attribute
+#         if len(self.componentDurations) == 0:
+#             returnNotes[0] == self.clone()  ## is already a simpleNote
+
+# there is alway s
+#         if len(self.duration.components) == 0:
+#             returnNotes.append(self.clone())
+
+        if len(self.duration.components) == (len(self.duration.linkages) - 1):
+            for i in range(len(self.duration.components)):
+                tempNote = self.clone()            
+                tempNote.clearDurations()
+                tempNote.duration = self.duration.components[i]
+                if i != (len(self.duration.components) - 1):
+                    tempNote.tie = self.duration.linkages[i]                
+                    # last note just gets the tie of the original Note
+                returnNotes.append(tempNote)
+        else: 
+            for i in range(len(self.duration.components)):
+                tempNote = self.clone()            
+                tempNote.clearDurations()
+                tempNote.duration = self.duration.components[i]
+                if i != (len(self.duration.components) - 1):
+                    tempNote.tie = Tie()
+                else:
+                    # last note just gets the tie of the original Note
+                    if self.tie is None:
+                        self.tie = Tie("stop")
+                returnNotes.append(tempNote)                
+        return returnNotes
+
+
+
+
+
+    #---------------------------------------------------------------------------
+    def splitNoteAtPoint(self, quarterLength):
+        '''
+        Split a Note into two Notes. 
+
+        >>> a = GeneralNote()
+        >>> a.duration.type = 'whole'
+        >>> b, c = a.splitNoteAtPoint(3)
+        >>> b.duration.type
+        'half'
+        >>> b.duration.dots
+        1
+        >>> b.duration.quarterLength
+        3.0
+        >>> c.duration.type
+        'quarter'
+        >>> c.duration.dots
+        0
+        >>> c.duration.quarterLength
+        1.0
+        '''
+        if quarterLength > self.duration.quarterLength:
+            raise duration.DurationException(
+            "cannont split a duration (%s) at this quarter length (%s)" % (
+            self.duration.quarterLength, quarterLength))
+
+        note1 = self.clone()
+        note2 = self.clone()
+
+        lenEnd = self.duration.quarterLength - quarterLength
+        lenStart = self.duration.quarterLength - lenEnd
+
+        d1 = duration.Duration()
+        d1.quarterLength = lenStart
+
+        d2 = duration.Duration()
+        d2.quarterLength = lenEnd
+
+        note1.duration = d1
+        note2.duration = d2
+
+        # this is all the functionality of PitchedOrUnpitched
+        if hasattr(self, 'isRest') and not self.isRest:
+            note1.tie = Tie("start")  #rests arent tied
+
+        return [note1, note2]
+
+
+
+    def compactNoteInfo(self):
+        '''
+        nice debugging info tool -- returns information about a note
+        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+        '''
+        
+        ret = ""
+        if (self.isNote is True):
+            ret += self.name + " " + self.step + " " + str(self.octave)
+            if (self.accidental is not None):
+                ret += " " + self.accidental.name
+        elif (self.isRest is True):
+            ret += "rest"
+        else:
+            ret += "other note type"
+        if (self.tie is not None):
+            ret += " (Tie: " + self.tie.type + ")"
+        ret += " " + self.duration.type
+        ret += " " + str(self.duration.quarterLength)
+        if len(self.duration.tuplets) > 0:
+            ret += " & is a tuplet"
+            if self.duration.tuplets[0].type == "start":
+                ret += " (in fact STARTS the tuplet)"
+            elif self.duration.tuplets[0].type == "stop":
+                ret += " (in fact STOPS the tuplet)"
+        if len(self.notations) > 0:
+            if (isinstance(self.notations[0], music21.notationMod.Fermata)):
+                ret += " has Fermata"
+        return ret
+
+#-------------------------------------------------------------------------------
+# class PitchedOrUnpitched(GeneralNote):
+#     '''
+#     Parent class for methods applicable to Pitched or Unpitched notes that are 
+#     not rests
+#     At present it contains only an extension of GeneralNote.splitNoteAtPoint 
+#        that 
+#     makes sure that the two notes are tied together.
+#     '''
+#     
+#     # unspecified means that there may be a stem, but its orienation
+#     # has not been declared. 
+#     stemDirection = "unspecified"
+#     
+#     def splitNoteAtPoint(self, quarterLength):
+#         (note1, note2) = GeneralNote.splitNoteAtPoint(self, quarterLength)
+#         note1.tie = Tie("start")  #rests arent tied
+#         return [note1, note2]
+
+
+
+
+#-------------------------------------------------------------------------------
+class Note(GeneralNote):
+    '''
+    Note class for notes (not rests or unpitched elements) 
+    that can be represented by one or more notational units
+
+    A Note knows both its total duration and how to express itself as a set of 
+    tied notes of different lengths. For instance, a note of 2.5 quarters in 
+    length could be half tied to eighth or dotted quarter tied to quarter.
+    
+    A ComplexNote will eventually be smart enough that if given a duration in 
+    quarters it will try to figure out a way to express itself as best it can if
+    it needs to be represented on page.  It does not know this now.
+    '''
+
+# Attributes:
+#     isNote: True
+#     isUnpitched: False
+#     isRest: False
+#     freq440: frequency if A=440 and 12ET is used (set automatically, but 
+# can be overridden) 
+#     frequency: same as above, but should be overridden by modules that 
+# alter frequency assumptions
+#     pitchClass : a number from 0 (C) to 11 (B)
+# 
+
+    isNote = True
+    isUnpitched = False
+    isRest = False
+    
+    # Accepts an argument for pitch
+    def __init__(self, *arguments, **keywords):
+        GeneralNote.__init__(self, **keywords)
+
+        if len(arguments) > 0:
+            self.pitch = Pitch(arguments[0]) # assume first arg is pitch
+        else:
+            self.pitch = Pitch('C4')
+
+#         components = []
+#         linkages = []
+#         if "components" in keywords:
+#             components = keywords["components"]
+#         if "linkages" in keywords:
+#             linkages = keywords["linkages"]
+        if "beams" in keywords:
+            self.beams = keywords["beams"]
+        else:
+            self.beams = Beams()
+
+    #---------------------------------------------------------------------------
+    # operators, representations, and transformatioins
+
+    def __repr__(self):
+        return "<music21.note.Note %s>" % self.name
+
+    #---------------------------------------------------------------------------
+    # property access
+
+
+    def _getName(self): return self.pitch.name
+    def _setName(self, value): self.pitch.name = value
+    name = property(_getName, _setName)
+
+    def _getNameWithOctave(self): return self.pitch.nameWithOctave
+    nameWithOctave = property(_getNameWithOctave, None)
+
+
+    def _getAccidental(self): 
+        return self.pitch.accidental
+
+    # do we no longer need setAccidental(), below?
+    def _setAccidental(self, value):
+        '''
+        Adds an accidental to the Note, given as an Accidental object.
+        Also alters the name of the note
+        
+        >>> a = Note()
+        >>> a.step = "D"
+        >>> a.name 
+        'D'
+        >>> b = Accidental("sharp")
+        >>> a.setAccidental(b)
+        >>> a.name 
+        'D#'
+        '''
+        if common.isStr(value):
+            accidental = Accidental(value)
+        else: 
+            accidental = value
+        self.pitch.accidental = accidental
+
+    # backwards compat; remove when possible
+    def setAccidental(self, accidental):
+        self._setAccidental(accidental)
+
+    accidental = property(_getAccidental, _setAccidental) 
+
+
+    def _getStep(self): return self.pitch.step
+    def _setStep(self, value): self.pitch.step = value
+    step = property(_getStep, _setStep)
+
+    def _getFrequency(self): return self.pitch.frequency
+    def _setFrequency(self, value): self.pitch.frequency = value
+    frequency = property(_getFrequency, _setFrequency)
+    
+    def _getFreq440(self): return self.pitch.freq440
+    def _setFreq440(self, value): self.pitch.freq440 = value
+    freq440 = property(_getFreq440, _setFreq440)
+
+    def _getOctave(self): return self.pitch.octave
+    def _setOctave(self, value): self.pitch.octave = value
+    octave = property(_getOctave, _setOctave)
+
+    # do we no longer need midiNote(), below?
+    def _getMidi(self):
+        '''
+        Returns the note's midi number.  
+        
+        C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
+
+        >>> a = Note()
+        >>> a.pitch = Pitch('d-4')
+        >>> a.midi
+        61
+        '''
+        return self.pitch.midi
+
+    # this is only here backward compat; remove when possible
+    def midiNote(self):
+        return self._getMidi()
+
+    def _setMidi(self, value): 
+        self.pitch.midi = value
+
+    midi = property(_getMidi, _setMidi)
+
+
+    
+    def _getPitchClass(self):
+        '''Return pitch class
+
+        >>> d = Note()
+        >>> d.pitch = Pitch('d-4')
+        >>> d.pitchClass
+        1
+        >>> 
+        '''
+        return self.pitch.pitchClass
+
+    def _setPitchClass(self, value):
+        self.pitch.pitchClass = value
+
+    pitchClass = property(_getPitchClass, _setPitchClass)
+
+
+
+    # was diatonicNoteNum
+    def _getDiatonicNoteNum(self):
+        ''' 
+        see Pitch.diatonicNoteNum
+        '''         
+        return self.pitch.diatonicNoteNum
+
+    diatonicNoteNum = property(_getDiatonicNoteNum)
+
+
+
+
+
+    #---------------------------------------------------------------------------
+    def _preDurationLily(self):
+        '''
+        Method to return all the lilypond information that appears before the 
+        duration number.
+        Is the same for simple and complex notes.
+        '''
+        baseName = ""
+        baseName += self.editorial.lilyStart()
+        baseName += self.step.lower()
+        if (self.pitch.accidental):
+            baseName += self.pitch.accidental.lily
+        elif (self.editorial.ficta is not None):
+            baseName += self.editorial.ficta.lily
+        octaveModChars = ""
+        if (self.pitch.octave < 3):
+            correctedOctave = 3 - self.octave
+            octaveModChars = ',' * correctedOctave #  C2 = c,  C1 = c,,
+        else:
+            correctedOctave = self.pitch.octave - 3
+            octaveModChars  = '\'' * correctedOctave # C4 = c', C5 = c''  etc.
+        baseName += octaveModChars
+        if (self.editorial.ficta is not None):
+            baseName += "!"  # always display ficta
+        return baseName
+
+
+    def _getLily(self):
+        '''
+        The name of the note as it would appear in Lilypond format.
+        '''
+        allNames = ""
+        baseName = self._preDurationLily()
+        if hasattr(self.duration, "components") and len(
+            self.duration.components) > 0:
+            for i in range(0, len(self.duration.components)):
+                thisDuration = self.duration.components[i]            
+                allNames += baseName
+                allNames += thisDuration.lily
+                allNames += self.editorial.lilyAttached()
+                if (i != len(self.duration.components) - 1):
+                    allNames += "~"
+                    allNames += " "
+        else:
+            allNames += baseName
+            allNames += self.duration.lily
+            allNames += self.editorial.lilyAttached()
+            
+        if (self.tie is not None):
+            if (self.tie.type != "stop"):
+                allNames += "~"
+        if (self.notations):
+            for thisNotation in self.notations:
+                if dir(thisNotation).count('lily') > 0:
+                    allNames += " " + thisNotation.lily
+
+        allNames += self.editorial.lilyEnd()
+        
+        return LilyString(allNames)
+
+    lily = property(_getLily)
+
+    def _getMX(self):
+        '''
+        Returns a List of mxNotes
+        Attributes of notes are merged from different locations: first from the 
+        duration objects, then from the pitch objects. Finally, GeneralNote 
+        attributes are added
+        '''
+        mxNoteList = []
+        for mxNote in self.duration.mx: # returns a list of mxNote objs
+            # merge method returns a new object
+            mxNote = mxNote.merge(self.pitch.mx)
+            # get color from within .editorial using attribute
+            mxNote.set('color', self.color)
+
+
+            for lyricObj in self.lyrics:
+                mxNote.lyricList.append(lyricObj.mx)
+            mxNoteList.append(mxNote)
+
+        # if this note, not a component duration, but this note has a tie, 
+        # need to add this to the last-encountered mxNote
+        if self.tie != None:
+            if self.tie.type == 'start':
+                mxNoteList[-1].addTie('start')
+            elif self.tie.type == 'stop':
+                # TODO: check
+                # this may not work properly, as components of this note
+                # might be tied to other notes
+                mxNoteList[0].addTie('stop')
+
+
+        # need to apply beams to notes, but application needs to be
+        # reconfigured based on what is gotten from self.duratoin.mx
+
+        # likely, this means that many continue beams
+        # will need to be added
+
+        # this is setting the same beams for each part of this 
+        # note; this may not be correct, as we may be dividing the note
+        for mxNote in mxNoteList:
+            mxNote.beamList = self.beams.mx
+
+
+        return mxNoteList
+
+
+    def _setMX(self, mxNote):
+        '''Given an mxNote, fill the necessary parameters
+        '''
+        # meausure reference may be needed
+        # here, it is assigned just for reference
+        # duration obtains from mxNote to get divisions
+        #mxMeasure = mxNote.external['measure']
+        #mxNote.get('chord')
+
+        #self.isRest = mxNote.get('rest')
+        #if not self.isRest:
+        self.pitch.mx = mxNote # required info will be taken from entore note
+        self.duration.mx = mxNote
+        self.beams.mx = mxNote.beamList
+
+    mx = property(_getMX, _setMX)    
+
+
+
+
+
+
+
+#--------------------------------------#
+# convenience classes
+
+class EighthNote(Note):
+    def __init__(self, *arguments, **keywords):
+        Note.__init__(self, *arguments, **keywords)
+        self.duration.type = "eighth"
+
+class QuarterNote(Note):
+    def __init__(self, *arguments, **keywords):
+        Note.__init__(self, *arguments, **keywords)
+        self.duration.type = "quarter"
+
+class HalfNote(Note):
+    def __init__(self, *arguments, **keywords):
+        Note.__init__(self, *arguments, **keywords)
+        self.duration.type = "half"
+
+class WholeNote(Note):
+    def __init__(self, *arguments, **keywords):
+        Note.__init__(self, *arguments, **keywords)
+        self.duration.type = "whole"
+
+
+
+
+#-------------------------------------------------------------------------------
+class Unpitched(GeneralNote):
+    '''
+    General class of unpitched objects which appear at different places
+    on the staff.  Examples: percussion notation
+    '''    
+    displayStep = "C"
+    displayOctave = 4
+    isNote = False
+    isUnpitched = True
+    isRest = False
+
+
+#-------------------------------------------------------------------------------
+class Rest(GeneralNote):
+    '''General rest class'''
+    isNote = False
+    isUnpitched = False
+    isRest = True
+    name = "rest"
+
+    def __repr__(self):
+        return "<music21.note.Rest %s>" % self.name
+
+    def _lilyName(self):
+        '''The name of the rest as it would appear in Lilypond format.
+        
+        >>> r1 = Rest()
+        >>> r1.duration.type = "half"
+        >>> r1.lily
+        'r2'
+        '''
+        baseName = ""
+        baseName += self.editorial.lilyStart()
+        baseName += "r"
+        baseName += self.duration.lily     
+        baseName += self.editorial.lilyAttached()
+        baseName += self.editorial.lilyEnd()
+        return baseName
+
+    lily = property(_lilyName)
+
+
+    def _getMX(self):
+        '''
+        Returns a List of mxNotes
+        Attributes of notes are merged from different locations: first from the 
+        duration objects, then from the pitch objects. Finally, GeneralNote 
+        attributes are added
+        '''
+        mxNoteList = []
+        for mxNote in self.duration.mx: # returns a list of mxNote objs
+            # merge method returns a new object
+            mxRest = musicxml.Rest()
+            mxRest.setDefaults()
+            mxNote.set('rest', mxRest)
+            # get color from within .editorial using attribute
+            mxNote.set('color', self.color)
+            mxNoteList.append(mxNote)
+        return mxNoteList
+
+    def _setMX(self, mxNote):
+        '''Given an mxNote, fille the necessary parameters
+        '''
+        self.duration.mx = mxNote
+
+    mx = property(_getMX, _setMX)    
+
+
+#-------------------------------------------------------------------------------
+
+class NoteException(Exception):
+    pass
+
+
+
+
+#-------------------------------------------------------------------------------
+
+def noteFromDiatonicNumber(number):
+    octave = int(number / 7)
+    noteIndex = number % 7
+    noteNames = ['C','D','E','F','G','A','B']
+    thisName = noteNames[noteIndex]
+    note1 = Note()
+    note1.octave = octave
+    note1.name = thisName
+    return note1
+
+
+def factory(usrStr):
+    '''convenience method to get Notes'''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# test methods and classes
+
+def sendNoteInfo(music21noteObject):
+    '''
+    Debugging method to print information about a music21 note
+    called by trecento.trecentoCadence, among other places
+    '''
+    retstr = ""
+    a = music21noteObject  
+    if (isinstance(a, music21.note.Note)):
+        retstr += "Name: " + a.name + "\n"
+        retstr += "Step: " + a.step + "\n"
+        retstr += "Octave: " + str(a.octave) + "\n"
+        if (a.accidental is not None):
+            retstr += "Accidental: " + a.accidental.name + "\n"
+    else:
+        retstr += "Is a rest\n"
+    if (a.tie is not None):
+        retstr += "Tie: " + a.tie.type + "\n"
+    retstr += "Duration Type: " + a.duration.type + "\n"
+    retstr += "QuarterLength: " + str(a.duration.quarterLength) + "\n"
+    if len(a.duration.tuplets) > 0:
+        retstr += "Is a tuplet\n"
+        if a.duration.tuplets[0].type == "start":
+            retstr += "   in fact STARTS the tuplet group\n"
+        elif a.duration.tuplets[0].type == "stop":
+            retstr += "   in fact STOPS the tuplet group\n"
+    if len(a.notations) > 0:
+        if (isinstance(a.notations[0], music21.notationMod.Fermata)):
+            retstr += "Has a fermata on it\n"
+    return retstr
+
+class TestExternal(unittest.TestCase):
+    '''These are tests that open windows and rely on external software
+    '''
+
+    def runTest(self):
+        pass
+
+    def testSingle(self):
+        '''Need to test direct meter creation w/o stream
+        '''
+        a = Note('d-3')
+        a.quarterLength = 2.25
+        a.show()
+
+    def testBasic(self):
+        from music21 import stream
+        a = stream.Stream()
+
+        for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', .5),
+                           ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
+                           ('d-3', 2.5), ('c#6', 3.25), ('a--5', .5),
+                           ('f#2', 1.75), ('g-3', 1.33333), ('d#6', .6666)
+                ]:
+            b = Note()
+            b.quarterLength = qLen
+            b.name = pitchName
+            b.color = '#FF00FF'
+            # print a.musicxml
+            a.addNext(b)
+
+        a.show()
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testComplex(self):
+        note1 = Note()
+        note1.duration.clear()
+        d1 = duration.Duration()
+        d1.type = "whole"
+        d2 = duration.Duration()
+        d2.type = "quarter"
+        note1.appendDuration(d1)
+        note1.appendDuration(d2)
+        self.assertEqual(note1.duration.quarterLength, 5.0)
+        self.assertEqual(note1.duration.componentIndexAtQtrPosition(2), 0)    
+        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4), 1)    
+        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4.5), 1)
+        note1.duration.sliceComponentAtPosition(1.0)
+        
+        matchStr = "c'4~ c'2.~ c'4"
+        self.assertEqual(str(note1.lily), matchStr)
+        i = 0
+        for thisNote in (note1.splitAtDurations()):
+            matchSub = matchStr.split(' ')[i]
+            self.assertEqual(str(thisNote.lily), matchSub)
+            i += 1
+       
+
+    def testNote(self):
+    #    note1 = Note("c#1")
+    #    assert note1.duration.quarterLength == 4
+    #    note1.duration.dots = 1
+    #    assert note1.duration.quarterLength == 6
+    #    note1.duration.type = "eighth"
+    #    assert note1.duration.quarterLength == 0.75
+    #    assert note1.octave == 4
+    #    assert note1.step == "C"
+
+        note2 = Rest()
+        self.assertEqual(note2.isRest, True)
+        note3 = Note()
+        note3.pitch.name = "B-"
+        # not sure how to test not None
+        #self.assertFalse (note3.pitch.accidental, None)
+        self.assertEqual (note3.accidental.name, "flat")
+        self.assertEqual (note3.pitchClass, 10)
+        
+        a5 = Note()
+        a5.name = "A"
+        a5.octave = 5
+        self.assertAlmostEquals(a5.freq440, 880.0)
+        self.assertEqual(a5.pitchClass, 9)
+    
+
+    def testMusicXMLOutput(self):
+        mxNotes = []
+        for pitchName, durType in [('g#', 'quarter'), ('g#', 'half'), 
+                ('g#', 'quarter'), ('g#', 'quarter'), ('g#', 'quarter')]:
+
+            dur = duration.Duration(durType)
+            p = pitch.Pitch(pitchName)
+
+            # a lost of one ore more notes (tied groups)
+            for mxNote in dur.mx: # returns a list of mxNote objs
+                # merger returns a new object
+                mxNotes.append(mxNote.merge(p.mx))
+
+        self.assertEqual(len(mxNotes), 5)
+        self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
