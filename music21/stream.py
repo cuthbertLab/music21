@@ -395,8 +395,10 @@ def makeTies(streamObj, meterStream=None):
             mNext.offset = m.offset + m.timeSignature.barDuration.quarterLength
             if len(meterStream) == 0: # in case no meters are defined
                 ts = meter.TimeSignature()
-                ts.numerator = defaults.meterNumerator
-                ts.denominator = defaults.meterDenominatorBeatType
+                ts.load('%s/%s' % (defaults.meterNumerator, 
+                                   defaults.meterDenominatorBeatType))
+#                 ts.numerator = defaults.meterNumerator
+#                 ts.denominator = defaults.meterDenominatorBeatType
             else: # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             mNext.timeSignature = ts
@@ -1482,8 +1484,10 @@ class Stream(Element):
         # get a default and/or place default at zero if nothing at zero
         if len(post) == 0 or post[0].offset > 0: 
             ts = meter.TimeSignature()
-            ts.numerator = defaults.meterNumerator
-            ts.denominator = defaults.meterDenominatorBeatType
+            ts.load('%s/%s' % (defaults.meterNumerator, 
+                               defaults.meterDenominatorBeatType))
+            #ts.numerator = defaults.meterNumerator
+            #ts.denominator = defaults.meterDenominatorBeatType
             post.insertAtOffset(ts,0)
     
         return post

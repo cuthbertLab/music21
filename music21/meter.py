@@ -1029,7 +1029,7 @@ class MeterSequence(MeterTerminal):
 
 
 #-------------------------------------------------------------------------------
-class _TimeSignature(music21.Music21Object):
+class TimeSignature(music21.Music21Object):
 
     def __init__(self, value=None, partitionRequest=None):
         music21.Music21Object.__init__(self)
@@ -1050,6 +1050,10 @@ class _TimeSignature(music21.Music21Object):
         # creates MeterSequence data representations
         # creates .display, .beam, .beat, .accent
         self.load(value, partitionRequest)
+
+        self._beamableDurationTypes = [duration.typeFromNumDict[8], 
+            duration.typeFromNumDict[16], duration.typeFromNumDict[32], 
+            duration.typeFromNumDict[64], duration.typeFromNumDict[128]]
 
     def __str__(self):
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
@@ -1110,7 +1114,7 @@ class _TimeSignature(music21.Music21Object):
         barDuration gets or sets a duration value that
         is equal in length to the totalLength
         
-        >>> a = _TimeSignature('3/8')
+        >>> a = TimeSignature('3/8')
         >>> d = a.barDuration
         >>> d.type
         'quarter'
@@ -1133,7 +1137,7 @@ class _TimeSignature(music21.Music21Object):
 
     def _getBeatLengthToQuarterLengthRatio(self):
         '''
-        >>> a = _TimeSignature('3/2')
+        >>> a = TimeSignature('3/2')
         >>> a.beatLengthToQuarterLengthRatio
         2.0
         '''
@@ -1152,23 +1156,50 @@ class _TimeSignature(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # not implemented
+    # access data for other processing
 
-    def getBeam(self, qLenPos):
-        '''Given a qLen position
+    def getBeams(self, durList):
+        '''Given a qLen position and a list of Duration objects, return a list of Beams object.
 
-        >>> a = _TimeSignature('2/4', 2)
+        Must process a list at  time, because we cannot tell when a beam ends
+        unless we see the context of adjoining durations.
+
+        >>> a = TimeSignature('2/4', 2)
         >>> a.beam[0] = a.beam[0].subdivide(2)
         >>> a.beam[1] = a.beam[1].subdivide(2)
+        >>> a.beam
+        {{1/8+1/8}+{1/8+1/8}}
         '''
-        pass
+        pos = 0 # assume we are always starting at zero w/n this meter
+        beams = [] # hold complted Beams objects
+        for dur in durList:
+            start = pos
+            end = pos + dur.quarterLength
+            if dur.type not in self._beamableDurationTypes:
+                pos += dur.quarterLength
+                continue
+            # we have a beamable duration
+            b = Beams()
+            # set the necessary number of internam beams, that is, one for
+            # each horizontal line in the beam group
+            b.fill(dur.type) 
+
+            # depending on what happened last, determine settings for all
+            # beams; assumes that all internal beams are the same type
+            if len(beams) == 0 or 'stop' in beams[-1].getTypes():
+                b.setAll('start')
+
+
+            # increment position and continue loop
+            pos += dur.quarterLength
+
 
 
 
     def getAccent(self, qLenPos):
         '''Return true or false if the qLenPos is at the start of an accent
         division
-        >>> a = _TimeSignature('3/4', 3)
+        >>> a = TimeSignature('3/4', 3)
         >>> a.accent.partition([2,1])
         >>> a.accent
         {2/4+1/4}
@@ -1190,7 +1221,7 @@ class _TimeSignature(music21.Music21Object):
     def getBeat(self, qLenPos):
         '''Get the beat, where beats count from 1
 
-        >>> a = _TimeSignature('3/4', 3)
+        >>> a = TimeSignature('3/4', 3)
         >>> a.getBeat(0)
         1
         >>> a.getBeat(2.5)
@@ -1216,11 +1247,13 @@ class _TimeSignature(music21.Music21Object):
         '''
         returns the lilypond representation of the timeSignature
         
-        >>> a = _TimeSignature('3/16')
+        >>> a = TimeSignature('3/16')
         >>> a.lily
         \\time 3/16
         '''
         
+        # TODO: values need to be taken from self.display
+
         if self._lilyOut is not None:
             return self._lilyOut
         return lily.LilyString("\\time " + str(self) + " ")
@@ -1238,9 +1271,11 @@ class _TimeSignature(music21.Music21Object):
         Compound meters are represented as multiple pairs of beat
         and beat-type elements
 
-        >>> a = _TimeSignature('3/4')
+        >>> a = TimeSignature('3/4')
         >>> b = a.mx
         '''
+        # TODO: values need to be taken from self.display
+
         mxTime = musicxml.Time()
         mxTime.set('beats', int(self.numerator))
         mxTime.set('beat-type', int(self.denominator))
@@ -1263,11 +1298,15 @@ class _TimeSignature(music21.Music21Object):
         >>> a.set('beat-type', 8)
         >>> b = musicxml.Attributes()
         >>> b.timeList.append(a)
-        >>> c = _TimeSignature()
+        >>> c = TimeSignature()
         >>> c.mx = b
         >>> c.numerator
         3
         '''
+
+        # TODO: may need special handling, as all data representations
+        # are being configured the same here
+
         mxTimeList = mxAttributes.timeList
         # only take the first until we can accomodate compound
         for mxTime in mxTimeList[:1]:
@@ -1334,259 +1373,259 @@ class _TimeSignature(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 
-class TimeSignature(music21.Music21Object):
-    inherited   = False # whether the TimeSignature object is inherited from 
-    _lilyOut = None    
-    symbol = "" # common, cut, single-number, normal
-                # a difference from musicXML: empty is different from normal:
-                #   normal = 4/4;  empty lets the interpreting program decide
-                # does not do anything at present
-
-    def __init__(self, asSlash = ""):
-        music21.Music21Object.__init__(self)
-
-        self._barDuration = duration.Duration()
-        self._overriddenBarDuration = None
-
-        self._numerator   = 0     # musicXML: beats
-        self._denominator = 1     # musicXML: beat-type
-
-
-        if (asSlash):
-            asSlash = asSlash.strip() # rem whitespace
-            matches = re.match("(\d+)\/(\d+)", asSlash)
-            if matches is not None:
-                self._numerator = float(matches.group(1))
-                self._denominator = float(matches.group(2))
-
-        #self.beatLengthToQuarterLengthRatio = 4.0/self.denominator
-        #self.quarterLengthToBeatLengthRatio = self.denominator/4.0
-        self._ratioChanged()
-
-
-    def __str__(self):
-        return str(int(self.numerator)) + "/" + str(int(self.denominator))
-
-    def __repr__(self):
-        return "<music21.meter.TimeSignature %s>" % self.__str__()
-
-
-    # temp for backward compat
-    def _getTotalLength(self):
-        return self._barDuration.quarterLength
- 
-    totalLength = property(_getTotalLength)
-
-
-
-    def _getNumerator(self):
-        return self._numerator
-
-    def _setNumerator(self, value):
-        self._numerator = value
-        self._ratioChanged()
-
-    numerator = property(_getNumerator, _setNumerator)
-
-
-
-    def _getDenominator(self):
-        return self._denominator
-
-    def _setDenominator(self, value):
-        self._denominator = value
-        self._ratioChanged()
-
-    denominator = property(_getDenominator, _setDenominator)
-
-
-
-
-    def _ratioChanged(self):
-        '''If ratio has been changed, call this to update
-        barDuration 
-        '''
-        self._barDuration = duration.Duration()
-        try:
-            self._barDuration.quarterLength = ((4.0 * 
-                        self.numerator)/self.denominator)
-        except duration.DurationException:
-            environLocal.printDebug(['DuratioinException encountered', 
-                'numerator/denominator', self.numerator, self.denominator])
-            self._barDuration = None
-
-
-    def _getBarDuration(self):
-        '''
-        barDuration gets or sets a duration value that
-        is equal in length to the totalLength
-        
-        >>> a = TimeSignature('3/8')
-        >>> d = a.barDuration
-        >>> d.type
-        'quarter'
-        >>> d.dots
-        1
-        >>> d.quarterLength
-        1.5
-        '''
-        
-        if self._overriddenBarDuration:
-            return self._overriddenBarDuration
-        else:
-            return self._barDuration
-
-
-    def _setBarDuration(self, value):
-        self._overriddenBarDuration = value
-
-    barDuration = property(_getBarDuration, _setBarDuration)
-
-
-
-    def _getBeatLengthToQuarterLengthRatio(self):
-        '''
-        >>> a = TimeSignature()
-        >>> a.numerator = 3
-        >>> a.denominator = 2
-        >>> a.beatLengthToQuarterLengthRatio
-        2.0
-        '''
-        return 4.0/self.denominator
-
-    beatLengthToQuarterLengthRatio = property(_getBeatLengthToQuarterLengthRatio)
-
-
-    def _getQuarterLengthToBeatLengthRatio(self):
-        return self.denominator/4.0
-
-    quarterLengthToBeatLengthRatio = property(_getQuarterLengthToBeatLengthRatio)
-
-
-
-    #---------------------------------------------------------------------------
-    # not implemented
-    def setBeamDivisions(self, beamDivs):
-        pass
-
-
-    #---------------------------------------------------------------------------
-    # utility methods
-    def quarterPositionToBeat(self, currentQtrPosition = 0):
-        return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
-    
-
-
-    #---------------------------------------------------------------------------
-    def _getLily(self):
-        '''
-        returns the lilypond representation of the timeSignature
-        
-        >>> a = TimeSignature('3/16')
-        >>> a.lily
-        \\time 3/16
-        '''
-        
-        if self._lilyOut is not None:
-            return self._lilyOut
-        return lily.LilyString("\\time " + str(self) + " ")
-    
-    def _setLily(self, newLily):
-        self._lilyOut = newLily
-    
-    lily = property(_getLily, _setLily)
-
-
-
-    def _getMX(self):
-        '''Returns a lost of one or more mxTime objects.
-        
-        Compound meters are represented as multiple pairs of beat
-        and beat-type elements
-
-        >>> a = TimeSignature('3/4')
-        >>> b = a.mx
-        '''
-        mxTime = musicxml.Time()
-        mxTime.set('beats', int(self.numerator))
-        mxTime.set('beat-type', int(self.denominator))
-        # can set this to common when necessary
-        mxTime.set('symbol', None)
-        # for declaring no time signature present
-        mxTime.set('senza-misura', None)
-        # number is for assigning to staves
-        mxTime.set('senza-misura', None)
-
-        mxTimeList = []
-        mxTimeList.append(mxTime)
-        return mxTimeList
-
-
-    def _setMX(self, mxAttributes):
-        '''Given an mxAttributute object, load this object 
-        >>> a = musicxml.Time()
-        >>> a.set('beats', 3)
-        >>> a.set('beat-type', 8)
-        >>> b = musicxml.Attributes()
-        >>> b.timeList.append(a)
-        >>> c = TimeSignature()
-        >>> c.mx = b
-        >>> c.numerator
-        3
-        '''
-        mxTimeList = mxAttributes.timeList
-        # only take the first until we can accomodate compound
-        for mxTime in mxTimeList[:1]:
-            # for combound meters, this may be a 3+2 string
-            self.numerator = int(mxTime.get('beats'))
-            self.denominator = int(mxTime.get('beat-type'))
-
-        self._ratioChanged()
-
-
-    mx = property(_getMX, _setMX)
-
-
-
-
-    def _getMusicXML(self):
-        '''Return a complete MusicXML string
-        '''
-        mxAttributes = musicxml.Attributes()
-        # need a lost of time 
-        mxAttributes.set('time', self._getMX())
-
-        mxMeasure = musicxml.Measure()
-        mxMeasure.setDefaults()
-        mxMeasure.set('attributes', mxAttributes)
-
-        mxPart = musicxml.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
-
-        mxScorePart = musicxml.ScorePart()
-        mxScorePart.setDefaults()
-        mxPartList = musicxml.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxml.Identification()
-        mxIdentification.setDefaults() # will create a composer
-
-        mxScore = musicxml.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-        return mxScore.xmlStr()
-
-
-    def _setMusicXML(self, mxNote):
-        '''
-        '''
-        pass
-
-    musicxml = property(_getMusicXML, _setMusicXML)
-
+# class TimeSignature(music21.Music21Object):
+#     inherited   = False # whether the TimeSignature object is inherited from 
+#     _lilyOut = None    
+#     symbol = "" # common, cut, single-number, normal
+#                 # a difference from musicXML: empty is different from normal:
+#                 #   normal = 4/4;  empty lets the interpreting program decide
+#                 # does not do anything at present
+# 
+#     def __init__(self, asSlash = ""):
+#         music21.Music21Object.__init__(self)
+# 
+#         self._barDuration = duration.Duration()
+#         self._overriddenBarDuration = None
+# 
+#         self._numerator   = 0     # musicXML: beats
+#         self._denominator = 1     # musicXML: beat-type
+# 
+# 
+#         if (asSlash):
+#             asSlash = asSlash.strip() # rem whitespace
+#             matches = re.match("(\d+)\/(\d+)", asSlash)
+#             if matches is not None:
+#                 self._numerator = float(matches.group(1))
+#                 self._denominator = float(matches.group(2))
+# 
+#         #self.beatLengthToQuarterLengthRatio = 4.0/self.denominator
+#         #self.quarterLengthToBeatLengthRatio = self.denominator/4.0
+#         self._ratioChanged()
+# 
+# 
+#     def __str__(self):
+#         return str(int(self.numerator)) + "/" + str(int(self.denominator))
+# 
+#     def __repr__(self):
+#         return "<music21.meter.TimeSignature %s>" % self.__str__()
+# 
+# 
+#     # temp for backward compat
+#     def _getTotalLength(self):
+#         return self._barDuration.quarterLength
+#  
+#     totalLength = property(_getTotalLength)
+# 
+# 
+# 
+#     def _getNumerator(self):
+#         return self._numerator
+# 
+#     def _setNumerator(self, value):
+#         self._numerator = value
+#         self._ratioChanged()
+# 
+#     numerator = property(_getNumerator, _setNumerator)
+# 
+# 
+# 
+#     def _getDenominator(self):
+#         return self._denominator
+# 
+#     def _setDenominator(self, value):
+#         self._denominator = value
+#         self._ratioChanged()
+# 
+#     denominator = property(_getDenominator, _setDenominator)
+# 
+# 
+# 
+# 
+#     def _ratioChanged(self):
+#         '''If ratio has been changed, call this to update
+#         barDuration 
+#         '''
+#         self._barDuration = duration.Duration()
+#         try:
+#             self._barDuration.quarterLength = ((4.0 * 
+#                         self.numerator)/self.denominator)
+#         except duration.DurationException:
+#             environLocal.printDebug(['DuratioinException encountered', 
+#                 'numerator/denominator', self.numerator, self.denominator])
+#             self._barDuration = None
+# 
+# 
+#     def _getBarDuration(self):
+#         '''
+#         barDuration gets or sets a duration value that
+#         is equal in length to the totalLength
+#         
+#         >>> a = TimeSignature('3/8')
+#         >>> d = a.barDuration
+#         >>> d.type
+#         'quarter'
+#         >>> d.dots
+#         1
+#         >>> d.quarterLength
+#         1.5
+#         '''
+#         
+#         if self._overriddenBarDuration:
+#             return self._overriddenBarDuration
+#         else:
+#             return self._barDuration
+# 
+# 
+#     def _setBarDuration(self, value):
+#         self._overriddenBarDuration = value
+# 
+#     barDuration = property(_getBarDuration, _setBarDuration)
+# 
+# 
+# 
+#     def _getBeatLengthToQuarterLengthRatio(self):
+#         '''
+#         >>> a = TimeSignature()
+#         >>> a.numerator = 3
+#         >>> a.denominator = 2
+#         >>> a.beatLengthToQuarterLengthRatio
+#         2.0
+#         '''
+#         return 4.0/self.denominator
+# 
+#     beatLengthToQuarterLengthRatio = property(_getBeatLengthToQuarterLengthRatio)
+# 
+# 
+#     def _getQuarterLengthToBeatLengthRatio(self):
+#         return self.denominator/4.0
+# 
+#     quarterLengthToBeatLengthRatio = property(_getQuarterLengthToBeatLengthRatio)
+# 
+# 
+# 
+#     #---------------------------------------------------------------------------
+#     # not implemented
+#     def setBeamDivisions(self, beamDivs):
+#         pass
+# 
+# 
+#     #---------------------------------------------------------------------------
+#     # utility methods
+#     def quarterPositionToBeat(self, currentQtrPosition = 0):
+#         return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
+#     
+# 
+# 
+#     #---------------------------------------------------------------------------
+#     def _getLily(self):
+#         '''
+#         returns the lilypond representation of the timeSignature
+#         
+#         >>> a = TimeSignature('3/16')
+#         >>> a.lily
+#         \\time 3/16
+#         '''
+#         
+#         if self._lilyOut is not None:
+#             return self._lilyOut
+#         return lily.LilyString("\\time " + str(self) + " ")
+#     
+#     def _setLily(self, newLily):
+#         self._lilyOut = newLily
+#     
+#     lily = property(_getLily, _setLily)
+# 
+# 
+# 
+#     def _getMX(self):
+#         '''Returns a lost of one or more mxTime objects.
+#         
+#         Compound meters are represented as multiple pairs of beat
+#         and beat-type elements
+# 
+#         >>> a = TimeSignature('3/4')
+#         >>> b = a.mx
+#         '''
+#         mxTime = musicxml.Time()
+#         mxTime.set('beats', int(self.numerator))
+#         mxTime.set('beat-type', int(self.denominator))
+#         # can set this to common when necessary
+#         mxTime.set('symbol', None)
+#         # for declaring no time signature present
+#         mxTime.set('senza-misura', None)
+#         # number is for assigning to staves
+#         mxTime.set('senza-misura', None)
+# 
+#         mxTimeList = []
+#         mxTimeList.append(mxTime)
+#         return mxTimeList
+# 
+# 
+#     def _setMX(self, mxAttributes):
+#         '''Given an mxAttributute object, load this object 
+#         >>> a = musicxml.Time()
+#         >>> a.set('beats', 3)
+#         >>> a.set('beat-type', 8)
+#         >>> b = musicxml.Attributes()
+#         >>> b.timeList.append(a)
+#         >>> c = TimeSignature()
+#         >>> c.mx = b
+#         >>> c.numerator
+#         3
+#         '''
+#         mxTimeList = mxAttributes.timeList
+#         # only take the first until we can accomodate compound
+#         for mxTime in mxTimeList[:1]:
+#             # for combound meters, this may be a 3+2 string
+#             self.numerator = int(mxTime.get('beats'))
+#             self.denominator = int(mxTime.get('beat-type'))
+# 
+#         self._ratioChanged()
+# 
+# 
+#     mx = property(_getMX, _setMX)
+# 
+# 
+# 
+# 
+#     def _getMusicXML(self):
+#         '''Return a complete MusicXML string
+#         '''
+#         mxAttributes = musicxml.Attributes()
+#         # need a lost of time 
+#         mxAttributes.set('time', self._getMX())
+# 
+#         mxMeasure = musicxml.Measure()
+#         mxMeasure.setDefaults()
+#         mxMeasure.set('attributes', mxAttributes)
+# 
+#         mxPart = musicxml.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+# 
+#         mxScorePart = musicxml.ScorePart()
+#         mxScorePart.setDefaults()
+#         mxPartList = musicxml.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxml.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+# 
+#         mxScore = musicxml.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+#         return mxScore.xmlStr()
+# 
+# 
+#     def _setMusicXML(self, mxNote):
+#         '''
+#         '''
+#         pass
+# 
+#     musicxml = property(_getMusicXML, _setMusicXML)
+# 
 
 
 
@@ -1676,7 +1715,7 @@ class Test(unittest.TestCase):
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 
 
 

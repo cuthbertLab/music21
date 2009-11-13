@@ -89,6 +89,9 @@ class Beam(object):
         # 8th, 16th, etc represetned as 1, 2, ...
         self.number = None 
 
+    def __str__(self):
+        return '<music21.note.Beam %s/%s/%s>' % (number, type, direction)        
+
 
     def _getMX(self):
         '''
@@ -168,9 +171,15 @@ class Beams(object):
         self.beamsList = []
         self.feathered = False
         
-
     def __len__(self):
         return len(self.beamsList)
+
+    def __str__(self):
+        msg = []
+        for beam in beamsList:
+            msg.append(str(beam))        
+        return '/'.join(msg)
+
 
     def addNext(self, type=None, direction=None):
         obj = Beam(type, direction)
@@ -202,10 +211,8 @@ class Beams(object):
             count = 4
         elif level in [5, duration.typeFromNumDict[128]]:
             count = 5
-        elif level in [6, duration.typeFromNumDict[256]]:
-            count = 6
-        elif level in [7, duration.typeFromNumDict[512]]:
-            count = 7
+        else:
+            raise BeamException('cannot fill beams for level %s' % level)
 
         for i in range(count):
             obj = Beam()
@@ -219,7 +226,7 @@ class Beams(object):
         >>> a = Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
-        >>> [x.type for x in a.beamsList]
+        >>> a.getTypes()
         ['start', 'start']
 
         '''
@@ -229,6 +236,19 @@ class Beams(object):
             beam.type = type
             beam.direction = direction
 
+    def getTypes(self):
+        '''Retur a lost of all types
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.getTypes()
+        ['start', 'start']
+        '''
+        return [x.type for x in self.beamsList]
+
+
+    #---------------------------------------------------------------------------
     def _getMX(self):
         '''
         Returns a list of mxBeam objects
