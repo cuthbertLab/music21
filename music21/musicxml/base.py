@@ -875,6 +875,10 @@ class Measure(MusicXMLElementList):
 
 class Attributes(MusicXMLElement):
     # store measure data; assuming that there is one per measure
+
+    # TODO: timeList needs to be replaced by a single
+    # time object.
+
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'attributes'

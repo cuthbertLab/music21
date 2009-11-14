@@ -1145,13 +1145,7 @@ class TimeSignature(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _setDefaultPartitions(self):
-
-        # 4/4 has subdivisions
-#         if (self.numerator, self.denominator) == (4, 4):
-#             self.beam.partition(4)
-#             for i in range(len(self.beam)): # subdivide  each beat in 2
-#                 self.beam[i] = self.beam[i].subdivide(2)
-# 
+ 
         # more general, based only on numerator
         if self.numerator in [2, 3, 4]:
             self.beam.partition(self.numerator)
@@ -1172,11 +1166,9 @@ class TimeSignature(music21.Music21Object):
             self.beam.partition(3)
 
         elif self.numerator in [6,9,12,15,18,21]:
-            self.beam.partition(self.numerator / 3)
+            self.beam.partition([3] * (self.numerator / 3))
         else:
             pass # doing nothing will beam all together
-
-
 
         #environLocal.printDebug('default beam partitions set to: %s' % self.beam)
 
@@ -1246,7 +1238,8 @@ class TimeSignature(music21.Music21Object):
         
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
-        else:
+        else: 
+            # could come from self.beam, self.accent, self.display, self.accent 
             return self.beam.duration
 
     def _setBarDuration(self, value):
@@ -1387,9 +1380,8 @@ class TimeSignature(music21.Music21Object):
                 # start or have a partial beam; what determines this?
                 elif beamPrevious == None:
                     beamType = 'start'
-# 
-#                 # last beams was active at this beamNumber was active
-#                 # and it was stopped
+
+               # last beams was active at this beamNumber was active                # and it was stopped
                 elif (beamPrevious != None and 
                     beamNumber in beamPrevious.getNumbers() and
                     beamPrevious.getByNumber(beamNumber).type == 'stop'):
@@ -1500,21 +1492,23 @@ class TimeSignature(music21.Music21Object):
 
         >>> a = TimeSignature('3/4')
         >>> b = a.mx
-        '''
-        # TODO: values need to be taken from self.display
+        >>> a = TimeSignature('3/4+2/4')
+        >>> b = a.mx
 
-        mxTime = musicxml.Time()
-        mxTime.set('beats', int(self.numerator))
-        mxTime.set('beat-type', int(self.denominator))
-        # can set this to common when necessary
-        mxTime.set('symbol', None)
-        # for declaring no time signature present
-        mxTime.set('senza-misura', None)
-        # number is for assigning to staves
-        mxTime.set('senza-misura', None)
+        '''
 
         mxTimeList = []
-        mxTimeList.append(mxTime)
+
+        for mt in self.display:
+            mxTime = musicxml.Time()
+            mxTime.set('beats', mt.numerator)
+            mxTime.set('beat-type', mt.denominator)
+            # can set this to common when necessary
+            mxTime.set('symbol', None)
+            # for declaring no time signature present
+            mxTime.set('senza-misura', None)
+            mxTimeList.append(mxTime)
+
         return mxTimeList
 
 
@@ -1531,8 +1525,7 @@ class TimeSignature(music21.Music21Object):
         3
         '''
 
-        # TODO: may need special handling, as all data representations
-        # are being configured the same here
+        # TODO: needs to be configured to handle comound meters
 
         mxTimeList = mxAttributes.timeList
         # only take the first until we can accomodate compound
@@ -1912,6 +1905,26 @@ class TestExternal(unittest.TestCase):
                 a.insertAtOffset(m, m.timeSignature.barDuration.quarterLength)
         a.show()
 
+    def testCompound(self):
+        from music21 import stream
+        import random
+
+        a = stream.Stream()
+        meterStrDenominator  = [1,2,4,8,16,32]
+        meterStrNumerator = [2,3,4,5,6,7,9,11,12,13]
+        
+        for x in range(30):
+            msg = []
+            for y in range(1, random.choice([2,3])):
+                msg.append('%s/%s' % (random.choice(meterStrNumerator),
+                                      random.choice(meterStrDenominator)))
+            tsString = '+'.join(msg)
+            ts = TimeSignature()
+            m = stream.Measure()
+            m.timeSignature = ts
+            a.insertAtOffset(m, m.timeSignature.barDuration.quarterLength)
+        a.show()
+
 
 class Test(unittest.TestCase):
     '''Unit tests
@@ -1942,7 +1955,7 @@ class Test(unittest.TestCase):
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 
 
 
