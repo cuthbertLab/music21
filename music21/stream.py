@@ -3269,16 +3269,32 @@ class TestExternal(unittest.TestCase):
 
 
 
+    def testBeamsPartial(self):
+        q = Stream()
+        for x in [.125, .25, .25, .125, .125, .125] * 30:
+            n = note.Note('c')
+            n.quarterLength = x
+            q.addNext(n)
+
+        s = Stream() # container
+        s.append(q)
+
+        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
+        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
+        s.insertAtOffset(meter.TimeSignature("4/4"), 8)
+
+        s.show()
+
+
     def testBeamsStream(self):
-        '''An approach to setting TimeSignature measures in offsets and durations
-        '''
         q = Stream()
         r = Stream()
         p = Stream()
 
         for x in ['c3','a3','c#4','d3'] * 30:
             n = note.Note(x)
-            n.quarterLength = .25
+            #n.quarterLength = random.choice([.25, .125, .5])
+            n.quarterLength = random.choice([.25])
             q.addNext(n)
 
             m = note.Note(x)

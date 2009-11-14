@@ -250,8 +250,16 @@ class Beams(object):
         >>> a.setByNumber(2, 'stop')
         >>> a.beamsList[1].type
         'stop'
-
+        >>> a.setByNumber(2, 'partial-right')
+        >>> a.beamsList[1].type
+        'partial'
+        >>> a.beamsList[1].direction
+        'right'
         '''
+        # permit providing one argument hyphenated
+        if '-' in type:
+            type, direction = type.split('-')
+
         if type not in ['start', 'stop', 'continue', 'partial']:
             raise BeamException('beam type cannot be %' %  type)
 

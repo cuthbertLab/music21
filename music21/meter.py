@@ -21,7 +21,7 @@ from music21 import lily
 from music21 import note
 from music21 import musicxml
 from music21 import environment
-_MOD = 'meter'
+_MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
 
 
@@ -914,6 +914,65 @@ class MeterSequence(MeterTerminal):
     flat = property(_getFlat)
 
 
+    #---------------------------------------------------------------------------
+    # alternative representations
+
+    def _getLevelList(self, levelCount):
+        '''Recursive utility function
+
+        >>> b = MeterSequence('4/4', 4)
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        >>> MeterSequence(b._getLevelList(0))
+        {1/4+1/4+1/4+1/4}
+        >>> MeterSequence(b._getLevelList(1))
+        {1/4+1/8+1/8+1/4+1/8+1/8}
+        >>> MeterSequence(b._getLevelList(2))
+        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        >>> MeterSequence(b._getLevelList(3))
+        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        '''
+        mtList = []
+        for i in range(len(self)):
+            if not isinstance(self[i], MeterSequence):
+                mt = self[i] # a meter terminal
+                mtList.append(mt)   
+            else: # its a sequence; need to make into a single terminal
+                if levelCount > 0: # retain this sequence but get lower level
+                    # reduce level by 1 when recursing; do not
+                    # change levelCount here
+                    mtList += self[i]._getLevelList(levelCount-1)
+                else: # level count is at zero
+                    mt = MeterTerminal('%s/%s' % (
+                              self[i].numerator, self[i].denominator))
+                    mtList.append(mt)   
+        return mtList
+
+
+    def getLevel(self, level=0):
+        '''Return a complete MeterSequence with the same numerator/denominator
+        reationship but that represents any partitions found at the rquested
+        level. A sort of flatness with variable depth.
+        
+        >>> b = MeterSequence('4/4', 4)
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        >>> b.getLevel(0)
+        {1/4+1/4+1/4+1/4}
+        >>> b
+        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        >>> b.getLevel(1)
+        {1/4+1/8+1/8+1/4+1/8+1/8}
+        >>> b.getLevel(2)
+        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        '''
+        return MeterSequence(self._getLevelList(level))
 
     #---------------------------------------------------------------------------
     # given a quarter note position, return the active index
@@ -1024,7 +1083,8 @@ class MeterSequence(MeterTerminal):
 
 
     def positionToSpan(self, qLenPos):
-        '''Given a lenPos, return the span of the active region
+        '''Given a lenPos, return the span of the active region.
+        Only applies to the top most level of partitions
 
         >>> a = MeterSequence('3/4', 3)
         >>> a.positionToSpan(.5)
@@ -1086,26 +1146,40 @@ class TimeSignature(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _setDefaultPartitions(self):
 
-        # 4/4 with lower divisions
-        if (self.numerator, self.denominator) == (4, 4):
-            self.beam.partition(4)
-            for i in range(4):
-                self.beam[i] = self.beam[i].subdivide(2)
-
+        # 4/4 has subdivisions
+#         if (self.numerator, self.denominator) == (4, 4):
+#             self.beam.partition(4)
+#             for i in range(len(self.beam)): # subdivide  each beat in 2
+#                 self.beam[i] = self.beam[i].subdivide(2)
+# 
         # more general, based only on numerator
-        elif self.numerator in [2, 3, 4]:
+        if self.numerator in [2, 3, 4]:
             self.beam.partition(self.numerator)
+            # if denominator is 4, subdivide each partition
+            if self.denominator in [4]:
+                for i in range(len(self.beam)): # subdivide  each beat in 2
+                    self.beam[i] = self.beam[i].subdivide(2)
 
         elif self.numerator == 5:
-            self.beam.partition(2)
+            default = [2,3]
+            self.beam.partition(default)
+            # if denominator is 4, subdivide each partition
+            if self.denominator in [4]:
+                for i in range(len(self.beam)): # subdivide  each beat in 2
+                    self.beam[i] = self.beam[i].subdivide(default[i])
 
         elif self.numerator == 7:
             self.beam.partition(3)
 
         elif self.numerator in [6,9,12,15,18,21]:
             self.beam.partition(self.numerator / 3)
+        else:
+            pass # doing nothing will beam all together
 
-        # doing nothing will beam all together
+
+
+        #environLocal.printDebug('default beam partitions set to: %s' % self.beam)
+
 
     def load(self, value, partitionRequest=None):
         '''Loading a meter destroys all internal representations
@@ -1224,7 +1298,7 @@ class TimeSignature(music21.Music21Object):
         >>> len(c) == len(b)
         True
         >>> print c
-        [<music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/continue/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>]
+        [<music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>]
         '''
 
         if len(durList) <= 1:
@@ -1283,30 +1357,49 @@ class TimeSignature(music21.Music21Object):
                     durPrevious = durList[i-1]
                     beamPrevious = beamsList[i-1]
 
-                # TODO: need to do this for sub-level groups
-                # so that the archetype is for the specified 
-                # internal level
-                archetypeSpan = self.beam.positionToSpan(start)
+                # get an archetype for this level
+                # level is depth, starting at zero
+                archetype = self.beam.getLevel(depth)
+                archetypeSpan = archetype.positionToSpan(start)
                 if beamNext == None: # last
                     archetypeSpanNext = None
                 else:
-                    archetypeSpanNext = self.beam.positionToSpan(startNext)
+                    archetypeSpanNext = archetype.positionToSpan(startNext)
 
                 # determine beamType
                 if i == 0: # if the first, we always start
                     beamType = 'start'
+                    # get a partial beam if we cannot continue this 
+                    if (beamNext == None or 
+                        beamNumber not in beamNext.getNumbers()):
+                        beamType = 'partial-right'
+
                 elif i == len(durList) - 1: # last is always stop
                     beamType = 'stop'
+                    # get a partial beam if we cannot come fomr a beam
+                    if (beamPrevious == None or 
+                        beamNumber not in beamPrevious.getNumbers()):
+                        beamType = 'partial-left'
 
                 # here on we know that it is neither the first nor last
-                # if last was stoped or does not exist
-                elif (beamPrevious == None or 
+
+                # if last beam was not defined, we need to either
+                # start or have a partial beam; what determines this?
+                elif beamPrevious == None:
+                    beamType = 'start'
+# 
+#                 # last beams was active at this beamNumber was active
+#                 # and it was stopped
+                elif (beamPrevious != None and 
+                    beamNumber in beamPrevious.getNumbers() and
                     beamPrevious.getByNumber(beamNumber).type == 'stop'):
                     beamType = 'start'
+
                 # if no beam is defined next (we know this already)
                 # then must stop
                 elif beamNext == None:
                     beamType = 'stop'
+
                     
                 # the last cases are when to stop, or when to continue
                 # when we know we have a beam next
