@@ -1600,7 +1600,8 @@ class TimeSignature(music21.Music21Object):
 
         mxTime = musicxml.Time()
         
-        fList = [(mt.numerator, mt.denominator) for mt in self.display]
+        # always get a flat version to display any subivisions created
+        fList = [(mt.numerator, mt.denominator) for mt in self.display.flat]
         if self.summedNumerator:
             fList = fractionToSlashMixed(fList)
 
