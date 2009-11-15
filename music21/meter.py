@@ -127,6 +127,42 @@ def slashMixedToFraction(valueSrc):
     return post, summedNumerator
 
 
+def fractionToSlashMixed(fList):
+    '''Given a lost of fraction values, compact numerators by sum if
+    denominators are the same 
+
+    >>> fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])
+    [('3+2+5', 8), ('3', 4), ('2+1+4', 16)]
+    '''
+    pre = []
+    for i in range(len(fList)):
+        n, d = fList[i]
+        # look at previous fration and determin if denominator is the same
+
+        match = None
+        search = range(0,len(pre))
+        search.reverse() # go backwards
+        for j in search:
+            if pre[j][1] == d:
+                match = j # index to add numerator
+                break
+            else:
+                break # if not found in one less
+
+        if match == None:
+            pre.append([[n], d])
+        else: # appnd nuemrator
+            pre[match][0].append(n)
+    # create string representation
+    post = []
+    for part in pre:
+        n = [str(x) for x in part[0]]
+        n = '+'.join(n)
+        d = part[1]
+        post.append((n, d))
+
+    return post
+
 
 def fractionSum(fList):
     '''Given a list of fractions represented as a list, find the sum
@@ -1560,15 +1596,17 @@ class TimeSignature(music21.Music21Object):
         >>> b = a.mx
 
         '''
-
         mxTimeList = []
 
         mxTime = musicxml.Time()
-        for mt in self.display:
-            mxBeats = musicxml.Beats(mt.numerator)
-            mxBeatType = musicxml.BeatType(mt.denominator)
-            #mxTime.set('beats', )
-            #mxTime.set('beat-type', mt.denominator)
+        
+        fList = [(mt.numerator, mt.denominator) for mt in self.display]
+        if self.summedNumerator:
+            fList = fractionToSlashMixed(fList)
+
+        for n,d in fList:
+            mxBeats = musicxml.Beats(n)
+            mxBeatType = musicxml.BeatType(d)
             mxTime.componentList.append(mxBeats)
             mxTime.componentList.append(mxBeatType)
 
@@ -1726,7 +1764,7 @@ class TestExternal(unittest.TestCase):
         
         for x in range(30):
             msg = []
-            for y in range(1, random.choice([2,3])):
+            for y in range(1, random.choice([2,4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
                                       random.choice(meterStrDenominator)))
             ts = TimeSignature('+'.join(msg))
