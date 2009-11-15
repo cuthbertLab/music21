@@ -2914,10 +2914,21 @@ class Measure(Stream):
                 raise StreamException(
                     'no mxAttribues available for this measure')
 
-        meterObj = meter.TimeSignature()
-        meterObj.mx = mxAttributes
+        # if no time is defined, get the last defined value from external
+        if len(mxAttributes.timeList) == 0:
+            if mxMeasure.external['time'] != None:
+                mxTimeList = [mxMeasure.external['time']]
+            else:
+                environLocal.printDebug('loading with default mxTime')
+                mxTime = musicxmlMod.Time()
+                mxTime.setDefaults()
+                mxTimeList = [mxTime]
+                #raise StreamException('no external mxTime object found within mxMeasure: %s' % mxMeasure)
+        else:
+            mxTimeList = mxAttributes.timeList
 
-        self.timeSignature = meterObj
+        self.timeSignature = meter.TimeSignature()
+        self.timeSignature.mx = mxTimeList
 
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure

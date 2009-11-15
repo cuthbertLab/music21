@@ -825,7 +825,7 @@ class Measure(MusicXMLElementList):
     def _getComponents(self):
         c = [] # have not checked order of this
         c.append(self.attributesObj)
-        c = c + self.componentList
+        c += self.componentList
         return c
 
     def setDefaults(self):
@@ -1009,22 +1009,42 @@ class Time(MusicXMLElement):
         self._attr['symbol'] = None
         self._attr['number'] = None
         # simple elements
-        # note: these may need to be lists of beats and beatType 
-        # in order to support compound meters
-        self.beats = None 
-        self.beatType = None
+        self.componentList = [] # a list of beats and beatType
+        #self.beats = None 
+        #self.beatType = None
         self.senzaMisura = None # an empty element, but boolean here
 
     def _getComponents(self):
         c = []
-        c.append(('beats', self.beats))
-        c.append(('beat-type', self.beatType))
+        c += self.componentList # beats and beatType
+        #c.append(('beats', self.beats))
+        #c.append(('beat-type', self.beatType))
         c.append(('senza-misura', self.senzaMisura))
         return c
 
     def setDefaults(self):
-        self.set('beats', defaults.meterNumerator)
-        self.set('beat-type', defaults.meterDenominatorBeatType)
+        #self.set('beats', defaults.meterNumerator)
+        #self.set('beat-type', defaults.meterDenominatorBeatType)
+        beats = Beats(defaults.meterNumerator)
+        beatType = BeatType(defaults.meterDenominatorBeatType)
+
+        self.componentList.append(beats)
+        self.componentList.append(beatType)
+
+
+class Beats(MusicXMLElement):
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'beats'
+        self.charData = charData
+
+class BeatType(MusicXMLElement):
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'beat-type'
+        self.charData = charData
+
+
 
 
 class Clef(MusicXMLElement):
@@ -1297,7 +1317,7 @@ class Rest(MusicXMLElementList):
         return self.componentList 
 
     # temporary; this needs to be set based on clef
-    # this could take a clef as  ana argument
+    # this could take a clef as an argument
     def setDefaults(self):
         displayStep = DisplayStep()
         displayStep.set('charData', 'D')
@@ -1306,15 +1326,15 @@ class Rest(MusicXMLElementList):
         self.append(displayStep, displayOctave)
 
 
-class DisplayStep(MusicXMLElementList):
+class DisplayStep(MusicXMLElement):
     def __init__(self, type=None):
-        MusicXMLElementList.__init__(self)
+        MusicXMLElement.__init__(self)
         self._tag = 'display-step'
         self.charData = None # only content
 
-class DisplayOctave(MusicXMLElementList):
+class DisplayOctave(MusicXMLElement):
     def __init__(self, type=None):
-        MusicXMLElementList.__init__(self)
+        MusicXMLElement.__init__(self)
         self._tag = 'display-octave'
         self.charData = None # only content
 
@@ -1711,6 +1731,9 @@ class Handler(xml.sax.ContentHandler):
         self._trillMarkObj = None
 
         self._timeObj = None
+        # store last encountered
+        self._timeObjLast = None
+
         self._clefObj = None
         self._tieObj = None
         self._accidentalObj = None
@@ -1823,6 +1846,9 @@ class Handler(xml.sax.ContentHandler):
             self._measureObj = Measure()
             self._measureObj.external['attributes'] = self._attributesObjLast
             self._measureObj.external['divisions'] = self._divisionsLast
+            # some attributes definitions do store time, and refer only
+            # to the last defined time value; store here for access
+            self._measureObj.external['time'] = self._timeObjLast
             self._measureObj.loadAttrs(attrs)
 
 
@@ -2456,16 +2482,21 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'time':
             self._attributesObj.timeList.append(self._timeObj)
+            self._timeObjLast = self._timeObj.deepcopy()
             self._timeObj = None
 
         elif name == 'staves':
             self._attributesObj.staves = self.t[name].getCharData()
 
         elif name == 'beats':
-            self._timeObj.beats = self.t[name].getCharData()
+            self._timeObj.componentList.append(
+                Beats(self.t[name].getCharData()))
+            #self._timeObj.beats = self.t[name].getCharData()
 
         elif name == 'beat-type':
-            self._timeObj.beatType = self.t[name].getCharData()
+            self._timeObj.componentList.append(
+                BeatType(self.t[name].getCharData()))
+            #self._timeObj.beatType = self.t[name].getCharData()
 
         elif name == 'clef':
             self._attributesObj.clefList.append(self._clefObj)
@@ -2805,17 +2836,23 @@ class Test(unittest.TestCase):
 
 
     def testPrimitiveXMLOut(self):
+        beats = Beats(3)
+        beatType = BeatType(8)
+
         a = Time()
-        a.set('beatType', 3)
-        a.set('beats', 8)
+        a.componentList.append(beats)
+        a.componentList.append(beatType)
+
+        #a.set('beats', 3)
+        #a.set('beatType', 8)
         #print a.toxml(None, None, 1)
         aExpected = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
 <time>
-  <beats>8</beats>
-  <beat-type>3</beat-type>
+  <beats>3</beats>
+  <beat-type>8</beat-type>
 </time>'''
 
         self._compareXml(a, aExpected)
@@ -3178,11 +3215,13 @@ class Test(unittest.TestCase):
 """
         self._compareXml(c, cExpected)
 
+        beats = Beats(3)
+        beatType = BeatType(8)
 
         d = Time()
         d.set('symbol', 'common')
-        d.set('beats', 3)
-        d.set('beat-type', 8)
+        d.componentList.append(beats)
+        d.componentList.append(beatType)
         #print d.xmlStr()
 
         dExpected = """<?xml version="1.0" encoding="utf-8"?>

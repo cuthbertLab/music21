@@ -481,7 +481,6 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.beams01
         a = parse(mxString)
         part = a[0]
-        print part
 
         notes = part.flat.getNotes()
         beams = []
@@ -491,6 +490,25 @@ class Test(unittest.TestCase):
         self.assertEqual(len(beams), 152)
 
 
+    def testConversionMXTime(self):
+
+        from music21.musicxml import testPrimitive
+
+        mxString = testPrimitive.timeSignatures11c
+        a = parse(mxString)
+        part = a[0]
+
+
+        mxString = testPrimitive.timeSignatures11d
+        a = parse(mxString)
+        part = a[0]
+
+
+        notes = part.flat.getNotes()
+        #self.assertEqual(len(beams), 152)
+
+
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
+    #music21.mainTest(Test, TestExternal)
 
