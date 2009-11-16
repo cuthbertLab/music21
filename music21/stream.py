@@ -260,6 +260,8 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
     # may need to look in parent if no time signatures are found
     if meterStream == None:
         meterStream = streamObj.getTimeSignatures()
+    # get a clef and for the entire stream
+    clefObj = streamObj.bestClef()
 
     # for each element in stream, need to find max and min offset
     # assume that flat/sorted options will be set before procesing
@@ -296,6 +298,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
         m = Measure()
         # get active time signature at this offset
         m.timeSignature = meterStream.getElementAtOrBefore(o)
+        m.clef = clefObj
 
         #environLocal.printDebug([measureCount, o, oMax, m.timeSignature,
         #                        m.timeSignature.barDuration.quarterLength])
@@ -2311,7 +2314,6 @@ class Stream(Element):
                 multiPart = True
                 break # only need one
 
-
         if multiPart:
             # need to edit streams contained within streams
             # must repack into a new stream at each step
@@ -2775,6 +2777,9 @@ class Measure(Stream):
         Stream.__init__(self, *args, **keywords)
         self.timeSignature = None
         self.timeSignatureIsNew = False
+        self.clef = None
+        self.clefIsNew = False
+
         self.filled = False
         self.measureNumber = 0   # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
@@ -2871,10 +2876,13 @@ class Measure(Stream):
         mxAttributes.setDefaults() # get basic defaults, divisions, etc
 
         if self.timeSignature != None:
-            # returns an mxTimeList
             mxAttributes.timeList = self.timeSignature.mx 
 
-        mxAttributes.clefList = [self.bestClef().mx]
+        if self.clef == None:
+            # this will set a new clef for each measure
+            mxAttributes.clefList = [self.bestClef().mx]
+        else:
+            mxAttributes.clefList = [self.clef.mx]
 
         #mxAttributes.keyList = []
         mxMeasure.set('attributes', mxAttributes)
@@ -2977,7 +2985,6 @@ class Measure(Stream):
                         for mxObjSub in mxNote.get('notations'):
                             # deal with ornaments, strill, etc
                             pass
-
                 else: # its a rest
                     n = note.Rest()
                     n.mx = mxNote # assign mxNote to rest obj
@@ -3009,7 +3016,6 @@ class Measure(Stream):
                     w = dynamics.Wedge()
                     w.mx = mxWedge     
                     self.insertAtOffset(w, offsetMeasureNote)  
-
 
     mx = property(_getMX, _setMX)    
 
