@@ -30,6 +30,10 @@ class Clef(music21.Music21Object):
         mxClef.set('line', self.line)
         return mxClef
 
+#     def _setMX(self):
+#         pass
+# 
+
     mx = property(_getMX)
 
 
