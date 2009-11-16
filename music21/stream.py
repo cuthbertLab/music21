@@ -2934,9 +2934,13 @@ class Measure(Stream):
                 #raise StreamException('no external mxTime object found within mxMeasure: %s' % mxMeasure)
         else:
             mxTimeList = mxAttributes.timeList
-
         self.timeSignature = meter.TimeSignature()
         self.timeSignature.mx = mxTimeList
+
+        # only set clef if it is defined
+#         if len(mxAttributes.clefList) != 0:
+#             self.clef = Clef()
+#             self.clef.mx = mxAttributes.clefList
 
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure
