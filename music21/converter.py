@@ -505,7 +505,18 @@ class Test(unittest.TestCase):
 
 
         notes = part.flat.getNotes()
-        #self.assertEqual(len(beams), 152)
+        self.assertEqual(len(notes), 11)
+
+
+    def testConversionMXClef(self):
+
+        from music21.musicxml import testPrimitive
+        mxString = testPrimitive.clefs12a
+        a = parse(mxString)
+        part = a[0]
+
+        clefs = part.flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 18)
 
 
 if __name__ == "__main__":

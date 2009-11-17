@@ -1291,7 +1291,7 @@ class Stream(Element):
     def getElementsByOffset(self, offsetStart, offsetEnd,
                     includeCoincidentBoundaries=True, onsetOnly=True,
                     unpackElement=False):
-        '''Return a list of all Elements that are found within a certain offset time range, specified as start and stop values, and including boundaries
+        '''Return a Stream/list of all Elements that are found within a certain offset time range, specified as start and stop values, and including boundaries
 
         If onsetOnly is true, only the onset of an event is taken into consideration; the offset is not.
 
@@ -2797,15 +2797,15 @@ class Measure(Stream):
         # are performed. it seems that all Streams, base music21 objects, and
         # Elements should be stored on the Stream's _elements list. 
 
-        self.internalbarlines = Stream()
+        #self.internalbarlines = Stream()
         # "measure expressions" that are attached to nowhere in particular
-        self.timeIndependentDirections = Stream() 
+        #self.timeIndependentDirections = Stream() 
         # list of times at which Directions take place.
-        self.timeDependentDirectionsTime = Stream() 
+        #self.timeDependentDirectionsTime = Stream() 
         # should be sorted always.
         # list of Directions that happen at a certain time, 
         # keep indices together
-        self.timeDependentDirections = Stream() 
+        #self.timeDependentDirections = Stream() 
 
 
     def addRepeat(self):
@@ -2835,7 +2835,27 @@ class Measure(Stream):
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
 
+    #---------------------------------------------------------------------------
+    # clef is stored in the Stream's elements list, however a property
+    # is provided to store and access the clef as an attribute
 
+    def _getClef(self):
+        clefList = self.getElementsByClass(clef.Clef)
+        # only return cleff that has a zero offset
+        clefList = clefList.getElementsByOffset(0,0)
+        if len(clefList) == 0:
+            return None
+        else:
+            return clefList[0]    
+    
+    def _setClef(self, clefObj):
+        self.insertAtOffset(clefObj, 0)
+
+
+    clef = property(_getClef, _setClef)    
+
+
+    #---------------------------------------------------------------------------
     def _getMxDynamics(self, mxDirection):
         '''Given an mxDirection, return a dynamics if present, otherwise, None
 
@@ -2862,10 +2882,10 @@ class Measure(Stream):
         >>> a.quarterLength = 4
         >>> b = Measure()
         >>> b.insertAtOffset(a, 0)
-        >>> len(b)
-        1
+        >>> len(b) # has a clef object in the stream
+        2
         >>> mxMeasure = b.mx
-        >>> len(mxMeasure)
+        >>> len(mxMeasure) 
         1
         '''
 
@@ -2878,6 +2898,9 @@ class Measure(Stream):
         if self.timeSignature != None:
             mxAttributes.timeList = self.timeSignature.mx 
 
+
+        # need to look here at the parent, and try to find
+        # the clef in the clef last defined in the parent
         if self.clef == None:
             # this will set a new clef for each measure
             mxAttributes.clefList = [self.bestClef().mx]
@@ -2938,9 +2961,9 @@ class Measure(Stream):
         self.timeSignature.mx = mxTimeList
 
         # only set clef if it is defined
-#         if len(mxAttributes.clefList) != 0:
-#             self.clef = Clef()
-#             self.clef.mx = mxAttributes.clefList
+        if len(mxAttributes.clefList) != 0:
+            self.clef = clef.Clef()
+            self.clef.mx = mxAttributes.clefList
 
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure
