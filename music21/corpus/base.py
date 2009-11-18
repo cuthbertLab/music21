@@ -11,9 +11,16 @@
 #-------------------------------------------------------------------------------
 
 import os
+import doctest, unittest
 
+import music21
 from music21 import common
 from music21 import converter
+from music21 import environment
+_MOD = "corpus/base.py"
+environLocal = environment.Environment(_MOD)
+
+
 
 from music21.corpus import beethoven
 from music21.corpus.beethoven import opus18no1
@@ -54,6 +61,7 @@ MODULES = [
     ]
 
 
+
 #-------------------------------------------------------------------------------
 class CorpusException(Exception):
     pass
@@ -61,25 +69,61 @@ class CorpusException(Exception):
 
 #-------------------------------------------------------------------------------
 def getPaths(extList=None):    
+    '''Get all paths in the corpus that match a known extension, or an extenions
+    provided by an argument.
+
+    >>> a = getPaths()
+    >>> len(a) > 30
+    True
+
+    >>> a = getPaths('krn')
+    >>> len(a) >= 4
+    True
+    '''
     if extList == None:
-        extList = common.findFormat('lily')[1] + common.findFormat('mx')[1]
+        extList = common.findInputExtension('lily') + common.findInputExtension('mx')
+    else:
+        if not common.isListLike(extList):
+            extList = [extList]
+
+    #environLocal.printDebug(['getting paths with extensions:', extList])
 
     paths = []    
     for moduleName in MODULES:
-        dir = moduleName.__path__[0] # returns a list with one or more paths
-        for fn in os.listdir(dir):
+        if not hasattr(moduleName, '__path__'):
+            # when importing a package name (a directory) the moduleName        
+            # may be a list of all paths contained within the package
+            # this seems to be dependent on the context of the call:
+            # from the command line is different than from the interpreter
+            dirListing = moduleName
+        else:
+            # returns a list with one or more paths
+            # the first is the path to the directory that contains xml files
+            dir = moduleName.__path__[0] 
+            dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+
+        for fp in dirListing:
+            if fp in paths:
+                continue
             match = False
             for ext in extList:
-                if fn.endswith(ext):
+                if fp.endswith(ext):
                     match = True
                     break 
             if match:
-                fp = os.path.join(dir, fn)
                 paths.append(fp)    
     return paths
 
 
 def getComposer(composerName):
+    '''
+    >>> a = getComposer('beethoven')
+    >>> len(a) > 10
+    True
+    >>> a = getComposer('mozart')
+    >>> len(a) > 10
+    True
+    '''
     paths = getPaths()
     post = []
     for path in paths:
@@ -90,6 +134,13 @@ def getComposer(composerName):
 
 
 def getWork(workName, movementNumber = None):
+    '''Search the corpus and return either a list of file paths or a single
+    file path
+
+    >>> a = getWork('opus74no2', 4)
+    >>> a.endswith('haydn/opus74no2/movement4.xml')
+    True
+    '''
     paths = getPaths()
     post = []
     for path in paths:
@@ -103,7 +154,10 @@ def getWork(workName, movementNumber = None):
             raise CorpusException(
                 "Cannot get movement number " + str(movementNumber) + 
                 " either because " + workName + " does not have that many movements or because the corpus is not organized by movement")
-    return post
+    if len(post) == 1:
+        return post[0]
+    else:
+        return post
 
     
 
@@ -123,3 +177,36 @@ paths = getPaths()
 beethoven = getComposer('beethoven')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testGetPaths(self):
+        for known in ['haydn/opus74no2/movement4.xml',         
+            'beethoven/opus18no3.xml',
+            'beethoven/opus59no1/movement2.xml',
+            'mozart/k80/movement4.xml',
+            'schumann/opus41no1/movement5.xml',
+            ]:
+            a = getWork(known)
+            # make sure it is not an empty list
+            self.assertNotEqual(len(a), 0)
+            self.assertEqual(a.endswith(known), True)
+
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
+

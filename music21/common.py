@@ -90,6 +90,24 @@ def findFormat(fmt):
     return None, None # if no match found
 
 
+def findInputExtension(fmt):
+    '''Given an input format, find and return all possible input extensions.
+
+    >>> a = findInputExtension('musicxml')
+    >>> a
+    ['xml', 'mxl', 'mx']
+    >>> a = findInputExtension('mx')
+    >>> a
+    ['xml', 'mxl', 'mx']
+    >>> a = findInputExtension('humdrum')
+    >>> a
+    ['krn']
+    '''
+    fmt = findFormat(fmt)[0]
+    if fmt == None:
+        raise Exception('no match to format: %s' % fmt)
+    return fileExtensions[fmt]['input']
+
 def findFormatFile(fp):
     '''Given a file path (relative or absolute) return the format
 

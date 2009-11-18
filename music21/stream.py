@@ -1136,8 +1136,12 @@ class Stream(Element):
     # getElementsByX(self): anything that returns a collection of Elements should return a Stream
 
     def getElementsByClass(self, classFilterList, unpackElement=False):
-        '''
-        return a list of all Elements that match the className
+        '''Return a list of all Elements that match the className.
+
+        Note that, as this appends Elements to a new Stream, whatever former
+        parent relationship the Element had is lost. The Eleemnts parents
+        is set to the new stream that contains it. This can be avoided
+        by unpacking the Element, which returns a list. 
         
         >>> a = Stream()
         >>> a.fillNone(10) # adds Elements with obj == None
@@ -1499,7 +1503,7 @@ class Stream(Element):
     notes = property(getNotes)
 
     def getMeasures(self):
-        '''Return all Measure objects in a Stream()
+        '''Return all Measure objects in a Stream
         '''
         return self.getElementsByClass(Measure)
 
@@ -1507,9 +1511,8 @@ class Stream(Element):
 
 
     def getTimeSignatures(self):
-        '''Create a stream of measures, given a stream with one or more        
-        TimeSignature ojbects. 
-        If not TimeSignature objects are defined, get a default
+        '''Collect all time signatures in this stream.
+        If no TimeSignature objects are defined, get a default
     
         Note: this could be a method of Stream.
     
@@ -1540,12 +1543,12 @@ class Stream(Element):
         '''Search this stream or parent streams for instruments, otherwise 
         return a default
 
-        Rename: getInstruments, and return a Stream of instruments
+        TODO: Rename: getInstruments, and return a Stream of instruments
 
         >>> a = Stream()
         >>> b = a.getInstrument()
         '''
-        environLocal.printDebug(['searching for instrument', searchDepth])
+        environLocal.printDebug(['searching for instrument: search depth:', searchDepth])
         searchDepth += 1
 
         instObj = None
@@ -1553,10 +1556,8 @@ class Stream(Element):
         if len(post) > 0:
             instObj = post[0] # get first
         else:
-            #environLocal.printDebug(['parent', self.parent])
-
-            pass # temporarily removed; causing an infinite loop
-
+            environLocal.printDebug(['parent', self.parent])
+            pass
 #             if isinstance(self.parent, Stream):
 #                 environLocal.printDebug(['searching parent Stream'])
 #                 instObj = self.parent.getInstrument(searchDepth)         
@@ -1663,22 +1664,20 @@ class Stream(Element):
             e.offset = e.offset + offset
         self._elementsChanged() 
         
-    def applyOffset(self):
-        '''Apply the offset of this stream to all internal elements; then set
+    def transferOffsetToElements(self):
+        '''Transfer the offset of this stream to all internal elements; then set
         the offset of this stream to zero.
-
-        TODO: rename transferOffset, if retained
 
         >>> a = Stream()
         >>> a.repeatCopy(None, range(0,10))
         >>> a.offset = 30
-        >>> a.applyOffset()
+        >>> a.transferOffsetToElements()
         >>> a.lowestOffset
         30.0
         >>> a.offset
         0.0
         >>> a.offset = 20
-        >>> a.applyOffset()        
+        >>> a.transferOffsetToElements()        
         >>> a.lowestOffset
         50.0
         '''
@@ -2323,7 +2322,7 @@ class Stream(Element):
 
             for obj in partStream.getElementsByClass(Stream):
                 # need to copy element here
-                obj.applyOffset() # apply this streams offset to elements
+                obj.transferOffsetToElements() # apply this streams offset to elements
 
                 ts = obj.getTimeSignatures()
                 # the longest meterStream is used as the meterStream for all parts
@@ -2402,6 +2401,10 @@ class Stream(Element):
             m.mx = mxMeasure  # assign data into music21 measure 
             # add measure to stream at current offset for this measure
             streamPart.insertAtOffset(m, oMeasure)
+
+            # parent is set to Part
+            #environLocal.printDebug(['src, part', m, m.parent])
+
             # increment measure offset for next time around
             oMeasure += m.timeSignature.barDuration.quarterLength 
 
@@ -3206,17 +3209,6 @@ class TestExternal(unittest.TestCase):
         a.lily.showPNG()
 
 
-    def testMXOutput(self):
-
-        c = Stream()
-        for m in range(4):
-            b = Measure()
-            for pitch in ['a', 'g', 'c#', 'a#']:
-                a = note.Note(pitch)
-                b.append(a)
-            c.append(b)
-        c.show()
-
         
     def testScoreLily(self):
         import meter
@@ -3236,7 +3228,22 @@ class TestExternal(unittest.TestCase):
         score1.lily.showPNG()
         
 
+
+    def testMXOutput(self):
+        '''A simple test of adding notes to measures in a stream. 
+        '''
+        c = Stream()
+        for m in range(4):
+            b = Measure()
+            for pitch in ['a', 'g', 'c#', 'a#']:
+                a = note.Note(pitch)
+                b.append(a)
+            c.append(b)
+        c.show()
+
     def testMxMeasures(self):
+        '''A test of the automatic partitioning of notes in a measure and the creation of ties.
+        '''
 
         n = note.Note()        
         n.quarterLength = 3
@@ -3253,9 +3260,8 @@ class TestExternal(unittest.TestCase):
 
 
     def testMultipartStreams(self):
-        '''Test the creation of multi-part streams w/o Measures or Parts
+        '''Test the creation of multi-part streams by simply having streams within streams.
 
-        Note: this does not work correctly yet, as all measures are note represented b/c each part is a different length 
         '''
         q = Stream()
         r = Stream()
@@ -3280,6 +3286,11 @@ class TestExternal(unittest.TestCase):
 
 
     def testMultipartMeasures(self):
+        '''This demonstrates obtaining slices from a stream and layering
+        them into individual parts.
+
+        TODO: this shoudl show instruments
+        '''
         from music21 import corpus, converter
         a = converter.parse(corpus.paths[36])
         b = a[3][10:20]
@@ -3294,6 +3305,9 @@ class TestExternal(unittest.TestCase):
 
 
     def testCanons(self):
+        '''A test of creating a canon with shifted presentations of a source melody. This demonstrates the addition of rests.
+
+        '''
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         s = Stream()
@@ -3314,6 +3328,8 @@ class TestExternal(unittest.TestCase):
 
 
     def testBeamsPartial(self):
+        '''This demonstrates a partial beam; a beam that is not connected between more than one note. 
+        '''
         q = Stream()
         for x in [.125, .25, .25, .125, .125, .125] * 30:
             n = note.Note('c')
@@ -3331,6 +3347,8 @@ class TestExternal(unittest.TestCase):
 
 
     def testBeamsStream(self):
+        '''A test of beams applied to different time signatures. 
+        '''
         q = Stream()
         r = Stream()
         p = Stream()
@@ -3348,7 +3366,6 @@ class TestExternal(unittest.TestCase):
             o = note.Note(x)
             o.quarterLength = .125
             p.addNext(o)
-
 
         s = Stream() # container
         s.append(q)
@@ -3663,7 +3680,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter
-        a = converter.parse(corpus.paths[36])
+        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
         b = a[3][10:20]
         c = a[3][20:30]
         d = a[3][30:40]
@@ -3676,6 +3693,70 @@ class Test(unittest.TestCase):
 
 
 
+    def testParents(self):
+        '''Test parent relationships.
+
+        Note that here we see why sometimes qualified class names are needed.
+        This test passes fine with class names Part and Measure when run interactivley, creating a Test instance. When run from the command line
+        Part and Measure do not match, and instead music21.stream.Part as to be 
+        employed instead. 
+        '''
+
+        from music21 import corpus, converter
+        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+
+        # test basic parent relationships
+        b = a[3]
+        self.assertEqual(isinstance(b, music21.stream.Part), True)
+        self.assertEqual(b.parent, a)
+
+        # this, if called, actively destroys the parent relationship!
+        # on the measures (as new Elements are not created)
+        #m = b.getMeasures()[5]
+        #self.assertEqual(isinstance(m, Measure), True)
+
+        # this false b/c, when getting the measures, parents are lost
+        #self.assertEqual(m.parent, b) #measures parent should be part
+
+        self.assertEqual(isinstance(b[8], music21.stream.Measure), True)
+        self.assertEqual(b[8].parent, b) #measures parent should be part
+
+
+
+
+    def xTestInstrumentExtraction(self):
+        '''Temporarily disabled while bypassing getInstrument issue
+        '''
+
+        from music21 import corpus, converter
+
+        # manuall set parent to associate 
+        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        b = a[3][10:20]
+        b.parent = a[3] # manually set the parent
+        instObj = b.getInstrument()
+        self.assertEqual(instObj.partName, 'Cello')
+
+
+
+        # search paraent from a measure within
+
+        # canot use getMeasures as this destroys parents
+        #b = a[3].getMeasures()
+        #self.assertEqual(len(b), 46)
+        #environLocal.printDebug(['parent of measure', b[10].parent])
+
+        p = a[3] # get part
+        # a mesausre within this part has as its parent the part
+        self.assertEqual(p[10].parent, a[3])
+
+        instObj = p[10].parent.getInstrument()
+        self.assertEqual(instObj.partName, 'Cello')
+
+        # print instObj.partName, instObj.instrumentName
+
+
+
 
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)

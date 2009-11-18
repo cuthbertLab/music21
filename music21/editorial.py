@@ -10,7 +10,12 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import doctest, unittest
+
+
 import music21
+
+
 
 class EditorialException(Exception):
     pass
@@ -19,7 +24,11 @@ class CommentException(Exception):
     pass
 
 class NoteEditorial(music21.Music21Object):
-    '''EditorialComments that can be applied to notes'''
+    '''EditorialComments that can be applied to notes
+    >>> a = NoteEditorial()
+    >>> a.misc
+    {}
+    '''
     def __init__(self):
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.color = ""
@@ -53,6 +62,7 @@ class NoteEditorial(music21.Music21Object):
     
     def lilyEnd(self):
         return ""
+
         
 class Comment(object):
     position = "below"
@@ -69,3 +79,22 @@ class Comment(object):
             raise CommentException("Cannot deal with position: " + self.position)
         
     lily = property(_getLily)
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        a = Comment()
+        self.assertEqual(a.position, 'below')
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+

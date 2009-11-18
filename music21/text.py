@@ -1,5 +1,22 @@
+#-------------------------------------------------------------------------------
+# Name:         test.py
+# Purpose:      music21 classes for text processing
+#
+# Authors:      Michael Scott Cuthbert
+# Authors:      Christopher Ariza
+#
+# Copyright:    (c) 2009 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+import doctest, unittest
+
+import music21 ## needed to properly do isinstance checking
+
+
 
 def assembleLyrics(streamIn):
+    '''Concatenate text from a stream.
+    '''
     word = []; words = []
     noteStream = streamIn.flat.getNotes()
     for n in noteStream:
@@ -12,3 +29,36 @@ def assembleLyrics(streamIn):
                 word = []
     return ' '.join(words)
         
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        from music21 import converter, corpus
+
+        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        post = assembleLyrics(a)
+        self.assertEqual(post, '') # no lyrics!
+
+        a = converter.parse(corpus.getWork('luca/gloria'))
+        post = assembleLyrics(a)
+        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True) # no lyrics!
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
+
+
+

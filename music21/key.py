@@ -3,16 +3,20 @@
 # Purpose:      Classes for keys
 #
 # Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+import doctest, unittest
+
 
 import music21
 
 from music21 import note
 from music21 import stream
 from music21 import interval
+
 
 class Key(music21.Music21Object):
     '''
@@ -71,3 +75,28 @@ class KeySignature(object):
     def __repr__(self):
         return "<music21.key.KeySignature of %s>" % self.strSharpsFlats()
         
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        a = KeySignature()
+        self.assertEqual(a.numberSharps, None)
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
+
+

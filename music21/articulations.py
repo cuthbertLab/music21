@@ -14,9 +14,13 @@ music21.articulations -- Classes for dealing with articulations
 As much as possible, MusicXML names are used, with xxx-yyy changed to XxxYyy 
 '''
 
-_MOD = "articulations.py"
+import doctest, unittest
 
 import music21
+
+_MOD = "articulations.py"
+
+
 
 class Articulation(music21.Music21Object):
     pass
@@ -197,3 +201,28 @@ class HarpFingerNails(HarpIndication):
     musicXML -- fingernails
     '''
     pass
+
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        a = FretBend()
+        self.assertEqual(a.bendAlter, None)
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
+

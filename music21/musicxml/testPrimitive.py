@@ -9,7 +9,9 @@
 #-------------------------------------------------------------------------------
 
 
+import doctest, unittest
 
+import music21
 
 
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
@@ -5820,3 +5822,33 @@ clefs12a = """<?xml version="1.0" encoding="UTF-8"?>
 
 ALL = [pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
 beams01, timeSignatures11c, timeSignatures11d, clefs12a]
+
+
+
+def get(contentRequest):
+    '''Get test material by type of content
+
+    >>> a = get('lyrics')
+    '''
+    if contentRequest in ['pitch']:
+        return pitches01a
+    if contentRequest in ['lyrics']:
+        return lyricsMelisma61d
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        from music21 import converter
+        for testMaterial in ALL:
+            a = converter.parse(testMaterial)
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+

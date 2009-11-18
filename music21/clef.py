@@ -51,6 +51,9 @@ class Clef(music21.Music21Object):
         '''
         This might be mobed only into PitchClef.
 
+        TODO: need to read clefOctaveChange and determine if class
+        should be alternative
+
         >>> a = musicxml.Clef()   
         >>> a.set('sign', 'G')
         >>> a.set('line', 2)
