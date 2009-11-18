@@ -1291,6 +1291,16 @@ class Test(unittest.TestCase):
         self.assertEqual(a5.pitchClass, 9)
     
 
+
+    def testCopyNote(self):
+        a = Note()
+        a.quarterLength = 3.5
+        a.name = 'D'
+        b = a.deepcopy()
+        self.assertEqual(b.name, a.name)
+        self.assertEqual(b.quarterLength, a.quarterLength)
+
+
     def testMusicXMLOutput(self):
         mxNotes = []
         for pitchName, durType in [('g#', 'quarter'), ('g#', 'half'), 

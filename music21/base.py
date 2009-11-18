@@ -220,12 +220,7 @@ class Music21Object(object):
     # look at this object for an atttribute; if not here
     # look up to parents
 
-#     def __getattribute__(self,name):
-#         if name=='test':
-#           return 0.
-#         else:
-#           return object.__getattribute__(self, name)
-    
+
 
     def searchParent(self, attrName):
         '''If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level
@@ -235,6 +230,8 @@ class Music21Object(object):
         try:
             found = getattr(self.parent, attrName)
         except AttributeError:
+            # not sure of passing here is the best action
+            environLocal.printDebug(['searchParent call raised attribute error for attribte:', attrName])
             pass
         if found == None:
             found = self.parent.searchParent(attrName)
@@ -379,7 +376,7 @@ class Music21Object(object):
         environLocal.launch(format, self.write(format))
 
 
-
+#-------------------------------------------------------------------------------
 class Element(Music21Object):
     '''
     An element wraps an object so that the same object can
@@ -401,9 +398,10 @@ class Element(Music21Object):
     _id = None
 
     def __init__(self, obj=None, offset=None, priority = 0):
+        Music21Object.__init__(self)
+
         self.obj = obj # object stored here        
         self._unlinkedDuration = None
-        super(Element, self).__init__()
 
     def getId(self):
         if self.obj is not None:
@@ -424,6 +422,7 @@ class Element(Music21Object):
             self._id = newId
 
     id = property (getId, setId)
+
 
     def copy(self):
         '''
@@ -500,12 +499,13 @@ class Element(Music21Object):
             new.obj = copy.deepcopy(self.obj)
         return new
 
+    #---------------------------------------------------------------------------
     def __repr__(self):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += "..."
             
-        if (self.id is not None):
+        if self.id is not None:
             return '<%s id=%s offset=%s obj="%s">' % \
                 (self.__class__.__name__, self.id, self.offset, shortObj)
         else:
@@ -549,6 +549,42 @@ class Element(Music21Object):
         '''
         '''
         return not self.__eq__(other)
+
+
+
+#     def __getattribute__(self, name):
+#         try: # call the base class getattribute to avoid recursion
+#             environLocal.printDebug('getting attribute from Element')
+#             return object.__getattribute__(self, name)
+#         except AttributeError: # look in the object
+#             # this only get attributes; it will not get properties
+#             #return self.obj.__dict__[name]
+#             # this get properties
+#             environLocal.printDebug('getting attribute from self.obj')
+#             return self.obj.__getattribute__(name)
+
+#     def __setattr__(self, name, value):
+#         try: # first, look to the internal object
+#             return self.obj.__setattr__(name, value)
+#         except AttributeError: # then, look to the Element
+#             return Music21Object.__setattr__(self, name)
+
+
+# this does not work:
+#     def __getattr__(self, name):
+#         '''This method is only called when __getattribute__() fails.
+#         Using this also avoids the potential recursion problems of subclassing
+#         __getattribute__()_
+#        
+#         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
+#         
+#         '''
+#         if name in self.obj.__dict__:
+#             return self.obj.name
+#         else:
+#             raise AttributeError
+
+
 
     def isTwin(self, other):
         '''
@@ -673,6 +709,13 @@ class Element(Music21Object):
     duration = property(_getDuration, _setDuration)
 
 
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
 class TestObject(Music21Object):
     pass
 
