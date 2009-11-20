@@ -10,6 +10,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import unittest, doctest
+
 import os, sys, webbrowser
 import types
 
@@ -32,27 +34,31 @@ from music21 import scale
 from music21 import stream
 from music21 import tempo
 
+from music21 import environment
+_MOD = "doc.build.py"
+environLocal = environment.Environment(_MOD)
 
-_MOD = 'build.py'
+
+OMIT_STR = 'OMIT_FROM_DOCS'
 FORMATS = ['html', 'latex']
 
 
 MODULES = [
-    chord, 
+#    chord, 
     common, 
-    converter,
-    duration, 
-    dynamics,
-#    environment, 
-    instrument,
- #   interval, 
-    note, 
+     converter,
+     duration, 
+#     dynamics,
+# #    environment, 
+#     instrument,
+#  #   interval, 
+     note, 
     pitch, 
-    meter, 
- #   musicxml, 
-  #  scale,
-    stream, 
-    tempo,  
+#     meter, 
+#  #   musicxml, 
+#   #  scale,
+     stream, 
+#     tempo,  
 ]
 
 
@@ -64,7 +70,6 @@ class RestrtucturedWriter(object):
 
     def __init__(self):
         self.INDENT = ' ' * 4
-
 
     def _heading(self, line, headingChar='='):
         '''Format an RST heading.
@@ -100,16 +105,20 @@ class RestrtucturedWriter(object):
         msg.append('\n'*1)
         return msg
 
+
     def formatDocString(self, doc, indent=''):
         '''Given a docstring, clean it up for RST presentation.
         '''
         if doc == None:
-            return '%sNo documentation.\n' % indent
+            return ''
+            #return '%sNo documentation.\n' % indent
 
         lines = doc.split('\n')
         sub = []
         for line in lines:
             line = line.strip()
+            if OMIT_STR in line:
+                break # do not gather any more lines
             sub.append(line)
 
         # find double breaks in text
@@ -117,7 +126,7 @@ class RestrtucturedWriter(object):
         for i in range(len(sub)):
             line = sub[i]
             if line == '' and i != 0 and sub[i-1] == '':
-                post.append(None)
+                post.append(None) # will be replaced with line breaks
             elif line == '':
                 pass
             else: 
@@ -155,6 +164,7 @@ class ModuleDoc(RestrtucturedWriter):
         self.modName = mod.__name__
         self.modDoc = mod.__doc__
         self.classes = {}
+        self.functions = {}
         self.imports = []
         self.globals = []
 
@@ -165,23 +175,37 @@ class ModuleDoc(RestrtucturedWriter):
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
 
 
+    #---------------------------------------------------------------------------
     def scanMethod(self, obj):
         methodInfo = {}
         #methodInfo['name'] = str(obj)
         methodInfo['doc'] = self.formatDocString(obj.__doc__, self.INDENT)
         return methodInfo
 
+    def scanFunction(self, obj):
+        info = {}
+        info['reference'] = obj
+        info['name'] = obj.__name__
+        info['doc']  = self.formatDocString(obj.__doc__)
+
+        # skip private functions
+        if not obj.__name__.startswith('_'): 
+            self.functions[obj.__name__] = info
+
     def scanClass(self, obj):
-        classInfo = {}
-        classInfo['reference'] = obj
-        classInfo['name'] = obj.__name__
-        classInfo['doc']  = self.formatDocString(obj.__doc__)
-        classInfo['methods'] = {}
-        classInfo['attributes'] = {}
+        '''For an object provided as an aargument, collect all relevant
+        information in a dictionary. 
+        '''
+        info = {}
+        info['reference'] = obj
+        info['name'] = obj.__name__
+        info['doc']  = self.formatDocString(obj.__doc__)
+        info['methods'] = {}
+        info['attributes'] = {}
         for partName in dir(obj):
             # partName is a string
-            if partName.startswith('__'): continue
-
+            if partName.startswith('__'): 
+                continue
             partObj = getattr(obj, partName)
             if (isinstance(partObj, types.StringTypes) or 
                 isinstance(partObj, types.DictionaryType) or 
@@ -189,15 +213,23 @@ class ModuleDoc(RestrtucturedWriter):
                 ):
                 pass
             elif (callable(partObj) or hasattr(partObj, '__doc__')):
-                classInfo['methods'][partName] = self.scanMethod(partObj)
+                info['methods'][partName] = self.scanMethod(partObj)
             else:
                 print 'noncallable', part
 
-        self.classes[obj.__name__] = classInfo
+        self.classes[obj.__name__] = info
 
+    #---------------------------------------------------------------------------
     def scanModule(self):
+        '''For a given module, determine which objects need to be documented.
+        '''
         for component in dir(self.mod):
-            if component.startswith('__'): continue
+            
+            if component.startswith('__'): # ignore private variables
+                continue
+            if component == 'Test': # ignore test classes
+                continue
+
             objName = '%s.%s' % (self.modName, component)
             obj = eval(objName)
             objType = type(obj)
@@ -214,9 +246,14 @@ class ModuleDoc(RestrtucturedWriter):
             # assume that these are classes
             elif isinstance(obj, types.TypeType):
                 self.scanClass(obj)
+            elif isinstance(obj, types.FunctionType):
+                self.scanFunction(obj)
+            # some of these are functions that need to be documented as well
             else:
-                print('cannot process: %s' % obj)
+                environLocal.printDebug(['cannot process: %s' % obj])
 
+
+    #---------------------------------------------------------------------------
     def getRestructured(self):
         msg = []
         msg += self._heading(self.modName , '=')
@@ -225,6 +262,14 @@ class ModuleDoc(RestrtucturedWriter):
         # can optionally list imports
         #msg += self._heading('Imports' , '-')
         #msg += self._list(self.imports)
+
+
+        funcNames = self.functions.keys()
+        funcNames.sort()
+        for funcName in funcNames:
+            titleStr = 'Function %s()' % self.functions[funcName]['name']
+            msg += self._heading(titleStr, '-')
+            msg.append('%s\n' % self.functions[funcName]['doc'])
 
         classNames = self.classes.keys()
         classNames.sort()
@@ -252,11 +297,11 @@ class ModuleDoc(RestrtucturedWriter):
                     else:
                         attrPublc.append(attr)
                 if len(attrPublc) > 0:
-                    msg += self._heading('Public Attributes', '~')
+                    msg += self._heading('Attributes', '~')
                     msg += self._list(attrPublc)
-                if len(attrPrivate) > 0:
-                    msg += self._heading('Private Attributes', '~')
-                    msg += self._list(attrPrivate)
+#                 if len(attrPrivate) > 0:
+#                     msg += self._heading('Private Attributes', '~')
+#                     msg += self._list(attrPrivate)
 
             methodNames = self.classes[className]['methods'].keys()
             methodNames.sort()
@@ -267,7 +312,7 @@ class ModuleDoc(RestrtucturedWriter):
                     methodPrivate.append(methodName)
                 else:
                     methodPublic.append(methodName)
-            for methodGroup, titleStr in [(methodPublic, 'Public Methods'), 
+            for methodGroup, titleStr in [(methodPublic, 'Methods'), 
                                         (methodPrivate, 'Private Methods')]:
                 if len(methodGroup) > 0:
                     msg += self._heading(titleStr, '~')
@@ -290,17 +335,16 @@ class ModuleDoc(RestrtucturedWriter):
 
 
 #-------------------------------------------------------------------------------
-
-
 class Documentation(RestrtucturedWriter):
 
     def __init__(self):
         RestrtucturedWriter.__init__(self)
 
-
         self.titleMain = 'Music 21 Documentation'
-        self.chaptersMain = ['install', 'environment', 'examples', 'glossary', 'faq']
-        self.chaptersGenerated = []
+        # include additional rst files that are not auto-generated
+        self.chaptersMain = ['install', 'environment', 
+                            'examples', 'glossary', 'faq']
+        self.chaptersGenerated = [] # to be populated
         self.titleAppendix = 'Indices and Tables'
         self.chaptersAppendix = ['glossary']
     
@@ -311,7 +355,7 @@ class Documentation(RestrtucturedWriter):
     def updateDirs(self):
         self.dir = os.getcwd()
         if not self.dir.endswith('music21%sdoc' % os.sep):
-            raise Exception, 'not in the music21%sdoc directory' % os.sep
+            raise Exception('not in the music21%sdoc directory' % os.sep)
     
         self.dirBuild = os.path.join(self.dir, '_build')
         self.dirBuildHtml = os.path.join(self.dirBuild, 'html')
@@ -327,6 +371,8 @@ class Documentation(RestrtucturedWriter):
                 os.mkdir(fp)
 
     def writeContents(self):
+        '''This writes the main table of contents file, contents.rst. 
+        '''
         msg = []
         msg.append('.. _contents\n\n')
         msg += self._heading(self.titleMain, '=')
@@ -362,15 +408,19 @@ class Documentation(RestrtucturedWriter):
 # 
 #    moduleNote_
 # 
-# 
 # Indices and Tables
 # ==================
 # 
 # * :ref:`glossary`
 # 
 #         '''
-    
+
+
+
     def writeModuleReference(self):
+        '''Write a .rst file for each module defined in modulesToBuild.
+        Add the file reference to the list of chaptersGenerated.
+        '''
         for module in self.modulesToBuild:
             a = ModuleDoc(module)
             a.scanModule()
@@ -380,6 +430,8 @@ class Documentation(RestrtucturedWriter):
             self.chaptersGenerated.append(a.fileRef)
 
     def main(self, format):
+        '''Create the documentation. 
+        '''
         if format not in FORMATS:
             raise Exception, 'bad format'
 
@@ -393,13 +445,13 @@ class Documentation(RestrtucturedWriter):
             dirOut = self.dirBuildLatex
             #pathLaunch = os.path.join(dirBuildHtml, 'contents.html')
     
-        platform = common.getPlatform()
-        if platform in ['darwin', 'nix', 'win']:
+        if common.getPlatform() in ['darwin', 'nix', 'win']:
             import sphinx
             sphinxList = ['sphinx', '-b', format, '-d', self.dirBuildDoctrees,
                          self.dir, dirOut] 
             sphinx.main(sphinxList)
-    
+
+
     # alternative command line approach
     #         cmd = 'sphinx-build -b %s -d %s %s %s' % (format, dirBuildDoctrees,
     #                 dir, dirOut)
@@ -409,6 +461,23 @@ class Documentation(RestrtucturedWriter):
     
         if format == 'html':
             webbrowser.open(pathLaunch)
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def setUp(self):
+        pass
+
+    def testToRoman(self):
+        self.assertEqual(True, True)
+
 
 
 #-------------------------------------------------------------------------------

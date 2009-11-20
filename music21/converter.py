@@ -481,11 +481,10 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.beams01
         a = parse(mxString)
         part = a[0]
-
         notes = part.flat.getNotes()
         beams = []
         for n in notes:
-            if isinstance(n, note.Note):
+            if isinstance(n.obj, note.Note):
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 

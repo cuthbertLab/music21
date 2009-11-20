@@ -8,7 +8,7 @@
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Utility functions and objects.
+'''Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that except in doctests.
@@ -196,6 +196,10 @@ def isPowerOfTwo(n):
     False
     >>> isPowerOfTwo(1024.00001)
     True
+
+    OMIT_FROM_DOCS
+    >>> isPowerOfTwo(10)
+    False
     '''
 
     if n <= 0:
@@ -515,12 +519,7 @@ Advantage is coding time and fewer type errors while coding.
 '''
 
 class defHash(dict):
-    '''a replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors
-    for dummies like Myke Cuthbert who cannot get used to differences between Perl and Python
-
-    the difference between defHash and defaultdict is that the Dict values
-    come first and that default can be set to None (which it is...) or
-    any object.
+    '''A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object.
     
     If you want a factory that makes hashes with a particular different default, use:
     
@@ -565,8 +564,7 @@ class defHash(dict):
 
 
 class defList(list):
-    '''a replacement for lists that behave a bit more like perl arrays.  No more ListErrors
-        for dummies like Myke Cuthbert who cannot get used to differences between Perl and Python
+    '''A replacement for lists that behave a bit more like perl arrays. No more ListErrors.
         '''    
     
     def __init__(self, value = None, default = None, callDefault = False):
@@ -770,7 +768,7 @@ def unwrapWeakref(referent):
 
 #-------------------------------------------------------------------------------
 class Timer(object):
-    """Timing"""
+    """An object for timing."""
         
     def __init__(self):
         # start on init
@@ -779,7 +777,7 @@ class Timer(object):
         self._tStop = None
 
     def start(self):
-        """explicit start method; will clear previous values"""
+        """Explicit start method; will clear previous values. Start always happens on initialization."""
         self._tStart = time.time()
         self._tStop = None # show that a new run has started so __call__ works
         self._tDif = 0
@@ -794,9 +792,9 @@ class Timer(object):
         self._tStart = None
 
     def __call__(self):
-        """reports curretntime or stopped time
-        if stopped, gets _tDif; if not stopped, gets current time
+        """Reports curren time or, if stopped, stopped time.
         """
+       # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop == None: # if not stoped yet
             t = time.time() - self._tStart
         else:

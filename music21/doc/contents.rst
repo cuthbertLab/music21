@@ -11,17 +11,7 @@ Music 21 Documentation
    examples
    glossary
    faq
-   moduleChord
    moduleCommon
-   moduleConverter
-   moduleDuration
-   moduleDynamics
-   moduleInstrument
-   moduleNote
-   modulePitch
-   moduleMeter
-   moduleStream
-   moduleTempo
 
 Indices and Tables
 ==================
