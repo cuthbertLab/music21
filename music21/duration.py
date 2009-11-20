@@ -520,7 +520,7 @@ def convertTypeToNumber(dType):
     else:
         return dTypeFound
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 class DurationCommon(object):
     '''
     base class for Duration and DurationUnit to borrow from
@@ -721,7 +721,7 @@ class DurationUnit(DurationCommon):
         2.0
         '''
         # validate
-        if value not in ordinalTypeFromNum:
+        if value not in typeToDuration.keys():
             raise DurationException("no such type exists: %s" % value)
         if value != self._type: # only update if different
             self._quarterLengthNeedsUpdating = True
@@ -1119,8 +1119,7 @@ class Duration(DurationCommon):
             
     components = property(_getComponents, _setComponents)
 
-#    #---------------------------------------------------------------------------
-#
+    #---------------------------------------------------------------------------
     def _isComplex(self):
         if len(self.components) > 1:
             return True
@@ -1287,8 +1286,8 @@ class Duration(DurationCommon):
 
 
 
-###--------------------------------------------------------------------------------
-### output formats
+#-------------------------------------------------------------------------------
+# output formats
 
     def _getLily(self):
         '''
@@ -1535,10 +1534,9 @@ class Duration(DurationCommon):
         environLocal.launch(format, self.write(format))
 
 
+#-------------------------------------------------------------------------------
+# methods for manipulating components
 
-#    #---------------------------------------------------------------------------
-#    # methods for manipulating components
-#
     def clear(self):
         ''' 
         Permit all componets to be removed. 
@@ -1839,13 +1837,16 @@ class Duration(DurationCommon):
 class GraceDuration(Duration):
     def __init__(self):
         Duration.__init__(self)
-        self.unlink()
+
+        # TODO: these cannot be unlinked presently like this because
+        # this objec is a subclass of Duration, not DurationUnit
+        #self.unlink()
         self.quarterLength = 0
 
 class LongGraceDuration(Duration):
     def __init__(self):
         Duration.__init__(self)
-        self.unlink()
+        #self.unlink()
         self.quarterLength = 0        
 
 class AppogiaturaStartDuration(Duration):

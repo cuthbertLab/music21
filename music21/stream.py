@@ -2827,7 +2827,8 @@ class Measure(Stream):
         Stream.__init__(self, *args, **keywords)
         self.timeSignature = None
         self.timeSignatureIsNew = False
-        self.clef = None
+
+        # clef is defined as a property below
         self.clefIsNew = False
 
         self.filled = False
@@ -2899,6 +2900,7 @@ class Measure(Stream):
             return clefList[0]    
     
     def _setClef(self, clefObj):
+        # TODO: this needs to remove an existing clef at this position
         self.insertAtOffset(clefObj, 0)
 
 
