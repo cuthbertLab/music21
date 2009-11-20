@@ -536,8 +536,10 @@ class Element(BaseElement):
 #         (False, True)
 
         newEl = copy.copy(self)
-        newEl.groups = copy.copy(self.groups)
-        newEl.contexts = copy.copy(self.contexts)
+        
+        if isinstance(self.obj, Music21Object):
+            newEl.groups = copy.copy(self.groups)
+            newEl.contexts = copy.copy(self.contexts)
 
         return newEl
 

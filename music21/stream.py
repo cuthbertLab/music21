@@ -522,7 +522,7 @@ saveRR = recurseRepr
 
 
 #-------------------------------------------------------------------------------
-class Stream(music21.BaseElement):
+class Stream(music21.BaseElement, music21.Music21Object):
     '''
     This is basic unit for timed Elements. In many cases these timed
     Elements will be of the same class of things; notes, clefs, etc. This is
@@ -548,6 +548,7 @@ class Stream(music21.BaseElement):
         
         '''
         music21.BaseElement.__init__(self)
+        music21.Music21Object.__init__(self)
 
         # self._elements stores Element objects. These are not ordered.
         # this should have a public attribute/property self.elements
@@ -3780,4 +3781,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest()
+    music21.mainTest(Test,'noDocTest')

@@ -10,6 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import re
 import os
 import doctest, unittest
 
@@ -143,8 +144,12 @@ def getWork(workName, movementNumber = None):
     '''
     paths = getPaths()
     post = []
+    workSlashes = re.sub('/', r'\\', workName)
+
     for path in paths:
         if workName.lower() in path.lower():
+            post.append(path)
+        elif workSlashes.lower() in path.lower():
             post.append(path)
     post.sort()
     if movementNumber is not None:
@@ -156,6 +161,8 @@ def getWork(workName, movementNumber = None):
                 " either because " + workName + " does not have that many movements or because the corpus is not organized by movement")
     if len(post) == 1:
         return post[0]
+    elif len(post) == 0:
+        raise CorpusException("Could not find a single file that met this criteria")
     else:
         return post
 
