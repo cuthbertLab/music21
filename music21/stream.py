@@ -812,7 +812,7 @@ class Stream(music21.BaseElement):
         True
         '''        
         # if an element or a stream
-        if not isinstance(other, music21.Element): 
+        if not isinstance(other, music21.BaseElement): 
             other = Element(other)
         new = self.copy()
         if isinstance(other, Stream):
@@ -838,7 +838,7 @@ class Stream(music21.BaseElement):
         attributes (if any) in the object?
         '''
         # if not an element, embed
-        if not isinstance(item, music21.Element): 
+        if not isinstance(item, music21.BaseElement): 
             element = Element(item)
         else:
             element = item
@@ -881,7 +881,7 @@ class Stream(music21.BaseElement):
         >>> a._getHighestOffset()
         32.0
         '''
-        if not isinstance(item, music21.Element): # if not an element, embed
+        if not isinstance(item, music21.BaseElement): # if not an element, embed
             element = Element(item)
         else:
             element = item
@@ -961,7 +961,7 @@ class Stream(music21.BaseElement):
             others = [others]
 
         for other in others:
-            if isinstance(other, music21.Element): # if an element or a stream
+            if isinstance(other, music21.BaseElement): # if an element or a stream
                 element = other
             else: # create an element for this stream
                 element = Element(other)
@@ -1201,6 +1201,25 @@ class Stream(music21.BaseElement):
     def getElementsByGroup(self, groupFilterList):
         '''
         # TODO: group comparisons are not YET case insensitive.  
+        
+        >>> from music21 import note
+        >>> n1 = note.Note("C")
+        >>> n1.groups.append('trombone')
+        >>> n2 = note.Note("D")
+        >>> n2.groups.append('trombone')
+        >>> n2.groups.append('tuba')
+        >>> n3 = note.Note("E")
+        >>> n3.groups.append('tuba')
+        >>> s1 = Stream()
+        >>> s1.addNext(n1)
+        >>> s1.addNext(n2)
+        >>> s1.addNext(n3)
+        >>> tboneSubStream = s1.getElementsByGroup("trombone")
+        >>> for thisNote in tboneSubStream:
+        ...     print thisNote.name
+        'C'
+        'D'
+        
         '''
         
         if not hasattr(groupFilterList, "__iter__"):
@@ -1702,7 +1721,7 @@ class Stream(music21.BaseElement):
         >>> a[9].offset
         36.0
         '''
-        if not isinstance(item, music21.Element): # if not an element, embed
+        if not isinstance(item, music21.BaseElement): # if not an element, embed
             element = Element(item)
         else:
             element = item # TODO: remove for new-old-style
@@ -1723,7 +1742,7 @@ class Stream(music21.BaseElement):
         >>> a[10].offset
         10.0
         '''
-        if not isinstance(item, music21.Element): # if not an element, embed
+        if not isinstance(item, music21.BaseElement): # if not an element, embed
             element = Element(item)
         else:
             element = item
@@ -3761,4 +3780,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'noDocTest')
+    music21.mainTest()

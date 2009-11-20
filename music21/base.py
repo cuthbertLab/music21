@@ -127,7 +127,6 @@ class Music21Object(object):
     _duration = None
     _parent = None
     contexts = None
-    _priority = 0
     id = None
     _overriddenLily = None
 
@@ -270,47 +269,6 @@ class Music21Object(object):
 
     duration = property(_getDuration, _setDuration)
 
-    def _getPriority(self):
-        return self._priority
-
-    def _setPriority(self, value):
-        '''
-        value is an int.
-        
-        Priority specifies the order of processing from 
-        left (LOWEST #) to right (HIGHEST #) of objects at the
-        same offset.  For instance, if you want a key change and a clef change
-        to happen at the same time but the key change to appear
-        first, then set: keySigElement.priority = 1; clefElement.priority = 2
-        this might be a slightly counterintuitive numbering of priority, but
-        it does mean, for instance, if you had two elements at the same 
-        offset, an allegro tempo change and an andante tempo change, 
-        then the tempo change with the higher priority number would 
-        apply to the following notes (by being processed
-        second).
-        
-        Default priority is 0; thus negative priorities are encouraged
-        to have Elements that appear non-priority set elements.
-        
-        In case of tie, there are defined class sort orders defined in
-        music21.stream.CLASS_SORT_ORDER.  For instance, a key signature
-        change appears before a time signature change before a note at the
-        same offset.  This produces the familiar order of materials at the
-        start of a musical score.
-        
-        >>> a = Element()
-        >>> a.priority = 3
-        >>> a.priority = 'high'
-        Traceback (most recent call last):
-        ElementException: priority values must be integers.
-        '''
-        if not isinstance(value, int):
-            raise ElementException('priority values must be integers.')
-        self._priority = value
-
-    priority = property(_getPriority, _setPriority)
-
-
 
     #---------------------------------------------------------------------------
     def write(self, fmt='musicxml', fp=None):
@@ -343,7 +301,7 @@ class Music21Object(object):
 
 
 #-------------------------------------------------------------------------------
-class BaseElement(Music21Object):
+class BaseElement(object):
     '''
     contains all the positioning information of an Element, but NOT the object
     inherited by stream.
@@ -351,10 +309,7 @@ class BaseElement(Music21Object):
     _offset  = 0.0
     _id = None
     _unlinkedDuration = None
-
-    def __init__(self):
-        Music21Object.__init__(self)
-
+    _priority = 0
 
     def _getDuration(self):
         '''
@@ -443,6 +398,48 @@ class BaseElement(Music21Object):
 
     offset = property(_getOffset, _setOffset)
 
+    def _getPriority(self):
+        return self._priority
+
+    def _setPriority(self, value):
+        '''
+        value is an int.
+        
+        Priority specifies the order of processing from 
+        left (LOWEST #) to right (HIGHEST #) of objects at the
+        same offset.  For instance, if you want a key change and a clef change
+        to happen at the same time but the key change to appear
+        first, then set: keySigElement.priority = 1; clefElement.priority = 2
+        this might be a slightly counterintuitive numbering of priority, but
+        it does mean, for instance, if you had two elements at the same 
+        offset, an allegro tempo change and an andante tempo change, 
+        then the tempo change with the higher priority number would 
+        apply to the following notes (by being processed
+        second).
+        
+        Default priority is 0; thus negative priorities are encouraged
+        to have Elements that appear non-priority set elements.
+        
+        In case of tie, there are defined class sort orders defined in
+        music21.stream.CLASS_SORT_ORDER.  For instance, a key signature
+        change appears before a time signature change before a note at the
+        same offset.  This produces the familiar order of materials at the
+        start of a musical score.
+        
+        >>> a = Element()
+        >>> a.priority = 3
+        >>> a.priority = 'high'
+        Traceback (most recent call last):
+        ElementException: priority values must be integers.
+        '''
+        if not isinstance(value, int):
+            raise ElementException('priority values must be integers.')
+        self._priority = value
+
+    priority = property(_getPriority, _setPriority)
+
+#-----------------------------------------------------------------#
+
 class Element(BaseElement):
     '''
     An element wraps an object so that the same object can
@@ -464,7 +461,6 @@ class Element(BaseElement):
     obj = None
 
     def __init__(self, obj=None, offset=None, priority = 0):
-        Music21Object.__init__(self)
         self.obj = obj # object stored here        
 
     def getId(self):
@@ -613,18 +609,19 @@ class Element(BaseElement):
         if not hasattr(other, "obj") or \
            not hasattr(other, "offset") or \
            not hasattr(other, "priority") or \
-           not hasattr(other, "id") or \
-           not hasattr(other, "parent") or \
-           not hasattr(other, "groups"):
+           not hasattr(other, "id"): # or \
+            # not hasattr(other, "groups"):
+            # not hasattr(other, "parent") or \
             # not hasattr(other, "duration") or \
             return False
+
 
         if (self.obj == other.obj and \
             self.offset == other.offset and \
             self.priority == other.priority and \
-            self.id == other.id and \
-            self.parent == other.parent and \
-            self.groups == other.groups):
+            self.id == other.id): # and \
+            #  self.groups == other.groups):
+            #  self.parent == other.parent and \
             #  self.duration == self.duration and \
             return True
         else:
@@ -821,4 +818,3 @@ def mainTest(*testClasses):
 
 if __name__ == "__main__":
     mainTest(Test)
-    
