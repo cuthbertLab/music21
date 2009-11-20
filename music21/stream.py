@@ -3775,6 +3775,16 @@ class Test(unittest.TestCase):
 
 
 
+    def testExtractedNoteAssignLyric(self):
+        from music21 import converter, corpus, text
+        a = converter.parse(corpus.getWork('opus74no1', 3))
+        b = a[1] 
+        for thisNote in b.flat.getElementsByClass(note.Note):
+            thisNote.lyric = thisNote.name
+        textStr = text.assembleLyrics(b)
+        self.assertEqual(textStr.startswith('C D E A F E rest rest E F G B '), 
+                         True)
+
 
     def xTestInstrumentExtraction(self):
         '''Temporarily disabled while bypassing getInstrument issue
