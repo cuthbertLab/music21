@@ -251,7 +251,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
     >>> d = Stream()
     >>> n = note.Note()
     >>> d.repeatAdd(n, 10)
-    >>> d.repeatCopy(n, [x+.5 for x in range(10)])
+    >>> d.repeatDeepcopy(n, [x+.5 for x in range(10)])
     >>> x = makeMeasures(d)
     '''
     #environLocal.printDebug(['calling makeMeasures'])
@@ -271,7 +271,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
         else:
             dur = 0 
         # may just need to copy element offset component
-        offsetMap.append([e.offset, e.offset+dur, e.deepcopy()])
+        offsetMap.append([e.offset, e.offset+dur, e.copy()])
 
     #offsetMap.sort() not necessary; just get min and max
     oMin = min([start for start, end, e in offsetMap])
@@ -426,13 +426,13 @@ def makeTies(streamObj, meterStream=None):
                     qLenRemain = e.duration.quarterLength - qLenBegin
                     # modify existing duration
                     e.duration.quarterLength = qLenBegin
-                    # create and palce new element
+                    # create and place new element
                     eRemain = e.deepcopy()
                     eRemain.duration.quarterLength = qLenRemain
 
                     # set ties
-                    if (isinstance(e, note.Note) or 
-                        isinstance(e, note.Unpitched)):
+                    if (e.isClass(note.Note) or 
+                        e.isClass(note.Unpitched)):
                         #environLocal.printDebug(['tieing in makeTies', e])
                         e.tie = note.Tie('start')
                         # TODO: not sure if we can assume to stop remainder
@@ -669,7 +669,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
                 return self.elements[key]
 
         elif isinstance(key, slice): # get a slice of index values
-            found = self.deepcopy() # return a stream of elements
+            found = self.copy() # return a stream of elements
             found.elements = self.elements[key]
             return found
 
@@ -2366,7 +2366,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
             # must repack into a new stream at each step
             midStream = Stream()
             finalStream = Stream()
-            partStream = self.deepcopy()
+            partStream = self.copy()
 
             for obj in partStream.getElementsByClass(Stream):
                 # need to copy element here
@@ -2928,8 +2928,8 @@ class Measure(Stream):
         '''Return a musicxml Measure, populated with notes, chords, rests
         and a musixcml Attributes, populated with time, meter, key, etc
 
-        >>> a = note.Note()
-        >>> a.quarterLength = 4
+        >>> a = Element(note.Note())
+        >>> a.obj.quarterLength = 4
         >>> b = Measure()
         >>> b.insertAtOffset(a, 0)
         >>> len(b) # has a clef object in the stream
@@ -2962,10 +2962,10 @@ class Measure(Stream):
 
         #need to handle objects in order when creating musicxml 
         for obj in self.flat:
-            if isinstance(obj, note.GeneralNote):
+            if obj.isClass(note.GeneralNote):
                 # .mx here returns a lost of notes
                 mxMeasure.componentList += obj.mx
-            elif isinstance(obj, dynamics.Dynamic):
+            elif obj.isClass(dynamics.Dynamic):
                 mxDynamicMark = obj.mx
                 mxDynamics = musicxmlMod.Dynamics()
                 mxDynamics.append(mxDynamicMark)
@@ -3284,7 +3284,7 @@ class TestExternal(unittest.TestCase):
             b = Measure()
             for pitch in ['a', 'g', 'c#', 'a#']:
                 a = note.Note(pitch)
-                b.append(a)
+                b.addNext(a)
             c.append(b)
         c.show()
 
@@ -3295,7 +3295,7 @@ class TestExternal(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatCopy(n, range(0,120,3))
+        a.repeatDeepcopy(n, range(0,120,3))
         #a.show() # default time signature used
         
         a.insertAtOffset(meter.TimeSignature("5/4"), 0)
@@ -3339,7 +3339,7 @@ class TestExternal(unittest.TestCase):
         TODO: this shoudl show instruments
         '''
         from music21 import corpus, converter
-        a = converter.parse(corpus.paths[36])
+        a = converter.parse(corpus.paths[36])  # what piece is this?
         b = a[3][10:20]
         c = a[3][20:30]
         d = a[3][30:40]
@@ -3809,4 +3809,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest()
+    music21.mainTest(TestExternal, 'noDocTest')
