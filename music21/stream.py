@@ -54,37 +54,37 @@ def extendDuration(streamObj, objName):
     object. The time between adjacent objects is then assigned to the 
     duration of each object. The last duration of the last object is assigned
     to the end of the stream.
-
-    >>> a = Stream()
-    >>> n = note.Note()
+    
+    >>> import music21.dynamics
+    >>> stream1 = Stream()
+    >>> n = note.QuarterNote()
     >>> n.duration.quarterLength
     1.0
-    >>> a.repeatCopy(n, range(0,50,10))
-    >>> import music21.dynamics
-    >>> d = music21.dynamics.Dynamic('ff')
-    >>> d.offset = 15.0
-    >>> a.append(d)
-    >>> a = a.sorted
-    >>> a.duration.quarterLength
+    >>> stream1.repeatDeepcopy(n, [0, 10, 20, 30, 40])
+    >>> dyn = Element(music21.dynamics.Dynamic('ff'))
+    >>> dyn.offset = 15.0
+    >>> stream1.append(dyn)
+    >>> sort1 = stream1.sorted
+    >>> sort1.duration.quarterLength
     41.0
-    >>> len(a)
+    >>> len(sort1)
     6
-    >>> a[-1].offset
+    >>> sort1[-1].offset
     40.0
 
-    >>> b = extendDuration(a.flat, note.Note)
-    >>> len(b)
+    >>> stream2 = extendDuration(sort1.flat, note.GeneralNote)
+    >>> len(stream2)
     6
-    >>> b[0].duration.quarterLength
+    >>> stream2[0].duration.quarterLength
     10.0
-    >>> b[-1].duration.quarterLength
+    >>> stream2[-1].duration.quarterLength
     1.0
-    >>> b.duration.quarterLength
+    >>> stream2.duration.quarterLength
     41.0
-    >>> b[-1].offset
+    >>> stream2[-1].offset
     40.0
 
-    #>>> a[1].duration.quarterLength
+    #>>> stream2[1].duration.quarterLength
     #1.0  ## TODO: FIX Error: gets 10.0
 
     '''
@@ -1183,11 +1183,13 @@ class Stream(music21.BaseElement, music21.Music21Object):
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
 
-        ### BUG: if Element fits two classes (GeneralNote & Rest, for instance) it will be appended twice.
+        ### appendedAlready fixes bug where if an element matches two classes it was appendedTwice
         for myEl in self:
+            appendedAlready = False
             for myCl in classFilterList:
-                if myEl.isClass(myCl):
-                    if unpackElement and hasattr(myEl, "obj"): # N.B. Streams have .obj too -- bug?
+                if myEl.isClass(myCl) and appendedAlready == False:
+                    appendedAlready = True
+                    if unpackElement and hasattr(myEl, "obj"):
                         found.append(myEl.obj)
                     else:
                         found.append(myEl)
@@ -1218,9 +1220,13 @@ class Stream(music21.BaseElement, music21.Music21Object):
         >>> tboneSubStream = s1.getElementsByGroup("trombone")
         >>> for thisNote in tboneSubStream:
         ...     print thisNote.name
-        'C'
-        'D'
-        
+        C
+        D
+        >>> tubaSubStream = s1.getElementsByGroup("tuba")
+        >>> for thisNote in tubaSubStream:
+        ...     print thisNote.name
+        D
+        E
         '''
         
         if not hasattr(groupFilterList, "__iter__"):
@@ -1229,7 +1235,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         returnStream = Stream()
         for myEl in self:
             for myGrp in groupFilterList:
-                if myGrp in myEl.groups:
+                if hasattr(myEl, "groups") and myGrp in myEl.groups:
                     returnStream.append(myEl)
 
         return returnStream
@@ -1749,14 +1755,38 @@ class Stream(music21.BaseElement, music21.Music21Object):
             element = item
 
         for offset in offsets:
-            #elementCopy = element.clone()
+            elementCopy = element.copy()
+            elementCopy.offset = offset
+            self.append(elementCopy)
 
-            # this needs to be deep clone in cases, for example, of copying 
-            # many notes. w/o using deep clone, all durations objects   
-            # are linked
+    def repeatDeepcopy(self, item, offsets):
+        '''Given an object, create many DeepCopies at the positions specified by 
+        the offset list
+
+        >>> a = Stream()
+        >>> n = note.Note('G-')
+        >>> n.quarterLength = 1
+        >>> a.repeatDeepcopy(n, range(30))
+        >>> len(a)
+        30
+        >>> a[10].offset
+        10.0
+        >>> a[10].step = "D"
+        >>> a[10].step
+        'D'
+        >>> a[11].step
+        'G'
+        '''
+        if not isinstance(item, music21.BaseElement): # if not an element, embed
+            element = Element(item)
+        else:
+            element = item
+
+        for offset in offsets:
             elementCopy = element.deepcopy()
             elementCopy.offset = offset
             self.append(elementCopy)
+
 
 
     def fillNone(self, number):
@@ -1764,7 +1794,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         '''
         self.repeatCopy(None, range(number))
 
-    def extractContext(self, element, before = 4.0, after = 4.0, 
+    def extractContext(self, searchElement, before = 4.0, after = 4.0, 
                        maxBefore = None, maxAfter = None):
         r'''
         extracts elements around the given element within (before) quarter notes and (after) quarter notes
@@ -1782,7 +1812,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         >>> qtrStream.repeatCopy(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
         >>> recurseRepr(hnStream)
-        '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>\n'
+        '{5.0} <Element offset=5.0 obj="<music21.note.Note C>">\n{6.0} <Element offset=6.0 obj="<music21.note.Note B->">\n{8.0} <Element offset=8.0 obj="<music21.note.Note C>">\n'
         '''
         
         display = Stream()
@@ -1791,14 +1821,13 @@ class Stream(music21.BaseElement, music21.Music21Object):
         foundEnd = 0 
         for i in range(0, len(self.elements)):
             b = self.elements[i]
-            if b.id is not None or element.id is not None:
-                print b.id
-                if b.id == element.id:
+            if b.id is not None or searchElement.id is not None:
+                if b.id == searchElement.id:
                     found = i
                     foundOffset = self.elements[i].offset
                     foundEnd    = foundOffset + self.elements[i].duration.quarterLength                        
             else:
-                if b is element:
+                if b is searchElement or b.obj is searchElement:
                     found = i
                     foundOffset = self.elements[i].offset
                     foundEnd    = foundOffset + self.elements[i].duration.quarterLength
@@ -1841,7 +1870,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         ...    g += "%s: %s; " % (myElement.offset, myElement.name)
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
-        >>> farRight = note.Note("E")
+        >>> farRight = Element(note.Note("E"))
         >>> farRight.priority = 5
         >>> farRight.offset = 2.0
         >>> y.append(farRight)
@@ -1870,7 +1899,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
     def _getFlat(self):
         '''
-        returns a new Stream where all no elements nest within other elements
+        returns a new Stream where no elements nest within other elements
         
         >>> s = Stream()
         >>> s.repeatCopy(note.Note("C#"), [0, 2, 4])
@@ -1892,7 +1921,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
 
         >>> p = Stream()
-        >>> p.repeatCopy(None, range(5))
+        >>> p.repeatCopy(music21.Music21Object(), range(5))
         >>> q = Stream()
         >>> q.repeatCopy(p, range(0,50,10))
         >>> len(q)
@@ -2686,7 +2715,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         True
         >>> c = Stream()
         >>> for x in range(4):
-        ...     n = note.Note('G#')
+        ...     n = Element(note.Note('G#'))
         ...     n.offset = x * 3
         ...     c.append(n)
         ...
@@ -2712,7 +2741,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     n = note.Note('G#')
+        ...     n = Element(note.Note('G#'))
         ...     n.duration = duration.Duration('quarter')
         ...     n.offset = x * 1
         ...     a.append(n)
@@ -2727,7 +2756,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         4
         >>> a = Stream()
         >>> for x in [0,0,0,0,13,13,13]:
-        ...     n = note.Note('G#')
+        ...     n = Element(note.Note('G#'))
         ...     n.duration = duration.Duration('half')
         ...     n.offset = x * 1
         ...     a.append(n)
@@ -2739,11 +2768,10 @@ class Stream(music21.BaseElement, music21.Music21Object):
         3
         >>> a = Stream()
         >>> for x in [0,0,0,0,3,3,3]:
-        ...     n = note.Note('G#')
+        ...     n = Element(note.Note('G#'))
         ...     n.duration = duration.Duration('whole')
-        ...     e = Element(n)
-        ...     e.offset = x * 1
-        ...     a.append(e)
+        ...     n.offset = x * 1
+        ...     a.append(n)
         ...
         >>> # default is to not include coincident boundaries
         >>> d = a.getOverlaps() 
@@ -3781,4 +3809,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test,'noDocTest')
+    music21.mainTest()

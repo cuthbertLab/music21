@@ -508,7 +508,7 @@ class Element(BaseElement):
     def copy(self):
         '''
         Makes a copy of this element with a reference
-        to the SAME object but with unlinked offset, id, priority
+        to the SAME object but with unlinked offset, priority
         and a cloned Groups object
 
         >>> import note
