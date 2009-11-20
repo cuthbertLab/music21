@@ -6,24 +6,93 @@ music21.pitch
 Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
 Used extensively by note.py
 
+Function convertDiatonicNumberToStep()
+--------------------------------------
+
+Utility conversion; does not process internals returns a tuple of Step and Octave 
+
+>>> convertDiatonicNumberToStep(15)
+('C', 2) 
+>>> convertDiatonicNumberToStep(23)
+('D', 3) 
+
+Function convertFqToPs()
+------------------------
+
+Utility conversion; does not process internals. Assumes A4 = 440 Hz 
+
+>>> convertFqToPs(440)
+69.0 
+>>> convertFqToPs(261.62556530059862)
+60.0 
+
+Function convertPsToFq()
+------------------------
+
+Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
+
+>>> convertPsToFq(69)
+440.0 
+>>> convertPsToFq(60)
+261.62556530059862 
+>>> convertPsToFq(2)
+9.1770239974189884 
+
+Function convertPsToOct()
+-------------------------
+
+Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
+
+>>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
+[3, 4, 4] 
+>>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
+[0, -1, -2] 
+
+Function convertPsToStep()
+--------------------------
+
+Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
+
+>>> convertPsToStep(60)
+('C', <accidental natural>) 
+>>> convertPsToStep(66)
+('F', <accidental sharp>) 
+>>> convertPsToStep(67)
+('G', <accidental natural>) 
+>>> convertPsToStep(68)
+('G', <accidental sharp>) 
+>>> convertPsToStep(-2)
+('A', <accidental sharp>) 
+
+Function convertStepToPs()
+--------------------------
+
+Utility conversion; does not process internals. 
+
+>>> convertStepToPs('c', 4, 1)
+61 
+>>> convertStepToPs('d', 2, -2)
+36 
+>>> convertStepToPs('b', 3, 3)
+62 
+
 Class Accidental
 ----------------
 
 Accidental class. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + alter
 + modifier
 + name
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -31,16 +100,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -62,27 +131,16 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **lily()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **searchParent()**
 
@@ -121,7 +179,6 @@ Private Methods
 
 **_duration()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -131,35 +188,15 @@ Private Methods
 
 **_getLily()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setDuration()**
 
@@ -167,61 +204,31 @@ Private Methods
 
 **_setLily()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 
 Class AccidentalException
 -------------------------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **args()**
 
-    No documentation.
 
 **message()**
 
-    No documentation.
 
 
 Class Pitch
 -----------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
@@ -233,7 +240,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -241,16 +247,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -308,7 +314,6 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **implicitOctave()**
 
@@ -316,7 +321,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **midi()**
 
@@ -372,13 +377,8 @@ Public Methods
     >>> a.ps
     187 
 
-**offset()**
-
-    No documentation.
-
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -398,10 +398,6 @@ Public Methods
     11 
     >>> dis.name
     'B' 
-
-**priority()**
-
-    No documentation.
 
 **ps()**
 
@@ -432,7 +428,6 @@ Private Methods
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
@@ -474,11 +469,9 @@ Private Methods
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getImplicitOctave()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -527,13 +520,8 @@ Private Methods
 
     This is _octave, not implicitOctave 
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -554,13 +542,8 @@ Private Methods
     >>> dis.name
     'B' 
 
-**_getPriority()**
-
-    No documentation.
-
 **_getPs()**
 
-    No documentation.
 
 **_getStep()**
 
@@ -578,21 +561,11 @@ Private Methods
     >>> a.freq440
     440.0 
 
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
-
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -639,7 +612,6 @@ Private Methods
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
@@ -653,43 +625,15 @@ Private Methods
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setPs()**
 
-    No documentation.
 
 **_setStep()**
 
@@ -697,7 +641,6 @@ Private Methods
 
 **_setfreq440()**
 
-    No documentation.
 
 **_updatePitchSpace()**
 
@@ -707,179 +650,23 @@ Private Methods
 Class PitchException
 --------------------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **args()**
 
-    No documentation.
 
 **message()**
 
-    No documentation.
-
-
-Class Test
-----------
-
-No documentation.
-
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _testMethodDoc
-+ _testMethodName
-
-Public Methods
-~~~~~~~~~~~~~~
-
-**assertAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertAlmostEquals()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertEquals()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertFalse()**
-
-    Fail the test if the expression is true. 
-
-**assertNotAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotAlmostEquals()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertNotEquals()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**assertTrue()**
-
-    Fail the test unless the expression is true. 
-
-**assert_()**
-
-    Fail the test unless the expression is true. 
-
-**countTestCases()**
-
-    No documentation.
-
-**debug()**
-
-    Run the test without collecting errors in a TestResult 
-
-**defaultTestResult()**
-
-    No documentation.
-
-**fail()**
-
-    Fail immediately, with the given message. 
-
-**failIf()**
-
-    Fail the test if the expression is true. 
-
-**failIfAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failIfEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**failUnless()**
-
-    Fail the test unless the expression is true. 
-
-**failUnlessAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failUnlessEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**failUnlessRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**failureException()**
-
-    Assertion failed. 
-
-**id()**
-
-    No documentation.
-
-**run()**
-
-    No documentation.
-
-**runTest()**
-
-    No documentation.
-
-**setUp()**
-
-    Hook method for setting up the test fixture before exercising it. 
-
-**shortDescription()**
-
-    Returns a one-line description of the test, or None if no description has been provided. The default implementation of this method returns the first line of the specified test method's docstring. 
-
-**tearDown()**
-
-    Hook method for deconstructing the test fixture after testing it. 
-
-**testOctave()**
-
-    No documentation.
-
-Private Methods
-~~~~~~~~~~~~~~~
-
-**_exc_info()**
-
-    Return a version of sys.exc_info() with the traceback frame minimised; usually the top level of the traceback frame is not needed. 
 
 
 Class TestExternal
 ------------------
 
-No documentation.
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _testMethodDoc
-+ _testMethodName
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **assertAlmostEqual()**
 
@@ -931,7 +718,6 @@ Public Methods
 
 **countTestCases()**
 
-    No documentation.
 
 **debug()**
 
@@ -939,7 +725,6 @@ Public Methods
 
 **defaultTestResult()**
 
-    No documentation.
 
 **fail()**
 
@@ -979,15 +764,12 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **run()**
 
-    No documentation.
 
 **runTest()**
 
-    No documentation.
 
 **setUp()**
 
@@ -1001,9 +783,8 @@ Public Methods
 
     Hook method for deconstructing the test fixture after testing it. 
 
-**testBasic()**
+**testSingle()**
 
-    No documentation.
 
 Private Methods
 ~~~~~~~~~~~~~~~

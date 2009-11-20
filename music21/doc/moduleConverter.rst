@@ -1,18 +1,30 @@
 music21.converter
 =================
 
+
+
+Public interface for importing file formats into music21.
+
+Function parse()
+----------------
+
+Determine if the file is a file path or a string 
+
+Function parseData()
+--------------------
+
+
+Function parseFile()
+--------------------
+
+
 Class Converter
 ---------------
 
 Not a subclass, but a wrapper for different converter objects based on format. 
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _converter
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **parseData()**
 
@@ -20,53 +32,59 @@ Public Methods
 
 **parseFile()**
 
-    No documentation.
 
 **stream()**
 
-    No documentation.
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_getStream()**
 
-    No documentation.
 
 **_setConverter()**
 
-    No documentation.
 
 
 Class ConverterException
 ------------------------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **args()**
 
-    No documentation.
 
 **message()**
 
-    No documentation.
+
+
+Class ConverterFileException
+----------------------------
+
+
+Methods
+~~~~~~~
+
+**args()**
+
+
+**message()**
+
 
 
 Class ConverterHumdrum
 ----------------------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + stream
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **parseData()**
 
@@ -80,28 +98,16 @@ Public Methods
 Class ConverterMusicXML
 -----------------------
 
-No documentation.
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _mxScore
-+ _stream
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **getPartNames()**
 
-    No documentation.
 
 **load()**
 
     Load all parts. This determines the order parts are found in the stream 
-
-**loadMxPart()**
-
-    This loads a part into a Stream by part ID. 
 
 **parseData()**
 
@@ -109,47 +115,56 @@ Public Methods
 
 **parseFile()**
 
-    Open from file path 
+    Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 **stream()**
 
-    No documentation.
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
-**_getMxDynamics()**
-
-    Given an mxDirection, return a dynamics if prsent, otherwise, None 
-
-    
-
-**_getMxInstrument()**
-
-    No documentation.
-
-**_getMxPart()**
-
-    No documentation.
-
 **_getStream()**
 
-    No documentation.
 
 
-Class Test
-----------
+Class PickleFilter
+------------------
 
-No documentation.
+Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
-+ _testMethodDoc
-+ _testMethodName
+**status()**
 
-Public Methods
-~~~~~~~~~~~~~~
+
+Private Methods
+~~~~~~~~~~~~~~~
+
+**_getPickleFp()**
+
+
+
+Class PickleFilterException
+---------------------------
+
+
+Methods
+~~~~~~~
+
+**args()**
+
+
+**message()**
+
+
+
+Class TestExternal
+------------------
+
+
+Methods
+~~~~~~~
 
 **assertAlmostEqual()**
 
@@ -201,7 +216,6 @@ Public Methods
 
 **countTestCases()**
 
-    No documentation.
 
 **debug()**
 
@@ -209,7 +223,6 @@ Public Methods
 
 **defaultTestResult()**
 
-    No documentation.
 
 **fail()**
 
@@ -249,15 +262,12 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **run()**
 
-    No documentation.
 
 **runTest()**
 
-    No documentation.
 
 **setUp()**
 
@@ -273,7 +283,9 @@ Public Methods
 
 **testConversionMusicXml()**
 
-    No documentation.
+
+**testMusicXMLConversion()**
+
 
 Private Methods
 ~~~~~~~~~~~~~~~
@@ -281,18 +293,5 @@ Private Methods
 **_exc_info()**
 
     Return a version of sys.exc_info() with the traceback frame minimised; usually the top level of the traceback frame is not needed. 
-
-
-Class TestExternal
-------------------
-
-No documentation.
-
-Public Methods
-~~~~~~~~~~~~~~
-
-**testConversion()**
-
-    No documentation.
 
 

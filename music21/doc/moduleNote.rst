@@ -6,24 +6,37 @@ music21.note
 Classes and functions for creating and manipulating notes, ties, and durations.
 Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.
 
+Function factory()
+------------------
+
+convenience method to get Notes 
+
+Function noteFromDiatonicNumber()
+---------------------------------
+
+
+Function sendNoteInfo()
+-----------------------
+
+Debugging method to print information about a music21 note called by trecento.trecentoCadence, among other places 
+
 Class Accidental
 ----------------
 
 Accidental class. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + alter
 + modifier
 + name
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -31,16 +44,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -62,27 +75,16 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **lily()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **searchParent()**
 
@@ -121,7 +123,6 @@ Private Methods
 
 **_duration()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -131,35 +132,15 @@ Private Methods
 
 **_getLily()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setDuration()**
 
@@ -167,76 +148,207 @@ Private Methods
 
 **_setLily()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 
 Class Beam
 ----------
 
-No documentation.
+An object representation of a beam, where each beam objects exists for each horizontal line in a total beam structure for one note. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + direction
 + independentAngle
++ number
 + type
+
+Methods
+~~~~~~~
+
+**mx()**
+
+    Returns a Beams object 
+
+    >>> a = Beam()
+    >>> a.type = 'start'
+    >>> a.number = 1
+    >>> b = a.mx
+    >>> b.get('charData')
+    'begin' 
+    >>> b.get('number')
+    1 
+    >>> a.type = 'partial'
+    >>> a.direction = 'left'
+    >>> b = a.mx
+    >>> b.get('charData')
+    'backward hook' 
+
+Private Methods
+~~~~~~~~~~~~~~~
+
+**_getMX()**
+
+    Returns a Beams object 
+
+    >>> a = Beam()
+    >>> a.type = 'start'
+    >>> a.number = 1
+    >>> b = a.mx
+    >>> b.get('charData')
+    'begin' 
+    >>> b.get('number')
+    1 
+    >>> a.type = 'partial'
+    >>> a.direction = 'left'
+    >>> b = a.mx
+    >>> b.get('charData')
+    'backward hook' 
+
+**_setMX()**
+
+    given a list of mxBeam objects, set beamsList 
+
+    >>> mxBeam = musicxmlMod.Beam()
+    >>> mxBeam.set('charData', 'begin')
+    >>> a = Beam()
+    >>> a.mx = mxBeam
+    >>> a.type
+    'start' 
+
+
+Class BeamException
+-------------------
+
+
+Methods
+~~~~~~~
+
+**args()**
+
+
+**message()**
+
 
 
 Class Beams
 -----------
 
-No documentation.
+A group of beams applied to a single note that represents the partial beam structure of many notes beamed together. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + beamsList
 + feathered
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **addNext()**
 
-    No documentation.
+
+**fill()**
+
+    Clear an fill the beams list as commonly needed for various durations do not set type or direction 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> len(a)
+    2 
+    >>> a.fill('32nd')
+    >>> len(a)
+    3 
+
+**getByNumber()**
+
+    Set an internal beam object by number, or rhythmic symbol level 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> a.setAll('start')
+    >>> a.getByNumber(2).type
+    'start' 
+
+**getNumbers()**
+
+    Retrun a lost of all defind numbers 
+
+    >>> a = Beams()
+    >>> a.fill('32nd')
+    >>> a.getNumbers()
+    [1, 2, 3] 
+
+**getTypes()**
+
+    Retur a lost of all types 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> a.setAll('start')
+    >>> a.getTypes()
+    ['start', 'start'] 
+
+**mx()**
+
+    Returns a list of mxBeam objects 
+
+**setAll()**
+
+    Convenience method to set all beam objects within Beams 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> a.setAll('start')
+    >>> a.getTypes()
+    ['start', 'start'] 
+
+    
+
+**setByNumber()**
+
+    Set an internal beam object by number, or rhythmic symbol level 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> a.setAll('start')
+    >>> a.setByNumber(1, 'continue')
+    >>> a.beamsList[0].type
+    'continue' 
+    >>> a.setByNumber(2, 'stop')
+    >>> a.beamsList[1].type
+    'stop' 
+    >>> a.setByNumber(2, 'partial-right')
+    >>> a.beamsList[1].type
+    'partial' 
+    >>> a.beamsList[1].direction
+    'right' 
+
+Private Methods
+~~~~~~~~~~~~~~~
+
+**_getMX()**
+
+    Returns a list of mxBeam objects 
+
+**_setMX()**
+
+    given a list of mxBeam objects, set beamsList 
+
+    >>> mxBeamList = []
+    >>> a = Beams()
+    >>> a.mx = mxBeamList
 
 
 Class EighthNote
 ----------------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + beams
@@ -248,17 +360,11 @@ Public Attributes
 + pitch
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
-    No documentation.
 
 **appendDuration()**
 
@@ -281,11 +387,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -293,7 +397,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -301,16 +404,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -336,15 +439,12 @@ Public Methods
 
 **freq440()**
 
-    No documentation.
 
 **frequency()**
 
-    No documentation.
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -352,7 +452,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -372,7 +472,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **midi()**
 
@@ -385,7 +484,6 @@ Public Methods
 
 **midiNote()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -397,23 +495,15 @@ Public Methods
 
 **name()**
 
-    No documentation.
 
 **nameWithOctave()**
 
-    No documentation.
 
 **octave()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -425,22 +515,17 @@ Public Methods
     1 
     >>>
 
-**priority()**
-
-    No documentation.
-
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -448,11 +533,10 @@ Public Methods
 
 **setAccidental()**
 
-    No documentation.
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -496,28 +580,22 @@ Public Methods
 
 **step()**
 
-    No documentation.
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDiatonicNoteNum()**
 
@@ -531,11 +609,9 @@ Private Methods
 
 **_getFreq440()**
 
-    No documentation.
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getLily()**
 
@@ -543,7 +619,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -564,23 +639,15 @@ Private Methods
 
 **_getName()**
 
-    No documentation.
 
 **_getNameWithOctave()**
 
-    No documentation.
 
 **_getOctave()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -592,42 +659,27 @@ Private Methods
     1 
     >>>
 
-**_getPriority()**
-
-    No documentation.
-
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **_getStep()**
 
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
 
 **_preDurationLily()**
 
     Method to return all the lilypond information that appears before the duration number. Is the same for simple and complex notes. 
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -644,7 +696,7 @@ Private Methods
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -662,11 +714,9 @@ Private Methods
 
 **_setFreq440()**
 
-    No documentation.
 
 **_setFrequency()**
 
-    No documentation.
 
 **_setLyric()**
 
@@ -679,63 +729,31 @@ Private Methods
 
 **_setMX()**
 
-    Given an mxNote, fille the necessary parameters 
+    Given an mxNote, fill the necessary parameters 
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
-    No documentation.
 
 **_setName()**
 
-    No documentation.
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 **_setStep()**
 
-    No documentation.
 
 
 Class GeneralNote
@@ -743,8 +761,8 @@ Class GeneralNote
 
 A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + contexts
@@ -754,13 +772,8 @@ Public Attributes
 + notations
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **appendDuration()**
 
@@ -783,11 +796,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -795,7 +806,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -803,16 +813,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -834,7 +844,6 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -842,40 +851,29 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **lyric()**
 
-    No documentation.
 
 **musicxml()**
 
     This must call _getMX to get basic mxNote objects 
 
-**offset()**
-
-    No documentation.
-
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -883,7 +881,7 @@ Public Methods
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -927,20 +925,16 @@ Public Methods
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -950,52 +944,32 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMusicXML()**
 
     This must call _getMX to get basic mxNote objects 
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
 
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
-
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -1022,48 +996,20 @@ Private Methods
 
 **_setMusicXML()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 
 Class HalfNote
 --------------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + beams
@@ -1075,17 +1021,11 @@ Public Attributes
 + pitch
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
-    No documentation.
 
 **appendDuration()**
 
@@ -1108,11 +1048,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -1120,7 +1058,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -1128,16 +1065,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -1163,15 +1100,12 @@ Public Methods
 
 **freq440()**
 
-    No documentation.
 
 **frequency()**
 
-    No documentation.
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -1179,7 +1113,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -1199,7 +1133,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **midi()**
 
@@ -1212,7 +1145,6 @@ Public Methods
 
 **midiNote()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -1224,23 +1156,15 @@ Public Methods
 
 **name()**
 
-    No documentation.
 
 **nameWithOctave()**
 
-    No documentation.
 
 **octave()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -1252,22 +1176,17 @@ Public Methods
     1 
     >>>
 
-**priority()**
-
-    No documentation.
-
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -1275,11 +1194,10 @@ Public Methods
 
 **setAccidental()**
 
-    No documentation.
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -1323,28 +1241,22 @@ Public Methods
 
 **step()**
 
-    No documentation.
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDiatonicNoteNum()**
 
@@ -1358,11 +1270,9 @@ Private Methods
 
 **_getFreq440()**
 
-    No documentation.
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getLily()**
 
@@ -1370,7 +1280,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -1391,23 +1300,15 @@ Private Methods
 
 **_getName()**
 
-    No documentation.
 
 **_getNameWithOctave()**
 
-    No documentation.
 
 **_getOctave()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -1419,42 +1320,27 @@ Private Methods
     1 
     >>>
 
-**_getPriority()**
-
-    No documentation.
-
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **_getStep()**
 
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
 
 **_preDurationLily()**
 
     Method to return all the lilypond information that appears before the duration number. Is the same for simple and complex notes. 
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -1471,7 +1357,7 @@ Private Methods
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -1489,11 +1375,9 @@ Private Methods
 
 **_setFreq440()**
 
-    No documentation.
 
 **_setFrequency()**
 
-    No documentation.
 
 **_setLyric()**
 
@@ -1506,79 +1390,121 @@ Private Methods
 
 **_setMX()**
 
-    Given an mxNote, fille the necessary parameters 
+    Given an mxNote, fill the necessary parameters 
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
-    No documentation.
 
 **_setName()**
 
-    No documentation.
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 **_setStep()**
 
-    No documentation.
+
+
+Class LilyString
+----------------
+
+
+Attributes
+~~~~~~~~~~
+
++ value
+
+Methods
+~~~~~~~
+
+**addMidi()**
+
+    override this in subclasses, such as LilyScore 
+
+**checkForMidi()**
+
+
+**checkForMidiAndAdd()**
+
+
+**createPDF()**
+
+
+**midiWrapped()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**playMIDIfile()**
+
+
+**quickHeader()**
+
+    Returns a quick and dirty lilyPond header for the stream 
+
+**runThroughLily()**
+
+
+**savePNG()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**showImageDirect()**
+
+    borrowed from and modified from the excellent PIL image library, but needed some changes to the NT handling 
+
+**showPDF()**
+
+
+**showPNG()**
+
+    Take the LilyString, run it through LilyPond, and then show it as a PNG file. On Windows, the PNG file will not be deleted, so you  will need to clean out TEMP every once in a while 
+
+**showPNGandPlayMIDI()**
+
+
+**wrapForMidi()**
+
+
+**wrappedValue()**
+
+    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
+
+**writeTemp()**
+
+
+Private Methods
+~~~~~~~~~~~~~~~
+
+**_getWrappedValue()**
+
+    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
 
 
 Class Lyric
 -----------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + number
 + syllabic
 + text
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **mx()**
 
@@ -1618,18 +1544,15 @@ Private Methods
 Class LyricException
 --------------------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **args()**
 
-    No documentation.
 
 **message()**
 
-    No documentation.
 
 
 Class Note
@@ -1637,8 +1560,8 @@ Class Note
 
 Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + beams
@@ -1650,17 +1573,11 @@ Public Attributes
 + pitch
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
-    No documentation.
 
 **appendDuration()**
 
@@ -1683,11 +1600,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -1695,7 +1610,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -1703,16 +1617,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -1738,15 +1652,12 @@ Public Methods
 
 **freq440()**
 
-    No documentation.
 
 **frequency()**
 
-    No documentation.
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -1754,7 +1665,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -1774,7 +1685,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **midi()**
 
@@ -1787,7 +1697,6 @@ Public Methods
 
 **midiNote()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -1799,23 +1708,15 @@ Public Methods
 
 **name()**
 
-    No documentation.
 
 **nameWithOctave()**
 
-    No documentation.
 
 **octave()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -1827,22 +1728,17 @@ Public Methods
     1 
     >>>
 
-**priority()**
-
-    No documentation.
-
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -1850,11 +1746,10 @@ Public Methods
 
 **setAccidental()**
 
-    No documentation.
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -1898,28 +1793,22 @@ Public Methods
 
 **step()**
 
-    No documentation.
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDiatonicNoteNum()**
 
@@ -1933,11 +1822,9 @@ Private Methods
 
 **_getFreq440()**
 
-    No documentation.
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getLily()**
 
@@ -1945,7 +1832,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -1966,23 +1852,15 @@ Private Methods
 
 **_getName()**
 
-    No documentation.
 
 **_getNameWithOctave()**
 
-    No documentation.
 
 **_getOctave()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -1994,42 +1872,27 @@ Private Methods
     1 
     >>>
 
-**_getPriority()**
-
-    No documentation.
-
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **_getStep()**
 
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
 
 **_preDurationLily()**
 
     Method to return all the lilypond information that appears before the duration number. Is the same for simple and complex notes. 
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -2046,7 +1909,7 @@ Private Methods
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -2064,11 +1927,9 @@ Private Methods
 
 **_setFreq440()**
 
-    No documentation.
 
 **_setFrequency()**
 
-    No documentation.
 
 **_setLyric()**
 
@@ -2081,89 +1942,53 @@ Private Methods
 
 **_setMX()**
 
-    Given an mxNote, fille the necessary parameters 
+    Given an mxNote, fill the necessary parameters 
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
-    No documentation.
 
 **_setName()**
 
-    No documentation.
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 **_setStep()**
 
-    No documentation.
 
 
 Class NoteException
 -------------------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **args()**
 
-    No documentation.
 
 **message()**
 
-    No documentation.
 
 
 Class Pitch
 -----------
 
-No documentation.
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
@@ -2175,7 +2000,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -2183,16 +2007,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -2250,7 +2074,6 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **implicitOctave()**
 
@@ -2258,7 +2081,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **midi()**
 
@@ -2314,13 +2137,8 @@ Public Methods
     >>> a.ps
     187 
 
-**offset()**
-
-    No documentation.
-
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -2340,10 +2158,6 @@ Public Methods
     11 
     >>> dis.name
     'B' 
-
-**priority()**
-
-    No documentation.
 
 **ps()**
 
@@ -2374,7 +2188,6 @@ Private Methods
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
@@ -2416,11 +2229,9 @@ Private Methods
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getImplicitOctave()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -2469,13 +2280,8 @@ Private Methods
 
     This is _octave, not implicitOctave 
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -2496,13 +2302,8 @@ Private Methods
     >>> dis.name
     'B' 
 
-**_getPriority()**
-
-    No documentation.
-
 **_getPs()**
 
-    No documentation.
 
 **_getStep()**
 
@@ -2520,21 +2321,11 @@ Private Methods
     >>> a.freq440
     440.0 
 
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
-
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -2581,7 +2372,6 @@ Private Methods
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
@@ -2595,43 +2385,15 @@ Private Methods
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setPs()**
 
-    No documentation.
 
 **_setStep()**
 
@@ -2639,7 +2401,6 @@ Private Methods
 
 **_setfreq440()**
 
-    No documentation.
 
 **_updatePitchSpace()**
 
@@ -2649,10 +2410,9 @@ Private Methods
 Class QuarterNote
 -----------------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + beams
@@ -2664,17 +2424,11 @@ Public Attributes
 + pitch
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
-    No documentation.
 
 **appendDuration()**
 
@@ -2697,11 +2451,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -2709,7 +2461,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -2717,16 +2468,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -2752,15 +2503,12 @@ Public Methods
 
 **freq440()**
 
-    No documentation.
 
 **frequency()**
 
-    No documentation.
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -2768,7 +2516,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -2788,7 +2536,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **midi()**
 
@@ -2801,7 +2548,6 @@ Public Methods
 
 **midiNote()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -2813,23 +2559,15 @@ Public Methods
 
 **name()**
 
-    No documentation.
 
 **nameWithOctave()**
 
-    No documentation.
 
 **octave()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -2841,22 +2579,17 @@ Public Methods
     1 
     >>>
 
-**priority()**
-
-    No documentation.
-
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -2864,11 +2597,10 @@ Public Methods
 
 **setAccidental()**
 
-    No documentation.
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -2912,28 +2644,22 @@ Public Methods
 
 **step()**
 
-    No documentation.
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDiatonicNoteNum()**
 
@@ -2947,11 +2673,9 @@ Private Methods
 
 **_getFreq440()**
 
-    No documentation.
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getLily()**
 
@@ -2959,7 +2683,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -2980,23 +2703,15 @@ Private Methods
 
 **_getName()**
 
-    No documentation.
 
 **_getNameWithOctave()**
 
-    No documentation.
 
 **_getOctave()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -3008,42 +2723,27 @@ Private Methods
     1 
     >>>
 
-**_getPriority()**
-
-    No documentation.
-
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **_getStep()**
 
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
 
 **_preDurationLily()**
 
     Method to return all the lilypond information that appears before the duration number. Is the same for simple and complex notes. 
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -3060,7 +2760,7 @@ Private Methods
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -3078,11 +2778,9 @@ Private Methods
 
 **_setFreq440()**
 
-    No documentation.
 
 **_setFrequency()**
 
-    No documentation.
 
 **_setLyric()**
 
@@ -3095,63 +2793,31 @@ Private Methods
 
 **_setMX()**
 
-    Given an mxNote, fille the necessary parameters 
+    Given an mxNote, fill the necessary parameters 
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
-    No documentation.
 
 **_setName()**
 
-    No documentation.
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 **_setStep()**
 
-    No documentation.
 
 
 Class Rest
@@ -3159,8 +2825,8 @@ Class Rest
 
 General rest class 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + contexts
@@ -3170,13 +2836,8 @@ Public Attributes
 + notations
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **appendDuration()**
 
@@ -3199,11 +2860,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -3211,7 +2870,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -3219,16 +2877,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -3250,7 +2908,6 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -3258,7 +2915,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -3283,7 +2940,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -3293,30 +2949,20 @@ Public Methods
 
     Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
 
-**offset()**
-
-    No documentation.
-
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -3324,7 +2970,7 @@ Public Methods
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -3368,20 +3014,16 @@ Public Methods
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -3391,7 +3033,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -3401,24 +3042,15 @@ Private Methods
 
     This must call _getMX to get basic mxNote objects 
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
 
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
@@ -3431,25 +3063,15 @@ Private Methods
     >>> r1.lily
     'r2' 
 
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
-
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -3480,193 +3102,12 @@ Private Methods
 
 **_setMusicXML()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
-
-
-Class Test
-----------
-
-No documentation.
-
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _testMethodDoc
-+ _testMethodName
-
-Public Methods
-~~~~~~~~~~~~~~
-
-**assertAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertAlmostEquals()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertEquals()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertFalse()**
-
-    Fail the test if the expression is true. 
-
-**assertNotAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotAlmostEquals()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertNotEquals()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**assertTrue()**
-
-    Fail the test unless the expression is true. 
-
-**assert_()**
-
-    Fail the test unless the expression is true. 
-
-**countTestCases()**
-
-    No documentation.
-
-**debug()**
-
-    Run the test without collecting errors in a TestResult 
-
-**defaultTestResult()**
-
-    No documentation.
-
-**fail()**
-
-    Fail immediately, with the given message. 
-
-**failIf()**
-
-    Fail the test if the expression is true. 
-
-**failIfAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failIfEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**failUnless()**
-
-    Fail the test unless the expression is true. 
-
-**failUnlessAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failUnlessEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**failUnlessRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**failureException()**
-
-    Assertion failed. 
-
-**id()**
-
-    No documentation.
-
-**run()**
-
-    No documentation.
-
-**runTest()**
-
-    No documentation.
-
-**setUp()**
-
-    Hook method for setting up the test fixture before exercising it. 
-
-**shortDescription()**
-
-    Returns a one-line description of the test, or None if no description has been provided. The default implementation of this method returns the first line of the specified test method's docstring. 
-
-**tearDown()**
-
-    Hook method for deconstructing the test fixture after testing it. 
-
-**testComplex()**
-
-    No documentation.
-
-**testMusicXMLOutput()**
-
-    No documentation.
-
-**testNote()**
-
-    No documentation.
-
-Private Methods
-~~~~~~~~~~~~~~~
-
-**_exc_info()**
-
-    Return a version of sys.exc_info() with the traceback frame minimised; usually the top level of the traceback frame is not needed. 
 
 
 Class TestExternal
@@ -3674,14 +3115,8 @@ Class TestExternal
 
 These are tests that open windows and rely on external software 
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _testMethodDoc
-+ _testMethodName
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **assertAlmostEqual()**
 
@@ -3733,7 +3168,6 @@ Public Methods
 
 **countTestCases()**
 
-    No documentation.
 
 **debug()**
 
@@ -3741,7 +3175,6 @@ Public Methods
 
 **defaultTestResult()**
 
-    No documentation.
 
 **fail()**
 
@@ -3781,15 +3214,12 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **run()**
 
-    No documentation.
 
 **runTest()**
 
-    No documentation.
 
 **setUp()**
 
@@ -3803,9 +3233,12 @@ Public Methods
 
     Hook method for deconstructing the test fixture after testing it. 
 
-**testColor()**
+**testBasic()**
 
-    No documentation.
+
+**testSingle()**
+
+    Need to test direct meter creation w/o stream 
 
 Private Methods
 ~~~~~~~~~~~~~~~
@@ -3820,19 +3253,18 @@ Class Tie
 
 Object added to notes that are tied to other notes note1.tie = Tie("start") note1.tieStyle = "normal" # could be dotted or dashed print note1.tie.type # prints start Differences from MusicXML: notes do not need to know if they are tied from a previous note.  i.e., you can tie n1 to n2 just with a tie start on n1.  However, if you want proper musicXML output you need a tie stop on n2 one tie with "continue" implies tied from and tied to optional (to know what notes are next:) .to = note()   # not implimented yet, b/c of garbage coll. .from = note() (question: should notes be able to be tied to multiple notes for the case where a single note is tied both voices of a two-note-head unison?) 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + contexts
 + groups
 + type
 
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -3840,16 +3272,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -3871,23 +3303,13 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
-
-**offset()**
-
-    No documentation.
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **searchParent()**
 
@@ -3906,7 +3328,6 @@ Private Methods
 
 **_duration()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -3914,65 +3335,21 @@ Private Methods
 
     
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setDuration()**
 
     Set the offset as a quarterNote length 
 
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
-
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 
 Class Unpitched
@@ -3980,8 +3357,8 @@ Class Unpitched
 
 General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + contexts
@@ -3991,13 +3368,8 @@ Public Attributes
 + notations
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **appendDuration()**
 
@@ -4020,11 +3392,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -4032,7 +3402,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -4040,16 +3409,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -4075,7 +3444,6 @@ Public Methods
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -4083,7 +3451,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -4099,36 +3467,25 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **musicxml()**
 
     This must call _getMX to get basic mxNote objects 
 
-**offset()**
-
-    No documentation.
-
 **parent()**
 
-    No documentation.
-
-**priority()**
-
-    No documentation.
 
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -4136,7 +3493,7 @@ Public Methods
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -4180,20 +3537,16 @@ Public Methods
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDuration()**
 
@@ -4203,52 +3556,32 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMusicXML()**
 
     This must call _getMX to get basic mxNote objects 
 
-**_getOffset()**
-
-    No documentation.
-
 **_getParent()**
 
-    No documentation.
-
-**_getPriority()**
-
-    No documentation.
 
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
-
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -4275,48 +3608,20 @@ Private Methods
 
 **_setMusicXML()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 
 Class WholeNote
 ---------------
 
-No documentation.
 
-Public Attributes
-~~~~~~~~~~~~~~~~~
+Attributes
+~~~~~~~~~~
 
 + articulations
 + beams
@@ -4328,17 +3633,11 @@ Public Attributes
 + pitch
 + tie
 
-Private Attributes
-~~~~~~~~~~~~~~~~~~
-
-+ _duration
-
-Public Methods
-~~~~~~~~~~~~~~
+Methods
+~~~~~~~
 
 **accidental()**
 
-    No documentation.
 
 **appendDuration()**
 
@@ -4361,11 +3660,9 @@ Public Methods
 
 **clone()**
 
-    No documentation.
 
 **color()**
 
-    No documentation.
 
 **compactNoteInfo()**
 
@@ -4373,7 +3670,6 @@ Public Methods
 
 **contexts()**
 
-    No documentation.
 
 **copy()**
 
@@ -4381,16 +3677,16 @@ Public Methods
 
 **deepcopy()**
 
-    Return a depp copy of an object with no reference to the source. 
+    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
 
     >>> from music21 import note, duration
     >>> n = note.Note('A')
-    >>> n.offset = duration.Duration("quarter")
+    >>> n.offset = 1.0 #duration.Duration("quarter")
     >>> n.groups.append("flute")
     >>> n.groups
     ['flute'] 
     >>> b = n.deepcopy()
-    >>> b.offset = duration.Duration("half")
+    >>> b.offset = 2.0 #duration.Duration("half")
     >>> n is b
     False 
     >>> n.accidental = "-"
@@ -4416,15 +3712,12 @@ Public Methods
 
 **freq440()**
 
-    No documentation.
 
 **frequency()**
 
-    No documentation.
 
 **id()**
 
-    No documentation.
 
 **isChord()**
 
@@ -4432,7 +3725,7 @@ Public Methods
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
 
 **isNote()**
 
@@ -4452,7 +3745,6 @@ Public Methods
 
 **lyric()**
 
-    No documentation.
 
 **midi()**
 
@@ -4465,7 +3757,6 @@ Public Methods
 
 **midiNote()**
 
-    No documentation.
 
 **musicxml()**
 
@@ -4477,23 +3768,15 @@ Public Methods
 
 **name()**
 
-    No documentation.
 
 **nameWithOctave()**
 
-    No documentation.
 
 **octave()**
 
-    No documentation.
-
-**offset()**
-
-    No documentation.
 
 **parent()**
 
-    No documentation.
 
 **pitchClass()**
 
@@ -4505,22 +3788,17 @@ Public Methods
     1 
     >>>
 
-**priority()**
-
-    No documentation.
-
 **quarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **reinit()**
 
-    No documentation.
 
 **searchParent()**
 
@@ -4528,11 +3806,10 @@ Public Methods
 
 **setAccidental()**
 
-    No documentation.
 
 **show()**
 
-    This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
 **splitAtDurations()**
 
@@ -4576,28 +3853,22 @@ Public Methods
 
 **step()**
 
-    No documentation.
 
 **write()**
 
-    Write a file. A None file path will result in temporary file TODO: Discussion: I would like if at all possible to have the output formats moved out of the modules and into a format.XXXXX module.  That way someone could write an entirely new format without needing to muck around with our code. Some formats that we probably would not write ourselves but which I can see someone else really wanting to write include: kern, braille (see MTO 15.3), ascii, etc.  It would be easier for these users to code .write() methods for each of the formats there. 
-
-    
+    Write a file. A None file path will result in temporary file 
 
 Private Methods
 ~~~~~~~~~~~~~~~
 
 **_duration()**
 
-    No documentation.
 
 **_getAccidental()**
 
-    No documentation.
 
 **_getColor()**
 
-    No documentation.
 
 **_getDiatonicNoteNum()**
 
@@ -4611,11 +3882,9 @@ Private Methods
 
 **_getFreq440()**
 
-    No documentation.
 
 **_getFrequency()**
 
-    No documentation.
 
 **_getLily()**
 
@@ -4623,7 +3892,6 @@ Private Methods
 
 **_getLyric()**
 
-    No documentation.
 
 **_getMX()**
 
@@ -4644,23 +3912,15 @@ Private Methods
 
 **_getName()**
 
-    No documentation.
 
 **_getNameWithOctave()**
 
-    No documentation.
 
 **_getOctave()**
 
-    No documentation.
-
-**_getOffset()**
-
-    No documentation.
 
 **_getParent()**
 
-    No documentation.
 
 **_getPitchClass()**
 
@@ -4672,42 +3932,27 @@ Private Methods
     1 
     >>>
 
-**_getPriority()**
-
-    No documentation.
-
 **_getQuarterLength()**
 
     Return quarter length 
 
     >>> n = Note()
-    >>> n.quarterLength = 2
+    >>> n.quarterLength = 2.0
     >>> n.quarterLength
     2.0 
 
 **_getStep()**
 
-    No documentation.
-
-**_offset()**
-
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
 
 **_overriddenLily()**
 
-    No documentation.
 
 **_parent()**
 
-    No documentation.
 
 **_preDurationLily()**
 
     Method to return all the lilypond information that appears before the duration number. Is the same for simple and complex notes. 
-
-**_priority()**
-
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
 **_setAccidental()**
 
@@ -4724,7 +3969,7 @@ Private Methods
 
 **_setColor()**
 
-    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: 
+    should check data here uses this re: #[\dA-F]{6}([\dA-F][\dA-F])? No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha 
 
     >>> a = GeneralNote()
     >>> a.duration.type = 'whole'
@@ -4742,11 +3987,9 @@ Private Methods
 
 **_setFreq440()**
 
-    No documentation.
 
 **_setFrequency()**
 
-    No documentation.
 
 **_setLyric()**
 
@@ -4759,62 +4002,30 @@ Private Methods
 
 **_setMX()**
 
-    Given an mxNote, fille the necessary parameters 
+    Given an mxNote, fill the necessary parameters 
 
 **_setMidi()**
 
-    No documentation.
 
 **_setMusicXML()**
 
-    No documentation.
 
 **_setName()**
 
-    No documentation.
 
 **_setOctave()**
 
-    No documentation.
-
-**_setOffset()**
-
-    Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...) 
-
-    >>> import note
-    >>> import duration
-    >>> a = Element(note.Note('A#'))
-    >>> a.offset = 23.0
-    >>> a.offset
-    23.0 
-    >>> a.offset = duration.Duration("whole")
-    >>> a.offset
-    4.0 
 
 **_setParent()**
 
-    No documentation.
 
 **_setPitchClass()**
 
-    No documentation.
-
-**_setPriority()**
-
-    value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
-
-    >>> a = Element()
-    >>> a.priority = 3
-    >>> a.priority = 'high'
-    Traceback (most recent call last): 
-    ElementException: priority values must be integers. 
 
 **_setQuarterLength()**
 
-    No documentation.
 
 **_setStep()**
 
-    No documentation.
 
 

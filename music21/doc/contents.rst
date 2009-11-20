@@ -12,6 +12,11 @@ Music 21 Documentation
    glossary
    faq
    moduleCommon
+   moduleConverter
+   moduleDuration
+   moduleNote
+   modulePitch
+   moduleStream
 
 Indices and Tables
 ==================
