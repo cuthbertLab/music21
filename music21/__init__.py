@@ -55,4 +55,3 @@ __all__ = ["composition", "counterpoint", "doc", "humdrum", \
 # base Music21Object -- all objects should inherit from this!
 import base
 from base import *
-

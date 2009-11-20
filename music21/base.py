@@ -343,7 +343,107 @@ class Music21Object(object):
 
 
 #-------------------------------------------------------------------------------
-class Element(Music21Object):
+class BaseElement(Music21Object):
+    '''
+    contains all the positioning information of an Element, but NOT the object
+    inherited by stream.
+    '''
+    _offset  = 0.0
+    _id = None
+    _unlinkedDuration = None
+
+    def __init__(self):
+        Music21Object.__init__(self)
+
+
+    def _getDuration(self):
+        '''
+        Gets the duration of the Element (if separately set), but
+        normal returns the duration of the component object if available, otherwise
+        returns None.
+
+        >>> import note
+        >>> el1 = Element()
+        >>> n = note.Note('F#')
+        >>> n.quarterLength = 2.0
+        >>> n.duration.quarterLength 
+        2.0
+        >>> el1.obj = n
+        >>> el1.duration.quarterLength
+        2.0
+
+        ADVANCED FEATURE TO SET DURATION OF ELEMENTS SEPARATELY
+        >>> import music21.key
+        >>> ks1 = Element(music21.key.KeySignature())
+        >>> ks1.obj.duration
+        Traceback (most recent call last):
+        AttributeError: 'KeySignature' object has no attribute 'duration'
+        
+        >>> import duration
+        >>> ks1.duration = duration.Duration("whole")
+        >>> ks1.duration.quarterLength
+        4.0
+        >>> ks1.obj.duration  # still not defined
+        Traceback (most recent call last):
+        AttributeError: 'KeySignature' object has no attribute 'duration'
+        '''
+        if self._unlinkedDuration is not None:
+            return self._unlinkedDuration
+        elif hasattr(self.obj, 'duration'):
+            return self.obj.duration
+        else:
+            return None
+
+    def _setDuration(self, durationObj):
+        '''
+        Set the offset as a quarterNote length
+        '''
+        if (hasattr(durationObj, "quarterLength") and 
+            hasattr(self.obj, 'duration')):
+            # if a number assume it is a quarter length
+            self.obj.duration = durationObj
+        elif (hasattr(durationObj, "quarterLength")):
+            self._unlinkedDuration = durationObj
+        else:
+            # need to permit Duration object assignment here
+            raise Exception, 'this must be a Duration object, not %s' % durationObj
+
+    duration = property(_getDuration, _setDuration)
+
+    def _getOffset(self):
+        return self._offset  # return self_offset.quarterLength
+
+    def _setOffset(self, offset):
+        '''Set the offset as a quarterNote length
+        (N.B. offsets are quarterNote lengths, not Duration objects...)
+
+        >>> import note
+        >>> import duration
+        >>> a = Element(note.Note('A#'))
+        >>> a.offset = 23.0
+        >>> a.offset
+        23.0
+        >>> a.offset = 4.0 # duration.Duration("whole")
+        >>> a.offset
+        4.0
+        '''
+        if common.isNum(offset):
+            # if a number assume it is a quarter length
+            # self._offset = duration.DurationUnit()
+            # MSC: We can change this when we decide that we want to return
+            #      something other than quarterLength
+
+            self._offset = float(offset)
+        elif hasattr(offset, "quarterLength"):
+            ## probably a Duration object, but could be something else -- in any case, 
+            ## we'll take it.
+            self._offset = offset.quarterLength
+        else:
+            raise Exception, 'We cannot set  %s as an offset' % offset
+
+    offset = property(_getOffset, _setOffset)
+
+class Element(BaseElement):
     '''
     An element wraps an object so that the same object can
     be positioned within a stream.
@@ -361,15 +461,11 @@ class Element(Music21Object):
                    objects at the same offset.
     '''
 
-    _offset  = 0.0
-    _id = None
     obj = None
 
     def __init__(self, obj=None, offset=None, priority = 0):
         Music21Object.__init__(self)
-
         self.obj = obj # object stored here        
-        self._unlinkedDuration = None
 
     def getId(self):
         if self.obj is not None:
@@ -391,7 +487,28 @@ class Element(Music21Object):
 
     id = property (getId, setId)
 
+    def isClass(self, className):
+        '''
+        Returns true if the object embedded is a particular class.
 
+        Used by getElementsByClass in Stream
+
+        >>> import note
+        >>> a = Element(None)
+        >>> a.isClass(note.Note)
+        False
+        >>> a.isClass(types.NoneType)
+        True
+        >>> b = Element(note.Note('A4'))
+        >>> b.isClass(note.Note)
+        True
+        >>> b.isClass(types.NoneType)
+        False
+        '''
+        if isinstance(self.obj, className):
+            return True
+        else:
+            return False
     def copy(self):
         '''
         Makes a copy of this element with a reference
@@ -555,7 +672,7 @@ class Element(Music21Object):
         if storedobj is None:
             raise AttributeError("Could not get attribute '" + name + "' in an object-less element")
         else:
-            return getattr(storedobj, name)
+            return object.__getattribute__(storedobj, name)
 
 
 
@@ -603,118 +720,6 @@ class Element(Music21Object):
             return True
         else:
             return False
-
-    def isClass(self, className):
-        '''
-        Returns true if the object embedded is a particular class.
-
-        Used by getElementsByClass in Stream
-
-        >>> import note
-        >>> a = Element(None)
-        >>> a.isClass(note.Note)
-        False
-        >>> a.isClass(types.NoneType)
-        True
-        >>> b = Element(note.Note('A4'))
-        >>> b.isClass(note.Note)
-        True
-        >>> b.isClass(types.NoneType)
-        False
-        '''
-        if isinstance(self.obj, className):
-            return True
-        else:
-            return False
-
-    def _getDuration(self):
-        '''
-        Gets the duration of the Element (if separately set), but
-        normal returns the duration of the component object if available, otherwise
-        returns None.
-
-        >>> import note
-        >>> el1 = Element()
-        >>> n = note.Note('F#')
-        >>> n.quarterLength = 2.0
-        >>> n.duration.quarterLength 
-        2.0
-        >>> el1.obj = n
-        >>> el1.duration.quarterLength
-        2.0
-
-        ADVANCED FEATURE TO SET DURATION OF ELEMENTS SEPARATELY
-        >>> import music21.key
-        >>> ks1 = Element(music21.key.KeySignature())
-        >>> ks1.obj.duration
-        Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
-        
-        >>> import duration
-        >>> ks1.duration = duration.Duration("whole")
-        >>> ks1.duration.quarterLength
-        4.0
-        >>> ks1.obj.duration  # still not defined
-        Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
-        '''
-        if self._unlinkedDuration is not None:
-            return self._unlinkedDuration
-        elif hasattr(self.obj, 'duration'):
-            return self.obj.duration
-        else:
-            return None
-
-    def _setDuration(self, durationObj):
-        '''
-        Set the offset as a quarterNote length
-        '''
-        if (hasattr(durationObj, "quarterLength") and 
-            hasattr(self.obj, 'duration')):
-            # if a number assume it is a quarter length
-            self.obj.duration = durationObj
-        elif (hasattr(durationObj, "quarterLength")):
-            self._unlinkedDuration = durationObj
-        else:
-            # need to permit Duration object assignment here
-            raise Exception, 'this must be a Duration object, not %s' % durationObj
-
-    duration = property(_getDuration, _setDuration)
-
-    def _getOffset(self):
-        return self._offset  # return self_offset.quarterLength
-
-    def _setOffset(self, offset):
-        '''Set the offset as a quarterNote length
-        (N.B. offsets are quarterNote lengths, not Duration objects...)
-
-        >>> import note
-        >>> import duration
-        >>> a = Element(note.Note('A#'))
-        >>> a.offset = 23.0
-        >>> a.offset
-        23.0
-        >>> a.offset = 4.0 # duration.Duration("whole")
-        >>> a.offset
-        4.0
-        '''
-        if common.isNum(offset):
-            # if a number assume it is a quarter length
-            # self._offset = duration.DurationUnit()
-            # MSC: We can change this when we decide that we want to return
-            #      something other than quarterLength
-
-            self._offset = float(offset)
-        elif hasattr(offset, "quarterLength"):
-            ## probably a Duration object, but could be something else -- in any case, 
-            ## we'll take it.
-            self._offset = offset.quarterLength
-        else:
-            raise Exception, 'We cannot set  %s as an offset' % offset
-
-    offset = property(_getOffset, _setOffset)
-
-
 
 
 

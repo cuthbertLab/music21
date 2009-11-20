@@ -20,7 +20,6 @@ import doctest, unittest
 
 import music21 ## needed to properly do isinstance checking
 from music21 import Element
-
 from music21 import common
 from music21 import clef
 from music21 import chord
@@ -523,7 +522,7 @@ saveRR = recurseRepr
 
 
 #-------------------------------------------------------------------------------
-class Stream(Element):
+class Stream(music21.BaseElement):
     '''
     This is basic unit for timed Elements. In many cases these timed
     Elements will be of the same class of things; notes, clefs, etc. This is
@@ -548,7 +547,7 @@ class Stream(Element):
         '''
         
         '''
-        Element.__init__(self)
+        music21.BaseElement.__init__(self)
 
         # self._elements stores Element objects. These are not ordered.
         # this should have a public attribute/property self.elements
@@ -3599,7 +3598,9 @@ class Test(unittest.TestCase):
         
         b.elements[0].duration.tuplets[0].type = "start"
         b.elements[-1].duration.tuplets[0].type = "stop"
-        b.elements[2].editorial.comment.text = "a real C"
+        b2temp = b.elements[2]
+        c = b2temp.editorial
+        c.comment.text = "a real C"
         
         bestC = b.bestClef(allowTreble8vb = True)
         a.append(bestC)
@@ -3680,7 +3681,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter
-        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        thisWork = corpus.getWork('haydn/opus74no2/movement4.xml')
+        a = converter.parse(thisWork)
         b = a[3][10:20]
         c = a[3][20:30]
         d = a[3][30:40]
@@ -3759,4 +3761,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, 'noDocTest')
