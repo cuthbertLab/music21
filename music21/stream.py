@@ -642,8 +642,8 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> a.fillNone(6)
-        >>> b = a[2:5]
-        >>> len(b)
+        >>> subslice = a[2:5]
+        >>> len(subslice)
         3
         >>> a[1].offset
         1.0
@@ -653,11 +653,11 @@ class Stream(Element):
         >>> a.append(b)
         >>> a[0].obj == None
         True
-        >>> a[note.Note][0] == b
+        >>> a[note.Note][0].obj == b
         True
-        >>> a['violin'][0] == b
+        >>> a['violin'][0].obj == b
         True
-        >>> a['green'] == b
+        >>> a['green'].obj == b
         True
         '''
 
@@ -813,7 +813,7 @@ class Stream(Element):
         True
         '''        
         # if an element or a stream
-        if not isinstance(other, music21.Music21Object): 
+        if not isinstance(other, music21.Element): 
             other = Element(other)
         new = self.copy()
         if isinstance(other, Stream):
@@ -839,7 +839,7 @@ class Stream(Element):
         attributes (if any) in the object?
         '''
         # if not an element, embed
-        if not isinstance(item, music21.Music21Object): 
+        if not isinstance(item, music21.Element): 
             element = Element(item)
         else:
             element = item
@@ -882,7 +882,7 @@ class Stream(Element):
         >>> a._getHighestOffset()
         32.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        if not isinstance(item, music21.Element): # if not an element, embed
             element = Element(item)
         else:
             element = item
@@ -962,7 +962,7 @@ class Stream(Element):
             others = [others]
 
         for other in others:
-            if isinstance(other, music21.Music21Object): # if an element or a stream
+            if isinstance(other, music21.Element): # if an element or a stream
                 element = other
             else: # create an element for this stream
                 element = Element(other)
@@ -1703,7 +1703,7 @@ class Stream(Element):
         >>> a[9].offset
         36.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        if not isinstance(item, music21.Element): # if not an element, embed
             element = Element(item)
         else:
             element = item # TODO: remove for new-old-style
@@ -1724,7 +1724,7 @@ class Stream(Element):
         >>> a[10].offset
         10.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        if not isinstance(item, music21.Element): # if not an element, embed
             element = Element(item)
         else:
             element = item

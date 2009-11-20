@@ -18,7 +18,6 @@ base -- the convention within music21 is that __init__ files contain:
    
 so everything in this file can be accessed as music21.XXXX
 
-Because this module uses some music21 modules (common, ot every music21 module can import music21 
 '''
 
 
@@ -125,7 +124,6 @@ class Music21Object(object):
 
     '''
 
-    _offset  = 0.0
     _duration = None
     _parent = None
     contexts = None
@@ -173,13 +171,13 @@ class Music21Object(object):
 
         >>> from music21 import note, duration
         >>> n = note.Note('A')
-        >>> n.offset = duration.Duration("quarter")
+        >>> n.offset = 1.0 #duration.Duration("quarter")
         >>> n.groups.append("flute")
         >>> n.groups
         ['flute']
 
         >>> b = n.deepcopy()
-        >>> b.offset = duration.Duration("half")
+        >>> b.offset = 2.0 #duration.Duration("half")
         
         >>> n is b
         False
@@ -249,38 +247,6 @@ class Music21Object(object):
     parent = property(_getParent, _setParent)
 
 
-    def _getOffset(self):
-        return self._offset  # return self_offset.quarterLength
-
-    def _setOffset(self, offset):
-        '''Set the offset as a quarterNote length
-        (N.B. offsets are quarterNote lengths, not Duration objects...)
-
-        >>> import note
-        >>> import duration
-        >>> a = Element(note.Note('A#'))
-        >>> a.offset = 23.0
-        >>> a.offset
-        23.0
-        >>> a.offset = duration.Duration("whole")
-        >>> a.offset
-        4.0
-        '''
-        if common.isNum(offset):
-            # if a number assume it is a quarter length
-            # self._offset = duration.DurationUnit()
-            # MSC: We can change this when we decide that we want to return
-            #      something other than quarterLength
-
-            self._offset = float(offset)
-        elif hasattr(offset, "quarterLength"):
-            ## probably a Duration object, but could be something else -- in any case, 
-            ## we'll take it.
-            self._offset = offset.quarterLength
-        else:
-            raise Exception, 'We cannot set  %s as an offset' % offset
-
-    offset = property(_getOffset, _setOffset)
 
     def _getDuration(self):
         '''
@@ -395,7 +361,9 @@ class Element(Music21Object):
                    objects at the same offset.
     '''
 
+    _offset  = 0.0
     _id = None
+    obj = None
 
     def __init__(self, obj=None, offset=None, priority = 0):
         Music21Object.__init__(self)
@@ -471,11 +439,11 @@ class Element(Music21Object):
         >>> n = note.Note('A')
         
         >>> a = Element(obj = n)
-        >>> a.offset = duration.Duration("quarter")
+        >>> a.offset = 1.0 # duration.Duration("quarter")
         >>> a.groups.append("flute")
 
         >>> b = a.deepcopy()
-        >>> b.offset = duration.Duration("half")
+        >>> b.offset = 2.0 # duration.Duration("half")
         
         >>> a.obj is b.obj
         False
@@ -563,26 +531,31 @@ class Element(Music21Object):
 #             environLocal.printDebug('getting attribute from self.obj')
 #             return self.obj.__getattribute__(name)
 
-#     def __setattr__(self, name, value):
-#         try: # first, look to the internal object
-#             return self.obj.__setattr__(name, value)
-#         except AttributeError: # then, look to the Element
-#             return Music21Object.__setattr__(self, name)
+    def __setattr__(self, name, value):
+        if name in self.__dict__:  # if in the Element already, set that first
+            object.__setattr__(self, name, value)
+        
+        # if not, change the attribute in the stored object
+        storedobj = object.__getattribute__(self, "obj")
+        if name not in ['offset', '_offset'] and \
+            storedobj is not None and hasattr(storedobj, name):
+            setattr(storedobj, name, value)
+        else:  # unless neither has the attribute, in which case add it to the Element
+            object.__setattr__(self, name, value)
 
-
-# this does not work:
-#     def __getattr__(self, name):
-#         '''This method is only called when __getattribute__() fails.
-#         Using this also avoids the potential recursion problems of subclassing
-#         __getattribute__()_
-#        
-#         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
-#         
-#         '''
-#         if name in self.obj.__dict__:
-#             return self.obj.name
-#         else:
-#             raise AttributeError
+    def __getattr__(self, name):
+        '''This method is only called when __getattribute__() fails.
+        Using this also avoids the potential recursion problems of subclassing
+        __getattribute__()_
+        
+        see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
+         
+        '''
+        storedobj = Music21Object.__getattribute__(self, "obj")
+        if storedobj is None:
+            raise AttributeError("Could not get attribute '" + name + "' in an object-less element")
+        else:
+            return getattr(storedobj, name)
 
 
 
@@ -708,6 +681,38 @@ class Element(Music21Object):
 
     duration = property(_getDuration, _setDuration)
 
+    def _getOffset(self):
+        return self._offset  # return self_offset.quarterLength
+
+    def _setOffset(self, offset):
+        '''Set the offset as a quarterNote length
+        (N.B. offsets are quarterNote lengths, not Duration objects...)
+
+        >>> import note
+        >>> import duration
+        >>> a = Element(note.Note('A#'))
+        >>> a.offset = 23.0
+        >>> a.offset
+        23.0
+        >>> a.offset = 4.0 # duration.Duration("whole")
+        >>> a.offset
+        4.0
+        '''
+        if common.isNum(offset):
+            # if a number assume it is a quarter length
+            # self._offset = duration.DurationUnit()
+            # MSC: We can change this when we decide that we want to return
+            #      something other than quarterLength
+
+            self._offset = float(offset)
+        elif hasattr(offset, "quarterLength"):
+            ## probably a Duration object, but could be something else -- in any case, 
+            ## we'll take it.
+            self._offset = offset.quarterLength
+        else:
+            raise Exception, 'We cannot set  %s as an offset' % offset
+
+    offset = property(_getOffset, _setOffset)
 
 
 
@@ -742,11 +747,11 @@ class Test(unittest.TestCase):
     def testNoteCreation(self):
         from music21 import note, duration
         n = note.Note('A')
-        n.offset = duration.Duration("quarter")
+        n.offset = 1.0 #duration.Duration("quarter")
         n.groups.append("flute")
 
         b = n.deepcopy()
-        b.offset = duration.Duration("half")
+        b.offset = 2.0 # duration.Duration("half")
         
         self.assertFalse(n is b)
         n.accidental = "-"
@@ -756,6 +761,22 @@ class Test(unittest.TestCase):
         n.groups[0] = "bassoon"
         self.assertFalse("flute" in n.groups)
         self.assertTrue("flute" in b.groups)
+
+    def testOffsets(self):
+        from music21 import note
+        a = Element(note.Note('A#'))
+        a.offset = 23.0
+        self.assertEqual(a.offset, 23.0)
+
+    def testObjectsAndElements(self):
+        from music21 import note, stream
+        note1 = note.Note("B-")
+        note1.type = "whole"
+        stream1 = stream.Stream()
+        stream1.addNext(note1)
+        stream1.addNext(note1)
+        subStream = stream1.getNotes()
+
 
 def mainTest(*testClasses):
     '''
@@ -795,3 +816,4 @@ def mainTest(*testClasses):
 
 if __name__ == "__main__":
     mainTest(Test)
+    
