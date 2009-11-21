@@ -52,7 +52,7 @@ class Test(unittest.TestCase):
 
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)
-        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True) # no lyrics!
+        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True) 
 
 
 

@@ -1205,6 +1205,8 @@ class MeterSequence(MeterTerminal):
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
 
+    # TODO: need to find a way to unlink .display
+
     def __init__(self, value=None, partitionRequest=None):
         music21.Music21Object.__init__(self)
 
