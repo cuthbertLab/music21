@@ -374,11 +374,11 @@ Methods
 
 **pop()**
 
-    D.pop(k[,d]) -> v, remove specified key and return the corresponding value. If key is not found, d is returned if given, otherwise KeyError is raised 
+    D.pop(k[,d]) -> v, remove specified key and return the corresponding value If key is not found, d is returned if given, otherwise KeyError is raised 
 
 **popitem()**
 
-    D.popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple; but raise KeyError if D is empty. 
+    D.popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple; but raise KeyError if D is empty 
 
 **setdefault()**
 
@@ -386,7 +386,7 @@ Methods
 
 **update()**
 
-    D.update(E, **F) -> None.  Update D from dict/iterable E and F. If E has a .keys() method, does:     for k in E: D[k] = E[k] If E lacks .keys() method, does:     for (k, v) in E: D[k] = v In either case, this is followed by: for k in F: D[k] = F[k] 
+    D.update(E, **F) -> None.  Update D from E and F: for k in E: D[k] = E[k] (if E has keys else: for (k, v) in E: D[k] = v) then: for k in F: D[k] = F[k] 
 
 **values()**
 
@@ -421,7 +421,7 @@ Methods
 
 **index()**
 
-    L.index(value, [start, [stop]]) -> integer -- return first index of value. Raises ValueError if the value is not present. 
+    L.index(value, [start, [stop]]) -> integer -- return first index of value 
 
 **insert()**
 
@@ -429,11 +429,11 @@ Methods
 
 **pop()**
 
-    L.pop([index]) -> item -- remove and return item at index (default last). Raises IndexError if list is empty or index is out of range. 
+    L.pop([index]) -> item -- remove and return item at index (default last) 
 
 **remove()**
 
-    L.remove(value) -- remove first occurrence of value. Raises ValueError if the value is not present. 
+    L.remove(value) -- remove first occurrence of value 
 
 **reverse()**
 

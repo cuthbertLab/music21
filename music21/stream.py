@@ -1521,14 +1521,33 @@ class Stream(music21.BaseElement, music21.Music21Object):
     # convenieunce routines for obtaining elements form a Stream
 
     def getNotes(self):
-        '''Return all Note objects in a Stream()
+        '''Return all Note, Chord, Rest, etc. objects in a Stream()
         '''
-        return self.getElementsByClass(note.GeneralNote)
+        return self.getElementsByClass(note.GeneralNote, chord.Chord)
 
     notes = property(getNotes)
 
+    def getPitches(self):
+        '''
+        Return all pitches found in any element in the stream as a list
+
+        (since pitches have no duration, it's a list not a stream)
+        '''        
+        returnPitches = []
+        for thisEl in self.elements:
+            if hasattr(thisEl, "pitch"):
+                returnPitches.append(thisEl.pitch)
+            elif hasattr(thisEl, "pitches"):
+                for thisPitch in thisEl.pitches:
+                    returnPitches.append(thisPitch)
+
+        return returnPitches
+    
+    pitches = property(getPitches)
+        
+
     def getMeasures(self):
-        '''Return all Measure objects in a Stream
+        '''Return all Measure objects in a Stream()
         '''
         return self.getElementsByClass(Measure)
 
@@ -3773,8 +3792,6 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(b[8], music21.stream.Measure), True)
         self.assertEqual(b[8].parent, b) #measures parent should be part
 
-
-
     def testExtractedNoteAssignLyric(self):
         from music21 import converter, corpus, text
         a = converter.parse(corpus.getWork('opus74no1', 3))
@@ -3821,4 +3838,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal, 'noDocTest')
+    music21.mainTest(Test)

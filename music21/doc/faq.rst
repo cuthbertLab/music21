@@ -19,15 +19,15 @@ What is the native music21 data format?
     
     But if you must store your music21 data somehow, here are some suggestions:
     
-    * For data that can quickly and exactly be recreated, the script that generates it should be used as the data storage unit.
+    * For data that can quickly and exactly be recreated, use the script that generates as your data storage.  Then just rerun the script to get your data back.
 
-    * For data storage of notation, musicXML output should work well for many purposes. If you just want to store an audio file or graphic of your output, MIDI or Lilypond->PNGcould work.
+    * For storing music notation, musicXML output will work well for many purposes. If you just want to store an audio file or graphic of your output, MIDI or Lilypond->PNG could work.
 
-    * For data that cannot easily be recreated (because it's computationally expensiveto create, or relies on user input, or is stochastically generated), Python's pickle or cPickle packages will allow you to store your data on disk.It cannotnecessarily be read in by a later version of music21 (i.e., the Finale problem inreverse), so it should not be used for long term storage and sharing.
+    * For data that cannot easily be recreated (because it's computationally expensive to create, or relies on user input, or is stochastically generated), Python's pickle or cPickle packages will allow you to store your data on disk.  These files cannot necessarily be read in by a later version of music21 (This is the reverse of the problem Finale has, where you can only read older versions of files), so it should not be used for long term storage and sharing.
 
-    * For data that cannot easily be recreated but needs long-term storage and sharing,try saving the relevant parts of the data in an XML, json, or even CSV(!) format. See plistlib http://docs.python.org/dev/library/plistlib.html or http://code.activestate.com/recipes/440595. You cannot store every element of python's object structure, but you should easilybe able to store the parts that are difficult to recreate.
+    * For data that cannot easily be recreated but needs long-term storage and sharing, try saving the relevant parts of the data in an XML, json, or even CSV(!) format. See plistlib http://docs.python.org/dev/library/plistlib.html or http://code.activestate.com/recipes/440595. You cannot store every element of python's object structure, but you should easily be able to store the parts that are difficult to recreate.
 
-    * If you're programming data structures too complex to be encapsulated in one of thesolutions above, you should have enough experience to create a data storage format of your own. Please consider contributing your solution to improve the package.
+    * If you're programming data structures too complex to be encapsulated in one of the solutions above, you should have enough experience to create a data storage format of your own. Please consider contributing your solution to improve the package.
 
 Can I synthesize sounds with music21?
 
