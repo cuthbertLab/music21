@@ -21,7 +21,7 @@ def assembleLyrics(streamIn):
     noteStream = streamIn.flat.getNotes()
     for n in noteStream:
         for lyricObj in n.lyrics: # a list of lyric objs
-            print lyricObj, lyricObj.syllabic, lyricObj.text
+            #print lyricObj, lyricObj.syllabic, lyricObj.text
             # need to match case of non-defined syllabic attribute
             if lyricObj.syllabic in ['begin', 'middle']:
                 word.append(lyricObj.text)
