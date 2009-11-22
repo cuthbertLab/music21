@@ -1804,6 +1804,14 @@ class Test(unittest.TestCase):
         
 
 
+    def testMeterDeepcopy(self):
+        a = MeterSequence()
+        a.load('4/4', 4)
+        str(a) == '{1/4+1/4+1/4+1/4}'
+        
+        b = deepcopy(a)        
+
+
 
 
 

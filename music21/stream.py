@@ -1926,13 +1926,13 @@ class Stream(music21.BaseElement, music21.Music21Object):
         '''
 
         # TODO: this may need to make measure for a stream without 
-        # measures
+        # measuress
 
         if not self.isClass(Measure):
             raise StreamException('cannot yet create beams without a Measure')
-    
+        
         if self.timeSignature == None:
-            raise StreamException('cannot proces beams in a Measure wtihout a time signature')
+            raise StreamException('cannot proces beams in a Measure without a time signature')
             # could just get a default here time signature here
         else:
             pass
