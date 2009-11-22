@@ -8,7 +8,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
+import music21
+import doctest, unittest
 
 
 
@@ -13325,4 +13326,35 @@ binchoisMagnificat = """<?xml version="1.0" encoding="utf-8"?>
 
 
 ALL  = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1, binchoisMagnificat]
+
+
+def get(contentRequest):
+    '''Get test material by type of content
+
+    >>> a = get('lyrics')
+    '''
+    if contentRequest in ['lyrics']:
+        return chantQuemQueritis
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        from music21 import converter
+        for testMaterial in ALL[:1]:
+            a = converter.parse(testMaterial)
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
 

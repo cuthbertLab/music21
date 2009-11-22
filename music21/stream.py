@@ -3124,7 +3124,7 @@ class Measure(Stream):
             if mxMeasure.external['time'] != None:
                 mxTimeList = [mxMeasure.external['time']]
             else:
-                environLocal.printDebug('loading with default mxTime')
+                #environLocal.printDebug('loading with default mxTime')
                 mxTime = musicxmlMod.Time()
                 mxTime.setDefaults()
                 mxTimeList = [mxTime]
