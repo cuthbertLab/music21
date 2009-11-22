@@ -1912,6 +1912,51 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
+    # transformations of self that return a new Stream
+
+    def makeBeams(self):
+        '''Return a new measure with beams applied to all notes. Presently this creates a new, independent copy of the source.
+
+        >>> aMeasure = Measure()
+        >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
+        >>> aNote = note.Note()
+        >>> aNote.quarterLength = .25
+        >>> aMeasure.repeatAdd(aNote,16)
+        >>> bMeasure = aMeasure.makeBeams()
+        '''
+
+        # TODO: this may need to make measure for a stream without 
+        # measures
+
+        if not self.isClass(Measure):
+            raise StreamException('cannot yet create beams without a Measure')
+    
+        if self.timeSignature == None:
+            raise StreamException('cannot proces beams in a Measure wtihout a time signature')
+            # could just get a default here time signature here
+        else:
+            pass
+
+        # return a deepcopy of this measure that is modified with beams
+        m = self.deepcopy()
+        ts = m.timeSignature
+
+        environLocal.printDebug(['beaming with ts', ts])
+        noteStream = m.getNotes()
+
+        durList = []
+        for n in noteStream:
+            durList.append(n.duration)
+
+        beamsList = ts.getBeams(durList)
+        for i in range(len(noteStream)):
+            noteStream[i].beams = beamsList[i]
+        return m
+
+
+
+
+    #---------------------------------------------------------------------------
     def _getSorted(self):
         '''
         returns a new Stream where all the elements are sorted according to offset time
@@ -3001,33 +3046,6 @@ class Measure(Stream):
     clef = property(_getClef, _setClef)    
 
 
-    #---------------------------------------------------------------------------
-    # transformations of self that return a new Measure
-
-    def makeBeams(self):
-        '''Return a new measure with beams applied to all notes. Presently this creates a new, independent copy of the source.
-
-        >>> a = Measure()
-        >>> n = note.Note()
-        '''
-        if self.timeSignature == None:
-            raise StreamException('cannot proces beams in a Measure wtihout a time signature')
-
-        # return a deepcopy of this measure that is modified with beams
-        m = self.deepcopy()
-
-        ts = m.timeSignature
-        environLocal.printDebug(['beaming with ts', ts])
-        noteStream = m.getNotes()
-
-        durList = []
-        for n in noteStream:
-            durList.append(n.duration)
-
-        beamsList = ts.getBeams(durList)
-        for i in range(len(noteStream)):
-            noteStream[i].beams = beamsList[i]
-        return m
 
     #---------------------------------------------------------------------------
     def _getMxDynamics(self, mxDirection):
@@ -3549,6 +3567,16 @@ class TestExternal(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), 360)
 
         s.show()
+
+
+    def testBeamsMeasure(self):
+        aMeasure = Measure()
+        aMeasure.timeSignature = meter.TimeSignature('4/4')
+        aNote = note.Note()
+        aNote.quarterLength = .25
+        aMeasure.repeatAdd(aNote,16)
+        bMeasure = aMeasure.makeBeams()
+        bMeasure.show()
 
 
 #-------------------------------------------------------------------------------
