@@ -3017,6 +3017,7 @@ class Measure(Stream):
         >>> a.clef.sign    # clef is an element
         'G'
         '''
+        # TODO: perhaps sort by priority?
         clefList = self.getElementsByClass(clef.Clef)
         # only return cleff that has a zero offset
         clefList = clefList.getElementsByOffset(0,0)
@@ -3035,12 +3036,10 @@ class Measure(Stream):
         >>> a.clef.sign
         'F'
         '''
-        # TODO: this needs to remove an existing clef at this position
-        clefList = self.getElementsByClass(clef.Clef)
-        clefList = clefList.getElementsByOffset(0,0)
-        if len(clefList) != 0:
-            environLocal.printDebug(['removing clef', clefList[0]])
-            junk = self.pop(self.index(clefList[0]))
+        oldClef = self._getClef()
+        if oldClef != None:
+            environLocal.printDebug(['removing clef', oldClef])
+            junk = self.pop(self.index(oldClef))
         self.insertAtOffset(clefObj, 0)
 
     clef = property(_getClef, _setClef)    
@@ -3934,11 +3933,12 @@ class Test(unittest.TestCase):
                          True)
 
 
-    def xTestInstrumentExtraction(self):
+    def xTestGetInstruments(self):
         '''Temporarily disabled while bypassing getInstrument issue
         '''
-
         from music21 import corpus, converter
+
+        #import pdb; pdb.set_trace()
 
         # manuall set parent to associate 
         a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
@@ -3949,7 +3949,7 @@ class Test(unittest.TestCase):
 
 
 
-        # search paraent from a measure within
+        # search parent from a measure within
 
         # canot use getMeasures as this destroys parents
         #b = a[3].getMeasures()
