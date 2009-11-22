@@ -251,33 +251,45 @@ class MeterTerminal(object):
     def __repr__(self):
         return self.__str__()
 
-    def __eq__(self, other):
-        '''Equality. 
+# now using ratioEqual()
 
-        >>> a = MeterTerminal('2/4')
-        >>> b = MeterTerminal('3/4')
-        '''
-#         if not isinstnace(other, MeterTerminal):
+#     def __eq__(self, other):
+#         '''Equality. 
+# 
+#         >>> a = MeterTerminal('2/4')
+#         >>> b = MeterTerminal('3/4')
+#         '''
+# #         if not isinstnace(other, MeterTerminal):
+# #             return False
+#         if other == None: return False
+#         if (other.numerator == self.numerator and 
+#             other.denominator == self.denominator):
+#             return True
+#         else:
 #             return False
+# 
+#     def __ne__(self, other):
+#         '''Inequality.
+#         '''
+# #         if not isinstnace(other, MeterTerminal):
+# #             return True
+#         if other == None: return True
+#         if (other.numerator == self.numerator and 
+#             other.denominator == self.denominator):
+#             return False
+#         else:
+#             return True
+
+
+    def ratioEqual(self, other):        
+        '''Compare the numerator and denominator of another object.
+        '''
         if other == None: return False
         if (other.numerator == self.numerator and 
             other.denominator == self.denominator):
             return True
         else:
             return False
-
-    def __ne__(self, other):
-        '''Inequality.
-        '''
-#         if not isinstnace(other, MeterTerminal):
-#             return True
-        if other == None: return True
-        if (other.numerator == self.numerator and 
-            other.denominator == self.denominator):
-            return False
-        else:
-            return True
-
 
 
     def deepcopy(self):
@@ -547,7 +559,8 @@ class MeterSequence(MeterTerminal):
         ...
         MeterException: cannot insert {1/16+1/16} into space of 1/4
         '''
-        if value == self[key]: # comparison of nuemrator and denominator
+        # comparison of numerator and denominator
+        if value.ratioEqual(self[key]): 
             self._partition[key] = value
         else:    
             raise MeterException('cannot insert %s into space of %s' % (value, self[key]))
@@ -1805,20 +1818,21 @@ class Test(unittest.TestCase):
 
 
     def testMeterDeepcopy(self):
+        import copy
         a = MeterSequence()
-        a.load('4/4', 4)
-        str(a) == '{1/4+1/4+1/4+1/4}'
-        
-        b = deepcopy(a)        
+        a.load('4/4', 4)        
+        b = copy.deepcopy(a)        
+        self.assertNotEqual(a, b)
 
 
-
-
+        c = TimeSignature('4/4')
+        d = copy.deepcopy(c)
+        self.assertNotEqual(c, d)
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
-    #music21.mainTest(Test)
+    #music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 
 
 
