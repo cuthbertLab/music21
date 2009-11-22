@@ -2337,6 +2337,11 @@ class Stream(music21.BaseElement, music21.Music21Object):
             if len(measureStream) == 0:            
                 raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
             environLocal.printDebug(['created measures:', len(measureStream)])
+        else: # there are measures
+            # this will override beams already set
+            pass
+            # measureStream = makeBeams(measureStream)
+
         # for each measure, call .mx to get the musicxml representation
         for obj in measureStream:
             mxPart.append(obj.mx)
