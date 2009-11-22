@@ -781,6 +781,55 @@ class Stream(music21.BaseElement, music21.Music21Object):
             self.isFlat = storedIsFlat
 
 
+    def __delitem__(self, key):
+        '''Delete items at index positions. Index positions are based
+        on position in self.elements. 
+
+        >>> a = Stream()
+        >>> a.repeatCopy(None, range(10))
+        >>> del a[0]
+        >>> len(a)
+        9
+        '''
+        del self._elements[key]
+        self._elementsChanged()
+
+
+    def pop(self, index):
+        '''return the matched object from the list. 
+
+        >>> a = Stream()
+        >>> a.repeatCopy(None, range(10))
+        >>> junk = a.pop(0)
+        >>> len(a)
+        9
+        '''
+        post = self._elements.pop(index)
+        self._elementsChanged()
+        return post
+
+
+    def index(self, obj):
+        '''return the index for the specified object 
+
+        >>> a = Stream()
+        >>> a.repeatCopy(None, range(10))
+        >>> a.index(None)
+        0
+        '''
+        try:
+            match = self._elements.index(obj)
+        except ValueError: # if not found
+            # access object inside of element
+            match = None
+            for i in range(len(self._elements)):
+                if obj == self._elements[i].obj:
+                    match = i
+                    break
+        return match
+
+
+
     def __add__(self, other):
         '''
         Returns a new stream that is the second added to the first.
@@ -2917,6 +2966,12 @@ class Measure(Stream):
     # is provided to store and access the clef as an attribute
 
     def _getClef(self):
+        '''
+        >>> a = Measure()
+        >>> a.clef = clef.TrebleClef()
+        >>> a.clef.sign    # clef is an element
+        'G'
+        '''
         clefList = self.getElementsByClass(clef.Clef)
         # only return cleff that has a zero offset
         clefList = clefList.getElementsByOffset(0,0)
@@ -2926,7 +2981,21 @@ class Measure(Stream):
             return clefList[0]    
     
     def _setClef(self, clefObj):
+        '''
+        >>> a = Measure()
+        >>> a.clef = clef.TrebleClef()
+        >>> a.clef.sign    # clef is an element
+        'G'
+        >>> a.clef = clef.BassClef()
+        >>> a.clef.sign
+        'F'
+        '''
         # TODO: this needs to remove an existing clef at this position
+        clefList = self.getElementsByClass(clef.Clef)
+        clefList = clefList.getElementsByOffset(0,0)
+        if len(clefList) != 0:
+            environLocal.printDebug(['removing clef', clefList[0]])
+            junk = self.pop(self.index(clefList[0]))
         self.insertAtOffset(clefObj, 0)
 
     clef = property(_getClef, _setClef)    
