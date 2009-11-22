@@ -2,8 +2,8 @@
 # Name:         meter.py
 # Purpose:      Classes for meters
 #
-# Authors:      Michael Scott Cuthbert
-#               Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
@@ -1559,7 +1559,7 @@ class TimeSignature(music21.Music21Object):
         '''For backward compatibility.
         '''
         #return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
-        return self.getBeat(qLenPos)
+        return self.getBeat(currentQtrPosition)
     
 
 
@@ -1633,7 +1633,7 @@ class TimeSignature(music21.Music21Object):
         4
         '''
         if len(mxTimeList) == 0:
-            raise MeterException('cannot create a TimeSignature from a empty MusicXML timeList: %s' % mxAttributes)
+            raise MeterException('cannot create a TimeSignature from a empty MusicXML timeList: %s' % musicxml.Attributes() )
         mxTime = mxTimeList[0] # only one for now
         n = []
         d = []

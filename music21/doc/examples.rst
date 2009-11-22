@@ -7,7 +7,7 @@ Examples
 Some simple ideas to get started
 --------------------------------
 
-1. Load a musicxml file and count the number of G#'s in it:
+1. Load a musicxml file and count the number of G#'s in it::
 
     from music21 import *
     chopinScore = converter.parse("mazurka6.xml")

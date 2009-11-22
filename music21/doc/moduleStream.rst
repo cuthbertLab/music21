@@ -779,11 +779,11 @@ Methods
 
 **getMeasures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **getNotes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **getOverlaps()**
 
@@ -827,6 +827,10 @@ Methods
     >>> d = a.getOverlaps()
     >>> len(d[0])
     7 
+
+**getPitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **getSimultaneous()**
 
@@ -969,7 +973,7 @@ Methods
 
 **measures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **musicxml()**
 
@@ -1003,13 +1007,17 @@ Methods
 
 **notes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **offset()**
 
 
 **parent()**
 
+
+**pitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **priority()**
 
@@ -1959,11 +1967,11 @@ Methods
 
 **getMeasures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **getNotes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **getOverlaps()**
 
@@ -2007,6 +2015,10 @@ Methods
     >>> d = a.getOverlaps()
     >>> len(d[0])
     7 
+
+**getPitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **getSimultaneous()**
 
@@ -2145,7 +2157,7 @@ Methods
 
 **measures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **musicxml()**
 
@@ -2176,13 +2188,17 @@ Methods
 
 **notes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **offset()**
 
 
 **parent()**
 
+
+**pitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **priority()**
 
@@ -3118,11 +3134,11 @@ Methods
 
 **getMeasures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **getNotes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **getOverlaps()**
 
@@ -3166,6 +3182,10 @@ Methods
     >>> d = a.getOverlaps()
     >>> len(d[0])
     7 
+
+**getPitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **getSimultaneous()**
 
@@ -3305,7 +3325,7 @@ Methods
 
 **measures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **musicxml()**
 
@@ -3336,13 +3356,17 @@ Methods
 
 **notes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **offset()**
 
 
 **parent()**
 
+
+**pitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **priority()**
 
@@ -4279,11 +4303,11 @@ Methods
 
 **getMeasures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **getNotes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **getOverlaps()**
 
@@ -4327,6 +4351,10 @@ Methods
     >>> d = a.getOverlaps()
     >>> len(d[0])
     7 
+
+**getPitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **getSimultaneous()**
 
@@ -4466,7 +4494,7 @@ Methods
 
 **measures()**
 
-    Return all Measure objects in a Stream 
+    Return all Measure objects in a Stream() 
 
 **musicxml()**
 
@@ -4497,13 +4525,17 @@ Methods
 
 **notes()**
 
-    Return all Note objects in a Stream() 
+    Return all Note, Chord, Rest, etc. objects in a Stream() 
 
 **offset()**
 
 
 **parent()**
 
+
+**pitches()**
+
+    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
 
 **priority()**
 
