@@ -209,7 +209,7 @@ class TestExternal(unittest.TestCase):
         o = 0
         for dynStr in shortNames:
             b = Dynamic(dynStr)
-            a.insertAtOffset(b, o)
+            a.insertAtOffset(o, b)
             o += 4 # increment
         a.show()
 

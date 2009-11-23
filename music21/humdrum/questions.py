@@ -1,7 +1,7 @@
 import unittest
 
-from music21 import *  # doing this because it will simplify the examples
 import music21
+from music21 import *  # doing this because it will simplify the examples
 
 class Test(unittest.TestCase):
 

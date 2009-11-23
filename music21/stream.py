@@ -168,7 +168,7 @@ def makeRests(streamObj, refStream=None):
     TODO: rename fillRests() or something else
 
     >>> a = Stream()
-    >>> a.insertAtOffset(None, 20)
+    >>> a.insertAtOffset(20, None)
     >>> len(a)
     1
     >>> a.lowestOffset
@@ -197,13 +197,13 @@ def makeRests(streamObj, refStream=None):
     if qLen > 0:
         r = note.Rest()
         r.duration.quarterLength = qLen
-        post.insertAtOffset(r, oLowTarget)
+        post.insertAtOffset(oLowTarget, r)
 
     qLen = oHighTarget - oHigh
     if qLen > 0:
         r = note.Rest()
         r.duration.quarterLength = qLen
-        post.insertAtOffset(r, oHigh)
+        post.insertAtOffset(oHigh, r)
 
 #     streamLead = Stream() # store rests leading this event
 # 
@@ -219,7 +219,7 @@ def makeRests(streamObj, refStream=None):
 # 
 #         r = note.Rest()
 #         r.duration.quarterLength = qLen
-#         streamLead.insertAtOffset(r, o)
+#         streamLead.insertAtOffset(o, r)
 # 
 #         o = o + qLen
 
@@ -245,7 +245,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
     >>> a.fillNone(3)
     >>> b = makeMeasures(a)
     >>> c = meter.TimeSignature('3/4')
-    >>> a.insertAtOffset(c, 0)
+    >>> a.insertAtOffset(0.0, c)
     >>> x = makeMeasures(a)
 
     >>> d = Stream()
@@ -305,7 +305,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
         # avoid an infinite loop
         if m.timeSignature.barDuration.quarterLength == 0:
             raise StreamException('time signature has no duration')    
-        post.insertAtOffset(m, o) # insert measure
+        post.insertAtOffset(o, m) # insert measure
         o += m.timeSignature.barDuration.quarterLength # increment by meter length
         if o >= oMax: # may be zero
             break # if length of this measure exceedes last offset
@@ -340,7 +340,7 @@ def makeMeasures(streamObj, meterStream=None, refStream=None):
         # not copying elements here!
         # here, we have the correct measure from above
         #environLocal.printDebug(['measure placement', mStart, oNew, e])
-        m.insertAtOffset(e, oNew)
+        m.insertAtOffset(oNew, e)
     return post
 
 
@@ -447,7 +447,7 @@ def makeTies(streamObj, meterStream=None):
                     # completely in the next measure, thus, need to continue
                     # processing each measure
                     if mNextAdd:
-                        streamObj.insertAtOffset(mNext, mNext.offset)
+                        streamObj.insertAtOffset(mNext.offset, mNext)
         mCount += 1
 
     #print streamObj.recurseRepr()
@@ -923,12 +923,12 @@ class Stream(music21.BaseElement, music21.Music21Object):
         self._elementsChanged()
 
 
-    def insertAtOffset(self, item, offset):
+    def insertAtOffset(self, offset, item):
         '''Append an object with a given offset. Wrap in an Element and 
         set offset time. 
 
         >>> a = Stream()
-        >>> a.insertAtOffset(None, 32)
+        >>> a.insertAtOffset(32, None)
         >>> a._getHighestOffset()
         32.0
         '''
@@ -956,7 +956,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
 #         20
 #         '''
 #         for e in other:
-#             self.insertAtOffset(e, e.offset)
+#             self.insertAtOffset(e.offset, e)
 #         self._elementsChanged() 
 
 
@@ -1450,9 +1450,9 @@ class Stream(music21.BaseElement, music21.Music21Object):
         >>> z = Element()
         >>> z.id = 'z'
 
-        >>> a.insertAtOffset(x, 20)
-        >>> a.insertAtOffset(y, 10)
-        >>> a.insertAtOffset(z, 0)
+        >>> a.insertAtOffset(20, x)
+        >>> a.insertAtOffset(10, y)
+        >>> a.insertAtOffset( 0, z)
 
         >>> b = a.getElementAtOrBefore(21)
         >>> b.offset, b.id
@@ -1627,7 +1627,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
                                defaults.meterDenominatorBeatType))
             #ts.numerator = defaults.meterNumerator
             #ts.denominator = defaults.meterDenominatorBeatType
-            post.insertAtOffset(ts,0)
+            post.insertAtOffset(0, ts)
     
         return post
     
@@ -2501,8 +2501,8 @@ class Stream(music21.BaseElement, music21.Music21Object):
                 midStream.append(obj)
 
             refStream = Stream()
-            refStream.insertAtOffset(None, 0) # placeholder at 0
-            refStream.insertAtOffset(None, highestTime) 
+            refStream.insertAtOffset(0, None) # placeholder at 0
+            refStream.insertAtOffset(highestTime, None) 
 
             # would like to do something like this but cannot
             # replace object inside of the stream
@@ -2568,7 +2568,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
             m = Measure()
             m.mx = mxMeasure  # assign data into music21 measure 
             # add measure to stream at current offset for this measure
-            streamPart.insertAtOffset(m, oMeasure)
+            streamPart.insertAtOffset(oMeasure, m)
 
             # parent is set to Part
             #environLocal.printDebug(['src, part', m, m.parent])
@@ -2581,7 +2581,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
         # add to this stream
         # this assumes all start at the same place
-        self.insertAtOffset(streamPart, 0)
+        self.insertAtOffset(0, streamPart)
 
 
     def _setMX(self, mxScore):
@@ -3040,7 +3040,7 @@ class Measure(Stream):
         if oldClef != None:
             environLocal.printDebug(['removing clef', oldClef])
             junk = self.pop(self.index(oldClef))
-        self.insertAtOffset(clefObj, 0)
+        self.insertAtOffset(0, clefObj)
 
     clef = property(_getClef, _setClef)    
 
@@ -3072,7 +3072,7 @@ class Measure(Stream):
         >>> a = Element(note.Note())
         >>> a.obj.quarterLength = 4
         >>> b = Measure()
-        >>> b.insertAtOffset(a, 0)
+        >>> b.insertAtOffset(0, a)
         >>> len(b) 
         1
         >>> mxMeasure = b.mx
@@ -3192,7 +3192,7 @@ class Measure(Stream):
                     else:
                         n = note.Note()
                         n.mx = mxNote
-                        self.insertAtOffset(n, offsetMeasureNote)
+                        self.insertAtOffset(offsetMeasureNote, n)
                         offsetIncrement = n.quarterLength
 
                     for mxLyric in mxNote.lyricList:
@@ -3206,7 +3206,7 @@ class Measure(Stream):
                 else: # its a rest
                     n = note.Rest()
                     n.mx = mxNote # assign mxNote to rest obj
-                    self.insertAtOffset(n, offsetMeasureNote)            
+                    self.insertAtOffset(offsetMeasureNote, n)            
                     offsetIncrement = n.quarterLength
 
                 # if we we have notes in the note list and the next
@@ -3217,7 +3217,7 @@ class Measure(Stream):
                     c = chord.Chord()
                     c.mx = mxNoteList
                     mxNoteList = [] # clear for next chord
-                    self.insertAtOffset(c, offsetMeasureNote)
+                    self.insertAtOffset(offsetMeasureNote, c)
                     offsetIncrement = c.quarterLength
 
                 # do not need to increment for musicxml chords
@@ -3229,11 +3229,11 @@ class Measure(Stream):
                 for mxDynamicMark in mxDynamicsFound:
                     d = dynamics.Dynamic()
                     d.mx = mxDynamicMark
-                    self.insertAtOffset(d, offsetMeasureNote)  
+                    self.insertAtOffset(offsetMeasureNote, d)  
                 for mxWedge in mxWedgeFound:
                     w = dynamics.Wedge()
                     w.mx = mxWedge     
-                    self.insertAtOffset(w, offsetMeasureNote)  
+                    self.insertAtOffset(offsetMeasureNote, w)  
 
     mx = property(_getMX, _setMX)    
 
@@ -3439,11 +3439,11 @@ class TestExternal(unittest.TestCase):
         a.repeatDeepcopy(n, range(0,120,3))
         #a.show() # default time signature used
         
-        a.insertAtOffset(meter.TimeSignature("5/4"), 0)
-        a.insertAtOffset(meter.TimeSignature("2/4"), 10)
-        a.insertAtOffset(meter.TimeSignature("3/16"), 3)
-        a.insertAtOffset(meter.TimeSignature("9/8"), 20)
-        a.insertAtOffset(meter.TimeSignature("10/4"), 40)
+        a.insertAtOffset( 0, meter.TimeSignature("5/4")  )
+        a.insertAtOffset(10, meter.TimeSignature("2/4")  )
+        a.insertAtOffset( 3, meter.TimeSignature("3/16") )
+        a.insertAtOffset(20, meter.TimeSignature("9/8")  )
+        a.insertAtOffset(40, meter.TimeSignature("10/4") )
         a.show()
 
 
@@ -3465,9 +3465,9 @@ class TestExternal(unittest.TestCase):
         s = Stream() # container
         s.append(q)
         s.append(r)
-        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
-        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
-        s.insertAtOffset(meter.TimeSignature("3/4"), 8)
+        s.insertAtOffset(0, meter.TimeSignature("3/4") )
+        s.insertAtOffset(3, meter.TimeSignature("5/4") )
+        s.insertAtOffset(8, meter.TimeSignature("3/4") )
 
         s.show()
             
@@ -3493,15 +3493,17 @@ class TestExternal(unittest.TestCase):
 
 
     def testCanons(self):
-        '''A test of creating a canon with shifted presentations of a source melody. This demonstrates the addition of rests.
-
+        '''A test of creating a canon with shifted presentations of a source melody. This also demonstrates 
+        the addition of rests to parts that start late or end early.
         '''
+        ## CHRIS: can you provide a cross-ref to where the addition of rests occurs.  For the HTML docs.
+        
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         s = Stream()
         partOffsetShift = 1.25
         partOffset = 0
-        for part in range(6):
+        for part in range(6):  
             p = Stream()
             for pitchName in a:
                 n = note.Note(pitchName)
@@ -3527,9 +3529,9 @@ class TestExternal(unittest.TestCase):
         s = Stream() # container
         s.append(q)
 
-        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
-        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
-        s.insertAtOffset(meter.TimeSignature("4/4"), 8)
+        s.insertAtOffset(0, meter.TimeSignature("3/4") )
+        s.insertAtOffset(3, meter.TimeSignature("5/4") )
+        s.insertAtOffset(8, meter.TimeSignature("4/4") )
 
         s.show()
 
@@ -3560,9 +3562,9 @@ class TestExternal(unittest.TestCase):
         s.append(r)
         s.append(p)
 
-        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
-        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
-        s.insertAtOffset(meter.TimeSignature("4/4"), 8)
+        s.insertAtOffset(0, meter.TimeSignature("3/4") )
+        s.insertAtOffset(3, meter.TimeSignature("5/4") )
+        s.insertAtOffset(8, meter.TimeSignature("4/4") )
         self.assertEqual(len(s.flat.notes), 360)
 
         s.show()
@@ -3874,9 +3876,9 @@ class Test(unittest.TestCase):
         s = Stream() # container
         s.append(q)
         s.append(r)
-        s.insertAtOffset(meter.TimeSignature("3/4"), 0)
-        s.insertAtOffset(meter.TimeSignature("5/4"), 3)
-        s.insertAtOffset(meter.TimeSignature("3/4"), 8)
+        s.insertAtOffset(0, meter.TimeSignature("3/4") )
+        s.insertAtOffset(3, meter.TimeSignature("5/4") )
+        s.insertAtOffset(8, meter.TimeSignature("3/4") )
         self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter

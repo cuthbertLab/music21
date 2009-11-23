@@ -156,7 +156,7 @@ class ConverterMusicXML(object):
 #             m = stream.Measure()
 #             m.mx = mxMeasure  # assign data into music21 measure 
 #             # add measure to stream at current offset for this measure
-#             streamPart.insertAtOffset(m, offsetMeasure)
+#             streamPart.insertAtOffset(offsetMeasure, m)
 #             # increment measure offset for next time around
 #             offsetMeasure += m.timeSignature.barDuration.quarterLength 
 # 
@@ -164,7 +164,7 @@ class ConverterMusicXML(object):
 #         streamPart.groups.append(partId) # set group for stream itself
 # 
 #         # this assumes all start at the same place
-#         self._stream.insertAtOffset(streamPart, 0)
+#         self._stream.insertAtOffset(0, streamPart)
 #                    
 
 
