@@ -1803,9 +1803,16 @@ class Handler(xml.sax.ContentHandler):
         '''Because each _Handler sub-class defines its own _tags, and because each Tag knows whether it is to receive character data or not, this method can be found in the base-class and need not be defined for each sub-class.
 
         '''
+#         if 'inue' in charData or 'cont' in charData:
+#             print charData
+
         for tag in self.t.tagsCharData:
             if self.t[tag].status:
-                self.t[tag].charData = charData
+                # was:
+                #self.t[tag].charData = charData
+                # trying this to solve problem with incomplete 
+                # character data aquisition
+                self.t[tag].charData += charData
                 break
 
 
@@ -2112,6 +2119,10 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'beam':
             self._beamObj.charData = self.t[name].getCharData()
+            # a rare problem that came up with incomplete charadata
+#             if self._beamObj.charData == 'inue':
+#                 environLocal.printDebug(['raw xml', self._beamObj.charData, self])
+
             self._noteObj.beamList.append(self._beamObj)
             self._beamObj = None
 

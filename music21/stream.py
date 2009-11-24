@@ -667,7 +667,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
 #            if abs(key) > self.__len__():
 #                raise IndexError(str(key) + " is out of range " + str(self.__len__()))
 #            else:
-                return self.elements[key]
+            return self.elements[key]
 
         elif isinstance(key, slice): # get a slice of index values
             found = self.copy() # return a stream of elements
@@ -1652,9 +1652,10 @@ class Stream(music21.BaseElement, music21.Music21Object):
         else:
             environLocal.printDebug(['looking at parent in getInstrument()',
                                     self.parent, self])
-            if isinstance(self.parent, Stream) and self.parent != self:
-                environLocal.printDebug(['searching parent Stream'])
-                instObj = self.parent.getInstrument(searchDepth)         
+            pass
+#             if isinstance(self.parent, Stream) and self.parent != self:
+#                 environLocal.printDebug(['searching parent Stream'])
+#                 instObj = self.parent.getInstrument(searchDepth)         
 
         # if still not defined, get default
         if instObj == None:
@@ -3192,6 +3193,9 @@ class Measure(Stream):
                         offsetIncrement = 0
                     else:
                         n = note.Note()
+                        #environLocal.printDebug(['handling note',
+                        #    offsetMeasureNote, self])
+
                         n.mx = mxNote
                         self.insertAtOffset(offsetMeasureNote, n)
                         offsetIncrement = n.quarterLength
@@ -3427,7 +3431,7 @@ class TestExternal(unittest.TestCase):
             for pitch in ['a', 'g', 'c#', 'a#']:
                 a = note.Note(pitch)
                 b.addNext(a)
-            c.append(b)
+            c.addNext(b)
         c.show()
 
     def testMxMeasures(self):
@@ -3478,10 +3482,12 @@ class TestExternal(unittest.TestCase):
         '''This demonstrates obtaining slices from a stream and layering
         them into individual parts.
 
-        TODO: this shoudl show instruments
+        TODO: this should show instruments
+        this is presently not showing instruments probably due to 
+        an error in assigning parents in slices
         '''
         from music21 import corpus, converter
-        a = converter.parse(corpus.paths[36])  # what piece is this?
+        a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
         b = a[3][10:20]
         c = a[3][20:30]
         d = a[3][30:40]
@@ -3496,8 +3502,10 @@ class TestExternal(unittest.TestCase):
     def testCanons(self):
         '''A test of creating a canon with shifted presentations of a source melody. This also demonstrates 
         the addition of rests to parts that start late or end early.
+
+        The addition of rests happens with makeRests(), which is called in 
+        musicxml generation of a Stream.
         '''
-        ## CHRIS: can you provide a cross-ref to where the addition of rests occurs.  For the HTML docs.
         
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
@@ -3539,6 +3547,8 @@ class TestExternal(unittest.TestCase):
 
     def testBeamsStream(self):
         '''A test of beams applied to different time signatures. 
+
+        this will cause an infinite loop if getinstrument is recursvie
         '''
         q = Stream()
         r = Stream()
@@ -3951,10 +3961,7 @@ class Test(unittest.TestCase):
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
-
         #import pdb; pdb.set_trace()
-
-
         # search parent from a measure within
 
         # canot use getMeasures as this destroys parents
@@ -3968,13 +3975,16 @@ class Test(unittest.TestCase):
         instObj = p.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
-
         instObj = p[10].getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
 
-
-
+    def testMXLCases(self):
+        '''isolate and test potential mxl problem caes
+        '''
+        from music21 import corpus, converter
+        a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
+        b = a[3][10:20]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
