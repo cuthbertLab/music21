@@ -1803,15 +1803,13 @@ class Handler(xml.sax.ContentHandler):
         '''Because each _Handler sub-class defines its own _tags, and because each Tag knows whether it is to receive character data or not, this method can be found in the base-class and need not be defined for each sub-class.
 
         '''
-#         if 'inue' in charData or 'cont' in charData:
-#             print charData
-
         for tag in self.t.tagsCharData:
             if self.t[tag].status:
-                # was:
+                # Note: this line
                 #self.t[tag].charData = charData
-                # trying this to solve problem with incomplete 
-                # character data aquisition
+                # can be substituted for all but a very cases; however, in a few
+                # places this will not get all character data and cause 
+                # very unexpected results
                 self.t[tag].charData += charData
                 break
 
