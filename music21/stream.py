@@ -1650,11 +1650,11 @@ class Stream(music21.BaseElement, music21.Music21Object):
         if len(post) > 0:
             instObj = post[0] # get first
         else:
-            environLocal.printDebug(['parent', self.parent])
-            pass
-#             if isinstance(self.parent, Stream):
-#                 environLocal.printDebug(['searching parent Stream'])
-#                 instObj = self.parent.getInstrument(searchDepth)         
+            environLocal.printDebug(['looking at parent in getInstrument()',
+                                    self.parent, self])
+            if isinstance(self.parent, Stream) and self.parent != self:
+                environLocal.printDebug(['searching parent Stream'])
+                instObj = self.parent.getInstrument(searchDepth)         
 
         # if still not defined, get default
         if instObj == None:
@@ -2525,6 +2525,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         else: # assume this is the only part
             environLocal.printDebug('handling single-part Stream')
             # if no instrument is provided it will be obtained through self
+            # when _getMxPart is called
             mxComponents.append(self._getMXPart(None, meterStream))
 
 
@@ -3924,6 +3925,7 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(b[8], music21.stream.Measure), True)
         self.assertEqual(b[8].parent, b) #measures parent should be part
 
+
     def testExtractedNoteAssignLyric(self):
         from music21 import converter, corpus, text
         a = converter.parse(corpus.getWork('opus74no1', 3))
@@ -3935,20 +3937,22 @@ class Test(unittest.TestCase):
                          True)
 
 
-    def xTestGetInstruments(self):
+    def testGetInstruments(self):
         '''Temporarily disabled while bypassing getInstrument issue
         '''
         from music21 import corpus, converter
 
-        #import pdb; pdb.set_trace()
 
         # manuall set parent to associate 
-        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        a = converter.parse(corpus.getWork(['haydn', 'opus74no2', 
+                                            'movement4.xml']))
         b = a[3][10:20]
         b.parent = a[3] # manually set the parent
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
+
+        #import pdb; pdb.set_trace()
 
 
         # search parent from a measure within
@@ -3961,11 +3965,13 @@ class Test(unittest.TestCase):
         p = a[3] # get part
         # a mesausre within this part has as its parent the part
         self.assertEqual(p[10].parent, a[3])
-
-        instObj = p[10].parent.getInstrument()
+        instObj = p.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
-        # print instObj.partName, instObj.instrumentName
+
+        instObj = p[10].getInstrument()
+        self.assertEqual(instObj.partName, 'Cello')
+
 
 
 

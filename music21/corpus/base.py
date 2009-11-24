@@ -138,12 +138,26 @@ def getWork(workName, movementNumber = None):
     '''Search the corpus and return either a list of file paths or a single
     file path
 
+    >>> import os
     >>> a = getWork('opus74no2', 4)
-    >>> a.endswith('haydn/opus74no2/movement4.xml')
+    >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
     True
+
+    >>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
+    >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
+    True
+
     '''
     paths = getPaths()
     post = []
+
+
+    # permit workName to be a list of paths/branches
+    if common.isListLike(workName):
+        workName = os.path.sep.join(workName)
+
+    # below, should '\\' be replaced by os.path.sep?
+    # or removed, and not encouraged?
     workSlashes = re.sub('/', r'\\', workName)
 
     for path in paths:
