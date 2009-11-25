@@ -746,10 +746,9 @@ def unwrapWeakref(referent):
     utility function that gets an object that might be an object itself
     or a weak reference to an object.
     
-    >>> class A(object):
-    ...    pass
-    >>> a1 = A()
-    >>> a2 = A()
+    >>> class Mock(object): pass
+    >>> a1 = Mock()
+    >>> a2 = Mock()
     >>> a2.strong = a1
     >>> a2.weak = wrapWeakref(a1)
     >>> unwrapWeakref(a2.strong) is a1
@@ -765,6 +764,25 @@ def unwrapWeakref(referent):
     else:
         return referent
     
+
+def isWeakref(referent):
+    '''Test if an object is a weakref
+
+    >>> class Mock(object): pass
+    >>> a1 = Mock()
+    >>> a2 = Mock()
+    >>> isWeakref(a1)
+    False
+    >>> isWeakref(3)
+    False
+    >>> isWeakref(wrapWeakref(a1))
+    True
+    '''
+    if type(referent) is weakref.ref:
+        return True
+    else:
+        return False
+
 
 #-------------------------------------------------------------------------------
 class Timer(object):

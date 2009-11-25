@@ -3,6 +3,7 @@
 # Purpose:      Classes and tools relating to tempo
 #
 # Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
@@ -17,10 +18,13 @@ import music21.note
 
 class TempoMark(music21.Music21Object):
     def __init__(self, value):
+        music21.Music21Object.__init__(self)
         self.value = value
     
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.value)
+
+
 
 class MetronomeMark(TempoMark):
     '''
@@ -29,12 +33,17 @@ class MetronomeMark(TempoMark):
     40
     '''
     def __init__(self, number, referent = None):
+        TempoMark.__init__(self, number)
+
         self.number = number
         self.referent = referent # should be a music21.note.Duration object
     
     def __repr__(self):
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
 
+
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     def runTest(self):
         pass

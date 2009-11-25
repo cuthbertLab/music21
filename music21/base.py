@@ -10,8 +10,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
 '''
+Music21 base classes and important utilities
+
 base -- the convention within music21 is that __init__ files contain:
 
    from base import *
@@ -25,6 +26,7 @@ import copy
 import unittest, doctest
 import sys
 import types
+import time
 
 from music21 import common
 from music21 import environment
@@ -34,6 +36,9 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
+    pass
+
+class LocationException(Exception):
     pass
 
 class Music21ObjectException(Exception):
@@ -105,6 +110,247 @@ class Groups(list):
             return True
 
 
+#-------------------------------------------------------------------------------
+class Location(object):
+    '''An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs.
+    '''
+    def __init__(self):
+        self._coordinates = [] # a list of dictionaries
+
+    def __len__(self):
+        '''Return a list of all offsets.
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 843)
+        >>> aLocation.add(bSite, 12) # can add at same ofst
+        >>> len(aLocation)
+        2
+        '''
+        return len(self._coordinates)
+
+
+    def scrubEmptySites(self):
+        '''If a parent has been deleted, we will still have an empty ref in 
+        _coordinates; when called, this empty ref will return None.
+        This method will remove all parents that deref to None
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 0)
+        >>> aLocation.add(bSite, 234) # can add at same ofst
+        >>> del aSite
+        >>> len(aLocation)
+        2
+        >>> aLocation.scrubEmptySites()
+        >>> len(aLocation)
+        1
+        '''
+        delList = []
+        for i in range(len(self._coordinates)):
+            if common.unwrapWeakref(self._coordinates[i]['site']) == None:        
+                delList.append(i)
+        delList.reverse() # go in reverse from largest to maintain positions
+        for i in delList:
+            del self._coordinates[i]
+
+    def clear(self):
+        '''Clear all data.
+        '''
+        self._coordinates = []
+
+    def getSites(self):
+        '''Get parents; unwrap from weakrefs
+        '''
+        #environLocal.printDebug([self._coordinates])
+        return [common.unwrapWeakref(x['site']) for x in self._coordinates]   
+
+    def getOffsets(self):
+        '''Return a list of all offsets.
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 0)
+        >>> aLocation.add(bSite, 234) # can add at same ofst
+        >>> aLocation.getOffsets()
+        [0, 234]
+        '''
+        return [x['offset'] for x in self._coordinates]   
+
+    def getTimes(self):
+        return [x['time'] for x in self._coordinates]   
+
+    def add(self, site, offset):
+        '''Add a location to the object.
+
+        If site already exists, this will update that entry. Note: this could be modified to support multiple instanes of one site in the list.
+
+        Might check/force site to be a Stream?
+
+        Might automatically create a weakref of site?
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> aLocation.add(bSite, 23) # can add at same ofst
+        >>> aLocation.add(aSite, 12) # will resset the offset
+        >>> aSite == aLocation.getSiteByOffset(12)
+        True
+        '''
+        # compare unwrapped first
+        sites = self.getSites()
+        if site in sites: 
+            #environLocal.printDebug(['site already defined in this Location object', site])
+            # order is the same as in _coordinates
+            i = sites.index(site)
+        else:
+            siteRef = common.wrapWeakref(site)
+            self._coordinates.append({}) # great new
+            i = -1 #now the last
+            # site here is wrapped in weakref
+            self._coordinates[i]['site'] = siteRef
+
+        self._coordinates[i]['offset'] = offset
+        # store creation time in order to sort by time
+        self._coordinates[i]['time'] = time.time()
+
+
+    def remove(self, site):
+        '''Remove the entry specified by sites
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> len(aLocation)
+        1
+        >>> aLocation.remove(aSite)
+        >>> len(aLocation)
+        0
+        
+        '''
+        sites = self.getSites()
+        if not site in sites: 
+            raise LocationException('an entry for this object is not stored: %s' % site)
+        del self._coordinates[sites.index(site)]
+
+
+    def getOffsetBySite(self, site):
+        '''For a given site return an offset.
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cParent = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> aLocation.add(bSite, 121.5)
+        >>> aLocation.getOffsetBySite(aSite)
+        23
+        >>> aLocation.getOffsetBySite(bSite)
+        121.5
+        >>> aLocation.getOffsetBySite(cParent)    
+        Traceback (most recent call last):
+        LocationException: ...
+        '''
+        sites = self.getSites()
+        if not site in sites: 
+            raise LocationException('an entry for this object is not stored: %s' % site)
+
+        match = None
+        # assume that last added offset is more likely the first needed
+        # access index values in reverse from highest to 0
+        for i in range(len(self._coordinates)-1, -1, -1):
+            # compare site to unwrapped site list
+            if sites[i] == site: 
+                match = self._coordinates[i]['offset']
+                break
+        return match # will be None if not match; could raise exception
+
+
+    def getOffsetByIndex(self, index):
+        '''For a given parent return an offset.
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> aLocation.add(bSite, 121.5)
+        >>> aLocation.getOffsetByIndex(-1)
+        121.5
+        >>> aLocation.getOffsetByIndex(2)
+        Traceback (most recent call last):
+        IndexError: list index out of range
+        '''
+        return self._coordinates[index]['offset']
+
+
+
+    def getSiteByOffset(self, offset):
+        '''For a given offset return the parent
+
+        More than one parent may have the same offset; thus, may need to sort
+        by some parameter.
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cParent = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> aLocation.add(bSite, 121.5)
+        >>> aSite == aLocation.getSiteByOffset(23)
+        True
+        '''
+        match = None
+        # assume that last added offset is more likely the first needed
+        # access index values in reverse from highest to 0
+        for i in range(len(self._coordinates)-1, -1, -1):
+            # might need to use almost equals here
+            if self._coordinates[i]['offset'] == offset:
+                match = self._coordinates[i]['site']
+                break
+        if match != None:
+            if not common.isWeakref(match):
+                raise LocationException('site on _coordinates is not a weak ref: %s' % match)
+            return common.unwrapWeakref(match)
+        else:
+            # will be None if not match; could alternatively exception
+            return match 
+
+
+    def getSiteByIndex(self, index):
+        '''Get parent by index value, unwrapping weak ref.
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocation = Location()
+        >>> aLocation.add(aSite, 23)
+        >>> aLocation.add(bSite, 121.5)
+        >>> bSite == aLocation.getSiteByIndex(-1)
+        True
+        '''
+        siteRef = self._coordinates[index]['site']
+        if siteRef == None: # let None parents pass
+            return siteRef
+        elif not common.isWeakref(siteRef):
+            raise LocationException('parent on _coordinates is not a weak ref: %s' % siteRef)
+        else:
+            return common.unwrapWeakref(siteRef)
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class Music21Object(object):
@@ -125,19 +371,23 @@ class Music21Object(object):
     '''
 
     _duration = None
-    _parent = None
+    # while testing .location
+    #_parent = None
     contexts = None
     id = None
     _overriddenLily = None
 
     def __init__(self, *arguments, **keywords):
 
+        self.location = Location()
+
+        # an offset keyword arg should set the offset in location
+        # not in a local parameter
+#         if "offset" in keywords and not self.offset:
+#             self.offset = keywords["offset"]
+
         if "id" in keywords and not self.id:
             self.id = keywords["id"]            
-
-        # why is offset not a DurationUnit object?
-        if "offset" in keywords and not self.offset:
-            self.offset = keywords["offset"]
         
         if "duration" in keywords and self.duration is None:
             self.duration = keywords["duration"]
@@ -238,10 +488,20 @@ class Music21Object(object):
     # properties
 
     def _getParent(self):
-        return common.unwrapWeakref(self._parent)
+        # return the last parent added to this location
+        if len(self.location) == 0:
+            return None # return None if no sites set
+        else: 
+            return self.location.getSiteByIndex(-1) 
+
+#         return common.unwrapWeakref(self._parent)
     
     def _setParent(self, value):
-        self._parent = common.wrapWeakref(value)
+        # presently setting all offsets to zero and removing old parents
+        self.location.clear()
+        self.location.add(value, 0) 
+
+#         self._parent = common.wrapWeakref(value)
 
     parent = property(_getParent, _setParent)
 
@@ -298,6 +558,10 @@ class Music21Object(object):
         This might need to return the file path.
         '''
         environLocal.launch(format, self.write(format))
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -438,8 +702,9 @@ class BaseElement(object):
 
     priority = property(_getPriority, _setPriority)
 
-#-----------------------------------------------------------------#
 
+
+#-------------------------------------------------------------------------------
 class Element(BaseElement):
     '''
     An element wraps an object so that the same object can
@@ -725,7 +990,7 @@ class Element(BaseElement):
 
 
 #-------------------------------------------------------------------------------
-class TestObject(Music21Object):
+class TestMock(Music21Object):
     pass
 
 class Test(unittest.TestCase):
@@ -734,7 +999,7 @@ class Test(unittest.TestCase):
         pass
 
     def testObjectCreation(self):
-        a = TestObject()
+        a = TestMock()
         a.groups.append("hello")
         a.id = "hi"
         a.offset = 2.0
@@ -781,6 +1046,30 @@ class Test(unittest.TestCase):
         stream1.addNext(note1)
         subStream = stream1.getNotes()
 
+    def testLocationRefs(self):
+        aMock = TestMock()
+        bMock = TestMock()
+
+        loc = Location()
+        loc.add(aMock, 234)
+        loc.add(bMock, 12)
+        
+        self.assertEqual(loc.getOffsetByIndex(-1), 12)
+        self.assertEqual(loc.getOffsetBySite(aMock), 234)
+        self.assertEqual(loc.getSiteByOffset(234), aMock)
+        self.assertEqual(loc.getSiteByIndex(-1), bMock)
+
+        del aMock
+        # if the parent has been deleted, the None will be returned
+        # even though there is still an entry
+        self.assertEqual(loc.getSiteByIndex(0), None)
+
+
+    def testLocationNone(self):
+        '''Test assigning a None to parent
+        '''
+        loc = Location()
+        loc.add(None, 0)
 
 def mainTest(*testClasses):
     '''
