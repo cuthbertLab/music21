@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 class Music21Exception(Exception):
     pass
 
-class LocationException(Exception):
+class LocationsException(Exception):
     pass
 
 class Music21ObjectException(Exception):
@@ -111,7 +111,7 @@ class Groups(list):
 
 
 #-------------------------------------------------------------------------------
-class Location(object):
+class Locations(object):
     '''An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs.
     '''
     def __init__(self):
@@ -122,10 +122,10 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 843)
-        >>> aLocation.add(bSite, 12) # can add at same ofst
-        >>> len(aLocation)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 843)
+        >>> aLocations.add(bSite, 12) # can add at same ofst
+        >>> len(aLocations)
         2
         '''
         return len(self._coordinates)
@@ -139,14 +139,14 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 0)
-        >>> aLocation.add(bSite, 234) # can add at same ofst
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(bSite, 234) # can add at same ofst
         >>> del aSite
-        >>> len(aLocation)
+        >>> len(aLocations)
         2
-        >>> aLocation.scrubEmptySites()
-        >>> len(aLocation)
+        >>> aLocations.scrubEmptySites()
+        >>> len(aLocations)
         1
         '''
         delList = []
@@ -174,10 +174,10 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 0)
-        >>> aLocation.add(bSite, 234) # can add at same ofst
-        >>> aLocation.getOffsets()
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(bSite, 234) # can add at same ofst
+        >>> aLocations.getOffsets()
         [0, 234]
         '''
         return [x['offset'] for x in self._coordinates]   
@@ -197,17 +197,17 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> aLocation.add(bSite, 23) # can add at same ofst
-        >>> aLocation.add(aSite, 12) # will resset the offset
-        >>> aSite == aLocation.getSiteByOffset(12)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 23) # can add at same ofst
+        >>> aLocations.add(aSite, 12) # will resset the offset
+        >>> aSite == aLocations.getSiteByOffset(12)
         True
         '''
         # compare unwrapped first
         sites = self.getSites()
         if site in sites: 
-            #environLocal.printDebug(['site already defined in this Location object', site])
+            #environLocal.printDebug(['site already defined in this Locations object', site])
             # order is the same as in _coordinates
             i = sites.index(site)
         else:
@@ -228,18 +228,18 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> len(aLocation)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> len(aLocations)
         1
-        >>> aLocation.remove(aSite)
-        >>> len(aLocation)
+        >>> aLocations.remove(aSite)
+        >>> len(aLocations)
         0
         
         '''
         sites = self.getSites()
         if not site in sites: 
-            raise LocationException('an entry for this object is not stored: %s' % site)
+            raise LocationsException('an entry for this object is not stored: %s' % site)
         del self._coordinates[sites.index(site)]
 
 
@@ -250,20 +250,20 @@ class Location(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cParent = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> aLocation.add(bSite, 121.5)
-        >>> aLocation.getOffsetBySite(aSite)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.getOffsetBySite(aSite)
         23
-        >>> aLocation.getOffsetBySite(bSite)
+        >>> aLocations.getOffsetBySite(bSite)
         121.5
-        >>> aLocation.getOffsetBySite(cParent)    
+        >>> aLocations.getOffsetBySite(cParent)    
         Traceback (most recent call last):
-        LocationException: ...
+        LocationsException: ...
         '''
         sites = self.getSites()
         if not site in sites: 
-            raise LocationException('an entry for this object is not stored: %s' % site)
+            raise LocationsException('an entry for this object is not stored: %s' % site)
 
         match = None
         # assume that last added offset is more likely the first needed
@@ -282,12 +282,12 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> aLocation.add(bSite, 121.5)
-        >>> aLocation.getOffsetByIndex(-1)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.getOffsetByIndex(-1)
         121.5
-        >>> aLocation.getOffsetByIndex(2)
+        >>> aLocations.getOffsetByIndex(2)
         Traceback (most recent call last):
         IndexError: list index out of range
         '''
@@ -305,10 +305,10 @@ class Location(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cParent = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> aLocation.add(bSite, 121.5)
-        >>> aSite == aLocation.getSiteByOffset(23)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aSite == aLocations.getSiteByOffset(23)
         True
         '''
         match = None
@@ -321,7 +321,7 @@ class Location(object):
                 break
         if match != None:
             if not common.isWeakref(match):
-                raise LocationException('site on _coordinates is not a weak ref: %s' % match)
+                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
             return common.unwrapWeakref(match)
         else:
             # will be None if not match; could alternatively exception
@@ -334,17 +334,17 @@ class Location(object):
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocation = Location()
-        >>> aLocation.add(aSite, 23)
-        >>> aLocation.add(bSite, 121.5)
-        >>> bSite == aLocation.getSiteByIndex(-1)
+        >>> aLocations = Locations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> bSite == aLocations.getSiteByIndex(-1)
         True
         '''
         siteRef = self._coordinates[index]['site']
         if siteRef == None: # let None parents pass
             return siteRef
         elif not common.isWeakref(siteRef):
-            raise LocationException('parent on _coordinates is not a weak ref: %s' % siteRef)
+            raise LocationsException('parent on _coordinates is not a weak ref: %s' % siteRef)
         else:
             return common.unwrapWeakref(siteRef)
 
@@ -379,7 +379,7 @@ class Music21Object(object):
 
     def __init__(self, *arguments, **keywords):
 
-        self.location = Location()
+        self.location = Locations()
 
         # an offset keyword arg should set the offset in location
         # not in a local parameter
@@ -1046,11 +1046,11 @@ class Test(unittest.TestCase):
         stream1.addNext(note1)
         subStream = stream1.getNotes()
 
-    def testLocationRefs(self):
+    def testLocationsRefs(self):
         aMock = TestMock()
         bMock = TestMock()
 
-        loc = Location()
+        loc = Locations()
         loc.add(aMock, 234)
         loc.add(bMock, 12)
         
@@ -1065,10 +1065,10 @@ class Test(unittest.TestCase):
         self.assertEqual(loc.getSiteByIndex(0), None)
 
 
-    def testLocationNone(self):
+    def testLocationsNone(self):
         '''Test assigning a None to parent
         '''
-        loc = Location()
+        loc = Locations()
         loc.add(None, 0)
 
 def mainTest(*testClasses):
