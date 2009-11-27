@@ -483,7 +483,7 @@ def makeBeams(streamObj, meterStream=None):
 
     for m in streamObj.getElementsByClass(Measure): 
         ts = m.timeSignature
-        environLocal.printDebug(['beaming with ts', ts])
+        # environLocal.printDebug(['beaming with ts', ts])
         noteStream = m.getNotes()
         durList = []
 
@@ -605,30 +605,31 @@ class Stream(music21.BaseElement, music21.Music21Object):
         '''
         # need to reset index each time an iterator is obtained
         # if a previous iteration calls break, _index will not be reset to zero
-        self._index = 0 
-        return self
+#         self._index = 0 
+#         return self
+        return common.Iterator(self._elements)
 
-    def next(self):
-        '''Method for treating this object as an iterator
-        Returns each element in order.  For sort order run x.sorted
-
-        >>> a = Stream()
-        >>> a.repeatCopy(None, range(6))
-        >>> b = []
-        >>> for x in a:
-        ...     b.append(x.offset) # get just offset
-        >>> b
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-        '''
-        # this will return the self._elementsSorted list
-        # unless it needs to be sorted
-        if abs(self._index) >= self.__len__():
-            self._index = 0 # reset for next run
-            raise StopIteration
-
-        out = self.elements[self._index]
-        self._index += 1
-        return out
+#     def next(self):
+#         '''Method for treating this object as an iterator
+#         Returns each element in order.  For sort order run x.sorted
+# 
+#         >>> a = Stream()
+#         >>> a.repeatCopy(None, range(6))
+#         >>> b = []
+#         >>> for x in a:
+#         ...     b.append(x.offset) # get just offset
+#         >>> b
+#         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+#         '''
+#         # this will return the self._elementsSorted list
+#         # unless it needs to be sorted
+#         if abs(self._index) >= self.__len__():
+#             self._index = 0 # reset for next run
+#             raise StopIteration
+# 
+#         out = self.elements[self._index]
+#         self._index += 1
+#         return out
 
 
 
@@ -1635,7 +1636,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
     
 
 
-    def getInstrument(self, searchParent=False):
+    def getInstrument(self, searchParent=True):
         '''Search this stream or parent streams for instruments, otherwise 
         return a default
 
@@ -1943,7 +1944,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         m = self.deepcopy()
         ts = m.timeSignature
 
-        environLocal.printDebug(['beaming with ts', ts])
+        # environLocal.printDebug(['beaming with ts', ts])
         noteStream = m.getNotes()
 
         durList = []
@@ -2405,7 +2406,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        environLocal.printDebug(['calling _getMXPart'])
+        #environLocal.printDebug(['calling _getMXPart'])
 
         if instObj == None:
             # see if an instrument is defined in this or a parent stream
@@ -2426,7 +2427,7 @@ class Stream(music21.BaseElement, music21.Music21Object):
         measureStream = self.getElementsByClass(Measure)
         if len(measureStream) == 0:
             # try to add measures if none defined
-            environLocal.printDebug(['pre makeMeasures', self.recurseRepr()])
+            #environLocal.printDebug(['pre makeMeasures', self.recurseRepr()])
 
             measureStream = makeMeasures(self, meterStream, refStream)
             measureStream = makeTies(measureStream, meterStream)
@@ -3976,7 +3977,7 @@ class Test(unittest.TestCase):
                          True)
 
 
-    def xtestGetInstruments(self):
+    def testGetInstruments(self):
         '''Temporarily disabled while bypassing getInstrument issue
         '''
         from music21 import corpus, converter
@@ -4025,10 +4026,9 @@ class Test(unittest.TestCase):
         instObj = r.getInstrument()
         instObj = s.getInstrument()
 
+        # test mx generation
         mx = q.mx
         mx = r.mx
-
-        # this produces an offset mismatch error
         mx = s.mx
 
 
@@ -4040,38 +4040,10 @@ class Test(unittest.TestCase):
         b = a[3][10:20]
 
 
-    def xtestHighestTime(self):
-        # a different test derived from a TestExternal
-        q = Stream()
-        r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 5:
-            n = note.Note(x)
-            n.quarterLength = random.choice([.25])
-            q.addNext(n)
-            m = note.Note(x)
-            m.quarterLength = .5
-            r.addNext(m)
-        s = Stream() # container
-        s.append(q)
-        s.append(r)
-
-        environLocal.printDebug(['q highest time', q.highestTime])
-        environLocal.printDebug(['s highest time', s.highestTime])
-
-# all these work
-#         post = makeMeasures(s)
-#         junk = s._getMXPart()
-#         post = makeMeasures(q)
-#         junk = q._getMXPart()
-#         post = makeMeasures(r)
-#         junk = r._getMXPart()
-
-        # this causes an error
-        junk = s._getMX()
-        #mx = s.mx
-
-
-    def xtestMystery(self):
+    def testIteration(self):
+        '''This test was designed to illustrate a past problem with stream
+        Iterations.
+        '''
         q = Stream()
         r = Stream()
         for x in ['c3','a3','c#4','d3'] * 5:

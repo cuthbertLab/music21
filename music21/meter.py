@@ -510,26 +510,28 @@ class MeterSequence(MeterTerminal):
     def __iter__(self):
         '''Support iteration of top level partitions
         '''
-        self._index = 0 
-        return self
+#         self._index = 0 
+#         return self
+        return common.Iterator(self._partition)
 
-    def next(self):
-        '''Top-level partitions are iterated
 
-        >>> a = MeterSequence('4/4', 4)
-        >>> len(a)
-        4
-        >>> sum = 0
-        >>> for x in a: sum += x.numerator
-        >>> sum
-        4
-        '''
-        if abs(self._index) >= self.__len__():
-            self._index = 0 # reset for next run
-            raise StopIteration
-        out = self._partition[self._index]
-        self._index += 1
-        return out
+#     def next(self):
+#         '''Top-level partitions are iterated
+# 
+#         >>> a = MeterSequence('4/4', 4)
+#         >>> len(a)
+#         4
+#         >>> sum = 0
+#         >>> for x in a: sum += x.numerator
+#         >>> sum
+#         4
+#         '''
+#         if abs(self._index) >= self.__len__():
+#             self._index = 0 # reset for next run
+#             raise StopIteration
+#         out = self._partition[self._index]
+#         self._index += 1
+#         return out
 
 
     def __getitem__(self, key):

@@ -388,29 +388,31 @@ class MusicXMLElementList(MusicXMLElement):
         return len(self.componentList)
 
     def __iter__(self):
-        self._index = 0 # need to reset index before returning iterator
-        return self
+#         self._index = 0 # need to reset index before returning iterator
+#         return self
+        return common.Iterator(self.componentList)
+
 
     def __getitem__(self, key):
         '''Get item via index value
         '''
-        if abs(key) > self.__len__():
-            raise IndexError
-        else:
-            return self.componentList[key]
+#         if abs(key) > self.__len__():
+#             raise IndexError
+#         else:
+        return self.componentList[key]
 
-    def next(self):
-        '''Method for treating this object as an iterator
-        Returns each node in sort order; could be in tree order. 
-        '''
-        if abs(self._index) >= self.__len__():
-            self._index = 0 # reset for next run
-            raise StopIteration
-        out = self.componentList[self._index] 
-        self._index += 1
-        return out
-
-
+#     def next(self):
+#         '''Method for treating this object as an iterator
+#         Returns each node in sort order; could be in tree order. 
+#         '''
+#         if abs(self._index) >= self.__len__():
+#             self._index = 0 # reset for next run
+#             raise StopIteration
+#         out = self.componentList[self._index] 
+#         self._index += 1
+#         return out
+# 
+# 
 
 
 

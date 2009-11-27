@@ -784,6 +784,29 @@ def isWeakref(referent):
         return False
 
 
+
+
+#-------------------------------------------------------------------------------
+class Iterator(object):
+    '''A simple Iterator object used to handle iteration of Streams and other 
+    list-like objects. 
+    '''
+    def __init__(self, data):
+        self.data = data
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.index >= len(self.data):
+            raise StopIteration
+        post = self.data[self.index]
+        self.index += 1
+        return post
+
+
+
 #-------------------------------------------------------------------------------
 class Timer(object):
     """An object for timing."""

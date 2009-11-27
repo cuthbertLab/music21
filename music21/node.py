@@ -17,6 +17,7 @@ import xml.dom.minidom
 
 
 import doctest, unittest
+from music21 import common
 
 _MOD = 'node.py'
 
@@ -423,19 +424,21 @@ class NodeList(Node):
         return len(self.componentList)
 
     def __iter__(self):
-        return self
+        return common.Iterator(self.componentList)
 
-    def next(self):
-        '''Method for treating this object as an iterator
-        Returns each node in sort order; could be in tree order. 
-        '''
-        if abs(self._index) >= self.__len__():
-            self._index = 0 # reset for next run
-            raise StopIteration
-        out = self.componentList[self._index] 
-        self._index += 1
-        return out
+        #return self
 
+#     def next(self):
+#         '''Method for treating this object as an iterator
+#         Returns each node in sort order; could be in tree order. 
+#         '''
+#         if abs(self._index) >= self.__len__():
+#             self._index = 0 # reset for next run
+#             raise StopIteration
+#         out = self.componentList[self._index] 
+#         self._index += 1
+#         return out
+# 
 
 
 
