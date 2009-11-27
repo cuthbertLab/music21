@@ -140,7 +140,7 @@ class ActivityMatch(object):
         post = []
         streamFlat = self.streamObj.flat
 
-        streamFlat = stream.extendDuration(streamFlat, objNameDst)
+        streamFlat = streamFlat.extendDuration(objNameDst)
 
         # get each src object; create a dictionary for each
         for element in streamFlat.getElementsByClass(objNameSrc):

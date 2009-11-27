@@ -46,395 +46,6 @@ class StreamException(Exception):
     pass
 
 #-------------------------------------------------------------------------------
-# Stream processing functions
-
-
-def extendDuration(streamObj, objName):
-    '''Given a stream and an object name, go through stream and find each 
-    object. The time between adjacent objects is then assigned to the 
-    duration of each object. The last duration of the last object is assigned
-    to the end of the stream.
-    
-    >>> import music21.dynamics
-    >>> stream1 = Stream()
-    >>> n = note.QuarterNote()
-    >>> n.duration.quarterLength
-    1.0
-    >>> stream1.repeatDeepcopy(n, [0, 10, 20, 30, 40])
-    >>> dyn = Element(music21.dynamics.Dynamic('ff'))
-    >>> dyn.offset = 15.0
-    >>> stream1.append(dyn)
-    >>> sort1 = stream1.sorted
-    >>> sort1.duration.quarterLength
-    41.0
-    >>> len(sort1)
-    6
-    >>> sort1[-1].offset
-    40.0
-
-    >>> stream2 = extendDuration(sort1.flat, note.GeneralNote)
-    >>> len(stream2)
-    6
-    >>> stream2[0].duration.quarterLength
-    10.0
-    >>> stream2[-1].duration.quarterLength
-    1.0
-    >>> stream2.duration.quarterLength
-    41.0
-    >>> stream2[-1].offset
-    40.0
-
-    #>>> stream2[1].duration.quarterLength
-    #1.0  ## TODO: FIX Error: gets 10.0
-
-    '''
-# temporarily removed for musicxml testing
-#     >>> from music21.musicxml import testFiles
-#     >>> from music21 import converter
-#     >>> mxString = testFiles.ALL[2] # has dynamics
-#     >>> a = converter.parse(mxString)
-#     >>> b = extendDuration(a.flat, dynamics.Dynamic)
-# 
-
-    # assuming user provides the desired versioin
-    #streamObj = streamSrc.flat.sorted
-
-    qLenTotal = streamObj.duration.quarterLength
-    elements = []
-
-    for element in streamObj.getElementsByClass(objName):
-        if not hasattr(element, 'duration'):
-            raise StreamException('can only process objects with duration attributes')
-        if element.duration == None:
-            element.duration = duration.Duration()
-        elements.append(element)
-
-    #print elements[-1], qLenTotal, elements[-1].duration
-    # print _MOD, elements
-    for i in range(len(elements)-1):
-        #print i, len(elements)
-        span = elements[i+1].offset - elements[i].offset
-        elements[i].duration.quarterLength = span
-
-    # handle last element
-    #print elements[-1], qLenTotal, elements[-1].duration
-    elements[-1].duration.quarterLength = (qLenTotal -
-                                             elements[-1].offset)
-    #print elements[-1], elements[-1].duration
-
-    # might want to return a new stream with the altered elements
-    return streamObj
-
-
-
-def splitByClass(streamObj, objName, fx):
-    '''Given a stream, get all objects specified by objName and then form
-    two new streams, where fx returns 1/True for the first stream and other values for the second stream.
-
-    Probably better named SplitByClass or similar.
-
-    >>> a = Stream()
-    >>> for x in range(30,81):
-    ...     n = note.Note()
-    ...     n.midi = x
-    ...     a.append(n)
-    >>> fx = lambda n: n.midi > 60
-    >>> b, c = splitByClass(a, note.Note, fx)
-    >>> len(b)
-    20
-    >>> len(c)
-    31
-    '''
-    a = Stream()
-    b = Stream()
-    for element in streamObj.getElementsByClass(objName):
-        if fx(element):
-            a.append(element)
-        else:
-            b.append(element)
-    return a, b
-        
-
-
-#-------------------------------------------------------------------------------
-
-
-
-# def makeMeasures(streamObj, meterStream=None, refStream=None):
-#     '''Take a stream and partition all elements into measures based on 
-#     one or more TimeSignature defined within the stream. If no TimeSignatures
-#     are defined, a default is used.
-# 
-#     If a meterStream is provided, this is used instead of the meterStream
-#     found in the Stream.
-# 
-#     If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.
-# 
-#     TODO: this can simply be a method of Stream?
-# 
-#     >>> a = Stream()
-#     >>> a.fillNone(3)
-#     >>> b = makeMeasures(a)
-#     >>> c = meter.TimeSignature('3/4')
-#     >>> a.insertAtOffset(0.0, c)
-#     >>> x = makeMeasures(a)
-# 
-#     >>> d = Stream()
-#     >>> n = note.Note()
-#     >>> d.repeatAdd(n, 10)
-#     >>> d.repeatDeepcopy(n, [x+.5 for x in range(10)])
-#     >>> x = makeMeasures(d)
-#     '''
-#     #environLocal.printDebug(['calling makeMeasures'])
-# 
-#     # may need to look in parent if no time signatures are found
-#     if meterStream == None:
-#         meterStream = streamObj.getTimeSignatures()
-#     # get a clef and for the entire stream
-#     clefObj = streamObj.bestClef()
-# 
-#     # for each element in stream, need to find max and min offset
-#     # assume that flat/sorted options will be set before procesing
-#     offsetMap = [] # list of start, start+dur, element
-#     for e in streamObj:
-#         if hasattr(e, 'duration') and e.duration != None:
-#             dur = e.duration.quarterLength
-#         else:
-#             dur = 0 
-#         # may just need to copy element offset component
-#         offsetMap.append([e.offset, e.offset+dur, e.copy()])
-# 
-#     #environLocal.printDebug(['makesMeasures()', offsetMap])    
-# 
-#     #offsetMap.sort() not necessary; just get min and max
-#     oMin = min([start for start, end, e in offsetMap])
-#     oMax = max([end for start, end, e in offsetMap])
-# 
-#     # this should not happend, but just in case
-#     if oMax != streamObj.highestTime:
-#         raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, streamObj.highestTime))
-#     #environLocal.printDebug(['oMin, oMax', oMin, oMax])
-# 
-#     # if a ref stream is provided, get highst time from there
-#     # only if it is greater thant the highest time yet encountered
-#     if refStream != None:
-#         if refStream.highestTime > oMax:
-#             oMax = refStream.highestTime
-# 
-#     # create a stream of measures to contain the offsets range defined
-#     # create as many measures as needed to fit in oMax
-#     post = Stream()
-#     o = 0 # initial position of first measure is assumed to be zero
-#     measureCount = 0
-#     while True:    
-#         m = Measure()
-#         # get active time signature at this offset
-#         m.timeSignature = meterStream.getElementAtOrBefore(o)
-#         m.clef = clefObj
-# 
-#         #environLocal.printDebug([measureCount, o, oMax, m.timeSignature,
-#         #                        m.timeSignature.barDuration.quarterLength])
-#         m.measureNumber = measureCount + 1
-#         # avoid an infinite loop
-#         if m.timeSignature.barDuration.quarterLength == 0:
-#             raise StreamException('time signature has no duration')    
-#         post.insertAtOffset(o, m) # insert measure
-#         o += m.timeSignature.barDuration.quarterLength # increment by meter length
-#         if o >= oMax: # may be zero
-#             break # if length of this measure exceedes last offset
-#         else:
-#             measureCount += 1
-# 
-#         if measureCount > 99999: # check for infinite loop
-#             raise StreamException('max measure count exceeded')    
-# 
-#     # populate measures with elements
-#     for start, end, e in offsetMap:
-#         # iterate through all measures 
-#         match = False
-#         for i in range(len(post)):
-#             m = post[i]
-#             # get start and end offsets for each measure
-#             # seems like should be able to use m.duration.quarterLengths
-#             mStart, mEnd = m.offset, m.offset + m.timeSignature.barDuration.quarterLength
-#             # if elements start fits within this measure, break and use 
-#             # offset cannot start on end
-#             if start >= mStart and start < mEnd:
-#                 match = True
-#                 #environLocal.printDebug(['found measure match', i, mStart, mEnd, start, end, e])
-#                 break
-#         if not match:
-#             raise StreamException('cannot place element with start/end %s/%s within any measures' % (start, end))
-#         # find offset in the temporal context of this measure
-#         # i is the index of the measure that this element starts at
-#         # mStart, mEnd are correct
-#         oNew = start - mStart # remove measure offset from element offset
-#         # insert element at this offset in the measure
-#         # not copying elements here!
-#         # here, we have the correct measure from above
-#         #environLocal.printDebug(['measure placement', mStart, oNew, e])
-#         m.insertAtOffset(oNew, e)
-#     return post
-
-
-# def makeTies(streamObj, meterStream=None):
-#     '''Given a stream containing measures, examine each element in the stream
-#     if the elements duration extends beyond the measures bound, create a tied 
-#     entity.
-# 
-#     Edits the current stream in-place. 
-# 
-#     TODO: this can simply be a method of Stream
-# 
-#     TODO: take a list of clases to act as filter on what elements are tied.
-# 
-#     configure ".previous" and ".next" attributes
-# 
-#     >>> d = Stream()
-#     >>> n = note.Note()
-#     >>> n.quarterLength = 12
-#     >>> d.repeatAdd(n, 10)
-#     >>> d.repeatCopy(n, [x+.5 for x in range(10)])
-#     >>> x = makeMeasures(d)
-# 
-#     >>> x = makeTies(x)
-# 
-#     '''
-#     if len(streamObj) == 0:
-#         raise StreamException('cannot process an empty stream')        
-# 
-#     # get measures from this stream
-#     measureStream = streamObj.getElementsByClass(Measure)
-#     if len(measureStream) == 0:
-#         raise StreamException('cannot process a stream without measures')        
-# 
-#     # may need to look in parent if no time signatures are found
-#     if meterStream == None:
-#         meterStream = streamObj.getTimeSignatures()
-# 
-#     mCount = 0
-#     while True:
-#         # update measureStream on each iteration, 
-#         # as new measure may have been added
-#         # to the stream 
-#         measureStream = streamObj.getElementsByClass(Measure)
-#         if mCount >= len(measureStream):
-#             break
-#         m = measureStream[mCount]
-#         if mCount + 1 < len(measureStream):
-#             mNext = measureStream[mCount+1]
-#             mNextAdd = False
-#         else: # create a new measure
-#             mNext = Measure()
-#             # set offset to last offset plus total length
-#             mNext.offset = m.offset + m.timeSignature.barDuration.quarterLength
-#             if len(meterStream) == 0: # in case no meters are defined
-#                 ts = meter.TimeSignature()
-#                 ts.load('%s/%s' % (defaults.meterNumerator, 
-#                                    defaults.meterDenominatorBeatType))
-# #                 ts.numerator = defaults.meterNumerator
-# #                 ts.denominator = defaults.meterDenominatorBeatType
-#             else: # get the last encountered meter
-#                 ts = meterStream.getElementAtOrBefore(mNext.offset)
-#             mNext.timeSignature = ts
-#             mNext.measureNumber = m.measureNumber + 1
-#             mNextAdd = True
-# 
-#         # seems like should be able to use m.duration.quarterLengths
-#         mStart, mEnd = 0, m.timeSignature.barDuration.quarterLength
-#         for e in m:
-#             if hasattr(e, 'duration') and e.duration != None:
-#                 # check to see if duration is within Measure
-#                 eEnd = e.offset + e.duration.quarterLength
-#                 # assume end can be at boundary of end of measure
-#                 if eEnd > mEnd:
-#                     if e.offset >= mEnd:
-#                         raise StreamException('element has offset %s within a measure that ends at offset %s' % (e.offset, mEnd))  
-# 
-#                     # note: cannot use GeneralNote.splitNoteAtPoint b/c
-#                     # we are not assuming that these are notes, only elements
-# 
-#                     qLenBegin = mEnd - e.offset
-#                     #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
-#                     qLenRemain = e.duration.quarterLength - qLenBegin
-#                     # modify existing duration
-#                     e.duration.quarterLength = qLenBegin
-#                     # create and place new element
-#                     eRemain = e.deepcopy()
-#                     eRemain.duration.quarterLength = qLenRemain
-# 
-#                     # set ties
-#                     if (e.isClass(note.Note) or 
-#                         e.isClass(note.Unpitched)):
-#                         #environLocal.printDebug(['tieing in makeTies', e])
-#                         e.tie = note.Tie('start')
-#                         # TODO: not sure if we can assume to stop remainder
-#                         #e.Remain.tie = note.Tie('stop')
-# 
-#                     # TODO: this does not seem the best way to do this!
-#                     # need to find a better way to insert this first in elements
-#                     eRemain.offset = 0
-#                     mNext.elements = [eRemain] + mNext.elements
-# 
-#                     # we are not sure that this element fits 
-#                     # completely in the next measure, thus, need to continue
-#                     # processing each measure
-#                     if mNextAdd:
-#                         streamObj.insertAtOffset(mNext.offset, mNext)
-#         mCount += 1
-# 
-#     #print streamObj.recurseRepr()
-# 
-#     return streamObj
-# 
-
-
-# def makeBeams(streamObj, meterStream=None):
-#     '''Given a stream containing measures, create beams based on 
-#     TimeSignature objects.
-# 
-#     Edits the current stream in-place. 
-# 
-#     >>> d = Stream()
-#     >>> n = note.Note()
-#     >>> n.quarterLength = .25
-#     >>> d.repeatAdd(n, 16)
-#     >>> x = makeMeasures(d)
-#     >>> y = makeBeams(x)
-# 
-#     '''
-# 
-#     if len(streamObj) == 0:
-#         raise StreamException('cannot process an empty stream')        
-# 
-#     # get measures from this stream
-#     measureStream = streamObj.getElementsByClass(Measure)
-#     if len(measureStream) == 0:
-#         raise StreamException('cannot process a stream without measures')        
-# 
-#     for m in streamObj.getElementsByClass(Measure): 
-#         ts = m.timeSignature
-#         # environLocal.printDebug(['beaming with ts', ts])
-#         noteStream = m.getNotes()
-#         durList = []
-# 
-#         for n in noteStream:
-#             durList.append(n.duration)
-#         if len(durList) <= 1: 
-#             continue
-# 
-#         beamsList = ts.getBeams(durList)
-#         for i in range(len(noteStream)):
-#             noteStream[i].beams = beamsList[i]
-# 
-#     return streamObj
-
-
-
-
-
-
-
 
 def recurseRepr(thisStream, prefixSpaces = 0):
     returnString = ""
@@ -1561,7 +1172,6 @@ class Stream(music21.BaseElement, music21.Music21Object):
             #ts.numerator = defaults.meterNumerator
             #ts.denominator = defaults.meterDenominatorBeatType
             post.insertAtOffset(0, ts)
-    
         return post
     
 
@@ -1846,6 +1456,36 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
+
+    def splitByClass(self, objName, fx):
+        '''Given a stream, get all objects specified by objName and then form
+        two new streams, where fx returns 1/True for the first stream and other values for the second stream.
+    
+        Probably better named SplitByClass or similar.
+    
+        >>> a = Stream()
+        >>> for x in range(30,81):
+        ...     n = note.Note()
+        ...     n.midi = x
+        ...     a.append(n)
+        >>> fx = lambda n: n.midi > 60
+        >>> b, c = a.splitByClass(note.Note, fx)
+        >>> len(b)
+        20
+        >>> len(c)
+        31
+        '''
+        a = Stream()
+        b = Stream()
+        for element in self.getElementsByClass(objName):
+            if fx(element):
+                a.append(element)
+            else:
+                b.append(element)
+        return a, b
+            
+
+
     def makeMeasures(self, meterStream=None, refStream=None):
         '''Take a stream and partition all elements into measures based on 
         one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used.
@@ -1921,7 +1561,8 @@ class Stream(music21.BaseElement, music21.Music21Object):
         while True:    
             m = Measure()
             # get active time signature at this offset
-            m.timeSignature = meterStream.getElementAtOrBefore(o)
+            # make a copy and it to the meter
+            m.timeSignature = meterStream.getElementAtOrBefore(o).deepcopy()
             m.clef = clefObj
     
             #environLocal.printDebug([measureCount, o, oMax, m.timeSignature,
@@ -1971,8 +1612,8 @@ class Stream(music21.BaseElement, music21.Music21Object):
         '''Given a streamObj with an Element with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
     
-        If refStream is provided, use this to get min and max offsets.
-    
+        If refStream is provided, use this to get min and max offsets. Rests 
+        will be added to fill all time defined within refStream.
     
         TODO: rename fillRests() or something else
     
@@ -2015,24 +1656,6 @@ class Stream(music21.BaseElement, music21.Music21Object):
             r = note.Rest()
             r.duration.quarterLength = qLen
             returnObj.insertAtOffset(oHigh, r)
-    
-    #     streamLead = Stream() # store rests leading this event
-    # 
-    #     o = 0 # starting offset
-    #     while True:
-    #         oRemain = oLow - o
-    #         if oRemain <= 0:
-    #             break
-    #         if oRemain >= maxRestQLen:
-    #             qLen = maxRestQLen
-    #         else: # oRemain is less tn maxRestQLen but greater than zero
-    #             qLen = oRemain
-    # 
-    #         r = note.Rest()
-    #         r.duration.quarterLength = qLen
-    #         streamLead.insertAtOffset(o, r)
-    # 
-    #         o = o + qLen
     
         # do not need to sort, can concatenate without sorting
         # post = streamLead + returnObj 
@@ -2098,7 +1721,8 @@ class Stream(music21.BaseElement, music21.Music21Object):
     #                 ts.denominator = defaults.meterDenominatorBeatType
                 else: # get the last encountered meter
                     ts = meterStream.getElementAtOrBefore(mNext.offset)
-                mNext.timeSignature = ts
+                # assumeing we need a new instance of TimeSignature
+                mNext.timeSignature = ts.deepcopy()
                 mNext.measureNumber = m.measureNumber + 1
                 mNextAdd = True
     
@@ -2195,6 +1819,83 @@ class Stream(music21.BaseElement, music21.Music21Object):
                 noteStream[i].beams = beamsList[i]
 
         return returnObj
+
+
+    def extendDuration(self, objName, inPlace=True):
+        '''Given a stream and an object name, go through stream and find each 
+        object. The time between adjacent objects is then assigned to the 
+        duration of each object. The last duration of the last object is assigned
+        to the end of the stream.
+        
+        >>> import music21.dynamics
+        >>> stream1 = Stream()
+        >>> n = note.QuarterNote()
+        >>> n.duration.quarterLength
+        1.0
+        >>> stream1.repeatDeepcopy(n, [0, 10, 20, 30, 40])
+        >>> dyn = Element(music21.dynamics.Dynamic('ff'))
+        >>> stream1.insertAtOffset(15, dyn)
+        >>> sort1 = stream1.sorted
+        >>> sort1[-1].offset # offset of last element
+        40.0
+        >>> sort1.duration.quarterLength # total duration
+        41.0
+        >>> len(sort1)
+        6
+    
+        >>> stream2 = sort1.flat.extendDuration(note.GeneralNote)
+        >>> len(stream2)
+        6
+        >>> stream2[0].duration.quarterLength
+        10.0
+        >>> stream2[1].duration.quarterLength # all note durs are 10
+        10.0
+        >>> stream2[-1].duration.quarterLength # or extend to end of stream
+        1.0
+        >>> stream2.duration.quarterLength
+        41.0
+        >>> stream2[-1].offset
+        40.0
+
+        >>> from music21.musicxml import testFiles
+        >>> from music21 import converter
+        >>> mxString = testFiles.ALL[2] # has dynamics
+        >>> a = converter.parse(mxString)
+        >>> b = a.flat.extendDuration(dynamics.Dynamic)    
+        '''
+    
+        if not inPlace: # make a copy
+            returnObj = self.deepcopy()
+        else:
+            returnObj = self
+
+        # this cannot work unless we use a sorted representation
+        returnObj = returnObj.sorted
+
+        qLenTotal = returnObj.duration.quarterLength
+        elements = []
+        for element in returnObj.getElementsByClass(objName):
+            if not hasattr(element, 'duration'):
+                raise StreamException('can only process objects with duration attributes')
+            if element.duration == None:
+                element.duration = duration.Duration()
+            elements.append(element)
+    
+        #print elements[-1], qLenTotal, elements[-1].duration
+        # print _MOD, elements
+        for i in range(len(elements)-1):
+            #print i, len(elements)
+            span = elements[i+1].offset - elements[i].offset
+            elements[i].duration.quarterLength = span
+    
+        # handle last element
+        #print elements[-1], qLenTotal, elements[-1].duration
+        elements[-1].duration.quarterLength = (qLenTotal -
+                                                 elements[-1].offset)
+        #print elements[-1], elements[-1].duration    
+        return returnObj
+    
+
 
 
     #---------------------------------------------------------------------------
@@ -3193,25 +2894,31 @@ class Stream(music21.BaseElement, music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class Measure(Stream):
-    # the music21 object need not know anything about musicxml;
-    # all that data is contained within the musicxml objects
-    # musicXmlTag = "measure"
+    '''A representation of a Measure organized as a Stream. 
 
+    All properties of a Measure that are Music21 objects are found as part of 
+    the Stream's elements. 
+    '''
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
-        self.timeSignature = None
-        self.timeSignatureIsNew = False
 
-        # clef is defined as a property below
+        # clef and timeSignature is defined as a property below
+
+        self.timeSignatureIsNew = False
         self.clefIsNew = False
 
         self.filled = False
         self.measureNumber = 0   # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
+
+
         # inherits from prev measure or is default for group
-        self.leftbarline = None  
         # inherits from next measure or is default for group
+
+        # these attrbute will, ultimate, be obtained form .elements
+        self.leftbarline = None  
         self.rightbarline = None 
+
         # for display is overridden by next measure\'s leftbarline if that is not None and
         # the two measures are on the same system
 
@@ -3261,8 +2968,8 @@ class Measure(Stream):
         
 
     #---------------------------------------------------------------------------
-    # clef is stored in the Stream's elements list, however a property
-    # is provided to store and access the clef as an attribute
+    # Music21Objects are stored in the Stream's elements list 
+    # properties are provided to store and access these attribute
 
     def _getClef(self):
         '''
@@ -3299,6 +3006,39 @@ class Measure(Stream):
     clef = property(_getClef, _setClef)    
 
 
+    def _getTimeSignature(self):
+        '''
+        >>> a = Measure()
+        >>> a.timeSignature = meter.TimeSignature('2/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator 
+        (2, 4)
+        '''
+        # there could be more than one
+        tsList = self.getElementsByClass(meter.TimeSignature)
+        # only return ts that has a zero offset
+        tsList = tsList.getElementsByOffset(0,0)
+        if len(tsList) == 0:
+            return None
+        else:
+            return tsList[0]    
+    
+    def _setTimeSignature(self, tsObj):
+        '''
+        >>> a = Measure()
+        >>> a.timeSignature = meter.TimeSignature('5/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator 
+        (5, 4)
+        >>> a.timeSignature = meter.TimeSignature('2/8')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator 
+        (2, 8)
+        '''
+        oldTimeSignature = self._getTimeSignature()
+        if oldTimeSignature != None:
+            environLocal.printDebug(['removing ts', oldTimeSignature])
+            junk = self.pop(self.index(oldTimeSignature))
+        self.insertAtOffset(0, tsObj)
+
+    timeSignature = property(_getTimeSignature, _setTimeSignature)   
 
     #---------------------------------------------------------------------------
     def _getMxDynamics(self, mxDirection):
