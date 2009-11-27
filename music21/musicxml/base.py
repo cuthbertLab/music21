@@ -375,7 +375,7 @@ class MusicXMLElementList(MusicXMLElement):
         MusicXMLElement.__init__(self)
         # basic storage location
         self.componentList = [] 
-        self._index = 0
+        # self._index = 0
         # additional attributes and elements will be defined in subclass
 
     def _getComponents(self):

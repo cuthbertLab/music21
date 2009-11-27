@@ -411,7 +411,7 @@ class NodeList(Node):
         Node.__init__(self)
         # basic storage location
         self.componentList = [] 
-        self._index = 0
+        # self._index = 0
         # additional attributes and nodess will be defined in subclass
 
     def _getComponents(self):
