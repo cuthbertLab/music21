@@ -1,7 +1,7 @@
 .. _contents
 
-Music 21 Documentation
-======================
+Music21 Documentation
+=====================
 
 .. toctree::
    :maxdepth: 2
@@ -14,12 +14,14 @@ Music 21 Documentation
    moduleCommon
    moduleConverter
    moduleDuration
+   moduleEnvironment
    moduleNote
    modulePitch
+   moduleMeter
    moduleStream
 
 Indices and Tables
 ==================
 
-* :ref:'glossary'
+* :ref:`glossary`
 

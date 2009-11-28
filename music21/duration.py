@@ -1674,8 +1674,6 @@ class Duration(DurationCommon):
         ...   components.append(Duration('quarter'))
         >>> a = Duration()
         >>> a.components = components
-
-        ARIZA: let's not call private methods from inside public docs.
         >>> a.updateQuarterLength()
         >>> a.quarterLength
         3.0

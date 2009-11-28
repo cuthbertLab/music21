@@ -214,653 +214,149 @@ simple representation of most durationObjects. works on a single DurationObject 
 Class AppogiaturaStartDuration
 ------------------------------
 
+Inherits from: duration.Duration, duration.DurationCommon, object
+
 
 Attributes
 ~~~~~~~~~~
 
-+ linkages
+**linkages**
 
 Methods
 ~~~~~~~
 
-**addDuration()**
 
-    Add a DurationUnit or a Duration's components to this Duration. 
-
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+Inherited from duration.DurationCommon
 
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-**clear()**
-
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
-
-**clone()**
-
-
-**componentIndexAtQtrPosition()**
-
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
-
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    ARIZA: let's not call private methods from inside public docs. 
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
-
-**componentStartTime()**
-
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
-
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
-
-**components()**
-
-
-**consolidate()**
-
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
-
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
-
-**dots()**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**expand()**
-
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
-
-**fill()**
-
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
-
-**isComplex()**
-
-
-**lily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**musicxml()**
-
-    Return a complete MusicXML string with defaults. 
-
-**mx()**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**quarterLength()**
-
-    Can be the same as the base class. 
-
-**show()**
-
-    This might need to return the file path. 
-
-**sliceComponentAtPosition()**
-
-    Given a quarter position within a component, divide that component into two components. 
-
-    >>> a = Duration()
-    >>> a.clear() # need to remove default
-    >>> components = []
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.quarterLength
-    3.0 
-    >>> a.sliceComponentAtPosition(.5)
-    >>> a.quarterLength
-    3.0 
-    >>> len(a.components)
-    4 
-    >>> a.components[0].type
-    'eighth' 
-    >>> a.components[1].type
-    'eighth' 
-    >>> a.components[2].type
-    'quarter' 
-
-**tuplets()**
-
-
-**type()**
-
-    Get the duration type. 
-
-**updateQuarterLength()**
-
-    Look to components and determine quarter length. 
+Inherited from duration.Duration
 
 **write()**
 
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
+**updateQuarterLength()**
 
-Private Methods
-~~~~~~~~~~~~~~~
+**sliceComponentAtPosition()**
 
-**_getComponents()**
+**show()**
 
+**fill()**
 
-**_getDots()**
+**expand()**
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+**consolidate()**
 
-**_getLily()**
+**componentStartTime()**
 
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+**componentIndexAtQtrPosition()**
 
-    
+**clone()**
 
-**_getMX()**
+**clear()**
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
+**addDuration()**
 
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**_getMusicXML()**
-
-    Return a complete MusicXML string with defaults. 
-
-**_getQuarterLength()**
-
-    Can be the same as the base class. 
-
-**_getTuplets()**
+Properties
+~~~~~~~~~~
 
 
-**_getType()**
+Inherited from duration.Duration
 
-    Get the duration type. 
+**type**
 
-**_isComplex()**
+**tuplets**
 
+**quarterLength**
 
-**_setComponents()**
+**mx**
 
+**musicxml**
 
-**_setDots()**
+**lily**
 
-    Set dots if a number, as first element Having this as a method permits error checking. 
+**isComplex**
 
-    >>> a = Duration()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
+**dots**
 
-**_setMX()**
-
-    Given a lost of one or more MusicXML Note objects, read in and create Durations mxNote must have a defined _measure attribute that is a reference to the MusicXML Measure that contains it 
-
-    >>> from music21 import musicxml
-    >>> a = musicxml.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
-    >>> c = Duration()
-    >>> c.mx = a
-    >>> c.quarterLength
-    1.0 
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. Currently (if the value is different from what is already stored) this wipes out any existing components, not preserving their type.  So if you've set up Duration(1.5) as 3-eighth notes, setting Duration to 1.75 will NOT dot the last eighth note, but instead give you a single double-dotted half note. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3.5
-    >>> a.quarterLength
-    3.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (3.5, 'half', 2, None, None, None) 
-    >>> a.quarterLength = 2.5
-    >>> a.quarterLength
-    2.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (2.0, 'half', 0, None, None, None) 
-    (0.5, 'eighth', 0, None, None, None) 
-
-**_setTuplets()**
-
-
-**_setType()**
-
-    Set the type length to the specified value. 
-
-    >>> a = Duration()
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
-    >>> a.type= '16th'
-    >>> a.quarterLength
-    0.25 
-
-**_updateComponents()**
-
+**components**
 
 
 Class AppogiaturaStopDuration
 -----------------------------
 
+Inherits from: duration.Duration, duration.DurationCommon, object
+
 
 Attributes
 ~~~~~~~~~~
 
-+ linkages
+**linkages**
 
 Methods
 ~~~~~~~
 
-**addDuration()**
 
-    Add a DurationUnit or a Duration's components to this Duration. 
-
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+Inherited from duration.DurationCommon
 
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-**clear()**
-
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
-
-**clone()**
-
-
-**componentIndexAtQtrPosition()**
-
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
-
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    ARIZA: let's not call private methods from inside public docs. 
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
-
-**componentStartTime()**
-
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
-
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
-
-**components()**
-
-
-**consolidate()**
-
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
-
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
-
-**dots()**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**expand()**
-
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
-
-**fill()**
-
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
-
-**isComplex()**
-
-
-**lily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**musicxml()**
-
-    Return a complete MusicXML string with defaults. 
-
-**mx()**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**quarterLength()**
-
-    Can be the same as the base class. 
-
-**show()**
-
-    This might need to return the file path. 
-
-**sliceComponentAtPosition()**
-
-    Given a quarter position within a component, divide that component into two components. 
-
-    >>> a = Duration()
-    >>> a.clear() # need to remove default
-    >>> components = []
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.quarterLength
-    3.0 
-    >>> a.sliceComponentAtPosition(.5)
-    >>> a.quarterLength
-    3.0 
-    >>> len(a.components)
-    4 
-    >>> a.components[0].type
-    'eighth' 
-    >>> a.components[1].type
-    'eighth' 
-    >>> a.components[2].type
-    'quarter' 
-
-**tuplets()**
-
-
-**type()**
-
-    Get the duration type. 
-
-**updateQuarterLength()**
-
-    Look to components and determine quarter length. 
+Inherited from duration.Duration
 
 **write()**
 
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
+**updateQuarterLength()**
 
-Private Methods
-~~~~~~~~~~~~~~~
+**sliceComponentAtPosition()**
 
-**_getComponents()**
+**show()**
 
+**fill()**
 
-**_getDots()**
+**expand()**
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+**consolidate()**
 
-**_getLily()**
+**componentStartTime()**
 
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+**componentIndexAtQtrPosition()**
 
-    
+**clone()**
 
-**_getMX()**
+**clear()**
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
+**addDuration()**
 
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**_getMusicXML()**
-
-    Return a complete MusicXML string with defaults. 
-
-**_getQuarterLength()**
-
-    Can be the same as the base class. 
-
-**_getTuplets()**
+Properties
+~~~~~~~~~~
 
 
-**_getType()**
+Inherited from duration.Duration
 
-    Get the duration type. 
+**type**
 
-**_isComplex()**
+**tuplets**
 
+**quarterLength**
 
-**_setComponents()**
+**mx**
 
+**musicxml**
 
-**_setDots()**
+**lily**
 
-    Set dots if a number, as first element Having this as a method permits error checking. 
+**isComplex**
 
-    >>> a = Duration()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
+**dots**
 
-**_setMX()**
-
-    Given a lost of one or more MusicXML Note objects, read in and create Durations mxNote must have a defined _measure attribute that is a reference to the MusicXML Measure that contains it 
-
-    >>> from music21 import musicxml
-    >>> a = musicxml.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
-    >>> c = Duration()
-    >>> c.mx = a
-    >>> c.quarterLength
-    1.0 
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. Currently (if the value is different from what is already stored) this wipes out any existing components, not preserving their type.  So if you've set up Duration(1.5) as 3-eighth notes, setting Duration to 1.75 will NOT dot the last eighth note, but instead give you a single double-dotted half note. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3.5
-    >>> a.quarterLength
-    3.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (3.5, 'half', 2, None, None, None) 
-    >>> a.quarterLength = 2.5
-    >>> a.quarterLength
-    2.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (2.0, 'half', 0, None, None, None) 
-    (0.5, 'eighth', 0, None, None, None) 
-
-**_setTuplets()**
-
-
-**_setType()**
-
-    Set the type length to the specified value. 
-
-    >>> a = Duration()
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
-    >>> a.type= '16th'
-    >>> a.quarterLength
-    0.25 
-
-**_updateComponents()**
-
+**components**
 
 
 Class Duration
 --------------
+
+Inherits from: duration.DurationCommon, object
 
 Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note" 
 
@@ -869,167 +365,26 @@ A Duration is made of one or more DurationUnits. Multiple DurationUnits in a sin
 Attributes
 ~~~~~~~~~~
 
-+ linkages
+**linkages**
 
 Methods
 ~~~~~~~
 
-**addDuration()**
 
-    Add a DurationUnit or a Duration's components to this Duration. 
-
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+Inherited from duration.DurationCommon
 
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
+Locally Defined
 
-**clear()**
+**write()**
 
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
+    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
 
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
+**updateQuarterLength()**
 
-**clone()**
-
-
-**componentIndexAtQtrPosition()**
-
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
-
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    ARIZA: let's not call private methods from inside public docs. 
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
-
-**componentStartTime()**
-
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
-
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
-
-**components()**
-
-
-**consolidate()**
-
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
-
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
-
-**dots()**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**expand()**
-
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
-
-**fill()**
-
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
-
-**isComplex()**
-
-
-**lily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**musicxml()**
-
-    Return a complete MusicXML string with defaults. 
-
-**mx()**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**quarterLength()**
-
-    Can be the same as the base class. 
-
-**show()**
-
-    This might need to return the file path. 
+    Look to components and determine quarter length. 
 
 **sliceComponentAtPosition()**
 
@@ -1055,38 +410,130 @@ Methods
     >>> a.components[2].type
     'quarter' 
 
-**tuplets()**
+**show()**
+
+    This might need to return the file path. 
+
+**fill()**
+
+    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
+
+**expand()**
+
+    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
+
+**consolidate()**
+
+    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
+
+    >>> a = Duration()
+    >>> a.fill(['quarter', 'half', 'quarter'])
+    >>> a.quarterLength
+    4.0 
+    >>> len(a.components)
+    3 
+    >>> a.consolidate()
+    >>> a.quarterLength
+    4.0 
+    >>> len(a.components)
+    1 
+    But it gains a type! 
+    >>> a.type
+    'whole' 
+
+**componentStartTime()**
+
+    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
+
+    >>> components = []
+    >>> for x in [1,1,1]:
+    ...    components.append(Duration('quarter')) 
+    >>> a = Duration()
+    >>> a.components = components
+    >>> a.updateQuarterLength()
+    >>> a.quarterLength
+    3.0 
+    >>> a.componentStartTime(0)
+    0.0 
+    >>> a.componentStartTime(1)
+    1.0 
+
+**componentIndexAtQtrPosition()**
+
+    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
+
+    >>> components = []
+    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
+    better is just to copy and paste three times.  Very easy to see what 
+    is happening. 
+    >>> for x in [1,1,1]:
+    ...   components.append(Duration('quarter')) 
+    >>> a = Duration()
+    >>> a.components = components
+    >>> a.updateQuarterLength()
+    >>> a.quarterLength
+    3.0 
+    >>> a.componentIndexAtQtrPosition(.5)
+    0 
+    >>> a.componentIndexAtQtrPosition(1.5)
+    1 
+    >>> a.componentIndexAtQtrPosition(2.5)
+    2 
+    this is odd behavior: 
+    e.g. given d1, d2, d3 as 3 quarter notes and 
+    self.components = [d1, d2, d3] 
+    then 
+    self.componentIndexAtQtrPosition(1.5) == d2 
+    self.componentIndexAtQtrPosition(2.0) == d3 
+    self.componentIndexAtQtrPosition(2.5) == d3 
+
+**clone()**
 
 
-**type()**
+**clear()**
+
+    Permit all componets to be removed. (It is not clear yet if this is needed) 
+
+    >>> a = Duration()
+    >>> a.quarterLength = 4
+    >>> a.type
+    'whole' 
+    >>> a.clear()
+    >>> a.quarterLength
+    0.0 
+    >>> a.type
+    'zero' 
+
+**addDuration()**
+
+    Add a DurationUnit or a Duration's components to this Duration. 
+
+    >>> a = Duration('quarter')
+    >>> b = Duration('quarter')
+    >>> a.addDuration(b)
+    >>> a.quarterLength
+    2.0 
+    >>> a.type
+    'complex' 
+
+Properties
+~~~~~~~~~~
+
+
+Locally Defined
+
+**type**
 
     Get the duration type. 
 
-**updateQuarterLength()**
-
-    Look to components and determine quarter length. 
-
-**write()**
-
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
-
-Private Methods
-~~~~~~~~~~~~~~~
-
-**_getComponents()**
+**tuplets**
 
 
-**_getDots()**
+**quarterLength**
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+    Can be the same as the base class. 
 
-**_getLily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**_getMX()**
+**mx**
 
     Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
 
@@ -1098,101 +545,39 @@ Private Methods
     >>> isinstance(b[0], musicxmlMod.Note)
     True 
 
-**_getMusicXML()**
+**musicxml**
 
     Return a complete MusicXML string with defaults. 
 
-**_getQuarterLength()**
+**lily**
 
-    Can be the same as the base class. 
+    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
 
-**_getTuplets()**
+    
 
-
-**_getType()**
-
-    Get the duration type. 
-
-**_isComplex()**
+**isComplex**
 
 
-**_setComponents()**
+**dots**
 
+    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
 
-**_setDots()**
-
-    Set dots if a number, as first element Having this as a method permits error checking. 
-
-    >>> a = Duration()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
-
-**_setMX()**
-
-    Given a lost of one or more MusicXML Note objects, read in and create Durations mxNote must have a defined _measure attribute that is a reference to the MusicXML Measure that contains it 
-
-    >>> from music21 import musicxml
-    >>> a = musicxml.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
-    >>> c = Duration()
-    >>> c.mx = a
-    >>> c.quarterLength
-    1.0 
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. Currently (if the value is different from what is already stored) this wipes out any existing components, not preserving their type.  So if you've set up Duration(1.5) as 3-eighth notes, setting Duration to 1.75 will NOT dot the last eighth note, but instead give you a single double-dotted half note. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3.5
-    >>> a.quarterLength
-    3.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (3.5, 'half', 2, None, None, None) 
-    >>> a.quarterLength = 2.5
-    >>> a.quarterLength
-    2.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (2.0, 'half', 0, None, None, None) 
-    (0.5, 'eighth', 0, None, None, None) 
-
-**_setTuplets()**
-
-
-**_setType()**
-
-    Set the type length to the specified value. 
-
-    >>> a = Duration()
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
-    >>> a.type= '16th'
-    >>> a.quarterLength
-    0.25 
-
-**_updateComponents()**
+**components**
 
 
 
 Class DurationCommon
 --------------------
 
+Inherits from: object
+
 base class for Duration and DurationUnit to borrow from 
 
 Methods
 ~~~~~~~
+
+
+Locally Defined
 
 **aggregateTupletRatio()**
 
@@ -1212,106 +597,78 @@ Methods
 Class DurationException
 -----------------------
 
+Inherits from: exceptions.Exception, exceptions.BaseException, object
+
 
 Methods
 ~~~~~~~
 
-**args()**
 
+Inherited from exceptions.BaseException
 
 **message()**
 
+**args()**
 
 
 Class DurationUnit
 ------------------
+
+Inherits from: duration.DurationCommon, object
 
 A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
 Attributes
 ~~~~~~~~~~
 
-+ linkStatus
+**linkStatus**
 
 Methods
 ~~~~~~~
 
+
+Inherited from duration.DurationCommon
+
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
+Locally Defined
 
-**dots()**
-
-    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
-
-**lily()**
-
-    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
-
-**link()**
-
-
-**ordinal()**
-
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
-
-    >>> a = DurationUnit('whole')
-    >>> a.ordinal
-    4 
-    >>> b = DurationUnit('maxima')
-    >>> b.ordinal
-    1 
-    >>> c = DurationUnit('1024th')
-    >>> c.ordinal
-    14 
-
-**quarterLength()**
-
-    determine the length in quarter notes from current information 
-
-**setTypeFromNum()**
-
-
-**tuplets()**
-
-    Return a list of Tuplet objects 
-
-**type()**
-
-    Get the duration type. 
-
-**unlink()**
+**updateType()**
 
 
 **updateQuarterLength()**
 
     Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
 
-**updateType()**
+**unlink()**
 
 
-Private Methods
-~~~~~~~~~~~~~~~
+**setTypeFromNum()**
 
-**_getDots()**
 
-    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
+**link()**
 
-**_getLily()**
 
-    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
+Properties
+~~~~~~~~~~
 
-**_getOrdinal()**
+
+Locally Defined
+
+**type**
+
+    Get the duration type. 
+
+**tuplets**
+
+    Return a list of Tuplet objects 
+
+**quarterLength**
+
+    determine the length in quarter notes from current information 
+
+**ordinal**
 
     Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
 
@@ -1325,865 +682,161 @@ Private Methods
     >>> c.ordinal
     14 
 
-**_getQuarterLength()**
+**lily**
 
-    determine the length in quarter notes from current information 
+    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
 
-**_getTuplets()**
+**dots**
 
-    Return a list of Tuplet objects 
-
-**_getType()**
-
-    Get the duration type. 
-
-**_setDots()**
-
-    Sets the number of dots Having this as a method permits error checking. 
-
-    >>> a = DurationUnit()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
-
-    
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. (We no longer unlink if quarterLength is greater than a long) 
-
-    >>> a = DurationUnit()
-    >>> a.quarterLength = 3
-    >>> a.type
-    'half' 
-    >>> a.dots
-    1 
-    >>> a.quarterLength = .5
-    >>> a.type
-    'eighth' 
-    >>> a.quarterLength = .75
-    >>> a.type
-    'eighth' 
-    >>> a.dots
-    1 
-    >>> b = DurationUnit()
-    >>> b.quarterLength = 16
-    >>> b.type
-    'longa' 
-    >>> c = DurationUnit()
-    >>> c.quarterLength = 129
-    >>> c.type
-    Traceback (most recent call last): 
-    ... 
-    DurationException: Cannot return types greater than double duplex-maxima: remove this when we are sure this works... 
-
-**_setTuplets()**
-
-    Takes in a list of Tuplet objects 
-
-**_setType()**
-
-    Set the type length to the specified value. Check for bad types. 
-
-    >>> a = Duration()
-    >>> a.type = '128th'
-    >>> a.quarterLength
-    0.03125 
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
+    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
 
 
 Class GraceDuration
 -------------------
 
+Inherits from: duration.Duration, duration.DurationCommon, object
+
 
 Attributes
 ~~~~~~~~~~
 
-+ linkages
+**linkages**
 
 Methods
 ~~~~~~~
 
-**addDuration()**
 
-    Add a DurationUnit or a Duration's components to this Duration. 
-
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+Inherited from duration.DurationCommon
 
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-**clear()**
-
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
-
-**clone()**
-
-
-**componentIndexAtQtrPosition()**
-
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
-
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    ARIZA: let's not call private methods from inside public docs. 
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
-
-**componentStartTime()**
-
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
-
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
-
-**components()**
-
-
-**consolidate()**
-
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
-
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
-
-**dots()**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**expand()**
-
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
-
-**fill()**
-
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
-
-**isComplex()**
-
-
-**lily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**musicxml()**
-
-    Return a complete MusicXML string with defaults. 
-
-**mx()**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**quarterLength()**
-
-    Can be the same as the base class. 
-
-**show()**
-
-    This might need to return the file path. 
-
-**sliceComponentAtPosition()**
-
-    Given a quarter position within a component, divide that component into two components. 
-
-    >>> a = Duration()
-    >>> a.clear() # need to remove default
-    >>> components = []
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.quarterLength
-    3.0 
-    >>> a.sliceComponentAtPosition(.5)
-    >>> a.quarterLength
-    3.0 
-    >>> len(a.components)
-    4 
-    >>> a.components[0].type
-    'eighth' 
-    >>> a.components[1].type
-    'eighth' 
-    >>> a.components[2].type
-    'quarter' 
-
-**tuplets()**
-
-
-**type()**
-
-    Get the duration type. 
-
-**updateQuarterLength()**
-
-    Look to components and determine quarter length. 
+Inherited from duration.Duration
 
 **write()**
 
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
+**updateQuarterLength()**
 
-Private Methods
-~~~~~~~~~~~~~~~
+**sliceComponentAtPosition()**
 
-**_getComponents()**
+**show()**
 
+**fill()**
 
-**_getDots()**
+**expand()**
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+**consolidate()**
 
-**_getLily()**
+**componentStartTime()**
 
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+**componentIndexAtQtrPosition()**
 
-    
+**clone()**
 
-**_getMX()**
+**clear()**
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
+**addDuration()**
 
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**_getMusicXML()**
-
-    Return a complete MusicXML string with defaults. 
-
-**_getQuarterLength()**
-
-    Can be the same as the base class. 
-
-**_getTuplets()**
+Properties
+~~~~~~~~~~
 
 
-**_getType()**
+Inherited from duration.Duration
 
-    Get the duration type. 
+**type**
 
-**_isComplex()**
+**tuplets**
 
+**quarterLength**
 
-**_setComponents()**
+**mx**
 
+**musicxml**
 
-**_setDots()**
+**lily**
 
-    Set dots if a number, as first element Having this as a method permits error checking. 
+**isComplex**
 
-    >>> a = Duration()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
+**dots**
 
-**_setMX()**
-
-    Given a lost of one or more MusicXML Note objects, read in and create Durations mxNote must have a defined _measure attribute that is a reference to the MusicXML Measure that contains it 
-
-    >>> from music21 import musicxml
-    >>> a = musicxml.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
-    >>> c = Duration()
-    >>> c.mx = a
-    >>> c.quarterLength
-    1.0 
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. Currently (if the value is different from what is already stored) this wipes out any existing components, not preserving their type.  So if you've set up Duration(1.5) as 3-eighth notes, setting Duration to 1.75 will NOT dot the last eighth note, but instead give you a single double-dotted half note. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3.5
-    >>> a.quarterLength
-    3.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (3.5, 'half', 2, None, None, None) 
-    >>> a.quarterLength = 2.5
-    >>> a.quarterLength
-    2.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (2.0, 'half', 0, None, None, None) 
-    (0.5, 'eighth', 0, None, None, None) 
-
-**_setTuplets()**
-
-
-**_setType()**
-
-    Set the type length to the specified value. 
-
-    >>> a = Duration()
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
-    >>> a.type= '16th'
-    >>> a.quarterLength
-    0.25 
-
-**_updateComponents()**
-
+**components**
 
 
 Class LongGraceDuration
 -----------------------
 
+Inherits from: duration.Duration, duration.DurationCommon, object
+
 
 Attributes
 ~~~~~~~~~~
 
-+ linkages
+**linkages**
 
 Methods
 ~~~~~~~
 
-**addDuration()**
 
-    Add a DurationUnit or a Duration's components to this Duration. 
-
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+Inherited from duration.DurationCommon
 
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-**clear()**
-
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
-
-**clone()**
-
-
-**componentIndexAtQtrPosition()**
-
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
-
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    ARIZA: let's not call private methods from inside public docs. 
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
-
-**componentStartTime()**
-
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
-
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
-
-**components()**
-
-
-**consolidate()**
-
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
-
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
-
-**dots()**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**expand()**
-
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
-
-**fill()**
-
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
-
-**isComplex()**
-
-
-**lily()**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**musicxml()**
-
-    Return a complete MusicXML string with defaults. 
-
-**mx()**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**quarterLength()**
-
-    Can be the same as the base class. 
-
-**show()**
-
-    This might need to return the file path. 
-
-**sliceComponentAtPosition()**
-
-    Given a quarter position within a component, divide that component into two components. 
-
-    >>> a = Duration()
-    >>> a.clear() # need to remove default
-    >>> components = []
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.quarterLength
-    3.0 
-    >>> a.sliceComponentAtPosition(.5)
-    >>> a.quarterLength
-    3.0 
-    >>> len(a.components)
-    4 
-    >>> a.components[0].type
-    'eighth' 
-    >>> a.components[1].type
-    'eighth' 
-    >>> a.components[2].type
-    'quarter' 
-
-**tuplets()**
-
-
-**type()**
-
-    Get the duration type. 
-
-**updateQuarterLength()**
-
-    Look to components and determine quarter length. 
+Inherited from duration.Duration
 
 **write()**
 
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
+**updateQuarterLength()**
 
-Private Methods
-~~~~~~~~~~~~~~~
+**sliceComponentAtPosition()**
 
-**_getComponents()**
+**show()**
 
+**fill()**
 
-**_getDots()**
+**expand()**
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+**consolidate()**
 
-**_getLily()**
+**componentStartTime()**
 
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+**componentIndexAtQtrPosition()**
 
-    
+**clone()**
 
-**_getMX()**
+**clear()**
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
+**addDuration()**
 
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
+Properties
+~~~~~~~~~~
 
-**_getMusicXML()**
 
-    Return a complete MusicXML string with defaults. 
+Inherited from duration.Duration
 
-**_getQuarterLength()**
+**type**
 
-    Can be the same as the base class. 
+**tuplets**
 
-**_getTuplets()**
+**quarterLength**
 
+**mx**
 
-**_getType()**
+**musicxml**
 
-    Get the duration type. 
+**lily**
 
-**_isComplex()**
+**isComplex**
 
+**dots**
 
-**_setComponents()**
-
-
-**_setDots()**
-
-    Set dots if a number, as first element Having this as a method permits error checking. 
-
-    >>> a = Duration()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
-
-**_setMX()**
-
-    Given a lost of one or more MusicXML Note objects, read in and create Durations mxNote must have a defined _measure attribute that is a reference to the MusicXML Measure that contains it 
-
-    >>> from music21 import musicxml
-    >>> a = musicxml.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
-    >>> c = Duration()
-    >>> c.mx = a
-    >>> c.quarterLength
-    1.0 
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. Currently (if the value is different from what is already stored) this wipes out any existing components, not preserving their type.  So if you've set up Duration(1.5) as 3-eighth notes, setting Duration to 1.75 will NOT dot the last eighth note, but instead give you a single double-dotted half note. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3.5
-    >>> a.quarterLength
-    3.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (3.5, 'half', 2, None, None, None) 
-    >>> a.quarterLength = 2.5
-    >>> a.quarterLength
-    2.5 
-    >>> for thisUnit in a.components:
-    ...    print unitSpec(thisUnit) 
-    (2.0, 'half', 0, None, None, None) 
-    (0.5, 'eighth', 0, None, None, None) 
-
-**_setTuplets()**
-
-
-**_setType()**
-
-    Set the type length to the specified value. 
-
-    >>> a = Duration()
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
-    >>> a.type= '16th'
-    >>> a.quarterLength
-    0.25 
-
-**_updateComponents()**
-
-
-
-Class TestExternal
-------------------
-
-
-Methods
-~~~~~~~
-
-**assertAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertAlmostEquals()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertEquals()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**assertFalse()**
-
-    Fail the test if the expression is true. 
-
-**assertNotAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotAlmostEquals()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**assertNotEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertNotEquals()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**assertRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**assertTrue()**
-
-    Fail the test unless the expression is true. 
-
-**assert_()**
-
-    Fail the test unless the expression is true. 
-
-**countTestCases()**
-
-
-**debug()**
-
-    Run the test without collecting errors in a TestResult 
-
-**defaultTestResult()**
-
-
-**fail()**
-
-    Fail immediately, with the given message. 
-
-**failIf()**
-
-    Fail the test if the expression is true. 
-
-**failIfAlmostEqual()**
-
-    Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failIfEqual()**
-
-    Fail if the two objects are equal as determined by the '==' operator. 
-
-**failUnless()**
-
-    Fail the test unless the expression is true. 
-
-**failUnlessAlmostEqual()**
-
-    Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit). 
-
-**failUnlessEqual()**
-
-    Fail if the two objects are unequal as determined by the '==' operator. 
-
-**failUnlessRaises()**
-
-    Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception. 
-
-**failureException()**
-
-    Assertion failed. 
-
-**id()**
-
-
-**run()**
-
-
-**runTest()**
-
-
-**setUp()**
-
-    Hook method for setting up the test fixture before exercising it. 
-
-**shortDescription()**
-
-    Returns a one-line description of the test, or None if no description has been provided. The default implementation of this method returns the first line of the specified test method's docstring. 
-
-**tearDown()**
-
-    Hook method for deconstructing the test fixture after testing it. 
-
-**testBasic()**
-
-
-**testSingle()**
-
-
-Private Methods
-~~~~~~~~~~~~~~~
-
-**_exc_info()**
-
-    Return a version of sys.exc_info() with the traceback frame minimised; usually the top level of the traceback frame is not needed. 
+**components**
 
 
 Class Tuplet
 ------------
+
+Inherits from: object
 
 tuplet class: creates tuplet objects which modify duration objects note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
 
@@ -2194,32 +847,64 @@ tuplet class: creates tuplet objects which modify duration objects note that thi
 Attributes
 ~~~~~~~~~~
 
-+ durationActual
-+ durationNormal
-+ nestedInside
-+ nestedLevel
-+ numberNotesActual
-+ numberNotesNormal
-+ tupletActualShow
-+ tupletId
-+ tupletNormalShow
-+ type
+**durationActual**
+
+**durationNormal**
+
+**nestedInside**
+
+**nestedLevel**
+
+**numberNotesActual**
+
+**numberNotesNormal**
+
+**tupletActualShow**
+
+**tupletId**
+
+**tupletNormalShow**
+
+**type**
 
 Methods
 ~~~~~~~
 
-**setDurationType()**
 
-    Set the Duration for both actual and normal. 
+Locally Defined
+
+**tupletMultiplier()**
+
+    Get a floating point value by which to scale the duration that this Tuplet is associated with. 
+
+    >>> myTuplet = Tuplet()
+    >>> print round(myTuplet.tupletMultiplier(), 3)
+    0.667 
+    >>> myTuplet.tupletActual = [5, Duration('eighth')]
+    >>> myTuplet.numberNotesActual
+    5 
+    >>> myTuplet.durationActual.type
+    'eighth' 
+    >>> print myTuplet.tupletMultiplier()
+    0.4 
+
+**totalTupletLength()**
+
+    The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
 
     >>> a = Tuplet()
-    >>> a.tupletMultiplier()
-    0.666... 
     >>> a.totalTupletLength()
     1.0 
-    >>> a.setDurationType('half')
-    >>> a.tupletMultiplier()
-    0.6666... 
+    >>> a.numberNotesActual = 3
+    >>> a.durationActual = Duration('half')
+    >>> a.numberNotesNormal = 2
+    >>> a.durationNormal = Duration('half')
+    >>> a.totalTupletLength()
+    4.0 
+    >>> a.setRatio(5,4)
+    >>> a.totalTupletLength()
+    8.0 
+    >>> a.setRatio(5,2)
     >>> a.totalTupletLength()
     4.0 
 
@@ -2243,234 +928,82 @@ Methods
     >>> a.totalTupletLength()
     2.0 
 
-**totalTupletLength()**
+**setDurationType()**
 
-    The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
+    Set the Duration for both actual and normal. 
 
     >>> a = Tuplet()
+    >>> a.tupletMultiplier()
+    0.666... 
     >>> a.totalTupletLength()
     1.0 
-    >>> a.numberNotesActual = 3
-    >>> a.durationActual = Duration('half')
-    >>> a.numberNotesNormal = 2
-    >>> a.durationNormal = Duration('half')
-    >>> a.totalTupletLength()
-    4.0 
-    >>> a.setRatio(5,4)
-    >>> a.totalTupletLength()
-    8.0 
-    >>> a.setRatio(5,2)
+    >>> a.setDurationType('half')
+    >>> a.tupletMultiplier()
+    0.6666... 
     >>> a.totalTupletLength()
     4.0 
 
-**tupletActual()**
+Properties
+~~~~~~~~~~
 
 
-**tupletMultiplier()**
+Locally Defined
 
-    Get a floating point value by which to scale the duration that this Tuplet is associated with. 
-
-    >>> myTuplet = Tuplet()
-    >>> print round(myTuplet.tupletMultiplier(), 3)
-    0.667 
-    >>> myTuplet.tupletActual = [5, Duration('eighth')]
-    >>> myTuplet.numberNotesActual
-    5 
-    >>> myTuplet.durationActual.type
-    'eighth' 
-    >>> print myTuplet.tupletMultiplier()
-    0.4 
-
-**tupletNormal()**
+**tupletNormal**
 
 
-Private Methods
-~~~~~~~~~~~~~~~
-
-**_getTupletActual()**
-
-
-**_getTupletNormal()**
-
-
-**_setTupletActual()**
-
-
-**_setTupletNormal()**
+**tupletActual**
 
 
 
 Class ZeroDuration
 ------------------
 
+Inherits from: duration.DurationUnit, duration.DurationCommon, object
+
 
 Attributes
 ~~~~~~~~~~
 
-+ linkStatus
+**linkStatus**
 
 Methods
 ~~~~~~~
 
+
+Inherited from duration.DurationCommon
+
 **aggregateTupletRatio()**
 
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-**dots()**
-
-    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
-
-**lily()**
-
-    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
-
-**link()**
-
-
-**ordinal()**
-
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
-
-    >>> a = DurationUnit('whole')
-    >>> a.ordinal
-    4 
-    >>> b = DurationUnit('maxima')
-    >>> b.ordinal
-    1 
-    >>> c = DurationUnit('1024th')
-    >>> c.ordinal
-    14 
-
-**quarterLength()**
-
-    determine the length in quarter notes from current information 
-
-**setTypeFromNum()**
-
-
-**tuplets()**
-
-    Return a list of Tuplet objects 
-
-**type()**
-
-    Get the duration type. 
-
-**unlink()**
-
-
-**updateQuarterLength()**
-
-    Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
+Inherited from duration.DurationUnit
 
 **updateType()**
 
+**updateQuarterLength()**
 
-Private Methods
-~~~~~~~~~~~~~~~
+**unlink()**
 
-**_getDots()**
+**setTypeFromNum()**
 
-    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
+**link()**
 
-**_getLily()**
+Properties
+~~~~~~~~~~
 
-    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
 
-**_getOrdinal()**
+Inherited from duration.DurationUnit
 
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
+**type**
 
-    >>> a = DurationUnit('whole')
-    >>> a.ordinal
-    4 
-    >>> b = DurationUnit('maxima')
-    >>> b.ordinal
-    1 
-    >>> c = DurationUnit('1024th')
-    >>> c.ordinal
-    14 
+**tuplets**
 
-**_getQuarterLength()**
+**quarterLength**
 
-    determine the length in quarter notes from current information 
+**ordinal**
 
-**_getTuplets()**
+**lily**
 
-    Return a list of Tuplet objects 
-
-**_getType()**
-
-    Get the duration type. 
-
-**_setDots()**
-
-    Sets the number of dots Having this as a method permits error checking. 
-
-    >>> a = DurationUnit()
-    >>> a.type = 'quarter'
-    >>> a.dots = 1
-    >>> a.quarterLength
-    1.5 
-    >>> a.dots = 2
-    >>> a.quarterLength
-    1.75 
-
-    
-
-**_setQuarterLength()**
-
-    Set the quarter note length to the specified value. (We no longer unlink if quarterLength is greater than a long) 
-
-    >>> a = DurationUnit()
-    >>> a.quarterLength = 3
-    >>> a.type
-    'half' 
-    >>> a.dots
-    1 
-    >>> a.quarterLength = .5
-    >>> a.type
-    'eighth' 
-    >>> a.quarterLength = .75
-    >>> a.type
-    'eighth' 
-    >>> a.dots
-    1 
-    >>> b = DurationUnit()
-    >>> b.quarterLength = 16
-    >>> b.type
-    'longa' 
-    >>> c = DurationUnit()
-    >>> c.quarterLength = 129
-    >>> c.type
-    Traceback (most recent call last): 
-    ... 
-    DurationException: Cannot return types greater than double duplex-maxima: remove this when we are sure this works... 
-
-**_setTuplets()**
-
-    Takes in a list of Tuplet objects 
-
-**_setType()**
-
-    Set the type length to the specified value. Check for bad types. 
-
-    >>> a = Duration()
-    >>> a.type = '128th'
-    >>> a.quarterLength
-    0.03125 
-    >>> a.type = 'half'
-    >>> a.quarterLength
-    2.0 
+**dots**
 
 

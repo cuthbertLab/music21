@@ -13,7 +13,7 @@
 import unittest, doctest
 
 import os, sys, webbrowser
-import types
+import types, inspect
 
 import music21
 
@@ -44,20 +44,23 @@ FORMATS = ['html', 'latex']
 
 
 MODULES = [
-#    chord, 
     common, 
-     converter,
+    converter,
      duration, 
-#     dynamics,
-# #    environment, 
+    environment, 
+   note, 
+   pitch, 
+   meter, 
+   stream, 
+
+#    chord, 
 #     instrument,
 #  #   interval, 
-     note, 
-    pitch, 
-#     meter, 
-#  #   musicxml, 
+#     dynamics,
+#     instrument,
+#  #   interval, 
+#   musicxml, 
 #   #  scale,
-     stream, 
 #     tempo,  
 ]
 
@@ -106,8 +109,50 @@ class RestrtucturedWriter(object):
         return msg
 
 
+    def formatParent(self, mroEntry):
+        '''Return a class name as a parent, showing module when necessary
+
+        >>> from music21 import note
+        >>> rw = RestrtucturedWriter()
+        >>> rw.formatParent(inspect.getmro(note.Note)[1])
+        'music21.note.GeneralNote'
+        >>> rw.formatParent(inspect.getmro(note.Note)[3])
+        'object'
+        '''
+        modName = mroEntry.__module__
+        modName = modName.replace('music21.', '') # remove leading music21
+        className = mroEntry.__name__
+        if modName == '__builtin__':
+            return className
+        else:
+            return '%s.%s' % (modName, className)
+
+
+
+    def formatClassInheritance(self, mro):
+        '''Given a lost of classes from inspect.getmro, return a formatted
+        String
+
+        >>> from music21 import note
+        >>> rw = RestrtucturedWriter()
+        >>> rw.formatClassInheritance(inspect.getmro(note.Note))
+        'Inherits from: music21.note.GeneralNote, music21.base.Music21Object, object'
+        '''
+        msg = []
+        msg.append('Inherits from:')
+        sub = []
+        for i in range(len(mro)):
+            if i == 0: continue # first is always the class itself
+            sub.append(self.formatParent(mro[i]))        
+        msg.append(', '.join(sub))
+        return ' '.join(msg)
+
+
     def formatDocString(self, doc, indent=''):
         '''Given a docstring, clean it up for RST presentation.
+
+        Note: can use inspect.getdoc() or inspect.cleandoc(); though
+        we need customized approach demonstrated here.
         '''
         if doc == None:
             return ''
@@ -117,7 +162,7 @@ class RestrtucturedWriter(object):
         sub = []
         for line in lines:
             line = line.strip()
-            if OMIT_STR in line:
+            if OMIT_STR in line: # permit blocking doctest examples
                 break # do not gather any more lines
             sub.append(line)
 
@@ -175,7 +220,35 @@ class ModuleDoc(RestrtucturedWriter):
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
 
 
+    def findDerivationClass(self, mro, partName):
+        '''Given an mro and a part of an object, find from where 
+        the part is derived.
+        '''
+        lastIndex = None
+        for i in range(len(mro)):
+            classPart = mro[i]
+            classDir = dir(classPart)
+            if partName in classDir:
+                lastIndex = i
+            else:
+                break # none further should match
+        if lastIndex == None:
+            raise Exception('cannot find %s in %s' % (partName, mro))
+        return lastIndex, partName
+
     #---------------------------------------------------------------------------
+    # for methods and functions can use
+    # inspect.getargspec(func)
+    # to get argument information
+    # can use this to format: inspect.formatargspec(inspect.getargspec(a.show))
+
+#             args, varargs, varkw, defaults = inspect.getargspec(object)
+#             argspec = inspect.formatargspec(
+#                 args, varargs, varkw, defaults, formatvalue=self.formatvalue)
+
+# might be abel to use
+# inspect.classify_class_attrs
+
     def scanMethod(self, obj):
         methodInfo = {}
         #methodInfo['name'] = str(obj)
@@ -193,16 +266,28 @@ class ModuleDoc(RestrtucturedWriter):
             self.functions[obj.__name__] = info
 
     def scanClass(self, obj):
-        '''For an object provided as an aargument, collect all relevant
+        '''For an object provided as an argument, collect all relevant
         information in a dictionary. 
         '''
         info = {}
         info['reference'] = obj
         info['name'] = obj.__name__
         info['doc']  = self.formatDocString(obj.__doc__)
+        info['properties'] = {}
         info['methods'] = {}
+        info['derivations'] = [] # a list of mroIndex, objName
         info['attributes'] = {}
+        # get a list of parent objects, starting from this one
+        # provide obj, not obj.__class__
+        info['mro'] = inspect.getmro(obj)
+        #environLocal.printDebug(['mro: %s, %s' % (obj, info['mro'])])
+
         for partName in dir(obj):
+            # add to a list the index, name of derived obj
+            # derivation from mro
+            info['derivations'].append(self.findDerivationClass(info['mro'],
+                                                                partName))
+
             # partName is a string
             if partName.startswith('__'): 
                 continue
@@ -212,14 +297,26 @@ class ModuleDoc(RestrtucturedWriter):
                 isinstance(partObj, types.ListType) 
                 ):
                 pass
+            elif isinstance(partObj, property):
+                info['properties'][partName] = self.scanMethod(partObj)
+
             elif (callable(partObj) or hasattr(partObj, '__doc__')):
                 info['methods'][partName] = self.scanMethod(partObj)
             else:
                 print 'noncallable', part
 
+
+        # will sort by index, which is proximity to this class
+        info['derivations'].sort() 
+        info['derivations'].reverse() # start with most remote first
+        # environLocal.printDebug(info['derivations'])
+
         self.classes[obj.__name__] = info
 
     #---------------------------------------------------------------------------
+    # note: can use inspect to get properties:
+    # inspect.isdatadescriptor()
+
     def scanModule(self):
         '''For a given module, determine which objects need to be documented.
         '''
@@ -227,7 +324,7 @@ class ModuleDoc(RestrtucturedWriter):
             
             if component.startswith('__'): # ignore private variables
                 continue
-            if component == 'Test': # ignore test classes
+            if component in ['Test', 'TestExternal']: # ignore test classes
                 continue
 
             objName = '%s.%s' % (self.modName, component)
@@ -254,7 +351,94 @@ class ModuleDoc(RestrtucturedWriter):
 
 
     #---------------------------------------------------------------------------
+    def getRestructuredClass(self, className):
+        msg = []
+        titleStr = 'Class %s' % self.classes[className]['name']
+        msg += self._heading(titleStr, '-')
+
+        msg.append('%s\n\n' % self.formatClassInheritance(
+            self.classes[className]['mro']))
+
+        msg.append('%s\n' % self.classes[className]['doc'])
+        #msg.append('*Attributes*\n\n')
+        #msg.append('*Methods*\n\n')
+
+        obj = None
+        try: # create a dummy object and list its attributes
+            obj = self.classes[className]['reference']()
+        except TypeError:
+            pass
+            #print _MOD, 'cannot create instance of %s' % className
+
+        if obj != None:
+            attrList = obj.__dict__.keys()
+            attrList.sort()
+            attrPublic = []
+            attrPrivate = []
+            for attr in attrList:
+                if not attr.startswith('_'):
+                    attrPublic.append(attr)
+            if len(attrPublic) > 0:
+                msg += self._heading('Attributes', '~')
+
+                # not working:
+#                 for i, nameFound in self.classes[className]['derivations']:
+#                     if nameFound not in attrPublic:
+#                         continue
+#                     #msg += self._list(attrPublic)
+                for nameFound in attrPublic:
+                    msg.append('**%s**\n\n' % nameFound)
+
+
+
+        for groupName, groupKey, postfix in [
+                                    ('Methods', 'methods', '()'), 
+                                    ('Properties', 'properties', '')]:
+            methodNames = self.classes[className][groupKey].keys()
+            methodPublic = []
+            for methodName in methodNames:
+                if not methodName.startswith('_'):
+                    methodPublic.append(methodName)
+            if len(methodPublic) == 0: 
+                continue    
+
+            msg += self._heading(groupName, '~')
+    
+            iLast = None
+            for i, nameFound in self.classes[className]['derivations']:
+                if nameFound not in methodPublic:
+                    continue
+                if i == len(self.classes[className]['mro']) - 1:
+                    continue # skip names dervied from object
+    
+                parentSrc = self.formatParent(
+                            self.classes[className]['mro'][i])
+    
+                if i != iLast:
+                    msg += '\n'
+                    iLast = i
+                    if i != 0:
+                        titleStr = 'Inherited from %s' % parentSrc
+                    else:
+                        titleStr = 'Locally Defined' 
+                    msg.append('%s\n\n' % titleStr)
+
+                msg.append('**%s%s**\n\n' % (nameFound, postfix))    
+                if i == 0: # only provide full doc
+                    msg.append('%s\n' % 
+                        self.classes[className][groupKey][nameFound]['doc'])
+
+
+
+
+
+        msg.append('\n'*1)
+        return msg
+
+
     def getRestructured(self):
+        '''Produce RST documentation for a complete module.
+        '''
         msg = []
         msg += self._heading(self.modName , '=')
         msg += self._para(self.modDoc)
@@ -274,56 +458,7 @@ class ModuleDoc(RestrtucturedWriter):
         classNames = self.classes.keys()
         classNames.sort()
         for className in classNames:
-            titleStr = 'Class %s' % self.classes[className]['name']
-            msg += self._heading(titleStr, '-')
-            msg.append('%s\n' % self.classes[className]['doc'])
-            #msg.append('*Attributes*\n\n')
-            #msg.append('*Methods*\n\n')
-
-            # create a dummy object and list its attributes
-            obj = None
-            try:
-                obj = self.classes[className]['reference']()
-            except TypeError:
-                print _MOD, 'cannot create instance of %s' % className
-            if obj != None:
-                attrList = obj.__dict__.keys()
-                attrList.sort()
-                attrPublc = []
-                attrPrivate = []
-                for attr in attrList:
-                    if attr.startswith('_'):
-                        attrPrivate.append(attr)
-                    else:
-                        attrPublc.append(attr)
-                if len(attrPublc) > 0:
-                    msg += self._heading('Attributes', '~')
-                    msg += self._list(attrPublc)
-#                 if len(attrPrivate) > 0:
-#                     msg += self._heading('Private Attributes', '~')
-#                     msg += self._list(attrPrivate)
-
-            methodNames = self.classes[className]['methods'].keys()
-            methodNames.sort()
-            methodPrivate = []
-            methodPublic = []
-            for methodName in methodNames:
-                if methodName.startswith('_'):
-                    methodPrivate.append(methodName)
-                else:
-                    methodPublic.append(methodName)
-            for methodGroup, titleStr in [(methodPublic, 'Methods'), 
-                                        (methodPrivate, 'Private Methods')]:
-                if len(methodGroup) > 0:
-                    msg += self._heading(titleStr, '~')
-                    for methodName in methodGroup:
-                        #msg += self._heading(methodName, '~')
-                        msg.append('**%s()**\n\n' % methodName)
-                        msg.append('%s\n' % self.classes[className]['methods'][methodName]['doc'])
-#             if len(methodNames) == 0:
-#                 msg.append('\nNo methods available.\n\n') # need space
-
-            msg.append('\n'*1)
+            msg += self.getRestructuredClass(className)
         return ''.join(msg)
 
 
@@ -340,7 +475,7 @@ class Documentation(RestrtucturedWriter):
     def __init__(self):
         RestrtucturedWriter.__init__(self)
 
-        self.titleMain = 'Music 21 Documentation'
+        self.titleMain = 'Music21 Documentation'
         # include additional rst files that are not auto-generated
         self.chaptersMain = ['install', 'environment', 
                             'examples', 'glossary', 'faq']
@@ -385,7 +520,7 @@ class Documentation(RestrtucturedWriter):
 
         msg += self._heading(self.titleAppendix, '=')
         for name in self.chaptersAppendix:
-            msg.append("* :ref:'%s'\n" % name)
+            msg.append("* :ref:`%s`\n" % name)
         msg.append('\n')
 
         fp = os.path.join(self.dir, 'contents.rst')
@@ -482,10 +617,16 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and sys.argv[1] in FORMATS:
+    if len(sys.argv) == 2 and sys.argv[1] == 'test':
+        music21.mainTest(Test)
+        buildDoc = False
+    elif len(sys.argv) == 2 and sys.argv[1] in FORMATS:
         format = sys.argv[1]
+        buildDoc = True
     else:
         format = 'html'
+        buildDoc = True
 
-    a = Documentation()
-    a.main(format)
+    if buildDoc:
+        a = Documentation()
+        a.main(format)

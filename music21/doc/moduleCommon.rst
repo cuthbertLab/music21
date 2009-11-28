@@ -206,6 +206,21 @@ True
 >>> isStr(u'flat')
 True 
 
+Function isWeakref()
+--------------------
+
+Test if an object is a weakref 
+
+>>> class Mock(object): pass
+>>> a1 = Mock()
+>>> a2 = Mock()
+>>> isWeakref(a1)
+False 
+>>> isWeakref(3)
+False 
+>>> isWeakref(wrapWeakref(a1))
+True 
+
 Function lcm()
 --------------
 
@@ -258,10 +273,9 @@ Function unwrapWeakref()
 
 utility function that gets an object that might be an object itself or a weak reference to an object. 
 
->>> class A(object):
-...    pass 
->>> a1 = A()
->>> a2 = A()
+>>> class Mock(object): pass
+>>> a1 = Mock()
+>>> a2 = Mock()
 >>> a2.strong = a1
 >>> a2.weak = wrapWeakref(a1)
 >>> unwrapWeakref(a2.strong) is a1
@@ -276,171 +290,164 @@ Function wrapWeakref()
 
 utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
 
+Class Iterator
+--------------
+
+Inherits from: object
+
+A simple Iterator object used to handle iteration of Streams and other list-like objects. 
+
+Methods
+~~~~~~~
+
+
+Locally Defined
+
+**next()**
+
+
+
 Class Scalar
 ------------
+
+Inherits from: object
 
 for those of us who miss perl scalars.... 
 
 Attributes
 ~~~~~~~~~~
 
-+ valType
-+ value
+**valType**
+
+**value**
 
 Methods
 ~~~~~~~
 
-**toFloat()**
+
+Locally Defined
+
+**toUnicode()**
 
 
 **toInt()**
 
 
-**toUnicode()**
+**toFloat()**
 
 
 
 Class Timer
 -----------
 
+Inherits from: object
+
 An object for timing. 
 
 Methods
 ~~~~~~~
 
-**clear()**
+
+Locally Defined
+
+**stop()**
 
 
 **start()**
 
     Explicit start method; will clear previous values. Start always happens on initialization. 
 
-**stop()**
+**clear()**
 
 
 
 Class defHash
 -------------
 
+Inherits from: dict, object
+
 A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print a["A"]["hi"] # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
 
 Attributes
 ~~~~~~~~~~
 
-+ callDefault
-+ default
+**callDefault**
+
+**default**
 
 Methods
 ~~~~~~~
 
-**clear()**
 
-    D.clear() -> None.  Remove all items from D. 
-
-**copy()**
-
-    D.copy() -> a shallow copy of D 
-
-**fromkeys()**
-
-    dict.fromkeys(S[,v]) -> New dict with keys from S and values equal to v. v defaults to None. 
-
-**get()**
-
-
-**has_key()**
-
-    D.has_key(k) -> True if D has a key k, else False 
-
-**items()**
-
-    D.items() -> list of D's (key, value) pairs, as 2-tuples 
-
-**iteritems()**
-
-    D.iteritems() -> an iterator over the (key, value) items of D 
-
-**iterkeys()**
-
-    D.iterkeys() -> an iterator over the keys of D 
-
-**itervalues()**
-
-    D.itervalues() -> an iterator over the values of D 
-
-**keys()**
-
-    D.keys() -> list of D's keys 
-
-**pop()**
-
-    D.pop(k[,d]) -> v, remove specified key and return the corresponding value If key is not found, d is returned if given, otherwise KeyError is raised 
-
-**popitem()**
-
-    D.popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple; but raise KeyError if D is empty 
-
-**setdefault()**
-
-    D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D 
-
-**update()**
-
-    D.update(E, **F) -> None.  Update D from E and F: for k in E: D[k] = E[k] (if E has keys else: for (k, v) in E: D[k] = v) then: for k in F: D[k] = F[k] 
+Inherited from dict
 
 **values()**
 
-    D.values() -> list of D's values 
+**update()**
+
+**setdefault()**
+
+**popitem()**
+
+**pop()**
+
+**keys()**
+
+**itervalues()**
+
+**iterkeys()**
+
+**iteritems()**
+
+**items()**
+
+**has_key()**
+
+**get()**
+
+**fromkeys()**
+
+**copy()**
+
+**clear()**
 
 
 Class defList
 -------------
+
+Inherits from: list, object
 
 A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
 
 Attributes
 ~~~~~~~~~~
 
-+ callDefault
-+ default
+**callDefault**
+
+**default**
 
 Methods
 ~~~~~~~
 
-**append()**
 
-    L.append(object) -- append object to end 
-
-**count()**
-
-    L.count(value) -> integer -- return number of occurrences of value 
-
-**extend()**
-
-    L.extend(iterable) -- extend list by appending elements from the iterable 
-
-**index()**
-
-    L.index(value, [start, [stop]]) -> integer -- return first index of value 
-
-**insert()**
-
-    L.insert(index, object) -- insert object before index 
-
-**pop()**
-
-    L.pop([index]) -> item -- remove and return item at index (default last) 
-
-**remove()**
-
-    L.remove(value) -- remove first occurrence of value 
-
-**reverse()**
-
-    L.reverse() -- reverse *IN PLACE* 
+Inherited from list
 
 **sort()**
 
-    L.sort(cmp=None, key=None, reverse=False) -- stable sort *IN PLACE*; cmp(x, y) -> -1, 0, 1 
+**reverse()**
+
+**remove()**
+
+**pop()**
+
+**insert()**
+
+**index()**
+
+**extend()**
+
+**count()**
+
+**append()**
 
 
