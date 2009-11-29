@@ -112,19 +112,24 @@ class Groups(list):
 
 #-------------------------------------------------------------------------------
 class Locations(object):
-    '''An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs.
+    '''An object, stored within a Music21Object, that manages site/offset pairs. 
+    Site is an object that contains an object; site may be a parent. 
+    Sites are always stored as weak refs.
+    
+    An object may store 'self' as a site -- this becomes the default offset
+    for any newly added sites that don't have any sites
     '''
     def __init__(self):
         self._coordinates = [] # a list of dictionaries
 
     def __len__(self):
-        '''Return a list of all offsets.
+        '''Return the total number of offsets.
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 843)
-        >>> aLocations.add(bSite, 12) # can add at same ofst
+        >>> aLocations.add(843, aSite)
+        >>> aLocations.add(12, bSite) # can add at same offset or different
         >>> len(aLocations)
         2
         '''
@@ -136,22 +141,25 @@ class Locations(object):
         _coordinates; when called, this empty ref will return None.
         This method will remove all parents that deref to None
 
+        DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED
+
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 0)
-        >>> aLocations.add(bSite, 234) # can add at same ofst
+        >>> aLocations.add(0, aSite)
+        >>> aLocations.add(234, bSite)
         >>> del aSite
         >>> len(aLocations)
         2
-        >>> aLocations.scrubEmptySites()
-        >>> len(aLocations)
-        1
+        >>> #aLocations.scrubEmptySites()
+        >>> #len(aLocations)
+        #1
         '''
         delList = []
         for i in range(len(self._coordinates)):
-            if common.unwrapWeakref(self._coordinates[i]['site']) == None:        
+            #if common.unwrapWeakref(self._coordinates[i]['site']) == None:
+            if self._coordinates[i]['site'] == None:        
                 delList.append(i)
         delList.reverse() # go in reverse from largest to maintain positions
         for i in delList:
@@ -166,7 +174,8 @@ class Locations(object):
         '''Get parents; unwrap from weakrefs
         '''
         #environLocal.printDebug([self._coordinates])
-        return [common.unwrapWeakref(x['site']) for x in self._coordinates]   
+        return [x['site'] for x in self._coordinates]
+        #return [common.unwrapWeakref(x['site']) for x in self._coordinates]   
 
     def getOffsets(self):
         '''Return a list of all offsets.
@@ -175,8 +184,8 @@ class Locations(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 0)
-        >>> aLocations.add(bSite, 234) # can add at same ofst
+        >>> aLocations.add(0, aSite)
+        >>> aLocations.add(234, bSite) # can add at same offset or another
         >>> aLocations.getOffsets()
         [0, 234]
         '''
@@ -185,10 +194,10 @@ class Locations(object):
     def getTimes(self):
         return [x['time'] for x in self._coordinates]   
 
-    def add(self, site, offset):
+    def add(self, offset, site):
         '''Add a location to the object.
 
-        If site already exists, this will update that entry. Note: this could be modified to support multiple instanes of one site in the list.
+        If site already exists, this will update that entry. 
 
         Might check/force site to be a Stream?
 
@@ -198,20 +207,24 @@ class Locations(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 23) # can add at same ofst
-        >>> aLocations.add(aSite, 12) # will resset the offset
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(23, bSite) # can add at same offset
+        >>> aLocations.add(12, aSite) # will change the offset for aSite
         >>> aSite == aLocations.getSiteByOffset(12)
         True
         '''
         # compare unwrapped first
+        if not common.isNum(offset):
+            raise LocationsException("offset must be a number (later, a Duration might be allowed)")
+        
         sites = self.getSites()
         if site in sites: 
             #environLocal.printDebug(['site already defined in this Locations object', site])
             # order is the same as in _coordinates
             i = sites.index(site)
         else:
-            siteRef = common.wrapWeakref(site)
+#            siteRef = common.wrapWeakref(site)
+            siteRef = site
             self._coordinates.append({}) # great new
             i = -1 #now the last
             # site here is wrapped in weakref
@@ -221,7 +234,6 @@ class Locations(object):
         # store creation time in order to sort by time
         self._coordinates[i]['time'] = time.time()
 
-
     def remove(self, site):
         '''Remove the entry specified by sites
 
@@ -229,7 +241,7 @@ class Locations(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(23, aSite)
         >>> len(aLocations)
         1
         >>> aLocations.remove(aSite)
@@ -244,15 +256,15 @@ class Locations(object):
 
 
     def getOffsetBySite(self, site):
-        '''For a given site return an offset.
+        '''For a given site return its offset.
 
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cParent = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(121.5, bSite)
         >>> aLocations.getOffsetBySite(aSite)
         23
         >>> aLocations.getOffsetBySite(bSite)
@@ -276,6 +288,36 @@ class Locations(object):
         return match # will be None if not match; could raise exception
 
 
+    def setOffsetBySite(self, site, value):
+        '''
+        Changes the offset of the site specified.  Note that this can also be
+        done with add, but the difference is that if the site is not in 
+        Locations, it will raise an exception.
+        
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> aLocations = Locations()
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(121.5, bSite)
+        >>> aLocations.setOffsetBySite(aSite, 20)
+        >>> aLocations.getOffsetBySite(aSite)
+        20
+        >>> aLocations.setOffsetBySite(cSite, 30)        
+        Traceback (most recent call last):
+        LocationsException: ...
+        '''
+        sites = self.getSites()
+        if site in sites: 
+            #environLocal.printDebug(['site already defined in this Locations object', site])
+            # order is the same as in _coordinates
+            i = sites.index(site)
+            self._coordinates[i]['offset'] = value
+        else:
+            raise LocationsException('an entry for this object is not stored: %s' % site)
+
+
     def getOffsetByIndex(self, index):
         '''For a given parent return an offset.
 
@@ -283,8 +325,8 @@ class Locations(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(121.5, bSite)
         >>> aLocations.getOffsetByIndex(-1)
         121.5
         >>> aLocations.getOffsetByIndex(2)
@@ -298,17 +340,24 @@ class Locations(object):
     def getSiteByOffset(self, offset):
         '''For a given offset return the parent
 
-        More than one parent may have the same offset; thus, may need to sort
-        by some parameter.
+        More than one parent may have the same offset; 
+        this will return the last site added.
 
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> cParent = Mock()
+        >>> cSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(121.5, bSite)
         >>> aSite == aLocations.getSiteByOffset(23)
+        True
+        
+        Adding another site at offset 23 will change getSiteByOffset
+        >>> aLocations.add(23, cSite)
+        >>> aSite == aLocations.getSiteByOffset(23)
+        False
+        >>> cSite == aLocations.getSiteByOffset(23)
         True
         '''
         match = None
@@ -320,33 +369,35 @@ class Locations(object):
                 match = self._coordinates[i]['site']
                 break
         if match != None:
-            if not common.isWeakref(match):
-                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
-            return common.unwrapWeakref(match)
+#            if not common.isWeakref(match):
+#                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
+#            return common.unwrapWeakref(match)
+            return match
         else:
             # will be None if not match; could alternatively exception
             return match 
 
 
     def getSiteByIndex(self, index):
-        '''Get parent by index value, unwrapping weak ref.
+        '''Get parent by index value, unwrapping the weakref.
 
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> aLocations = Locations()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.add(23, aSite)
+        >>> aLocations.add(121.5, bSite)
         >>> bSite == aLocations.getSiteByIndex(-1)
         True
         '''
         siteRef = self._coordinates[index]['site']
-        if siteRef == None: # let None parents pass
-            return siteRef
-        elif not common.isWeakref(siteRef):
-            raise LocationsException('parent on _coordinates is not a weak ref: %s' % siteRef)
-        else:
-            return common.unwrapWeakref(siteRef)
+        return siteRef
+#        if siteRef == None: # let None parents pass
+#            return siteRef
+#        elif not common.isWeakref(siteRef):
+#            raise LocationsException('parent on _coordinates is not a weakref: %s' % siteRef)
+#        else:
+#            return common.unwrapWeakref(siteRef)
 
 
 
@@ -359,28 +410,38 @@ class Music21Object(object):
     
     All music21 objects encode 7 pieces of information:
     
-    (1) id       : unique identification string (optional)
-    (2) groups   : list of strings identifying internal subcollections
-                   (voices, parts, selections) to which this element belongs
-    (3) parent   : a reference or weakreference to a single containing object
-    (4) duration : Duration object representing the length of the object
+    (1) id        : unique identification string (optional)
+    (2) groups    : a Groups object: which is a list of strings identifying 
+                    internal subcollections
+                    (voices, parts, selections) to which this element belongs
+    (3) duration  : Duration object representing the length of the object
+    (4) locations : a Locations object (see above) that specifies connections of
+                    this object to one location in another object
+    (5) parent    : a reference or weakreference to a currently active Location
+    (6) offset    : a float or duration specifying the position of the object in parent 
+    (7) contexts  : a list of references or weakrefs for current contexts 
+                    of the object (similar to locations but without an offset)
+    (8) priority  : int representing the position of an object among all
+                    objects at the same offset.
+
     
-    each of these may be passed in as a named keyword to any music21 object.
+    Each of these may be passed in as a named keyword to any music21 object.
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)
 
     '''
 
     _duration = None
-    # while testing .location
+    # while testing .locations
     #_parent = None
     contexts = None
     id = None
+    _priority = 0
     _overriddenLily = None
+    disconnectedOffset = 0.0 # gets assigned if offset is assigned before any location
+    _currentParent = None
+
 
     def __init__(self, *arguments, **keywords):
-
-        self.location = Locations()
-
         # an offset keyword arg should set the offset in location
         # not in a local parameter
 #         if "offset" in keywords and not self.offset:
@@ -400,6 +461,11 @@ class Music21Object(object):
         elif self.groups is None:
             self.groups = Groups()
 
+        if "locations" in keywords and self.locations is None:
+            self.locations = keywords["locations"]
+        else:
+            self.locations = Locations()
+
         if "parent" in keywords and self.parent is None:
             self.parent = keywords["parent"]
         
@@ -416,7 +482,7 @@ class Music21Object(object):
     def deepcopy(self):
         '''
         Return a deep copy of an object with no reference to the source.
-        The parent is not deep copied!
+        The parent is not deep copied, nor are references within location
 
         >>> from music21 import note, duration
         >>> n = note.Note('A')
@@ -441,11 +507,7 @@ class Music21Object(object):
         >>> ("flute" in n.groups, "flute" in b.groups)
         (False, True)
         '''
-        psave = self.parent
-        self.parent = None
         myCopy = copy.deepcopy(self)
-        self.parent = psave
-        myCopy.parent = psave
         return myCopy
     
     def isClass(self, className):
@@ -467,18 +529,17 @@ class Music21Object(object):
     # look at this object for an atttribute; if not here
     # look up to parents
 
-
-
     def searchParent(self, attrName):
-        '''If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level
-        objects. The first encounted match is returned, or None if no match.
+        '''If this element is contained within a Stream or other Music21 element, 
+        searchParent() permits searching attributes of higher-level
+        objects. The first encountered match is returned, or None if no match.
         '''
         found = None
         try:
             found = getattr(self.parent, attrName)
         except AttributeError:
             # not sure of passing here is the best action
-            environLocal.printDebug(['searchParent call raised attribute error for attribte:', attrName])
+            environLocal.printDebug(['searchParent call raised attribute error for attribute:', attrName])
             pass
         if found == None:
             found = self.parent.searchParent(attrName)
@@ -489,22 +550,58 @@ class Music21Object(object):
 
     def _getParent(self):
         # return the last parent added to this location
-        if len(self.location) == 0:
+        if self._currentParent is not None:
+            return self._currentParent
+        elif len(self.locations) == 0:
             return None # return None if no sites set
         else: 
-            return self.location.getSiteByIndex(-1) 
+            return self.locations.getSiteByIndex(-1) 
 
 #         return common.unwrapWeakref(self._parent)
     
-    def _setParent(self, value):
-        # presently setting all offsets to zero and removing old parents
-        self.location.clear()
-        self.location.add(value, 0) 
+    def _setParent(self, site):
+        if site is not None and \
+            site not in self.locations.getSites():
+            self.locations.add(self.offset, site) 
+        
+        self._currentParent = site
 
 #         self._parent = common.wrapWeakref(value)
 
     parent = property(_getParent, _setParent)
 
+    def _getOffset(self):
+        if self.parent is not None:
+            return self.locations.getOffsetBySite(self.parent)
+        elif self.disconnectedOffset is not None:
+            return self.disconnectedOffset
+        else:
+            return 0.0
+
+    def _setOffset(self, value):
+        if common.isNum(value):
+            # if a number assume it is a quarter length
+            # self._offset = duration.DurationUnit()
+            # MSC: We can change this when we decide that we want to return
+            #      something other than quarterLength
+
+            offset = float(value)
+        elif hasattr(value, "quarterLength"):
+            ## probably a Duration object, but could be something else -- in any case, 
+            ## we'll take it.
+            offset = value.quarterLength
+        else:
+            raise Exception, 'We cannot set  %s as an offset' % value
+        
+        if self.parent is None:
+            self.disconnectedOffset = offset
+        else:
+            self.locations.setOffsetBySite(self.parent, offset)
+    
+    offset = property(_getOffset, _setOffset)
+
+    def getOffsetBySite(self, site):
+        return self.locations.getOffsetBySite(site)
 
 
     def _getDuration(self):
@@ -528,6 +625,46 @@ class Music21Object(object):
             raise Exception, 'this must be a Duration object, not %s' % durationObj
 
     duration = property(_getDuration, _setDuration)
+
+    def _getPriority(self):
+        return self._priority
+
+    def _setPriority(self, value):
+        '''
+        value is an int.
+        
+        Priority specifies the order of processing from 
+        left (LOWEST #) to right (HIGHEST #) of objects at the
+        same offset.  For instance, if you want a key change and a clef change
+        to happen at the same time but the key change to appear
+        first, then set: keySigElement.priority = 1; clefElement.priority = 2
+        this might be a slightly counterintuitive numbering of priority, but
+        it does mean, for instance, if you had two elements at the same 
+        offset, an allegro tempo change and an andante tempo change, 
+        then the tempo change with the higher priority number would 
+        apply to the following notes (by being processed
+        second).
+        
+        Default priority is 0; thus negative priorities are encouraged
+        to have Elements that appear non-priority set elements.
+        
+        In case of tie, there are defined class sort orders defined in
+        music21.stream.CLASS_SORT_ORDER.  For instance, a key signature
+        change appears before a time signature change before a note at the
+        same offset.  This produces the familiar order of materials at the
+        start of a musical score.
+        
+        >>> a = Music21Object()
+        >>> a.priority = 3
+        >>> a.priority = 'high'
+        Traceback (most recent call last):
+        ElementException: priority values must be integers.
+        '''
+        if not isinstance(value, int):
+            raise ElementException('priority values must be integers.')
+        self._priority = value
+
+    priority = property(_getPriority, _setPriority)
 
 
     #---------------------------------------------------------------------------
@@ -559,153 +696,8 @@ class Music21Object(object):
         '''
         environLocal.launch(format, self.write(format))
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
-class BaseElement(object):
-    '''
-    contains all the positioning information of an Element, but NOT the object
-    inherited by stream.
-    '''
-    _offset  = 0.0
-    _id = None
-    _unlinkedDuration = None
-    _priority = 0
-
-    def _getDuration(self):
-        '''
-        Gets the duration of the Element (if separately set), but
-        normal returns the duration of the component object if available, otherwise
-        returns None.
-
-        >>> import note
-        >>> el1 = Element()
-        >>> n = note.Note('F#')
-        >>> n.quarterLength = 2.0
-        >>> n.duration.quarterLength 
-        2.0
-        >>> el1.obj = n
-        >>> el1.duration.quarterLength
-        2.0
-
-        ADVANCED FEATURE TO SET DURATION OF ELEMENTS SEPARATELY
-        >>> import music21.key
-        >>> ks1 = Element(music21.key.KeySignature())
-        >>> ks1.obj.duration
-        Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
-        
-        >>> import duration
-        >>> ks1.duration = duration.Duration("whole")
-        >>> ks1.duration.quarterLength
-        4.0
-        >>> ks1.obj.duration  # still not defined
-        Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
-        '''
-        if self._unlinkedDuration is not None:
-            return self._unlinkedDuration
-        elif hasattr(self.obj, 'duration'):
-            return self.obj.duration
-        else:
-            return None
-
-    def _setDuration(self, durationObj):
-        '''
-        Set the offset as a quarterNote length
-        '''
-        if (hasattr(durationObj, "quarterLength") and 
-            hasattr(self.obj, 'duration')):
-            # if a number assume it is a quarter length
-            self.obj.duration = durationObj
-        elif (hasattr(durationObj, "quarterLength")):
-            self._unlinkedDuration = durationObj
-        else:
-            # need to permit Duration object assignment here
-            raise Exception, 'this must be a Duration object, not %s' % durationObj
-
-    duration = property(_getDuration, _setDuration)
-
-    def _getOffset(self):
-        return self._offset  # return self_offset.quarterLength
-
-    def _setOffset(self, offset):
-        '''Set the offset as a quarterNote length
-        (N.B. offsets are quarterNote lengths, not Duration objects...)
-
-        >>> import note
-        >>> import duration
-        >>> a = Element(note.Note('A#'))
-        >>> a.offset = 23.0
-        >>> a.offset
-        23.0
-        >>> a.offset = 4.0 # duration.Duration("whole")
-        >>> a.offset
-        4.0
-        '''
-        if common.isNum(offset):
-            # if a number assume it is a quarter length
-            # self._offset = duration.DurationUnit()
-            # MSC: We can change this when we decide that we want to return
-            #      something other than quarterLength
-
-            self._offset = float(offset)
-        elif hasattr(offset, "quarterLength"):
-            ## probably a Duration object, but could be something else -- in any case, 
-            ## we'll take it.
-            self._offset = offset.quarterLength
-        else:
-            raise Exception, 'We cannot set  %s as an offset' % offset
-
-    offset = property(_getOffset, _setOffset)
-
-    def _getPriority(self):
-        return self._priority
-
-    def _setPriority(self, value):
-        '''
-        value is an int.
-        
-        Priority specifies the order of processing from 
-        left (LOWEST #) to right (HIGHEST #) of objects at the
-        same offset.  For instance, if you want a key change and a clef change
-        to happen at the same time but the key change to appear
-        first, then set: keySigElement.priority = 1; clefElement.priority = 2
-        this might be a slightly counterintuitive numbering of priority, but
-        it does mean, for instance, if you had two elements at the same 
-        offset, an allegro tempo change and an andante tempo change, 
-        then the tempo change with the higher priority number would 
-        apply to the following notes (by being processed
-        second).
-        
-        Default priority is 0; thus negative priorities are encouraged
-        to have Elements that appear non-priority set elements.
-        
-        In case of tie, there are defined class sort orders defined in
-        music21.stream.CLASS_SORT_ORDER.  For instance, a key signature
-        change appears before a time signature change before a note at the
-        same offset.  This produces the familiar order of materials at the
-        start of a musical score.
-        
-        >>> a = Element()
-        >>> a.priority = 3
-        >>> a.priority = 'high'
-        Traceback (most recent call last):
-        ElementException: priority values must be integers.
-        '''
-        if not isinstance(value, int):
-            raise ElementException('priority values must be integers.')
-        self._priority = value
-
-    priority = property(_getPriority, _setPriority)
-
-
-
-#-------------------------------------------------------------------------------
-class Element(BaseElement):
+class Element(Music21Object):
     '''
     An element wraps an object so that the same object can
     be positioned within a stream.
@@ -713,19 +705,17 @@ class Element(BaseElement):
     The object is always available as element.obj -- however, calls to
     the Element will call 
     
-    In addition to the properties that all Music21Objects have, Elements also
-    have:
-    (5) offset   : a float or duration specifying the distance from the 
-                   start of the surrounding container (if any) 
-    (6) contexts : a list of references or weakreferences for current contexts 
-                   of the object (for searching after parent)
-    (7) priority : int representing the position of an object among all
-                   objects at the same offset.
+    Object is now mandatory -- calls to Element without an object fail,
+    because in the new (11/29) object model, Element should only be used
+    to wrap an object.
+    
     '''
 
     obj = None
+    _id = None
 
-    def __init__(self, obj=None, offset=None, priority = 0):
+    def __init__(self, obj):
+        Music21Object.__init__(self)
         self.obj = obj # object stored here        
 
     def getId(self):
@@ -802,9 +792,9 @@ class Element(BaseElement):
 
         newEl = copy.copy(self)
         
-        if isinstance(self.obj, Music21Object):
-            newEl.groups = copy.copy(self.groups)
-            newEl.contexts = copy.copy(self.contexts)
+        newEl.groups = copy.copy(self.groups)
+        newEl.contexts = copy.copy(self.contexts)
+        newEl.locations = copy.copy(self.locations)
 
         return newEl
 
@@ -841,11 +831,67 @@ class Element(BaseElement):
         new = self.copy()
         if hasattr(self.obj, 'deepcopy'):
             new.obj = self.obj.deepcopy()
-        elif hasattr(self.obj, 'clone'):
-            new.obj = self.obj.clone()
         else:    
             new.obj = copy.deepcopy(self.obj)
         return new
+
+    _unlinkedDuration = None
+
+    def _getDuration(self):
+        '''
+        Gets the duration of the Element (if separately set), but
+        normal returns the duration of the component object if available, otherwise
+        returns None.
+
+        >>> import note
+        >>> n = note.Note('F#')
+        >>> n.quarterLength = 2.0
+        >>> n.duration.quarterLength 
+        2.0
+        >>> el1 = Element(n)
+        >>> el1.duration.quarterLength
+        2.0
+
+        ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY
+        >>> import music21.key
+        >>> ks1 = Element(music21.key.KeySignature())
+        >>> ks1.obj.duration
+        Traceback (most recent call last):
+        AttributeError: 'KeySignature' object has no attribute 'duration'
+        
+        >>> import duration
+        >>> ks1.duration = duration.Duration("whole")
+        >>> ks1.duration.quarterLength
+        4.0
+        >>> ks1.obj.duration  # still not defined
+        Traceback (most recent call last):
+        AttributeError: 'KeySignature' object has no attribute 'duration'
+        '''
+        if self._unlinkedDuration is not None:
+            return self._unlinkedDuration
+        elif hasattr(self, "obj") and hasattr(self.obj, 'duration'):
+            return self.obj.duration
+        else:
+            return None
+
+    def _setDuration(self, durationObj):
+        '''
+        Set the offset as a quarterNote length
+        '''
+        if not hasattr(durationObj, "quarterLength"):
+            raise Exception, 'this must be a Duration object, not %s' % durationObj
+        
+        if hasattr(self.obj, 'duration'):
+            # if a number assume it is a quarter length
+            self.obj.duration = durationObj
+        else:
+            self._unlinkedDuration = durationObj
+            
+    duration = property(_getDuration, _setDuration)
+
+    offset = property(Music21Object._getOffset, Music21Object._setOffset)
+
+
 
     #---------------------------------------------------------------------------
     def __repr__(self):
@@ -864,32 +910,40 @@ class Element(BaseElement):
     def __eq__(self, other):
         '''Test Element equality
 
-        >>> a = Element()
+        >>> import note
+        >>> n = note.Note("C#")
+        >>> a = Element(n)
         >>> a.offset = 3.0
-        >>> c = Element()
-        >>> c.offset = 3.0
+        >>> b = Element(n)
+        >>> b.offset = 3.0
+        >>> a == b
+        True
+        >>> a is not b
+        True
+        >>> c = Element(n)
+        >>> c.offset = 2.0
+        >>> c.offset
+        2.0
         >>> a == c
-        True
-        >>> a is not c
-        True
+        False
         '''
         if not hasattr(other, "obj") or \
            not hasattr(other, "offset") or \
            not hasattr(other, "priority") or \
-           not hasattr(other, "id"): # or \
-            # not hasattr(other, "groups"):
-            # not hasattr(other, "parent") or \
-            # not hasattr(other, "duration") or \
+           not hasattr(other, "id") or \
+           not hasattr(other, "groups") or \
+           not hasattr(other, "parent") or \
+           not hasattr(other, "duration"):
             return False
 
 
         if (self.obj == other.obj and \
             self.offset == other.offset and \
             self.priority == other.priority and \
-            self.id == other.id): # and \
-            #  self.groups == other.groups):
-            #  self.parent == other.parent and \
-            #  self.duration == self.duration and \
+            self.id == other.id and \
+            self.groups == other.groups and \
+            self.parent == other.parent and \
+            self.duration == self.duration):
             return True
         else:
             return False
@@ -918,7 +972,7 @@ class Element(BaseElement):
         
         # if not, change the attribute in the stored object
         storedobj = object.__getattribute__(self, "obj")
-        if name not in ['offset', '_offset'] and \
+        if name not in ['offset', '_offset', 'disconnectedOffset'] and \
             storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
         else:  # unless neither has the attribute, in which case add it to the Element
@@ -1006,12 +1060,17 @@ class Test(unittest.TestCase):
         assert(a.offset == 2.0)
 
     def testElementEquality(self):
-        a = Element()
+        from music21 import note
+        n = note.Note("F-")
+        a = Element(n)
         a.offset = 3.0
-        c = Element()
+        c = Element(n)
         c.offset = 3.0
         assert (a == c)
         assert (a is not c)
+        b = Element(n)
+        b.offset = 2.0
+        assert (a != b)
 
     def testNoteCreation(self):
         from music21 import note, duration
@@ -1043,7 +1102,6 @@ class Test(unittest.TestCase):
         note1.type = "whole"
         stream1 = stream.Stream()
         stream1.addNext(note1)
-        stream1.addNext(note1)
         subStream = stream1.getNotes()
 
     def testLocationsRefs(self):
@@ -1051,25 +1109,25 @@ class Test(unittest.TestCase):
         bMock = TestMock()
 
         loc = Locations()
-        loc.add(aMock, 234)
-        loc.add(bMock, 12)
+        loc.add(234, aMock)
+        loc.add(12, bMock)
         
         self.assertEqual(loc.getOffsetByIndex(-1), 12)
         self.assertEqual(loc.getOffsetBySite(aMock), 234)
         self.assertEqual(loc.getSiteByOffset(234), aMock)
         self.assertEqual(loc.getSiteByIndex(-1), bMock)
 
-        del aMock
+        #del aMock
         # if the parent has been deleted, the None will be returned
         # even though there is still an entry
-        self.assertEqual(loc.getSiteByIndex(0), None)
+        #self.assertEqual(loc.getSiteByIndex(0), None)
 
 
     def testLocationsNone(self):
         '''Test assigning a None to parent
         '''
         loc = Locations()
-        loc.add(None, 0)
+        loc.add(0, None)
 
 def mainTest(*testClasses):
     '''
@@ -1105,6 +1163,7 @@ def mainTest(*testClasses):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(thisClass)
             s1.addTests(s2) 
     runner = unittest.TextTestRunner()
+    runner.verbosity = 1
     runner.run(s1)  
 
 if __name__ == "__main__":

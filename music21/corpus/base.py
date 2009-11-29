@@ -220,7 +220,8 @@ class Test(unittest.TestCase):
             a = getWork(known)
             # make sure it is not an empty list
             self.assertNotEqual(len(a), 0)
-            self.assertEqual(a.endswith(known), True)
+            workSlashes = re.sub(r'\\', '/', a)
+            self.assertEqual(workSlashes.endswith(known), True)
 
 
 
