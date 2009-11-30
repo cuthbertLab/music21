@@ -1186,7 +1186,8 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> b = a.getInstrument()
         '''
-        #environLocal.printDebug(['searching for instrument: search depth:'])
+        environLocal.printDebug(['searching for instrument, called from:', 
+                                self])
         #TODO: Rename: getInstruments, and return a Stream of instruments
         #for cases when there is more than one instrument
 
@@ -1511,7 +1512,8 @@ class Stream(music21.Music21Object):
         >>> d.repeatCopy(n, [x+.5 for x in range(10)])
         >>> x = d.makeMeasures()
         '''
-        #environLocal.printDebug(['calling makeMeasures'])
+        environLocal.printDebug(['calling Stream.makeMeasures()'])
+
         useSelf = False
         if not useSelf: # make a copy
             srcObj = self.deepcopy()
@@ -1683,6 +1685,9 @@ class Stream(music21.Music21Object):
         >>> #x = x.makeTies()
     
         '''
+
+        environLocal.printDebug(['calling Stream.makeTies()'])
+
         if not inPlace: # make a copy
             returnObj = self.deepcopy()
         else:
@@ -1708,6 +1713,7 @@ class Stream(music21.Music21Object):
             measureStream = returnObj.getElementsByClass(Measure)
             if mCount >= len(measureStream):
                 break
+            # get the current measure to look for notes that need ties
             m = measureStream[mCount]
             if mCount + 1 < len(measureStream):
                 mNext = measureStream[mCount+1]
@@ -1733,6 +1739,8 @@ class Stream(music21.Music21Object):
             # seems like should be able to use m.duration.quarterLengths
             mStart, mEnd = 0, m.timeSignature.barDuration.quarterLength
             for e in m:
+                environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
+
                 if hasattr(e, 'duration') and e.duration != None:
                     # check to see if duration is within Measure
                     eoffset = e.getOffsetBySite(m)
@@ -1751,6 +1759,8 @@ class Stream(music21.Music21Object):
                         # modify existing duration
                         e.duration.quarterLength = qLenBegin
                         # create and place new element
+
+                        # NOTE: this copy is causing a problem
                         eRemain = e.deepcopy()
                         eRemain.duration.quarterLength = qLenRemain
     
@@ -1764,8 +1774,14 @@ class Stream(music21.Music21Object):
     
                         # TODO: this does not seem the best way to do this!
                         # need to find a better way to insert this first in elements
+
+                        # used to do this:
                         eRemain.offset = 0
                         mNext.elements = [eRemain] + mNext.elements
+
+                        # alternative approach (same slowness)
+                        #mNext.insertAtOffset(0, eRemain)
+                        #mNext = mNext.sorted
     
                         # we are not sure that this element fits 
                         # completely in the next measure, thus, need to continue
@@ -1773,7 +1789,7 @@ class Stream(music21.Music21Object):
                         if mNextAdd:
                             returnObj.insertAtOffset(mNext.offset, mNext)
             mCount += 1
-    
+
         #print returnObj.recurseRepr()
         return returnObj
     
@@ -1794,6 +1810,9 @@ class Stream(music21.Music21Object):
         >>> aMeasure.repeatAddNext(aNote,16)
         >>> bMeasure = aMeasure.makeBeams()
         '''
+
+        environLocal.printDebug(['calling Stream.makeBeams()'])
+
         if not inPlace: # make a copy
             returnObj = self.deepcopy()
         else:
@@ -2046,12 +2065,12 @@ class Stream(music21.Music21Object):
                     recurseStream = myEl.flat
                 
                 recurseStreamOffset = myEl.locations.getOffsetBySite(self)
-                environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
+                #environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
                 
                 for subEl in recurseStream:
                     oldOffset = subEl.locations.getOffsetBySite(recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
-                    environLocal.printDebug("newOffset: " + str(subEl.id) + " " + str(newOffset))
+                    #environLocal.printDebug("newOffset: " + str(subEl.id) + " " + str(newOffset))
                     newStream.insertAtOffset(newOffset, subEl)
             
             else:
@@ -2340,7 +2359,7 @@ class Stream(music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        #environLocal.printDebug(['calling _getMXPart'])
+        environLocal.printDebug(['calling Stream._getMXPart'])
 
         if instObj == None:
             # see if an instrument is defined in this or a parent stream
@@ -2397,7 +2416,7 @@ class Stream(music21.Music21Object):
         >>> c.append(b)
         >>> mxScore = c.mx
         '''
-        # environLocal.printDebug('calling _getMX')
+        environLocal.printDebug('calling Stream._getMX')
 
         mxComponents = []
         instList = []
@@ -3410,7 +3429,7 @@ class TestExternal(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatDeepcopy(n, range(0,120,3))
+        a.repeatCopy(n, range(0,120,3))
         #a.show() # default time signature used
         
         a.insertAtOffset( 0, meter.TimeSignature("5/4")  )
@@ -3955,7 +3974,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestExtractedNoteAssignLyric(self):
+    def testExtractedNoteAssignLyric(self):
         from music21 import converter, corpus, text
         a = converter.parse(corpus.getWork('opus74no1', 3))
         b = a[1] 
@@ -3967,26 +3986,21 @@ class Test(unittest.TestCase):
                          True)
 
 
-    def xtestGetInstruments(self):
-        '''Temporarily disabled while bypassing getInstrument issue
+
+    def testGetInstrumentFromMxl(self):
+        '''Test getting an instrument from an mxl file
         '''
         from music21 import corpus, converter
 
         # manuall set parent to associate 
         a = converter.parse(corpus.getWork(['haydn', 'opus74no2', 
                                             'movement4.xml']))
+
         b = a[3][10:20]
+        # TODO: manually setting the parent is still necessary
         b.parent = a[3] # manually set the parent
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
-
-        #import pdb; pdb.set_trace()
-        # search parent from a measure within
-
-        # canot use getMeasures as this destroys parents
-        #b = a[3].getMeasures()
-        #self.assertEqual(len(b), 46)
-        #environLocal.printDebug(['parent of measure', b[10].parent])
 
         p = a[3] # get part
         # a mesausre within this part has as its parent the part
@@ -3997,6 +4011,17 @@ class Test(unittest.TestCase):
         instObj = p[10].getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
+
+
+
+    def xtestGetInstrumentManual(self):
+        '''Temporarily disabled while bypassing getInstrument issue
+        '''
+        from music21 import corpus, converter
+
+
+        #import pdb; pdb.set_trace()
+        # search parent from a measure within
 
         # a different test derived from a TestExternal
         q = Stream()
@@ -4009,26 +4034,80 @@ class Test(unittest.TestCase):
             m.quarterLength = .5
             r.addNext(m)
         s = Stream() # container
+
+        # probably should not use append here!
         s.append(q)
         s.append(r)
 
         instObj = q.getInstrument()
-        instObj = r.getInstrument()
-        instObj = s.getInstrument()
+        self.assertEqual(instObj.partName, defaults.partName)
 
-        # test mx generation
+        instObj = r.getInstrument()
+        self.assertEqual(instObj.partName, defaults.partName)
+
+        instObj = s.getInstrument()
+        self.assertEqual(instObj.partName, defaults.partName)
+
+        # test mx generation of parts
         mx = q.mx
         mx = r.mx
+
+        # test mx generation of score
         mx = s.mx
 
+    def xtestMeasureAndTieCreation(self):
+        '''A test of the automatic partitioning of notes in a measure and the creation of ties.
+        '''
 
-    def testMXLCases(self):
-        '''isolate and test potential mxl problem caes
+        n = note.Note()        
+        n.quarterLength = 3
+        a = Stream()
+        a.repeatCopy(n, range(0,120,3))
+        #a.show() # default time signature used
+        
+        a.insertAtOffset( 0, meter.TimeSignature("5/4")  )
+#         a.insertAtOffset(10, meter.TimeSignature("2/4")  )
+#         a.insertAtOffset( 3, meter.TimeSignature("3/16") )
+#         a.insertAtOffset(20, meter.TimeSignature("9/8")  )
+#         a.insertAtOffset(40, meter.TimeSignature("10/4") )
+
+        mx = a.mx
+
+    def xtestStreamCopy(self):
+        '''Test copying a stream
         '''
         from music21 import corpus, converter
-        a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
-        b = a[3][10:20]
 
+
+        #import pdb; pdb.set_trace()
+        # search parent from a measure within
+
+        # a different test derived from a TestExternal
+        q = Stream()
+        r = Stream()
+        for x in ['c3','a3','c#4','d3'] * 30:
+            n = note.Note(x)
+            n.quarterLength = random.choice([.25])
+            q.addNext(n)
+            m = note.Note(x)
+            m.quarterLength = .5
+            r.addNext(m)
+        s = Stream() # container
+
+        # probably should not use append here!
+        s.append(q)
+        s.append(r)
+
+        # copying the whole: this works
+        w = s.deepcopy()
+
+        # copying while looping: this gets increasingly slow
+        for aElement in s:
+            environLocal.printDebug(['copying and inserting an element',
+                                     aElement])
+            bElement = aElement.deepcopy()
+            s.insertAtOffset(aElement.offset, bElement)
+            
 
     def testIteration(self):
         '''This test was designed to illustrate a past problem with stream
@@ -4062,6 +4141,13 @@ class Test(unittest.TestCase):
             junk = x.getInstrument(searchParent=True)
             del junk
             counter += 1
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -114,10 +114,12 @@ class RestrtucturedWriter(object):
 
         >>> from music21 import note
         >>> rw = RestrtucturedWriter()
-        >>> rw.formatParent(inspect.getmro(note.Note)[1])
-        'music21.note.GeneralNote'
-        >>> rw.formatParent(inspect.getmro(note.Note)[3])
-        'object'
+        >>> post = rw.formatParent(inspect.getmro(note.Note)[1])
+        >>> 'note.GeneralNote' in post      
+        True
+        >>> post = rw.formatParent(inspect.getmro(note.Note)[3])
+        >>> 'object' in post      
+        True
         '''
         modName = mroEntry.__module__
         modName = modName.replace('music21.', '') # remove leading music21
@@ -135,8 +137,13 @@ class RestrtucturedWriter(object):
 
         >>> from music21 import note
         >>> rw = RestrtucturedWriter()
-        >>> rw.formatClassInheritance(inspect.getmro(note.Note))
-        'Inherits from: music21.note.GeneralNote, music21.base.Music21Object, object'
+        >>> post = rw.formatClassInheritance(inspect.getmro(note.Note))
+        >>> 'note.GeneralNote' in post
+        True
+        >>> 'base.Music21Object' in post
+        True
+        >>> 'object' in post
+        True
         '''
         msg = []
         msg.append('Inherits from:')
