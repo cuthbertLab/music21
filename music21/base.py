@@ -434,10 +434,16 @@ class Music21Object(object):
     # while testing .locations
     #_parent = None
     contexts = None
+
     id = None
     _priority = 0
     _overriddenLily = None
-    disconnectedOffset = 0.0 # gets assigned if offset is assigned before any location
+
+    # store offset if assigned before any Location entry is set
+    # an object without a parent, when assigned an offset, stores its offset 
+    # here
+    disconnectedOffset = 0.0 
+    # store a reference to the current parent in Locations
     _currentParent = None
 
 
@@ -1128,6 +1134,86 @@ class Test(unittest.TestCase):
         '''
         loc = Locations()
         loc.add(0, None)
+
+
+    def testM21BaseLocations(self):
+        '''Basic testing of M21 base object
+        '''
+        a = Music21Object()
+        b = Music21Object()
+
+        # storing a single offset does not add a Locations entry  
+        a.offset = 30
+        self.assertEqual(len(a.locations), 0)
+        self.assertEqual(a.disconnectedOffset, 30.0)
+        self.assertEqual(a.offset, 30.0)
+
+        # assigning a parent directly
+        a.parent = b
+        # now we have an offset in locations
+        self.assertEqual(len(a.locations), 1)
+        # we still have an entry in disconnected offset
+        self.assertEqual(a.disconnectedOffset, 30.0)
+
+        a.offset = 40
+        # still have parent
+        self.assertEqual(a.parent, b)
+        # still have disconnected offset at original value
+        self.assertEqual(a.disconnectedOffset, 30.0)
+        self.assertEqual(a.offset, 40.0)
+
+        # assigning a parent to None
+        a.parent = None
+        # but still return the same offsets?
+        self.assertEqual(a.offset, 40.0)
+        self.assertEqual(a.disconnectedOffset, 30.0)
+        # we still have a location stored
+        self.assertEqual(len(a.locations), 1)
+        self.assertEqual(a.getOffsetBySite(b), 40.0)
+
+
+    def testM21BaseLocationsCopy(self):
+        '''Basic testing of M21 base object
+        '''
+        a = Music21Object()
+        b = Music21Object()
+
+        post = []
+        for x in range(30):
+            b.id = 'test'
+            b.parent = a
+            c = b.deepcopy()
+            post.append(c)
+
+        self.assertEqual(len(b.locations), 1)
+        self.assertEqual(len(post[-1].locations), 1)
+
+        # this does not seem correct: c.parent exists but no object
+        # can be found that matches it
+        # this is because the reference has been copied and new object exists
+        self.assertNotEqual(post[-1].parent, a)
+
+
+        a = Music21Object()
+
+        post = []
+        for x in range(30):
+            b = Music21Object()
+            b.id = 'test'
+            b.parent = a
+            b.offset = 30
+            c = b.deepcopy()
+            c.parent = b
+            post.append(c)
+
+        self.assertEqual(len(post[-1].locations), 2)
+
+        # this works because the parent is being set on the object
+        self.assertEqual(post[-1].parent, b)
+        # the copied parent has been deepcopied, and cannot now be accessed
+        # this fails! post[-1].getOffsetBySite(a)
+
+
 
 def mainTest(*testClasses):
     '''
