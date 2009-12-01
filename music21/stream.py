@@ -66,19 +66,21 @@ class StreamIterator():
     '''A simple Iterator object used to handle iteration of Streams and other 
     list-like objects. 
     '''
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self, srcStream):
+        self.srcStream = srcStream
         self.index = 0
 
     def __iter__(self):
         return self
 
     def next(self):
-        if self.index >= len(self.parent.elements):
-            del self.parent
+        if self.index >= len(self.srcStream.elements):
+            del self.srcStream
             raise StopIteration
-        post = self.parent.elements[self.index]
-        post.parent = self.parent
+        post = self.srcStream.elements[self.index]
+        # here, the parent of extracted element is being set to Stream
+        # that is the source of the iteration
+        post.parent = self.srcStream
         self.index += 1
         return post
 
@@ -4151,4 +4153,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)
