@@ -582,9 +582,6 @@ class Music21Object(object):
            
             part = getattr(self, name)
             
-            if inspect.ismethod(part): # skip methods
-                continue
-
             # attributes that require special handling
             if name == '_currentParent':
                 environLocal.printDebug(['creating parent reference'])
