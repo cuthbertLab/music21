@@ -2061,7 +2061,8 @@ class Stream(music21.Music21Object):
             if hasattr(myEl, "elements"): # recurse time:
                 if retainContainers == True: ## semiFlat
                     newOffset = myEl.locations.getOffsetBySite(self)
-                    newStream.insertAtOffset(myEl.locations.getOffsetBySite(self), myEl)
+                    newStream.insertAtOffset(
+                        myEl.locations.getOffsetBySite(self), myEl)
                     recurseStream = myEl.semiFlat
                 else:
                     recurseStream = myEl.flat
@@ -3973,6 +3974,20 @@ class Test(unittest.TestCase):
 
         self.assertEqual(q.parent, s)
         self.assertEqual(r.parent, s)
+
+    def testParentsMultiple(self):
+        '''Test an object having multiple parents.
+        '''
+        a = Stream()
+        b = Stream()
+        n = note.Note("G#")
+        n.offset = 10
+        a.append(n)
+        b.append(n)
+        # the objects elements has been transfered to each parent
+        # stream in the same way
+        self.assertEqual(n.getOffsetBySite(a), n.getOffsetBySite(b))
+        self.assertEqual(n.getOffsetBySite(a), 10)
 
 
 

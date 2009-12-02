@@ -22,7 +22,7 @@ import weakref
 import hashlib
 import imp
 import random
-
+import inspect
 
 # define file extensions for various foramts
 fileExtensions = {
@@ -503,6 +503,41 @@ def formatStr(msg, *arguments, **keywords):
     return ' '.join(msg)+'\n'
 
 
+def dirPartitioned(obj, skipLeading=['__']):
+    '''Given an objet, return three lists of names: methods, attributes, and properties.
+
+    Note that if a name/attribute is dynamically created by a property it 
+    cannot be found until that attribute is created.
+
+    TODO: this cannot properly partiton properties from methods
+    '''
+    names = dir(obj)
+    methods = []
+    attributes = []
+    properties = []
+    for name in names:
+        skip = False
+        for lead in skipLeading:
+            if name.startswith(lead):
+                skip = True
+                break
+        if skip:
+            continue
+        # get attr returns methods, attributes, and properties
+        # when getting an attribute from a property, however, this may call
+        # the getter of a name that is only defined in a setter
+        part = getattr(obj, name)
+        if isinstance(part, property):
+            properties.append(name)
+#         if inspect.isdatadescriptor(part):
+#             properties.append(name)
+        elif inspect.ismethod(part):
+            methods.append(name)
+#         elif isinstance(part, types.MethodType):
+#             methods.append(name)
+        else:
+            attributes.append(name)
+    return methods, attributes, properties
 
 #-------------------------------------------------------------------------------
 
@@ -853,6 +888,33 @@ class Timer(object):
 
 
 #-------------------------------------------------------------------------------
+class TestMockAttributes(object):
+    '''A test object with attributes, methods, and properties
+    '''
+    def __init__(self):
+        self.attr1 = 1
+        self.attr2 = 2
+        self.attr3 = 3
+
+    def method1(self):
+        return 3
+
+    def method2(self):
+        return 4
+
+    def _get1(self):
+        return self.attr3
+
+    def _set1(self, value):
+        self.attr3 = value
+    
+    property1 = property(_get1, _set1)
+
+    property2 = property(_get1, _set1)
+
+
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -864,6 +926,34 @@ class Test(unittest.TestCase):
     def testToRoman(self):
         for src, dst in [(1, 'I'), (3, 'III'), (5, 'V')]:
             self.assertEqual(dst, toRoman(src))
+
+
+    def testGettingAttributes(self):
+        a = TestMockAttributes()
+        # dir() returns all names, including properties, attributes, methods
+        aDir = dir(a)
+        self.assertEqual(('_get1' in aDir), True)
+        self.assertEqual(('attr1' in aDir), True)
+        self.assertEqual(('method1' in aDir), True)
+        self.assertEqual(('property1' in aDir), True)
+        # __dict__ stores only attributes
+        aDictKeys = a.__dict__.keys()
+        self.assertEqual(('attr1' in aDictKeys), True)
+        # properties are not found htere
+        self.assertNotEqual(('property1' in aDictKeys), True)
+        # after setting an attribute not defined in __init__ with a property
+        # the new data value is store in __dict__
+        a.property1 = 3
+        aDictKeys = a.__dict__.keys()
+        self.assertEqual(('attr3' in aDictKeys), True)
+
+        # we cannot use insepct.isdatadescriptor to find properties
+        self.assertEqual(inspect.isdatadescriptor(a.property1), False)
+        
+
+        methods, attributes, properties = dirPartitioned(a)
+        self.assertEqual(('attr1' in attributes), True)
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

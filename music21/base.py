@@ -27,6 +27,7 @@ import unittest, doctest
 import sys
 import types
 import time
+import inspect
 
 from music21 import common
 from music21 import environment
@@ -135,6 +136,26 @@ class Locations(object):
         '''
         return len(self._coordinates)
 
+    def deepcopy(self):
+        '''This produces a new, independent locations object.
+        This does not, however, deepcopy site references stored therein
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocations = Locations()
+        >>> aLocations.add(843, aSite)
+        >>> aLocations.add(12, bSite) # can add at same offset or different
+        >>> bLocations = aLocations.deepcopy()
+        >>> aLocations != bLocations
+        True
+        >>> aLocations.getSiteByIndex(-1) == bLocations.getSiteByIndex(-1)      
+        True
+        '''
+        new = self.__class__()
+        for dict in self._coordinates:
+            new.add(dict['offset'], dict['site'], dict['time'])
+        return new
 
     def scrubEmptySites(self):
         '''If a parent has been deleted, we will still have an empty ref in 
@@ -194,7 +215,7 @@ class Locations(object):
     def getTimes(self):
         return [x['time'] for x in self._coordinates]   
 
-    def add(self, offset, site):
+    def add(self, offset, site, timeValue=None):
         '''Add a location to the object.
 
         If site already exists, this will update that entry. 
@@ -225,14 +246,18 @@ class Locations(object):
         else:
 #            siteRef = common.wrapWeakref(site)
             siteRef = site
-            self._coordinates.append({}) # great new
+            self._coordinates.append({}) # create new
             i = -1 #now the last
             # site here is wrapped in weakref
             self._coordinates[i]['site'] = siteRef
 
         self._coordinates[i]['offset'] = offset
+
         # store creation time in order to sort by time
-        self._coordinates[i]['time'] = time.time()
+        if timeValue != None:
+            self._coordinates[i]['time'] = time.time()
+        else:
+            self._coordinates[i]['time'] = timeValue
 
     def remove(self, site):
         '''Remove the entry specified by sites
@@ -516,6 +541,70 @@ class Music21Object(object):
         myCopy = copy.deepcopy(self)
         return myCopy
     
+    def _deepcopy(self, exclude=[]):
+        '''
+        exclude permits specififying specific attributes to note copy.
+
+        Problem: if an attribute is defined with an understscore (_priority) but
+        is made available through a property priority, using dir(self) results   
+        in the copy happening twice. Thus, __dict__.keys() is used.
+
+        >>> from music21 import note, duration
+        >>> n = note.Note('A')
+        >>> n.offset = 1.0 #duration.Duration("quarter")
+        >>> n.groups.append("flute")
+        >>> n.groups
+        ['flute']
+
+        >>> b = n.deepcopy()
+        >>> b.offset = 2.0 #duration.Duration("half")
+        
+        >>> n is b
+        False
+        >>> n.accidental = "-"
+        >>> b.name
+        'A'
+        >>> n.offset
+        1.0
+        >>> b.offset
+        2.0
+        >>> n.groups[0] = "bassoon"
+        >>> ("flute" in n.groups, "flute" in b.groups)
+        (False, True)
+        '''
+        # call class to get a new, empty instance
+        new = self.__class__()
+        #for name in dir(self):
+        for name in self.__dict__.keys():
+
+            if name.startswith('__') or name in exclude:
+                continue
+           
+            part = getattr(self, name)
+            
+            if inspect.ismethod(part): # skip methods
+                continue
+
+            # attributes that require special handling
+            if name == '_currentParent':
+                environLocal.printDebug(['creating parent reference'])
+                newValue = self.parent # keep a reference, not a copy
+            # assume we can copy everything else
+            elif hasattr(part, 'deepcopy'):
+                #environLocal.printDebug(['using deepcopy method of object:',
+                #   self, name, part])
+                newValue = part.deepcopy()
+            else: # have to use copy.deepcopy   
+                #environLocal.printDebug(['forced to use copy.deepcopy:',
+                #    self, name, part])
+                newValue = copy.deepcopy(part)
+
+            #Note that setattr() will call the set method of a named property.
+            setattr(new, name, newValue)
+                
+        return new
+
+
     def isClass(self, className):
         '''
         returns bool depending on if the object is a particular class or not
@@ -1050,13 +1139,19 @@ class Element(Music21Object):
 
 
 #-------------------------------------------------------------------------------
+
+
 class TestMock(Music21Object):
-    pass
+    def __init__(self):
+        Music21Object.__init__(self)
+
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+
 
     def testObjectCreation(self):
         a = TestMock()
@@ -1136,6 +1231,16 @@ class Test(unittest.TestCase):
         loc.add(0, None)
 
 
+
+    def testM21BaseDeepcopy(self):
+        '''Test copying
+        '''
+        a = Music21Object()
+        a.id = 'test'
+        b = a.deepcopy()
+        self.assertNotEqual(a, b)
+        self.assertEqual(b.id, 'test')
+
     def testM21BaseLocations(self):
         '''Basic testing of M21 base object
         '''
@@ -1188,10 +1293,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(b.locations), 1)
         self.assertEqual(len(post[-1].locations), 1)
 
-        # this does not seem correct: c.parent exists but no object
-        # can be found that matches it
-        # this is because the reference has been copied and new object exists
-        self.assertNotEqual(post[-1].parent, a)
+        # this now works
+        self.assertEqual(post[-1].parent, a)
 
 
         a = Music21Object()

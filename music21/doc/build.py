@@ -305,6 +305,7 @@ class ModuleDoc(RestrtucturedWriter):
                 ):
                 pass
             elif isinstance(partObj, property):
+                # can use method processing on properties
                 info['properties'][partName] = self.scanMethod(partObj)
 
             elif (callable(partObj) or hasattr(partObj, '__doc__')):
