@@ -59,12 +59,14 @@ directionTerms = {DESCENDING:"Descending", OBLIQUE:"Oblique", ASCENDING:"Ascendi
 
 
 class Interval(music21.Music21Object):
-    '''requires certain named arguments:
+    '''
 
-    either both of
+    requires either (1) a string ("P5" etc.) or    
+    (2) named arguments:
+    (2a) either both of
        diatonic  = DiatonicInterval object
        chromatic = ChromaticInterval object
-    or
+    (2b) or both of
        note1     = Pitch (or Note) object
        note2     = Pitch (or Note) object
     in which case it figures out the diatonic and chromatic intervals itself'''
@@ -81,15 +83,19 @@ class Interval(music21.Music21Object):
 
     def __init__(self, *args, **keydict):
         music21.Music21Object.__init__(self)
-
-        if (keydict.has_key("diatonic")):
-            self.diatonic = keydict['diatonic']
-        if (keydict.has_key("chromatic")):
-            self.chromatic = keydict['chromatic']
-        if (keydict.has_key("note1")):
-            self.note1 = keydict['note1']
-        if (keydict.has_key("note2")):
-            self.note2 = keydict['note2']
+        if len(args) == 1 and isinstance(args[0], basestring):
+            (dInterval, cInterval) = _separateIntervalFromString(args[0])
+            self.diatonic = dInterval
+            self.chromatic = cInterval
+        else:
+            if (keydict.has_key("diatonic")):
+                self.diatonic = keydict['diatonic']
+            if (keydict.has_key("chromatic")):
+                self.chromatic = keydict['chromatic']
+            if (keydict.has_key("note1")):
+                self.note1 = keydict['note1']
+            if (keydict.has_key("note2")):
+                self.note2 = keydict['note2']
 
         self.reinit()
 
@@ -417,13 +423,7 @@ def generateNote(note1, intervalString):
     newNote.pitch = newPitch
     return newNote
 
-
-def generateIntervalFromString(string):
-    '''generateIntervalFromString(string) -> Interval
-
-    Generates an interval object based on the given string,
-    such as "P5", "m3", "A2".
-    '''
+def _separateIntervalFromString(string):
     generic = int(string.lstrip('PMmAd'))
     specName = string.rstrip('-0123456789')
     gInterval = GenericInterval(generic)
@@ -454,9 +454,16 @@ def generateIntervalFromString(string):
                                     # (automatically positive until this step)
 
     cInterval = ChromaticInterval(semitones)
+    return (dInterval, cInterval)
 
+def generateIntervalFromString(string):
+    '''generateIntervalFromString(string) -> Interval
+
+    Generates an interval object based on the given string,
+    such as "P5", "m3", "A2".
+    '''
+    (dInterval, cInterval) = _separateIntervalFromString(string)
     allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
-
     return allInterval
         
 def generateChromatic(n1, n2):
@@ -513,19 +520,13 @@ def getSpecifier(gInt, cInt):
 #-----------------------------------------------------------
 
 class Test(unittest.TestCase):
-    pass
 
     def runTest(self):
         pass
     
-    def testFirst(self):
-        try:
-            if Note is not None:
-                pass
-        except:
-            from note import Note
-            from pitch import Accidental
-        
+    def testFirst(self):       
+        from music21.note import Note
+        from music21.pitch import Accidental
         n1 = Note()
         n2 = Note()
         
@@ -621,6 +622,20 @@ class Test(unittest.TestCase):
         n8 = generatePitch(n7, "P8")
         assert n8.name == "C"
         assert n8.octave == 5
+
+        ## same thing using newer syntax:
+        
+        interval1 = Interval("P-5")
+        
+        n5 = generatePitch(n4, interval1)
+        n6 = generatePitch(n4, "P-5")
+        assert n5.name == "G-"
+        assert n6.name == n5.name
+        n7 = Note()
+        n8 = generatePitch(n7, "P8")
+        assert n8.name == "C"
+        assert n8.octave == 5
+
         
         n9 = generatePitch(n7, "m7")  ## should be B-
         assert n9.name == "B-"

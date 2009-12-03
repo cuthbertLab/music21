@@ -1,13 +1,13 @@
-
 import unittest, doctest
 
 import music21
-from music21.note import Note
 from music21 import interval
 
+from music21.note import Note
+from music21.interval import Interval
 
 class VoiceLeadingQuartet(music21.Music21Object):
-    '''A quartet of four pitches: v1n1, v1n2, v2n1, v2n2
+    '''An object consisting of four pitches: v1n1, v1n2, v2n1, v2n2
     where v1n1 moves to v1n2 at the same time as 
     v2n1 moves to v2n2.  
     
@@ -16,7 +16,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
     
     motionType = None
     unison = interval.generateIntervalFromString("P1")
-    fifth = interval.generateIntervalFromString("P5")
+    fifth  = interval.generateIntervalFromString("P5")
     octave = interval.generateIntervalFromString("P8")
         
     def __init__(self, v1n1, v1n2, v2n1, v2n2):
@@ -26,9 +26,9 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.v2n2 = v2n2    
         self.vIntervals = []
         self.hIntervals = []
-        self.findIntervals()
+        self._findIntervals()
     
-    def findIntervals(self):
+    def _findIntervals(self):
         self.vIntervals.append(interval.generateInterval(self.v1n1, self.v2n1))
         self.vIntervals.append(interval.generateInterval(self.v1n2, self.v2n2))
         self.hIntervals.append(interval.generateInterval(self.v1n1, self.v1n2))
@@ -42,7 +42,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         return True
 
     def obliqueMotion(self):
-        '''Returns true if one voice remains the same and another moves.  I.e., isNoMotion 
+        '''
+        Returns true if one voice remains the same and another moves.  I.e., isNoMotion 
         must also be false
         '''
         if self.noMotion():
@@ -56,6 +57,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
     
     
     def similarMotion(self):
+        '''
+        Returns true if the two voices both move in the same direction.
+        Parallel Motion will also return true, as it is a special case of similar motion
+        '''
+        
         if self.noMotion():
             return False
         else:
@@ -65,7 +71,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return False
  
     def parallelMotion(self):
-        '''returns true if both voices move with the same interval or an octave duplicate of the interval'''
+        '''returns True if both voices move with the same interval or an octave duplicate of the interval'''
         if not self.similarMotion():
             return False
         else:
@@ -73,6 +79,10 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return True
     
     def contraryMotion(self):
+        '''
+        returns True if both voices move in opposite directions
+        '''
+        
         if self.noMotion():
             return False
         elif self.parallelMotion():
@@ -84,6 +94,19 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return True
  
     def antiParallelMotion(self):
+        '''
+        Returns true if the simple interval before is the same as the simple interval after
+        and the motion is contrary
+
+        >>> n11 = Note("C4")
+        >>> n12 = Note("D3") # descending 7th
+        >>> n21 = Note("G4")
+        >>> n22 = Note("A4") # ascending 2nd
+        >>> vlq1 = VoiceLeadingQuartet(n11, n12, n21, n22)
+        >>> vlq1.antiParallelMotion()
+        True
+
+        '''
         if not self.contraryMotion():
             return False
         else:
@@ -95,7 +118,30 @@ class VoiceLeadingQuartet(music21.Music21Object):
  
     def parallelInterval(self, thisInterval):
         '''
-        parrallelInterval traps both parallelMotion and antiParallelMotion
+        Returns true if there is a parallel or antiParallel interval of this type
+        
+        >>> n11 = Note("C4")
+        >>> n12a = Note("D4") # ascending 2nd
+        >>> n12b = Note("D3") # descending 7th
+
+        >>> n21 = Note("G4")
+        >>> n22a = Note("A4") # ascending 2nd
+        >>> n22b = Note("B4") # ascending 3rd
+        >>> vlq1 = VoiceLeadingQuartet(n11, n12a, n21, n22a)
+        >>> vlq1.parallelInterval(Interval("P5"))
+        True
+        >>> vlq1.parallelInterval(Interval("P8"))
+        False
+        
+        Antiparallel fifths also are true
+        >>> vlq2 = VoiceLeadingQuartet(n11, n12b, n21, n22a)
+        >>> vlq2.parallelInterval(Interval("P5"))
+        True
+        
+        Non-parallel intervals are, of course, False
+        >>> vlq3 = VoiceLeadingQuartet(n11, n12a, n21, n22b)
+        >>> vlq3.parallelInterval(Interval("P5"))
+        False
         '''
         
         if not (self.parallelMotion() or self.antiParallelMotion()):
@@ -107,13 +153,53 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return False
 
     def parallelFifth(self):
+        '''
+        Returns true if the motion is a parallel Perfect Fifth (or antiparallel) or Octave duplication
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G4"), Note("A4")).parallelFifth()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G5"), Note("A5")).parallelFifth()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D#4"), Note("G4"), Note("A4")).parallelFifth()
+        False
+        '''
         return self.parallelInterval(self.fifth)
     
     def parallelOctave(self):
+        '''
+        Returns true if the motion is a parallel Perfect Octave
+        
+        [ a concept so abhorrent we shudder to illustrate it with an example, but alas, we must ]
+
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelOctave()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C6"), Note("D6")).parallelOctave()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelOctave()
+        False
+        '''
         return self.parallelInterval(self.octave)
     
     def parallelUnison(self):
+        '''
+        Returns true if the motion is a parallel Perfect Unison (and not Perfect Octave, etc.)
+
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnison()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelUnison()
+        False
+        '''
         return self.parallelInterval(self.unison)
+
+    def parallelUnisonOrOctave(self):
+        '''
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C3"), Note("D3")).parallelUnisonOrOctave()
+        True
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnisonOrOctave()
+        True
+        '''
+    
+        return (self.parallelOctave() | self.parallelUnison() )
+    
     
     def hiddenInterval(self, thisInterval):
         '''
@@ -177,9 +263,9 @@ class Test(unittest.TestCase):
         assert c.hiddenInterval(interval.generateIntervalFromString("P5")) == False
     
         d = VoiceLeadingQuartet(C4, D4, E4, A4)
-        assert d.hiddenInterval(interval.generateIntervalFromString("P5")) == True
-        assert d.hiddenInterval(interval.generateIntervalFromString("A4")) == False
-        assert d.hiddenInterval(interval.generateIntervalFromString("AA4")) == False
+        assert d.hiddenInterval(Interval("P5")) == True
+        assert d.hiddenInterval(Interval("A4")) == False
+        assert d.hiddenInterval(Interval("AA4")) == False
 
 if __name__ == "__main__":
     music21.mainTest(Test)
