@@ -88,13 +88,13 @@ class Interval(music21.Music21Object):
             self.diatonic = dInterval
             self.chromatic = cInterval
         else:
-            if (keydict.has_key("diatonic")):
+            if ("diatonic" in keydict):
                 self.diatonic = keydict['diatonic']
-            if (keydict.has_key("chromatic")):
+            if ("chromatic" in keydict):
                 self.chromatic = keydict['chromatic']
-            if (keydict.has_key("note1")):
+            if ("note1" in keydict):
                 self.note1 = keydict['note1']
-            if (keydict.has_key("note2")):
+            if ("note2" in keydict):
                 self.note2 = keydict['note2']
 
         self.reinit()

@@ -7,13 +7,13 @@ from music21 import stream
 import capua
 
 class PolyphonicSnippet(music21.Music21Object):
-    def __init__(self, fiveExcelCells, parent):
+    def __init__(self, fiveExcelCells, parentPiece):
         if len(fiveExcelCells) != 5:
             raise Exception("Need five Excel Cells to make a PolyphonicSnippet object")
         self.streams = fiveExcelCells[0:3]  # first three
         self.cadenceType = fiveExcelCells[3]
         self.timeSig = meter.TimeSignature(fiveExcelCells[4])
-        self.parent = parent
+        self.parentPiece = parentPiece
         self.cantus = self.streams[0]
         self.tenor  = self.streams[1]
         self.contratenor = self.streams[2]
@@ -30,15 +30,15 @@ class PolyphonicSnippet(music21.Music21Object):
 
     def headerWithPageNums(self):
         '''returns a string that prints an appropriate header for this cadence'''
-        if (self.parent is not None):
-            parent = self.parent
+        if (self.parentPiece is not None):
+            parentPiece = self.parentPiece
             headOut = " \\header { \n piece = \\markup \\bold \""
-            if (parent.fischerNum):
-                headOut += str(parent.fischerNum) + ". " 
-            if parent.title:
-                headOut += parent.title
-            if (parent.pmfcVol and parent.pmfcPageRange()):
-                headOut += " PMFC " + str(parent.pmfcVol) + " " + parent.pmfcPageRange()
+            if (parentPiece.fischerNum):
+                headOut += str(parentPiece.fischerNum) + ". " 
+            if parentPiece.title:
+                headOut += parentPiece.title
+            if (parentPiece.pmfcVol and parentPiece.pmfcPageRange()):
+                headOut += " PMFC " + str(parentPiece.pmfcVol) + " " + parentPiece.pmfcPageRange()
             headOut += "\" \n}\n";
             return headOut
         else:
@@ -119,14 +119,14 @@ class FrontPaddedCadence(PolyphonicSnippet):
             thisStream.elements = newNotes.elements + thisStream.elements
 
     def header(self):
-        headOut = " \\header { \n piece = \"" + self.parent.title
+        headOut = " \\header { \n piece = \"" + self.parentPiece.title
         if (self.cadenceName):
             headOut += " -- " + self.cadenceName + " "
         headOut += " \" \n}\n";
         return headOut
 
-    def __init__(self, fiveExcelCells, parent):
-        PolyphonicSnippet.__init__(self, fiveExcelCells, parent)
+    def __init__(self, fiveExcelCells, parentPiece):
+        PolyphonicSnippet.__init__(self, fiveExcelCells, parentPiece)
         self.findLongestCadence()
         for thisStream in self.streams:
             self.frontPadLine(thisStream)

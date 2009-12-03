@@ -45,7 +45,7 @@ def capuaRuleOne(stream):
         ## e.g. G, F, G => G, F#, G
         if i1.directedName == "M-2" and \
            i2.directedName == "M2":
-            if (n2.editorial.misc.has_key("capua")):
+            if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua'] += RULEONE
             else:
                 n2.editorial.misc['capua'] = RULEONE
@@ -98,7 +98,7 @@ def capuaRuleTwo(stream):
         if i1.directedName == "M2" and \
            i2.directedName == "m2" and \
            i3.directedName == "M2":
-            if (n3.editorial.misc.has_key("capua")):
+            if ("capua" in n3.editorial.misc):
                 n3.editorial.misc['capua'] += RULETWO
             else:
                 n3.editorial.misc['capua'] = RULETWO
@@ -151,7 +151,7 @@ def capuaRuleThree(stream):
         # e.g., E C D => E C# D
         if i1.directedName  == "M-3" and \
            i2.directedName  == "M2":
-            if (n2.editorial.misc.has_key("capua")):
+            if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua'] += RULETHREE
             else:
                 n2.editorial.misc['capua'] = RULETHREE
@@ -191,7 +191,7 @@ def capuaRuleFourA(stream):
         # e.g., D B A => D Bb A
         if i1.directedName  == "m-3" and \
            i2.directedName  == "M2":
-            if (n2.editorial.misc.has_key("capua")):
+            if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua'] += RULEFOURA
             else:
                 n2.editorial.misc['capua'] = RULEFOURA
@@ -232,7 +232,7 @@ def capuaRuleFourB(stream):
         # e.g., D F G => D F# G  or G Bb C => G B C
         if i1.directedName  == "m3" and \
            i2.directedName  == "M2":
-            if (n2.editorial.misc.has_key("capua")):
+            if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua'] += RULEFOURB
             else:
                 n2.editorial.misc['capua'] = RULEFOURB
@@ -264,7 +264,7 @@ def restoreFicta(stream1):
     '''In the given stream, moves anything under note.editorial.misc["saved-ficta"]
     back to note.editorial.ficta.'''
     for n2 in stream1:
-        if  n2.editorial.misc.has_key("saved-ficta"):
+        if  "saved-ficta" in n2.editorial.misc:
             n2.editorial.ficta = n2.editorial.misc["saved-ficta"]
             n2.editorial.misc["saved-ficta"] = None
 
@@ -276,7 +276,7 @@ def clearAccidental(note1):
 
 def restoreAccidental(note1):
     '''takes note.editorial.music[\'saved-accidental\'] and moves it back to the note'''
-    if  note1.editorial.misc.has_key("saved-accidental"):
+    if  "saved-accidental" in note1.editorial.misc:
         note1.accidental = note1.editorial.misc["saved-accidental"]
         note1.editorial.misc["saved-accidental"] = None
 
@@ -289,7 +289,7 @@ def fictaToAccidental(note1):
 
 def pmfcFictaToAccidental(note1):
     '''Moves PMFC's ficta to the accidental'''
-    if note1.editorial.misc.has_key("pmfc-ficta") and \
+    if "pmfc-ficta" in note1.editorial.misc and \
        note1.editorial.misc["pmfc-ficta"] is not None:
         if note1.accidental is not None:
             note1.editorial.misc["saved-accidental"] = note1.accidental
@@ -297,7 +297,7 @@ def pmfcFictaToAccidental(note1):
         
 def capuaFictaToAccidental(note1):
     '''Moves Capua's ficta to the accidental'''
-    if note1.editorial.misc.has_key("capua-ficta") and \
+    if "capua-ficta" in note1.editorial.misc and \
        note1.editorial.misc["capua-ficta"] is not None:
         if note1.accidental is not None:
             note1.editorial.misc["saved-accidental"] = note1.accidental
@@ -408,16 +408,16 @@ def compareThreeFictas(stream1, stream2):
     twoStream1.intervalToOtherStreamWhenAttacked()
 
     for note1 in stream1.notes:
-        if note1.editorial.misc.has_key("pmfc-ficta") or \
-           note1.editorial.misc.has_key("capua-ficta"):
+        if "pmfc-ficta" in note1.editorial.misc or \
+           "capua-ficta" in note1.editorial.misc:
             normalInterval = note1.editorial.harmonicInterval.name
-            if note1.editorial.misc.has_key("pmfc-ficta"):
+            if "pmfc-ficta" in note1.editorial.misc:
                 pmfcFictaToAccidental(note1)
                 note1.editorial.harmonicInterval.reinit()
                 pmfcInterval = note1.editorial.harmonicInterval.name
             else:
                 pmfcInterval = ""
-            if note1.editorial.misc.has_key("capua-ficta"):
+            if "capua-ficta" in note1.editorial.misc:
                 capuaFictaToAccidental(note1)
                 note1.editorial.harmonicInterval.reinit()
                 capuaInterval = note1.editorial.harmonicInterval.name
@@ -454,18 +454,18 @@ def compareNoteCapuaToEditor(note1):
     if note1.isRest:
         return {}
     statsDict['totalNotes'] += 1
-    if note1.editorial.misc.has_key("pmfc-ficta") and \
-           note1.editorial.misc.has_key("capua-ficta"):
+    if "pmfc-ficta" in note1.editorial.misc and \
+           "capua-ficta" in note1.editorial.misc:
         statsDict['pmfcAlt'] += 1
         statsDict['capuaAlt'] += 1
         statsDict['pmfcAndCapua'] += 1
-    elif note1.editorial.misc.has_key("pmfc-ficta"):
+    elif "pmfc-ficta" in note1.editorial.misc:
         statsDict['pmfcAlt'] += 1
         statsDict['pmfcNotCapua'] += 1
         if note1.editorial.harmonicInterval:
             pass
             #print "In PMFC: " + note1.editorial.harmonicInterval.name
-    elif note1.editorial.misc.has_key("capua-ficta"):
+    elif "capua-ficta" in note1.editorial.misc:
         statsDict['capuaAlt'] += 1
         statsDict['capuaNotPmfc'] += 1
         if note1.editorial.harmonicInterval:
@@ -565,7 +565,7 @@ def colorCapuaFicta(stream1, stream2, oneOrBoth = "both"):
 
 def colorNote(note1, oneOrBoth = "both"):
     '''Applies all rules to a note according to what harmonies are better/worse/neutral.'''
-    if not note1.editorial.misc.has_key("capua2FictaHarmony"): return
+    if "capua2FictaHarmony" not in note1.editorial.misc: return
     elif oneOrBoth == "one": capuaHarmony = note1.editorial.misc["capua1FictaHarmony"]
     elif oneOrBoth == "both": capuaHarmony = note1.editorial.misc["capua2FictaHarmony"]
     else: raise("Please specify \"one\" or \"both\" for the variable \"oneOrBoth\".")
@@ -783,12 +783,12 @@ def improvedHarmony():
     
                     #### KEEP PROGRAMMING FROM HERE
                     if hI.diatonic.specificName == "Perfect":
-                        if note1.editorial.misc.has_key("capua-ficta"):
+                        if "capua-ficta" in note1.editorial.misc:
                             checkDict["perfCapua"] += 1  ## ugh Capua changed a P1, P5, or P8
                         else:
                             checkDict["perfIgnored"] +=1 ## yay Capua left it alone
                     else:
-                        if note1.editorial.misc.has_key("capua-ficta"):
+                        if "capua-ficta" in note1.editorial.misc:
                             checkDict["imperfCapua"] += 1  ## yay Capua changed a A1 or d1, A5 or d5, or A8 or d8
                         else:
                             checkDict["imperfIgnored"] +=1 ## hrumph, Capua left it alone                                
@@ -801,12 +801,12 @@ def improvedHarmony():
     
                     #### KEEP PROGRAMMING FROM HERE
                     if hI.diatonic.specificName == "Perfect":
-                        if note1.editorial.misc.has_key("capua-ficta"):
+                        if "capua-ficta" in note1.editorial.misc:
                             checkDict["perfCapua"] += 1  ## ugh Capua changed a P1, P5, or P8
                         else:
                             checkDict["perfIgnored"] +=1 ## yay Capua left it alone
                     else:
-                        if note1.editorial.misc.has_key("capua-ficta"):
+                        if "capua-ficta" in note1.editorial.misc:
                             checkDict["imperfCapua"] += 1  ## yay Capua changed a A1 or d1, A5 or d5, or A8 or d8
                         else:
                             checkDict["imperfIgnored"] +=1 ## hrumph, Capua left it alone                                

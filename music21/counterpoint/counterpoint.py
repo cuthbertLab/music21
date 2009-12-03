@@ -507,14 +507,14 @@ class Test(unittest.TestCase):
         
         assert findPar5 == 1
         assert n24.editorial.misc["Parallel Fifth"] == True
-        assert n21.editorial.misc.has_key("Parallel Fifth") == False
-        assert n22.editorial.misc.has_key("Parallel Fifth") == False
-        assert n23.editorial.misc.has_key("Parallel Fifth") == False
-    
+        assert "Parallel Fifth" not in n21.editorial.misc
+        assert "Parallel Fifth" not in n22.editorial.misc
+        assert "Parallel Fifth" not in n23.editorial.misc
+
         assert n14.editorial.misc["Parallel Fifth"] == True
-        assert n11.editorial.misc.has_key("Parallel Fifth") == False
-        assert n12.editorial.misc.has_key("Parallel Fifth") == False
-        assert n13.editorial.misc.has_key("Parallel Fifth") == False
+        assert "Parallel Fifth" not in n11.editorial.misc
+        assert "Parallel Fifth" not in n12.editorial.misc
+        assert "Parallel Fifth" not in n13.editorial.misc
     
         par5 = counterpoint1.isParallelFifth(n11, n12, n21, n22)
         assert par5 == False
@@ -580,7 +580,7 @@ class Test(unittest.TestCase):
         par8 = counterpoint1.findParallelOctaves(stream1, stream6)
     
         assert par8 == 3
-        assert not n31.editorial.misc.has_key("Parallel Octave")
+        assert "Parallel Octave" not in n31.editorial.misc
         assert n32.editorial.misc["Parallel Octave"] == True
         assert n33.editorial.misc["Parallel Octave"] == True
         assert n34.editorial.misc["Parallel Octave"] == True
@@ -717,7 +717,7 @@ class Test(unittest.TestCase):
     
         parallel5 = counterpoint1.findParallelFifths(stream10, stream11)
         hidden5 = counterpoint1.findHiddenFifths(stream10, stream11)
-        assert not n71.editorial.misc.has_key("Hidden Fifth")
+        assert "Hidden Fifth" not in n71.editorial.misc
         assert n72.editorial.misc["Hidden Fifth"] == True
         assert n75.editorial.misc["Hidden Fifth"] == True
         total5 = counterpoint1.findAllBadFifths(stream10, stream11)
@@ -755,12 +755,12 @@ class Test(unittest.TestCase):
         hidden8 = counterpoint1.findHiddenOctaves(stream12, stream13)
         total8 = counterpoint1.findAllBadOctaves(stream12, stream13)
     
-        assert not n91.editorial.misc.has_key("Parallel Octave")
-        assert not n91.editorial.misc.has_key("Hidden Octave")
+        assert "Parallel Octave" not in n91.editorial.misc
+        assert "Hidden Octave" not in n91.editorial.misc
         assert n92.editorial.misc["Hidden Octave"] == True
-        assert not n92.editorial.misc.has_key("Parallel Octave")
+        assert "Parallel Octave" not in n92.editorial.misc
         assert n93.editorial.misc["Parallel Octave"] == True
-        assert not n93.editorial.misc.has_key("Hidden Octave")
+        assert "Hidden Octave" not in n93.editorial.misc
         assert n94.editorial.misc["Parallel Octave"] == True
         assert n96.editorial.misc["Hidden Octave"] == True
     

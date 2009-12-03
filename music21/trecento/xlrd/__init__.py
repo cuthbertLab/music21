@@ -928,7 +928,7 @@ class Book(BaseObject):
                     fprintf(self.logfile, "*** No CODEPAGE record; assuming 1200 (utf_16_le)\n")
         else:
             codepage = self.codepage
-            if encoding_from_codepage.has_key(codepage):
+            if codepage in encoding_from_codepage:
                 encoding = encoding_from_codepage[codepage]
             elif 300 <= codepage <= 1999:
                 encoding = 'cp' + str(codepage)
@@ -1129,11 +1129,11 @@ class Book(BaseObject):
             nobj = self.name_obj_list[namex]
             name_lcase = nobj.name.lower()
             key = (name_lcase, nobj.scope)
-            if name_and_scope_map.has_key(key):
+            if key in name_and_scope_map:
                 raise XLRDError(
                     'Duplicate entry %r in name_and_scope_map' % (key, ))
             name_and_scope_map[key] = nobj
-            if name_map.has_key(name_lcase):
+            if name_lcase in name_map.has_key:
                 name_map[name_lcase].append((nobj.scope, nobj))
             else:
                 name_map[name_lcase] = [(nobj.scope, nobj)]

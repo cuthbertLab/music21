@@ -23,10 +23,10 @@ class TrecentoSheet(object):
     filename  = "cadences.xls"
     
     def __init__(self, **keywords):
-        if (keywords.has_key("filename")): self.filename = keywords["filename"]
+        if ("filename" in keywords): self.filename = keywords["filename"]
         xbook = xlrd.open_workbook(self.filename)
         
-        if (keywords.has_key("sheetname")): self.sheetname = keywords["sheetname"]
+        if ("sheetname" in keywords): self.sheetname = keywords["sheetname"]
         
         self.sheet = xbook.sheet_by_name(self.sheetname)
         self.totalRows = self.sheet.nrows

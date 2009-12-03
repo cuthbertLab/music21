@@ -556,7 +556,7 @@ def biff_count_records(mem, stream_offset, stream_len, fout=sys.stdout):
             recname = biff_rec_name_dict.get(rc, None)
             if recname is None:
                 recname = "Unknown_0x%04X" % rc
-        if tally.has_key(recname):
+        if recname in tally:
             tally[recname] += 1
         else:
             tally[recname] = 1

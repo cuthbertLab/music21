@@ -3539,7 +3539,7 @@ class TestExternal(unittest.TestCase):
     def xtestBeamsStream(self):
         '''A test of beams applied to different time signatures. 
 
-        This will cause an infinite loop if getinstrument is recursvie
+        This will cause an infinite loop if getinstrument is recursive
         '''
         q = Stream()
         r = Stream()
@@ -4168,4 +4168,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import copy
+    x = Stream()
+    copy.deepcopy(x)
     music21.mainTest(Test)

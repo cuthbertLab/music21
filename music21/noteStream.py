@@ -156,7 +156,7 @@ class NoteStream(object):
         '''Returns the note object that is sounding at the given time.
         Time is assumed to be measured in quarter notes.'''
         for i in range(len(self.noteTimeInfo)):
-            if self.noteTimeInfo[i].has_key('start') is False:
+            if 'start' not in self.noteTimeInfo[i]:
                 self.noteTimeInfo[i]['start'] = 0
             if almostEquals(self.noteTimeInfo[i]['start'], time1):
                 return self.notes[i]
@@ -198,9 +198,9 @@ class NoteStream(object):
         '''Returns [start time, end time] for the given note. Time is measured
         in quarter notes.'''
         index = self.notes.index(note)
-        if self.noteTimeInfo[index].has_key('start') is False:
+        if 'start' not in self.noteTimeInfo[index]:
             self.noteTimeInfo[index]['start'] = 0
-        if self.noteTimeInfo[index].has_key('length') is False:
+        if 'length' not in self.noteTimeInfo[index]:
             self.noteTimeInfo[index]['length'] = 0
         start = self.noteTimeInfo[index]['start']
         end = start + self.noteTimeInfo[index]['length']
