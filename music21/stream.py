@@ -510,10 +510,10 @@ class Stream(music21.Music21Object):
 #        return new
 
     def append(self, item):
-        '''Add a (sub)Stream, Music21Object, or object (wrapped into a default element)
-         to the Stream at the stored offset of the object, or at 0.0.
+        '''Add a (sub)Stream, Music21Object, or object (wrapped into a default 
+        element) to the Stream at the stored offset of the object, or at 0.0.
          
-         For adding to the last open location of the stream, use addNext.
+        For adding to the last open location of the stream, use addNext.
 
         Adds an entry in Locations as well.
 
@@ -523,12 +523,21 @@ class Stream(music21.Music21Object):
         >>> len(a)
         2
         '''
-        if hasattr(item, "disconnectedOffset") and item.disconnectedOffset is not None:
-            appendOffset = item.disconnectedOffset
+#         if hasattr(item, "disconnectedOffset") and item.disconnectedOffset is not None:
+#             appendOffset = item.disconnectedOffset
+#         else:
+#             appendOffset = 0.0
+
+        # if not an element, embed
+        if not isinstance(item, music21.Music21Object): 
+            environLocal.printDebug(['insertAtOffset called with non Music21Object', item])
+            element = Element(item)
         else:
-            appendOffset = 0.0
-            
-        self.insertAtOffset(appendOffset, item)
+            element = item
+
+        # always get append value from None site, or unposititoned 
+        appendOffset = element.getOffsetBySite(None)            
+        self.insertAtOffset(appendOffset, element)
 
     def insertAtOffset(self, offset, item):
         '''Append an object with a given offset. Wrap in an Element and 
@@ -547,12 +556,14 @@ class Stream(music21.Music21Object):
             element = item
         offset = float(offset)
         element.locations.add(offset, self)
+        # need to explicitly set the parent of the elment
+        element.parent = self 
 
-        if self.isSorted is True and \
-            self.highestTime <= offset:
+        if self.isSorted is True and self.highestTime <= offset:
                 storeSorted = True
         else:
                 storeSorted = False
+
         self._elements.append(element)  # could also do self.elements = self.elements + [element]
         self._elementsChanged()         # maybe much slower?
         self.isSorted = storeSorted
@@ -611,11 +622,15 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:
-            if not isinstance(item, music21.Music21Object): # if not an element, embed
+            # if not an element, embed
+            if not isinstance(item, music21.Music21Object): 
                 element = Element(item)
             else:
                 element = item
-            addOffset = highestTimeTemp + element.disconnectedOffset
+
+            addOffset = highestTimeTemp + element.getOffsetBySite(None)
+
+#            addOffset = highestTimeTemp + element.disconnectedOffset
             
             # this should look to the contained object duration
             if (hasattr(element, "duration") and 
@@ -625,6 +640,8 @@ class Stream(music21.Music21Object):
                 highestTimeTemp = addOffset
 
             element.locations.add(addOffset, self)
+            # need to explicitly set the parent of the elment
+            element.parent = self 
             self._elements.append(element)  
 
         ## does not change sorted state
@@ -647,7 +664,17 @@ class Stream(music21.Music21Object):
         '''
         if not hasattr(item, "locations"):
             raise StreamException("Cannot insert and item that does not have a location; wrap in an Element() first")
-        item.locations.add(item.disconnectedOffset, self)
+
+        #item.locations.add(item.disconnectedOffset, self)
+
+        # NOTE: this may have enexpected side effects, as the None location
+        # may have been set much later in this objects life.
+        # optionally, could use last assigned site to get the offset        
+        # or, use zero
+        item.locations.add(item.getOffsetBySite(None), self)
+        # need to explicitly set the parent of the elment
+        item.parent = self 
+
         self._elements.insert(pos, item)
         self._elementsChanged()
 
@@ -867,10 +894,6 @@ class Stream(music21.Music21Object):
         return found
 
 
-
-
-
-
     def getElementsByGroup(self, groupFilterList):
         '''
         # TODO: group comparisons are not YET case insensitive.  
@@ -906,7 +929,9 @@ class Stream(music21.Music21Object):
         for myEl in self:
             for myGrp in groupFilterList:
                 if hasattr(myEl, "groups") and myGrp in myEl.groups:
-                    returnStream.append(myEl)
+                    returnStream.insertAtOffset(myEl.getOffsetBySite(self),
+                                                myEl)
+                    #returnStream.append(myEl)
 
         return returnStream
 
@@ -1263,8 +1288,8 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> b = a.getInstrument()
         '''
-        environLocal.printDebug(['searching for instrument, called from:', 
-                                self])
+        #environLocal.printDebug(['searching for instrument, called from:', 
+        #                        self])
         #TODO: Rename: getInstruments, and return a Stream of instruments
         #for cases when there is more than one instrument
 
@@ -1443,7 +1468,8 @@ class Stream(music21.Music21Object):
         >>> a[10].offset
         10.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        if not isinstance(item, music21.Music21Object): 
+            # if not an element, embed
             element = Element(item)
         else:
             element = item
@@ -1589,7 +1615,7 @@ class Stream(music21.Music21Object):
         >>> d.repeatCopy(n, [x+.5 for x in range(10)])
         >>> x = d.makeMeasures()
         '''
-        environLocal.printDebug(['calling Stream.makeMeasures()'])
+        #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         useSelf = False
         if not useSelf: # make a copy
@@ -1765,7 +1791,7 @@ class Stream(music21.Music21Object):
     
         '''
 
-        environLocal.printDebug(['calling Stream.makeTies()'])
+        #environLocal.printDebug(['calling Stream.makeTies()'])
 
         if not inPlace: # make a copy
             returnObj = self.deepcopy()
@@ -1890,7 +1916,7 @@ class Stream(music21.Music21Object):
         >>> bMeasure = aMeasure.makeBeams()
         '''
 
-        environLocal.printDebug(['calling Stream.makeBeams()'])
+        #environLocal.printDebug(['calling Stream.makeBeams()'])
 
         if not inPlace: # make a copy
             returnObj = self.deepcopy()
@@ -2055,7 +2081,10 @@ class Stream(music21.Music21Object):
         newStream = self.copy()
         newStream.elements = post
         for thisElement in post:
-            thisElement.locations.add(thisElement.getOffsetBySite(self), newStream)
+            thisElement.locations.add(thisElement.getOffsetBySite(self),
+                                       newStream)
+            # need to explicitly set parent
+            thisElement.parent = newStream 
 
         newStream.isSorted = True
         return newStream
@@ -2442,7 +2471,7 @@ class Stream(music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        environLocal.printDebug(['calling Stream._getMXPart'])
+        #environLocal.printDebug(['calling Stream._getMXPart'])
 
         if instObj == None:
             # see if an instrument is defined in this or a parent stream
@@ -2499,7 +2528,7 @@ class Stream(music21.Music21Object):
         >>> c.append(b)
         >>> mxScore = c.mx
         '''
-        environLocal.printDebug('calling Stream._getMX')
+        #environLocal.printDebug('calling Stream._getMX')
 
         mxComponents = []
         instList = []
@@ -3768,8 +3797,8 @@ class Test(unittest.TestCase):
         # component notes still have a location set to midStream[1]
         self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)        
 
-        # no locations for midstream
-        self.assertEqual(len(midStream.locations), 0)
+        # one location in midstream
+        self.assertEqual(len(midStream.locations), 1)
         
         #environLocal.printDebug(['srcStream', srcStream])
         #environLocal.printDebug(['midStream', midStream])

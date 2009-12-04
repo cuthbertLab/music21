@@ -260,9 +260,9 @@ class Locations(object):
         self._coordinates[i]['offset'] = offset
 
         # store creation time in order to sort by time
-        if timeValue != None:
+        if timeValue == None:
             self._coordinates[i]['time'] = time.time()
-        else:
+        else: # a time vaue might be provided
             self._coordinates[i]['time'] = timeValue
 
     def remove(self, site):
@@ -304,6 +304,10 @@ class Locations(object):
         Traceback (most recent call last):
         LocationsException: ...
         '''
+        # permit self to provided as site: translates into none
+        if site == self:
+            site = None
+
         sites = self.getSites()
         if not site in sites: 
             raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
@@ -473,8 +477,9 @@ class Music21Object(object):
     # store offset if assigned before any Location entry is set
     # an object without a parent, when assigned an offset, stores its offset 
     # here
-    disconnectedOffset = 0.0 
-    # store a reference to the current parent in Locations
+    #disconnectedOffset = 0.0 
+
+    # None is stored as the internal location of an obj w/o a parent
     _currentParent = None
 
 
@@ -502,6 +507,9 @@ class Music21Object(object):
             self.locations = keywords["locations"]
         else:
             self.locations = Locations()
+            # set up a default lcoaton for self at zero
+            # use None as the name of the site
+            self.locations.add(0.0, None)
 
         if "parent" in keywords and self.parent is None:
             self.parent = keywords["parent"]
@@ -645,17 +653,33 @@ class Music21Object(object):
             found = self.parent.searchParent(attrName)
         return found
         
+
+    def getOffsetBySite(self, site):
+        '''
+        >>> a = Music21Object()
+        >>> a.offset = 30
+        >>> a.getOffsetBySite(None)
+        30.0
+        >>> a.getOffsetBySite(a)
+        30.0
+        '''
+        if site == self:
+            site = None # shortcut
+        return self.locations.getOffsetBySite(site)
+
     #---------------------------------------------------------------------------
     # properties
 
     def _getParent(self):
-        # return the last parent added to this location
-        if self._currentParent is not None:
-            return self._currentParent
-        elif len(self.locations) == 0:
-            return None # return None if no sites set
-        else: 
-            return self.locations.getSiteByIndex(-1) 
+        # can be None
+        return self._currentParent
+
+#         if self._currentParent is not None:
+#             return self._currentParent
+#         elif len(self.locations) == 0:
+#             return None # return None if no sites set
+#         else: 
+#             return self.locations.getSiteByIndex(-1) 
 
 #         return common.unwrapWeakref(self._parent)
     
@@ -670,6 +694,8 @@ class Music21Object(object):
 
     parent = property(_getParent, _setParent)
 
+
+
     def _getOffset(self):
         '''
 
@@ -679,10 +705,15 @@ class Music21Object(object):
         # the first case here would match
         if self.parent != None and self.parent in self.locations.getSites():
             return self.locations.getOffsetBySite(self.parent)
-        elif self.disconnectedOffset is not None:
-            return self.disconnectedOffset
+        elif self.parent == None: # assume we want self
+            return self.locations.getOffsetBySite(None)
         else:
-            return 0.0
+            raise Exception('request for offset cannot be made with parent of %s' % self.parent)            
+
+#         elif self.disconnectedOffset is not None:
+#             return self.disconnectedOffset
+#         else:
+#             return 0.0
 
     def _setOffset(self, value):
         if common.isNum(value):
@@ -700,14 +731,13 @@ class Music21Object(object):
             raise Exception, 'We cannot set  %s as an offset' % value
         
         if self.parent is None:
-            self.disconnectedOffset = offset
+            # a None parent gets the offset at self
+            self.locations.setOffsetBySite(None, offset)
+            #self.disconnectedOffset = offset
         else:
             self.locations.setOffsetBySite(self.parent, offset)
     
     offset = property(_getOffset, _setOffset)
-
-    def getOffsetBySite(self, site):
-        return self.locations.getOffsetBySite(site)
 
 
     def _getDuration(self):
@@ -816,33 +846,15 @@ class Element(Music21Object):
     to wrap an object.
     
     '''
-
     obj = None
     _id = None
 
     def __init__(self, obj):
         Music21Object.__init__(self)
         self.obj = obj # object stored here        
+        self._unlinkedDuration = None
 
-    def getId(self):
-        if self.obj is not None:
-            if hasattr(self.obj, "id"):
-                return self.obj.id
-            else:
-                return self._id
-        else:
-            return self._id
 
-    def setId(self, newId):
-        if self.obj is not None:
-            if hasattr(self.obj, "id"):
-                self.obj.id = newId
-            else:
-                self._id = newId
-        else:
-            self._id = newId
-
-    id = property (getId, setId)
 
     def isClass(self, className):
         '''
@@ -866,6 +878,7 @@ class Element(Music21Object):
             return True
         else:
             return False
+
     def copy(self):
         '''
         Makes a copy of this element with a reference
@@ -898,9 +911,12 @@ class Element(Music21Object):
 
         newEl = copy.copy(self)
         
-        newEl.groups = copy.copy(self.groups)
-        newEl.contexts = copy.copy(self.contexts)
-        newEl.locations = copy.copy(self.locations)
+        # it is assumed that we need new objects for groups, contexts
+        # and locations in order to position / group this object
+        # independently
+        newEl.groups = copy.deepcopy(self.groups)
+        newEl.contexts = copy.deepcopy(self.contexts)
+        newEl.locations = copy.deepcopy(self.locations)
 
         return newEl
 
@@ -935,13 +951,39 @@ class Element(Music21Object):
         (False, True)
         '''
         new = self.copy()
+        # this object needs a new locations object
+        new.locations = copy.deepcopy(self.locations)
+
+
         if hasattr(self.obj, 'deepcopy'):
             new.obj = self.obj.deepcopy()
         else:    
             new.obj = copy.deepcopy(self.obj)
         return new
 
-    _unlinkedDuration = None
+    #---------------------------------------------------------------------------
+    # properties
+
+    def getId(self):
+        if self.obj is not None:
+            if hasattr(self.obj, "id"):
+                return self.obj.id
+            else:
+                return self._id
+        else:
+            return self._id
+
+    def setId(self, newId):
+        if self.obj is not None:
+            if hasattr(self.obj, "id"):
+                self.obj.id = newId
+            else:
+                self._id = newId
+        else:
+            self._id = newId
+
+    id = property (getId, setId)
+
 
     def _getDuration(self):
         '''
@@ -1081,7 +1123,8 @@ class Element(Music21Object):
         if name not in ['offset', '_offset', 'disconnectedOffset'] and \
             storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
-        else:  # unless neither has the attribute, in which case add it to the Element
+        # unless neither has the attribute, in which case add it to the Element
+        else:  
             object.__setattr__(self, name, value)
 
     def __getattr__(self, name):
@@ -1260,31 +1303,30 @@ class Test(unittest.TestCase):
 
         # storing a single offset does not add a Locations entry  
         a.offset = 30
-        self.assertEqual(len(a.locations), 0)
-        self.assertEqual(a.disconnectedOffset, 30.0)
+        # all offsets are store in locations
+        self.assertEqual(len(a.locations), 1)
+        self.assertEqual(a.getOffsetBySite(None), 30.0)
         self.assertEqual(a.offset, 30.0)
 
         # assigning a parent directly
         a.parent = b
-        # now we have an offset in locations
-        self.assertEqual(len(a.locations), 1)
+        # now we have two offsets in locations
+        self.assertEqual(len(a.locations), 2)
         # we still have an entry in disconnected offset
-        self.assertEqual(a.disconnectedOffset, 30.0)
+#        self.assertEqual(a.disconnectedOffset, 30.0)
 
         a.offset = 40
         # still have parent
         self.assertEqual(a.parent, b)
-        # still have disconnected offset at original value
-        self.assertEqual(a.disconnectedOffset, 30.0)
+        # now the offst returns the value for the current parent 
         self.assertEqual(a.offset, 40.0)
 
         # assigning a parent to None
         a.parent = None
-        # but still return the same offsets?
-        self.assertEqual(a.offset, 40.0)
-        self.assertEqual(a.disconnectedOffset, 30.0)
-        # we still have a location stored
-        self.assertEqual(len(a.locations), 1)
+        # properly returns original offset
+        self.assertEqual(a.offset, 30.0)
+        # we still have two locations stored
+        self.assertEqual(len(a.locations), 2)
         self.assertEqual(a.getOffsetBySite(b), 40.0)
 
 
@@ -1301,8 +1343,9 @@ class Test(unittest.TestCase):
             c = b.deepcopy()
             post.append(c)
 
-        self.assertEqual(len(b.locations), 1)
-        self.assertEqual(len(post[-1].locations), 1)
+        # have two locations: None, and that set by assigning parent
+        self.assertEqual(len(b.locations), 2)
+        self.assertEqual(len(post[-1].locations), 2)
 
         # this now works
         self.assertEqual(post[-1].parent, a)
@@ -1320,7 +1363,7 @@ class Test(unittest.TestCase):
             c.parent = b
             post.append(c)
 
-        self.assertEqual(len(post[-1].locations), 2)
+        self.assertEqual(len(post[-1].locations), 3)
 
         # this works because the parent is being set on the object
         self.assertEqual(post[-1].parent, b)
