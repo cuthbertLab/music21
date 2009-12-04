@@ -137,6 +137,9 @@ class Locations(object):
         return len(self._coordinates)
 
     def deepcopy(self):
+        return copy.deepcopy(self)
+
+    def __deepcopy__(self, memo=None):
         '''This produces a new, independent locations object.
         This does not, however, deepcopy site references stored therein
 
@@ -155,7 +158,10 @@ class Locations(object):
         new = self.__class__()
         for dict in self._coordinates:
             new.add(dict['offset'], dict['site'], dict['time'])
+
+        junk = new.getSites()
         return new
+
 
     def scrubEmptySites(self):
         '''If a parent has been deleted, we will still have an empty ref in 
@@ -276,7 +282,7 @@ class Locations(object):
         '''
         sites = self.getSites()
         if not site in sites: 
-            raise LocationsException('an entry for this object is not stored: %s' % site)
+            raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
         del self._coordinates[sites.index(site)]
 
 
@@ -300,7 +306,7 @@ class Locations(object):
         '''
         sites = self.getSites()
         if not site in sites: 
-            raise LocationsException('an entry for this object is not stored: %s' % site)
+            raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
 
         match = None
         # assume that last added offset is more likely the first needed
@@ -340,7 +346,7 @@ class Locations(object):
             i = sites.index(site)
             self._coordinates[i]['offset'] = value
         else:
-            raise LocationsException('an entry for this object is not stored: %s' % site)
+            raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
 
 
     def getOffsetByIndex(self, index):
@@ -510,44 +516,47 @@ class Music21Object(object):
         '''Return a shallow copy, or a linked reference to the source.'''
         return copy.copy(self)
     
-    def deepcopy(self):
-        '''
-        Return a deep copy of an object with no reference to the source.
-        The parent is not deep copied, nor are references within location
-
-        >>> from music21 import note, duration
-        >>> n = note.Note('A')
-        >>> n.offset = 1.0 #duration.Duration("quarter")
-        >>> n.groups.append("flute")
-        >>> n.groups
-        ['flute']
-
-        >>> b = n.deepcopy()
-        >>> b.offset = 2.0 #duration.Duration("half")
-        
-        >>> n is b
-        False
-        >>> n.accidental = "-"
-        >>> b.name
-        'A'
-        >>> n.offset
-        1.0
-        >>> b.offset
-        2.0
-        >>> n.groups[0] = "bassoon"
-        >>> ("flute" in n.groups, "flute" in b.groups)
-        (False, True)
-        '''
-        myCopy = copy.deepcopy(self)
-        return myCopy
+#     def deepcopy(self):
+#         '''
+#         Return a deep copy of an object with no reference to the source.
+#         The parent is not deep copied, nor are references within location
+# 
+#         >>> from music21 import note, duration
+#         >>> n = note.Note('A')
+#         >>> n.offset = 1.0 #duration.Duration("quarter")
+#         >>> n.groups.append("flute")
+#         >>> n.groups
+#         ['flute']
+# 
+#         >>> b = n.deepcopy()
+#         >>> b.offset = 2.0 #duration.Duration("half")
+#         
+#         >>> n is b
+#         False
+#         >>> n.accidental = "-"
+#         >>> b.name
+#         'A'
+#         >>> n.offset
+#         1.0
+#         >>> b.offset
+#         2.0
+#         >>> n.groups[0] = "bassoon"
+#         >>> ("flute" in n.groups, "flute" in b.groups)
+#         (False, True)
+#         '''
+#         myCopy = copy.deepcopy(self)
+#         return myCopy
     
-    def _deepcopy(self, exclude=[]):
+
+    def deepcopy(self):
+        return copy.deepcopy(self)
+
+    def __deepcopy__(self, memo=None):
         '''
-        exclude permits specififying specific attributes to note copy.
+        memo=None is the default as specified in copy.py
 
         Problem: if an attribute is defined with an understscore (_priority) but
-        is made available through a property priority, using dir(self) results   
-        in the copy happening twice. Thus, __dict__.keys() is used.
+        is also made available through a property (e.g. priority)  using dir(self) results in the copy happening twice. Thus, __dict__.keys() is used.
 
         >>> from music21 import note, duration
         >>> n = note.Note('A')
@@ -577,27 +586,26 @@ class Music21Object(object):
         #for name in dir(self):
         for name in self.__dict__.keys():
 
-            if name.startswith('__') or name in exclude:
+            if name.startswith('__'):
                 continue
            
             part = getattr(self, name)
             
             # attributes that require special handling
             if name == '_currentParent':
-                environLocal.printDebug(['creating parent reference'])
-                newValue = self.parent # keep a reference, not a copy
-            # assume we can copy everything else
-            elif hasattr(part, 'deepcopy'):
-                #environLocal.printDebug(['using deepcopy method of object:',
-                #   self, name, part])
-                newValue = part.deepcopy()
-            else: # have to use copy.deepcopy   
-                #environLocal.printDebug(['forced to use copy.deepcopy:',
-                #    self, name, part])
+                #environLocal.printDebug(['creating parent reference'])
+                newValue = self.parent # keep a reference, not a deepcopy
+                setattr(new, name, newValue)
+            # this is an error check, particularly for object that inherit
+            # this object and place a Stream as an attribute
+            elif hasattr(part, '_elements'):
+                environLocal.printDebug(['found stream in dict keys', self,
+                    part, name])
+                raise StreamException('streams as attributes requires special handling')
+            else: # use copy.deepcopy, will call __deepcopy__ if available
                 newValue = copy.deepcopy(part)
-
-            #Note that setattr() will call the set method of a named property.
-            setattr(new, name, newValue)
+                #setattr() will call the set method of a named property.
+                setattr(new, name, newValue)
                 
         return new
 
@@ -663,7 +671,13 @@ class Music21Object(object):
     parent = property(_getParent, _setParent)
 
     def _getOffset(self):
-        if self.parent is not None:
+        '''
+
+        '''
+        #there is a problem if a new parent is being set and no offsets have 
+        # been provided for that parent; when self.offset is called, 
+        # the first case here would match
+        if self.parent != None and self.parent in self.locations.getSites():
             return self.locations.getOffsetBySite(self.parent)
         elif self.disconnectedOffset is not None:
             return self.disconnectedOffset

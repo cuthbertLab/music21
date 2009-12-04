@@ -115,10 +115,14 @@ class Stream(music21.Music21Object):
         # this should have a public attribute/property self.elements
         self._elements = []
         self._unlinkedDuration = None
+
+        # this does not seem to be needed any more:
         self.obj = None
 
         self.isSorted = True
         self.isFlat = True  ## does it have no embedded elements
+
+        # seems that this hsould be named with a leading lower case?
         self.FlattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
         
         self._cache = common.defHash()
@@ -398,6 +402,67 @@ class Stream(music21.Music21Object):
         return match
 
 
+    def deepcopy(self):
+        return copy.deepcopy(self)
+
+    def __deepcopy__(self, memo=None):
+        '''This produces a new, independent object.
+        '''
+        #environLocal.printDebug(['Stream calling __deepcopy__', self])
+
+        new = self.__class__()
+        old = self
+        for name in self.__dict__.keys():
+
+            if name.startswith('__'):
+                continue
+           
+            part = getattr(self, name)
+                    
+            # all subclasses of Music21Object that define their own
+            # __deepcopy__ methods must be sure to not try to copy parent
+            if name == '_currentParent':
+                newValue = self.parent # keep a reference, not a deepcopy
+                setattr(new, name, newValue)
+            # attributes that require special handling
+            elif name == 'FlattenedRepresentationOf':
+                # keep a reference, not a deepcopy
+                newValue = self.FlattenedRepresentationOf
+                setattr(new, name, newValue)
+            elif name == '_cache':
+                continue # skip for now
+            elif name == '_elements':
+                # must manually add elements to 
+                for e in self._elements: 
+                    # temp for backwards compat
+                    # should not use on Streams as memo dict is not passed
+                    if hasattr(e, 'deepcopy') and not isinstance(e, Stream): 
+                        newElement = e.deepcopy()
+                    else: # this will work for all with __deepcopy___
+                        newElement = copy.deepcopy(e)
+                    # get the old offset from the parent Stream     
+                    # user here to provide new offset
+                    new.insertAtOffset(e.getOffsetBySite(old), newElement)
+                # the elements, formerly had their stream as parent     
+                # they will still have that site in locations
+                # need to set new stream as parent 
+                
+            elif isinstance(part, Stream):
+                environLocal.printDebug(['found stream in dict keys', self,
+                    part, name])
+                raise StreamException('streams as attributes requires special handling')
+
+            else: # use copy.deepcopy   
+                #environLocal.printDebug(['forced to use copy.deepcopy:',
+                #    self, name, part])
+                newValue = copy.deepcopy(part)
+                #setattr() will call the set method of a named property.
+                setattr(new, name, newValue)
+
+                
+        return new
+
+
 
 #    def __add__(self, other):
 #        '''
@@ -474,7 +539,9 @@ class Stream(music21.Music21Object):
         >>> a._getHighestOffset()
         32.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        # if not an element, embed
+        if not isinstance(item, music21.Music21Object): 
+            environLocal.printDebug(['insertAtOffset called with non Music21Object', item])
             element = Element(item)
         else:
             element = item
@@ -780,7 +847,8 @@ class Stream(music21.Music21Object):
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
 
-        ### appendedAlready fixes bug where if an element matches two classes it was appendedTwice
+        # appendedAlready fixes bug where if an element matches two 
+        # classes it was appendedTwice
         for myEl in self:
             appendedAlready = False
             for myCl in classFilterList:
@@ -788,9 +856,14 @@ class Stream(music21.Music21Object):
                     appendedAlready = True
                     if unpackElement and hasattr(myEl, "obj"):
                         found.append(myEl.obj)
-                    else:
+                    elif not isinstance(found, Stream):
                         found.append(myEl)
-                
+                    else:
+                        # using append here on a non list adds elements to a 
+                        # new stream without offsets in locations. thus
+                        # all offset information is lost. using
+                        # insertAtOffset fixes the problem
+                        found.insertAtOffset(myEl.getOffsetBySite(self), myEl)
         return found
 
 
@@ -1024,6 +1097,7 @@ class Stream(music21.Music21Object):
         nearestTrailSpan = offset # start with max time
         for element in self:
             span = offset - element.offset
+            #environLocal.printDebug(['element span check', span])
             if span < 0: # the element is after this offset
                 continue
             elif span == 0: 
@@ -1035,6 +1109,7 @@ class Stream(music21.Music21Object):
                     nearestTrailSpan = span
                 else:
                     continue
+        #environLocal.printDebug(['element candidates', candidates])
         if len(candidates) > 0:
             candidates.sort()
             return candidates[0][1]
@@ -1519,13 +1594,14 @@ class Stream(music21.Music21Object):
         useSelf = False
         if not useSelf: # make a copy
             srcObj = self.deepcopy()
-        else:
+        else: # this is not tested
             srcObj = self
 
     
         # may need to look in parent if no time signatures are found
         if meterStream == None:
             meterStream = srcObj.getTimeSignatures()
+
         # get a clef and for the entire stream
         clefObj = srcObj.bestClef()
     
@@ -1568,6 +1644,7 @@ class Stream(music21.Music21Object):
             # get active time signature at this offset
             # make a copy and it to the meter
             m.timeSignature = meterStream.getElementAtOrBefore(o).deepcopy()
+            #environLocal.printDebug(['assigned time sig', m.timeSignature])
             m.clef = clefObj
     
             #environLocal.printDebug([measureCount, o, oMax, m.timeSignature,
@@ -1741,7 +1818,7 @@ class Stream(music21.Music21Object):
             # seems like should be able to use m.duration.quarterLengths
             mStart, mEnd = 0, m.timeSignature.barDuration.quarterLength
             for e in m:
-                environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
+                #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
 
                 if hasattr(e, 'duration') and e.duration != None:
                     # check to see if duration is within Measure
@@ -2052,7 +2129,9 @@ class Stream(music21.Music21Object):
     semiFlat = property(_getSemiFlat)
         
     def _getFlatOrSemiFlat(self, retainContainers):
+        # this copy will have a shared locations object
         newStream = self.copy()
+
         newStream._elements = []
         newStream._elementsChanged()
 
@@ -2077,7 +2156,8 @@ class Stream(music21.Music21Object):
                     newStream.insertAtOffset(newOffset, subEl)
             
             else:
-                newStream.insertAtOffset(myEl.locations.getOffsetBySite(self), myEl)
+                newStream.insertAtOffset(
+                    myEl.locations.getOffsetBySite(self), myEl)
 
         newStream.isFlat = True
         newStream.FlattenedRepresentationOf = self #common.wrapWeakref(self)
@@ -3536,10 +3616,8 @@ class TestExternal(unittest.TestCase):
         s.show()
 
 
-    def xtestBeamsStream(self):
+    def testBeamsStream(self):
         '''A test of beams applied to different time signatures. 
-
-        This will cause an infinite loop if getinstrument is recursive
         '''
         q = Stream()
         r = Stream()
@@ -3656,6 +3734,47 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sf1), 4)
         assert(sf1[1] is n2)
         
+
+    def testParentCopiedStreams(self):
+        srcStream = Stream()
+        srcStream.insertAtOffset(3, note.Note())
+        # the note's parent is srcStream now
+        self.assertEqual(srcStream[0].parent, srcStream)
+
+        midStream = Stream()
+        for x in range(2):
+            srcNew = srcStream.deepcopy()
+#             for n in srcNew:
+#                 offset = n.getOffsetBySite(srcStream)
+
+            #got = srcNew[0].getOffsetBySite(srcStream)
+
+            #for n in srcNew: pass
+
+            srcNew.offset = x * 10 
+            midStream.append(srcNew)
+            self.assertEqual(srcNew.offset, x * 10)
+
+        # no offset is set yet
+        self.assertEqual(midStream.offset, 0)
+
+        # component streams have offsets
+        self.assertEqual(midStream[0].getOffsetBySite(midStream), 0)
+        self.assertEqual(midStream[1].getOffsetBySite(midStream), 10.0)
+
+        # component notes still have a location set to srcStream
+        self.assertEqual(midStream[1][0].getOffsetBySite(srcStream), 3.0)
+
+        # component notes still have a location set to midStream[1]
+        self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)        
+
+        # no locations for midstream
+        self.assertEqual(len(midStream.locations), 0)
+        
+        #environLocal.printDebug(['srcStream', srcStream])
+        #environLocal.printDebug(['midStream', midStream])
+        x = midStream.flat
+
         
     def testStreamRecursion(self):
         srcStream = Stream()
@@ -3677,6 +3796,7 @@ class Test(unittest.TestCase):
             midStream.append(srcNew)
 
         self.assertEqual(len(midStream), 4)
+        environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
 
@@ -4031,9 +4151,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestGetInstrumentManual(self):
-        '''Temporarily disabled while bypassing getInstrument issue
-        '''
+    def testGetInstrumentManual(self):
         from music21 import corpus, converter
 
 
@@ -4072,25 +4190,23 @@ class Test(unittest.TestCase):
         # test mx generation of score
         mx = s.mx
 
-    def xtestMeasureAndTieCreation(self):
+    def testMeasureAndTieCreation(self):
         '''A test of the automatic partitioning of notes in a measure and the creation of ties.
         '''
 
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatCopy(n, range(0,120,3))
-        #a.show() # default time signature used
-        
+        a.repeatCopy(n, range(0,120,3))        
         a.insertAtOffset( 0, meter.TimeSignature("5/4")  )
-#         a.insertAtOffset(10, meter.TimeSignature("2/4")  )
-#         a.insertAtOffset( 3, meter.TimeSignature("3/16") )
-#         a.insertAtOffset(20, meter.TimeSignature("9/8")  )
-#         a.insertAtOffset(40, meter.TimeSignature("10/4") )
+        a.insertAtOffset(10, meter.TimeSignature("2/4")  )
+        a.insertAtOffset( 3, meter.TimeSignature("3/16") )
+        a.insertAtOffset(20, meter.TimeSignature("9/8")  )
+        a.insertAtOffset(40, meter.TimeSignature("10/4") )
 
         mx = a.mx
 
-    def xtestStreamCopy(self):
+    def testStreamCopy(self):
         '''Test copying a stream
         '''
         from music21 import corpus, converter
@@ -4118,12 +4234,13 @@ class Test(unittest.TestCase):
         # copying the whole: this works
         w = s.deepcopy()
 
+        post = Stream()
         # copying while looping: this gets increasingly slow
         for aElement in s:
             environLocal.printDebug(['copying and inserting an element',
-                                     aElement])
+                                     aElement, len(aElement.locations)])
             bElement = aElement.deepcopy()
-            s.insertAtOffset(aElement.offset, bElement)
+            post.insertAtOffset(aElement.offset, bElement)
             
 
     def testIteration(self):
@@ -4160,12 +4277,36 @@ class Test(unittest.TestCase):
             counter += 1
 
 
+    def testGetTimeSignatures(self):
+        #getTimeSignatures
+
+        n = note.Note()        
+        n.quarterLength = 3
+        a = Stream()
+        a.insertAtOffset( 0, meter.TimeSignature("5/4")  )
+        a.insertAtOffset(10, meter.TimeSignature("2/4")  )
+        a.insertAtOffset( 3, meter.TimeSignature("3/16") )
+        a.insertAtOffset(20, meter.TimeSignature("9/8")  )
+        a.insertAtOffset(40, meter.TimeSignature("10/4") )
+
+        offsets = [x.offset for x in a]
+        self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
+
+        a.repeatCopy(n, range(0,120,3))        
+
+        b = a.getTimeSignatures()
+        self.assertEqual(len(b), 5)
+        self.assertEqual(b[0].numerator, 5)
+        self.assertEqual(b[4].numerator, 10)
+
+        self.assertEqual(b[4].parent, b)
+
+        # none of the offsets are being copied 
+        offsets = [x.offset for x in b]
+        self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
 
-
-
-
-
+  
 
 if __name__ == "__main__":
     import copy

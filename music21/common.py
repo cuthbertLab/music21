@@ -888,13 +888,18 @@ class Timer(object):
 
 
 #-------------------------------------------------------------------------------
-class TestMockAttributes(object):
+class TestMock(object):
     '''A test object with attributes, methods, and properties
     '''
     def __init__(self):
         self.attr1 = 1
         self.attr2 = 2
         self.attr3 = 3
+
+        from music21 import environment
+        _MOD = 'music21.common.TestMock'
+        self._environLocal = environment.Environment(_MOD)
+       
 
     def method1(self):
         return 3
@@ -908,6 +913,27 @@ class TestMockAttributes(object):
     def _set1(self, value):
         self.attr3 = value
     
+    def deepcopy(self):
+        return copy.deepcopy(self)
+
+    def __deepcopy__(self, memo=None):
+        # None is the empty memp default
+        #self._environLocal.printDebug(['__deepcopy__ called, got memo', 
+        #                              self, memo])
+        new = self.__class__()
+        for name in self.__dict__.keys():
+            if name.startswith('_'): # avoid environemnt
+                continue
+            part = getattr(self, name)
+            newValue = copy.deepcopy(part, memo)
+            setattr(new, name, newValue)
+        return new
+
+    def __copy__(self, memo):
+        self.environLocal.printDebug(['copy called'])
+        return copy.copy(self, memo)
+
+
     property1 = property(_get1, _set1)
 
     property2 = property(_get1, _set1)
@@ -929,7 +955,7 @@ class Test(unittest.TestCase):
 
 
     def testGettingAttributes(self):
-        a = TestMockAttributes()
+        a = TestMock()
         # dir() returns all names, including properties, attributes, methods
         aDir = dir(a)
         self.assertEqual(('_get1' in aDir), True)
@@ -953,6 +979,31 @@ class Test(unittest.TestCase):
 
         methods, attributes, properties = dirPartitioned(a)
         self.assertEqual(('attr1' in attributes), True)
+
+
+
+    def testDeepcopy(self):
+        a = TestMock()
+        b = TestMock()
+        a.attr1 = b
+        a.attr2 = b
+        # test first by using copy.deepcopy
+        c = copy.deepcopy(a)
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(a.attr1, c.attr1)
+        self.assertNotEqual(a.attr2, c.attr2)
+        # but, the concept of the same object w/ two references is still there
+        self.assertEqual(a.attr1, a.attr2)
+        self.assertEqual(c.attr1, c.attr2)
+
+        # test second by using the .deepcopy() method
+        c = a.deepcopy()
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(a.attr1, c.attr1)
+        self.assertNotEqual(a.attr2, c.attr2)
+        self.assertEqual(a.attr1, a.attr2)
+        self.assertEqual(c.attr1, c.attr2)
+        
 
 
 #-------------------------------------------------------------------------------
