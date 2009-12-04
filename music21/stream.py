@@ -19,7 +19,7 @@ import sys
 
 
 import music21 ## needed to properly do isinstance checking
-from music21 import Element
+#from music21 import Element
 from music21 import common
 from music21 import clef
 from music21 import chord
@@ -123,7 +123,7 @@ class Stream(music21.Music21Object):
         self.isFlat = True  ## does it have no embedded elements
 
         # seems that this hsould be named with a leading lower case?
-        self.FlattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
+        self.flattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
         
         self._cache = common.defHash()
         # self._index = 0
@@ -422,9 +422,9 @@ class Stream(music21.Music21Object):
                 newValue = self.parent # keep a reference, not a deepcopy
                 setattr(new, name, newValue)
             # attributes that require special handling
-            elif name == 'FlattenedRepresentationOf':
+            elif name == 'flattenedRepresentationOf':
                 # keep a reference, not a deepcopy
-                newValue = self.FlattenedRepresentationOf
+                newValue = self.flattenedRepresentationOf
                 setattr(new, name, newValue)
             elif name == '_cache':
                 continue # skip for now
@@ -524,7 +524,7 @@ class Stream(music21.Music21Object):
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insertAtOffset called with non Music21Object', item])
-            element = Element(item)
+            element = music21.Element(item)
         else:
             element = item
 
@@ -544,7 +544,7 @@ class Stream(music21.Music21Object):
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insertAtOffset called with non Music21Object', item])
-            element = Element(item)
+            element = music21.Element(item)
         else:
             element = item
         offset = float(offset)
@@ -617,7 +617,7 @@ class Stream(music21.Music21Object):
         for item in others:
             # if not an element, embed
             if not isinstance(item, music21.Music21Object): 
-                element = Element(item)
+                element = music21.Element(item)
             else:
                 element = item
 
@@ -1397,7 +1397,8 @@ class Stream(music21.Music21Object):
         20.0
         '''
         for e in self:
-            e.locations.setOffsetBySite(self, e.locations.getOffsetBySite(self) + offset)
+            e.locations.setOffsetBySite(self, 
+                e.locations.getOffsetBySite(self) + offset)
         self._elementsChanged() 
         
     def transferOffsetToElements(self):
@@ -1463,7 +1464,7 @@ class Stream(music21.Music21Object):
         '''
         if not isinstance(item, music21.Music21Object): 
             # if not an element, embed
-            element = Element(item)
+            element = music21.Element(item)
         else:
             element = item
 
@@ -1731,7 +1732,7 @@ class Stream(music21.Music21Object):
         >>> b.lowestOffset
         0.0
         '''
-        #environLocal.printDebug(['calling makeRests'])
+        environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
             returnObj = self.deepcopy()
         else:
@@ -1742,7 +1743,7 @@ class Stream(music21.Music21Object):
         if refStream != None:
             oLowTarget = refStream.lowestOffset
             oHighTarget = refStream.highestTime
-            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget])
+            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStream)])
         else:
             oLowTarget = 0
             oHighTarget = returnObj.highestTime
@@ -2182,7 +2183,7 @@ class Stream(music21.Music21Object):
                     myEl.locations.getOffsetBySite(self), myEl)
 
         newStream.isFlat = True
-        newStream.FlattenedRepresentationOf = self #common.wrapWeakref(self)
+        newStream.flattenedRepresentationOf = self #common.wrapWeakref(self)
         return newStream
     
 
@@ -2566,6 +2567,8 @@ class Stream(music21.Music21Object):
                 if ht > highestTime:
                     highestTime = ht
                 midStream.append(obj)
+
+            environLocal.printDebug(['highest time found', highestTime])
 
             refStream = Stream()
             refStream.insertAtOffset(0, None) # placeholder at 0
@@ -4342,6 +4345,22 @@ class Test(unittest.TestCase):
 
 
   
+    def testElements(self):
+        '''Test basic Elements wrapping non music21 objects
+        '''
+        a = Stream()
+        a.insertAtOffset(50, None)
+        self.assertEqual(len(a), 1)
+
+        # there are two locations, default and the one just added
+        self.assertEqual(len(a[0].locations), 2)
+        # this works
+        self.assertEqual(a[0].locations.getOffsetByIndex(-1), 50.0)
+
+        self.assertEqual(a[0].locations.getSiteByIndex(-1), a)
+        self.assertEqual(a[0].getOffsetBySite(a), 50.0)
+        self.assertEqual(a[0].offset, 50.0)
+
 
 if __name__ == "__main__":
     import copy

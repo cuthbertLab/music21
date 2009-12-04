@@ -61,7 +61,9 @@ class KeySignature(object):
 
     def strSharpsFlats(self):
         ns = self.numberSharps
-        if ns > 1:
+        if ns == None:
+            return 'None'
+        elif ns > 1:
             return "%s sharps" % str(ns)
         elif ns == 1:
             return "1 sharp"

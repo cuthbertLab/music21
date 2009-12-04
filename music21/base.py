@@ -35,6 +35,8 @@ _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
 
+WEAKREFACTIVE = True
+
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
     pass
@@ -182,8 +184,9 @@ class Locations(object):
         '''
         delList = []
         for i in range(len(self._coordinates)):
-            #if common.unwrapWeakref(self._coordinates[i]['site']) == None:
-            if self._coordinates[i]['site'] == None:        
+            if self._coordinates[i]['site'] == None:
+                continue
+            if common.unwrapWeakref(self._coordinates[i]['site']) == None:
                 delList.append(i)
         delList.reverse() # go in reverse from largest to maintain positions
         for i in delList:
@@ -198,8 +201,17 @@ class Locations(object):
         '''Get parents; unwrap from weakrefs
         '''
         #environLocal.printDebug([self._coordinates])
-        return [x['site'] for x in self._coordinates]
-        #return [common.unwrapWeakref(x['site']) for x in self._coordinates]   
+        if WEAKREFACTIVE:
+            post = []
+            for dict in self._coordinates:
+                if dict['site'] == None: # leave None alone
+                    post.append(dict['site'])
+                else:
+                    post.append(common.unwrapWeakref(dict['site']))
+            return post
+        else:
+            return [x['site'] for x in self._coordinates]
+
 
     def getOffsets(self):
         '''Return a list of all offsets.
@@ -223,10 +235,6 @@ class Locations(object):
 
         If site already exists, this will update that entry. 
 
-        Might check/force site to be a Stream?
-
-        Might automatically create a weakref of site?
-
         >>> class Mock(object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
@@ -247,8 +255,14 @@ class Locations(object):
             # order is the same as in _coordinates
             i = sites.index(site)
         else:
-#            siteRef = common.wrapWeakref(site)
-            siteRef = site
+            if WEAKREFACTIVE:
+                if site == None: # leave None alone
+                    siteRef = site
+                else:
+                    siteRef = common.wrapWeakref(site)
+            else:
+                siteRef = site
+
             self._coordinates.append({}) # create new
             i = -1 #now the last
             # site here is wrapped in weakref
@@ -397,14 +411,14 @@ class Locations(object):
             if self._coordinates[i]['offset'] == offset:
                 match = self._coordinates[i]['site']
                 break
-        if match != None:
-#            if not common.isWeakref(match):
-#                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
-#            return common.unwrapWeakref(match)
-            return match
+        if WEAKREFACTIVE:
+            if match == None:
+                return match
+            if not common.isWeakref(match):
+                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
+            return common.unwrapWeakref(match)
         else:
-            # will be None if not match; could alternatively exception
-            return match 
+            return match
 
 
     def getSiteByIndex(self, index):
@@ -420,13 +434,14 @@ class Locations(object):
         True
         '''
         siteRef = self._coordinates[index]['site']
-        return siteRef
-#        if siteRef == None: # let None parents pass
-#            return siteRef
-#        elif not common.isWeakref(siteRef):
-#            raise LocationsException('parent on _coordinates is not a weakref: %s' % siteRef)
-#        else:
-#            return common.unwrapWeakref(siteRef)
+        if WEAKREFACTIVE:
+            if siteRef == None: # let None parents pass
+                return siteRef
+            if not common.isWeakref(siteRef):
+                raise LocationsException('parent on _coordinates is not a weakref: %s' % siteRef)
+            return common.unwrapWeakref(siteRef)
+        else:
+            return siteRef
 
 
 
@@ -460,19 +475,10 @@ class Music21Object(object):
     '''
 
     _duration = None
-    # while testing .locations
-    #_parent = None
     contexts = None
-
     id = None
     _priority = 0
     _overriddenLily = None
-
-    # store offset if assigned before any Location entry is set
-    # an object without a parent, when assigned an offset, stores its offset 
-    # here
-    #disconnectedOffset = 0.0 
-
     # None is stored as the internal location of an obj w/o a parent
     _currentParent = None
 
@@ -624,11 +630,9 @@ class Music21Object(object):
         >>> a.offset = 30
         >>> a.getOffsetBySite(None)
         30.0
-        >>> a.getOffsetBySite(a)
-        30.0
         '''
-        if site == self:
-            site = None # shortcut
+#         if site == self:
+#             site = None # shortcut
         return self.locations.getOffsetBySite(site)
 
     #---------------------------------------------------------------------------
@@ -636,7 +640,13 @@ class Music21Object(object):
 
     def _getParent(self):
         # can be None
-        return self._currentParent
+        if WEAKREFACTIVE:
+            if self._currentParent == None: #leave None
+                return self._currentParent
+            else:
+                return common.unwrapWeakref(self._currentParent)
+        else:
+            return self._currentParent
 
 #         if self._currentParent is not None:
 #             return self._currentParent
@@ -645,19 +655,23 @@ class Music21Object(object):
 #         else: 
 #             return self.locations.getSiteByIndex(-1) 
 
-#         return common.unwrapWeakref(self._parent)
     
     def _setParent(self, site):
-        if site == self:
-            site = None # shortcut translation
+#         if site == self:
+#             site = None # shortcut translation
 
         if site is not None and \
             site not in self.locations.getSites():
             self.locations.add(self.offset, site) 
         
-        self._currentParent = site
+        if WEAKREFACTIVE:
+            if site == None: # leave None alone
+                self._currentParent = site
+            else:
+                self._currentParent = common.wrapWeakref(site)
+        else:
+            self._currentParent = site
 
-#         self._parent = common.wrapWeakref(value)
 
     parent = property(_getParent, _setParent)
 
@@ -799,6 +813,8 @@ class Music21Object(object):
         '''
         environLocal.launch(format, self.write(format))
 
+
+
 #-------------------------------------------------------------------------------
 class Element(Music21Object):
     '''
@@ -820,8 +836,6 @@ class Element(Music21Object):
         Music21Object.__init__(self)
         self.obj = obj # object stored here        
         self._unlinkedDuration = None
-
-
 
     def isClass(self, className):
         '''
@@ -845,7 +859,6 @@ class Element(Music21Object):
             return True
         else:
             return False
-
 
     def __copy__(self):
         '''
@@ -1008,8 +1021,6 @@ class Element(Music21Object):
 
     offset = property(Music21Object._getOffset, Music21Object._setOffset)
 
-
-
     #---------------------------------------------------------------------------
     def __repr__(self):
         shortObj = (str(self.obj))[0:30]
@@ -1071,25 +1082,15 @@ class Element(Music21Object):
         return not self.__eq__(other)
 
 
-
-#     def __getattribute__(self, name):
-#         try: # call the base class getattribute to avoid recursion
-#             environLocal.printDebug('getting attribute from Element')
-#             return object.__getattribute__(self, name)
-#         except AttributeError: # look in the object
-#             # this only get attributes; it will not get properties
-#             #return self.obj.__dict__[name]
-#             # this get properties
-#             environLocal.printDebug('getting attribute from self.obj')
-#             return self.obj.__getattribute__(name)
-
     def __setattr__(self, name, value):
+        #environLocal.printDebug(['calling __setattr__ of Element', name, value])
+
         if name in self.__dict__:  # if in the Element already, set that first
             object.__setattr__(self, name, value)
         
         # if not, change the attribute in the stored object
         storedobj = object.__getattribute__(self, "obj")
-        if name not in ['offset', '_offset', 'disconnectedOffset'] and \
+        if name not in ['offset', '_offset', '_currentParent'] and \
             storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
         # unless neither has the attribute, in which case add it to the Element
