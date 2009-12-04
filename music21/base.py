@@ -304,9 +304,6 @@ class Locations(object):
         Traceback (most recent call last):
         LocationsException: ...
         '''
-        # permit self to provided as site: translates into none
-        if site == self:
-            site = None
 
         sites = self.getSites()
         if not site in sites: 
@@ -684,6 +681,9 @@ class Music21Object(object):
 #         return common.unwrapWeakref(self._parent)
     
     def _setParent(self, site):
+        if site == self:
+            site = None # shortcut translation
+
         if site is not None and \
             site not in self.locations.getSites():
             self.locations.add(self.offset, site) 
@@ -953,7 +953,6 @@ class Element(Music21Object):
         new = self.copy()
         # this object needs a new locations object
         new.locations = copy.deepcopy(self.locations)
-
 
         if hasattr(self.obj, 'deepcopy'):
             new.obj = self.obj.deepcopy()
