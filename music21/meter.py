@@ -292,15 +292,6 @@ class MeterTerminal(object):
             return False
 
 
-    def deepcopy(self):
-        '''Return a complete copy. Here, copy and deepcopy should be the same.
-        >>> a = MeterTerminal('2/4')
-        >>> b = a.deepcopy()
-        '''
-        return copy.deepcopy(self)
-  
-
-
     #---------------------------------------------------------------------------
     def subdivideByCount(self, countRequest=None):
         '''retrun a MeterSequence
@@ -851,7 +842,7 @@ class MeterSequence(MeterTerminal):
 
             self._clearPartition()
             for mt in other:
-                self._addTerminal(mt.deepcopy())
+                self._addTerminal(copy.deepcopy(mt))
         else:
             raise MeterException('Cannot set partition for unequal MeterSequences')
 
@@ -1805,6 +1796,27 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         pass
+
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        import sys, types, copy
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            name = getattr(sys.modules[self.__module__], part)
+            if callable(name) and not isinstance(name, types.FunctionType):
+                try: # see if obj can be made w/ args
+                    obj = name()
+                except TypeError:
+                    continue
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+
 
     def testMeterSubdivision(self):
         a = MeterSequence()

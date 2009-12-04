@@ -1,3 +1,15 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         voiceLeading.py
+# Purpose:      music21 classes for voice leading
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    (c) 2009 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import unittest, doctest
 
 import music21
@@ -6,6 +18,7 @@ from music21 import interval
 from music21.note import Note
 from music21.interval import Interval
 
+#-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(music21.Music21Object):
     '''An object consisting of four pitches: v1n1, v1n2, v2n1, v2n2
     where v1n1 moves to v1n2 at the same time as 
@@ -227,12 +240,34 @@ class VoiceLeadingQuartet(music21.Music21Object):
 class VoiceLeadingException(Exception):
     pass
 
-###### test routines
+
+
+
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-    
+ 
+
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        import sys, types, copy
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            obj = getattr(sys.modules[self.__module__], part)
+            if callable(obj) and not isinstance(obj, types.FunctionType):
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+
+   
     def unifiedTest(self):
         C4 = Note(); C4.name = "C"
         D4 = Note(); D4.name = "D"

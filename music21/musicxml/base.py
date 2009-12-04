@@ -2249,7 +2249,7 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'attributes':
             self._measureObj.attributesObj = self._attributesObj
             # update last found
-            self._attributesObjLast = self._attributesObj.deepcopy()
+            self._attributesObjLast = copy.deepcopy(self._attributesObj)
             # remove current, as loaded into measure
             self._attributesObj = None
 
@@ -2491,7 +2491,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'time':
             self._attributesObj.timeList.append(self._timeObj)
-            self._timeObjLast = self._timeObj.deepcopy()
+            self._timeObjLast = copy.deepcopy(self._timeObj)
             self._timeObj = None
 
         elif name == 'staves':
@@ -2806,6 +2806,27 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         pass
+
+
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        import sys, types, copy
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            name = getattr(sys.modules[self.__module__], part)
+            if callable(name) and not isinstance(name, types.FunctionType):
+                try: # see if obj can be made w/ args
+                    obj = name()
+                except TypeError:
+                    continue
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
 
     def testTagLib(self):
         t = TagLib()

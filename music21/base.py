@@ -136,9 +136,6 @@ class Locations(object):
         '''
         return len(self._coordinates)
 
-    def deepcopy(self):
-        return copy.deepcopy(self)
-
     def __deepcopy__(self, memo=None):
         '''This produces a new, independent locations object.
         This does not, however, deepcopy site references stored therein
@@ -149,7 +146,7 @@ class Locations(object):
         >>> aLocations = Locations()
         >>> aLocations.add(843, aSite)
         >>> aLocations.add(12, bSite) # can add at same offset or different
-        >>> bLocations = aLocations.deepcopy()
+        >>> bLocations = copy.deepcopy(aLocations)
         >>> aLocations != bLocations
         True
         >>> aLocations.getSiteByIndex(-1) == bLocations.getSiteByIndex(-1)      
@@ -519,39 +516,9 @@ class Music21Object(object):
 
     def copy(self):
         '''Return a shallow copy, or a linked reference to the source.'''
+        # NOTE: may need to create a new Locations object even in the shallow 
+        # copy
         return copy.copy(self)
-    
-#     def deepcopy(self):
-#         '''
-#         Return a deep copy of an object with no reference to the source.
-#         The parent is not deep copied, nor are references within location
-# 
-#         >>> from music21 import note, duration
-#         >>> n = note.Note('A')
-#         >>> n.offset = 1.0 #duration.Duration("quarter")
-#         >>> n.groups.append("flute")
-#         >>> n.groups
-#         ['flute']
-# 
-#         >>> b = n.deepcopy()
-#         >>> b.offset = 2.0 #duration.Duration("half")
-#         
-#         >>> n is b
-#         False
-#         >>> n.accidental = "-"
-#         >>> b.name
-#         'A'
-#         >>> n.offset
-#         1.0
-#         >>> b.offset
-#         2.0
-#         >>> n.groups[0] = "bassoon"
-#         >>> ("flute" in n.groups, "flute" in b.groups)
-#         (False, True)
-#         '''
-#         myCopy = copy.deepcopy(self)
-#         return myCopy
-    
 
     def deepcopy(self):
         return copy.deepcopy(self)
@@ -879,7 +846,8 @@ class Element(Music21Object):
         else:
             return False
 
-    def copy(self):
+
+    def __copy__(self):
         '''
         Makes a copy of this element with a reference
         to the SAME object but with unlinked offset, priority
@@ -909,18 +877,24 @@ class Element(Music21Object):
 #         >>> ("flute" in a.groups, "flute" in b.groups)
 #         (False, True)
 
-        newEl = copy.copy(self)
-        
+        new = self.__class__(self.obj)
+        #for name in dir(self):
+        for name in self.__dict__.keys():
+            if name.startswith('__'):
+                continue
+            part = getattr(self, name)
+            newValue = part # just provide a reference
+            setattr(new, name, newValue)
+
         # it is assumed that we need new objects for groups, contexts
         # and locations in order to position / group this object
         # independently
-        newEl.groups = copy.deepcopy(self.groups)
-        newEl.contexts = copy.deepcopy(self.contexts)
-        newEl.locations = copy.deepcopy(self.locations)
+        new.groups = copy.deepcopy(self.groups)
+        new.contexts = copy.deepcopy(self.contexts)
+        new.locations = copy.deepcopy(self.locations)
+        return new
 
-        return newEl
-
-    def deepcopy(self):
+    def __deepcopy__(self, memo=None):
         '''
         similar to copy but also does a deepcopy of
         the object as well.
@@ -950,14 +924,10 @@ class Element(Music21Object):
         >>> ("flute" in a.groups, "flute" in b.groups)
         (False, True)
         '''
-        new = self.copy()
+        new = self.__copy__()
         # this object needs a new locations object
         new.locations = copy.deepcopy(self.locations)
-
-        if hasattr(self.obj, 'deepcopy'):
-            new.obj = self.obj.deepcopy()
-        else:    
-            new.obj = copy.deepcopy(self.obj)
+        new.obj = copy.deepcopy(self.obj)
         return new
 
     #---------------------------------------------------------------------------
@@ -1204,6 +1174,25 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        import sys, types, copy
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            name = getattr(sys.modules[self.__module__], part)
+            if callable(name) and not isinstance(name, types.FunctionType):
+                try: # see if obj can be made w/ args
+                    obj = name()
+                except TypeError:
+                    continue
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
 
 
     def testObjectCreation(self):

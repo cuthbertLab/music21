@@ -11,7 +11,7 @@
 
 import copy, types, random
 import doctest, unittest
-
+import sys
 # try:
 #     import cPickle as pickleMod
 # except ImportError:
@@ -402,9 +402,6 @@ class Stream(music21.Music21Object):
         return match
 
 
-    def deepcopy(self):
-        return copy.deepcopy(self)
-
     def __deepcopy__(self, memo=None):
         '''This produces a new, independent object.
         '''
@@ -434,12 +431,8 @@ class Stream(music21.Music21Object):
             elif name == '_elements':
                 # must manually add elements to 
                 for e in self._elements: 
-                    # temp for backwards compat
-                    # should not use on Streams as memo dict is not passed
-                    if hasattr(e, 'deepcopy') and not isinstance(e, Stream): 
-                        newElement = e.deepcopy()
-                    else: # this will work for all with __deepcopy___
-                        newElement = copy.deepcopy(e)
+                    # this will work for all with __deepcopy___
+                    newElement = copy.deepcopy(e)
                     # get the old offset from the parent Stream     
                     # user here to provide new offset
                     new.insertAtOffset(e.getOffsetBySite(old), newElement)
@@ -3695,9 +3688,22 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testEquality(self):
-        pass
-        # TODO: Write; before just tested Element equality
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        for part in sys.modules[self.__module__].__dict__.keys():
+            if part.startswith('_') or part.startswith('__'):
+                continue
+            elif part in ['Test', 'TestExternal']:
+                continue
+            elif callable(part):
+                environLocal.printDebug(['testing copying on', part])
+                obj = getattr(module, part)()
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+                self.assertNotEqual(a, obj)
+                self.assertNotEqual(b, obj)
+            
     
     def testAdd(self):
         a = Stream()

@@ -178,9 +178,6 @@ class Node(object):
         
 
     #---------------------------------------------------------------------------
-    def deepcopy(self):
-        return copy.deepcopy(self)
-
 
     def _mergeSpecial(self, new, other, favorSelf):
         '''Provide handling of merging when given an object of a different class.
@@ -206,7 +203,7 @@ class Node(object):
         if not isinstance(other, Node):
             raise NodeException('can only merge with other nodes')
 
-        new = self.deepcopy()
+        new = copy.deepcopy(self)
 
         localAttr = self._publicAttributes()
         otherAttr = other._publicAttributes()
@@ -455,7 +452,25 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        import sys, types, copy
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            name = getattr(sys.modules[self.__module__], part)
+            if callable(name) and not isinstance(name, types.FunctionType):
+                try: # see if obj can be made w/ args
+                    obj = name()
+                except TypeError:
+                    continue
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
 
 
 

@@ -949,6 +949,22 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
+    def testCopyAndDeepcopy(self):
+        '''Test copyinng all objects defined in this module
+        '''
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            obj = getattr(sys.modules[self.__module__], part)
+            if callable(obj) and not isinstance(obj, types.FunctionType):
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+
+
     def testToRoman(self):
         for src, dst in [(1, 'I'), (3, 'III'), (5, 'V')]:
             self.assertEqual(dst, toRoman(src))
