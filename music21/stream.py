@@ -116,8 +116,9 @@ class Stream(music21.Music21Object):
         self._elements = []
         self._unlinkedDuration = None
 
-        # this does not seem to be needed any more:
-        self.obj = None
+        # the .obj attributes was held over from old Element model
+        # no longer needed
+        #self.obj = None
 
         self.isSorted = True
         self.isFlat = True  ## does it have no embedded elements
@@ -126,11 +127,6 @@ class Stream(music21.Music21Object):
         self.flattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
         
         self._cache = common.defHash()
-        # self._index = 0
-
-#    def clone(self):
-#        '''Element.clone should work fine...
-#        '''
 
 
     #---------------------------------------------------------------------------
