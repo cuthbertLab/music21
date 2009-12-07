@@ -2,15 +2,10 @@
 
 
 
-
 Installing Music21
 ======================================
 
-
 Music21 can be installed with a number of different methods. Choose the installation method you are most comfortable with using.
-
-
-
 
 
 Installing from Source
@@ -21,6 +16,12 @@ The music21.zip or music21.tgz distribution permits easy installation using Pyth
 To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.
 
 
+Installing from Subversion (SVN)
+--------------------------------
+
+For developers and advanced users, anonymous SVN access is available from Google Code. Enter the following command line argument or SVN commnds::
+
+    svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only
 
 
 
@@ -31,7 +32,6 @@ Installing Additional Python Components
 ---------------------------------------
 
 Additional functionality of Music21 is available with the installation of Python libraries. The following topics cover additional software used by Music21.
-
 
 
 Python Imaging Library (PIL)
@@ -54,13 +54,10 @@ http://matplotlib.sourceforge.net/
 
 
 
-
-
 Installing Additional Software Components
 ---------------------------------------
 
 Additional functionality of Music21 is available with the installation of numerous helper applications. While not essential for all applications, these tools will aid in working with Music21.
-
 
 
 
@@ -70,7 +67,6 @@ Lilypond
 Music21 can generate notation as lilypond files. Lilypond is required to render these files into graphical notation output.
 
 http://lilypond.org/
-
 
 
 

@@ -71,8 +71,7 @@ def ticksDynamics():
 
 #-------------------------------------------------------------------------------
 class ActivityMatch(object):
-
-    '''Given a stream of note, find what other parameter is active at agiven time
+    '''Given a stream of notes, find what other parameter is active at a given time
     '''
 
     def __init__(self, streamObj):

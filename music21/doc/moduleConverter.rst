@@ -48,40 +48,6 @@ Locally Defined
 
 
 
-Class ConverterException
-------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
-Class ConverterFileException
-----------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
 Class ConverterHumdrum
 ----------------------
 
@@ -160,22 +126,5 @@ Locally Defined
 
 **status()**
 
-
-
-Class PickleFilterException
----------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 

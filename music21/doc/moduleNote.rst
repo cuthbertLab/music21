@@ -52,6 +52,8 @@ Inherited from base.Music21Object
 
 **id()**
 
+**getOffsetBySite()**
+
 **deepcopy()**
 
 **copy()**
@@ -87,7 +89,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -139,23 +145,6 @@ Locally Defined
     >>> b = a.mx
     >>> b.get('charData')
     'backward hook' 
-
-
-Class BeamException
--------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 
 Class Beams
@@ -283,7 +272,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -308,6 +297,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -353,7 +344,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -414,7 +409,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -437,6 +432,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -526,7 +523,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -572,7 +573,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -597,6 +598,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -642,7 +645,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -796,23 +803,6 @@ Locally Defined
     'hello' 
 
 
-Class LyricException
---------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
 Class Note
 ----------
 
@@ -833,7 +823,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -858,6 +848,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -911,7 +903,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -982,23 +978,6 @@ Locally Defined
 
 
 
-Class NoteException
--------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
 Class Pitch
 -----------
 
@@ -1021,6 +1000,8 @@ Inherited from base.Music21Object
 
 **id()**
 
+**getOffsetBySite()**
+
 **deepcopy()**
 
 **copy()**
@@ -1033,7 +1014,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -1193,7 +1178,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -1218,6 +1203,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -1263,7 +1250,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -1324,7 +1315,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -1347,6 +1338,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -1394,7 +1387,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -1440,7 +1437,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **type**
 
@@ -1460,6 +1457,8 @@ Inherited from base.Music21Object
 
 **id()**
 
+**getOffsetBySite()**
+
 **deepcopy()**
 
 **copy()**
@@ -1472,7 +1471,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -1495,7 +1498,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -1518,6 +1521,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -1569,7 +1574,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -1604,7 +1613,7 @@ Attributes
 
 **groups**
 
-**location**
+**locations**
 
 **lyrics**
 
@@ -1629,6 +1638,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -1674,7 +1685,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 

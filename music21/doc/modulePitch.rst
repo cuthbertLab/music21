@@ -108,6 +108,8 @@ Inherited from base.Music21Object
 
 **id()**
 
+**getOffsetBySite()**
+
 **deepcopy()**
 
 **copy()**
@@ -143,7 +145,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -152,23 +158,6 @@ Locally Defined
 
 **lily**
 
-
-
-Class AccidentalException
--------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 
 Class Pitch
@@ -193,6 +182,8 @@ Inherited from base.Music21Object
 
 **id()**
 
+**getOffsetBySite()**
+
 **deepcopy()**
 
 **copy()**
@@ -205,7 +196,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -344,22 +339,5 @@ Locally Defined
     >>> a = Pitch('D-2')
     >>> a.accidental.alter
     -1.0 
-
-
-Class PitchException
---------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 

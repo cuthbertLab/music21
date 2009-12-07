@@ -5,135 +5,10 @@ Function recurseRepr()
 ----------------------
 
 
-Class Element
--------------
-
-Inherits from: base.BaseElement, object
-
-An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the Element will call In addition to the properties that all Music21Objects have, Elements also have: (5) offset   : a float or duration specifying the distance from the start of the surrounding container (if any) (6) contexts : a list of references or weakreferences for current contexts of the object (for searching after parent) (7) priority : int representing the position of an object among all objects at the same offset. 
-
-Attributes
-~~~~~~~~~~
-
-**obj**
-
-Methods
-~~~~~~~
-
-
-Locally Defined
-
-**setId()**
-
-
-**obj()**
-
-
-**isTwin()**
-
-    a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
-
-    >>> import note
-    >>> aE = Element(obj = note.Note("A-"))
-    >>> aE.id = "aflat-Note"
-    >>> aE.groups.append("out-of-range")
-    >>> aE.offset = 4.0
-    >>> aE.priority = 4
-    >>> bE = aE.copy()
-    >>> aE is bE
-    False 
-    >>> aE == bE
-    True 
-    >>> aE.isTwin(bE)
-    True 
-    >>> bE.offset = 14.0
-    >>> bE.priority = -4
-    >>> aE == bE
-    False 
-    >>> aE.isTwin(bE)
-    True 
-
-**isClass()**
-
-    Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
-
-    >>> import note
-    >>> a = Element(None)
-    >>> a.isClass(note.Note)
-    False 
-    >>> a.isClass(types.NoneType)
-    True 
-    >>> b = Element(note.Note('A4'))
-    >>> b.isClass(note.Note)
-    True 
-    >>> b.isClass(types.NoneType)
-    False 
-
-**getId()**
-
-
-**deepcopy()**
-
-    similar to copy but also does a deepcopy of the object as well. (name is all lowercase to go with copy.deepcopy convention) 
-
-    >>> from music21 import note, duration
-    >>> n = note.Note('A')
-    >>> a = Element(obj = n)
-    >>> a.offset = 1.0 # duration.Duration("quarter")
-    >>> a.groups.append("flute")
-    >>> b = a.deepcopy()
-    >>> b.offset = 2.0 # duration.Duration("half")
-    >>> a.obj is b.obj
-    False 
-    >>> a.obj.accidental = "-"
-    >>> b.obj.name
-    'A' 
-    >>> a.offset
-    1.0 
-    >>> b.offset
-    2.0 
-    >>> a.groups[0] = "bassoon"
-    >>> ("flute" in a.groups, "flute" in b.groups)
-    (False, True) 
-
-**copy()**
-
-    Makes a copy of this element with a reference to the SAME object but with unlinked offset, priority and a cloned Groups object 
-
-    >>> import note
-    >>> import duration
-    >>> n = note.Note('A')
-    >>> a = Element(obj = n)
-    >>> a.offset = duration.Duration("quarter")
-    >>> a.groups.append("flute")
-    >>> b = a.copy()
-    >>> b.offset = duration.Duration("half")
-
-    
-
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.BaseElement
-
-**priority**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**id**
-
-
-
 Class Measure
 -------------
 
-Inherits from: stream.Stream, base.BaseElement, base.Music21Object, object
+Inherits from: stream.Stream, base.Music21Object, object
 
 A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream's elements. 
 
@@ -146,23 +21,21 @@ Attributes
 
 **filled**
 
+**flattenedRepresentationOf**
+
 **groups**
 
 **isFlat**
-
-**isFlattenedRepresentation**
 
 **isSorted**
 
 **leftbarline**
 
-**location**
+**locations**
 
 **measureNumber**
 
 **measureNumberSuffix**
-
-**obj**
 
 **rightbarline**
 
@@ -172,27 +45,38 @@ Methods
 ~~~~~~~
 
 
-Inherited from stream.Stream
+Inherited from base.Music21Object
 
 **write()**
+
+**show()**
+
+**searchParent()**
+
+**isClass()**
+
+**id()**
+
+**getOffsetBySite()**
+
+**deepcopy()**
+
+**copy()**
+
+**contexts()**
+
+
+Inherited from stream.Stream
 
 **transferOffsetToElements()**
 
 **splitByClass()**
 
-**show()**
-
 **shiftElements()**
-
-**setIdForElements()**
-
-**searchParent()**
-
-**repeatDeepcopy()**
 
 **repeatCopy()**
 
-**repeatAdd()**
+**repeatAddNext()**
 
 **recurseRepr()**
 
@@ -208,15 +92,11 @@ Inherited from stream.Stream
 
 **isSequence()**
 
-**isClass()**
-
 **insertAtOffset()**
 
 **insert()**
 
 **index()**
-
-**id()**
 
 **groupElementsByOffset()**
 
@@ -258,19 +138,9 @@ Inherited from stream.Stream
 
 **findGaps()**
 
-**fillNone()**
-
 **extractContext()**
 
 **extendDuration()**
-
-**deepcopy()**
-
-**countId()**
-
-**copy()**
-
-**contexts()**
 
 **bestClef()**
 
@@ -304,14 +174,13 @@ Properties
 
 Inherited from base.Music21Object
 
-**duration**
-
-
-Inherited from base.BaseElement
-
 **priority**
 
+**parent**
+
 **offset**
+
+**duration**
 
 
 Inherited from stream.Stream
@@ -321,8 +190,6 @@ Inherited from stream.Stream
 **semiFlat**
 
 **pitches**
-
-**parent**
 
 **notes**
 
@@ -371,7 +238,7 @@ Locally Defined
 Class Part
 ----------
 
-Inherits from: stream.Stream, base.BaseElement, base.Music21Object, object
+Inherits from: stream.Stream, base.Music21Object, object
 
 A stream subclass for containing parts. 
 
@@ -380,43 +247,52 @@ Attributes
 
 **contexts**
 
+**flattenedRepresentationOf**
+
 **groups**
 
 **isFlat**
 
-**isFlattenedRepresentation**
-
 **isSorted**
 
-**location**
-
-**obj**
+**locations**
 
 Methods
 ~~~~~~~
 
 
-Inherited from stream.Stream
+Inherited from base.Music21Object
 
 **write()**
+
+**show()**
+
+**searchParent()**
+
+**isClass()**
+
+**id()**
+
+**getOffsetBySite()**
+
+**deepcopy()**
+
+**copy()**
+
+**contexts()**
+
+
+Inherited from stream.Stream
 
 **transferOffsetToElements()**
 
 **splitByClass()**
 
-**show()**
-
 **shiftElements()**
-
-**setIdForElements()**
-
-**searchParent()**
-
-**repeatDeepcopy()**
 
 **repeatCopy()**
 
-**repeatAdd()**
+**repeatAddNext()**
 
 **recurseRepr()**
 
@@ -432,15 +308,11 @@ Inherited from stream.Stream
 
 **isSequence()**
 
-**isClass()**
-
 **insertAtOffset()**
 
 **insert()**
 
 **index()**
-
-**id()**
 
 **groupElementsByOffset()**
 
@@ -482,19 +354,9 @@ Inherited from stream.Stream
 
 **findGaps()**
 
-**fillNone()**
-
 **extractContext()**
 
 **extendDuration()**
-
-**deepcopy()**
-
-**countId()**
-
-**copy()**
-
-**contexts()**
 
 **bestClef()**
 
@@ -510,14 +372,13 @@ Properties
 
 Inherited from base.Music21Object
 
-**duration**
-
-
-Inherited from base.BaseElement
-
 **priority**
 
+**parent**
+
 **offset**
+
+**duration**
 
 
 Inherited from stream.Stream
@@ -527,8 +388,6 @@ Inherited from stream.Stream
 **semiFlat**
 
 **pitches**
-
-**parent**
 
 **notes**
 
@@ -556,7 +415,7 @@ Inherited from stream.Stream
 Class Score
 -----------
 
-Inherits from: stream.Stream, base.BaseElement, base.Music21Object, object
+Inherits from: stream.Stream, base.Music21Object, object
 
 A Stream subclass for handling multi-part music. 
 
@@ -565,43 +424,52 @@ Attributes
 
 **contexts**
 
+**flattenedRepresentationOf**
+
 **groups**
 
 **isFlat**
 
-**isFlattenedRepresentation**
-
 **isSorted**
 
-**location**
-
-**obj**
+**locations**
 
 Methods
 ~~~~~~~
 
 
-Inherited from stream.Stream
+Inherited from base.Music21Object
 
 **write()**
+
+**show()**
+
+**searchParent()**
+
+**isClass()**
+
+**id()**
+
+**getOffsetBySite()**
+
+**deepcopy()**
+
+**copy()**
+
+**contexts()**
+
+
+Inherited from stream.Stream
 
 **transferOffsetToElements()**
 
 **splitByClass()**
 
-**show()**
-
 **shiftElements()**
-
-**setIdForElements()**
-
-**searchParent()**
-
-**repeatDeepcopy()**
 
 **repeatCopy()**
 
-**repeatAdd()**
+**repeatAddNext()**
 
 **recurseRepr()**
 
@@ -617,15 +485,11 @@ Inherited from stream.Stream
 
 **isSequence()**
 
-**isClass()**
-
 **insertAtOffset()**
 
 **insert()**
 
 **index()**
-
-**id()**
 
 **groupElementsByOffset()**
 
@@ -667,19 +531,9 @@ Inherited from stream.Stream
 
 **findGaps()**
 
-**fillNone()**
-
 **extractContext()**
 
 **extendDuration()**
-
-**deepcopy()**
-
-**countId()**
-
-**copy()**
-
-**contexts()**
 
 **bestClef()**
 
@@ -695,14 +549,13 @@ Properties
 
 Inherited from base.Music21Object
 
-**duration**
-
-
-Inherited from base.BaseElement
-
 **priority**
 
+**parent**
+
 **offset**
+
+**duration**
 
 
 Inherited from stream.Stream
@@ -712,8 +565,6 @@ Inherited from stream.Stream
 **semiFlat**
 
 **pitches**
-
-**parent**
 
 **notes**
 
@@ -741,43 +592,58 @@ Inherited from stream.Stream
 Class Stream
 ------------
 
-Inherits from: base.BaseElement, base.Music21Object, object
+Inherits from: base.Music21Object, object
 
-This is basic unit for timed Elements. In many cases these timed Elements will be of the same class of things; notes, clefs, etc. This is not required. Like the base class, Element, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; the obj attribute returns the same list (Stream-aware applications should ask for ElementOrStream.elements first and then look for .obj if the ElementOrStream does not have an element attribute). The Stream has a duration that can either be explicitly set or it is the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). Streams may be embedded within other Streams. TODO: Get Stream Duration working -- should be the total length of the Stream. -- see the ._getDuration() and ._setDuration() methods 
+This is basic container for Music21Objects that occur at certain times. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams. TODO: Get Stream Duration working -- should be the total length of the Stream. -- see the ._getDuration() and ._setDuration() methods 
 
 Attributes
 ~~~~~~~~~~
 
 **contexts**
 
+**flattenedRepresentationOf**
+
 **groups**
 
 **isFlat**
 
-**isFlattenedRepresentation**
-
 **isSorted**
 
-**location**
-
-**obj**
+**locations**
 
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Inherited from base.Music21Object
 
 **write()**
 
-    Write a file. A None file path will result in temporary file 
+**show()**
+
+**searchParent()**
+
+**isClass()**
+
+**id()**
+
+**getOffsetBySite()**
+
+**deepcopy()**
+
+**copy()**
+
+**contexts()**
+
+
+Locally Defined
 
 **transferOffsetToElements()**
 
     Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero. 
 
     >>> a = Stream()
-    >>> a.repeatCopy(None, range(0,10))
+    >>> a.repeatCopy(note.Note("C"), range(0,10))
     >>> a.offset = 30
     >>> a.transferOffsetToElements()
     >>> a.lowestOffset
@@ -791,7 +657,7 @@ Locally Defined
 
 **splitByClass()**
 
-    Given a stream, get all objects specified by objName and then form two new streams, where fx returns 1/True for the first stream and other values for the second stream. Probably better named SplitByClass or similar. 
+    Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream. 
 
     >>> a = Stream()
     >>> for x in range(30,81):
@@ -805,16 +671,12 @@ Locally Defined
     >>> len(c)
     31 
 
-**show()**
-
-    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
-
 **shiftElements()**
 
     Add offset value to every offset of contained Elements. TODO: add a class filter to set what is shifted 
 
     >>> a = Stream()
-    >>> a.repeatCopy(None, range(0,10))
+    >>> a.repeatCopy(note.Note("C"), range(0,10))
     >>> a.shiftElements(30)
     >>> a.lowestOffset
     30.0 
@@ -822,76 +684,27 @@ Locally Defined
     >>> a.lowestOffset
     20.0 
 
-**setIdForElements()**
-
-    Set all componenent Elements to the given id. Do not change the id of the Stream 
-
-    >>> a = Stream()
-    >>> a.repeatAdd(note.Note('A-'), 30)
-    >>> a.repeatAdd(note.Note('E-'), 30)
-    >>> a.setIdForElements('flute')
-    >>> a[0].id
-    'flute' 
-    >>> ref = a.countId()
-    >>> len(ref)
-    1 
-    >>> ref['flute']
-    60 
-    >>> b = Stream()
-    >>> b.repeatCopy(None, range(30))
-    >>> b.repeatCopy(note.Note('E-'), range(30, 60))
-    >>> b.setIdForElements('flute', note.Note)
-    >>> a[0].id
-    'flute' 
-    >>> ref = b.countId()
-    >>> ref['flute']
-    30 
-
-    
-
-**searchParent()**
-
-    If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encounted match is returned, or None if no match. 
-
-**repeatDeepcopy()**
-
-    Given an object, create many DeepCopies at the positions specified by the offset list 
-
-    >>> a = Stream()
-    >>> n = note.Note('G-')
-    >>> n.quarterLength = 1
-    >>> a.repeatDeepcopy(n, range(30))
-    >>> len(a)
-    30 
-    >>> a[10].offset
-    10.0 
-    >>> a[10].step = "D"
-    >>> a[10].step
-    'D' 
-    >>> a[11].step
-    'G' 
-
 **repeatCopy()**
 
-    Given an object, create many copies at the possitioins specified by the offset list 
+    Given an object, create many DEEPcopies at the positions specified by the offset list: 
 
     >>> a = Stream()
     >>> n = note.Note('G-')
     >>> n.quarterLength = 1
-    >>> a.repeatCopy(n, range(30))
+    >>> a.repeatCopy(n, [0, 2, 3, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12])
     >>> len(a)
-    30 
+    13 
     >>> a[10].offset
     10.0 
 
-**repeatAdd()**
+**repeatAddNext()**
 
     Given an object and a number, run addNext that many times on the object. numberOfTimes should of course be a positive integer. 
 
     >>> a = Stream()
     >>> n = note.Note()
     >>> n.duration.type = "whole"
-    >>> a.repeatAdd(n, 10)
+    >>> a.repeatAddNext(n, 10)
     >>> a.duration.quarterLength
     40.0 
     >>> a[9].offset
@@ -905,7 +718,7 @@ Locally Defined
     return the matched object from the list. 
 
     >>> a = Stream()
-    >>> a.repeatCopy(None, range(10))
+    >>> a.repeatCopy(note.Note("C"), range(10))
     >>> junk = a.pop(0)
     >>> len(a)
     9 
@@ -917,10 +730,10 @@ Locally Defined
     >>> d = Stream()
     >>> n = note.Note()
     >>> n.quarterLength = 12
-    >>> d.repeatAdd(n, 10)
+    >>> d.repeatAddNext(n, 10)
     >>> d.repeatCopy(n, [x+.5 for x in range(10)])
-    >>> x = d.makeMeasures()
-    >>> x = x.makeTies()
+    >>> #x = d.makeMeasures()
+    >>> #x = x.makeTies()
 
     
 
@@ -929,7 +742,7 @@ Locally Defined
     Given a streamObj with an Element with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, use this to get min and max offsets. Rests will be added to fill all time defined within refStream. TODO: rename fillRests() or something else 
 
     >>> a = Stream()
-    >>> a.insertAtOffset(20, None)
+    >>> a.insertAtOffset(20, note.Note())
     >>> len(a)
     1 
     >>> a.lowestOffset
@@ -945,15 +758,16 @@ Locally Defined
     Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar. 
 
     >>> a = Stream()
-    >>> a.fillNone(3)
+    >>> a.repeatAddNext(note.Rest(), 3)
     >>> b = a.makeMeasures()
     >>> c = meter.TimeSignature('3/4')
     >>> a.insertAtOffset(0.0, c)
     >>> x = a.makeMeasures()
+    TODO: Test something here... 
     >>> d = Stream()
     >>> n = note.Note()
-    >>> d.repeatAdd(n, 10)
-    >>> d.repeatDeepcopy(n, [x+.5 for x in range(10)])
+    >>> d.repeatAddNext(n, 10)
+    >>> d.repeatCopy(n, [x+.5 for x in range(10)])
     >>> x = d.makeMeasures()
 
 **makeBeams()**
@@ -964,7 +778,7 @@ Locally Defined
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
     >>> aNote = note.Note()
     >>> aNote.quarterLength = .25
-    >>> aMeasure.repeatAdd(aNote,16)
+    >>> aMeasure.repeatAddNext(aNote,16)
     >>> bMeasure = aMeasure.makeBeams()
 
 **isSequence()**
@@ -975,34 +789,18 @@ Locally Defined
     >>> for x in [0,0,0,0,3,3,3]:
     ...     n = note.Note('G#') 
     ...     n.duration = duration.Duration('whole') 
-    ...     e = Element(n) 
-    ...     e.offset = x * 1 
-    ...     a.append(e) 
+    ...     n.offset = x * 1 
+    ...     a.append(n) 
     ... 
     >>> a.isSequence()
     False 
-
-**isClass()**
-
-    Returns true if the Stream or Stream Subclass is a particular class or subclasses that class. Used by getElementsByClass in Stream 
-
-    >>> a = Stream()
-    >>> a.isClass(note.Note)
-    False 
-    >>> a.isClass(Stream)
-    True 
-    >>> b = Measure()
-    >>> b.isClass(Measure)
-    True 
-    >>> b.isClass(Stream)
-    True 
 
 **insertAtOffset()**
 
     Append an object with a given offset. Wrap in an Element and set offset time. 
 
     >>> a = Stream()
-    >>> a.insertAtOffset(32, None)
+    >>> a.insertAtOffset(32, note.Note("B-"))
     >>> a._getHighestOffset()
     32.0 
 
@@ -1011,7 +809,7 @@ Locally Defined
     Insert in elements by index position. 
 
     >>> a = Stream()
-    >>> a.repeatAdd(note.Note('A-'), 30)
+    >>> a.repeatAddNext(note.Note('A-'), 30)
     >>> a[0].name == 'A-'
     True 
     >>> a.insert(0, note.Note('B'))
@@ -1023,16 +821,15 @@ Locally Defined
     return the index for the specified object 
 
     >>> a = Stream()
-    >>> a.repeatCopy(None, range(10))
-    >>> a.index(None)
-    0 
-
-**id()**
-
+    >>> fSharp = note.Note("F#")
+    >>> a.repeatCopy(note.Note("A#"), range(10))
+    >>> a.addNext(fSharp)
+    >>> a.index(fSharp)
+    10 
 
 **groupElementsByOffset()**
 
-    returns a List of lists in which each entry in the main list is a list of elements occuring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can't hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first. 
+    returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can't hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first. 
 
 **getTimeSignatures()**
 
@@ -1041,7 +838,7 @@ Locally Defined
     >>> a = Stream()
     >>> b = meter.TimeSignature('3/4')
     >>> a.append(b)
-    >>> a.fillNone(10)
+    >>> a.repeatCopy(note.Note("C#"), range(10))
     >>> c = a.getTimeSignatures()
     >>> len(c) == 1
     True 
@@ -1061,7 +858,7 @@ Locally Defined
     True 
     >>> c = Stream()
     >>> for x in range(4):
-    ...     n = Element(note.Note('G#')) 
+    ...     n = note.Note('G#') 
     ...     n.offset = x * 3 
     ...     c.append(n) 
     ... 
@@ -1071,15 +868,15 @@ Locally Defined
 
 **getPitches()**
 
-    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
+    Return all pitches found in any element in the stream as a list (since Pitches have no duration, it's a list not a stream) 
 
 **getOverlaps()**
 
-    Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeNoneDur. This example demosntrates end-joing overlaps: there are four quarter notes spaced by quarter notes. Whether or not these count as overalps is determined by the includeCoincidentBoundaries parameter. 
+    Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeNoneDur. This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overalps is determined by the includeCoincidentBoundaries parameter. 
 
     >>> a = Stream()
     >>> for x in range(4):
-    ...     n = Element(note.Note('G#')) 
+    ...     n = note.Note('G#') 
     ...     n.duration = duration.Duration('quarter') 
     ...     n.offset = x * 1 
     ...     a.append(n) 
@@ -1094,7 +891,7 @@ Locally Defined
     4 
     >>> a = Stream()
     >>> for x in [0,0,0,0,13,13,13]:
-    ...     n = Element(note.Note('G#')) 
+    ...     n = note.Note('G#') 
     ...     n.duration = duration.Duration('half') 
     ...     n.offset = x * 1 
     ...     a.append(n) 
@@ -1106,7 +903,7 @@ Locally Defined
     3 
     >>> a = Stream()
     >>> for x in [0,0,0,0,3,3,3]:
-    ...     n = Element(note.Note('G#')) 
+    ...     n = note.Note('G#') 
     ...     n.duration = duration.Duration('whole') 
     ...     n.offset = x * 1 
     ...     a.append(n) 
@@ -1137,7 +934,7 @@ Locally Defined
 
     >>> a = Stream()
     >>> n = note.Note()
-    >>> a.repeatAdd(n, 30)
+    >>> a.repeatAddNext(n, 30)
     >>> a.addGroupForElements('P1')
     >>> a.getGroups()
     {'P1': 30} 
@@ -1150,7 +947,7 @@ Locally Defined
     Return a Stream/list of all Elements that are found within a certain offset time range, specified as start and stop values, and including boundaries If onsetOnly is true, only the onset of an event is taken into consideration; the offset is not. The time range is taken as the context for the flat representation. The includeCoincidentBoundaries option determines if an end boundary match is included. 
 
     >>> a = Stream()
-    >>> a.repeatCopy(None, range(10)) # adds Elements with obj == None
+    >>> a.repeatCopy(note.Note("C"), range(10))
     >>> b = a.getElementsByOffset(4,6)
     >>> len(b)
     3 
@@ -1166,9 +963,11 @@ Locally Defined
     >>> c = b.getElementsByOffset(2,6.9)
     >>> len(c)
     2 
-    >>> c = b.flat.getElementsByOffset(2,6.9)
-    >>> len(c)
-    10 
+    # TODO: Fix 
+    >>> ### CANNOT FLATTEN IF EMBEDDED --
+    >>> ### c = b.flat.getElementsByOffset(2,6.9)
+    >>> ###len(c)
+    ###10 
 
 **getElementsByGroup()**
 
@@ -1199,10 +998,10 @@ Locally Defined
 
 **getElementsByClass()**
 
-    Return a list of all Elements that match the className. Note that, as this appends Elements to a new Stream, whatever former parent relationship the Element had is lost. The Eleemnts parents is set to the new stream that contains it. This can be avoided by unpacking the Element, which returns a list. 
+    Return a list of all Elements that match the className. Note that, as this appends Elements to a new Stream, whatever former parent relationship the Element had is lost. The Element's parent is set to the new stream that contains it. 
 
     >>> a = Stream()
-    >>> a.fillNone(10) # adds Elements with obj == None
+    >>> a.repeatCopy(note.Rest(), range(10))
     >>> for x in range(4):
     ...     n = note.Note('G#') 
     ...     n.offset = x * 3 
@@ -1213,25 +1012,16 @@ Locally Defined
     >>> found[0].pitch.accidental.name
     'sharp' 
     >>> b = Stream()
-    >>> b.repeatCopy(None, range(10))
+    >>> b.repeatCopy(note.Rest(), range(15))
     >>> a.append(b)
     >>> # here, it gets elements from within a stream
     >>> # this probably should not do this, as it is one layer lower
-    >>> found = a.getElementsByClass(types.NoneType)
+    >>> found = a.getElementsByClass(note.Rest)
     >>> len(found)
     10 
-    >>> c = Stream()
-    >>> c.append(note.Note('A-'))
-    >>> d = Stream()
-    >>> d.repeatCopy(None, range(10))
-    >>> c.append(d)
-    >>> a.append(c)
-    >>> found = a.getElementsByClass(types.NoneType)
-    >>> len(found) # if recursive, should get 20
-    10 
-    >>> found = a.flat.getElementsByClass(types.NoneType)
-    >>> len(found)  # this is not the right answer
-    30 
+    >>> found = a.flat.getElementsByClass(note.Rest)
+    >>> len(found)
+    25 
 
 **getElementById()**
 
@@ -1259,11 +1049,11 @@ Locally Defined
     Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset. TODO: inlcude sort order for concurrent matches? 
 
     >>> a = Stream()
-    >>> x = Element()
+    >>> x = music21.Music21Object()
     >>> x.id = 'x'
-    >>> y = Element()
+    >>> y = music21.Music21Object()
     >>> y.id = 'y'
-    >>> z = Element()
+    >>> z = music21.Music21Object()
     >>> z.id = 'z'
     >>> a.insertAtOffset(20, x)
     >>> a.insertAtOffset(10, y)
@@ -1299,10 +1089,6 @@ Locally Defined
 
     returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless 
 
-**fillNone()**
-
-    For use in testing. fills a None object at every int offset between 0 and number 
-
 **extractContext()**
 
     extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) TODO: maxBefore -- maximum number of elements to return before; etc. 
@@ -1317,7 +1103,7 @@ Locally Defined
     >>> qtrStream.repeatCopy(qn, [8, 9, 10, 11])
     >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
     >>> recurseRepr(hnStream)
-    '{5.0} <Element offset=5.0 obj="<music21.note.Note C>">\n{6.0} <Element offset=6.0 obj="<music21.note.Note B->">\n{8.0} <Element offset=8.0 obj="<music21.note.Note C>">\n' 
+    '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>\n' 
 
 **extendDuration()**
 
@@ -1328,8 +1114,8 @@ Locally Defined
     >>> n = note.QuarterNote()
     >>> n.duration.quarterLength
     1.0 
-    >>> stream1.repeatDeepcopy(n, [0, 10, 20, 30, 40])
-    >>> dyn = Element(music21.dynamics.Dynamic('ff'))
+    >>> stream1.repeatCopy(n, [0, 10, 20, 30, 40])
+    >>> dyn = music21.dynamics.Dynamic('ff')
     >>> stream1.insertAtOffset(15, dyn)
     >>> sort1 = stream1.sorted
     >>> sort1[-1].offset # offset of last element
@@ -1351,47 +1137,12 @@ Locally Defined
     41.0 
     >>> stream2[-1].offset
     40.0 
-    >>> from music21.musicxml import testFiles
-    >>> from music21 import converter
-    >>> mxString = testFiles.ALL[2] # has dynamics
-    >>> a = converter.parse(mxString)
-    >>> b = a.flat.extendDuration(dynamics.Dynamic)
-
-**deepcopy()**
-
-    Return a deep copy of an object with no reference to the source. The parent is not deep copied! 
-
-    >>> from music21 import note, duration
-    >>> n = note.Note('A')
-    >>> n.offset = 1.0 #duration.Duration("quarter")
-    >>> n.groups.append("flute")
-    >>> n.groups
-    ['flute'] 
-    >>> b = n.deepcopy()
-    >>> b.offset = 2.0 #duration.Duration("half")
-    >>> n is b
-    False 
-    >>> n.accidental = "-"
-    >>> b.name
-    'A' 
-    >>> n.offset
-    1.0 
-    >>> b.offset
-    2.0 
-    >>> n.groups[0] = "bassoon"
-    >>> ("flute" in n.groups, "flute" in b.groups)
-    (False, True) 
-
-**countId()**
-
-    Get all componenent Elements id as dictionary of id:count entries. Alternative name: getElementIdByClass() 
-
-**copy()**
-
-    Return a shallow copy, or a linked reference to the source. 
-
-**contexts()**
-
+    TODO: Chris; what file is testFiles.ALL[2]?? 
+    #        >>> from music21.musicxml import testFiles 
+    #        >>> from music21 import converter 
+    #        >>> mxString = testFiles.ALL[2] # has dynamics 
+    #        >>> a = converter.parse(mxString) 
+    #        >>> b = a.flat.extendDuration(dynamics.Dynamic) 
 
 **bestClef()**
 
@@ -1422,15 +1173,13 @@ Locally Defined
 
 **append()**
 
-    Add a (sub)Stream, Element, or object (wrapped into a default element) to the element Stream. 
+    Add a (sub)Stream, Music21Object, or object (wrapped into a default element) to the Stream at the stored offset of the object, or at 0.0. For adding to the last open location of the stream, use addNext. Adds an entry in Locations as well. 
 
     >>> a = Stream()
-    >>> a.append(None)
+    >>> a.append(music21.Music21Object())
     >>> a.append(music21.note.Note('G#'))
     >>> len(a)
     2 
-    QUESTION: should this also add an entry to the parent and context 
-    attributes (if any) in the object? 
 
 **addNext()**
 
@@ -1455,7 +1204,8 @@ Locally Defined
     >>> # since notes are not embedded in Elements here, their offset
     >>> # changes when added to a stream!
     >>> for x in range(0,3):
-    ...     n = notes[x].deepcopy() 
+    ...     n = note.Note("A-") 
+    ...     n.duration.quarterLength = 3 
     ...     n.offset = 0 
     ...     notes2.append(n) 
     >>> a.addNext(notes2) # add em all again
@@ -1463,14 +1213,23 @@ Locally Defined
     (15.0, 18.0) 
     >>> a.isSequence()
     True 
+    Add a note that already has an offset set 
+    >>> n3 = note.Note("B-")
+    >>> n3.offset = 1
+    >>> n3.duration.quarterLength = 3
+    >>> a.addNext(n3)
+    >>> a.highestOffset, a.highestTime
+    (19.0, 22.0) 
+
+    
 
 **addGroupForElements()**
 
     Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set. 
 
     >>> a = Stream()
-    >>> a.repeatAdd(note.Note('A-'), 30)
-    >>> a.repeatAdd(note.Rest(), 30)
+    >>> a.repeatAddNext(note.Note('A-'), 30)
+    >>> a.repeatAddNext(note.Rest(), 30)
     >>> a.addGroupForElements('flute')
     >>> a[0].groups
     ['flute'] 
@@ -1498,14 +1257,13 @@ Properties
 
 Inherited from base.Music21Object
 
-**duration**
-
-
-Inherited from base.BaseElement
-
 **priority**
 
+**parent**
+
 **offset**
+
+**duration**
 
 
 Locally Defined
@@ -1532,7 +1290,7 @@ Locally Defined
     ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
     >>> g
     '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ' 
-    >>> farRight = Element(note.Note("E"))
+    >>> farRight = note.Note("E")
     >>> farRight.priority = 5
     >>> farRight.offset = 2.0
     >>> y.append(farRight)
@@ -1555,10 +1313,7 @@ Locally Defined
 
 **pitches**
 
-    Return all pitches found in any element in the stream as a list (since pitches have no duration, it's a list not a stream) 
-
-**parent**
-
+    Return all pitches found in any element in the stream as a list (since Pitches have no duration, it's a list not a stream) 
 
 **notes**
 
@@ -1591,7 +1346,7 @@ Locally Defined
     >>> a.lowestOffset
     0.0 
     >>> for x in range(3,5):
-    ...     e = Element(note.Note('G#')) 
+    ...     e = note.Note('G#') 
     ...     e.offset = x * 3 
     ...     a.append(e) 
     ... 
@@ -1616,8 +1371,8 @@ Locally Defined
     Get start time of element with the highest offset in the Stream 
 
     >>> a = Stream()
-    >>> for x in range(3,5):
-    ...     e = Element(note.Note('G#')) 
+    >>> for x in [3, 4]:
+    ...     e = note.Note('G#') 
     ...     e.offset = x * 3 
     ...     a.append(e) 
     ... 
@@ -1648,18 +1403,28 @@ Locally Defined
     ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
     >>> g
     '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ' 
-    >>> p = Stream()
-    >>> p.repeatCopy(music21.Music21Object(), range(5))
     >>> q = Stream()
-    >>> q.repeatCopy(p, range(0,50,10))
+    >>> for i in range(5):
+    ...   p = Stream() 
+    ...   p.repeatCopy(music21.Music21Object(), range(5)) 
+    ...   q.insertAtOffset(i * 10, p) 
     >>> len(q)
     5 
-    >>> len(q.flat)
+    >>> qf = q.flat
+    >>> len(qf)
     25 
-    >>> q.flat[24].offset
+    >>> qf[24].offset
     44.0 
+
+    
     >>> r = Stream()
-    >>> r.repeatCopy(q, range(0, 500, 100))
+    >>> for j in range(5):
+    ...   q = Stream() 
+    ...   for i in range(5): 
+    ...      p = Stream() 
+    ...      p.repeatCopy(music21.Music21Object(), range(5)) 
+    ...      q.insertAtOffset(i * 10, p) 
+    ...   r.insertAtOffset(j * 100, q) 
     >>> len(r)
     5 
     >>> len(r.flat)
@@ -1669,22 +1434,5 @@ Locally Defined
 
 **elements**
 
-
-
-Class StreamException
----------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 

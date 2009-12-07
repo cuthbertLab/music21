@@ -9,15 +9,17 @@ Music21 Documentation
    install
    environment
    examples
+   graphing
    glossary
    faq
+   moduleBase
    moduleCommon
    moduleConverter
    moduleDuration
    moduleEnvironment
+   moduleMeter
    moduleNote
    modulePitch
-   moduleMeter
    moduleStream
 
 Indices and Tables

@@ -58,8 +58,7 @@ class GraphException(Exception):
 class Graph(object):
 
     def __init__(self, *args, **keywords):
-        '''Setup a basic graph witha dictionary for 2 or more axis values. Set
-        options for grid and other parameters.
+        '''Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters.
 
         Optional keyword arguments: title, doneAction
 
@@ -358,7 +357,7 @@ class Graph3DPolygonBars(Graph):
     def __init__(self, *args, **keywords):
         '''Graph multiple parallel bar graphs in 3D.
 
-        This draws bar with polygons, imporat to avoid a bug in matplotlib.
+        This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
 
         >>> a = Graph3DPolygonBars(doneAction=None) 
         >>> data = {1:[], 2:[], 3:[]}

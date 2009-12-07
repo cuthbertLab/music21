@@ -53,23 +53,6 @@ Locally Defined
     Return the path to the platform specific settings file. 
 
 
-Class EnvironmentException
---------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
 Class Preference
 ----------------
 
@@ -105,8 +88,6 @@ Inherited from node.Node
 **getNewDoc()**
 
 **get()**
-
-**deepcopy()**
 
 Properties
 ~~~~~~~~~~
@@ -154,8 +135,6 @@ Inherited from node.Node
 **getNewDoc()**
 
 **get()**
-
-**deepcopy()**
 
 
 Inherited from node.NodeList

@@ -92,7 +92,7 @@ Attributes
 
 **inherited**
 
-**location**
+**locations**
 
 **summedNumerator**
 
@@ -115,6 +115,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -143,7 +145,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -193,7 +199,7 @@ Attributes
 
 **inherited**
 
-**location**
+**locations**
 
 **summedNumerator**
 
@@ -216,6 +222,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -244,7 +252,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -268,23 +280,6 @@ Inherited from meter.TimeSignature
 **beatLengthToQuarterLengthRatio**
 
 **barDuration**
-
-
-Class MeterException
---------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
 
 
 Class MeterSequence
@@ -312,8 +307,6 @@ Inherited from meter.MeterTerminal
 **subdivide()**
 
 **ratioEqual()**
-
-**deepcopy()**
 
 
 Locally Defined
@@ -567,13 +560,6 @@ Locally Defined
 
     Compare the numerator and denominator of another object. 
 
-**deepcopy()**
-
-    Return a complete copy. Here, copy and deepcopy should be the same. 
-
-    >>> a = MeterTerminal('2/4')
-    >>> b = a.deepcopy()
-
 Properties
 ~~~~~~~~~~
 
@@ -625,7 +611,7 @@ Attributes
 
 **inherited**
 
-**location**
+**locations**
 
 **summedNumerator**
 
@@ -648,6 +634,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -676,7 +664,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 
@@ -725,7 +717,7 @@ Attributes
 
 **inherited**
 
-**location**
+**locations**
 
 **summedNumerator**
 
@@ -748,6 +740,8 @@ Inherited from base.Music21Object
 **isClass()**
 
 **id()**
+
+**getOffsetBySite()**
 
 **deepcopy()**
 
@@ -820,7 +814,11 @@ Properties
 
 Inherited from base.Music21Object
 
+**priority**
+
 **parent**
+
+**offset**
 
 **duration**
 

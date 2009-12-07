@@ -33,6 +33,11 @@ Function decimalToTuplet()
 
 For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
 
+Function dirPartitioned()
+-------------------------
+
+Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
+
 Function dotMultiplier()
 ------------------------
 

@@ -594,23 +594,6 @@ Locally Defined
     (15, 8) 
 
 
-Class DurationException
------------------------
-
-Inherits from: exceptions.Exception, exceptions.BaseException, object
-
-
-Methods
-~~~~~~~
-
-
-Inherited from exceptions.BaseException
-
-**message()**
-
-**args()**
-
-
 Class DurationUnit
 ------------------
 

@@ -17,6 +17,7 @@ import types, inspect
 
 import music21
 
+from music21 import base
 from music21 import clef
 from music21 import chord
 from music21 import common
@@ -44,15 +45,16 @@ FORMATS = ['html', 'latex']
 
 
 MODULES = [
+    base,
     common, 
     converter,
-     duration, 
+    duration, 
     environment, 
-   note, 
-   pitch, 
-   meter, 
-   stream, 
-
+    meter, 
+    note, 
+    pitch, 
+    stream, 
+    
 #    chord, 
 #     instrument,
 #  #   interval, 
@@ -228,8 +230,7 @@ class ModuleDoc(RestrtucturedWriter):
 
 
     def findDerivationClass(self, mro, partName):
-        '''Given an mro and a part of an object, find from where 
-        the part is derived.
+        '''Given an mro (method resolution order) and a part of an object, find from where the part is derived.
         '''
         lastIndex = None
         for i in range(len(mro)):
@@ -332,7 +333,9 @@ class ModuleDoc(RestrtucturedWriter):
             
             if component.startswith('__'): # ignore private variables
                 continue
-            if component in ['Test', 'TestExternal']: # ignore test classes
+            elif 'Test' in component: # ignore test classes
+                continue
+            elif 'Exception' in component: # ignore test classes
                 continue
 
             objName = '%s.%s' % (self.modName, component)
@@ -485,8 +488,12 @@ class Documentation(RestrtucturedWriter):
 
         self.titleMain = 'Music21 Documentation'
         # include additional rst files that are not auto-generated
-        self.chaptersMain = ['install', 'environment', 
-                            'examples', 'glossary', 'faq']
+        self.chaptersMain = ['install', 
+                             'environment', 
+                             'examples', 
+                             'graphing', 
+                             'glossary', 
+                             'faq']
         self.chaptersGenerated = [] # to be populated
         self.titleAppendix = 'Indices and Tables'
         self.chaptersAppendix = ['glossary']
