@@ -356,7 +356,8 @@ class ModuleDoc(RestrtucturedWriter):
                 self.scanClass(obj)
             elif isinstance(obj, types.FunctionType):
                 self.scanFunction(obj)
-            # some of these are functions that need to be documented as well
+            elif isinstance(obj, environment.Environment):
+                continue # skip environment object
             else:
                 environLocal.printDebug(['cannot process: %s' % obj])
 
