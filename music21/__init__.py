@@ -18,7 +18,7 @@ accessible, this license is made accessible, and the developers are
 credited.
 
 The development of music21 was supported by a grant
-from the Seaver Foundation and with the support of the MIT
+from the Seaver Institute and with the support of the MIT
 Music and Theater Arts section and the School of Humanities, Arts,
 and Social Sciences. 
 

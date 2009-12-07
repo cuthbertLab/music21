@@ -3,6 +3,8 @@
 # Purpose:      music21 classes for representing intervals
 #
 # Authors:      Michael Scott Cuthbert
+#               Jackie Rogoff
+#               Amy Hailes 
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
@@ -13,6 +15,7 @@ There are also a number of useful lists included in the module."""
 
 _MOD = "interval.py"
 
+import copy
 import math
 import unittest, doctest
 
@@ -419,7 +422,7 @@ def generatePitch(pitch1, interval1):
 
 def generateNote(note1, intervalString):
     newPitch = generatePitch(note1, intervalString)
-    newNote = note1.deepcopy()
+    newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
     return newNote
 

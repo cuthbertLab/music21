@@ -99,7 +99,11 @@ class DocumentException(Exception):
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 class Tag(object):
-    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the status attribute. Tags can store character data collected beteen their defined tags. These are used only for finding and collecting tag attributes and elements. As we do not need character data for all tags, tags have an optional flag to select if the are to collect charater data.'''
+    '''Object to store tags as encountered by SAX. Tags can be open or closed based 
+    on the status attribute. Tags can store character data collected between their 
+    defined tags. These are used only for finding and collecting tag attributes and 
+    elements. As we do not need character data for all tags, tags have an optional flag 
+    to select if the are to collect character data.'''
 
     def __init__(self, tag, cdFlag=0):
         self.tag = tag
@@ -1802,7 +1806,9 @@ class Handler(xml.sax.ContentHandler):
 
 
     def characters(self, charData):
-        '''Because each _Handler sub-class defines its own _tags, and because each Tag knows whether it is to receive character data or not, this method can be found in the base-class and need not be defined for each sub-class.
+        '''Because each _Handler sub-class defines its own _tags, 
+        and because each Tag knows whether it is to receive character data or not, 
+        this method can be found in the base-class and need not be defined for each sub-class.
         '''
 
         # in all but a very few cases self.t[tag].charData = charData is 

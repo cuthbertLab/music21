@@ -33,7 +33,7 @@ correl          None                Use numpy.corrcoef() or other, more sophisti
 deg             Key.degree(Note)    NOT YET WRITTEN -- for music21 v0.6b.  You will want to run key.keyFromStream() or key.keyFromStreams() first if key is unknown
 degree          Key.degree(Note)    Returns a scale.ScaleDegree object which will have various representations
 diss            analysis.kkdiss     NOT YET WRITTEN -- for music21 v2.0.
-ditto           None                Not needed.  Use object.clone() or copy.deepcopy(object) to get another copy of an object
+ditto           None                Not needed.  Use copy.copy(object) or copy.deepcopy(object) to get another copy of an object
 encode          midi.(severaltools) Multifunction humdrum program.  Replaced by midi tools.  (NOT YET WRITTEN: simple midi in v0.3a; more complex in v2.0)
 extract         None                Use python commands to extract objects with certain properties
 fields          None                Not needed.

@@ -1317,7 +1317,7 @@ class Test(unittest.TestCase):
         a = Note()
         a.quarterLength = 3.5
         a.name = 'D'
-        b = a.deepcopy()
+        b = copy.deepcopy(a)
         self.assertEqual(b.name, a.name)
         self.assertEqual(b.quarterLength, a.quarterLength)
 

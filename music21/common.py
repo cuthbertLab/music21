@@ -912,10 +912,7 @@ class TestMock(object):
 
     def _set1(self, value):
         self.attr3 = value
-    
-    def deepcopy(self):
-        return copy.deepcopy(self)
-
+ 
     def __deepcopy__(self, memo=None):
         # None is the empty memp default
         #self._environLocal.printDebug(['__deepcopy__ called, got memo', 
@@ -1013,7 +1010,7 @@ class Test(unittest.TestCase):
         self.assertEqual(c.attr1, c.attr2)
 
         # test second by using the .deepcopy() method
-        c = a.deepcopy()
+        c = copy.deepcopy(a)
         self.assertNotEqual(a, c)
         self.assertNotEqual(a.attr1, c.attr1)
         self.assertNotEqual(a.attr2, c.attr2)

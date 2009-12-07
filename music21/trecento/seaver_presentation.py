@@ -2,18 +2,18 @@
 
 import music21
 from music21 import note
-from note import Note
-from note import QuarterNote
+from music21.note import Note
+from music21.note import QuarterNote
 from music21 import noteStream
-from noteStream import Stream
-from lily import LilyString
+from music21.noteStream import Stream
+from music21.lily import LilyString
 from music21 import tinyNotation
-from tinyNotation import TinyNotationLine
-from meter import TimeSignature
+from music21.tinyNotation import TinyNotationLine
+from music21.meter import TimeSignature
 from music21 import clef
 from music21 import trecento
-from trecento import cadencebook
-from trecento import capua
+from music21.trecento import cadencebook
+from music21.trecento import capua
 
 def createScalePart():
     c = QuarterNote(); c.step = "C"
@@ -73,9 +73,8 @@ def badMeter():
     s1.timeSignature = time1
     s1.showTimeSignature = True
     print s1.lily
-    lS1 = LilyString("{" + s1.lily + "}")
-    lS1.showPDF()
-
+    s1.lily.showPNG()
+    
 def capuaReg1():
     myScale = "g4 f4 g4 r4 r2 g4 f#4 g2"
     tinyNotation = TinyNotationLine(myScale)
@@ -131,8 +130,8 @@ def redoLandini():
 
 if (__name__ == "__main__"):
 #    redoLandini()
-#    major3rd()
-#    capuaReg3()
+    major3rd()
+    capuaReg3()
     createOrphee()
-#    createEasyScale()
-#    badMeter()
+    createEasyScale()
+    badMeter()

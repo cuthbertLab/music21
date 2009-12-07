@@ -963,7 +963,7 @@ class Chord(note.GeneralNote):
         'C'
         '''
 
-        newChord = self.copy()
+        newChord = copy.copy(self)
         tempChordNotes = copy.copy(self.pitches)
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or \
                             cmp(x.ps, y.ps))
@@ -975,7 +975,7 @@ class Chord(note.GeneralNote):
         '''
         Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.
         '''
-        newChord = self.copy()
+        newChord = copy.copy(self)
         tempChordNotes = copy.copy(self.pitches)
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.ps, y.ps))
         newChord.pitches = tempChordNotes
@@ -988,7 +988,7 @@ class Chord(note.GeneralNote):
         C# would be below D- in 1/4-comma meantone, equal in equal temperament,
         but below it in (most) just intonation types.
         '''
-        newChord = self.copy()
+        newChord = copy.copy(self)
         tempChordNotes = copy.copy(self.pitches)
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.frequency, y.frequency))
         newChord.pitches = tempChordNotes

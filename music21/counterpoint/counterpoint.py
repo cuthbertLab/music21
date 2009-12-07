@@ -859,7 +859,6 @@ class TestExternal(unittest.TestCase):
         n126.name = "F"
         n127.name = "E"
         n128.name = "D"
-    #    n120 = n115.deepcopy()
     
         cantusFirmus1 = Stream([n110, n111, n112, n113, n114, n115, n116, n117, n118])
         cantusFirmus2 = Stream([n110, n115, n114, n119, n120, n113, n121, n116, n117, n118])
@@ -920,4 +919,4 @@ def twoStreamLily(st1, st2):
     return lilyOut
     
 if (__name__ == "__main__"):
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)

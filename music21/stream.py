@@ -12,6 +12,8 @@
 import copy, types, random
 import doctest, unittest
 import sys
+
+from copy import deepcopy
 # try:
 #     import cPickle as pickleMod
 # except ImportError:
@@ -153,7 +155,7 @@ class Stream(music21.Music21Object):
 
         >>> b = Stream()
         >>> for x in range(4):
-        ...     b.append(a.deepcopy() ) # append streams
+        ...     b.append(deepcopy(a) ) # append streams
         >>> len(b)
         4
         >>> len(b.flat)
@@ -235,7 +237,7 @@ class Stream(music21.Music21Object):
             return returnEl
     
         elif isinstance(key, slice): # get a slice of index values
-            found = self.copy() # return a stream of elements
+            found = copy.copy(self) # return a stream of elements
             found.elements = self.elements[key]
             for element in found:
                 pass ## sufficient to set parent properly
@@ -487,7 +489,7 @@ class Stream(music21.Music21Object):
 #        '''        
 #        # if an element or a stream
 #        if not isinstance(other, music21.Music21Object): 
-#            other = Element(other)
+#            other = music21.Element(other)
 #        new = self.copy()
 #        if isinstance(other, Stream):
 #            new.elements = self.elements + other.elements
@@ -1437,12 +1439,12 @@ class Stream(music21.Music21Object):
         36.0
         '''
         if not isinstance(item, music21.Music21Object): # if not an element, embed
-            element = Element(item)
+            element = music21.Element(item)
         else:
             element = item # TODO: remove for new-old-style
             
         for i in range(0, numberOfTimes):
-            self.addNext(element.deepcopy())
+            self.addNext(deepcopy(element))
     
     def repeatCopy(self, item, offsets):
         '''Given an object, create many DEEPcopies at the positions specified by 
@@ -1465,36 +1467,9 @@ class Stream(music21.Music21Object):
             element = item
 
         for offset in offsets:
-            elementCopy = element.deepcopy()
+            elementCopy = deepcopy(element)
             self.insertAtOffset(offset, elementCopy)
 
-#    def repeatDeepcopy(self, item, offsets):
-#        '''Given an object, create many DeepCopies at the positions specified by 
-#        the offset list
-#
-#        >>> a = Stream()
-#        >>> n = note.Note('G-')
-#        >>> n.quarterLength = 1
-#        >>> a.repeatDeepcopy(n, range(30))
-#        >>> len(a)
-#        30
-#        >>> a[10].offset
-#        10.0
-#        >>> a[10].step = "D"
-#        >>> a[10].step
-#        'D'
-#        >>> a[11].step
-#        'G'
-#        '''
-#        if not isinstance(item, music21.Music21Object): # if not an element, embed
-#            element = Element(item)
-#        else:
-#            element = item
-#
-#        for offset in offsets:
-#            elementCopy = element.deepcopy()
-#            elementCopy.offset = offset
-#            self.append(elementCopy)
 
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0, 
@@ -1609,7 +1584,7 @@ class Stream(music21.Music21Object):
 
         useSelf = False
         if not useSelf: # make a copy
-            srcObj = self.deepcopy()
+            srcObj = deepcopy(self)
         else: # this is not tested
             srcObj = self
 
@@ -1631,7 +1606,7 @@ class Stream(music21.Music21Object):
                 dur = 0 
             # may just need to copy element offset component
             offset = e.getOffsetBySite(srcObj)
-            offsetMap.append([offset, offset + dur, e.copy()])
+            offsetMap.append([offset, offset + dur, copy.copy(e)])
     
         #environLocal.printDebug(['makesMeasures()', offsetMap])    
     
@@ -1659,7 +1634,7 @@ class Stream(music21.Music21Object):
             m = Measure()
             # get active time signature at this offset
             # make a copy and it to the meter
-            m.timeSignature = meterStream.getElementAtOrBefore(o).deepcopy()
+            m.timeSignature = deepcopy(meterStream.getElementAtOrBefore(o))
             #environLocal.printDebug(['assigned time sig', m.timeSignature])
             m.clef = clefObj
     
@@ -1730,7 +1705,7 @@ class Stream(music21.Music21Object):
         '''
         environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
-            returnObj = self.deepcopy()
+            returnObj = deepcopy(self)
         else:
             returnObj = self
     
@@ -1784,7 +1759,7 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['calling Stream.makeTies()'])
 
         if not inPlace: # make a copy
-            returnObj = self.deepcopy()
+            returnObj = deepcopy(self)
         else:
             returnObj = self
 
@@ -1827,7 +1802,7 @@ class Stream(music21.Music21Object):
                 else: # get the last encountered meter
                     ts = meterStream.getElementAtOrBefore(mNext.offset)
                 # assumeing we need a new instance of TimeSignature
-                mNext.timeSignature = ts.deepcopy()
+                mNext.timeSignature = deepcopy(ts)
                 mNext.measureNumber = m.measureNumber + 1
                 mNextAdd = True
     
@@ -1856,7 +1831,7 @@ class Stream(music21.Music21Object):
                         # create and place new element
 
                         # NOTE: this copy is causing a problem
-                        eRemain = e.deepcopy()
+                        eRemain = deepcopy(e)
                         eRemain.duration.quarterLength = qLenRemain
     
                         # set ties
@@ -1909,7 +1884,7 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['calling Stream.makeBeams()'])
 
         if not inPlace: # make a copy
-            returnObj = self.deepcopy()
+            returnObj = deepcopy(self)
         else:
             returnObj = self
 
@@ -1986,7 +1961,7 @@ class Stream(music21.Music21Object):
         '''
     
         if not inPlace: # make a copy
-            returnObj = self.deepcopy()
+            returnObj = deepcopy(self)
         else:
             returnObj = self
 
@@ -2068,7 +2043,7 @@ class Stream(music21.Music21Object):
         '''
         post = self.elements ## already a copy
         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority))
-        newStream = self.copy()
+        newStream = copy.copy(self)
         newStream.elements = post
         for thisElement in post:
             thisElement.locations.add(thisElement.getOffsetBySite(self),
@@ -2149,7 +2124,7 @@ class Stream(music21.Music21Object):
         
     def _getFlatOrSemiFlat(self, retainContainers):
         # this copy will have a shared locations object
-        newStream = self.copy()
+        newStream = copy.copy(self)
 
         newStream._elements = []
         newStream._elementsChanged()
@@ -2549,7 +2524,7 @@ class Stream(music21.Music21Object):
             # must repack into a new stream at each step
             midStream = Stream()
             finalStream = Stream()
-            partStream = self.copy()
+            partStream = copy.copy(self)
 
             for obj in partStream.getElementsByClass(Stream):
                 # need to copy element here
@@ -2869,7 +2844,7 @@ class Stream(music21.Music21Object):
         highestCurrentEndTime = 0
         for thisElement in sortedElements:
             if thisElement.offset > highestCurrentEndTime:
-                gapElement = Element(obj = None, offset = highestCurrentEndTime)
+                gapElement = music21.Element(obj = None, offset = highestCurrentEndTime)
                 gapElement.duration = duration.Duration()
                 gapElement.duration.quarterLength = thisElement.offset - highestCurrentEndTime
                 gapStream.append(gapElement)
@@ -3480,7 +3455,7 @@ class TestExternal(unittest.TestCase):
         
         
         for i in range(0,5):
-            b.addNext(q.deepcopy())
+            b.addNext(deepcopy(q))
             b.elements[i].accidental = note.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
@@ -3501,11 +3476,11 @@ class TestExternal(unittest.TestCase):
         d = note.Note("D4")
         ts = meter.TimeSignature("2/4")
         s1 = Part()
-        s1.addNext(c.copy())
-        s1.addNext(d.copy())
+        s1.addNext(deepcopy(c))
+        s1.addNext(deepcopy(d))
         s2 = Part()
-        s2.addNext(d.copy())
-        s2.addNext(c.copy())
+        s2.addNext(deepcopy(d))
+        s2.addNext(deepcopy(c))
         score1 = Score()
         score1.append(ts)
         score1.append(s1)
@@ -3777,7 +3752,7 @@ class Test(unittest.TestCase):
 
         midStream = Stream()
         for x in range(2):
-            srcNew = srcStream.deepcopy()
+            srcNew = deepcopy(srcStream)
 #             for n in srcNew:
 #                 offset = n.getOffsetBySite(srcStream)
 
@@ -3825,7 +3800,7 @@ class Test(unittest.TestCase):
 
         midStream = Stream()
         for x in range(4):
-            srcNew = srcStream.deepcopy()
+            srcNew = deepcopy(srcStream)
             srcNew.offset = x * 10 
             midStream.append(srcNew)
 
@@ -3836,7 +3811,7 @@ class Test(unittest.TestCase):
 
         farStream = Stream()
         for x in range(7):
-            midNew = midStream.deepcopy()
+            midNew = deepcopy(midStream)
             midNew.offset = x * 100 
             farStream.append(midNew)
 
@@ -3980,7 +3955,7 @@ class Test(unittest.TestCase):
         
         
         for i in range(0,5):
-            b.addNext(q.deepcopy())
+            b.addNext(deepcopy(q))
             b.elements[i].accidental = note.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
@@ -4000,11 +3975,11 @@ class Test(unittest.TestCase):
         d = note.Note("D4")
         ts = meter.TimeSignature("2/4")
         s1 = Part()
-        s1.addNext(c.copy())
-        s1.addNext(d.copy())
+        s1.addNext(deepcopy(c))
+        s1.addNext(deepcopy(d))
         s2 = Part()
-        s2.addNext(d.copy())
-        s2.addNext(c.copy())
+        s2.addNext(deepcopy(d))
+        s2.addNext(deepcopy(c))
         score1 = Score()
         score1.append(ts)
         score1.append(s1)
@@ -4266,14 +4241,14 @@ class Test(unittest.TestCase):
         s.append(r)
 
         # copying the whole: this works
-        w = s.deepcopy()
+        w = deepcopy(s)
 
         post = Stream()
         # copying while looping: this gets increasingly slow
         for aElement in s:
             environLocal.printDebug(['copying and inserting an element',
                                      aElement, len(aElement.locations)])
-            bElement = aElement.deepcopy()
+            bElement = deepcopy(aElement)
             post.insertAtOffset(aElement.offset, bElement)
             
 
@@ -4359,7 +4334,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import copy
-    x = Stream()
-    copy.deepcopy(x)
     music21.mainTest(Test)

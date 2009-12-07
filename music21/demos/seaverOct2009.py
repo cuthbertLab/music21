@@ -56,6 +56,7 @@ def simple3():
     
     defaultPitch = music21.pitch.Pitch("C3")    
     
+    import copy
     from music21.converter import parse
     from music21.stream import Stream, Measure
     
@@ -72,7 +73,7 @@ def simple3():
         
         offsetString = "" ## comma separated string of offsets 
         for thisNote in notes:
-            rhythmNote = thisNote.deepcopy()
+            rhythmNote = copy.deepcopy(thisNote)
             if rhythmNote.isNote:
                 rhythmNote.pitch = defaultPitch
             elif rhythmNote.isChord:

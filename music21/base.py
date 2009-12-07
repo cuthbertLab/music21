@@ -520,22 +520,17 @@ class Music21Object(object):
             self.contexts = []
     
 
-    def copy(self):
-        '''Return a shallow copy, or a linked reference to the source.'''
-        # NOTE: may need to create a new Locations object even in the shallow 
-        # copy
-        return copy.copy(self)
-
-    def deepcopy(self):
-        return copy.deepcopy(self)
-
     def __deepcopy__(self, memo=None):
         '''
+        Helper method to copy.py's deepcopy function.  Call it from there
+
         memo=None is the default as specified in copy.py
 
         Problem: if an attribute is defined with an understscore (_priority) but
-        is also made available through a property (e.g. priority)  using dir(self) results in the copy happening twice. Thus, __dict__.keys() is used.
+        is also made available through a property (e.g. priority)  using dir(self) 
+        results in the copy happening twice. Thus, __dict__.keys() is used.
 
+        >>> from copy import deepcopy
         >>> from music21 import note, duration
         >>> n = note.Note('A')
         >>> n.offset = 1.0 #duration.Duration("quarter")
@@ -543,7 +538,7 @@ class Music21Object(object):
         >>> n.groups
         ['flute']
 
-        >>> b = n.deepcopy()
+        >>> b = deepcopy(n)
         >>> b.offset = 2.0 #duration.Duration("half")
         
         >>> n is b
@@ -579,7 +574,7 @@ class Music21Object(object):
             elif hasattr(part, '_elements'):
                 environLocal.printDebug(['found stream in dict keys', self,
                     part, name])
-                raise StreamException('streams as attributes requires special handling')
+                raise Music21Exception('streams as attributes requires special handling')
             else: # use copy.deepcopy, will call __deepcopy__ if available
                 newValue = copy.deepcopy(part)
                 #setattr() will call the set method of a named property.
@@ -874,7 +869,7 @@ class Element(Music21Object):
         >>> a.offset = duration.Duration("quarter")
         >>> a.groups.append("flute")
 
-        >>> b = a.copy()
+        >>> b = copy.copy(a)
         >>> b.offset = duration.Duration("half")
         
         '''
@@ -914,6 +909,7 @@ class Element(Music21Object):
         
         (name is all lowercase to go with copy.deepcopy convention)
 
+        >>> import copy    
         >>> from music21 import note, duration
         >>> n = note.Note('A')
         
@@ -921,7 +917,7 @@ class Element(Music21Object):
         >>> a.offset = 1.0 # duration.Duration("quarter")
         >>> a.groups.append("flute")
 
-        >>> b = a.deepcopy()
+        >>> b = copy.deepcopy(a)
         >>> b.offset = 2.0 # duration.Duration("half")
         
         >>> a.obj is b.obj
@@ -1129,7 +1125,7 @@ class Element(Music21Object):
         >>> aE.offset = 4.0
         >>> aE.priority = 4
         
-        >>> bE = aE.copy()
+        >>> bE = copy.copy(aE)
         >>> aE is bE
         False
         >>> aE == bE
@@ -1222,7 +1218,7 @@ class Test(unittest.TestCase):
         n.offset = 1.0 #duration.Duration("quarter")
         n.groups.append("flute")
 
-        b = n.deepcopy()
+        b = copy.deepcopy(n)
         b.offset = 2.0 # duration.Duration("half")
         
         self.assertFalse(n is b)
@@ -1280,7 +1276,7 @@ class Test(unittest.TestCase):
         '''
         a = Music21Object()
         a.id = 'test'
-        b = a.deepcopy()
+        b = copy.deepcopy(a)
         self.assertNotEqual(a, b)
         self.assertEqual(b.id, 'test')
 
@@ -1329,7 +1325,7 @@ class Test(unittest.TestCase):
         for x in range(30):
             b.id = 'test'
             b.parent = a
-            c = b.deepcopy()
+            c = copy.deepcopy(b)
             post.append(c)
 
         # have two locations: None, and that set by assigning parent
@@ -1348,7 +1344,7 @@ class Test(unittest.TestCase):
             b.id = 'test'
             b.parent = a
             b.offset = 30
-            c = b.deepcopy()
+            c = copy.deepcopy(b)
             c.parent = b
             post.append(c)
 

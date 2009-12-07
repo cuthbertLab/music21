@@ -375,14 +375,13 @@ class Environment(object):
         '''
         if not common.isNum(statusLevel):
             raise EnvironmentException('bad statusLevel argument given: %s' % statusLevel)
-
-        if common.isStr(msg):
-            msg = [msg] # make into a list
-        if msg[0] != self.modNameParent and self.modNameParent != None:
-            msg = [self.modNameParent] + msg
-
-        msg = common.formatStr(*msg)
         if self.__getitem__('debug') >= statusLevel:
+            if common.isStr(msg):
+                msg = [msg] # make into a list
+            if msg[0] != self.modNameParent and self.modNameParent != None:
+                msg = [self.modNameParent] + msg
+    
+            msg = common.formatStr(*msg)
             sys.stderr.write(msg)
     
 

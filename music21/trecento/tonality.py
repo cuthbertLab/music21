@@ -11,16 +11,15 @@ Also demonstrates the PNG generating abilities of the software, etc.
 import music21
 import unittest
 
-from common import *
-from note import Note
-import interval
+from music21.note import Note
+from music21 import interval
 import cadencebook
 from re import match
-import lily
-from lily import lilyString
+from music21 import lily
+from music21.lily import lilyString
 import capua
 import polyphonicSnippet
-from common import defHash
+from music21.common import defHash
 
 ph = lambda h = {}: defHash(h, default = False)
 
