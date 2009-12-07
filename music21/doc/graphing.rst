@@ -41,6 +41,9 @@ http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend
 
 
 
+
+
+
 Primitive Graphing Formats
 -------------------------------
 
@@ -130,7 +133,7 @@ A basic example follows::
 .. image:: images/graphing3dbar-basic.*
     :width: 500
 
-The following examples demonstrates basic customization with keyword arguments using the same data obtained above
+The following examples demonstrates basic customization with keyword arguments using the same data obtained above::
 
 
     >>> b = graph.Graph3DPolygonBars(title='Random Data', alpha=.8,\
@@ -141,3 +144,50 @@ The following examples demonstrates basic customization with keyword arguments u
 .. image:: images/graphing3dbar-args.*
     :width: 500
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+High Level Graphing Objects
+-------------------------------
+
+Music21 features high level graphing objects for common musical operations and analysis routines. 
+
+
+
+The ActivityMatch Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ActivityMatch object provides a way to examine, for a given parameter, what other parameters are active. 
+
+
+
+
+The NoteAnalysis Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The NoteAnalysis object permits graphing and correlating two parameters of a Note objects in a Stream.
+
+The NoteAnalysis object provides graphing routines using the Graph2DHistogram object.
+
+The following example demonstrates the default settings of the noteAttributeCount(), which correlate MIDI Note Number and Quarter Length of notes in a stream::
+
+    >>> from music21 import corpus, converter
+    >>> from music21.analysis import correlate
+    >>> a = converter.parse(corpus.getWork('luca/gloria'))
+    >>> b = correlate.NoteAnalysis(a.flat)
+    >>> b.noteAttributeCount(colors=['#aa46ff'], barWidth=.1, alpha=.7)
+
+.. image:: images/graphingNoteAnalysis-default.*
+    :width: 500
