@@ -44,6 +44,16 @@ class CorrelateException(Exception):
 #-------------------------------------------------------------------------------
 # utilities for getting ticks
 
+def ticksPitchClass():
+    ticks = []
+    cVals = range(12)
+    for i in cVals:
+        p = pitch.Pitch()
+        p.ps = i
+        ticks.append([i, '%s' % p.name])
+    return ticks
+
+
 def ticksPitchSpace(pitchMin=36, pitchMax=100):
     ticks = []
     cVals = range(pitchMin,pitchMax,12)
@@ -389,7 +399,7 @@ class NoteAnalysis(object):
     def noteAttributeHistogram(self, fx=None, *args, **keywords):
         # need a list of durations for each pitch, and a count of each duration
         '''
-        Provide two functions that process a noteObj and return the data
+        Provide one functions that process a noteObj and return the data
         to be analyzed
         '''
 

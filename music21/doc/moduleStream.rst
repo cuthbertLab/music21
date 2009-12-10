@@ -1,6 +1,11 @@
 music21.stream
 ==============
 
+Function deepcopy()
+-------------------
+
+Deep copy operation on arbitrary Python objects. See the module's __doc__ string for more info. 
+
 Function recurseRepr()
 ----------------------
 
@@ -58,10 +63,6 @@ Inherited from base.Music21Object
 **id()**
 
 **getOffsetBySite()**
-
-**deepcopy()**
-
-**copy()**
 
 **contexts()**
 
@@ -275,10 +276,6 @@ Inherited from base.Music21Object
 
 **getOffsetBySite()**
 
-**deepcopy()**
-
-**copy()**
-
 **contexts()**
 
 
@@ -452,10 +449,6 @@ Inherited from base.Music21Object
 
 **getOffsetBySite()**
 
-**deepcopy()**
-
-**copy()**
-
 **contexts()**
 
 
@@ -628,10 +621,6 @@ Inherited from base.Music21Object
 **id()**
 
 **getOffsetBySite()**
-
-**deepcopy()**
-
-**copy()**
 
 **contexts()**
 

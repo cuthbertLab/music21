@@ -118,10 +118,6 @@ Inherited from base.Music21Object
 
 **getOffsetBySite()**
 
-**deepcopy()**
-
-**copy()**
-
 **contexts()**
 
 
@@ -224,10 +220,6 @@ Inherited from base.Music21Object
 **id()**
 
 **getOffsetBySite()**
-
-**deepcopy()**
-
-**copy()**
 
 **contexts()**
 
@@ -637,10 +629,6 @@ Inherited from base.Music21Object
 
 **getOffsetBySite()**
 
-**deepcopy()**
-
-**copy()**
-
 **contexts()**
 
 
@@ -742,10 +730,6 @@ Inherited from base.Music21Object
 **id()**
 
 **getOffsetBySite()**
-
-**deepcopy()**
-
-**copy()**
 
 **contexts()**
 
