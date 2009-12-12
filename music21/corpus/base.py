@@ -182,14 +182,22 @@ def getWork(workName, movementNumber = None):
 
     
 
-def parseWork(workName, movementNumber = None):
+def parseWork(workName, movementNumber=None, forceSource=False):
+    '''Return a parsed stream from a converter by providing only a work name.
+
+    If forceSource is True, the original file will always be loaded and pickled
+    files, if available, will be ignored.
+
+    >>> aStream = parseWork('opus74no1/movement3')
+    '''
     work = getWork(workName, movementNumber)
-    return converter.parse(work)
+    return converter.parse(work, forceSource)
 
 
 
 #-------------------------------------------------------------------------------
 # all paths
+
 paths = getPaths()
 
 #-------------------------------------------------------------------------------
@@ -198,9 +206,6 @@ paths = getPaths()
 beethoven = getComposer('beethoven')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
-
-
-
 
 
 
@@ -224,6 +229,27 @@ class Test(unittest.TestCase):
             self.assertEqual(workSlashes.endswith(known), True)
 
 
+    def testTimingTolerance(self):
+        '''Test the performance of loading various files
+        This may not produce errors as such, but is used to provide reference
+        if overall perforamance has changed.
+        '''
+        # provide work and expected min/max in seconds
+        for known, max in [
+            ('beethoven/opus59no2/movement3', 9),
+            ('haydn/opus74no1/movement3', 6),
+            ('schumann/opus41no1/movement2', 7),
+
+            ]:
+            pass
+
+            t = common.Timer()
+            t.start()
+            x = parseWork(known, forceSource=True)
+            t.stop()
+            dur = t()
+            environLocal.printDebug(['timing tolarance for', known, t])
+            self.assertEqual(True, dur <= max) # performance test
 
 
 if __name__ == "__main__":

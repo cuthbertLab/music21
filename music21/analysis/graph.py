@@ -46,7 +46,6 @@ class GraphException(Exception):
 
 
 
-
 # visual apearance notes:
 
 # can we make these defaults on our
@@ -77,6 +76,12 @@ class Graph(object):
         else:
             self.alpha = .2
 
+        # set the color of the background data region
+        if 'colorBackgroundData' in keywords:
+            self.colorBackgroundData = keywords['colorBackgroundData']
+        else:
+            self.colorBackgroundData = '#cccccc'
+
         if 'title' in keywords:
             self.setTitle(keywords['title'])
         else:
@@ -97,6 +102,11 @@ class Graph(object):
         for ax in self.axisKeys:
             self.axis[ax] = {}
             self.axis[ax]['range'] = None
+
+    def _getFigure(self):
+        '''Configure and return a figure object
+        '''
+        pass
 
     def setData(self, data):
         self.data = data
@@ -139,6 +149,15 @@ class Graph(object):
         self.axis[axisKey]['label'] = label
 
     def _applyFormatting(self, ax):
+        '''Apply formatting to the Axes container     
+        '''
+        rect = ax.axesPatch
+        # this sets the color of the main data presentation window
+        rect.set_facecolor(self.colorBackgroundData)
+        # this does not do anything yet
+        #rect.set_edgecolor('red')
+
+
         for axis in self.axisKeys:
             if self.axis[axis]['range'] != None:
                 if axis == 'x' and len(self.axisKeys) == 2:
@@ -228,6 +247,10 @@ class Graph2DScatter(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
+
+        # this works if we need to change size
+        #self.fig.set_figwidth(10) 
+
         ax = self.fig.add_subplot(111)
         for x, y in self.data:
             ax.plot(x, y, 'o', color='b', alpha=self.alpha)

@@ -58,8 +58,14 @@ class PickleFilter(object):
     If the user has not specified a scratch directory, a pickle path will 
     not be created. 
     '''
-    def __init__(self, fp):
+    def __init__(self, fp, forceSource=False):
+        '''Provide a file path to check if there is pickled version.
+
+        If forceSource is True, pickled files, if available, will not be
+        returned.
+        '''
         self.fp = fp
+        self.forceSource = forceSource
 
     def _getPickleFp(self, dir):
         if dir == None:
@@ -67,16 +73,18 @@ class PickleFilter(object):
         return os.path.join(dir, 'm21-' + common.getMd5(self.fp) + '.p')
 
     def status(self):
-        # look for an upto date pickled version
+        # look for an up to date pickled version
         # if it exists, return its fp, other wise return fp
         fpScratch = environLocal['directoryScratch']
         format = common.findFormatFile(self.fp)
 
         if format == 'pickle': # do not pickle a pickle
+            if self.forceSource:
+                raise PickleFilterException('cannot access source file when only given a file path to a pickled file.')
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None                    
-        elif fpScratch == None:
+        elif fpScratch == None or self.forceSource:
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
@@ -127,46 +135,10 @@ class ConverterHumdrum(object):
 #-------------------------------------------------------------------------------
 class ConverterMusicXML(object):
 
-    def __init__(self):
+    def __init__(self, forceSource):
         self._mxScore = None
         self._stream = stream.Score()
- 
-# 
-#     def loadMxPart(self, partId):
-#         '''This loads a part into a Stream by part ID.
-#         '''
-#         mxPart = self._mxScore.getPart(partId)
-#         mxInstrument = self._mxScore.getInstrument(partId)
-#         #mxInstrument = self._getMxInstrument(partId)
-# 
-#         instrumentObj = instrument.Instrument()
-#         if mxInstrument != None:
-#             instrumentObj.mx = mxInstrument
-#         # add part id as group
-#         instrumentObj.groups.append(partId)
-# 
-#         streamPart = stream.Part() # create a part instance for each part
-#         # add instrument into stream at zero offset
-#         streamPart.append(instrumentObj)
-# 
-#         # offset is in quarter note length
-#         offsetMeasure = 0
-#         for mxMeasure in mxPart:
-#             # create a music21 measure and then assign to mx attribute
-#             m = stream.Measure()
-#             m.mx = mxMeasure  # assign data into music21 measure 
-#             # add measure to stream at current offset for this measure
-#             streamPart.insert(offsetMeasure, m)
-#             # increment measure offset for next time around
-#             offsetMeasure += m.timeSignature.barDuration.quarterLength 
-# 
-#         streamPart.addGroupForElements(partId) # set group for components 
-#         streamPart.groups.append(partId) # set group for stream itself
-# 
-#         # this assumes all start at the same place
-#         self._stream.insert(0, streamPart)
-#                    
-
+        self.forceSource = forceSource
 
     #---------------------------------------------------------------------------
     def getPartNames(self):
@@ -178,19 +150,9 @@ class ConverterMusicXML(object):
         '''
         t = common.Timer()
         t.start()
-
-        # should be
         self._stream.mx = self._mxScore
-
-#         partNames = self._mxScore.getPartNames().keys()
-#         partNames.sort()
-#         for partName in partNames:
-#             self.loadMxPart(partName)
-
         t.stop()
         environLocal.printDebug(['music21 object creation time:', t])
-
-
 
     #---------------------------------------------------------------------------
     # properties
@@ -217,7 +179,7 @@ class ConverterMusicXML(object):
         open source.
         '''
         # return fp to load, if pickle needs to be written, fp pickle
-        pfObj = PickleFilter(fp)
+        pfObj = PickleFilter(fp, self.forceSource)
         fpDst, writePickle, fpPickle = pfObj.status() # get status
 
         formatSrc = common.findFormatFile(fp)
@@ -268,21 +230,21 @@ class Converter(object):
     def __init__(self):
         self._converter = None
 
-    def _setConverter(self, format):
+    def _setConverter(self, format, forceSource=False):
         # assume for now tt pickled files are alwasy musicxml
         # this may change in the future
         if format in ['musicxml', 'pickle']: 
-            self._converter = ConverterMusicXML()
+            self._converter = ConverterMusicXML(forceSource)
         elif format == 'humdrum':
             self._converter = ConverterHumdrum()
         else:
             raise ConverterException('no such format: %s' % format)
 
-    def parseFile(self, fp):
+    def parseFile(self, fp, forceSource=False):
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
         format = common.findFormatFile(fp) 
-        self._setConverter(format)
+        self._setConverter(format, forceSource)
         self._converter.parseFile(fp)
 
     def parseData(self, dataStr):
@@ -317,9 +279,9 @@ class Converter(object):
 # module level convenience methods
 
 
-def parseFile(fp):
+def parseFile(fp, forceSource=False):
     v = Converter()
-    v.parseFile(fp)
+    v.parseFile(fp, forceSource)
     return v.stream
 
 def parseData(dataStr):
@@ -327,12 +289,12 @@ def parseData(dataStr):
     v.parseData(dataStr)
     return v.stream
 
-def parse(value):
+def parse(value, forceSource=False):
     '''
     Determine if the file is a file path or a string 
     '''
     if os.path.exists(value):
-        return parseFile(value)
+        return parseFile(value, forceSource)
     else:
         return parseData(value)
 
@@ -531,6 +493,8 @@ class Test(unittest.TestCase):
 
         clefs = part.flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 18)
+
+
 
 
 if __name__ == "__main__":
