@@ -2,8 +2,11 @@
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
+  <movement-title>Gloria (Bologna Q15, f. A45v-46r)</movement-title>
   <identification>
     <encoding>
+      <creator type="composer">D. Luca</creator>
+      <creator type="editor">Michael Scott Cuthbert</creator>
       <software>Finale 2010 for Windows</software>
       <software>Dolet Light for Finale 2010</software>
       <encoding-date>2009-11-07</encoding-date>
