@@ -686,11 +686,6 @@ class Music21Object(object):
         else:
             raise Exception('request for offset cannot be made with parent of %s' % self.parent)            
 
-#         elif self.disconnectedOffset is not None:
-#             return self.disconnectedOffset
-#         else:
-#             return 0.0
-
     def _setOffset(self, value):
         if common.isNum(value):
             # if a number assume it is a quarter length
@@ -1297,8 +1292,6 @@ class Test(unittest.TestCase):
         a.parent = b
         # now we have two offsets in locations
         self.assertEqual(len(a.locations), 2)
-        # we still have an entry in disconnected offset
-#        self.assertEqual(a.disconnectedOffset, 30.0)
 
         a.offset = 40
         # still have parent
