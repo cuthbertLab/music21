@@ -514,11 +514,6 @@ class Stream(music21.Music21Object):
         >>> len(a)
         2
         '''
-#         if hasattr(item, "disconnectedOffset") and item.disconnectedOffset is not None:
-#             appendOffset = item.disconnectedOffset
-#         else:
-#             appendOffset = 0.0
-
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insertAtOffset called with non Music21Object', item])
@@ -619,10 +614,7 @@ class Stream(music21.Music21Object):
             else:
                 element = item
 
-            addOffset = highestTimeTemp + element.getOffsetBySite(None)
-
-#            addOffset = highestTimeTemp + element.disconnectedOffset
-            
+            addOffset = highestTimeTemp + element.getOffsetBySite(None)            
             # this should look to the contained object duration
             if (hasattr(element, "duration") and 
                 hasattr(element.duration, "quarterLength")):
@@ -655,8 +647,6 @@ class Stream(music21.Music21Object):
         '''
         if not hasattr(item, "locations"):
             raise StreamException("Cannot insert and item that does not have a location; wrap in an Element() first")
-
-        #item.locations.add(item.disconnectedOffset, self)
 
         # NOTE: this may have enexpected side effects, as the None location
         # may have been set much later in this objects life.
