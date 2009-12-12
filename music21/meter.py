@@ -1763,7 +1763,7 @@ class TestExternal(unittest.TestCase):
                                             meterStrDenominator))
                 m = stream.Measure()
                 m.timeSignature = ts
-                a.insertAtOffset(m.timeSignature.barDuration.quarterLength, m)
+                a.insert(m.timeSignature.barDuration.quarterLength, m)
         a.show()
 
     def testCompound(self):
@@ -1782,7 +1782,7 @@ class TestExternal(unittest.TestCase):
             ts = TimeSignature('+'.join(msg))
             m = stream.Measure()
             m.timeSignature = ts
-            a.insertAtOffset(m.timeSignature.barDuration.quarterLength, m)
+            a.insert(m.timeSignature.barDuration.quarterLength, m)
         a.show()
 
 

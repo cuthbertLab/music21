@@ -169,7 +169,7 @@ class Test(unittest.TestCase):
                 # of the source
                 # not sure where/how part stream places this
                 annotation = articulations.Annotation('big cadential moment')
-                partStream.insertAtOffset(chordThis.offset, annotation)
+                partStream.insert(chordThis.offset, annotation)
 
     def test008(self):
         '''Are dynamic swells (crescendo-diminuendos) more common than dips (diminuendos-crescendos)?'''

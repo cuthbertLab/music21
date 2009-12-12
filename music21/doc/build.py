@@ -35,7 +35,9 @@ from music21 import scale
 from music21 import stream
 from music21 import tempo
 
-from music21 import environment
+from music21.trecento import cadencebook as trecentoCadencebook
+
+#from music21 import environment #redundant
 _MOD = "doc.build.py"
 environLocal = environment.Environment(_MOD)
 
@@ -54,6 +56,7 @@ MODULES = [
     note, 
     pitch, 
     stream, 
+
     
 #    chord, 
 #     instrument,
@@ -64,6 +67,9 @@ MODULES = [
 #   musicxml, 
 #   #  scale,
 #     tempo,  
+
+# trecento
+    trecentoCadencebook
 ]
 
 

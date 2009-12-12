@@ -40,14 +40,20 @@ class TrecentoSheet(object):
     filename  = "cadences.xls"
     
     def __init__(self, **keywords):
-        if ("filename" in keywords): self.filename = keywords["filename"]
-        xbook = xlrd.open_workbook(self.filename)
-        
-        if ("sheetname" in keywords): self.sheetname = keywords["sheetname"]
-        
-        self.sheet = xbook.sheet_by_name(self.sheetname)
-        self.totalRows = self.sheet.nrows
-        self.rowDescriptions = self.sheet.row_values(0)
+        if ("filename" in keywords): 
+            self.filename = keywords["filename"]
+        if self.filename:
+            try:
+                xbook = xlrd.open_workbook(self.filename)        
+            except IOError:
+                xbook = xlrd.open_workbook("trecento/" + self.filename)
+            if ("sheetname" in keywords): 
+                self.sheetname = keywords["sheetname"]
+            
+            self.sheet = xbook.sheet_by_name(self.sheetname)
+            self.totalRows = self.sheet.nrows
+            self.rowDescriptions = self.sheet.row_values(0)
+                
 
     def __iter__(self):
         self.iterIndex = 2 ## row 1 is a header

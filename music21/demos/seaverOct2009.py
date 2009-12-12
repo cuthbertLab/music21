@@ -204,17 +204,25 @@ def simple4e():
     
     beethovenQuartet = corpus.parseWork('opus18no1', 4)
     
+    maxNote = None
+    
     for part in beethovenQuartet:
-        pf = part.flat.getNotes()
-        for n in pf:
-            if n.quarterLength >= qLenMax:
-                qLenMax = n.quarterLength
-                n.color = 'red'
-                display = pf.extractContext(n, before = 4.0, after = 6.0)
-                
-    print 'longest duration was: %s quarters long' % (qLenMax)
-    lily.LilyString("{ \\time 2/4 " + display.bestClef().lily + " " + display.lily + "}").showPNG()
+        lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
+#        part.show()
 
+#        pf = part.flat.getNotes()
+#        for n in pf:
+#            if n.quarterLength >= qLenMax:
+#                qLenMax = n.quarterLength
+#                maxNote = n
+#
+#        maxNote.color = 'red'
+#        display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
+#
+#                
+#    print 'longest duration was: %s quarters long' % (qLenMax)
+#    lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
+#    display.show()
 
 def simple4f():
     # question 19: Calculate pitch-class sets for melodic passages segmented by rests.
@@ -261,7 +269,7 @@ def simple4g():
 
 
 def simple4h():
-    # question 40: Count how many measures contain at least one trill.
+    # question 40: Count how many measures contain at least one trill. 
     pass
 
     # question 60: Determine how frequently ascending melodic leaps are followed by descending steps
@@ -390,5 +398,5 @@ def js_q5():
     returnStream.show()
 
 if (__name__ == "__main__"):
-    simple1()
+    simple4e()
     
