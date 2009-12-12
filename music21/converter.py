@@ -496,6 +496,16 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXClefCorpus(self):
+    
+        from music21 import corpus
+        a = corpus.parseWork('luca')
+        clefs = a[0].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+        clefs = a[1].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+        clefs = a[2].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+
 
 
 if __name__ == "__main__":

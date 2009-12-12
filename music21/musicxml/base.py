@@ -33,9 +33,6 @@ environLocal = environment.Environment(_MOD)
 
 
 
-
-
-
 #-------------------------------------------------------------------------------
 # notes
 
@@ -80,10 +77,7 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 
 # 'bend' : not implemented as needs many sub components
 
-
-
 #-------------------------------------------------------------------------------
-
 class TagException(Exception):
     pass
 
@@ -96,7 +90,6 @@ class MusicXMLException(Exception):
 class DocumentException(Exception):
     pass
 
-#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 class Tag(object):
     '''Object to store tags as encountered by SAX. Tags can be open or closed based 
@@ -379,7 +372,6 @@ class MusicXMLElementList(MusicXMLElement):
         MusicXMLElement.__init__(self)
         # basic storage location
         self.componentList = [] 
-        # self._index = 0
         # additional attributes and elements will be defined in subclass
 
     def _getComponents(self):
@@ -392,31 +384,13 @@ class MusicXMLElementList(MusicXMLElement):
         return len(self.componentList)
 
     def __iter__(self):
-#         self._index = 0 # need to reset index before returning iterator
-#         return self
         return common.Iterator(self.componentList)
 
 
     def __getitem__(self, key):
         '''Get item via index value
         '''
-#         if abs(key) > self.__len__():
-#             raise IndexError
-#         else:
         return self.componentList[key]
-
-#     def next(self):
-#         '''Method for treating this object as an iterator
-#         Returns each node in sort order; could be in tree order. 
-#         '''
-#         if abs(self._index) >= self.__len__():
-#             self._index = 0 # reset for next run
-#             raise StopIteration
-#         out = self.componentList[self._index] 
-#         self._index += 1
-#         return out
-# 
-# 
 
 
 
@@ -3298,13 +3272,12 @@ class Test(unittest.TestCase):
         for xmlString in testPrimitive.ALL:
             a.read(xmlString)
 
-
-#     def testCorpus(self):
-#         from music21 import corpus
-#         movements = corpus.getWork('opus41no1')
-#         a = Document()
-#         a.open(movements[2])
-
+    def testOpenCorpus(self):
+        from music21 import corpus
+        path = corpus.getWork('luca')
+        d = Document()
+        d.open(path)
+        
 
 
 #-------------------------------------------------------------------------------

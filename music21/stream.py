@@ -1296,8 +1296,7 @@ class Stream(music21.Music21Object):
 
 
     def bestClef(self, allowTreble8vb = False):
-        '''
-        Cheat method: returns the clef that is the best fit for the sequence
+        '''Eeturns the clef that is the best fit for notes and chords found in thisStream.
 
         Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets
 
@@ -1324,7 +1323,6 @@ class Stream(music21.Music21Object):
         >>> d.sign
         'F'
         '''
-
         totalNotes = 0
         totalHeight = 0
 
@@ -1547,8 +1545,8 @@ class Stream(music21.Music21Object):
         '''Take a stream and partition all elements into measures based on 
         one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used.
 
-        This creates a new stream with Measures, though objects are not copied
-        from self stream. 
+        This always creates a new stream with Measures, though objects are not
+        copied from self stream. 
     
         If a meterStream is provided, this is used instead of the meterStream
         found in the Stream.
@@ -1572,13 +1570,15 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-        useSelf = False
-        if not useSelf: # make a copy
-            srcObj = deepcopy(self)
-        else: # this is not tested
-            srcObj = self
+#         useSelf = False
+#         if not useSelf: # make a copy
+#             srcObj = deepcopy(self)
+#         else: # this is not tested
+#             srcObj = self
+#     
+        # the srcObj shold not be modified or chagned
+        srcObj = self
 
-    
         # may need to look in parent if no time signatures are found
         if meterStream == None:
             meterStream = srcObj.getTimeSignatures()
@@ -1604,7 +1604,7 @@ class Stream(music21.Music21Object):
         oMin = min([start for start, end, e in offsetMap])
         oMax = max([end for start, end, e in offsetMap])
     
-        # this should not happend, but just in case
+        # this should not happen, but just in case
         if oMax != srcObj.highestTime:
             raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, srcObj.highestTime))
         #environLocal.printDebug(['oMin, oMax', oMin, oMax])
@@ -1622,20 +1622,23 @@ class Stream(music21.Music21Object):
         measureCount = 0
         while True:    
             m = Measure()
+            m.measureNumber = measureCount + 1
             # get active time signature at this offset
             # make a copy and it to the meter
             m.timeSignature = deepcopy(meterStream.getElementAtOrBefore(o))
             #environLocal.printDebug(['assigned time sig', m.timeSignature])
-            m.clef = clefObj
+
+            # only add a clef for the first measure when automatically 
+            # creating Measures
+            if measureCount == 0: 
+                m.clef = clefObj
     
-            #environLocal.printDebug([measureCount, o, oMax, m.timeSignature,
-            #                        m.timeSignature.barDuration.quarterLength])
-            m.measureNumber = measureCount + 1
             # avoid an infinite loop
             if m.timeSignature.barDuration.quarterLength == 0:
                 raise StreamException('time signature has no duration')    
             post.insert(o, m) # insert measure
-            o += m.timeSignature.barDuration.quarterLength # increment by meter length
+            # increment by meter length
+            o += m.timeSignature.barDuration.quarterLength 
             if o >= oMax: # may be zero
                 break # if length of this measure exceedes last offset
             else:
@@ -2585,6 +2588,8 @@ class Stream(music21.Music21Object):
     def _setMXPart(self, mxScore, partId):
         '''Load a part given an mxScore and a part name.
         '''
+        #environLocal.printDebug(['calling Stream._setMXPart'])
+
         mxPart = mxScore.getPart(partId)
         mxInstrument = mxScore.getInstrument(partId)
 
@@ -2607,10 +2612,6 @@ class Stream(music21.Music21Object):
             m.mx = mxMeasure  # assign data into music21 measure 
             # add measure to stream at current offset for this measure
             streamPart.insert(oMeasure, m)
-
-            # parent is set to Part
-            #environLocal.printDebug(['src, part', m, m.parent])
-
             # increment measure offset for next time around
             oMeasure += m.timeSignature.barDuration.quarterLength 
 
@@ -3166,13 +3167,9 @@ class Measure(Stream):
         if self.timeSignature != None:
             mxAttributes.timeList = self.timeSignature.mx 
 
-
         # need to look here at the parent, and try to find
         # the clef in the clef last defined in the parent
-        if self.clef == None:
-            # this will set a new clef for each measure
-            mxAttributes.clefList = [self.bestClef().mx]
-        else:
+        if self.clef != None:
             mxAttributes.clefList = [self.clef.mx]
 
         #mxAttributes.keyList = []
@@ -3204,7 +3201,10 @@ class Measure(Stream):
         # may not be available; may need to be obtained from 
 
         mxAttributes = mxMeasure.get('attributes')
-        if mxAttributes == None:
+        mxAttributesInternal = True
+        if mxAttributes == None:    
+            # need to keep track of where mxattributessrc is coming from
+            mxAttributesInternal = False
             # not all measures have attributes definitions; this
             # gets the last-encountered measure attributes
             mxAttributes = mxMeasure.external['attributes']
@@ -3228,8 +3228,11 @@ class Measure(Stream):
         self.timeSignature = meter.TimeSignature()
         self.timeSignature.mx = mxTimeList
 
-        # only set clef if it is defined
-        if len(mxAttributes.clefList) != 0:
+        # only set clef if it is defined 
+        # we must check that attributes are derived from the measure proper
+        #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
+        #                        mxAttributesInternal])
+        if mxAttributesInternal == True and len(mxAttributes.clefList) != 0:
             self.clef = clef.Clef()
             self.clef.mx = mxAttributes.clefList
 
@@ -4322,6 +4325,18 @@ class Test(unittest.TestCase):
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 
+
+
+    def testClefs(self):
+        s = Stream()
+        for x in ['c3','a3','c#4','d3'] * 5:
+            n = note.Note(x)
+            s.addNext(n)
+        clefObj = s.bestClef()
+        self.assertEqual(clefObj.sign, 'F')
+        measureStream = s.makeMeasures()
+        clefObj = measureStream[0].clef
+        self.assertEqual(clefObj.sign, 'F')
 
 if __name__ == "__main__":
     music21.mainTest(Test)
