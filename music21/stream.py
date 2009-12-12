@@ -1570,12 +1570,6 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-#         useSelf = False
-#         if not useSelf: # make a copy
-#             srcObj = deepcopy(self)
-#         else: # this is not tested
-#             srcObj = self
-#     
         # the srcObj shold not be modified or chagned
         srcObj = self
 
@@ -3161,16 +3155,18 @@ class Measure(Stream):
         mxMeasure = musicxmlMod.Measure()
         mxMeasure.set('number', self.measureNumber)
 
+        # get an empty mxAttributes object
         mxAttributes = musicxmlMod.Attributes()
-        mxAttributes.setDefaults() # get basic defaults, divisions, etc
+        # setting defaults sets divisions, key, clef, and timesig
+        mxAttributes.setDefaults() 
 
-        if self.timeSignature != None:
-            mxAttributes.timeList = self.timeSignature.mx 
-
-        # need to look here at the parent, and try to find
+        # may need to look here at the parent, and try to find
         # the clef in the clef last defined in the parent
         if self.clef != None:
             mxAttributes.clefList = [self.clef.mx]
+        
+        if self.timeSignature != None:
+            mxAttributes.timeList = self.timeSignature.mx 
 
         #mxAttributes.keyList = []
         mxMeasure.set('attributes', mxAttributes)

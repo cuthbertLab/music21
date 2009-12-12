@@ -16,6 +16,9 @@ from music21 import common
 from music21 import musicxml
 from music21.lily import LilyString
 
+from music21 import environment
+_MOD = "clef.py"
+environLocal = environment.Environment(_MOD)
 
 
 class ClefException(Exception):
@@ -28,31 +31,42 @@ class Clef(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self.sign = None
         self.line = None
+        self.clefOctaveChange = 0 # set to zero as default
 
         # mxl has an attribute forr clefOctaveChange, and integer to show 
         # transposing clefs
 
     def _getMX(self):
-        '''
-        This might be mobed only into PitchClef.
+        '''Given a music21 Clef object, return a MusicXML Clef object.
+
+        This might be moved only into PitchClef.
 
         >>> b = GClef()
         >>> a = b.mx
         >>> a.get('sign')
         'G'
+
+        >>> b = Treble8vbClef()
+        >>> b.clefOctaveChange
+        -1
+        >>> a = b.mx
+        >>> a.get('sign')
+        'G'
+        >>> a.get('clefOctaveChange')
+        -1
         '''
 
         mxClef = musicxml.Clef()
         mxClef.set('sign', self.sign)
         mxClef.set('line', self.line)
+        if self.clefOctaveChange != 0:
+            mxClef.set('clefOctaveChange', self.clefOctaveChange)
         return mxClef
 
     def _setMX(self, mxClefList):
-        '''
-        This might be mobed only into PitchClef.
+        '''Given a MusicXML Clef object, return a music21 Clef object
 
-        TODO: need to read clefOctaveChange and determine if class
-        should be alternative
+        This might be moved only into PitchClef.
 
         >>> a = musicxml.Clef()   
         >>> a.set('sign', 'G')
@@ -67,9 +81,16 @@ class Clef(music21.Music21Object):
         else: # just get first for now
             mxClef = mxClefList[0]
 
+        
         # this is not trying to load special clef classes below
         self.sign = mxClef.get('sign')
         self.line = mxClef.get('line')
+        mxOctaveChange = mxClef.get('clefOctaveChange')
+        if mxOctaveChange != None:
+            self.clefOctaveChange = int(mxOctaveChange)
+
+        #environLocal.printDebug(['called _setMX, got clefOctaveChange',
+        #                         self.clefOctaveChange, mxClef])
 
     mx = property(_getMX, _setMX)
 
@@ -104,7 +125,6 @@ class GClef(PitchClef):
         '''
         PitchClef.__init__(self)
         self.sign = "G"
-
 
 class FrenchViolinClef(GClef):
     def __init__(self):
@@ -296,8 +316,7 @@ def standardClefFromXN(xnStr):
         
 
 
-
-
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -324,12 +343,18 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
 
     def testConversionMX(self):
+        # test basic creation
         for clefObjName in [FrenchViolinClef, TrebleClef, Treble8vbClef, 
                 GSopranoClef, SopranoClef, MezzoSopranoClef,
                 TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
                 SubBassClef]:
             a = clefObjName()
             mxClef = a.mx
+
+        # test specific clefs
+        a = Treble8vbClef()
+        mxClef = a.mx
+        self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
 
 if __name__ == "__main__":

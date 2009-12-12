@@ -194,7 +194,7 @@ class TagLib(object):
         'software', 'movement-title', 'movement-number', 'creator', 'rights', 
         'group-name', 'group-symbol', 'group-barline', 
         'midi-channel', 'midi-program', 'fifths', 'mode', 'cancel', 'key-step', 'key-alter', 
-        'key-octave', 'beats', 'beat-type', 'sign', 'line', 'diatonic', 
+        'key-octave', 'beats', 'beat-type', 'sign', 'line', 'clef-octave-change', 'diatonic', 
         'chromatic', 'octave-change', 
         ]
 
@@ -897,16 +897,21 @@ class Attributes(MusicXMLElement):
         return c
 
     def setDefaults(self):
+        # previously, clef and key were set as defaults
+        # this poses a problem, however, as each may be be based
+        # on past measures and are not required for each measures
+        # time signature is set for each measure, as m21 expects there
+        # to be a timeSignature object in each measure.
         self.set('divisions', defaults.divisionsPerQuarter)
         mxTime = Time()
         mxTime.setDefaults()
         self.timeList.append(mxTime)
-        mxClef = Clef()
-        mxClef.setDefaults()
-        self.clefList.append(mxClef)
-        mxKey = Key()
-        mxKey.setDefaults()
-        self.keyList.append(mxKey)
+#         mxClef = Clef()
+#         mxClef.setDefaults()
+#         self.clefList.append(mxClef)
+#         mxKey = Key()
+#         mxKey.setDefaults()
+#         self.keyList.append(mxKey)
 
 
 class Key(MusicXMLElement):
@@ -1751,7 +1756,8 @@ class Handler(xml.sax.ContentHandler):
 
         'attributes', 'divisions', 'forward', 'backup', 'grace', 'time-modification', 'actual-notes', 'normal-notes', 'normal-type', 'normal-dot', 'tuplet', 'notehead', 'technical', 'wedge', 'ornaments',
 
-        'part', 'key', 'fifths', 'mode', 'cancel', 'key-step', 'key-alter', 'key-octave', 'transpose', 'diatonic', 'chromatic', 'octave-change', 'time', 'beats', 'beat-type', 'clef', 'sign', 'line', 'staff',  'fermata', 'barline', 'ending', 'bar-style', 'repeat', 'measure-style', 'multiple-rest', 'staves'
+        'part', 'key', 'fifths', 'mode', 'cancel', 'key-step', 'key-alter', 'key-octave', 'transpose', 'diatonic', 'chromatic', 'octave-change', 'time', 'beats', 'beat-type', 'clef', 'sign', 'line',
+        'clef-octave-change', 'staff',  'fermata', 'barline', 'ending', 'bar-style', 'repeat', 'measure-style', 'multiple-rest', 'staves'
         ] + DYNAMIC_MARKS + ARTICULATION_MARKS + TECHNICAL_MARKS
 
         self._tags += ['score-partwise', 'score-timewise', 'movement-title', 'movement-number', 'work', 'work-title', 'work-number', 'identification', 'rights', 'creator', 'encoding', 'software', 'encoding-date', ]
@@ -2030,6 +2036,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'clef':
             self._clefObj = Clef()
+            #environLocal.printDebug(['found clef, attrs', attrs.keys()])
             self._clefObj.loadAttrs(attrs)
 
         elif name == 'measure-style':
@@ -2504,6 +2511,9 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'line':
             self._clefObj.line = self.t[name].getCharData()
 
+        elif name == 'clef-octave-change':
+            self._clefObj.clefOctaveChange = self.t[name].getCharData()
+            #environLocal.printDebug(['got coc tag', self._clefObj])
 
 
 
@@ -3277,8 +3287,13 @@ class Test(unittest.TestCase):
         path = corpus.getWork('luca')
         d = Document()
         d.open(path)
-        
 
+        mxMeasure = d.score.componentList[1][0] # second part, first measure
+        mxAttributes = mxMeasure.get('attributes')
+        mxClef = mxAttributes.get('clefList')[0]
+        self.assertEqual(mxClef.get('sign'), 'G')
+        # values is stored as a string
+        self.assertEqual(mxClef.get('clef-octave-change'), '-1')
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

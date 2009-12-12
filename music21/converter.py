@@ -499,12 +499,38 @@ class Test(unittest.TestCase):
     
         from music21 import corpus
         a = corpus.parseWork('luca')
+
+        # there should be only one clef in each part
         clefs = a[0].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
+        self.assertEqual(clefs[0].sign, 'G')
+
         clefs = a[1].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
+        self.assertEqual(clefs[0].clefOctaveChange, -1)
+
         clefs = a[2].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
+
+
+
+        from music21 import corpus
+        a = corpus.parseWork('mozart/k156/movement4')
+
+        # violin part
+        clefs = a[0].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+        self.assertEqual(clefs[0].sign, 'G')
+
+        # viola
+        clefs = a[2].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+        self.assertEqual(clefs[0].sign, 'C')
+
+        # violoncello
+        clefs = a[3].flat.getElementsByClass(clef.Clef)
+        self.assertEqual(len(clefs), 1)
+        self.assertEqual(clefs[0].sign, 'F')
 
 
 
