@@ -123,9 +123,9 @@ class RestrtucturedWriter(object):
         >>> from music21 import note
         >>> rw = RestrtucturedWriter()
         >>> post = rw.formatParent(inspect.getmro(note.Note)[1])
-        >>> 'note.GeneralNote' in post      
+        >>> 'note.NotRest' in post      
         True
-        >>> post = rw.formatParent(inspect.getmro(note.Note)[3])
+        >>> post = rw.formatParent(inspect.getmro(note.Note)[4])
         >>> 'object' in post      
         True
         '''

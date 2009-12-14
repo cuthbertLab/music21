@@ -37,7 +37,7 @@ class ChordException(Exception):
 
 
 
-class Chord(note.GeneralNote):
+class Chord(note.NotRest):
     '''Class for dealing with chords
     
     A Chord is an object composed of Notes.
@@ -72,7 +72,7 @@ class Chord(note.GeneralNote):
     isRest = False
 
     def __init__(self, notes = [], **keywords):
-        note.GeneralNote.__init__(self, **keywords)
+        note.NotRest.__init__(self, **keywords)
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes

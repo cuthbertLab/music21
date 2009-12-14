@@ -415,7 +415,6 @@ class GeneralNote(music21.Music21Object):
     isChord = False
     
     def __init__(self, *arguments, **keywords):
-        #super(GeneralNote, self).__init__(**keywords)
         music21.Music21Object.__init__(self)
 
         self.duration = duration.Duration(**keywords)
@@ -607,15 +606,6 @@ class GeneralNote(music21.Music21Object):
         '''
         returnNotes = []
 
-        # but a simple note does not have a self.componentDurations 
-        # attribute
-#         if len(self.componentDurations) == 0:
-#             returnNotes[0] == self.clone()  ## is already a simpleNote
-
-# there is alway s
-#         if len(self.duration.components) == 0:
-#             returnNotes.append(self.clone())
-
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
                 tempNote = self.clone()            
@@ -640,7 +630,56 @@ class GeneralNote(music21.Music21Object):
         return returnNotes
 
 
+    def compactNoteInfo(self):
+        '''
+        nice debugging info tool -- returns information about a note
+        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+        '''
+        
+        ret = ""
+        if (self.isNote is True):
+            ret += self.name + " " + self.step + " " + str(self.octave)
+            if (self.accidental is not None):
+                ret += " " + self.accidental.name
+        elif (self.isRest is True):
+            ret += "rest"
+        else:
+            ret += "other note type"
+        if (self.tie is not None):
+            ret += " (Tie: " + self.tie.type + ")"
+        ret += " " + self.duration.type
+        ret += " " + str(self.duration.quarterLength)
+        if len(self.duration.tuplets) > 0:
+            ret += " & is a tuplet"
+            if self.duration.tuplets[0].type == "start":
+                ret += " (in fact STARTS the tuplet)"
+            elif self.duration.tuplets[0].type == "stop":
+                ret += " (in fact STOPS the tuplet)"
+        if len(self.notations) > 0:
+            if (isinstance(self.notations[0], music21.notationMod.Fermata)):
+                ret += " has Fermata"
+        return ret
 
+
+
+
+#-------------------------------------------------------------------------------
+class NotRest(GeneralNote):
+    '''
+    Parent class for objects that are not rests; or, object that can be tied.
+    '''
+    
+    # unspecified means that there may be a stem, but its orienation
+    # has not been declared. 
+    stemDirection = "unspecified"
+    
+    def __init__(self, *arguments, **keywords):
+        GeneralNote.__init__(self, **keywords)
+
+#     def splitNoteAtPoint(self, quarterLength):
+#         (note1, note2) = GeneralNote.splitNoteAtPoint(self, quarterLength)
+#         note1.tie = Tie("start")  #rests arent tied
+#         return [note1, note2]
 
 
     #---------------------------------------------------------------------------
@@ -648,7 +687,7 @@ class GeneralNote(music21.Music21Object):
         '''
         Split a Note into two Notes. 
 
-        >>> a = GeneralNote()
+        >>> a = NotRest()
         >>> a.duration.type = 'whole'
         >>> b, c = a.splitNoteAtPoint(3)
         >>> b.duration.type
@@ -692,60 +731,8 @@ class GeneralNote(music21.Music21Object):
 
 
 
-    def compactNoteInfo(self):
-        '''
-        nice debugging info tool -- returns information about a note
-        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
-        '''
-        
-        ret = ""
-        if (self.isNote is True):
-            ret += self.name + " " + self.step + " " + str(self.octave)
-            if (self.accidental is not None):
-                ret += " " + self.accidental.name
-        elif (self.isRest is True):
-            ret += "rest"
-        else:
-            ret += "other note type"
-        if (self.tie is not None):
-            ret += " (Tie: " + self.tie.type + ")"
-        ret += " " + self.duration.type
-        ret += " " + str(self.duration.quarterLength)
-        if len(self.duration.tuplets) > 0:
-            ret += " & is a tuplet"
-            if self.duration.tuplets[0].type == "start":
-                ret += " (in fact STARTS the tuplet)"
-            elif self.duration.tuplets[0].type == "stop":
-                ret += " (in fact STOPS the tuplet)"
-        if len(self.notations) > 0:
-            if (isinstance(self.notations[0], music21.notationMod.Fermata)):
-                ret += " has Fermata"
-        return ret
-
 #-------------------------------------------------------------------------------
-# class PitchedOrUnpitched(GeneralNote):
-#     '''
-#     Parent class for methods applicable to Pitched or Unpitched notes that are 
-#     not rests
-#     At present it contains only an extension of GeneralNote.splitNoteAtPoint 
-#        that 
-#     makes sure that the two notes are tied together.
-#     '''
-#     
-#     # unspecified means that there may be a stem, but its orienation
-#     # has not been declared. 
-#     stemDirection = "unspecified"
-#     
-#     def splitNoteAtPoint(self, quarterLength):
-#         (note1, note2) = GeneralNote.splitNoteAtPoint(self, quarterLength)
-#         note1.tie = Tie("start")  #rests arent tied
-#         return [note1, note2]
-
-
-
-
-#-------------------------------------------------------------------------------
-class Note(GeneralNote):
+class Note(NotRest):
     '''
     Note class for notes (not rests or unpitched elements) 
     that can be represented by one or more notational units
@@ -776,7 +763,7 @@ class Note(GeneralNote):
     
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
-        GeneralNote.__init__(self, **keywords)
+        NotRest.__init__(self, **keywords)
 
         if len(arguments) > 0:
             self.pitch = Pitch(arguments[0]) # assume first arg is pitch
@@ -1161,11 +1148,6 @@ def noteFromDiatonicNumber(number):
     note1.octave = octave
     note1.name = thisName
     return note1
-
-
-def factory(usrStr):
-    '''convenience method to get Notes'''
-    pass
 
 
 #-------------------------------------------------------------------------------
