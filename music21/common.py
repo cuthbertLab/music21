@@ -26,6 +26,7 @@ import inspect
 
 # define file extensions for various foramts
 fileExtensions = {
+    'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'mxl'},
     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
@@ -80,6 +81,8 @@ def findFormat(fmt):
     ('jpeg', '.jpg')
     >>> findFormat('humdrum')
     ('humdrum', '.krn')
+    >>> findFormat('txt')
+    ('text', '.txt')
     '''
     for key in fileExtensions.keys():
         if fmt.startswith('.'):

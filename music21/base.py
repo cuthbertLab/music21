@@ -929,6 +929,10 @@ class Music21Object(object):
         format, ext = common.findFormat(fmt)
         if format == None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
+        elif format == 'text':
+            if fp == None:
+                fp = environLocal.getTempFile(ext)
+            dataStr = self._reprText()
         elif format == 'musicxml':
             if fp == None:
                 fp = environLocal.getTempFile(ext)
@@ -940,14 +944,26 @@ class Music21Object(object):
         f.close()
         return fp
 
-    def show(self, format='musicxml'):
+
+    def _reprText(self):
+        '''Retrun a text representation. This methods can be overridden by
+        subclasses to provide alternative text representations.
+        '''
+        return self.__repr__()
+
+
+    def show(self, fmt='musicxml'):
         '''
         Displays an object in the given format (default: musicxml) using the default display
         tools.
         
         This might need to return the file path.
         '''
-        environLocal.launch(format, self.write(format))
+        format, ext = common.findFormat(fmt)
+        if format == 'text':
+            print(self._reprText())
+        else: # a format that writes a file
+            environLocal.launch(format, self.write(format))
 
 
 

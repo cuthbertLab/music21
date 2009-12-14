@@ -49,18 +49,6 @@ class StreamException(Exception):
 
 #-------------------------------------------------------------------------------
 
-def recurseRepr(thisStream, prefixSpaces = 0):
-    returnString = ""
-    for element in thisStream:    
-        off = str(element.getOffsetBySite(thisStream))    
-        if isinstance(element, Stream):
-            returnString += (" " * prefixSpaces) + "{" + off + "} " + element.__repr__() + "\n"
-            returnString += recurseRepr(element, prefixSpaces + 2)
-        else:
-            returnString += (" " * prefixSpaces) + "{" + off + "} " + element.__repr__() + "\n"
-    return returnString
-
-saveRR = recurseRepr
 
 
 #-------------------------------------------------------------------------------
@@ -662,9 +650,29 @@ class Stream(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # display method
-    def recurseRepr(self):
-        return saveRR(self)
+
+    def _recurseRepr(self, thisStream, prefixSpaces = 0):
+        msg = []
+        insertSpaces = 4
+        for element in thisStream:    
+            off = str(element.getOffsetBySite(thisStream))    
+            if isinstance(element, Stream):
+                msg.append((" " * prefixSpaces) + "{" + off + "} " + 
+                           element.__repr__())
+                msg.append(self._recurseRepr(element, 
+                           prefixSpaces + insertSpaces))
+            else:
+                msg.append((" " * prefixSpaces) + "{" + off + "} " + 
+                            element.__repr__())
+        return '\n'.join(msg)
+
+
+    def _reprText(self):
+        '''Retrun a text representation. This methods can be overridden by
+        subclasses to provide alternative text representations.
+        '''
+        return self._recurseRepr(self)
+
 
 
     #---------------------------------------------------------------------------
@@ -1368,6 +1376,9 @@ class Stream(music21.Music21Object):
         >>> a[10].offset
         10.0
         '''
+        if not common.isListLike(offsets): 
+            raise StreamException('must provide a lost of offsets, not %s' % offsets)
+
         if not isinstance(item, music21.Music21Object): 
             # if not an element, embed
             element = music21.Element(item)
@@ -1397,8 +1408,8 @@ class Stream(music21.Music21Object):
         >>> qtrStream.addNext(hn)
         >>> qtrStream.repeatCopy(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
-        >>> recurseRepr(hnStream)
-        '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>\n'
+        >>> hnStream._reprText()
+        '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>'
         '''
         
         display = Stream()
@@ -1767,7 +1778,6 @@ class Stream(music21.Music21Object):
                             returnObj.insert(mNext.offset, mNext)
             mCount += 1
 
-        #print returnObj.recurseRepr()
         return returnObj
     
 
@@ -2364,8 +2374,6 @@ class Stream(music21.Music21Object):
         measureStream = self.getElementsByClass(Measure)
         if len(measureStream) == 0:
             # try to add measures if none defined
-            #environLocal.printDebug(['pre makeMeasures', self.recurseRepr()])
-
             # returns a new stream w/ new Measures but the same objects
             measureStream = self.makeMeasures(meterStream, refStream)
             #measureStream = makeTies(measureStream, meterStream)
@@ -2961,7 +2969,7 @@ class Measure(Stream):
             return str(self.measureNumber)
     
     def __repr__(self):
-        return "<%s %s offset=%s>" % \
+        return "<music21.stream.%s %s offset=%s>" % \
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
 
