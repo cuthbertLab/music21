@@ -117,10 +117,146 @@ class Contexts(object):
     '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
     '''
     def __init__(self):
-        self._coordinates = [] # a list of dictionaries
+        self._ref = [] # a list of dictionaries
+
+    def __len__(self):
+        '''Return the total number of references.
+
+        >>> class Mock(object): pass
+        >>> aObj = Mock()
+        >>> aContexts = Contexts()
+        >>> aContexts.add(aObj)
+        >>> len(aContexts) 
+        1
+        '''
+        return len(self._ref)
+
+    def scrubEmptyReferences(self):
+        '''Remove all objects that no longer exist
+        '''
+        delList = []
+        for i in range(len(self._ref)):
+            if common.unwrapWeakref(self._ref[i]['obj']) == None:
+                delList.append(i)
+        delList.reverse() # go in reverse from largest to maintain positions
+        for i in delList:
+            del self._ref[i]
+
+    def clear(self):
+        '''Clear all data.
+        '''
+        self._ref = []
 
 
-    #obj, type(obj).__name__
+    def getReferences(self):
+        '''Get references; unwrap from weakrefs; place in order from 
+        most recently added to least recently added
+
+        >>> class Mock(object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aContexts = Contexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.getReferences() == [bObj, aObj]
+        True
+        '''
+        post = []
+        for i in range(len(self._ref)-1, -1, -1):
+            dict = self._ref[i]
+            post.append(common.unwrapWeakref(dict['obj']))
+        return post
+
+    def add(self, obj, *arguments):
+        '''Add an object
+        '''
+        # only add if not already here
+        proc = [obj] + list(arguments)
+        for obj in proc:
+            if obj not in self.getReferences(): 
+                objRef = common.wrapWeakref(obj)
+                self._ref.append({}) # create new
+                self._ref[-1]['obj'] = objRef
+                self._ref[-1]['name'] = type(obj).__name__
+                self._ref[-1]['time'] = time.time()
+
+
+    def getReferenceByClass(self, className):
+        '''Return the most recently added reference based on className. Class name can be a string or the real class name.
+
+        >>> class Mock(object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aContexts = Contexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.getReferenceByClass('mock') == bObj
+        True
+        >>> aContexts.getReferenceByClass(Mock) == bObj
+        True
+
+        '''
+        for obj in self.getReferences():
+            if obj == None: continue # in case the reference is dead
+            if common.isStr(className):
+                if type(obj).__name__.lower() == className.lower():
+                    return obj       
+            else:
+                if isinstance(obj, className):
+                    return obj
+
+    def getAttributeByName(self, attrName):
+        '''Given an attribute name, search all objects and find the first
+        that matches this attribute name; then return a reference to this attribute.
+
+        >>> class Mock(object): attr1=234
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> bObj.attr1 = 98
+        >>> aContexts = Contexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.getAttributeByName('attr1') == 98
+        True
+        >>> del bObj
+        >>> aContexts.getAttributeByName('attr1') == 234
+        True
+        '''
+        post = None
+        for obj in self.getReferences():
+            if obj == None: continue # in case the reference is dead
+            try:
+                post = getattr(obj, attrName)
+                return post
+            except AttributeError:
+                pass
+
+
+    def setAttributeByName(self, attrName, value):
+        '''Given an attribute name, search all objects and find the first
+        that matches this attribute name; then return a reference to this attribute.
+
+        >>> class Mock(object): attr1=234
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> bObj.attr1 = 98
+        >>> aContexts = Contexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.setAttributeByName('attr1', 'test')
+        >>> aContexts.getAttributeByName('attr1') == 'test'
+        True
+        '''
+        post = None
+        for obj in self.getReferences():
+            if obj == None: continue # in case the reference is dead
+            try:
+                junk = getattr(obj, attrName) # if attr already exists
+                setattr(obj, attrName, value) # if attr already exists
+            except AttributeError:
+                pass
+
+
 
 
 #-------------------------------------------------------------------------------

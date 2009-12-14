@@ -173,29 +173,6 @@ class Stream(music21.Music21Object):
 #         return self
         return StreamIterator(self)
 
-#     def next(self):
-#         '''Method for treating this object as an iterator
-#         Returns each element in order.  For sort order run x.sorted
-# 
-#         >>> a = Stream()
-#         >>> a.repeatCopy(None, range(6))
-#         >>> b = []
-#         >>> for x in a:
-#         ...     b.append(x.offset) # get just offset
-#         >>> b
-#         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-#         '''
-#         # this will return the self._elementsSorted list
-#         # unless it needs to be sorted
-#         if abs(self._index) >= self.__len__():
-#             self._index = 0 # reset for next run
-#             raise StopIteration
-# 
-#         out = self.elements[self._index]
-#         self._index += 1
-#         return out
-
-
 
     def __getitem__(self, key):
         '''Get an Element from the stream in current order; sorted if isSorted is True,
@@ -660,25 +637,6 @@ class Stream(music21.Music21Object):
         self._elementsChanged()
 
 
-# not needed
-#     def merge(self, other):
-#         '''Given another stream, merge that stream's elements into this stream.
-# 
-#         Not sure if other.offset should be taken into account in assigning
-#         element offsets.
-# 
-#         >>> a = Stream()
-#         >>> a.repeatAddNext(note.Note("C"), 10)
-#         >>> b = Stream()
-#         >>> b.repeatAddNext(note.Note("D"), 10)
-#         >>> a.merge(b)
-#         >>> len(a)
-#         20
-#         '''
-#         for e in other:
-#             self.insert(e.getOffsetBySite(other), e)
-#         self._elementsChanged() 
-
     def isClass(self, className):
         '''
         Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
@@ -774,44 +732,6 @@ class Stream(music21.Music21Object):
                 else: # music21 type
                     if isinstance(myElement, classFilter):
                         myElement.groups.append(group)
-
-### commented out because multiple elements should not have the same id
-#    def setIdForElements(self, id, classFilter=None):
-#        '''Set all componenent Elements to the given id. Do not change the id
-#        of the Stream
-#        
-#        >>> a = Stream()
-#        >>> a.repeatAddNext(note.Note('A-'), 30)
-#        >>> a.repeatAddNext(note.Note('E-'), 30)
-#        >>> a.setIdForElements('flute')
-#        >>> a[0].id 
-#        'flute'
-#        >>> ref = a.countId()
-#        >>> len(ref)
-#        1
-#        >>> ref['flute']
-#        60
-#
-#        >>> b = Stream()
-#        >>> b.repeatCopy(None, range(30))
-#        >>> b.repeatCopy(note.Note('E-'), range(30, 60))
-#        >>> b.setIdForElements('flute', note.Note)
-#        >>> a[0].id 
-#        'flute'
-#        >>> ref = b.countId()
-#        >>> ref['flute']
-#        30
-#
-#        '''
-#        # elements do not have to be sorted
-#        for element in self.elements:
-#            if classFilter != None:
-#                if element.isClass(classFilter):
-#                    element.id = id
-#            else:
-#                element.id = id
-#        # seperate handling for streams?
-
 
 
     #---------------------------------------------------------------------------
