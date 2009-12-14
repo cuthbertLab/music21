@@ -1,3 +1,5 @@
+import copy
+
 import music21
 import music21.lily
 from music21.lily.lilyString import LilyString
@@ -147,7 +149,7 @@ def test():
     n2.octave = 5
     n2.duration.type = "half"
     
-    n4 = n3.clone()
+    n4 = copy.deepcopy(n3)
     n4.octave = 5
 
     st1 = music21.noteStream.Stream([n1, n3])

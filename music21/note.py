@@ -426,8 +426,8 @@ class GeneralNote(music21.Music21Object):
         self.tie = None
         self.reinit()
 
-    def clone(self):
-        return copy.deepcopy(self)
+#     def clone(self):
+#         return copy.deepcopy(self)
         
     def reinit(self):
         pass
@@ -608,7 +608,7 @@ class GeneralNote(music21.Music21Object):
 
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
-                tempNote = self.clone()            
+                tempNote = copy.deepcoy(self)
                 tempNote.clearDurations()
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
@@ -617,7 +617,7 @@ class GeneralNote(music21.Music21Object):
                 returnNotes.append(tempNote)
         else: 
             for i in range(len(self.duration.components)):
-                tempNote = self.clone()            
+                tempNote = copy.deepcopy(self)
                 tempNote.clearDurations()
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
@@ -708,8 +708,8 @@ class NotRest(GeneralNote):
             "cannont split a duration (%s) at this quarter length (%s)" % (
             self.duration.quarterLength, quarterLength))
 
-        note1 = self.clone()
-        note2 = self.clone()
+        note1 = copy.deepcopy(self)
+        note2 = copy.deepcopy(self)
 
         lenEnd = self.duration.quarterLength - quarterLength
         lenStart = self.duration.quarterLength - lenEnd
@@ -747,9 +747,6 @@ class Note(NotRest):
     '''
 
 # Attributes:
-#     isNote: True
-#     isUnpitched: False
-#     isRest: False
 #     freq440: frequency if A=440 and 12ET is used (set automatically, but 
 # can be overridden) 
 #     frequency: same as above, but should be overridden by modules that 

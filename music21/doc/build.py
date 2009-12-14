@@ -11,7 +11,6 @@
 #-------------------------------------------------------------------------------
 
 import unittest, doctest
-
 import os, sys, webbrowser
 import types, inspect
 
