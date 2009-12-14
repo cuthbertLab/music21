@@ -424,13 +424,12 @@ class GeneralNote(music21.Music21Object):
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
         self.tie = None
-        self.reinit()
 
-#     def clone(self):
-#         return copy.deepcopy(self)
-        
-    def reinit(self):
-        pass
+#         self.reinit()
+# 
+#         
+#     def reinit(self):
+#         pass
     
     #---------------------------------------------------------------------------
     def _getColor(self):
