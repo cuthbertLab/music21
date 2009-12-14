@@ -35,7 +35,10 @@ _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
 
-WEAKREFACTIVE = True
+#-------------------------------------------------------------------------------
+VERSION = (0, 0, 1)
+VERSION_STR = '.'.join([str(x) for x in VERSION]) + '-beta'
+WEAKREF_ACTIVE = True
 
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
@@ -347,7 +350,7 @@ class Locations(object):
         '''Get parents; unwrap from weakrefs
         '''
         #environLocal.printDebug([self._coordinates])
-        if WEAKREFACTIVE:
+        if WEAKREF_ACTIVE:
             post = []
             for dict in self._coordinates:
                 if dict['site'] == None: # leave None alone
@@ -401,7 +404,7 @@ class Locations(object):
             # order is the same as in _coordinates
             i = sites.index(site)
         else:
-            if WEAKREFACTIVE:
+            if WEAKREF_ACTIVE:
                 if site == None: # leave None alone
                     siteRef = site
                 else:
@@ -557,7 +560,7 @@ class Locations(object):
             if self._coordinates[i]['offset'] == offset:
                 match = self._coordinates[i]['site']
                 break
-        if WEAKREFACTIVE:
+        if WEAKREF_ACTIVE:
             if match == None:
                 return match
             if not common.isWeakref(match):
@@ -580,7 +583,7 @@ class Locations(object):
         True
         '''
         siteRef = self._coordinates[index]['site']
-        if WEAKREFACTIVE:
+        if WEAKREF_ACTIVE:
             if siteRef == None: # let None parents pass
                 return siteRef
             if not common.isWeakref(siteRef):
@@ -781,7 +784,7 @@ class Music21Object(object):
 
     def _getParent(self):
         # can be None
-        if WEAKREFACTIVE:
+        if WEAKREF_ACTIVE:
             if self._currentParent == None: #leave None
                 return self._currentParent
             else:
@@ -805,7 +808,7 @@ class Music21Object(object):
             site not in self.locations.getSites():
             self.locations.add(self.offset, site) 
         
-        if WEAKREFACTIVE:
+        if WEAKREF_ACTIVE:
             if site == None: # leave None alone
                 self._currentParent = site
             else:

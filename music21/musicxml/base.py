@@ -896,23 +896,22 @@ class Attributes(MusicXMLElement):
         c.append(self.measureStyleObj)
         return c
 
+    def setDefaultDivisions(self):
+        '''Utility to just set the divisioins parameters
+        '''
+        self.set('divisions', defaults.divisionsPerQuarter)
+
     def setDefaults(self):
-        # previously, clef and key were set as defaults
-        # this poses a problem, however, as each may be be based
-        # on past measures and are not required for each measures
-        # time signature is set for each measure, as m21 expects there
-        # to be a timeSignature object in each measure.
         self.set('divisions', defaults.divisionsPerQuarter)
         mxTime = Time()
         mxTime.setDefaults()
         self.timeList.append(mxTime)
-#         mxClef = Clef()
-#         mxClef.setDefaults()
-#         self.clefList.append(mxClef)
-#         mxKey = Key()
-#         mxKey.setDefaults()
-#         self.keyList.append(mxKey)
-
+        mxClef = Clef()
+        mxClef.setDefaults()
+        self.clefList.append(mxClef)
+        mxKey = Key()
+        mxKey.setDefaults()
+        self.keyList.append(mxKey)
 
 class Key(MusicXMLElement):
     # musicXml permits traditional and non-traditional keys

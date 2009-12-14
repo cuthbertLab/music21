@@ -1248,6 +1248,15 @@ class TimeSignature(music21.Music21Object):
     def __repr__(self):
         return "<music21.meter.TimeSignature %s>" % self.__str__()
 
+    def ratioEqual(self, other):
+        '''A basic form comparison; does not determine if any internatl structures are equal; only outermost ratio. 
+        '''
+        if other == None: return False
+        if (other.numerator == self.numerator and 
+            other.denominator == self.denominator):
+            return True
+        else:
+            return False
 
 
     #---------------------------------------------------------------------------

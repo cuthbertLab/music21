@@ -731,6 +731,11 @@ class NotRest(GeneralNote):
 
 
 #-------------------------------------------------------------------------------
+class NoteException(Exception):
+    pass
+
+
+#-------------------------------------------------------------------------------
 class Note(NotRest):
     '''
     Note class for notes (not rests or unpitched elements) 
@@ -1124,11 +1129,6 @@ class Rest(GeneralNote):
 
     mx = property(_getMX, _setMX)    
 
-
-#-------------------------------------------------------------------------------
-
-class NoteException(Exception):
-    pass
 
 
 

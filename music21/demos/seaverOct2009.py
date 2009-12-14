@@ -201,28 +201,27 @@ def simple4e():
     from music21 import stream
     
     qLenMax = 0
-    
     beethovenQuartet = corpus.parseWork('opus18no1', 4)
-    
     maxNote = None
-    
     for part in beethovenQuartet:
-        lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
-#        part.show()
+#         lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
 
-#        pf = part.flat.getNotes()
-#        for n in pf:
-#            if n.quarterLength >= qLenMax:
-#                qLenMax = n.quarterLength
-#                maxNote = n
-#
-#        maxNote.color = 'red'
-#        display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
-#
-#                
-#    print 'longest duration was: %s quarters long' % (qLenMax)
-#    lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
-#    display.show()
+        # note: this probably is not re-joining tied notes
+        pf = part.flat.getNotes()
+        for n in pf:
+            if n.quarterLength >= qLenMax:
+                qLenMax = n.quarterLength
+                maxNote = n
+        maxNote.color = 'red'
+        display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
+               
+    print 'longest duration was: %s quarters long' % (qLenMax)
+
+
+    lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
+    display.show()
+
+
 
 def simple4f():
     # question 19: Calculate pitch-class sets for melodic passages segmented by rests.

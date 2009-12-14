@@ -1210,8 +1210,8 @@ class Stream(music21.Music21Object):
         else:
             if searchParent:
                 if isinstance(self.parent, Stream) and self.parent != self:
-                    environLocal.printDebug(['searching parent Stream', 
-                        self, self.parent])
+                    #environLocal.printDebug(['searching parent Stream', 
+                    #    self, self.parent])
                     instObj = self.parent.getInstrument()         
 
         # if still not defined, get default
@@ -1251,6 +1251,8 @@ class Stream(music21.Music21Object):
         >>> d.sign
         'F'
         '''
+        #environLocal.printDebug(['calling bestClef()'])
+
         totalNotes = 0
         totalHeight = 0
 
@@ -1545,25 +1547,29 @@ class Stream(music21.Music21Object):
         post = Stream()
         o = 0 # initial position of first measure is assumed to be zero
         measureCount = 0
+        lastTimeSignature = None
         while True:    
             m = Measure()
             m.measureNumber = measureCount + 1
             # get active time signature at this offset
             # make a copy and it to the meter
-            m.timeSignature = deepcopy(meterStream.getElementAtOrBefore(o))
-            #environLocal.printDebug(['assigned time sig', m.timeSignature])
+            thisTimeSignature = meterStream.getElementAtOrBefore(o)
+            if thisTimeSignature != lastTimeSignature:
+                lastTimeSignature = meterStream.getElementAtOrBefore(o)
+                m.timeSignature = deepcopy(thisTimeSignature)
+                #environLocal.printDebug(['assigned time sig', m.timeSignature])
 
             # only add a clef for the first measure when automatically 
-            # creating Measures
+            # creating Measures; this clef is from bestClef, called above
             if measureCount == 0: 
                 m.clef = clefObj
     
             # avoid an infinite loop
-            if m.timeSignature.barDuration.quarterLength == 0:
+            if thisTimeSignature.barDuration.quarterLength == 0:
                 raise StreamException('time signature has no duration')    
             post.insert(o, m) # insert measure
             # increment by meter length
-            o += m.timeSignature.barDuration.quarterLength 
+            o += thisTimeSignature.barDuration.quarterLength 
             if o >= oMax: # may be zero
                 break # if length of this measure exceedes last offset
             else:
@@ -1573,12 +1579,15 @@ class Stream(music21.Music21Object):
         for start, end, e in offsetMap:
             # iterate through all measures 
             match = False
+            lastTimeSignature = None
             for i in range(len(post)):
                 m = post[i]
+                if m.timeSignature != None:
+                    lastTimeSignature = m.timeSignature
                 # get start and end offsets for each measure
                 # seems like should be able to use m.duration.quarterLengths
-                moffset = m.getOffsetBySite(post)
-                mStart, mEnd = moffset, moffset + m.timeSignature.barDuration.quarterLength
+                mStart = m.getOffsetBySite(post)
+                mEnd = mStart + lastTimeSignature.barDuration.quarterLength
                 # if elements start fits within this measure, break and use 
                 # offset cannot start on end
                 if start >= mStart and start < mEnd:
@@ -1621,7 +1630,7 @@ class Stream(music21.Music21Object):
         >>> b.lowestOffset
         0.0
         '''
-        environLocal.printDebug(['calling makeRests'])
+        #environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -1695,6 +1704,7 @@ class Stream(music21.Music21Object):
             meterStream = returnObj.getTimeSignatures()
     
         mCount = 0
+        lastTimeSignature = None
         while True:
             # update measureStream on each iteration, 
             # as new measure may have been added to the stream 
@@ -1703,6 +1713,9 @@ class Stream(music21.Music21Object):
                 break
             # get the current measure to look for notes that need ties
             m = measureStream[mCount]
+            if m.timeSignature != None:
+                lastTimeSignature = m.timeSignature
+
             if mCount + 1 < len(measureStream):
                 mNext = measureStream[mCount+1]
                 mNextAdd = False
@@ -1710,22 +1723,23 @@ class Stream(music21.Music21Object):
                 mNext = Measure()
                 # set offset to last offset plus total length
                 moffset = m.getOffsetBySite(measureStream)
-                mNext.offset = moffset + m.timeSignature.barDuration.quarterLength
+                mNext.offset = (moffset + 
+                                lastTimeSignature.barDuration.quarterLength)
                 if len(meterStream) == 0: # in case no meters are defined
                     ts = meter.TimeSignature()
                     ts.load('%s/%s' % (defaults.meterNumerator, 
                                        defaults.meterDenominatorBeatType))
-    #                 ts.numerator = defaults.meterNumerator
-    #                 ts.denominator = defaults.meterDenominatorBeatType
                 else: # get the last encountered meter
                     ts = meterStream.getElementAtOrBefore(mNext.offset)
-                # assumeing we need a new instance of TimeSignature
-                mNext.timeSignature = deepcopy(ts)
+                # only copy and assign if not the same as the last
+                if not lastTimeSignature.ratioEqual(ts):
+                    mNext.timeSignature = deepcopy(ts)
+                # increment measure number
                 mNext.measureNumber = m.measureNumber + 1
                 mNextAdd = True
     
             # seems like should be able to use m.duration.quarterLengths
-            mStart, mEnd = 0, m.timeSignature.barDuration.quarterLength
+            mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
             for e in m:
                 #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
 
@@ -1747,8 +1761,6 @@ class Stream(music21.Music21Object):
                         # modify existing duration
                         e.duration.quarterLength = qLenBegin
                         # create and place new element
-
-                        # NOTE: this copy is causing a problem
                         eRemain = deepcopy(e)
                         eRemain.duration.quarterLength = qLenRemain
     
@@ -1813,9 +1825,11 @@ class Stream(music21.Music21Object):
         else:
             raise StreamException('cannot process a stream that neither is a Measure nor has Measures')        
 
+        lastTimeSignature = None
         for m in mColl:
-            ts = m.timeSignature
-            if ts == None:
+            if m.timeSignature != None:
+                lastTimeSignature = m.timeSignature
+            if lastTimeSignature == None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
     
             # environLocal.printDebug(['beaming with ts', ts])
@@ -1825,7 +1839,7 @@ class Stream(music21.Music21Object):
                 durList.append(n.duration)
             if len(durList) <= 1: 
                 continue
-            beamsList = ts.getBeams(durList)
+            beamsList = lastTimeSignature.getBeams(durList)
             for i in range(len(noteStream)):
                 noteStream[i].beams = beamsList[i]
 
@@ -2454,8 +2468,6 @@ class Stream(music21.Music21Object):
                     highestTime = ht
                 midStream.append(obj)
 
-            environLocal.printDebug(['highest time found', highestTime])
-
             refStream = Stream()
             refStream.insert(0, None) # placeholder at 0
             refStream.insert(highestTime, None) 
@@ -2528,14 +2540,23 @@ class Stream(music21.Music21Object):
 
         # offset is in quarter note length
         oMeasure = 0
+        lastTimeSignature = None
         for mxMeasure in mxPart:
             # create a music21 measure and then assign to mx attribute
             m = Measure()
             m.mx = mxMeasure  # assign data into music21 measure 
+            if m.timeSignature != None:
+                lastTimeSignature = m.timeSignature
+            elif lastTimeSignature == None and m.timeSignature == None:
+                # if no time sigature is defined, need to get a default
+                ts = meter.TimeSignature()
+                ts.load('%s/%s' % (defaults.meterNumerator, 
+                                   defaults.meterDenominatorBeatType))
+                lastTimeSignature = ts
             # add measure to stream at current offset for this measure
             streamPart.insert(oMeasure, m)
             # increment measure offset for next time around
-            oMeasure += m.timeSignature.barDuration.quarterLength 
+            oMeasure += lastTimeSignature.barDuration.quarterLength 
 
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
@@ -3085,8 +3106,9 @@ class Measure(Stream):
 
         # get an empty mxAttributes object
         mxAttributes = musicxmlMod.Attributes()
-        # setting defaults sets divisions, key, clef, and timesig
-        mxAttributes.setDefaults() 
+        # best to only set dvisions here, as clef, time sig, meter are not
+        # required for each measure
+        mxAttributes.setDefaultDivisions() 
 
         # may need to look here at the parent, and try to find
         # the clef in the clef last defined in the parent
@@ -3132,25 +3154,24 @@ class Measure(Stream):
             # not all measures have attributes definitions; this
             # gets the last-encountered measure attributes
             mxAttributes = mxMeasure.external['attributes']
-
             if mxAttributes == None:
                 raise StreamException(
                     'no mxAttribues available for this measure')
 
         # if no time is defined, get the last defined value from external
-        if len(mxAttributes.timeList) == 0:
-            if mxMeasure.external['time'] != None:
-                mxTimeList = [mxMeasure.external['time']]
-            else:
-                #environLocal.printDebug('loading with default mxTime')
-                mxTime = musicxmlMod.Time()
-                mxTime.setDefaults()
-                mxTimeList = [mxTime]
-                #raise StreamException('no external mxTime object found within mxMeasure: %s' % mxMeasure)
-        else:
-            mxTimeList = mxAttributes.timeList
-        self.timeSignature = meter.TimeSignature()
-        self.timeSignature.mx = mxTimeList
+#         if len(mxAttributes.timeList) == 0:
+#             if mxMeasure.external['time'] != None:
+#                 mxTimeList = [mxMeasure.external['time']]
+#             else:
+#                 mxTime = musicxmlMod.Time()
+#                 mxTime.setDefaults()
+#                 mxTimeList = [mxTime]
+#         else:
+#             mxTimeList = mxAttributes.timeList
+
+        if mxAttributesInternal and len(mxAttributes.timeList) != 0:
+            self.timeSignature = meter.TimeSignature()
+            self.timeSignature.mx = mxAttributes.timeList
 
         # only set clef if it is defined 
         # we must check that attributes are derived from the measure proper
@@ -3161,13 +3182,8 @@ class Measure(Stream):
             self.clef.mx = mxAttributes.clefList
 
         # set to zero for each measure
-        offsetMeasureNote = 0 # offset of note w/n measure
-
-        # bar Duration object
-        barDuration = self.timeSignature.barDuration
-        
+        offsetMeasureNote = 0 # offset of note w/n measure        
         mxNoteList = [] # for chords
-
         for i in range(len(mxMeasure)):
             mxObj = mxMeasure[i]
             if i < len(mxMeasure)-1:
@@ -3195,13 +3211,9 @@ class Measure(Stream):
                         offsetIncrement = 0
                     else:
                         n = note.Note()
-                        #environLocal.printDebug(['handling note',
-                        #    offsetMeasureNote, self])
-
                         n.mx = mxNote
                         self.insert(offsetMeasureNote, n)
                         offsetIncrement = n.quarterLength
-
                     for mxLyric in mxNote.lyricList:
                         lyricObj = note.Lyric()
                         lyricObj.mx = mxLyric
