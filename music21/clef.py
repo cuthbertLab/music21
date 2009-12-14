@@ -31,7 +31,7 @@ class Clef(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self.sign = None
         self.line = None
-        self.clefOctaveChange = 0 # set to zero as default
+        self.octaveChange = 0 # set to zero as default
 
         # mxl has an attribute forr clefOctaveChange, and integer to show 
         # transposing clefs
@@ -47,7 +47,7 @@ class Clef(music21.Music21Object):
         'G'
 
         >>> b = Treble8vbClef()
-        >>> b.clefOctaveChange
+        >>> b.octaveChange
         -1
         >>> a = b.mx
         >>> a.get('sign')
@@ -59,8 +59,8 @@ class Clef(music21.Music21Object):
         mxClef = musicxml.Clef()
         mxClef.set('sign', self.sign)
         mxClef.set('line', self.line)
-        if self.clefOctaveChange != 0:
-            mxClef.set('clefOctaveChange', self.clefOctaveChange)
+        if self.octaveChange != 0:
+            mxClef.set('clefOctaveChange', self.octaveChange)
         return mxClef
 
     def _setMX(self, mxClefList):
@@ -84,13 +84,54 @@ class Clef(music21.Music21Object):
         
         # this is not trying to load special clef classes below
         self.sign = mxClef.get('sign')
-        self.line = mxClef.get('line')
-        mxOctaveChange = mxClef.get('clefOctaveChange')
-        if mxOctaveChange != None:
-            self.clefOctaveChange = int(mxOctaveChange)
+        if self.sign in ['TAB', 'percussion', 'none']:
+            if self.sign == 'TAB':
+                self.__class__ = TabClef
+            if self.sign == 'percussion':
+                self.__class__ = PercussionClef
+            if self.sign == 'none':
+                self.__class__ = NoClef
 
-        #environLocal.printDebug(['called _setMX, got clefOctaveChange',
-        #                         self.clefOctaveChange, mxClef])
+        else:
+            self.line = int(mxClef.get('line'))
+            mxOctaveChange = mxClef.get('clefOctaveChange')
+            if mxOctaveChange != None:
+                self.octaveChange = int(mxOctaveChange)
+    
+            # specialize class based on sign, line, ocatve
+            params = (self.sign, self.line, self.octaveChange)
+            if params == ('G', 1, 0):
+                self.__class__ = FrenchViolinClef
+            elif params == ('G', 2, 0):
+                self.__class__ = TrebleClef
+            elif params == ('G', 2, -1):
+                self.__class__ = Treble8vbClef
+            elif params == ('G', 2, 1):
+                self.__class__ = Treble8vaClef
+            elif params == ('G', 3, 0):
+                self.__class__ = GSopranoClef
+            elif params == ('C', 1, 0):
+                self.__class__ = SopranoClef
+            elif params == ('C', 2, 0):
+                self.__class__ = MezzoSopranoClef
+            elif params == ('C', 3, 0):
+                self.__class__ = AltoClef
+            elif params == ('C', 4, 0):
+                self.__class__ = TenorClef
+            elif params == ('C', 5, 0):
+                self.__class__ = CBaritoneClef
+            elif params == ('F', 3, 0):
+                self.__class__ = FBaritoneClef
+            elif params == ('F', 4, 0):
+                self.__class__ = BassClef
+            elif params == ('F', 4, -1):
+                self.__class__ = Bass8vbClef
+            elif params == ('F', 4, 1):
+                self.__class__ = Bass8vaClef
+            elif params == ('F', 5, 0):
+                self.__class__ = SubBassClef
+            else:
+                raise ClefException('cannot match clef parameters (%s/%s/%s) to a Clef subclass' % (params[0], params[1], params[2]))
 
     mx = property(_getMX, _setMX)
 
@@ -101,6 +142,8 @@ class PercussionClef(Clef):
 class NoClef(Clef):
     pass
 
+class TabClef(Clef):
+    pass
 
 class PitchClef(Clef):
 
@@ -158,7 +201,18 @@ class Treble8vbClef(TrebleClef):
         '''
         TrebleClef.__init__(self)
         self.lilyName = "treble_8"
-        self.clefOctaveChange = -1
+        self.octaveChange = -1
+        self.lowestLine = (7*3) + 3
+
+class Treble8vaClef(TrebleClef):
+    def __init__(self):
+        '''
+        >>> a = Treble8vaClef()
+        >>> a.sign
+        'G'
+        '''
+        TrebleClef.__init__(self)
+        self.octaveChange = 1
         self.lowestLine = (7*3) + 3
 
 class GSopranoClef(GClef):
@@ -273,6 +327,30 @@ class BassClef(FClef):
         self.line = 4
         self.lowestLine = (7*2) + 5
 
+class Bass8vbClef(FClef):
+    def __init__(self):
+        '''
+        >>> a = Bass8vbClef()
+        >>> a.sign
+        'F'
+        '''
+        FClef.__init__(self)
+        self.line = 4
+        self.octaveChange = -1
+        self.lowestLine = (7*2) + 5
+
+class Bass8vaClef(FClef):
+    def __init__(self):
+        '''
+        >>> a = Bass8vaClef()
+        >>> a.sign
+        'F'
+        '''
+        FClef.__init__(self)
+        self.line = 4
+        self.octaveChange = 1
+        self.lowestLine = (7*2) + 5
+
 class SubBassClef(FClef):
     def __init__(self):
         '''
@@ -356,6 +434,41 @@ class Test(unittest.TestCase):
         mxClef = a.mx
         self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
+    def testConversionClassMatch(self):
+
+        src = [
+            [('G', 1, 0), FrenchViolinClef],
+            [('G', 2, 0), TrebleClef],
+            [('G', 2, -1), Treble8vbClef],
+            [('G', 2, 1), Treble8vaClef],
+            [('G', 3, 0), GSopranoClef],
+            [('C', 1, 0), SopranoClef],
+            [('C', 2, 0), MezzoSopranoClef],
+            [('C', 3, 0), AltoClef],
+            [('C', 4, 0), TenorClef],
+            [('C', 5, 0), CBaritoneClef],
+            [('F', 3, 0), FBaritoneClef],
+            [('F', 4, 0), BassClef],
+            [('F', 4, 1), Bass8vaClef],
+            [('F', 4, -1), Bass8vbClef],
+            [('F', 5, 0), SubBassClef]
+        ]
+
+        for params, className in src:
+            mxClef = musicxml.Clef()
+            mxClef.set('sign', params[0])
+            mxClef.set('line', params[1])
+            mxClef.set('octaveChange', params[2])
+
+            c = Clef()
+            c.mx = mxClef
+
+            #environLocal.printDebug([type(c).__name__])
+
+            self.assertEqual(c.sign, params[0])
+            self.assertEqual(c.line, params[1])
+            self.assertEqual(c.octaveChange, params[2])
+            self.assertEqual(isinstance(c, className), True)
 
 if __name__ == "__main__":
     music21.mainTest(Test)

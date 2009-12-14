@@ -3041,7 +3041,7 @@ class Measure(Stream):
             return str(self.measureNumber)
     
     def __repr__(self):
-        return "<MEASURE %s %s offset=%s>" % \
+        return "<%s %s offset=%s>" % \
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
 

@@ -1044,6 +1044,9 @@ class Clef(MusicXMLElement):
         self.line = None
         self.clefOctaveChange = None # integer for transposing clefs
 
+        self._crossReference['clefOctaveChange'] = ['octaveChange']
+
+
     def _getComponents(self):
         c = []
         c.append(('sign', self.sign))

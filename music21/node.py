@@ -118,7 +118,7 @@ class Node(object):
         'charData'
         '''
         for attr, options in self._crossReference.items():
-            if name.lower() in options:
+            if name in options or name.lower() in options:
                 return attr
         return '' # return an empty string if no match
 
@@ -274,7 +274,7 @@ class Node(object):
                     setattr(self, candidate, value)
                     match = True
             if not match:
-                raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
+                raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
     def get(self, name):
         if name in self._attr.keys():

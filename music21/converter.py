@@ -505,9 +505,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'G')
 
+        # second part
         clefs = a[1].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].clefOctaveChange, -1)
+        self.assertEqual(clefs[0].octaveChange, -1)
+        self.assertEqual(type(clefs[0]).__name__, 'Treble8vbClef')
 
         clefs = a[2].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)

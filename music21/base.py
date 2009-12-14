@@ -112,6 +112,16 @@ class Groups(list):
         else:
             return True
 
+#-------------------------------------------------------------------------------
+class Contexts(object):
+    '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
+    '''
+    def __init__(self):
+        self._coordinates = [] # a list of dictionaries
+
+
+    #obj, type(obj).__name__
+
 
 #-------------------------------------------------------------------------------
 class Locations(object):
@@ -119,8 +129,8 @@ class Locations(object):
     Site is an object that contains an object; site may be a parent. 
     Sites are always stored as weak refs.
     
-    An object may store 'self' as a site -- this becomes the default offset
-    for any newly added sites that don't have any sites
+    An object may store None as a site -- this becomes the default offset
+    for any newly added sites that do not have any sites
     '''
     def __init__(self):
         self._coordinates = [] # a list of dictionaries
