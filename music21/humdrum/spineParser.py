@@ -27,7 +27,7 @@ import music21.meter
 import music21.clef
 import music21.stream
 from music21.stream import Stream
-from music21 import Element
+from music21 import ElementWrapper
 from music21 import common
 from music21.humdrum import testFiles, canonicalOutput
 from music21.dynamics import Dynamic, Wedge

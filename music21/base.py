@@ -739,7 +739,7 @@ class Music21Object(object):
         here, it just returns isinstance, but for Elements it will return true
         if the embedded object is of the given class.  Thus, best to use it throughout
         music21 and only use isinstance if you really want to see if something is
-        an Element or not.
+        an ElementWrapper or not.
         '''
         if isinstance(self, className):
             return True
@@ -971,16 +971,16 @@ class Music21Object(object):
 
 
 #-------------------------------------------------------------------------------
-class Element(Music21Object):
+class ElementWrapper(Music21Object):
     '''
     An element wraps an object so that the same object can
     be positioned within a stream.
     
     The object is always available as element.obj -- however, calls to
-    the Element will call 
+    the ElementWrapper will call 
     
-    Object is now mandatory -- calls to Element without an object fail,
-    because in the new (11/29) object model, Element should only be used
+    Object is now mandatory -- calls to ElementWrapper without an object fail,
+    because in the new (11/29) object model, ElementWrapper should only be used
     to wrap an object.
     
     '''
@@ -999,12 +999,12 @@ class Element(Music21Object):
         Used by getElementsByClass in Stream
 
         >>> import note
-        >>> a = Element(None)
+        >>> a = ElementWrapper(None)
         >>> a.isClass(note.Note)
         False
         >>> a.isClass(types.NoneType)
         True
-        >>> b = Element(note.Note('A4'))
+        >>> b = ElementWrapper(note.Note('A4'))
         >>> b.isClass(note.Note)
         True
         >>> b.isClass(types.NoneType)
@@ -1025,7 +1025,7 @@ class Element(Music21Object):
         >>> import duration
         >>> n = note.Note('A')
         
-        >>> a = Element(obj = n)
+        >>> a = ElementWrapper(obj = n)
         >>> a.offset = duration.Duration("quarter")
         >>> a.groups.append("flute")
 
@@ -1073,7 +1073,7 @@ class Element(Music21Object):
         >>> from music21 import note, duration
         >>> n = note.Note('A')
         
-        >>> a = Element(obj = n)
+        >>> a = ElementWrapper(obj = n)
         >>> a.offset = 1.0 # duration.Duration("quarter")
         >>> a.groups.append("flute")
 
@@ -1125,7 +1125,7 @@ class Element(Music21Object):
 
     def _getDuration(self):
         '''
-        Gets the duration of the Element (if separately set), but
+        Gets the duration of the ElementWrapper (if separately set), but
         normal returns the duration of the component object if available, otherwise
         returns None.
 
@@ -1134,13 +1134,13 @@ class Element(Music21Object):
         >>> n.quarterLength = 2.0
         >>> n.duration.quarterLength 
         2.0
-        >>> el1 = Element(n)
+        >>> el1 = ElementWrapper(n)
         >>> el1.duration.quarterLength
         2.0
 
         ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY
         >>> import music21.key
-        >>> ks1 = Element(music21.key.KeySignature())
+        >>> ks1 = ElementWrapper(music21.key.KeySignature())
         >>> ks1.obj.duration
         Traceback (most recent call last):
         AttributeError: 'KeySignature' object has no attribute 'duration'
@@ -1192,19 +1192,19 @@ class Element(Music21Object):
 
 
     def __eq__(self, other):
-        '''Test Element equality
+        '''Test ElementWrapper equality
 
         >>> import note
         >>> n = note.Note("C#")
-        >>> a = Element(n)
+        >>> a = ElementWrapper(n)
         >>> a.offset = 3.0
-        >>> b = Element(n)
+        >>> b = ElementWrapper(n)
         >>> b.offset = 3.0
         >>> a == b
         True
         >>> a is not b
         True
-        >>> c = Element(n)
+        >>> c = ElementWrapper(n)
         >>> c.offset = 2.0
         >>> c.offset
         2.0
@@ -1239,9 +1239,9 @@ class Element(Music21Object):
 
 
     def __setattr__(self, name, value):
-        #environLocal.printDebug(['calling __setattr__ of Element', name, value])
+        #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
-        if name in self.__dict__:  # if in the Element already, set that first
+        if name in self.__dict__:  # if in the ElementWrapper already, set that first
             object.__setattr__(self, name, value)
         
         # if not, change the attribute in the stored object
@@ -1249,7 +1249,7 @@ class Element(Music21Object):
         if name not in ['offset', '_offset', '_currentParent'] and \
             storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
-        # unless neither has the attribute, in which case add it to the Element
+        # unless neither has the attribute, in which case add it to the ElementWrapper
         else:  
             object.__setattr__(self, name, value)
 
@@ -1279,7 +1279,7 @@ class Element(Music21Object):
         In other words, is essentially the same object in a different context
              
         >>> import note
-        >>> aE = Element(obj = note.Note("A-"))
+        >>> aE = ElementWrapper(obj = note.Note("A-"))
         >>> aE.id = "aflat-Note"
         >>> aE.groups.append("out-of-range")
         >>> aE.offset = 4.0
@@ -1362,13 +1362,13 @@ class Test(unittest.TestCase):
     def testElementEquality(self):
         from music21 import note
         n = note.Note("F-")
-        a = Element(n)
+        a = ElementWrapper(n)
         a.offset = 3.0
-        c = Element(n)
+        c = ElementWrapper(n)
         c.offset = 3.0
         assert (a == c)
         assert (a is not c)
-        b = Element(n)
+        b = ElementWrapper(n)
         b.offset = 2.0
         assert (a != b)
 
@@ -1392,7 +1392,7 @@ class Test(unittest.TestCase):
 
     def testOffsets(self):
         from music21 import note
-        a = Element(note.Note('A#'))
+        a = ElementWrapper(note.Note('A#'))
         a.offset = 23.0
         self.assertEqual(a.offset, 23.0)
 
