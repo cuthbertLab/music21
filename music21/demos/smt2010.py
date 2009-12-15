@@ -82,3 +82,20 @@ def ex04():
     fy = lambda n: n.pitchClass # y values will be pitch classes
     fx = lambda n: n.offset # x values will be offsets in quarter notes
     na.noteAttributeScatter(fx, fy, yTicks=correlate.ticksPitchClass())
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+
+def ex01Alt():
+    # measure here is a good test of dynamics positioning:
+    from music21 import corpus, chord
+    sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
+    v2Part = sStream[1].measures # get all measures from the second violin
+    v2Part[45].show() # render the 48th measure as notation
+
+
+

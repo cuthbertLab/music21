@@ -1075,6 +1075,45 @@ class Direction(MusicXMLElementList):
         c = c + self.componentList
         return c
 
+    def getDynamicMark(self):
+        '''Search this direction and determine if it contains a dynamic mark, return, otherwise, return None
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Dynamics()
+        >>> d = DynamicMark('f')
+        >>> c.append(d)
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getDynamicMark() != None
+        True
+        '''
+        for directionType in self.componentList:
+            for obj in directionType:
+                if isinstance(obj, Dynamics):
+                    for subobj in obj:
+                        if isinstance(subobj, DynamicMark):
+                            return subobj
+        return None
+
+    def getWedge(self):
+        '''Search this direction and determine if it contains a dynamic mark.
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Wedge('crescendo')
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getWedge() != None
+        True
+        '''
+        for directionType in self.componentList:
+            for obj in directionType:
+                if isinstance(obj, Wedge):
+                    return obj
+        return None
+
+
 
 class DirectionType(MusicXMLElementList):
     '''DirectionType stores objects like Pedal, dynamics, wedge
@@ -1877,8 +1916,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'dynamics': 
             self._dynamicsObj = Dynamics()
-            self._dynamicsObj.loadAttrs(attrs)
-
+            self._dynamicsObj.loadAttrs(attrs) # loads placement and pos args
 
         elif name == 'time-modification': 
             self._timeModificationObj = TimeModification()
@@ -1887,20 +1925,17 @@ class Handler(xml.sax.ContentHandler):
             self._tupletObj = Tuplet()
             self._tupletObj.loadAttrs(attrs)
 
-
         elif name == 'forward':
             self._forwardObj = Forward()
 
         elif name == 'backup':
             self._backupObj = Backup()
 
-
         elif name == 'articulations': 
             self._articulationsObj = Articulations()
 
         elif name == 'attributes':
             self._attributesObj = Attributes()
-
 
 
 

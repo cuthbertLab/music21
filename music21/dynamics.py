@@ -48,9 +48,15 @@ englishNames  = {'ppp': 'extremely soft',
                  'fff': 'extremely loud'} 
 
 
+class DynamicException(Exception):
+    pass
+
+class WedgeException(Exception):
+    pass
+
+
 class Dynamic(music21.Music21Object):
-    '''
-    class to deal with dynamics
+    '''Object representation of Dyanmics.
     '''
     
     def __init__(self, value = None):
@@ -66,29 +72,91 @@ class Dynamic(music21.Music21Object):
         else:
             self.englishName = None
 
+        # for position, as musicxml, all units are in tenths of interline space
+        # position is needed as default positions are often incorrect
+        self.posDefaultX = None
+        self.posDefaultY = None
+        self.posRelativeX = None
+        self.posRelativeY = None
+        self.posPlacement = 'below' # attr in mxDirection, below or above
+
+
     def __repr__(self):
         return "<music21.dynamics.Dynamic %s >" % self.value
 
 
-
     def _getMX(self):
         '''
-        returns a musicxml.DynamicMark object
+        returns a musicxml.Direction object
+
+        >>> a = Dynamic('ppp')
+        >>> a.posRelativeY = -10
+        >>> b = a.mx
+        >>> b[0][0][0].get('tag')
+        'ppp'
+        >>> b.get('placement')
+        'below'
         '''
         mxDynamicMark = musicxml.DynamicMark(self.value)
-        return mxDynamicMark
+        mxDynamics = musicxml.Dynamics()
+        for src, dst in [(self.posDefaultX, 'default-x'), 
+                         (self.posDefaultY, 'default-y'), 
+                         (self.posRelativeX, 'relative-x'),
+                         (self.posRelativeY, 'relative-y')]:
+            if src != None:
+                mxDynamics.set(dst, src)
+        mxDynamics.append(mxDynamicMark) # store on component list
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxDynamics)
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.append(mxDirectionType)
+        mxDirection.set('placement', self.posPlacement)
+        return mxDirection
 
-    def _setMX(self, mxDynamicMark):
-        '''
-        given an mxDynamicMark, load instance
+    def _setMX(self, mxDirection):
+        '''Given an mxDirection, load instance
 
+        >>> mxDirection = musicxml.Direction()
+        >>> mxDirectionType = musicxml.DirectionType()
         >>> mxDynamicMark = musicxml.DynamicMark('ff')
+        >>> mxDynamics = musicxml.Dynamics()
+        >>> mxDynamics.set('default-y', -20)
+        >>> mxDynamics.append(mxDynamicMark)
+        >>> mxDirectionType.append(mxDynamics)
+        >>> mxDirection.append(mxDirectionType)
         >>> a = Dynamic()
-        >>> a.mx = mxDynamicMark
+        >>> a.mx = mxDirection
         >>> a.value
         'ff'
+        >>> a.posDefaultY
+        -20
+        >>> a.posPlacement
+        'below'
         '''
-        self.value = mxDynamicMark.get('tag')
+        mxDynamics = None
+        for mxObj in mxDirection:
+            if isinstance(mxObj, musicxmlMod.DirectionType):
+                for mxObjSub in mxObj:
+                    if isinstance(mxObjSub, musicxmlMod.Dynamics):
+                        mxDynamics = mxObjSub
+        if mxDynamics == None:
+            raise DynamicException('when importing a Dyanmics object from MusicXML, did not find a DyanmicMark')            
+        if len(mxDynamics) > 1:
+            raise DynamicException('when importing a Dyanmics object from MusicXML, found more than one DyanmicMark contained')
+
+        # palcement is found in outermost object
+        if mxDirection.get('placement') != None:
+            self.posPlacement = mxDirection.get('placement') 
+
+        # the tag is the dynmic mark value
+        mxDynamicMark = mxDynamics.componentList[0].get('tag')
+        self.value = mxDynamicMark
+        for dst, src in [('posDefaultX', 'default-x'), 
+                         ('posDefaultY', 'default-y'), 
+                         ('posRelativeX', 'relative-x'),
+                         ('posRelativeY', 'relative-y')]:
+            if mxDynamics.get(src) != None:
+                setattr(self, dst, mxDynamics.get(src))
 
     mx = property(_getMX, _setMX)
 
@@ -96,18 +164,20 @@ class Dynamic(music21.Music21Object):
 
 
     def _getMusicXML(self):
-        '''Provide a complete MusicXM: representation. Presently, this is based on 
+        '''Provide a complete MusicXM: representation.
         '''
-        mxDynamicMark = self._getMX()
+        #mxDynamicMark = self._getMX()
+        #mxDynamics = musicxml.Dynamics()
+#         mxDynamics = self._getMX()
+# 
+#         mxDirectionType = musicxml.DirectionType()
+#         mxDirectionType.append(mxDynamics)
+# 
+#         mxDirection = musicxml.Direction()
+#         mxDirection.append(mxDirectionType)
 
-        mxDynamics = musicxml.Dynamics()
-        mxDynamics.append(mxDynamicMark)
 
-        mxDirectionType = musicxml.DirectionType()
-        mxDirectionType.append(mxDynamics)
-
-        mxDirection = musicxml.Direction()
-        mxDirection.append(mxDirectionType)
+        mxDirection = self._getMX()
 
         mxMeasure = musicxml.Measure()
         mxMeasure.setDefaults()
@@ -142,12 +212,8 @@ class Dynamic(music21.Music21Object):
 
 
 
-
-
-
 class Wedge(music21.Music21Object):
-    '''
-    class to deal with dynamics
+    '''Object model of crescendeo/decrescendo wedges.
     '''
     
     def __init__(self, value = None):
@@ -156,33 +222,53 @@ class Wedge(music21.Music21Object):
         self.type = None # crescendo, stop, or diminuendo
         self.spread = None
         # relative-y and relative-x are also defined in xml
+        self.posPlacement = 'below' # defined in mxDirection
 
     def _getMX(self):
         '''
-        returns a musicxml.DynamicMark object
+        returns a musicxml.Direction object
         >>> a = Wedge()
         >>> a.type = 'crescendo'
-        >>> mxWedge = a.mx
+        >>> mxDirection = a.mx
+        >>> mxWedge = mxDirection.getWedge()
         >>> mxWedge.get('type')
         'crescendo'
         '''
         mxWedge = musicxml.Wedge()
         mxWedge.set('type', self.type)
         mxWedge.set('spread', self.spread)
-        return mxWedge
+
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxWedge)
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.append(mxDirectionType)
+        mxDirection.set('placement', self.posPlacement)
+        return mxDirection
 
 
-    def _setMX(self, mxWedge):
+    def _setMX(self, mxDirection):
         '''
-        given an mxDynamicMark, load instance
+        given an mxDirection, load instance
 
+        >>> mxDirection = musicxml.Direction()
+        >>> mxDirectionType = musicxml.DirectionType()
         >>> mxWedge = musicxml.Wedge()
         >>> mxWedge.set('type', 'crescendo')
+        >>> mxDirectionType.append(mxWedge)
+        >>> mxDirection.append(mxDirectionType)
+        >>>
         >>> a = Wedge()
-        >>> a.mx = mxWedge
+        >>> a.mx = mxDirection
         >>> a.type
         'crescendo'
         '''
+        if mxDirection.get('placement') != None:
+            self.posPlacement = mxDirection.get('placement') 
+
+        mxWedge = mxDirection.getWedge()
+        if mxWedge == None:
+            raise WedgeException('no wedge found in MusicXML direction object')
+
         self.type = mxWedge.get('type')
         self.spread = mxWedge.get('spread')
 
@@ -249,6 +335,17 @@ class Test(unittest.TestCase):
         self.assertEquals(pp.value, 'pp')
         self.assertEquals(pp.longName, 'pianissimo')
         self.assertEquals(pp.englishName, 'very soft')
+
+
+    def testCorpusDyanmicsWedge(self):
+        from music21 import corpus
+        import music21
+        a = corpus.parseWork('opus41no1/movement2') # has dynamics!
+        b = a[0].flat.getElementsByClass(music21.dynamics.Dynamic)
+        self.assertEquals(len(b), 35)
+
+        b = a[0].flat.getElementsByClass(music21.dynamics.Wedge)
+        self.assertEquals(len(b), 4)
 
 if __name__ == "__main__":
     music21.mainTest(Test)

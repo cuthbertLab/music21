@@ -3068,24 +3068,6 @@ class Measure(Stream):
     timeSignature = property(_getTimeSignature, _setTimeSignature)   
 
     #---------------------------------------------------------------------------
-    def _getMxDynamics(self, mxDirection):
-        '''Given an mxDirection, return a dynamics if present, otherwise, None
-
-        This should be moved into musicxml.py, as a method of mxDirection
-        '''
-        mxDynamicsFound = []
-        mxWedgeFound = []
-        for mxObj in mxDirection:
-            if isinstance(mxObj, musicxmlMod.DirectionType):
-                for mxObjSub in mxObj:
-                    if isinstance(mxObjSub, musicxmlMod.Dynamics):
-                        for mxObjSubSub in mxObjSub:
-                            if isinstance(mxObjSubSub, musicxmlMod.DynamicMark):
-                                mxDynamicsFound.append(mxObjSubSub)
-                    elif isinstance(mxObjSub, musicxmlMod.Wedge):
-                        mxWedgeFound.append(mxObjSub)
-        return mxDynamicsFound, mxWedgeFound
-
     def _getMX(self):
         '''Return a musicxml Measure, populated with notes, chords, rests
         and a musixcml Attributes, populated with time, meter, key, etc
@@ -3127,14 +3109,8 @@ class Measure(Stream):
                 # .mx here returns a lost of notes
                 mxMeasure.componentList += obj.mx
             elif obj.isClass(dynamics.Dynamic):
-                mxDynamicMark = obj.mx
-                mxDynamics = musicxmlMod.Dynamics()
-                mxDynamics.append(mxDynamicMark)
-                mxDirectionType = musicxmlMod.DirectionType()
-                mxDirectionType.append(mxDynamics)
-                mxDirection = musicxmlMod.Direction()
-                mxDirection.append(mxDirectionType)
-                mxMeasure.append(mxDirection)
+                # returns an mxDirection object
+                mxMeasure.append(obj.mx)
         return mxMeasure
 
 
@@ -3244,18 +3220,18 @@ class Measure(Stream):
 
             # load dynamics into measure
             elif isinstance(mxObj, musicxmlMod.Direction):
-                mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
-                for mxDynamicMark in mxDynamicsFound:
+#                 mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
+#                 for mxDirection in mxDynamicsFound:
+                if mxObj.getDynamicMark() != None:
                     d = dynamics.Dynamic()
-                    d.mx = mxDynamicMark
+                    d.mx = mxObj
                     self.insert(offsetMeasureNote, d)  
-                for mxWedge in mxWedgeFound:
+                if mxObj.getWedge() != None:
                     w = dynamics.Wedge()
-                    w.mx = mxWedge     
+                    w.mx = mxObj     
                     self.insert(offsetMeasureNote, w)  
 
     mx = property(_getMX, _setMX)    
-
 
 
 

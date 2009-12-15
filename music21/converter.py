@@ -484,7 +484,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(notes), 11)
 
 
-    def testConversionMXClef(self):
+    def testConversionMXClefPrimitive(self):
 
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.clefs12a
@@ -495,7 +495,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 18)
 
 
-    def testConversionMXClefCorpus(self):
+    def testConversionMXClefTimeCorpus(self):
     
         from music21 import corpus
         a = corpus.parseWork('luca')
@@ -511,10 +511,13 @@ class Test(unittest.TestCase):
         self.assertEqual(clefs[0].octaveChange, -1)
         self.assertEqual(type(clefs[0]).__name__, 'Treble8vbClef')
 
+        # third part
         clefs = a[2].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
 
-
+        # check time signature count
+        ts = a[1].flat.getElementsByClass(meter.TimeSignature)
+        self.assertEqual(len(ts), 4)
 
         from music21 import corpus
         a = corpus.parseWork('mozart/k156/movement4')
@@ -534,6 +537,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'F')
 
+        # check time signatures
+        # there are
+        ts = a[0].flat.getElementsByClass(meter.TimeSignature)
+        self.assertEqual(len(ts), 1)
 
 
 if __name__ == "__main__":
