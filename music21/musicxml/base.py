@@ -118,10 +118,10 @@ class Tag(object):
     def zeroCount(self):
         self.count = 0
 
-    def getCharData(self):
-        if not self.cdFlag:
-            raise TagException('Character data cannot be obtained from a Tag (%s) that has been set as not receiving character data with the cdFlag.' % self.tag)
-        return self.charData
+#     def getCharData(self):
+#         if not self.cdFlag:
+#             raise TagException('Character data cannot be obtained from a Tag (%s) that has been set as not receiving character data with the cdFlag.' % self.tag)
+#         return self.charData
 
     def __eq__(self, other):
         if other == self.tag: return True
@@ -306,8 +306,6 @@ class TagLib(object):
                 self.tagsCharData.append(tagName)
 
             self._t[tagName] = Tag(tagName, charDataBool, className)
-
-
         
         # utility
         self.stat = None
@@ -376,14 +374,13 @@ class TagLib(object):
         all start() calls have been paired with an end() call, 
         and that all element data has been cleared.
         '''
-
         errors = []
         header = 'TagLib audit: '
         for key in self._t:
             if self._t[key].status != 0:
                 errors.append('tag <%s> left open' % key)
             if self._t[key].cdFlag:
-                sample = self._t[key].getCharData()
+                sample = self._t[key].charData
                 if sample != '':
                     errors.append('tag <%s> left element data: %s' % (key, sample))
         if len(errors) != 0:
@@ -1780,7 +1777,10 @@ class Handler(xml.sax.ContentHandler):
         else:
             self.t = tagLib
 
-        self._currentObj = None # store current object for processing
+        # this might be used in startElement() to speed up processing
+        # this is not opperational yet
+        self._currentObj = None # store current mx object for processing
+        self._currentTag = None # store current tag object
 
         # all objects built in processing
         self._scoreObj = Score() # returned as content
@@ -1899,13 +1899,18 @@ class Handler(xml.sax.ContentHandler):
     def startElement(self, name, attrs):
         environLocal.printDebug([self._debugTagStr('start', name, attrs)], common.DEBUG_ALL)
 
-        # start all tags
-        for tag in self.t.tagsAll:
-#        for tag in self._tags:
-            if name == tag:
-                self.t[tag].start() 
-                break
+        if name in self.t.tagsAll:
+            self._currentTag = self.t[name]
+            self._currentTag.start() 
 
+            # presently, doing this breaks xml processing; not sure why
+#             if self.t[name].className != None:
+#                 self._currentObj = self.t[name].className()
+#                 #environLocal.printDebug(['got', self._currentObj])
+#                 self._currentObj.loadAttrs(attrs)
+#                 self._currentObj = None
+
+        
         # place most commonly used tags first
         if name == 'note':
             self._noteObj = Note()      
@@ -2120,7 +2125,6 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'clef':
             self._clefObj = Clef()
-            #environLocal.printDebug(['found clef, attrs', attrs.keys()])
             self._clefObj.loadAttrs(attrs)
 
         elif name == 'measure-style':
@@ -2148,10 +2152,13 @@ class Handler(xml.sax.ContentHandler):
 
     #---------------------------------------------------------------------------
     def endElement(self, name):
-
         environLocal.printDebug([self._debugTagStr('end', name)],  
                 common.DEBUG_ALL)
     
+        if name in self.t.tagsAll:
+            self._currentObj = None # reset
+            #environLocal.printDebug([self._currentTag.tag])
+
         # place most commonly used tags first
         if name == 'note':
             self._measureObj.componentList.append(self._noteObj)
@@ -2159,34 +2166,30 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'voice':
             if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.voice = self.t[name].getCharData()
+                self._noteObj.voice = self._currentTag.charData
             else: # inside of backup tag
                 pass
-                #environLocal.printDebug([' cannot deal with this voice', self.t[name].getCharData()])
+                #environLocal.printDebug([' cannot deal with this voice', self._currentTag.charData])
 
         elif name == 'duration':
             if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.duration = self.t[name].getCharData()
+                self._noteObj.duration = self._currentTag.charData
             elif self._backupObj != None:
-                self._backupObj.duration = self.t[name].getCharData()
+                self._backupObj.duration = self._currentTag.charData
             elif self._forwardObj != None:
-                self._forwardObj.duration = self.t[name].getCharData()
+                self._forwardObj.duration = self._currentTag.charData
             else: # ignoring figured-bass
                 pass
                 #raise MusicXMLException('cannot handle duration tag at: %s' % self._getLocation())
 
         elif name == 'type':
-            self._noteObj.type = self.t[name].getCharData()
+            self._noteObj.type = self._currentTag.charData
 
         elif name == 'stem':
-            self._noteObj.stem = self.t[name].getCharData()
+            self._noteObj.stem = self._currentTag.charData
 
         elif name == 'beam':
-            self._beamObj.charData = self.t[name].getCharData()
-            # a rare problem that came up with incomplete charadata
-#             if self._beamObj.charData == 'inue':
-#                 environLocal.printDebug(['raw xml', self._beamObj.charData, self])
-
+            self._beamObj.charData = self._currentTag.charData
             self._noteObj.beamList.append(self._beamObj)
             self._beamObj = None
 
@@ -2195,13 +2198,13 @@ class Handler(xml.sax.ContentHandler):
             self._pitchObj = None
 
         elif name == 'step':
-            self._pitchObj.step = self.t[name].getCharData()
+            self._pitchObj.step = self._currentTag.charData
 
         elif name == 'octave':
-            self._pitchObj.octave = self.t[name].getCharData()
+            self._pitchObj.octave = self._currentTag.charData
 
         elif name == 'alter':
-            self._pitchObj.alter = self.t[name].getCharData()
+            self._pitchObj.alter = self._currentTag.charData
 
 
         elif name == 'notations': 
@@ -2226,7 +2229,7 @@ class Handler(xml.sax.ContentHandler):
             self._slurObj = None
 
         elif name == 'accidental':
-            self._accidentalObj.charData = self.t[name].getCharData()
+            self._accidentalObj.charData = self._currentTag.charData
             self._noteObj.accidentalObj = self._accidentalObj
             self._accidentalObj = None
 
@@ -2278,10 +2281,10 @@ class Handler(xml.sax.ContentHandler):
             self._lyricObj = None
 
         elif name == 'syllabic':
-            self._lyricObj.syllabic = self.t[name].getCharData()
+            self._lyricObj.syllabic = self._currentTag.charData
 
         elif name == 'text':
-            self._lyricObj.text = self.t[name].getCharData()
+            self._lyricObj.text = self._currentTag.charData
 
         elif name == 'trill-mark': 
             self._ornamentsObj.append(self._trillMarkObj)
@@ -2294,16 +2297,16 @@ class Handler(xml.sax.ContentHandler):
             self._timeModificationObj = None
 
         elif name == 'actual-notes': 
-            self._timeModificationObj.actualNotes = self.t[name].getCharData()
+            self._timeModificationObj.actualNotes = self._currentTag.charData
 
         elif name == 'normal-notes': 
-            self._timeModificationObj.normalNotes = self.t[name].getCharData()
+            self._timeModificationObj.normalNotes = self._currentTag.charData
 
         elif name == 'normal-type':
-            self._timeModificationObj.normalType = self.t[name].getCharData()
+            self._timeModificationObj.normalType = self._currentTag.charData
 
         elif name == 'normal-dot': 
-            self._timeModificationObj.normalDot = self.t[name].getCharData()
+            self._timeModificationObj.normalDot = self._currentTag.charData
 
         elif name == 'tuplet': 
             self._notationsObj.componentList.append(self._tupletObj)
@@ -2320,8 +2323,8 @@ class Handler(xml.sax.ContentHandler):
             self._attributesObj = None
 
         elif name == 'divisions':
-            self._attributesObj.divisions = self.t[name].getCharData()
-            self._divisionsLast = self.t[name].getCharData()
+            self._attributesObj.divisions = self._currentTag.charData
+            self._divisionsLast = self._currentTag.charData
     
         elif name == 'forward':
             self._measureObj.componentList.append(self._forwardObj)
@@ -2332,19 +2335,13 @@ class Handler(xml.sax.ContentHandler):
             self._backupObj = None
 
 
-
-
         elif name == 'grace':
             self._noteObj.graceObj = self._graceObj
             self._graceObj = None
 
 
-
-
-
-
         elif name == 'notehead':
-            self._noteheadObj.charData = self.t[name].getCharData()
+            self._noteheadObj.charData = self._currentTag.charData
             self._noteObj.noteheadObj = self._noteheadObj
             self._noteheadObj = None
 
@@ -2373,7 +2370,7 @@ class Handler(xml.sax.ContentHandler):
             self._dynamicMarkObj = None
 
         elif name == 'other-dynamics':
-            self._dynamicMarkObj.charData = self.t[name].getCharData()            
+            self._dynamicMarkObj.charData = self._currentTag.charData            
             self._dynamicsObj.componentList.append(self._dynamicMarkObj)
             self._dynamicMarkObj = None
 
@@ -2383,7 +2380,7 @@ class Handler(xml.sax.ContentHandler):
             self._articulationMarkObj = None
 
         elif name == 'other-articulation':
-            self._articulationMarkObj.charData = self.t[name].getCharData()            
+            self._articulationMarkObj.charData = self._currentTag.charData            
             self._articulationsObj.componentList.append(self._dynamicMarkObj)
             self._articulationMarkObj = None
 
@@ -2396,12 +2393,12 @@ class Handler(xml.sax.ContentHandler):
             self._technicalMarkObj = None
 
         elif name == 'other-technical':
-            self._technicalMarkObj.charData = self.t[name].getCharData()            
+            self._technicalMarkObj.charData = self._currentTag.charData            
             self._technicalObj.componentList.append(self._technicalMarkObj)
             self._technicalMarkObj = None
 
         elif name == 'fermata':
-            self._fermataObj.charData = self.t[name].getCharData()  
+            self._fermataObj.charData = self._currentTag.charData  
             self._notationsObj.componentList.append(self._fermataObj)
             self._fermataObj = None
 
@@ -2409,30 +2406,30 @@ class Handler(xml.sax.ContentHandler):
 
         # formerly part of handler score
         elif name == 'movement-title':
-            self._scoreObj.movementTitle = self.t['movement-title'].getCharData()
+            self._scoreObj.movementTitle = self._currentTag.charData
 
         elif name == 'movement-number':
-            self._scoreObj.movementNumber = self.t[name].getCharData()
+            self._scoreObj.movementNumber = self._currentTag.charData
 
         elif name == 'work':
             self._scoreObj.workObj = self._workObj
             self._workObj = None
 
         elif name == 'work-title':
-            self._workObj.workTitle = self.t[name].getCharData()
+            self._workObj.workTitle = self._currentTag.charData
 
         elif name == 'work-number':
-            self._workObj.workNumber = self.t[name].getCharData()
+            self._workObj.workNumber = self._currentTag.charData
 
         elif name == 'identification':
             self._scoreObj.identificationObj = self._identificationObj
             self._identificationObj = None
 
         elif name == 'rights':
-            self._identificationObj.rights = self.t[name].getCharData()
+            self._identificationObj.rights = self._currentTag.charData
 
         elif name == 'creator':
-            self._creatorObj.charData = self.t[name].getCharData()
+            self._creatorObj.charData = self._currentTag.charData
             self._identificationObj.creatorList.append(self._creatorObj)
             self._creatorObj = None
 
@@ -2441,12 +2438,12 @@ class Handler(xml.sax.ContentHandler):
             self._encodingObj = None
 
         elif name == 'software':
-            self._softwareObj.charData = self.t[name].getCharData()
+            self._softwareObj.charData = self._currentTag.charData
             self._encodingObj.softwareList.append(self._softwareObj)
             self._softwareObj = None
 
         elif name == 'encoding-date':
-            self._encodingObj.encodingDate = self.t[name].getCharData()
+            self._encodingObj.encodingDate = self._currentTag.charData
 
 
         # formerly part of handler part list
@@ -2455,13 +2452,13 @@ class Handler(xml.sax.ContentHandler):
             self._partGroupObj = None 
 
         elif name == 'group-name':
-            self._partGroupObj.groupName = self.t[name].getCharData()
+            self._partGroupObj.groupName = self._currentTag.charData
 
         elif name == 'group-symbol':
-            self._partGroupObj.groupSymbol = self.t[name].getCharData()
+            self._partGroupObj.groupSymbol = self._currentTag.charData
 
         elif name == 'group-barline':
-            self._partGroupObj.groupBarline = self.t[name].getCharData()
+            self._partGroupObj.groupBarline = self._currentTag.charData
 
         elif name == 'score-instrument':
             self._scorePartObj.scoreInstrumentList.append(
@@ -2469,10 +2466,10 @@ class Handler(xml.sax.ContentHandler):
             self._scoreInstrumentObj = None
 
         elif name == 'instrument-name':
-            self._scoreInstrumentObj.instrumentName = self.t[name].getCharData()
+            self._scoreInstrumentObj.instrumentName = self._currentTag.charData
 
         elif name == 'instrument-abbreviation':
-            self._scoreInstrumentObj.instrumentAbbreviation = self.t[name].getCharData()
+            self._scoreInstrumentObj.instrumentAbbreviation = self._currentTag.charData
 
         elif name == 'score-part':
             self._partListObj.componentList.append(self._scorePartObj)
@@ -2480,7 +2477,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'part-name':
             # copy completed character data and clear
-            self._scorePartObj.partName = self.t[name].getCharData()
+            self._scorePartObj.partName = self._currentTag.charData
 
         elif name == 'score-instrument':                
             self._scorePartObj.scoreInstrumentList.append(
@@ -2495,11 +2492,11 @@ class Handler(xml.sax.ContentHandler):
              
         elif name == 'midi-channel':
             if self.t['score-part'].status:
-                self._midiInstrumentObj.midiChannel = self.t[name].getCharData()
+                self._midiInstrumentObj.midiChannel = self._currentTag.charData
 
         elif name == 'midi-program':
             if self.t['score-part'].status:
-                self._midiInstrumentObj.midiProgram = self.t[name].getCharData()
+                self._midiInstrumentObj.midiProgram = self._currentTag.charData
 
 
 
@@ -2516,26 +2513,26 @@ class Handler(xml.sax.ContentHandler):
             self._keyObj = None
 
         elif name == 'fifths':
-            self._keyObj.fifths = self.t[name].getCharData()
+            self._keyObj.fifths = self._currentTag.charData
 
         elif name == 'mode':
-            self._keyObj.mode = self.t[name].getCharData()
+            self._keyObj.mode = self._currentTag.charData
 
         elif name == 'cancel':
-            self._keyObj.cancel = self.t[name].getCharData()
+            self._keyObj.cancel = self._currentTag.charData
 
         elif name == 'key-step':
-            self._keyStepObj.charData = self.t[name].getCharData()
+            self._keyStepObj.charData = self._currentTag.charData
             self._keyObj.nonTraditionalKeyList.append(self._keyStepObj)
             self._keyStepObj = None
 
         elif name == 'key-alter':
-            self._keyAlterObj.charData = self.t[name].getCharData()
+            self._keyAlterObj.charData = self._currentTag.charData
             self._keyObj.nonTraditionalKeyList.append(self._keyAlterObj)
             self._keyAlterObj = None
 
         elif name == 'key-octave':
-            self._keyOctaveObj.charData = self.t[name].getCharData()
+            self._keyOctaveObj.charData = self._currentTag.charData
             self._keyObj.nonTraditionalKeyList.append(self._keyOctaveObj)
             self._keyOctaveObj = None
 
@@ -2544,13 +2541,13 @@ class Handler(xml.sax.ContentHandler):
             self._transposeObj = None
 
         elif name == 'diatonic':
-            self._transposeObj.diatonic = self.t[name].getCharData()
+            self._transposeObj.diatonic = self._currentTag.charData
 
         elif name == 'chromatic':
-            self._transposeObj.chromatic = self.t[name].getCharData()
+            self._transposeObj.chromatic = self._currentTag.charData
 
         elif name == 'octave-change':
-            self._transposeObj.octaveChange = self.t['octave-change'].getCharData()
+            self._transposeObj.octaveChange = self._currentTag.charData
 
         elif name == 'double': 
             self._transposeObj.double = True
@@ -2561,37 +2558,37 @@ class Handler(xml.sax.ContentHandler):
             self._timeObj = None
 
         elif name == 'staves':
-            self._attributesObj.staves = self.t[name].getCharData()
+            self._attributesObj.staves = self._currentTag.charData
 
         elif name == 'beats':
             self._timeObj.componentList.append(
-                Beats(self.t[name].getCharData()))
-            #self._timeObj.beats = self.t[name].getCharData()
+                Beats(self._currentTag.charData))
+            #self._timeObj.beats = self._currentTag.charData
 
         elif name == 'beat-type':
             self._timeObj.componentList.append(
-                BeatType(self.t[name].getCharData()))
-            #self._timeObj.beatType = self.t[name].getCharData()
+                BeatType(self._currentTag.charData))
+            #self._timeObj.beatType = self._currentTag.charData
 
         elif name == 'clef':
             self._attributesObj.clefList.append(self._clefObj)
             self._clefObj = None
 
         elif name == 'multiple-rest':
-            self._measureStyleObj.multipleRest = self.t[name].getCharData()
+            self._measureStyleObj.multipleRest = self._currentTag.charData
 
         elif name == 'measure-style':
             self._attributesObj.measureStyleObj = self._measureStyleObj
             self._measureStyleObj = None
 
         elif name == 'sign':
-            self._clefObj.sign = self.t[name].getCharData()
+            self._clefObj.sign = self._currentTag.charData
 
         elif name == 'line':
-            self._clefObj.line = self.t[name].getCharData()
+            self._clefObj.line = self._currentTag.charData
 
         elif name == 'clef-octave-change':
-            self._clefObj.clefOctaveChange = self.t[name].getCharData()
+            self._clefObj.clefOctaveChange = self._currentTag.charData
             #environLocal.printDebug(['got coc tag', self._clefObj])
 
 
@@ -2611,10 +2608,10 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'staff': 
             if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.staff = self.t[name].getCharData()
+                self._noteObj.staff = self._currentTag.charData
             else:
                 pass
-                #environLocal.printDebug([' cannot deal with this staff', self.t[name].getCharData()])
+                #environLocal.printDebug([' cannot deal with this staff', self._currentTag.charData])
 
 
         elif name == 'barline': 
@@ -2626,20 +2623,17 @@ class Handler(xml.sax.ContentHandler):
             self._endingObj = None
 
         elif name == 'bar-style': 
-            self._barlineObj.barStyle = self.t[name].getCharData()
+            self._barlineObj.barStyle = self._currentTag.charData
 
         elif name == 'repeat': 
             self._barlineObj.repeatObj = self._repeatObj
             self._repeatObj = None
 
+        # clear and end
+        if name in self.t.tagsAll:
+            self.t[name].clear() 
+            self.t[name].end() 
 
-        # end and clear all tags
-        for tag in self.t.tagsAll:
-#         for tag in self._tags:
-            if name == tag:
-                self.t[tag].clear() 
-                self.t[tag].end() 
-                break
 
 
     #---------------------------------------------------------------------------

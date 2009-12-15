@@ -34,12 +34,15 @@ class Test(unittest.TestCase):
         '''
         # provide work and expected min/max in seconds
         for known, max, best in [
-            ('beethoven/opus59no2/movement3', 9, 7.42),
-            ('haydn/opus74no1/movement3', 5, 4.08),
-            ('schumann/opus41no1/movement2', 7, 5.88),
-            ('luca/gloria', 4, 3.174),
+            ('beethoven/opus59no2/movement3', 9, 
+                {'2009.12.14': 7.42, '2009.12.15': 6.686}),
+            ('haydn/opus74no1/movement3', 5, 
+                {'2009.12.14': 4.08, '2009.12.15': 3.531}),
+            ('schumann/opus41no1/movement2', 7, 
+                {'2009.12.14': 5.88, '2009.12.15': 5.126}),
+            ('luca/gloria', 4,
+                {'2009.12.14': 3.174, '2009.12.15': 2.954}),
             ]:
-            pass
 
             t = common.Timer()
             t.start()
@@ -47,7 +50,8 @@ class Test(unittest.TestCase):
             t.stop()
             dur = t()
             environLocal.printDebug(['timing tolarance for', known, 
-                'this run:', t, 'best run:', best])
+                'this run:', t, 'best runs:', 
+                ['%s: %s' % (x, y) for x, y in best.items()]])
             self.assertEqual(True, dur <= max) # performance test
 
 
