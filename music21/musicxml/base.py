@@ -92,18 +92,14 @@ class DocumentException(Exception):
 
 #-------------------------------------------------------------------------------
 class Tag(object):
-    '''Object to store tags as encountered by SAX. Tags can be open or closed based 
-    on the status attribute. Tags can store character data collected between their 
-    defined tags. These are used only for finding and collecting tag attributes and 
-    elements. As we do not need character data for all tags, tags have an optional flag 
-    to select if the are to collect character data.'''
-
-    def __init__(self, tag, cdFlag=0):
+    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the status attribute. Tags can store character data collected between their defined tags. These are used only for finding and collecting tag attributes and elements. As we do not need character data for all tags, tags have an optional flag to select if the are to collect character data.'''
+    def __init__(self, tag, cdFlag=False, className=None):
         self.tag = tag
         self.cdFlag = cdFlag # character data flag
         self.status = 0
         self.charData = u''
         self.count = 0 # for statistics
+        self.className = className
 
     def start(self):
         if self.status: # already open
@@ -142,6 +138,7 @@ class Tag(object):
         return "%s: %s" % (self.tag, self.charData)
 
 
+
 class TagLib(object):
     '''
     An object to store all MusicXML tags as Tag objects. Tag objects are used 
@@ -150,62 +147,167 @@ class TagLib(object):
     structural monitors, but not be instantiated as objects for content 
     delivery.
     '''
-
     def __init__(self):
         self._t = {}
 
-        # tags that do not store character data
-        _tags = ['note', 'pitch', 
-
-        'notations', 'rest', 'measure', 'slur', 'articulations', 'tie', 
-
-        'direction', 'direction-type', 'dot', 
-
-        'time-modification', 'dynamics', 'tuplet', 'ornaments', 
-        'forward', 
-
-        'score-partwise', 'score-timewise', 'identification', 
-        'work', 'opus', 'encoding', 'part-list', 'part-group', 'group-name-display', 'group-abbreviation', 
-        'group-abbreviation-display', 'group-time', 'score-instrument', 'solo', 
-        'ensemble', 'score-part', 'midi-name', 'midi-bank', 'midi-instrument', 'midi-unpitched', 'volume', 'pan', 'elevation', 'part', 'attributes', 'key', 'time', 'clef', 
-        'transpose', 'double', 'chord', 
-        'lyric', 'backup', 'tied', 'barline', 'repeat', 'ending', 'technical', 'grace', 'measure-style', 'wedge',
-        'trill-mark',
-        ] + DYNAMIC_MARKS + ARTICULATION_MARKS + TECHNICAL_MARKS
-        for tagName in _tags:
-            if tagName in self._t.keys():
-                raise TagLibException('unidentied tag %s' % tagName)
-            self._t[tagName] = Tag(tagName)
-
-        # tags that store character data
-        # order here is used to optimize perforamnce
-        _tagsCharData = ['voice', 'duration', 'type', 'beam', 'step', 'stem', 
-
-        'octave', 'alter', 'accidental', 
-
-        'actual-notes', 'normal-notes', 'normal-type', 'normal-dot',
-
-         'staff', 'syllabic', 'text', 'notehead', 'bar-style', 'divisions', 'other-dynamics', 'other-articulation', 'other-technical', 'fermata', 'multiple-rest', 
-        'staves', 'display-step', 'display-octave',
-
-        'part-name', 'instrument-name', 'instrument-abbreviation', 
-
-        'work-title', 'work-number', 'encoding-date', 
-        'software', 'movement-title', 'movement-number', 'creator', 'rights', 
-        'group-name', 'group-symbol', 'group-barline', 
-        'midi-channel', 'midi-program', 'fifths', 'mode', 'cancel', 'key-step', 'key-alter', 
-        'key-octave', 'beats', 'beat-type', 'sign', 'line', 'clef-octave-change', 'diatonic', 
-        'chromatic', 'octave-change', 
+        # store tag, charDataBool, className
+        # charDataBool is if this tag stores char data
+        # order here is based on most-often used, found through empircal tests
+        _tags = [
+('voice', True), 
+('note', False, Note), 
+('duration', True), 
+('type', True), 
+('beam', True, Beam), 
+('step', True), 
+('stem', True), 
+('pitch', False, Pitch), 
+('octave', True), 
+('alter', True), 
+('notations', False, Notations), 
+('measure', False, Measure), 
+('slur', False, Slur), 
+('articulations', False, Articulations), 
+('rest', False, Rest), 
+('accidental', True, Accidental), 
+('direction', False, Direction), 
+('direction-type', False, DirectionType), 
+('dot', False, Dot), 
+('dynamics', False, Dynamics), 
+('tied', False, Tied), 
+('tie', False, Tie), 
+('chord', False), 
+('lyric', False, Lyric), 
+('syllabic', True), 
+('text', True),
+('trill-mark', False, TrillMark), 
+('attributes', False, Attributes), 
+('divisions', True), 
+('forward', False, Forward), 
+('backup', False, Backup), 
+('grace', False, Grace),  
+('time-modification', False, TimeModification), 
+('actual-notes', True), 
+('normal-notes', True), 
+('normal-type', True), 
+('normal-dot', True), 
+('tuplet', False, Tuplet), 
+('notehead', True, Notehead), 
+('technical', False, Technical), 
+('wedge', False, Wedge), 
+('ornaments', False, Ornaments), 
+('part', False, Part), 
+('key', False, Key), 
+('fifths', True), 
+('mode', True), 
+('cancel', True), 
+('key-step', True, KeyStep), 
+('key-alter', True, KeyAlter), 
+('key-octave', True, KeyOctave), 
+('transpose', False, Transpose), 
+('diatonic', True), 
+('chromatic', True), 
+('octave-change', True), 
+('time', False, Time), 
+('beats', True, Beats), 
+('beat-type', True, BeatType), 
+('clef', False, Clef), 
+('sign', True), 
+('line', True), 
+('clef-octave-change', True), 
+('staff', True), 
+('fermata', True, Fermata), 
+('barline', False, Barline), 
+('ending', False, Ending), 
+('bar-style', True), 
+('repeat', False, Repeat), 
+('measure-style', False, MeasureStyle), 
+('multiple-rest', True), 
+('staves', True), 
+('display-step', True, DisplayStep), 
+('display-octave', True, DisplayOctave),
+        ]
+        _tags += DYNAMIC_MARKS
+        _tags += ARTICULATION_MARKS
+        _tags += TECHNICAL_MARKS
+        _tags += [('other-dynamics', True, DynamicMark), 
+('other-articulation', True, ArticulationMark), 
+('other-technical', True, TechnicalMark), 
+('score-partwise', False), 
+('score-timewise', False),  
+('movement-title', True), 
+('movement-number', True), 
+('work', False, Work), 
+('work-title', True), 
+('work-number', True), 
+('opus', False), 
+('identification', False, Identification),  
+('rights', True), 
+('creator', True, Creator), 
+('encoding', False, Encoding), 
+('software', True, Software), 
+('encoding-date', True), 
+('part-list', False, PartList), 
+('part-group', False, PartGroup), 
+('group-name', True), 
+('group-symbol', True), 
+('group-barline', True), 
+('group-name-display', False), 
+('group-abbreviation', False), 
+('group-abbreviation-display', False), 
+('group-time', False), 
+('solo', False), 
+('ensemble', False), 
+('score-part', False, ScorePart), 
+('score-instrument', False, ScoreInstrument), 
+('instrument-name', True), 
+('instrument-abbreviation', True), 
+('part-name', True), 
+('midi-instrument', False, MIDIInstrument),
+('midi-channel', True), 
+('midi-program', True), 
+('volume', False), 
+('pan', False), 
+('elevation', False),
+('midi-name', False), 
+('midi-bank', False), 
+('midi-unpitched', False), 
+('double', False),  
         ]
 
-        for tagName in _tagsCharData:
-            if tagName in self._t.keys(): 
-                raise TagLibException('unidentied tag %s' % tagName)
-            self._t[tagName] = Tag(tagName, 1) # arg stores char data
+        # order matters: keep order here
+        self.tagsCharData = []
+        self.tagsAll = [] 
 
-        # access tags as lists of strings
-        self.tagsAll = _tags + _tagsCharData
-        self.tagsCharData = _tagsCharData
+        for data in _tags:
+            if common.isStr(data): # if just a string w/o a class definition
+                if data in DYNAMIC_MARKS:
+                    data = [data, False, DynamicMark]
+                elif data in ARTICULATION_MARKS:
+                    data = [data, False, ArticulationMark]
+                elif data in TECHNICAL_MARKS:
+                    data = [data, False, TechnicalMark]
+                else:
+                    raise MusicXMLException('got tag without any information on it: %s' % data)
+            tagName = data[0]
+            charDataBool = data[1]
+            if len(data) > 2:
+                className = data[2]
+            else: # not all tags define a clas sname
+                className = None
+
+            # error check for redundancy
+            if tagName in self._t.keys():
+                raise TagLibException('duplicated tag %s' % tagName)
+
+            # store tag names in order
+            self.tagsAll.append(tagName)
+            if charDataBool:
+                self.tagsCharData.append(tagName)
+
+            self._t[tagName] = Tag(tagName, charDataBool, className)
+
+
         
         # utility
         self.stat = None
@@ -295,15 +397,8 @@ class TagLib(object):
 
 
 #-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-
 class MusicXMLElement(node.Node):
-    '''
-    MusicXML elements are an abstraction of MusicXML into an object oriented framework. 
-    Some, not all, of MusicXML elements are represented as objects. Some sub-elements 
-    are much more simply placed as attributes of parent objects. These simple elements 
-    have only a tag and character data. Elements that have attributes and/or sub-elements, 
-    however, must be represented as objects.
+    '''MusicXML elements are an abstraction of MusicXML into an object oriented framework. Some, not all, of MusicXML elements are represented as objects. Some sub-elements are much more simply placed as attributes of parent objects. These simple elements have only a tag and character data. Elements that have attributes and/or sub-elements, however, must be represented as objects.
     '''
 
     def __init__(self):
@@ -1349,7 +1444,8 @@ class Rest(MusicXMLElementList):
         displayStep.set('charData', 'D')
         displayOctave = DisplayOctave()
         displayOctave.set('charData', '4')
-        self.append(displayStep, displayOctave)
+        self.append(displayStep)
+        self.append(displayOctave)
 
 
 class DisplayStep(MusicXMLElement):
@@ -1363,20 +1459,6 @@ class DisplayOctave(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'display-octave'
         self.charData = None # only content
-
-
-
-
-
-class Rest(MusicXMLElementList):
-    def __init__(self, type=None):
-        MusicXMLElementList.__init__(self)
-        self._tag = 'rest'
-        self.componentList = []  # objects tt are part of this node
-
-    def _getComponents(self):
-        return self.componentList 
-
 
 
 
@@ -1437,9 +1519,7 @@ class Technical(MusicXMLElementList):
         return c
 
 class DynamicMark(MusicXMLElement):
-    '''This is not an XML object, but a container for all XML dynamic tags.
-    Dynamic tags have no attributes or elements. Tags inlcude common marks
-    such as p, pp, ff, etc.'''
+    '''This is not an XML object in the normal sense, but a container for all XML dynamic tags. Dynamic tags have no attributes or elements. Tags inlcude common marks such as p, pp, ff, etc.'''
 
     def __init__(self, tag):
         MusicXMLElement.__init__(self)
@@ -1462,7 +1542,6 @@ class ArticulationMark(MusicXMLElement):
         self._attr['placement'] = None
         # character data 
         self.charData = None # found only in other-articulation tag
-
 
 class TechnicalMark(MusicXMLElement):
     '''This is not an XML object, but a container for all XML technical tags.
@@ -1588,6 +1667,7 @@ class Tied(MusicXMLElement):
         self._attr['type'] = None
         self._attr['number'] = None
 
+
 class Beam(MusicXMLElement):
     '''Beams are specified is individual objects for each beam, in order, where the beam number refers to its duration representation (8th, 16th, etc) and its character data specifies whether it is begin/continue/end (for normal beams) or backward hook/forward wook (for beams that do not continue are attached only to the staff). These character data values can be mixed: one beam can continue while another can hook or end. 
 
@@ -1700,10 +1780,9 @@ class Handler(xml.sax.ContentHandler):
         else:
             self.t = tagLib
 
-        # define tags relevant to this handler as pairs
-        # tagName, charDataBoolean (if char data needs to be collected)
-        self._tags = []
+        self._currentObj = None # store current object for processing
 
+        # all objects built in processing
         self._scoreObj = Score() # returned as content
         self._creatorObj = None
         self._workObj = None
@@ -1782,30 +1861,6 @@ class Handler(xml.sax.ContentHandler):
         self._graceObj = None
         self._wedgeObj = None
 
-
-        # order here should put most often used first
-        self._tags = ['voice', 'note', 'duration', 'type', 
-        'beam',  'step', 'stem', 
-
-        'pitch', 'octave', 'alter', 'notations', 'measure', 'slur', 
-
-        'articulations', 'rest', 'accidental', 'direction', 'direction-type', 'dot', 'dynamics', 
-
-        'tied', 'tie', 'chord', 
-
-        'lyric', 'syllabic', 'text', 'trill-mark',
-
-        'attributes', 'divisions', 'forward', 'backup', 'grace', 'time-modification', 'actual-notes', 'normal-notes', 'normal-type', 'normal-dot', 'tuplet', 'notehead', 'technical', 'wedge', 'ornaments',
-
-        'part', 'key', 'fifths', 'mode', 'cancel', 'key-step', 'key-alter', 'key-octave', 'transpose', 'diatonic', 'chromatic', 'octave-change', 'time', 'beats', 'beat-type', 'clef', 'sign', 'line',
-        'clef-octave-change', 'staff',  'fermata', 'barline', 'ending', 'bar-style', 'repeat', 'measure-style', 'multiple-rest', 'staves'
-        ] + DYNAMIC_MARKS + ARTICULATION_MARKS + TECHNICAL_MARKS
-
-        self._tags += ['score-partwise', 'score-timewise', 'movement-title', 'movement-number', 'work', 'work-title', 'work-number', 'identification', 'rights', 'creator', 'encoding', 'software', 'encoding-date', ]
-
-        self._tags += ['part-list', 'part-group', 'group-name', 'group-symbol', 'group-barline', 'score-part', 'score-instrument', 'instrument-name', 'instrument-abbreviation', 'part-name', 'midi-instrument', 'midi-channel', 'midi-program']
-    
-
     def setDocumentLocator(self, locator):
         '''A locator object can be used to get line numbers from the XML document.'''
         self._locator = locator
@@ -1831,7 +1886,6 @@ class Handler(xml.sax.ContentHandler):
         and because each Tag knows whether it is to receive character data or not, 
         this method can be found in the base-class and need not be defined for each sub-class.
         '''
-
         # in all but a very few cases self.t[tag].charData = charData is 
         # sufficient for getting charData. however, in a few cases this
         # will not gather all data and cause very unexpected results
@@ -1841,16 +1895,15 @@ class Handler(xml.sax.ContentHandler):
                 break
 
 
-    def endDocument(self):
-        pass
-
+    #---------------------------------------------------------------------------
     def startElement(self, name, attrs):
         environLocal.printDebug([self._debugTagStr('start', name, attrs)], common.DEBUG_ALL)
 
         # start all tags
-        for tag in self._tags:
+        for tag in self.t.tagsAll:
+#        for tag in self._tags:
             if name == tag:
-                self.t[tag].start() # start all defined tags
+                self.t[tag].start() 
                 break
 
         # place most commonly used tags first
@@ -1968,7 +2021,6 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'ornaments': 
             self._ornamentsObj = Ornaments()
 
-
         elif name in DYNAMIC_MARKS:
             self._dynamicMarkObj = DynamicMark(name)
 
@@ -1994,9 +2046,6 @@ class Handler(xml.sax.ContentHandler):
             self._fermataObj.loadAttrs(attrs)
 
 
-
-
-        # formerly part of handlerScore
         elif name == 'score-partwise':
             self._scoreObj.loadAttrs(attrs)
             self._scoreObj.format = 'score-partwise'
@@ -2049,8 +2098,6 @@ class Handler(xml.sax.ContentHandler):
             self._partObj = Part()
             self._partObj.loadAttrs(attrs)
 
-
-
         elif name == 'key':
             self._keyObj = Key()
 
@@ -2079,16 +2126,11 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'measure-style':
             self._measureStyleObj = MeasureStyle()
 
-
-
-
         elif name == 'display-step':
             self._displayStepObj = DisplayStep()
 
         elif name == 'display-octave':
             self._displayOctaveObj = DisplayOctave()
-
-
 
         elif name == 'barline':
             self._barlineObj = Barline()
@@ -2104,7 +2146,7 @@ class Handler(xml.sax.ContentHandler):
 
 
 
-
+    #---------------------------------------------------------------------------
     def endElement(self, name):
 
         environLocal.printDebug([self._debugTagStr('end', name)],  
@@ -2592,14 +2634,15 @@ class Handler(xml.sax.ContentHandler):
 
 
         # end and clear all tags
-        for tag in self._tags:
+        for tag in self.t.tagsAll:
+#         for tag in self._tags:
             if name == tag:
                 self.t[tag].clear() 
                 self.t[tag].end() 
                 break
 
 
-
+    #---------------------------------------------------------------------------
     def getContent(self):
         self._scoreObj.partListObj = self._partListObj
         self._scoreObj.componentList = self._parts
@@ -2617,7 +2660,6 @@ class Document(object):
         self.tagLib = TagLib()
         self.score = None
 
-
     def _getParser(self):
         '''Setup and return a saxparser with default configuration.'''
         saxparser = xml.sax.make_parser()
@@ -2628,11 +2670,8 @@ class Document(object):
         saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)   
         return saxparser
 
-
     def _load(self, fileLike, file=True, audit=False):
         saxparser = self._getParser()
-        #for key in ['score', 'partList', 'parts']: 
-#         for key in ['parts']: 
 
         t = common.Timer()
         t.start()
@@ -2664,7 +2703,6 @@ class Document(object):
             else:
                 environLocal.printDebug(msg)
 
-        #self.score, parts, partList = h.getContent()
         self.score = h.getContent()
 
         if audit:

@@ -24,7 +24,6 @@ environLocal = environment.Environment(_MOD)
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-
     def runTest(self):
         pass
 
@@ -34,11 +33,11 @@ class Test(unittest.TestCase):
         if overall perforamance has changed.
         '''
         # provide work and expected min/max in seconds
-        for known, max in [
-            ('beethoven/opus59no2/movement3', 9),
-            ('haydn/opus74no1/movement3', 6),
-            ('schumann/opus41no1/movement2', 7),
-
+        for known, max, best in [
+            ('beethoven/opus59no2/movement3', 9, 7.42),
+            ('haydn/opus74no1/movement3', 5, 4.08),
+            ('schumann/opus41no1/movement2', 7, 5.88),
+            ('luca/gloria', 4, 3.174),
             ]:
             pass
 
@@ -47,7 +46,8 @@ class Test(unittest.TestCase):
             x = corpus.parseWork(known, forceSource=True)
             t.stop()
             dur = t()
-            environLocal.printDebug(['timing tolarance for', known, t])
+            environLocal.printDebug(['timing tolarance for', known, 
+                'this run:', t, 'best run:', best])
             self.assertEqual(True, dur <= max) # performance test
 
 
