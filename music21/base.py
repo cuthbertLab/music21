@@ -144,9 +144,9 @@ class Contexts(object):
     def _selectDomain(self, arg):
         post = []
         if 'ref' in arg:
-            post.append(self._ref)
+            post += self._ref
         elif 'loc' in arg:
-            post.append(self._loc)
+            post += self._loc
         return post
 
     def scrub(self, domain=['ref', 'loc']):
@@ -199,8 +199,7 @@ class Contexts(object):
     def getLocations(self):
         return self.get('loc')
 
-
-    def add(self, obj, weakRef=False):
+    def addReference(self, obj, weakRef=False):
         '''Add a reference
         '''
         # only add if not already here
@@ -210,6 +209,29 @@ class Contexts(object):
             self._ref[-1]['obj'] = objRef
             self._ref[-1]['name'] = type(obj).__name__
             self._ref[-1]['time'] = time.time()
+
+    def remove(self, obj, domain):
+        '''Remove the entry specified by sites
+
+        >>> class Mock(object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocations = Locations()
+        >>> aLocations.add(23, aSite)
+        >>> len(aLocations)
+        1
+        >>> aLocations.remove(aSite)
+        >>> len(aLocations)
+        0
+        
+        '''
+        for coll in self._selectDomain(domain):
+            objs = coll.get(coll)
+        sites = self.getSites()
+        if not site in sites: 
+            raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
+        del self._coordinates[sites.index(site)]
+
 
 
     def getByClass(self, className):
