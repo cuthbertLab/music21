@@ -115,6 +115,10 @@ class Groups(list):
         else:
             return True
 
+
+
+
+
 #-------------------------------------------------------------------------------
 class Contexts(object):
     '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
@@ -129,7 +133,7 @@ class Contexts(object):
         >>> class Mock(object): pass
         >>> aObj = Mock()
         >>> aContexts = Contexts()
-        >>> aContexts.add(aObj)
+        >>> aContexts.addReference(aObj)
         >>> len(aContexts) 
         1
         '''
@@ -144,9 +148,9 @@ class Contexts(object):
     def _selectDomain(self, arg):
         post = []
         if 'ref' in arg:
-            post += self._ref
+            post.append(self._ref)
         elif 'loc' in arg:
-            post += self._loc
+            post.append(self._loc)
         return post
 
     def scrub(self, domain=['ref', 'loc']):
@@ -177,8 +181,8 @@ class Contexts(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = Contexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
+        >>> aContexts.addReference(aObj)
+        >>> aContexts.addReference(bObj)
         >>> aContexts.getReferences() == [bObj, aObj]
         True
         '''
@@ -213,16 +217,6 @@ class Contexts(object):
     def remove(self, obj, domain):
         '''Remove the entry specified by sites
 
-        >>> class Mock(object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> aLocations = Locations()
-        >>> aLocations.add(23, aSite)
-        >>> len(aLocations)
-        1
-        >>> aLocations.remove(aSite)
-        >>> len(aLocations)
-        0
         
         '''
         for coll in self._selectDomain(domain):
@@ -243,8 +237,8 @@ class Contexts(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = Contexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
+        >>> aContexts.addReference(aObj)
+        >>> aContexts.addReference(bObj)
         >>> aContexts.getByClass('mock') == bObj
         True
         >>> aContexts.getByClass(Mock) == bObj
@@ -269,8 +263,8 @@ class Contexts(object):
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
         >>> aContexts = Contexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
+        >>> aContexts.addReference(aObj)
+        >>> aContexts.addReference(bObj)
         >>> aContexts.getAttributeByName('attr1') == 98
         True
         >>> del bObj
@@ -296,8 +290,8 @@ class Contexts(object):
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
         >>> aContexts = Contexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
+        >>> aContexts.addReference(aObj)
+        >>> aContexts.addReference(bObj)
         >>> aContexts.setAttributeByName('attr1', 'test')
         >>> aContexts.getAttributeByName('attr1') == 'test'
         True
