@@ -44,6 +44,9 @@ WEAKREF_ACTIVE = True
 class Music21Exception(Exception):
     pass
 
+class ContextsException(Exception):
+    pass
+
 class LocationsException(Exception):
     pass
 
@@ -214,19 +217,24 @@ class Contexts(object):
             self._ref[-1]['name'] = type(obj).__name__
             self._ref[-1]['time'] = time.time()
 
-    def remove(self, obj, domain):
+    def remove(self, obj, domain=['ref', 'loc']):
         '''Remove the entry specified by sites
 
-        
         '''
+        match = False
         for coll in self._selectDomain(domain):
-            objs = coll.get(coll)
-        sites = self.getSites()
-        if not site in sites: 
-            raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
-        del self._coordinates[sites.index(site)]
+            if obj in coll: 
+                del coll[coll.index(obj)]
+                match = True
+        if not match:
+            raise ContextsException('an entry for this object (%s) is not stored in this object' % obj)
 
 
+    def getById(self, id, domain=['ref', 'loc']):
+        pass
+    
+    def getByGroup(self, id, domain=['ref', 'loc']):
+        pass
 
     def getByClass(self, className, domain=['ref', 'loc']):
         '''Return the most recently added reference based on className. Class name can be a string or the real class name.
@@ -254,7 +262,7 @@ class Contexts(object):
                 if isinstance(obj, className):
                     return obj
 
-    def getAttrByName(self, attrName):
+    def getAttrByName(self, attrName, domain=['rec', 'loc']):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -272,7 +280,7 @@ class Contexts(object):
         True
         '''
         post = None
-        for obj in self.getReferences():
+        for obj in self.get(domain=domain):
             if obj == None: continue # in case the reference is dead
             try:
                 post = getattr(obj, attrName)
@@ -280,8 +288,7 @@ class Contexts(object):
             except AttributeError:
                 pass
 
-
-    def setAttrByName(self, attrName, value):
+    def setAttrByName(self, attrName, value, domain=['rec', 'loc']):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -297,7 +304,7 @@ class Contexts(object):
         True
         '''
         post = None
-        for obj in self.getReferences():
+        for obj in self.get(domain=domain):
             if obj == None: continue # in case the reference is dead
             try:
                 junk = getattr(obj, attrName) # if attr already exists
