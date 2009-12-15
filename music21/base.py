@@ -228,7 +228,7 @@ class Contexts(object):
 
 
 
-    def getByClass(self, className):
+    def getByClass(self, className, domain=['ref', 'loc']):
         '''Return the most recently added reference based on className. Class name can be a string or the real class name.
 
         TODO: do this recursively, searching the Contexts of all members
@@ -245,7 +245,7 @@ class Contexts(object):
         True
 
         '''
-        for obj in self.getReferences():
+        for obj in self.get(domain=domain):
             if obj == None: continue # in case the reference is dead
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
@@ -254,7 +254,7 @@ class Contexts(object):
                 if isinstance(obj, className):
                     return obj
 
-    def getAttributeByName(self, attrName):
+    def getAttrByName(self, attrName):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -265,10 +265,10 @@ class Contexts(object):
         >>> aContexts = Contexts()
         >>> aContexts.addReference(aObj)
         >>> aContexts.addReference(bObj)
-        >>> aContexts.getAttributeByName('attr1') == 98
+        >>> aContexts.getAttrByName('attr1') == 98
         True
         >>> del bObj
-        >>> aContexts.getAttributeByName('attr1') == 234
+        >>> aContexts.getAttrByName('attr1') == 234
         True
         '''
         post = None
@@ -281,7 +281,7 @@ class Contexts(object):
                 pass
 
 
-    def setAttributeByName(self, attrName, value):
+    def setAttrByName(self, attrName, value):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -292,8 +292,8 @@ class Contexts(object):
         >>> aContexts = Contexts()
         >>> aContexts.addReference(aObj)
         >>> aContexts.addReference(bObj)
-        >>> aContexts.setAttributeByName('attr1', 'test')
-        >>> aContexts.getAttributeByName('attr1') == 'test'
+        >>> aContexts.setAttrByName('attr1', 'test')
+        >>> aContexts.getAttrByName('attr1') == 'test'
         True
         '''
         post = None
