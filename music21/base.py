@@ -120,7 +120,8 @@ class Contexts(object):
     '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
     '''
     def __init__(self):
-        self._ref = [] # a list of dictionaries
+        self._ref = [] # references
+        self._loc = [] # locations
 
     def __len__(self):
         '''Return the total number of references.
@@ -132,26 +133,43 @@ class Contexts(object):
         >>> len(aContexts) 
         1
         '''
+        return len(self._ref) + len(self._loc)
+
+    def countLoc(self):
+        return len(self._loc)
+
+    def countRef(self):
         return len(self._ref)
 
-    def scrubEmptyReferences(self):
-        '''Remove all objects that no longer exist
+    def _selectDomain(self, arg):
+        post = []
+        if 'ref' in arg:
+            post.append(self._ref)
+        elif 'loc' in arg:
+            post.append(self._loc)
+        return post
+
+    def scrub(self, domain=['ref', 'loc']):
+        '''Remove all weak ref objects that point to objects that no longer exist.
         '''
-        delList = []
-        for i in range(len(self._ref)):
-            if common.unwrapWeakref(self._ref[i]['obj']) == None:
-                delList.append(i)
-        delList.reverse() # go in reverse from largest to maintain positions
-        for i in delList:
-            del self._ref[i]
+        for coll in self._selectDomain(domain):
+            delList = []
+            for i in range(len(coll)):
+                if common.isWeakref(self._ref[i]): # only del weak refs
+                    if common.unwrapWeakref(self._ref[i]['obj']) == None:
+                        delList.append(i)
+            delList.reverse() # go in reverse from largest to maintain positions
+            for i in delList:
+                del self._ref[i]
 
     def clear(self):
         '''Clear all data.
         '''
         self._ref = []
+        self._loc = []
 
 
-    def getReferences(self):
+    def get(self, domain=['ref', 'loc']):
         '''Get references; unwrap from weakrefs; place in order from 
         most recently added to least recently added
 
@@ -165,27 +183,39 @@ class Contexts(object):
         True
         '''
         post = []
-        for i in range(len(self._ref)-1, -1, -1):
-            dict = self._ref[i]
-            post.append(common.unwrapWeakref(dict['obj']))
+        for coll in self._selectDomain(domain):
+            for i in range(len(self._ref)-1, -1, -1):
+                dict = self._ref[i]
+                # need to check if these is weakref
+                if common.isWeakref(dict['obj']):
+                    post.append(common.unwrapWeakref(dict['obj']))
+                else:
+                    post.append(dict['obj'])
         return post
 
-    def add(self, obj, *arguments):
-        '''Add an object
+    def getReferences(self):
+        return self.get('ref')
+
+    def getLocations(self):
+        return self.get('loc')
+
+
+    def add(self, obj, weakRef=False):
+        '''Add a reference
         '''
         # only add if not already here
-        proc = [obj] + list(arguments)
-        for obj in proc:
-            if obj not in self.getReferences(): 
-                objRef = common.wrapWeakref(obj)
-                self._ref.append({}) # create new
-                self._ref[-1]['obj'] = objRef
-                self._ref[-1]['name'] = type(obj).__name__
-                self._ref[-1]['time'] = time.time()
+        if obj not in self.getReferences(): 
+            objRef = common.wrapWeakref(obj)
+            self._ref.append({}) # create new
+            self._ref[-1]['obj'] = objRef
+            self._ref[-1]['name'] = type(obj).__name__
+            self._ref[-1]['time'] = time.time()
 
 
-    def getReferenceByClass(self, className):
+    def getByClass(self, className):
         '''Return the most recently added reference based on className. Class name can be a string or the real class name.
+
+        TODO: do this recursively, searching the Contexts of all members
 
         >>> class Mock(object): pass
         >>> aObj = Mock()
@@ -193,9 +223,9 @@ class Contexts(object):
         >>> aContexts = Contexts()
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
-        >>> aContexts.getReferenceByClass('mock') == bObj
+        >>> aContexts.getByClass('mock') == bObj
         True
-        >>> aContexts.getReferenceByClass(Mock) == bObj
+        >>> aContexts.getByClass(Mock) == bObj
         True
 
         '''
@@ -260,6 +290,9 @@ class Contexts(object):
                 pass
 
 
+
+    def find(self, classList, recursive=True, hasAttr=None):
+        pass
 
 
 #-------------------------------------------------------------------------------
