@@ -1,8 +1,7 @@
 
 
 
-# TODO: possibley use more than on example, or more than one encoding
-
+# TODO: possibly use more than one example, or more than one encoding
 # TODO: remove extraneous print statements in examples?
 
 

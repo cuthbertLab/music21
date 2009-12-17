@@ -481,7 +481,7 @@ class Stream(music21.Music21Object):
         '''
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
-            environLocal.printDebug(['insert called with non Music21Object', item])
+            #environLocal.printDebug(['insert called with non Music21Object', item])
             element = music21.ElementWrapper(item)
         else:
             element = item
@@ -499,6 +499,9 @@ class Stream(music21.Music21Object):
         >>> a._getHighestOffset()
         32.0
         '''
+        # TODO: possible permit inserting of an item, an element, without
+        # an offset, where the element's native offset is used as the offset.
+
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insert called with non Music21Object', item])
@@ -511,9 +514,9 @@ class Stream(music21.Music21Object):
         element.parent = self 
 
         if self.isSorted is True and self.highestTime <= offset:
-                storeSorted = True
+            storeSorted = True
         else:
-                storeSorted = False
+            storeSorted = False
 
         self._elements.append(element)  # could also do self.elements = self.elements + [element]
         self._elementsChanged()         # maybe much slower?
@@ -610,6 +613,8 @@ class Stream(music21.Music21Object):
         >>> a[0].name == 'B'
         True
         '''
+        # possible rename insertAtIndex()?
+
         if not hasattr(item, "locations"):
             raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
 

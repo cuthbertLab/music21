@@ -31,6 +31,12 @@ _MOD = 'musicxml.py'
 environLocal = environment.Environment(_MOD)
 
 
+# store the highest version number of m21 that pickled mxl object files
+# are compatible; compatible pickles (always written with the m21 version)
+# are >= to this value
+# if changes are made here that are not compatible, the m21 version number
+# needs to be increased and this number needs to be set to that value
+VERSION_MINIMUM = (0, 2, 0) 
 
 
 #-------------------------------------------------------------------------------
@@ -494,7 +500,7 @@ class Score(MusicXMLElementList):
     partwise or timewise scores. This object includes all MusicXML score 
     information.
     '''
-    def __init__(self):
+    def __init__(self, m21Version=None):
         '''
         >>> a = Score()
         >>> a.tag
@@ -513,7 +519,6 @@ class Score(MusicXMLElementList):
         # elements
         self.movementTitle = None
         self.movementNumber = None
-        
         # component objects
         self.workObj = None
         self.identificationObj = None
@@ -523,6 +528,11 @@ class Score(MusicXMLElementList):
 
         self._crossReference['partListObj'] = ['partlist', 'part-list']
         self._crossReference['identificationObj'] = ['identification']
+
+        # the score, as the outermost container, stores the m21 version 
+        # number that it was made with when written to disc
+        # this value is only relevant in comparing pickled files
+        self.m21Version = m21Version
 
     def _getComponents(self):
         c = []
@@ -540,7 +550,7 @@ class Score(MusicXMLElementList):
     #---------------------------------------------------------------------------
     # utility methods unique to the score
     def getPartIds(self):
-        '''A quick way to get all valid par ids
+        '''A quick way to get all valid part ids
         '''
         post = []        
         for part in self.componentList:
@@ -1783,7 +1793,11 @@ class Handler(xml.sax.ContentHandler):
         self._currentTag = None # store current tag object
 
         # all objects built in processing
-        self._scoreObj = Score() # returned as content
+        # scoreObj is returned as content, contains everything
+        # stores version of m21 used to create this file
+        self._scoreObj = Score(music21.VERSION) 
+
+        # component objects
         self._creatorObj = None
         self._workObj = None
         self._identificationObj = None

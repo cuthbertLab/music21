@@ -200,12 +200,23 @@ class ConverterMusicXML(object):
                     fpDst = fp # set to orignal file path
                 else:
                     raise ConverterException(msg)
+            # check if this pickle is up to date
+            if (hasattr(c.score, 'm21Version') and 
+                c.score.m21Version >= musicxml.VERSION_MINIMUM):
+                environLocal.printDebug(['pickled file version is compatible'])
+            else:
+                environLocal.printDebug(['pickled file version is not compatible'])
+                pickleError = True
+                writePickle = True
+                fpDst = fp # set to orignal file path
 
         if format == 'musicxml' or (formatSrc == 'musicxml' and pickleError):
             environLocal.printDebug(['opening musicxml file', fpDst])
             c.open(fpDst)
 
         if writePickle:
+            if fpPickle == None: # if original file cannot be found
+                raise ConverterException('attempting to write pickle but no file path is given')
             environLocal.printDebug(['writing pickled file', fpPickle])
             c.writePickle(fpPickle)
 
