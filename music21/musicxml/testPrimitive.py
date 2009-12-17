@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testPrimitive.py
 # Purpose:      MusicXML test files
@@ -6102,6 +6102,9 @@ def get(contentRequest):
         return pitches01a
     if contentRequest in ['lyrics']:
         return lyricsMelisma61d
+    if contentRequest in ['beams']:
+        return beams02
+
 
 
 #-------------------------------------------------------------------------------

@@ -28,6 +28,8 @@ environLocal = environment.Environment(_MOD)
 #-------------------------------------------------------------------------------
 
 validDenominators = [1,2,4,8,16,32,64] # in order
+# also [pow(2,x) for x in range(7)]
+
 
 def slashToFraction(value):
     '''
@@ -221,9 +223,6 @@ class MeterException(Exception):
 class MeterTerminal(object):
     '''A meter is a nestable primitive of rhythmic division
 
-    This object might also store accent patterns based on numerator or
-    set as another internal representation.
-
     >>> a = MeterTerminal('2/4')
     >>> a.duration.quarterLength
     2.0
@@ -235,15 +234,19 @@ class MeterTerminal(object):
     10.0
 
     '''
-    def __init__(self, slashNotation=None):
-        self._numerator   = 0     # musicXML: beats
-        self._denominator = 1     # musicXML: beat-type
+    def __init__(self, slashNotation=None, weight=1):
+        self._numerator = 0 
+        self._denominator = 1
         self._overriddenDuration = None
 
         if slashNotation != None:
             self.numerator, self.denominator = slashToFraction(slashNotation)
         self._ratioChanged() # sets self._duration
 
+        # this will call _setWeight property for data checking
+        # explicitly calling base class method to avoid problems
+        # in the derived class MeterSequence
+        MeterTerminal._setWeight(self, weight)
 
     def __str__(self):
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
@@ -305,9 +308,11 @@ class MeterTerminal(object):
         '''
         # elevate to meter sequence
         ms = MeterSequence()
-        ms.load(self, countRequest)
+        # cannot set the weight of this MeterSequence w/o having offsets
+        # pass this MeterTerminal as an argument
+        # when subdividing, use autoWeight
+        ms.load(self, countRequest, autoWeight=True, targetWeight=self.weight) 
         return ms
-    
 
     def subdivideByList(self, numeratorList):
         '''Return a MeterSequence
@@ -320,8 +325,8 @@ class MeterTerminal(object):
         '''
         # elevate to meter sequence
         ms = MeterSequence()
-        ms.load(self)
-        ms.partitionByList(numeratorList)
+        ms.load(self) # do not need to autoWeight here
+        ms.partitionByList(numeratorList) # this will split weight
         return ms    
 
     def subdivide(self, value):
@@ -338,6 +343,23 @@ class MeterTerminal(object):
 
     #---------------------------------------------------------------------------
     # properties
+
+    def _getWeight(self):
+        return self._weight
+
+    def _setWeight(self, value):
+        '''
+        >>> a = MeterTerminal('2/4')
+        >>> a.weight = .5
+        >>> a.weight
+        0.5
+        '''
+        if not common.isNum(value):
+            raise MeterException('weight values must be numbers')
+        self._weight = value
+    
+    weight = property(_getWeight, _setWeight)
+
 
     def _getNumerator(self):
         return self._numerator
@@ -474,7 +496,16 @@ class MeterSequence(MeterTerminal):
         self._partition = [] # a list of terminals or MeterSequences
         self._overriddenDuration = None
 
-        self.summedNumerator = False # based on import string
+        # this atribute is only used in MeterTermainals, and note 
+        # in MeterSequences; a MeterSequences weight is based solely
+        # on the sum of its components
+        del self._weight
+
+        # store whether this meter was provided as a summed nuemerator
+        self.summedNumerator = False 
+        # an optional parameter used only in displaying this meter sq
+        # needed in cases where a meter component is parenthetical 
+        self.parenthesis = False
 
         if value != None:
             self.load(value, partitionRequest)
@@ -497,33 +528,10 @@ class MeterSequence(MeterTerminal):
         '''
         return len(self._partition)
 
-
     def __iter__(self):
         '''Support iteration of top level partitions
         '''
-#         self._index = 0 
-#         return self
         return common.Iterator(self._partition)
-
-
-#     def next(self):
-#         '''Top-level partitions are iterated
-# 
-#         >>> a = MeterSequence('4/4', 4)
-#         >>> len(a)
-#         4
-#         >>> sum = 0
-#         >>> for x in a: sum += x.numerator
-#         >>> sum
-#         4
-#         '''
-#         if abs(self._index) >= self.__len__():
-#             self._index = 0 # reset for next run
-#             raise StopIteration
-#         out = self._partition[self._index]
-#         self._index += 1
-#         return out
-
 
     def __getitem__(self, key):
         '''Get an MeterTerminal from _partition
@@ -553,6 +561,8 @@ class MeterSequence(MeterTerminal):
         MeterException: cannot insert {1/16+1/16} into space of 1/4
         '''
         # comparison of numerator and denominator
+        if not isinstance(value, MeterTerminal):
+            raise MeterException('values in MeterSequences must be MeterTerminals or MeterSequences, not %s' % value)
         if value.ratioEqual(self[key]): 
             self._partition[key] = value
         else:    
@@ -726,13 +736,18 @@ class MeterSequence(MeterTerminal):
 
     def _addTerminal(self, value):
         '''Add a an object to the partition list. This does not update numerator and denominator.
+
+        targetWeight is the expected total Weight for this MeterSequence. This
+        would be self.weight, but offten partitions are cleared before _addTerminal is called. 
         '''
         if common.isStr(value):
-            self._partition.append(MeterTerminal(value))
+            mt = MeterTerminal(value)
         elif isinstance(value, MeterTerminal):
-            self._partition.append(value)
+            mt = value
         else:
             raise MeterException('cannot add %s to this sequence' % value)
+        self._partition.append(mt)
+
 
     def _getOptions(self):
         n = int(self.numerator)
@@ -770,15 +785,21 @@ class MeterSequence(MeterTerminal):
             optMatch = opts[0]
             
         if optMatch != None:
-            self._clearPartition()
+            targetWeight = self.weight
+            environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
+
+            self._clearPartition() # weight will now be zero
             for mStr in optMatch:
                 self._addTerminal(mStr)
+            self.weight = targetWeight
         else:
             raise MeterException('Cannot set partition by %s' % countRequest)
 
 
     def partitionByList(self, numeratorList):
-        '''
+        '''Given a numerator list, partition MeterSequence inot a new list
+        of MeterTerminals
+
         >>> a = MeterSequence('4/4')
         >>> a.partitionByList([1,1,1,1])
         >>> str(a)
@@ -791,7 +812,7 @@ class MeterSequence(MeterTerminal):
         MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
 
         '''
-        # assume a lost of terminal definitions
+        # assume a list of terminal definitions
         if common.isStr(numeratorList[0]):        
             test = MeterSequence()
             for mtStr in numeratorList:
@@ -803,12 +824,10 @@ class MeterSequence(MeterTerminal):
             else:
                 raise MeterException('Cannot set partition by %s' % numeratorList)
 
-
         elif sum(numeratorList) == self.numerator:
             optMatch = []
             for n in numeratorList:
                 optMatch.append('%s/%s' % (n, self.denominator))
-
 
         else: # search options
             opts = self._getOptions()
@@ -819,11 +838,13 @@ class MeterSequence(MeterTerminal):
                 if nFound == numeratorList:
                     optMatch = opt
                     break
-
+        # if a n/d match, now set this MeterSequence
         if optMatch != None:
-            self._clearPartition()
+            targetWeight = self.weight
+            self._clearPartition() # clears self.weight
             for mStr in optMatch:
                 self._addTerminal(mStr)
+            self.weight = targetWeight
         else:
             raise MeterException('Cannot set partition by %s' % numeratorList)
 
@@ -837,12 +858,14 @@ class MeterSequence(MeterTerminal):
         >>> len(a)
         2
         '''       
-        if (self.numerator == other.numerator and self.denominator ==     
-            other.denominator):
+        if (self.numerator == other.numerator and 
+            self.denominator == other.denominator):
 
+            targetWeight = self.weight
             self._clearPartition()
             for mt in other:
                 self._addTerminal(copy.deepcopy(mt))
+            self.weight = targetWeight
         else:
             raise MeterException('Cannot set partition for unequal MeterSequences')
 
@@ -875,8 +898,14 @@ class MeterSequence(MeterTerminal):
     #---------------------------------------------------------------------------
     # loading is always destructive
 
-    def load(self, value, partitionRequest=None):
-        '''User can enter a list of values or an abbreviated slash notation
+    def load(self, value, partitionRequest=None, autoWeight=False,
+            targetWeight=None):
+        '''This method is called when a MeterSequence is created, or if a MeterSequece is re-set. 
+
+        User can enter a list of values or an abbreviated slash notation.
+
+        autoWeight, if True, will attempt to set weights.
+        tragetWeight, if given, will be used instead of self.weight        
 
         >>> a = MeterSequence()
         >>> a.load('4/4', 4)
@@ -896,24 +925,41 @@ class MeterSequence(MeterTerminal):
         '{5/8+4/4}'
 
         '''
+        if autoWeight:
+            if targetWeight != None:
+                targetWeight = targetWeight
+            else: # get from current MeterSequence
+                targetWeight = self.weight # store old
+        else: # None will not set any value
+            targetWeight = None
+
+        environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
+
         if common.isStr(value):
             self._clearPartition()
             ratioList, self.summedNumerator = slashMixedToFraction(value)
             for n,d in ratioList:
                 slashNotation = '%s/%s' % (n,d)
-                #print _MOD, 'candidate slash', slashNotation
                 self._addTerminal(MeterTerminal(slashNotation)) 
             self._updateRatio()
+            self.weight = targetWeight # may be None
         elif isinstance(value, MeterTerminal):
+            # if we have a singel MeterTerminal and autoWeight is active
+            # set this terminal to the old weight
+            if targetWeight != None:
+                value.weight = targetWeight
             self._clearPartition()
             self._addTerminal(value) 
             self._updateRatio()
-        elif common.isListLike(value): # a lost of Terminals
+            # do not need to set weight, as based on terminal
+            environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
+    
+        elif common.isListLike(value): # a list of Terminals
             self._clearPartition()
             for obj in value:
                 self._addTerminal(obj) 
             self._updateRatio()
-
+            self.weight = targetWeight # may be None
         else:
             raise MeterException('cannot create a MeterSequence with a %s' % repr(value))
 
@@ -939,7 +985,47 @@ class MeterSequence(MeterTerminal):
 
     #---------------------------------------------------------------------------
     # properties
-    # do not permit setting of numerator
+    # do not permit setting of numerator/denominator
+
+    def _getWeight(self):
+        '''
+        >>> a = MeterSequence('3/4')
+        >>> a.partition(3)
+        >>> a.weight = 1
+        >>> a[0].weight
+        0.333...
+        >>> b = MeterTerminal('1/4', .25)
+        >>> c = MeterTerminal('1/4', .25)
+        >>> d = MeterSequence([b, c])
+        >>> d.weight
+        0.5
+        '''
+        sum = 0
+        for obj in self:
+            sum += obj.weight # may be a MeterTerminal or MeterSequence
+        return sum
+
+    def _setWeight(self, value):
+        '''Assume this MeterSequence is a whole, not a part of some larger MeterSequence. Thus, we cannot use numerator/denominator relationship
+        as a scalar. 
+        '''
+        environLocal.printDebug(['calling setWeight with value', value])
+
+        if value == None:
+            pass # do nothing
+        else:
+            if not common.isNum(value):
+                raise MeterException('weight values must be numbers')
+            totalRatio = self.numerator / float(self.denominator)
+            for mt in self:
+                partRatio = mt.numerator / float(mt.denominator)
+                mt.weight = value * (partRatio/totalRatio)
+                #mt.weight = (partRatio/totalRatio) #* totalRatio
+                environLocal.printDebug(['setting weight based on part, total, weight', partRatio, totalRatio, mt.weight])
+    
+    weight = property(_getWeight, _setWeight)
+
+
 
     def _getNumerator(self):
         return self._numerator
@@ -989,9 +1075,9 @@ class MeterSequence(MeterTerminal):
                 mtList += obj._getFlatList()
         return mtList
 
-
     def _getFlat(self):
         '''Retrun a new MeterSequence composed of the flattend representation.
+
         >>> a = MeterSequence('3/4', 3)
         >>> b = a.flat
         >>> len(b)
@@ -1015,6 +1101,18 @@ class MeterSequence(MeterTerminal):
         return post
 
     flat = property(_getFlat)
+
+    def _getFlatWeight(self):
+        '''Retrun a list of flat weight valuess
+
+        '''
+        post = []
+        for mt in self._getFlatList():
+            post.append(mt.weight)
+        return post
+
+    flatWeight = property(_getFlatWeight)
+
 
 
     #---------------------------------------------------------------------------
@@ -1040,6 +1138,7 @@ class MeterSequence(MeterTerminal):
         '''
         mtList = []
         for i in range(len(self)):
+            environLocal.printDebug(['_getLevelList weight', i, self[i].weight])
             if not isinstance(self[i], MeterSequence):
                 mt = self[i] # a meter terminal
                 mtList.append(mt)   
@@ -1051,6 +1150,8 @@ class MeterSequence(MeterTerminal):
                 else: # level count is at zero
                     mt = MeterTerminal('%s/%s' % (
                               self[i].numerator, self[i].denominator))
+                    # set weight to that of the sequence
+                    mt.weight = self[i].weight
                     mtList.append(mt)   
         return mtList
 
@@ -1068,14 +1169,48 @@ class MeterSequence(MeterTerminal):
         {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
         >>> b.getLevel(0)
         {1/4+1/4+1/4+1/4}
-        >>> b
-        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
         >>> b.getLevel(1)
         {1/4+1/8+1/8+1/4+1/8+1/8}
         >>> b.getLevel(2)
         {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
         '''
         return MeterSequence(self._getLevelList(level))
+
+
+
+    def getLevelWeight(self, level=0):
+        '''The weightList is an array of weights found in the components.
+        The MeterSequence has a ._weight attribute, but it is not used here
+
+        >>> a = MeterSequence('4/4', 4)
+        >>> a.getLevelWeight()
+        [0.25, 0.25, 0.25, 0.25]
+
+        >>> b = MeterSequence('4/4', 4)
+        >>> b.getLevelWeight(0)
+        [0.25, 0.25, 0.25, 0.25]
+
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b.getLevelWeight(0)
+        [0.25, 0.25, 0.25, 0.25]
+
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        >>> b.getLevelWeight(0)
+        [0.25, 0.25, 0.25, 0.25]
+        >>> b.getLevelWeight(1)
+        [0.25, 0.125, 0.125, 0.25, 0.125, 0.125]
+        >>> b.getLevelWeight(2)
+        [0.25, 0.125, 0.125, 0.25, 0.0625, 0.0625, 0.125]
+        '''
+        post = []
+        for mt in self._getLevelList(level):
+            post.append(mt.weight)
+        return post
+
+    
 
     #---------------------------------------------------------------------------
     # given a quarter note position, return the active index
@@ -1214,8 +1349,6 @@ class MeterSequence(MeterTerminal):
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
 
-    # TODO: need to provide a way to unlink .display
-
     def __init__(self, value=None, partitionRequest=None):
         music21.Music21Object.__init__(self)
 
@@ -1223,12 +1356,9 @@ class TimeSignature(music21.Music21Object):
         self.inherited = False 
         self._lilyOut = None    
         self.symbol = "" # common, cut, single-number, normal
-                    # a difference from musicXML: empty is different from normal:
-                    #   normal = 4/4;  empty lets the interpreting program decide
-                    # does not do anything at present
 
-        # a parameter to determin if the denominator is represented
-        # as either a symbol (a note) or as a numebr
+        # a parameter to determine if the denominator is represented
+        # as either a symbol (a note) or as a number
         self.symbolizeDenominator = False
         self.summedNumerator = False
 
@@ -1260,7 +1390,7 @@ class TimeSignature(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _setDefaultPartitions(self):
+    def _setDefaultBeamPartitions(self):
  
         # more general, based only on numerator
         if self.numerator in [2, 3, 4]:
@@ -1297,6 +1427,7 @@ class TimeSignature(music21.Music21Object):
         # relationship
 
         # used for drawing the time signature symbol
+        # this is the only one that can be  unlinked
         self.display = MeterSequence(value, partitionRequest)
         # used for beaming
         self.beam = MeterSequence(value, partitionRequest)
@@ -1310,7 +1441,7 @@ class TimeSignature(music21.Music21Object):
         self.summedNumerator = self.display.summedNumerator
 
         if partitionRequest == None: # set default groups
-            self._setDefaultPartitions()
+            self._setDefaultBeamPartitions()
 
 
     def loadRatio(self, numerator, denominator, partitionRequest=None):
@@ -1534,6 +1665,32 @@ class TimeSignature(music21.Music21Object):
 
         return beamsList
 
+    def setDisplay(self, value, partitionRequest=None):
+        '''Set an indendent display value
+
+        >>> a = TimeSignature()
+        >>> a.load('3/4')
+        >>> a.setDisplay('2/8+2/8+2/8')
+        >>> a.display
+        {2/8+2/8+2/8}
+        >>> a.beam
+        {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}
+        >>> a.beat
+        {3/4}
+        >>> a.setDisplay(a.beat)
+        >>> a.display
+        {3/4}
+        '''
+        if isinstance(value, MeterSequence): # can set to an existing meterseq
+            # must make a copy
+            self.display = copy.deepcopy(value)
+        else:
+            # create a new object; it will not be linked
+            self.display = MeterSequence(value, partitionRequest)
+
+        # need to update summed numerator states
+        self.summedNumerator = self.display.summedNumerator
+
 
     def getAccent(self, qLenPos):
         '''Return true or false if the qLenPos is at the start of an accent
@@ -1557,8 +1714,13 @@ class TimeSignature(music21.Music21Object):
         return False
 
 
+    def getAccentLevel(self, qLenPos):
+        '''Given a qLenPos,  return an accent level. 
+        '''
+        pass
+
     def getBeat(self, qLenPos):
-        '''Get the beat, where beats count from 1
+        '''Given a quarterLenght position, get the beat, where beats count from 1
 
         >>> a = TimeSignature('3/4', 3)
         >>> a.getBeat(0)
@@ -1617,12 +1779,13 @@ class TimeSignature(music21.Music21Object):
 
         '''
         mxTimeList = []
-
         mxTime = musicxml.Time()
         
         # always get a flat version to display any subivisions created
         fList = [(mt.numerator, mt.denominator) for mt in self.display.flat]
         if self.summedNumerator:
+            # this will try to reduce any common denominators into 
+            # a common group
             fList = fractionToSlashMixed(fList)
 
         for n,d in fList:

@@ -389,6 +389,12 @@ def lcm(filter):
 
 
 def fromRoman(num):
+    '''
+    >>> fromRoman('ii')
+    2
+    >>> fromRoman('vii')
+    7
+    '''
     if (num == 'I' or num == 'i'):
         return 1
     elif (num == 'II' or num == 'ii'):
@@ -409,6 +415,12 @@ def fromRoman(num):
         raise Exception("invalid roman numeral")
 
 def toRoman(num):
+    '''
+    >>> toRoman(2)
+    'II'
+    >>> toRoman(7)
+    'VII'
+    '''
     if (num == 1):
         return 'I'
     elif (num == 2):
@@ -423,7 +435,7 @@ def toRoman(num):
         return 'VI'
     elif (num == 7):
         return 'VII'
-    elif (num == 8):
+    elif (num == 8): # TODO: add comment explaining if this is correct!
         return 'VII'
     else:
         raise Exception("invalid input: must be integer 1-8")
