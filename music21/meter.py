@@ -786,8 +786,7 @@ class MeterSequence(MeterTerminal):
             
         if optMatch != None:
             targetWeight = self.weight
-            environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
-
+            #environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
             self._clearPartition() # weight will now be zero
             for mStr in optMatch:
                 self._addTerminal(mStr)
@@ -933,7 +932,7 @@ class MeterSequence(MeterTerminal):
         else: # None will not set any value
             targetWeight = None
 
-        environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
+        #environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
 
         if common.isStr(value):
             self._clearPartition()
@@ -952,7 +951,7 @@ class MeterSequence(MeterTerminal):
             self._addTerminal(value) 
             self._updateRatio()
             # do not need to set weight, as based on terminal
-            environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
+            #environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
     
         elif common.isListLike(value): # a list of Terminals
             self._clearPartition()
@@ -1009,7 +1008,7 @@ class MeterSequence(MeterTerminal):
         '''Assume this MeterSequence is a whole, not a part of some larger MeterSequence. Thus, we cannot use numerator/denominator relationship
         as a scalar. 
         '''
-        environLocal.printDebug(['calling setWeight with value', value])
+        #environLocal.printDebug(['calling setWeight with value', value])
 
         if value == None:
             pass # do nothing
@@ -1021,7 +1020,7 @@ class MeterSequence(MeterTerminal):
                 partRatio = mt.numerator / float(mt.denominator)
                 mt.weight = value * (partRatio/totalRatio)
                 #mt.weight = (partRatio/totalRatio) #* totalRatio
-                environLocal.printDebug(['setting weight based on part, total, weight', partRatio, totalRatio, mt.weight])
+                #environLocal.printDebug(['setting weight based on part, total, weight', partRatio, totalRatio, mt.weight])
     
     weight = property(_getWeight, _setWeight)
 
@@ -1138,7 +1137,7 @@ class MeterSequence(MeterTerminal):
         '''
         mtList = []
         for i in range(len(self)):
-            environLocal.printDebug(['_getLevelList weight', i, self[i].weight])
+            #environLocal.printDebug(['_getLevelList weight', i, self[i].weight])
             if not isinstance(self[i], MeterSequence):
                 mt = self[i] # a meter terminal
                 mtList.append(mt)   
@@ -1832,8 +1831,7 @@ class TimeSignature(music21.Music21Object):
         for i in range(len(n)):
             msg.append('%s/%s' % (n[i], d[i]))
 
-        if len(msg) > 1:
-            environLocal.printDebug(['loading meter string:', '+'.join(msg)])
+        #environLocal.printDebug(['loading meter string:', '+'.join(msg)])
         self.load('+'.join(msg))
 
     mx = property(_getMX, _setMX)
