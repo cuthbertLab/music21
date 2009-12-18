@@ -195,15 +195,15 @@ def quarterLengthToTuplet(qLen, maxToReturn = 4):
     by dottedMatch
 
     >>> quarterLengthToTuplet(.33333333)
-    [[3, 2, 'eighth'], [3, 1, 'quarter']]
+    [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>]
 
     By specifying only 1 count, the tuple with the smallest type will be 
     returned.    
     >>> quarterLengthToTuplet(.3333333, 1)
-    [[3, 2, 'eighth']]
+    [<music21.duration.Tuplet 3/2/eighth>]
 
     >>> quarterLengthToTuplet(.20)
-    [[5, 4, '16th'], [5, 2, 'eighth'], [5, 1, 'quarter']]
+    [<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>]
 
     >>> c = quarterLengthToTuplet(.3333333, 1)[0]
     >>> c.tupletMultiplier()
@@ -326,9 +326,6 @@ def quarterLengthToDurations(qLen):
     [(0.1666..., '16th', 0, 3, 2, '16th')]
 
     '''
-
-#    print _MOD, 'quarterLengthToDurations', qLen 
-
     post = []
     typeLargest = None # largest found type that is less than
     match = False
@@ -356,7 +353,6 @@ def quarterLengthToDurations(qLen):
             dNew.dots = dots
             post.append(dNew)
             match = True
-
 
     typeNext = nextLargerType(typeFound)
     # try tuplets
@@ -492,14 +488,9 @@ def convertTypeToQuarterLength(dType, dots = 0, tuplets=[], dotGroups=[]):
             qtrLength *= common.dotMultiplier(dot)
     else:
         qtrLength *= common.dotMultiplier(dots)
-        
     for tup in tuplets:
         qtrLength *= tup.tupletMultiplier()
-
     return qtrLength
-
-
-
 
 
 def convertTypeToNumber(dType):
@@ -519,6 +510,80 @@ def convertTypeToNumber(dType):
         % dTypeFound)
     else:
         return dTypeFound
+
+
+def updateTupletType(durationList):
+    '''Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, 
+    and set Tuplet type to start or stop, as necessary.
+
+    >>> a = Duration()
+    >>> a.quarterLength = .33333
+    >>> b = Duration()
+    >>> b.quarterLength = .33333
+    >>> c = Duration()
+    >>> c.quarterLength = .33333
+    >>> a.tuplets[0].type == None
+    True
+    >>> updateTupletType([a, b, c])
+    >>> a.tuplets[0].type == 'start'
+    True
+    >>> b.tuplets[0].type == None
+    True
+    >>> c.tuplets[0].type == 'stop'
+    True
+    '''
+    tupletMap = [] # a list of tuplet obj / dur pairs  
+    for part in durationList: # can be Durations or DurationUnits
+        if isinstance(part, Duration):
+            partGroup = part.components
+        else:
+            partGroup = [part] # emulate Duration.components
+        for dur in partGroup: # all DurationUnits
+            tuplets = dur.tuplets
+            if tuplets in [[], None]: # no tuplets, lenth is zero
+                tupletMap.append([None, dur])
+            elif len(tuplets) > 1:
+                raise Exception('got mutli-tuplet DurationUnit; cannot yet handle this. %s' % tuplets)
+            elif len(tuplets) == 1:
+                tupletMap.append([tuplets[0], dur])
+                if tuplets[0] != dur.tuplets[0]:
+                    raise Exception('cannot access Tuplets object from within DurationUnit')
+            else:
+                raise Exception('chanot handle this tuplets: %s' % tuplets)
+
+    # have a list of tuplet, DurationUnit pairs
+    completionCount = 0
+    for i in range(len(tupletMap)):
+        tuplet, dur = tupletMap[i]
+
+        if i > 0:
+            tupletPrevious, durPrevious = tupletMap[i-1]
+        else: 
+            tupletPrevious, durPrevious = None, None
+
+        if i < len(tupletMap) - 1:
+            tupletNext, durNext = tupletMap[i+1]
+        else: 
+            tupletNext, durNext = None, None
+
+        environLocal.printDebug(['updateTupletType previous, this, next:', 
+                                 tupletPrevious, tuplet, tupletNext])
+
+        # if previous tuplet is None, always start
+        if tupletPrevious == None and tuplet != None:
+            tuplet.type = 'start'
+            environLocal.printDebug(['setting tuplet type, value:', 
+                                     tuplet, tuplet.type])
+
+        # if tuplet next is None, always stop
+        # if both previous and next are None, just keep a start
+        elif tupletNext == None and tuplet != None:
+            tuplet.type = 'stop'
+            environLocal.printDebug(['setting tuplet type, value:', 
+                                     tuplet, tuplet.type])
+
+        
+
 
 #-------------------------------------------------------------------------------
 class DurationCommon(object):
@@ -594,7 +659,7 @@ class DurationUnit(DurationCommon):
     def __repr__(self):
         '''Provide a representation.
         '''
-        return '<DurationUnit %s>' % self._getQuarterLength()
+        return '<music21.duration.DurationUnit %s>' % self._getQuarterLength()
 
 
     def __eq__(self, other):
@@ -689,7 +754,8 @@ class DurationUnit(DurationCommon):
 
     def updateType(self):
         if self.linkStatus == True:
-            self._quarterLengthNeedsUpdating = False # cant update both at same time
+            # cant update both at same time
+            self._quarterLengthNeedsUpdating = False 
             tempDurations = quarterLengthToDurations(self.quarterLength)
             if len(tempDurations) > 1:
                 self.type = 'unexpressible'
@@ -818,6 +884,7 @@ class DurationUnit(DurationCommon):
             "value submitted (%s) is not a list of tuplets" % value)
         if self._tuplets != value:
             self._quarterLengthNeedsUpdating = True
+        #environLocal.printDebug(['assigning tuplets in DurationUnit', value])
         self._tuplets = value
 
     tuplets = property(_getTuplets, _setTuplets)
@@ -840,14 +907,6 @@ class DurationUnit(DurationCommon):
 
 
 
-#    def split(self):
-#        '''Divide a duration into two component Durations.
-#        
-#        '''
-#
-#
-#
-#
 
 #-------------------------------------------------------------------------------
 class Tuplet(object):
@@ -862,12 +921,14 @@ class Tuplet(object):
     '''
 
     def __init__(self, *arguments, **keywords):
+        #environLocal.printDebug(['creating Tuplet instance'])
 
         # necessary for some complex tuplets, interrupted, for instance
         if 'tupletId' in keywords:
             self.tupletId = keywords['tupletId']
         else:
             self.tupletId = 0
+
         if 'nestedLevel' in keywords:
             self.nestedLevel = keywords['nestedLevel']
         else:
@@ -879,13 +940,15 @@ class Tuplet(object):
         else:
             self.numberNotesActual = 3.0
         
+        # this previously stored a Duration, not a DurationUnit
         if 'durationActual' in keywords:
             if isinstance(keywords['durationActual'], basestring):
-                self.durationActual = Duration(keywords['durationActual'])
+                self.durationActual = DurationUnit(keywords['durationActual'])
             else:
                 self.durationActual = keywords['durationActual']
         else:
-            self.durationActual     = Duration("eighth") 
+            self.durationActual = DurationUnit("eighth") 
+
 
         # normal is the space that would normally be occupied
         if 'numberNotesNormal' in keywords:
@@ -893,20 +956,33 @@ class Tuplet(object):
         else:
             self.numberNotesNormal = 2.0
         
+        # this previously stored a Duration, not a DurationUnit
         if 'durationNormal' in keywords:
             if isinstance(keywords['durationNormal'], basestring):
-                self.durationNormal = Duration(keywords['durationNormal'])
+                self.durationNormal = DurationUnit(keywords['durationNormal'])
             else:
                 self.durationNormal = keywords['durationNormal']
         else:
-            self.durationNormal     = Duration("eighth") 
+            self.durationNormal = DurationUnit("eighth") 
 
-        self.nestedInside       = ""  # could be a tuplet object
-        # "start" to imply start of tuplet; "stop" to end; optional; 
-        # needed for MusicXML
-        self.type               = ""  
-        self.tupletActualShow   = "number" # could be "number","type", or "none"
-        self.tupletNormalShow   = "none"
+        # type needs to be set at the start/stop of each group
+        # if set to None, will not be included
+        self.type = None # start/stop: for mxl bracket/group drawing 
+        self.bracket = True # true or false
+        self.placement = "above" # above or below
+        self.tupletActualShow = "number" # could be "number","type", or "none"
+        self.tupletNormalShow = None
+
+        # this attribute is not yet used anywhere
+        #self.nestedInside = ""  # could be a tuplet object
+
+
+    def __repr__(self):
+        return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, self.numberNotesNormal, self.durationNormal.type))
+
+
+    #---------------------------------------------------------------------------
+    # properties
 
     def _setTupletActual(self, tupList = []):
         self.numberNotesActual, self.durationActual = tupList
@@ -925,9 +1001,7 @@ class Tuplet(object):
 
     tupletNormal = property(_getTupletNormal, _setTupletNormal)
 
-    def __repr__(self):
-        return ("[%d, %d, '%s']" % (self.numberNotesActual, self.numberNotesNormal, self.durationNormal.type))
-
+    #---------------------------------------------------------------------------
     def tupletMultiplier(self):
         '''Get a floating point value by which to scale the duration that 
         this Tuplet is associated with.
@@ -1013,8 +1087,44 @@ class Tuplet(object):
         >>> a.totalTupletLength()
         4.0
         '''
-        self.durationActual = Duration(type) 
-        self.durationNormal = Duration(type)        
+        # these used to be Duration; now using DurationUnits
+        self.durationActual = DurationUnit(type) 
+        self.durationNormal = DurationUnit(type)        
+
+    #---------------------------------------------------------------------------
+    def _getMX(self):
+        '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
+        mxTuplet needs to be on the Notes mxNotations field
+
+        >>> a = Tuplet()
+        >>> a.bracket = True
+        >>> b, c = a.mx
+        '''
+        mxTimeModification = musicxmlMod.TimeModification()
+        mxTimeModification.set('actual-notes', self.numberNotesActual)
+        mxTimeModification.set('normal-notes', self.numberNotesNormal)
+        mxTimeModification.set('normal-type', self.durationNormal.type)
+
+        mxTuplet = musicxmlMod.Tuplet()
+        if self.type != None:
+            # start/stop; needs to bet set by group
+            mxTuplet.set('type', self.type) 
+        if self.bracket:
+            mxBracket = 'yes'
+        else:
+            mxBracket = 'no'
+        mxTuplet.set('bracket', mxBracket) 
+        mxTuplet.set('placement', self.placement) 
+
+        return mxTimeModification, mxTuplet
+
+    def _setMX(self, mxNote):
+        '''Given an mxNote, configure mxTimeModification and mxTuplet objects
+        '''
+        pass
+
+    mx = property(_getMX, _setMX)
+
 
 #-------------------------------------------------------------------------------
 class ZeroDuration(DurationUnit):
@@ -1093,7 +1203,7 @@ class Duration(DurationCommon):
     def __repr__(self):
         '''Provide a representation.
         '''
-        return '<Duration %s>' % self.quarterLength
+        return '<music21.duration.Duration %s>' % self.quarterLength
 
     def updateQuarterLength(self):
         '''
@@ -1265,7 +1375,6 @@ class Duration(DurationCommon):
     def _getTuplets(self):
         if self._componentsNeedUpdating == True:
             self._updateComponents()
-
         if len(self.components) > 1:
             return None
         elif len(self.components) == 1:
@@ -1274,6 +1383,7 @@ class Duration(DurationCommon):
             raise DurationException("zero DurationUnits in components")
 
     def _setTuplets(self, value):
+        #environLocal.printDebug(['assigning tuplets in Duration', value])
         if len(self.components) > 1:
             raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
         elif len(self.components) == 1:
@@ -1311,8 +1421,18 @@ class Duration(DurationCommon):
 
         TODO: tuplets, notations, ties
 
+        !!! need to automatically set Tuplet type if not set
+
         >>> a = Duration()
         >>> a.quarterLength = 3
+        >>> b = a.mx
+        >>> len(b) == 1
+        True
+        >>> isinstance(b[0], musicxmlMod.Note)
+        True
+
+        >>> a = Duration()
+        >>> a.quarterLength = .33333333
         >>> b = a.mx
         >>> len(b) == 1
         True
@@ -1340,18 +1460,6 @@ class Duration(DurationCommon):
             mxNote = musicxmlMod.Note()
             mxNote.set('duration', mxDivisions)
             mxNote.set('type', mxType)
-
-            if len(dur.tuplets) > 0:
-                mxTimeModification = musicxmlMod.TimeModification()
-                mxTimeModification.set('actual-notes',
-                                     dur.tuplets[0].numberNotesActual)
-                mxTimeModification.set('normal-notes', 
-                                     dur.tuplets[0].numberNotesNormal)
-                # this may not be necssary
-                mxTimeModification.set('normal-type', 
-                                     dur.tuplets[0].durationNormal.type)
-                mxNote.set('timemodification', mxTimeModification)
-
             mxNote.set('dotList', mxDotList)
             post.append(mxNote)
 
@@ -1364,14 +1472,16 @@ class Duration(DurationCommon):
         for i in range(len(self.components)):
             dur = self.components[i]
             mxNote = post[i]
-            mxTimeMod = mxNote.get('timemodification')
-            if i+1 < len(self.components):
-                mxTimeModNext = post[i+1].get('timemodification')
-            else:
-                mxTimeModNext = None
+
+#             mxTimeMod = mxNote.get('timemodification')
+#             if i+1 < len(self.components):
+#                 mxTimeModNext = post[i+1].get('timemodification')
+#             else:
+#                 mxTimeModNext = None
 
             # contains Tuplet, Dynamcs, Articulations
             mxNotations = musicxmlMod.Notations()
+
             # only need ties if more than one component
             mxTieList = []
             if len(self.components) > 1:
@@ -1398,33 +1508,32 @@ class Duration(DurationCommon):
                         mxTied.set('type', type) 
                         mxNotations.append(mxTied)
 
-            # for any number of components need mxTuplet:
-            # produces bracket and a number
-            if mxTimeMod != None and tupletStatus == None:
-                mxTuplet = musicxmlMod.Tuplet()
-                mxTuplet.set('type', 'start') 
-                mxNotations.append(mxTuplet)
-                tupletStatus = 'start'
-            elif (mxTimeMod != None and tupletStatus == 'start' 
-                and mxTimeModNext == None): #end 
-                mxTuplet = musicxmlMod.Tuplet()
-                mxTuplet.set('type', 'stop') 
-                mxNotations.append(mxTuplet)
-                tupletStatus = 'stop'
-            # continuation
-            elif (mxTimeMod != None and tupletStatus == 'start' 
-                and  mxTimeModNext != None): #end 
-                for type in ['stop', 'start']:
-                    # not sure continuation is necessary
-                    mxTuplet = musicxmlMod.Tuplet()
-                    mxTuplet.set('type', type) 
-                    mxNotations.append(mxTuplet)
-
             if len(self.components) > 1:
                 mxNote.set('tieList', mxTieList)
-            mxNote.set('notations', mxNotations)
 
-        return post
+            # for any number of components need mxTuplet:
+            # produces bracket and a number
+            # only needed on first and last of any tuplet group
+#             if mxTimeMod != None and tupletStatus == None:
+#                 mxTuplet = musicxmlMod.Tuplet()
+#                 mxTuplet.set('type', 'start') 
+#                 mxNotations.append(mxTuplet)
+#                 tupletStatus = 'start'
+#             elif (mxTimeMod != None and tupletStatus == 'start' 
+#                 and mxTimeModNext == None): #end 
+#                 mxTuplet = musicxmlMod.Tuplet()
+#                 mxTuplet.set('type', 'stop') 
+#                 mxNotations.append(mxTuplet)
+#                 tupletStatus = 'stop'
+
+            if len(dur.tuplets) > 0:
+                mxTimeModification, mxTuplet = dur.tuplets[0].mx
+                mxNote.set('timemodification', mxTimeModification)
+                mxNotations.append(mxTuplet)
+
+            # add notations to mxNote
+            mxNote.set('notations', mxNotations)
+        return post # a lost of mxNotes
 
 
     def _setMX(self, mxNote):
@@ -1475,8 +1584,8 @@ class Duration(DurationCommon):
             mxNoteDefault = musicxmlMod.Note()
             mxNoteDefault.setDefaults()    
             mxNoteDefault.set('notehead', mxNotehead)
-
             mxNoteList[i] = mxNoteList[i].merge(mxNoteDefault, favorSelf=True)
+
         mxMeasure = musicxmlMod.Measure()
         mxMeasure.setDefaults()
         for mxNote in mxNoteList:

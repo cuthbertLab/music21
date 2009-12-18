@@ -1361,7 +1361,8 @@ class Stream(music21.Music21Object):
         >>> a[9].offset
         36.0
         '''
-        if not isinstance(item, music21.Music21Object): # if not an element, embed
+        # if not an element, embed
+        if not isinstance(item, music21.Music21Object): 
             element = music21.ElementWrapper(item)
         else:
             element = item # TODO: remove for new-old-style
@@ -1537,7 +1538,7 @@ class Stream(music21.Music21Object):
         oMax = max([end for start, end, e in offsetMap])
     
         # this should not happen, but just in case
-        if oMax != srcObj.highestTime:
+        if not common.almostEquals(oMax, srcObj.highestTime):
             raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, srcObj.highestTime))
         #environLocal.printDebug(['oMin, oMax', oMin, oMax])
     

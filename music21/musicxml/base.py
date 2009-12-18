@@ -31,6 +31,7 @@ _MOD = 'musicxml.py'
 environLocal = environment.Environment(_MOD)
 
 
+#-------------------------------------------------------------------------------
 # store the highest version number of m21 that pickled mxl object files
 # are compatible; compatible pickles (always written with the m21 version)
 # are >= to this value
@@ -49,7 +50,7 @@ VERSION_MINIMUM = (0, 2, 0)
 # unicode and python issues
 # http://evanjones.ca/python-utf8.html
 
-# todo
+# TODO:
 # handle direction-type metronome, beat-unit, etc.; test 31c
 # deal with grace notes, in particular duration handling
 # add print <print new-system="yes"/>
@@ -104,8 +105,9 @@ class Tag(object):
         self.cdFlag = cdFlag # character data flag
         self.status = 0
         self.charData = u''
-        self.count = 0 # for statistics
         self.className = className
+
+        self.count = 0 # for statistics; not presentl used
 
     def start(self):
         if self.status: # already open
@@ -116,18 +118,14 @@ class Tag(object):
         if not self.status:
             raise TagException('Tag (%s) is already ended.' % self.tag)
         self.status = 0
-        self.count += 1 # increment on close
+        # when not doing audit checks, no need to count
+        #self.count += 1 # increment on close
 
     def clear(self):
         self.charData = u''
 
     def zeroCount(self):
         self.count = 0
-
-#     def getCharData(self):
-#         if not self.cdFlag:
-#             raise TagException('Character data cannot be obtained from a Tag (%s) that has been set as not receiving character data with the cdFlag.' % self.tag)
-#         return self.charData
 
     def __eq__(self, other):
         if other == self.tag: return True
@@ -314,14 +312,17 @@ class TagLib(object):
             self._t[tagName] = Tag(tagName, charDataBool, className)
         
         # utility
-        self.stat = None
-        self.statMapWidth = 80
+        self._stat = None
+        self._statMapWidth = 80
 
     def __getitem__(self, key):
         return self._t[key]
 
+    #---------------------------------------------------------------------------
+    # utilities for error checking and debugging
+
     def _statTabulate(self):
-        self.stat = {}
+        self._stat = {}
         tags = self._t.keys()
         tags.sort()
 
@@ -336,8 +337,8 @@ class TagLib(object):
         for tag in tags:
             # get magnitude string
             if maxCount > 0:
-                if maxCount > self.statMapWidth:
-                    scalar = self.statMapWidth * (self._t[tag].count / 
+                if maxCount > self._statMapWidth:
+                    scalar = self._statMapWidth * (self._t[tag].count / 
                             float(maxCount))
                     scalar = int(round(scalar))
                 else:
@@ -347,7 +348,7 @@ class TagLib(object):
             # get formatted tag str
             tagStr = tag.ljust(maxTag+1)
             # store count, tag string, magnitude string
-            self.stat[tag] = [self._t[tag].count, tagStr, magStr]
+            self._stat[tag] = [self._t[tag].count, tagStr, magStr]
 
     def statClear(self):
         tags = self._t.keys()
@@ -355,24 +356,25 @@ class TagLib(object):
             self._t[tag].zeroCount()
 
     def _statMapActive(self):
+        '''Display method for tag audit checks
+        '''
         tags = self._t.keys()
         tags.sort()
         sortOrder = []
         for tag in tags:
-            if self.stat[tag][0] > 0:
+            if self._stat[tag][0] > 0:
                 # count, tagStr, magStr
-                sortOrder.append(self.stat[tag])
+                sortOrder.append(self._stat[tag])
 
         sortOrder.sort()
         msg = []
         for count, tagStr, magStr in sortOrder:
             msg.append(tagStr + str(count).ljust(4) + magStr)
-        print '\n'.join(msg)
+        print('\n'.join(msg))
 
     def statRun(self):
         self._statTabulate()
         self._statMapActive()
-
 
     def audit(self):
         '''
@@ -2794,8 +2796,7 @@ class TestExternal(unittest.TestCase):
         if fp == None: # get shuman
             fp = corpus.getWork('opus41no1', 2)
         c = Document()
-        audit = 1
-        c.open(fp, audit)
+        c.open(fp, audit=True)
         c.repr()
 
     def testCompareFile(self, fpIn=None, fpOut=None):
@@ -2808,10 +2809,9 @@ class TestExternal(unittest.TestCase):
             fpOut = environLocal.getTempFile('.xml')
 
         c = Document()
-        audit = 1
-        c.open(fpIn, audit)
+        c.open(fpIn, audit=True)
         c.write(fpOut)
-        print _MOD, 'wrote:', fpOut
+        environLocal.printDebug([_MOD, 'wrote:', fpOut])
 
 
 #     def testInputDirectory(self, dirPath=None):
@@ -2847,8 +2847,7 @@ class TestExternal(unittest.TestCase):
             fp = corpus.getWork('opus41no1', 2)
 
         c = Document()
-        audit = 1
-        c.open(fp, audit)
+        c.open(fp, audit=True)
         c.reprPolyphony()
 
 # need new path
