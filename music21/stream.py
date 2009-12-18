@@ -927,11 +927,14 @@ class Stream(music21.Music21Object):
 
 
     def getElementsByOffset(self, offsetStart, offsetEnd,
-                    includeCoincidentBoundaries=True, onsetOnly=True,
-                    unpackElement=False):
-        '''Return a Stream/list of all Elements that are found within a certain offset time range, specified as start and stop values, and including boundaries
+                    includeCoincidentBoundaries=True, onsetOnly=True):
+        '''
+        Return a Stream/list of all Elements that are found within a 
+        certain offset time range, specified as start and stop values, 
+        and including boundaries.
 
-        If onsetOnly is true, only the onset of an event is taken into consideration; the offset is not.
+        If onsetOnly is true, only the onset of an event is taken into 
+        consideration; the offset is not.
 
         The time range is taken as the context for the flat representation.
 
@@ -963,10 +966,7 @@ class Stream(music21.Music21Object):
         >>> ###len(c)
         ###10
         '''
-        if unpackElement: # a list of objects
-            found = []
-        else: # return a Stream     
-            found = Stream()
+        found = Stream()
 
         #(offset, priority, dur, element). 
         for element in self:
@@ -987,10 +987,7 @@ class Stream(music21.Music21Object):
                     match = True
 
             if match:
-                if unpackElement and hasattr(element, "obj"):   
-                    found.append(element.obj)
-                else:
-                    found.append(element)
+                found.append(element)
         return found
 
 

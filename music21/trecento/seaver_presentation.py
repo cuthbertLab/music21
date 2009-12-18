@@ -4,8 +4,8 @@ import music21
 from music21 import note
 from music21.note import Note
 from music21.note import QuarterNote
-from music21 import noteStream
-from music21.noteStream import Stream
+from music21 import stream
+from music21.stream import Stream
 from music21.lily import LilyString
 from music21 import tinyNotation
 from music21.tinyNotation import TinyNotationLine
@@ -21,7 +21,8 @@ def createScalePart():
     # etc
     b = QuarterNote(); b.step = "B"
     
-    s1 = Stream([c, d, b])
+    s1 = Stream()
+    s1.addNext([c, d, b])
     print s1.lily
     lS1 = LilyString("{" + s1.lily + "}")
     lS1.showPNG()
@@ -31,8 +32,9 @@ def createEasyScale():
     time1 = TimeSignature("3/4")
     tinyNotation = TinyNotationLine(myScale, time1)
     s1 = tinyNotation.stream
-    s1.timeSignature = time1
-    s1.showTimeSignature = True
+    s1.insertAtOffset(0, time1)
+#    s1.timeSignature = time1
+#    s1.showTimeSignature = True
     print s1.lily
     lS1 = LilyString("{" + s1.lily.value + "}")
     lS1.showPDF()
@@ -70,8 +72,9 @@ def badMeter():
     time1 = TimeSignature("3/4")
     tinyNotation = TinyNotationLine(myScale, time1)
     s1 = tinyNotation.stream
-    s1.timeSignature = time1
-    s1.showTimeSignature = True
+    s1.insertAtOffset(0, time1)    
+#    s1.timeSignature = time1
+#    s1.showTimeSignature = True
     print s1.lily
     s1.lily.showPNG()
     
