@@ -501,7 +501,11 @@ class GeneralNote(music21.Music21Object):
     def _getMusicXML(self):
         '''This must call _getMX to get basic mxNote objects
         '''
-        mxNoteList = self._getMX() # can be rest, note, or chord
+        # make a copy, as we this process will change tuple types
+        selfCopy = copy.deepcopy(self)
+        duration.updateTupletType(selfCopy.duration) # modifies in place
+
+        mxNoteList = selfCopy._getMX() # can be rest, note, or chord
 
         mxMeasure = musicxml.Measure()
         mxMeasure.setDefaults()
@@ -1007,7 +1011,6 @@ class Note(NotRest):
         for mxNote in mxNoteList:
             if self.beams != None:
                 mxNote.beamList = self.beams.mx
-
 
         return mxNoteList
 

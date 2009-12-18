@@ -12,18 +12,20 @@ to do complex things to.
 Trecento specific examples have migrated into the trecento directory
 '''
 
+import unittest, doctest
+import copy
+from re import compile, search, match
+import collections
+
 import music21
 import music21.note
 import music21.duration
 
-from re import compile, search, match
-import collections
 from music21 import common
 from music21 import stream
 from music21 import notationMod
 from music21 import meter
 
-import unittest, doctest
 
 class TinyNotationLine(object):
     '''A TinyNotationLine begins as a string representation similar to Lilypond format
@@ -167,7 +169,7 @@ class TinyNotationNote(object):
             else:
                 noteObj.duration.type = music21.duration.typeFromNumDict[int(typeNum)]
         else:
-            noteObj.duration = storedDict['lastDuration'].clone()
+            noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
             usedLastDuration = True
             if (noteObj.duration.tuplets):
                 noteObj.duration.tuplets[0].type = ""

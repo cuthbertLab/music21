@@ -176,12 +176,21 @@ def greaterThan(x, y = 0.0):
     if x < y or almostEquals(x, y): return False
     else: return True
 
+def greaterThanOrEqual(x, y=0.0, grain=1e-7):
+    '''
+    greaterThan returns True if x is greater than or almostEquals y
+    '''
+    if x > y or almostEquals(x, y, grain): return True
+    else: return False
+
+
 def lessThan(x, y = 0.0):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
     '''
     if x > y or almostEquals(x, y): return False
     else: return True    
+
     
 def isPowerOfTwo(n):
     ''' 

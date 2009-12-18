@@ -1642,7 +1642,6 @@ class TimeSignature(music21.Music21Object):
                 elif beamNext == None:
                     beamType = 'stop'
 
-                    
                 # the last cases are when to stop, or when to continue
                 # when we know we have a beam next
 
@@ -1650,11 +1649,13 @@ class TimeSignature(music21.Music21Object):
                 # as this one.
                 # if endNext is outside of the archetype span,
                 # not sure what to do
-                elif startNext < archetypeSpan[1]: # if next w/n this span
+                # use common to avoid floating point noise
+                elif common.lessThan(startNext, archetypeSpan[1]):
                     beamType = 'continue'
 
                 # we stop if the next beam is not in the sme beaming archetyp
-                elif startNext >= archetypeSpanNext[0]: # if next w/n this span
+                # use common to avoid floating point noise
+                elif common.greaterThanOrEqual(startNext, archetypeSpanNext[0]):
                     beamType = 'stop'
 
                 beams.setByNumber(beamNumber, beamType)

@@ -516,23 +516,34 @@ def updateTupletType(durationList):
     '''Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, 
     and set Tuplet type to start or stop, as necessary.
 
-    >>> a = Duration()
-    >>> a.quarterLength = .33333
-    >>> b = Duration()
-    >>> b.quarterLength = .33333
-    >>> c = Duration()
-    >>> c.quarterLength = .33333
+    >>> a = Duration(); a.quarterLength = .33333
+    >>> b = Duration(); b.quarterLength = .33333
+    >>> c = DurationUnit(); c.quarterLength = .33333
+    >>> d = Duration(); d.quarterLength = 2
+    >>> e = Duration(); e.quarterLength = .33333
+    >>> f = DurationUnit(); f.quarterLength = .33333
+    >>> g = Duration(); g.quarterLength = .33333
+
     >>> a.tuplets[0].type == None
     True
-    >>> updateTupletType([a, b, c])
+    >>> updateTupletType([a, b, c, d, e, f, g])
     >>> a.tuplets[0].type == 'start'
     True
     >>> b.tuplets[0].type == None
     True
     >>> c.tuplets[0].type == 'stop'
     True
+    >>> e.tuplets[0].type == 'start'
+    True
+    >>> g.tuplets[0].type == 'stop'
+    True
     '''
+    environLocal.printDebug(['calling updateTupletType'])
     tupletMap = [] # a list of tuplet obj / dur pairs  
+
+    if isinstance(durationList, Duration): # if a Duration object alone
+        durationList = [durationList] # put in list
+
     for part in durationList: # can be Durations or DurationUnits
         if isinstance(part, Duration):
             partGroup = part.components
@@ -552,7 +563,8 @@ def updateTupletType(durationList):
                 raise Exception('chanot handle this tuplets: %s' % tuplets)
 
     # have a list of tuplet, DurationUnit pairs
-    completionCount = 0
+    completionCount = 0 # qLen currently filled
+    completionTarget = None # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tuplet, dur = tupletMap[i]
 
@@ -563,26 +575,56 @@ def updateTupletType(durationList):
 
         if i < len(tupletMap) - 1:
             tupletNext, durNext = tupletMap[i+1]
+            if tupletNext != None:
+                nextNormalType = tupletNext.durationNormal.type
+            else:
+                nextNormalType = None
         else: 
             tupletNext, durNext = None, None
+            nextNormalType = None
 
-        environLocal.printDebug(['updateTupletType previous, this, next:', 
-                                 tupletPrevious, tuplet, tupletNext])
+        #environLocal.printDebug(['updateTupletType previous, this, next:', 
+        #                         tupletPrevious, tuplet, tupletNext])
 
-        # if previous tuplet is None, always start
-        if tupletPrevious == None and tuplet != None:
-            tuplet.type = 'start'
-            environLocal.printDebug(['setting tuplet type, value:', 
-                                     tuplet, tuplet.type])
+        if tuplet != None:
+            thisNormalType = tuplet.durationNormal.type
+            completionCount += dur.quarterLength
+            # if previous tuplet is None, always start
+            # always reset completion target
+            if tupletPrevious == None or completionTarget == None:
+                tuplet.type = 'start'
+                # get total quarter length of this tuplet
+                completionTarget = (tuplet.numberNotesNormal *             
+                                   tuplet.durationNormal.quarterLength)
 
-        # if tuplet next is None, always stop
-        # if both previous and next are None, just keep a start
-        elif tupletNext == None and tuplet != None:
-            tuplet.type = 'stop'
-            environLocal.printDebug(['setting tuplet type, value:', 
-                                     tuplet, tuplet.type])
+                #environLocal.printDebug(['starting tuplet type, value:', 
+                #                         tuplet, tuplet.type])
+                #environLocal.printDebug(['completion count, target:', 
+                #                         completionCount, completionTarget])
+    
+            # if tuplet next is None, always stop
+            # if both previous and next are None, just keep a start
 
-        
+            # this, below, is optional:
+            # if next normal type is not the same as this one, also stop
+            # common.greaterThan uses is >= w/ almost equals
+            elif (tupletNext == None or 
+                common.greaterThanOrEqual(completionCount, completionTarget)):
+                tuplet.type = 'stop'
+                completionTarget = None # reset
+                completionCount = 0 # rest
+                #environLocal.printDebug(['stopping tuplet type, value:', 
+                #                         tuplet, tuplet.type])
+                #environLocal.printDebug(['completion count, target:', 
+                #                         completionCount, completionTarget])
+
+            # if typlet next and previous not None, increment 
+            elif tupletPrevious != None and tupletNext != None:
+                # do not need to change tuplet type; should be None        
+                pass
+                #environLocal.printDebug(['completion count, target:', 
+                #                         completionCount, completionTarget])
+
 
 
 #-------------------------------------------------------------------------------
@@ -744,10 +786,8 @@ class DurationUnit(DurationCommon):
         if not common.isNum(value):
             raise DurationException(
             "not a valid quarter length (%s)" % value)
-
         if self.linkStatus is True:
             self._typeNeedsUpdating = True
-
         self._qtrLength = value
 
     quarterLength = property(_getQuarterLength, _setQuarterLength)
@@ -765,14 +805,12 @@ class DurationUnit(DurationCommon):
                 self.type = tempDurations[0].type
                 self.dots = tempDurations[0].dots
                 self.tuplets = tempDurations[0].tuplets
-        self.typeNeedsUpdating = False
-
+        self._typeNeedsUpdating = False
 
     def _getType(self):
         '''Get the duration type.'''
         if self._typeNeedsUpdating:
             self.updateType()
-
         return self._type
         
     def _setType(self, value):
@@ -884,7 +922,10 @@ class DurationUnit(DurationCommon):
             "value submitted (%s) is not a list of tuplets" % value)
         if self._tuplets != value:
             self._quarterLengthNeedsUpdating = True
-        #environLocal.printDebug(['assigning tuplets in DurationUnit', value])
+        # note that in some cases this methods seems to be called more 
+        # often than necessary
+        #environLocal.printDebug(['assigning tuplets in DurationUnit', 
+        #                         value, id(value)])
         self._tuplets = value
 
     tuplets = property(_getTuplets, _setTuplets)
@@ -935,6 +976,7 @@ class Tuplet(object):
             self.nestedLevel = 1
 
         # actual is the count of notes that happen in this space
+        # this it not the real duration of notes that happen
         if 'numberNotesActual' in keywords:
             self.numberNotesActual = keywords['numberNotesActual']
         else:
@@ -948,7 +990,6 @@ class Tuplet(object):
                 self.durationActual = keywords['durationActual']
         else:
             self.durationActual = DurationUnit("eighth") 
-
 
         # normal is the space that would normally be occupied
         if 'numberNotesNormal' in keywords:
@@ -1105,16 +1146,20 @@ class Tuplet(object):
         mxTimeModification.set('normal-notes', self.numberNotesNormal)
         mxTimeModification.set('normal-type', self.durationNormal.type)
 
-        mxTuplet = musicxmlMod.Tuplet()
         if self.type != None:
+            mxTuplet = musicxmlMod.Tuplet()
             # start/stop; needs to bet set by group
             mxTuplet.set('type', self.type) 
-        if self.bracket:
-            mxBracket = 'yes'
-        else:
-            mxBracket = 'no'
-        mxTuplet.set('bracket', mxBracket) 
-        mxTuplet.set('placement', self.placement) 
+            # only provide other parameters if this tuplet is a start
+            if self.type == 'start':
+                if self.bracket:
+                    mxBracket = 'yes'
+                else:
+                    mxBracket = 'no'
+                mxTuplet.set('bracket', mxBracket) 
+                mxTuplet.set('placement', self.placement) 
+        else: # cannot provide an empty tuplet; return None
+            mxTuplet = None 
 
         return mxTimeModification, mxTuplet
 
@@ -1179,14 +1224,12 @@ class Duration(DurationCommon):
             self._quarterLengthNeedsUpdating = True
         if 'type' in keywords:
             self.addDuration(DurationUnit(keywords['type']))
-
       
         # only apply default if components are empty
         # looking at private _components so as not to trigger
         # _updateComponents
         if self.quarterLength == 0 and len(self._components) == 0:
             self.addDuration(DurationUnit('quarter'))
-
 
         # linkages are a list of things used to connect durations.  
         # If undefined, Ties are used.  Other sorts of things could be 
@@ -1196,9 +1239,8 @@ class Duration(DurationCommon):
         else:
             self.linkages = []
         
-               
-    def clone(self):
-        return copy.deepcopy(self)
+#     def clone(self):
+#         return copy.deepcopy(self)
 
     def __repr__(self):
         '''Provide a representation.
@@ -1419,7 +1461,7 @@ class Duration(DurationCommon):
         Returns a list of one or more musicxml.Note() objects with all rhythms
         and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
 
-        TODO: tuplets, notations, ties
+        TODO: notations, ties
 
         !!! need to automatically set Tuplet type if not set
 
@@ -1529,11 +1571,12 @@ class Duration(DurationCommon):
             if len(dur.tuplets) > 0:
                 mxTimeModification, mxTuplet = dur.tuplets[0].mx
                 mxNote.set('timemodification', mxTimeModification)
-                mxNotations.append(mxTuplet)
+                if mxTuplet != None:
+                    mxNotations.append(mxTuplet)
 
             # add notations to mxNote
             mxNote.set('notations', mxNotations)
-        return post # a lost of mxNotes
+        return post # a list of mxNotes
 
 
     def _setMX(self, mxNote):
@@ -1579,7 +1622,11 @@ class Duration(DurationCommon):
         mxNotehead = musicxmlMod.Notehead()
         mxNotehead.set('charData', defaults.noteheadUnpitched)
 
-        mxNoteList = self.mx
+        # make a copy, as we this process will change tuple types
+        selfCopy = copy.deepcopy(self)
+        updateTupletType(selfCopy.components) # modifies in place
+
+        mxNoteList = selfCopy.mx # getting durations here as mxNotes
         for i in range(len(mxNoteList)):
             mxNoteDefault = musicxmlMod.Note()
             mxNoteDefault.setDefaults()    
@@ -2098,6 +2145,71 @@ class Test(unittest.TestCase):
         a.external['divisions'] = m.external['divisions']
         c = Duration()
         c.mx = a
+
+
+    def testTupletTypeComplete(self):
+        '''Test settinf of tuplet type when durations sum to expected completion
+        '''
+        # default tuplets group into threes when possible
+        test, match = ([.333333]*3+[.1666666]*6, 
+            ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
+        input = []
+        for qLen in test:
+            d = Duration()
+            d.quarterLength = qLen
+            input.append(d)
+        updateTupletType(input)
+        output = []
+        for d in input:
+            output.append(d.tuplets[0].type)
+        self.assertEqual(output, match)
+
+
+        tup6 = Duration()
+        tup6.quarterLength = .16666666
+        tup6.tuplets[0].numberNotesActual = 6
+        tup6.tuplets[0].numberNotesNormal = 4
+
+        tup5 = Duration()
+        tup5.quarterLength = .2 # default is 5 in the space of 4 16th
+
+        input = [copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
+        copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
+        copy.deepcopy(tup5), copy.deepcopy(tup5), copy.deepcopy(tup5),
+        copy.deepcopy(tup5), copy.deepcopy(tup5)]
+
+        match = ['start', None, None, None, None, 'stop', 
+                 'start', None, None, None, 'stop']
+
+        updateTupletType(input)
+        output = []
+        for d in input:
+            output.append(d.tuplets[0].type)
+        self.assertEqual(output, match)
+
+
+
+    def testTupletTypeIncomplete(self):
+        '''Test setting of tuplet type when durations do not sum to expected
+        completion. 
+        '''
+
+        # the current match results here are a good compromise
+        # for a difficult situation. 
+        test, match = ([.333333]*2+[.1666666]*5, 
+            ['start', None, None, 'stop', 'start', None, 'stop']
+            )
+        input = []
+        for qLen in test:
+            d = Duration()
+            d.quarterLength = qLen
+            input.append(d)
+        updateTupletType(input)
+        output = []
+        for d in input:
+            output.append(d.tuplets[0].type)
+        #environLocal.printDebug(['got', output])
+        self.assertEqual(output, match)
 
 
 if __name__ == "__main__":

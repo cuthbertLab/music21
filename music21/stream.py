@@ -1796,12 +1796,12 @@ class Stream(music21.Music21Object):
         return returnObj
     
 
-
-
     def makeBeams(self, inPlace=True):
         '''Return a new measure with beams applied to all notes. 
 
         if inPlace is false, this creates a new, independent copy of the source.
+
+        In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.
 
         TODO: inPlace==False does not work in many cases
 
@@ -1845,6 +1845,9 @@ class Stream(music21.Music21Object):
             beamsList = lastTimeSignature.getBeams(durList)
             for i in range(len(noteStream)):
                 noteStream[i].beams = beamsList[i]
+            # apply tuple types in place
+            duration.updateTupletType(durList)
+
 
         return returnObj
 
