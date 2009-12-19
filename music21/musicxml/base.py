@@ -85,6 +85,23 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 # 'bend' : not implemented as needs many sub components
 
 #-------------------------------------------------------------------------------
+def yesNoToBoolean(value):
+    if value in ['yes', True]:
+        return True
+    else:
+        return False
+
+
+def booleanToYesNo(value):
+    if value:
+        return 'yes'
+    else:
+        return 'no'
+
+
+
+
+#-------------------------------------------------------------------------------
 class TagException(Exception):
     pass
 
@@ -1481,6 +1498,14 @@ class Notations(MusicXMLElementList):
     def _getComponents(self):
         return self.componentList 
 
+    def getTuplets(self):
+        '''A quick way to get all tuplets; there is likely only one
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Tuplet):
+                post.append(part)
+        return post
 
 
 class Dynamics(MusicXMLElementList):
