@@ -50,7 +50,6 @@ class Tie(music21.Music21Object):
        previous note.  i.e., you can tie n1 to n2 just with
        a tie start on n1.  However, if you want proper musicXML output
        you need a tie stop on n2
-
        one tie with "continue" implies tied from and tied to
 
        optional (to know what notes are next:)
@@ -66,9 +65,31 @@ class Tie(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self.type = tievalue
 
-    ### NOTE: READ UP ON weak references BEFORE adding .to and .from
-    ### THESE MUST BE WEAK otherwise garbage collection will not take 
-        # place properly
+    # use weak-refs for .to and .from
+    def _getMX(self):
+        mxTieList = []
+        mxTie = musicxmlMod.Tie()
+        mxTie.set('type', self.type) # start, stop
+        mxTieList.append(mxTie) # goes on mxNote.tieList
+
+        mxTiedList = []
+        mxTied = musicxmlMod.Tied()
+        mxTied.set('type', self.type) 
+        mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
+
+        return mxTieList, mxTiedList
+    
+    def _setMX(self, mxNote):
+        mxTieList = mxNote.get('tieList')
+        if len(mxTieList) > 0:
+            self.type = mxTieList[0].get('type')
+
+        mxNotations = mxNote.get('notations')
+        if mxNotations != None:
+            mxTiedList = mxNotations.getTieds()
+            # should be sufficient to only get mxTieList
+
+    mx = property(_getMX, _setMX)
 
 
 
@@ -423,14 +444,9 @@ class GeneralNote(music21.Music21Object):
         self.notations = []
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
-        self.tie = None
+        self.tie = None # store a Tie object
 
-#         self.reinit()
-# 
-#         
-#     def reinit(self):
-#         pass
-    
+
     #---------------------------------------------------------------------------
     def _getColor(self):
         return self.editorial.color
@@ -983,7 +999,6 @@ class Note(NotRest):
             # get color from within .editorial using attribute
             mxNote.set('color', self.color)
 
-
             for lyricObj in self.lyrics:
                 mxNote.lyricList.append(lyricObj.mx)
             mxNoteList.append(mxNote)
@@ -991,14 +1006,16 @@ class Note(NotRest):
         # if this note, not a component duration, but this note has a tie, 
         # need to add this to the last-encountered mxNote
         if self.tie != None:
+            mxTieList, mxTiedList = self.tie.mx # get mxl objs from tie obj
+            # if starting a tie, add to last mxNote in mxNote list
             if self.tie.type == 'start':
-                mxNoteList[-1].addTie('start')
+                mxNoteList[-1].tieList += mxTieList
+                mxNoteList[-1].notationsObj.componentList += mxTiedList
+            # if ending a tie, set first mxNote ot stop
+            # TODO: this may need to continue if there are components here
             elif self.tie.type == 'stop':
-                # TODO: check
-                # this may not work properly, as components of this note
-                # might be tied to other notes
-                mxNoteList[0].addTie('stop')
-
+                mxNoteList[0].tieList += mxTieList
+                mxNoteList[0].notationsObj.componentList += mxTiedList
 
         # need to apply beams to notes, but application needs to be
         # reconfigured based on what is gotten from self.duratoin.mx
@@ -1029,6 +1046,13 @@ class Note(NotRest):
         self.pitch.mx = mxNote # required info will be taken from entore note
         self.duration.mx = mxNote
         self.beams.mx = mxNote.beamList
+
+        mxTieList = mxNote.get('tieList')
+        if len(mxTieList) > 0:
+            tieObj = Tie() # m21 tie object
+            tieObj.mx = mxNote # provide entire Note
+            # self.tie is defined in GeneralNote as None by default
+            self.tie = tieObj
 
     mx = property(_getMX, _setMX)    
 

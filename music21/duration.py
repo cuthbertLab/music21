@@ -1646,7 +1646,6 @@ class Duration(DurationCommon):
 
         mxDivisions = mxNote.external['divisions']
 
-
         if mxNote.duration != None: 
 
             if mxNote.get('type') != None:
@@ -1658,9 +1657,6 @@ class Duration(DurationCommon):
     
             mxDotList = mxNote.get('dotList')
             qLen = float(mxNote.duration) / float(mxDivisions)
-
-            #TODO: add ties here
-            mxTieList = mxNote.get('tieList')
 
             mxNotations = mxNote.get('notations')
             mxTimeModification = mxNote.get('timemodification')

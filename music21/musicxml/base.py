@@ -1409,20 +1409,20 @@ class Note(MusicXMLElement):
                     new.pitchObj = other
 
 
-    def addTie(self, tieType):
-        '''Convenience for settting up ties. Can only be used when 
-        not manually configure mxNotations
-        '''
-        if tieType not in ['start', 'stop']:
-            raise MusicXMLException('bad tie type %s' % tieType)
-        mxTie = Tie()
-        mxTie.set('type', tieType) # start, stop
-        self.tieList.append(mxTie)
-
-        mxTied = Tied()
-        mxTied.set('type', tieType) 
-        self.notationsObj.append(mxTied)
-        
+#     def addTie(self, tieType):
+#         '''Convenience for settting up ties. Can only be used when 
+#         not manually configure mxNotations
+#         '''
+#         if tieType not in ['start', 'stop']:
+#             raise MusicXMLException('bad tie type %s' % tieType)
+#         mxTie = Tie()
+#         mxTie.set('type', tieType) # start, stop
+#         self.tieList.append(mxTie)
+# 
+#         mxTied = Tied()
+#         mxTied.set('type', tieType) 
+#         self.notationsObj.append(mxTied)
+#         
 
 
 
@@ -1504,6 +1504,15 @@ class Notations(MusicXMLElementList):
         post = []        
         for part in self.componentList:
             if isinstance(part, Tuplet):
+                post.append(part)
+        return post
+
+    def getTieds(self):
+        '''A quick way to get all tied objects; there is likely only one
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Tied):
                 post.append(part)
         return post
 
