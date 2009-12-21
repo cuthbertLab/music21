@@ -22,7 +22,7 @@ _MOD = 'test/testPerformance.py'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
-class Test(unittest.TestCase):
+class TestPerformance(unittest.TestCase):
 
     def runTest(self):
         pass
@@ -30,7 +30,7 @@ class Test(unittest.TestCase):
     def testTimingTolerance(self):
         '''Test the performance of loading various files
         This may not produce errors as such, but is used to provide reference
-        if overall perforamance has changed.
+        if overall performance has changed.
         '''
         # provide work and expected min/max in seconds
         for known, max, best in [
@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
             x = corpus.parseWork(known, forceSource=True)
             t.stop()
             dur = t()
-            environLocal.printDebug(['timing tolarance for', known, 
+            environLocal.printDebug(['timing tolerance for', known, 
                 'this run:', t, 'best runs:', 
                 ['%s: %s' % (x, y) for x, y in best.items()]])
             self.assertEqual(True, dur <= max) # performance test
@@ -58,5 +58,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestPerformance)
 

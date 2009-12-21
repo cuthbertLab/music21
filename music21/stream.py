@@ -490,24 +490,44 @@ class Stream(music21.Music21Object):
         appendOffset = element.getOffsetBySite(None)            
         self.insert(appendOffset, element)
 
-    def insert(self, offset, item):
-        '''Append an object with a given offset. Wrap in an ElementWrapper and 
-        set offset time. 
-
-        >>> a = Stream()
-        >>> a.insert(32, note.Note("B-"))
-        >>> a._getHighestOffset()
+    def insert(self, offsetOrItem, itemOrNone = None):
+        '''
+        Has two forms: in the two argument form, inserts an element at the given offset:
+        
+        >>> st1 = Stream()
+        >>> st1.insert(32, note.Note("B-"))
+        >>> st1._getHighestOffset()
         32.0
+        
+        In the single argument form, inserts the element at its stored offset:
+        
+        >>> n1 = note.Note("C#")
+        >>> n1.offset = 30.0
+        >>> st1 = Stream()
+        >>> st1.insert(n1)
+        >>> st2 = Stream()
+        >>> st2.insert(40.0, n1)
+        >>> n1.getOffsetBySite(st1)
+        30.0
+        
         '''
         # TODO: possible permit inserting of an item, an element, without
         # an offset, where the element's native offset is used as the offset.
 
         # if not an element, embed
+        if itemOrNone == None:
+            item = offsetOrItem
+            offset = item.offset
+        else:
+            offset = offsetOrItem
+            item = itemOrNone
+        
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insert called with non Music21Object', item])
             element = music21.ElementWrapper(item)
         else:
             element = item
+
         offset = float(offset)
         element.locations.add(offset, self)
         # need to explicitly set the parent of the elment
@@ -2481,8 +2501,8 @@ class Stream(music21.Music21Object):
                 midStream.append(obj)
 
             refStream = Stream()
-            refStream.insert(0, None) # placeholder at 0
-            refStream.insert(highestTime, None) 
+            refStream.insert(0, True) # placeholder at 0
+            refStream.insert(highestTime, True) 
 
             # would like to do something like this but cannot
             # replace object inside of the stream
@@ -4237,7 +4257,7 @@ class Test(unittest.TestCase):
         '''Test basic Elements wrapping non music21 objects
         '''
         a = Stream()
-        a.insert(50, None)
+        a.insert(50, True)
         self.assertEqual(len(a), 1)
 
         # there are two locations, default and the one just added
