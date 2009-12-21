@@ -285,7 +285,9 @@ class Accidental(music21.Music21Object):
         >>> a.alter
         -2.0
         '''
-        if name in ['natural', "n", 0]:
+        if common.isStr(name):
+            name = name.lower() # sometimes args get capitalized
+        if name in ['natural', "n", 0]: 
             self.name = 'natural'
             self.alter = 0.0
             self.modifier = ''

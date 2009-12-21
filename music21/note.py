@@ -312,6 +312,24 @@ class Beams(object):
             if self.beamsList[i].number == number:
                 return self.beamsList[i]
 
+    def getTypeByNumber(self, number):
+        '''Get beam type, with direction, by number
+
+        >>> a = Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.setByNumber(2, 'partial-right')
+        >>> a.getTypeByNumber(2)
+        'partial-right'
+        >>> a.getTypeByNumber(1)
+        'start'
+        '''
+        beamObj = self.getByNumber(number)
+        if beamObj.direction == None:
+            return beamObj.type
+        else:
+            return '%s-%s' % (beamObj.type, beamObj.direction)
+            
 
     def getTypes(self):
         '''Retur a lost of all types

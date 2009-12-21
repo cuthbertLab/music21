@@ -217,6 +217,8 @@ def fractionSum(fList):
 class MeterException(Exception):
     pass
 
+class TimeSignatureException(MeterException):
+    pass
 
 
 #-------------------------------------------------------------------------------
@@ -1618,7 +1620,6 @@ class TimeSignature(music21.Music21Object):
                 else:
                     archetypeSpanNext = archetype.positionToSpan(startNext)
 
-
                 # determine beamType
                 if i == 0: # if the first, we always start
                     beamType = 'start'
@@ -1629,9 +1630,10 @@ class TimeSignature(music21.Music21Object):
 
                 elif i == len(durList) - 1: # last is always stop
                     beamType = 'stop'
-                    # get a partial beam if we cannot come fomr a beam
+                    # get a partial beam if we cannot come form a beam
                     if (beamPrevious == None or 
                         beamNumber not in beamPrevious.getNumbers()):
+                        environLocal.printDebug(['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
 
                 # here on we know that it is neither the first nor last
@@ -1642,10 +1644,22 @@ class TimeSignature(music21.Music21Object):
                 elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
                     beamType = 'start'
 
-                # last beams was active, this beamNumber was active,                # and it was stopped
+                    # case of where we need a partial left:
+                    # if the next start value is outside of this span (or at the 
+                    # the greater boundary of this span), and we did not have a 
+                    # beam or beam number in the previous beam
+
+                    # may need to check: beamNext != None and 
+                    #   beamNumber in beamNext.getNumbers()
+                    # note: it is cretical that we check archetypeSpan here
+                    # not archetypeSpanNext
+                    if (common.greaterThanOrEqual(startNext, 
+                        archetypeSpan[1])):
+                        beamType = 'partial-left'
+
+                # last beams was active, last beamNumber was active,                # and it was stopped or was a partial-left
                 elif (beamPrevious != None and 
-                    beamNumber in beamPrevious.getNumbers() and
-                    beamPrevious.getByNumber(beamNumber).type == 'stop'):
+                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
                     beamType = 'start'
 
                 # if no beam is defined next (we know this already)
@@ -1661,14 +1675,26 @@ class TimeSignature(music21.Music21Object):
                 # as this one.
                 # if endNext is outside of the archetype span,
                 # not sure what to do
-                # use common to avoid floating point noise
+                # use common.lessThan to avoid floating point noise
                 elif common.lessThan(startNext, archetypeSpan[1]):
                     beamType = 'continue'
 
-                # we stop if the next beam is not in the sme beaming archetyp
+                # we stop if the next beam is not in the same beaming archetype
+                # and (as shown above) a valid beam number is not previous
                 # use common to avoid floating point noise
                 elif common.greaterThanOrEqual(startNext, archetypeSpanNext[0]):
                     beamType = 'stop'
+
+                else:
+                    raise TimeSignatureException('cannot match beamType')
+
+
+#                 if beamPrevious != None:
+#                     environLocal.printDebug(['beamPrevious', beamPrevious, 'beamPrevious.getNumbers()', beamPrevious.getNumbers(), 'beamPrevious.getByNumber(beamNumber).type'])
+#                     if beamNumber in beamPrevious.getNumbers():
+#                         environLocal.printDebug(['beamPrevious type', beamPrevious.getByNumber(beamNumber).type])
+                        
+                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType', beamNumber, start, archetypeSpan, beamType])
 
                 beams.setByNumber(beamNumber, beamType)
 

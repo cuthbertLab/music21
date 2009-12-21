@@ -110,6 +110,12 @@ class Chord(note.NotRest):
                 if hasattr(thisNote, "duration") and thisNote.duration != None:
                     self.duration = notes[0].duration
                     break
+
+        if "beams" in keywords:
+            self.beams = keywords["beams"]
+        else:
+            self.beams = note.Beams()
+
         
     def _preDurationLily(self):
         '''
@@ -235,8 +241,15 @@ class Chord(note.NotRest):
                     mxNote.set('chord', True)
                 # get color from within .editorial using attribute
                 mxNote.set('color', self.color)
+
+                # only add beam to first note in group
+                if self.beams != None and chordPos == 0:
+                    mxNote.beamList = self.beams.mx
+
                 mxNoteList.append(mxNote)
                 chordPos += 1
+
+
         return mxNoteList
 
     def _setMX(self, mxNoteList):

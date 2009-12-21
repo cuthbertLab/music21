@@ -1133,6 +1133,13 @@ class Stream(music21.Music21Object):
 
     def getNotes(self):
         '''Return all Note, Chord, Rest, etc. objects in a Stream()
+
+        >>> s1 = Stream()
+        >>> c = chord.Chord(['a', 'b'])
+        >>> s1.addNext(c)
+        >>> s2 = s1.getNotes()
+        >>> len(s2) == 1
+        True
         '''
         return self.getElementsByClass(note.GeneralNote, chord.Chord)
 
@@ -1847,7 +1854,6 @@ class Stream(music21.Music21Object):
                 noteStream[i].beams = beamsList[i]
             # apply tuple types in place
             duration.updateTupletType(durList)
-
 
         return returnObj
 
