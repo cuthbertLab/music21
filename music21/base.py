@@ -126,6 +126,9 @@ class Groups(list):
 class Contexts(object):
     '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
     '''
+    #TODO: make locations, by default, use weak refs
+    # make contexts, by default, not use weak refs
+
     def __init__(self):
         self._ref = [] # references
         self._loc = [] # locations

@@ -111,7 +111,10 @@ class Beam(object):
         self.number = None 
 
     def __str__(self):
-        return '<music21.note.Beam %s/%s/%s>' % (self.number, self.type, self.direction)        
+        if self.direction == None:
+            return '<music21.note.Beam %s/%s>' % (self.number, self.type)
+        else:
+            return '<music21.note.Beam %s/%s/%s>' % (self.number, self.type, self.direction)        
 
 
     def _getMX(self):

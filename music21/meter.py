@@ -252,7 +252,7 @@ class MeterTerminal(object):
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
 
     def __repr__(self):
-        return self.__str__()
+        return '<MeterTerminal %s>' % self.__str__()
 
 # now using ratioEqual()
 
@@ -485,9 +485,6 @@ class MeterSequence(MeterTerminal):
     '''A meter sequence is a list of MeterTerminals, or other MeterSequences
     '''
 
-    # TODO: add an attribute to indicate that this is 
-    # displayed parenthetically as part of a group of meteres or otherwise
-
     def __init__(self, value=None, partitionRequest=None):
         MeterTerminal.__init__(self)
 
@@ -517,7 +514,7 @@ class MeterSequence(MeterTerminal):
         return '{%s}' % '+'.join(msg)
 
     def __repr__(self):
-        return self.__str__()
+        return '<MeterSequence %s>' % self.__str__()
 
     def __len__(self):
         '''Return the length of the partition list
@@ -551,10 +548,10 @@ class MeterSequence(MeterTerminal):
         >>> a = MeterSequence('4/4', 4)
         >>> a[0] = a[0].subdivide(2)
         >>> a
-        {{1/8+1/8}+1/4+1/4+1/4}
+        <MeterSequence {{1/8+1/8}+1/4+1/4+1/4}>
         >>> a[0][0] = a[0][0].subdivide(2)
         >>> a
-        {{{1/16+1/16}+1/8}+1/4+1/4+1/4}
+        <MeterSequence {{{1/16+1/16}+1/8}+1/4+1/4+1/4}>
         >>> a[3] = a[0][0].subdivide(2)
         Traceback (most recent call last):
         ...
@@ -805,7 +802,7 @@ class MeterSequence(MeterTerminal):
         '{1/4+1/4+1/4+1/4}'
         >>> a.partitionByList(['3/4', '1/8', '1/8'])
         >>> a
-        {3/4+1/8+1/8}
+        <MeterSequence {3/4+1/8+1/8}>
         >>> a.partitionByList(['3/4', '1/8', '5/8'])
         Traceback (most recent call last):
         MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
@@ -1051,7 +1048,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1] = a[1].subdivide(4)
         >>> a
-        {1/4+{1/16+1/16+1/16+1/16}+1/4}
+        <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
         >>> b = a._getFlatList()
@@ -1060,7 +1057,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
-        {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}
+        <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a._getFlatList()
         >>> len(b)
         9
@@ -1089,7 +1086,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
-        {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}
+        <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a.flat
         >>> len(b)
         9
@@ -1125,15 +1122,15 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> MeterSequence(b._getLevelList(0))
-        {1/4+1/4+1/4+1/4}
+        <MeterSequence {1/4+1/4+1/4+1/4}>
         >>> MeterSequence(b._getLevelList(1))
-        {1/4+1/8+1/8+1/4+1/8+1/8}
+        <MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
         >>> MeterSequence(b._getLevelList(2))
-        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         >>> MeterSequence(b._getLevelList(3))
-        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
         mtList = []
         for i in range(len(self)):
@@ -1165,13 +1162,13 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevel(0)
-        {1/4+1/4+1/4+1/4}
+        <MeterSequence {1/4+1/4+1/4+1/4}>
         >>> b.getLevel(1)
-        {1/4+1/8+1/8+1/4+1/8+1/8}
+        <MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
         >>> b.getLevel(2)
-        {1/4+1/8+1/8+1/4+1/16+1/16+1/8}
+        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
         return MeterSequence(self._getLevelList(level))
 
@@ -1196,7 +1193,7 @@ class MeterSequence(MeterTerminal):
 
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
         >>> b.getLevelWeight(1)
@@ -1222,7 +1219,7 @@ class MeterSequence(MeterTerminal):
         >>> a.positionToIndex(5)
         Traceback (most recent call last):
         ...
-        MeterException: cannot access from qLenPos 5
+        MeterException: cannot access from qLenPos 5 where total duration is 4.0
 
         >>> a = MeterSequence('4/4')
         >>> a.positionToIndex(.5)
@@ -1241,7 +1238,7 @@ class MeterSequence(MeterTerminal):
         1
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+            raise MeterException('cannot access from qLenPos %s where total duration is %s' % (qLenPos, self.duration.quarterLength))
 
         qPos = 0
         match = None
@@ -1270,19 +1267,19 @@ class MeterSequence(MeterTerminal):
         >>> a = MeterSequence('3/4', 3)
         >>> a[1] = a[1].subdivide(4)
         >>> a
-        {1/4+{1/16+1/16+1/16+1/16}+1/4}
+        <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
         >>> a.positionToAddress(.5)
         [0]
         >>> a[0]    
-        1/4
+        <MeterTerminal 1/4>
         >>> a.positionToAddress(1.0)
         [1, 0]
         >>> a.positionToAddress(1.5)
         [1, 2]
         >>> a[1][2]
-        1/16
+        <MeterTerminal 1/16>
         >>> a.positionToAddress(1.99)
         [1, 3]
         >>> a.positionToAddress(2.5)
@@ -1427,7 +1424,8 @@ class TimeSignature(music21.Music21Object):
 
         # used for drawing the time signature symbol
         # this is the only one that can be  unlinked
-        self.display = MeterSequence(value, partitionRequest)
+        # generaly not partitioned as others?
+        self.display = MeterSequence(value)
         # used for beaming
         self.beam = MeterSequence(value, partitionRequest)
         # used for getting beat divisions
@@ -1439,7 +1437,7 @@ class TimeSignature(music21.Music21Object):
         # all have the same value
         self.summedNumerator = self.display.summedNumerator
 
-        if partitionRequest == None: # set default groups
+        if partitionRequest == None: # set default beam partitions
             self._setDefaultBeamPartitions()
 
 
@@ -1535,13 +1533,19 @@ class TimeSignature(music21.Music21Object):
         >>> a.beam[0] = a.beam[0].subdivide(2)
         >>> a.beam[1] = a.beam[1].subdivide(2)
         >>> a.beam
-        {{1/8+1/8}+{1/8+1/8}}
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> b = [duration.Duration('16th')] * 8
         >>> c = a.getBeams(b)
         >>> len(c) == len(b)
         True
         >>> print c
-        [<music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>]
+        [<music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>]
+
+        >>> a = TimeSignature('6/8')
+        >>> b = [duration.Duration('eighth')] * 6
+        >>> c = a.getBeams(b)
+        >>> print c
+        [<music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>]
         '''
 
         if len(durList) <= 1:
@@ -1555,12 +1559,13 @@ class TimeSignature(music21.Music21Object):
             else:
                 # we have a beamable duration
                 b = note.Beams()
-                # set the necessary number of internal beamsList, that is, one for
-                # each horizontal line in the beams group
+                # set the necessary number of internal beamsList, that is, 
+                # one for each horizontal line in the beams group
                 # this does not set type or direction
                 b.fill(dur.type) 
                 beamsList.append(b)
 
+        #environLocal.printDebug(['beamsList', beamsList])
         # iter over each beams line, from top to bottom (1 thourgh 5)
         for depth in range(len(self._beamableDurationTypes)):
             beamNumber = depth + 1 # increment to count from 1 not 0
@@ -1600,14 +1605,19 @@ class TimeSignature(music21.Music21Object):
                     durPrevious = durList[i-1]
                     beamPrevious = beamsList[i-1]
 
-                # get an archetype for this level
+                # get an archetype of the MeterSequence for this level
                 # level is depth, starting at zero
                 archetype = self.beam.getLevel(depth)
+                # span is the quarter note duration points for each partition 
+                # at this level
                 archetypeSpan = archetype.positionToSpan(start)
+                #environLocal.printDebug(['at level, got archetype span', depth,
+                #                         archetypeSpan])
                 if beamNext == None: # last
                     archetypeSpanNext = None
                 else:
                     archetypeSpanNext = archetype.positionToSpan(startNext)
+
 
                 # determine beamType
                 if i == 0: # if the first, we always start
@@ -1628,10 +1638,11 @@ class TimeSignature(music21.Music21Object):
 
                 # if last beam was not defined, we need to either
                 # start or have a partial beam; what determines this?
-                elif beamPrevious == None:
+                # or, if beam number was not active in last beams 
+                elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
                     beamType = 'start'
 
-               # last beams was active at this beamNumber was active                # and it was stopped
+                # last beams was active, this beamNumber was active,                # and it was stopped
                 elif (beamPrevious != None and 
                     beamNumber in beamPrevious.getNumbers() and
                     beamPrevious.getByNumber(beamNumber).type == 'stop'):
@@ -1639,7 +1650,8 @@ class TimeSignature(music21.Music21Object):
 
                 # if no beam is defined next (we know this already)
                 # then must stop
-                elif beamNext == None:
+                elif (beamNext == None or 
+                    beamNumber not in beamNext.getNumbers()):
                     beamType = 'stop'
 
                 # the last cases are when to stop, or when to continue
@@ -1672,14 +1684,14 @@ class TimeSignature(music21.Music21Object):
         >>> a.load('3/4')
         >>> a.setDisplay('2/8+2/8+2/8')
         >>> a.display
-        {2/8+2/8+2/8}
+        <MeterSequence {2/8+2/8+2/8}>
         >>> a.beam
-        {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.beat
-        {3/4}
+        <MeterSequence {3/4}>
         >>> a.setDisplay(a.beat)
         >>> a.display
-        {3/4}
+        <MeterSequence {3/4}>
         '''
         if isinstance(value, MeterSequence): # can set to an existing meterseq
             # must make a copy
@@ -1698,7 +1710,7 @@ class TimeSignature(music21.Music21Object):
         >>> a = TimeSignature('3/4', 3)
         >>> a.accent.partition([2,1])
         >>> a.accent
-        {2/4+1/4}
+        <MeterSequence {2/4+1/4}>
         >>> a.getAccent(0)
         True
         >>> a.getAccent(1)
@@ -1957,6 +1969,20 @@ class TestExternal(unittest.TestCase):
         a.show()
 
 
+    def testMeterBeam(self):
+        from music21 import stream
+        ts = TimeSignature('6/8', 2)
+        b = [duration.Duration('16th')] * 12
+        s = stream.Stream()
+        s.insert(0, ts)
+        for x in b:
+            n = note.Note()
+            n.duration = x
+            s.addNext(n)
+        s.show()
+
+
+
 class Test(unittest.TestCase):
     '''Unit tests
     '''
@@ -2013,6 +2039,22 @@ class Test(unittest.TestCase):
         c = TimeSignature('4/4')
         d = copy.deepcopy(c)
         self.assertNotEqual(c, d)
+
+
+    def testGetBeams(self):
+        from music21 import duration
+
+        a = TimeSignature('6/8')
+        b = ([duration.Duration('16th')] * 4  + 
+             [duration.Duration('eighth')] * 1) * 2
+        c = a.getBeams(b)
+        match = '''[<music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/continue>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/continue>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/continue>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/continue>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/stop>>]'''
+
+        self.assertEqual(str(c), match)
+
+
+
+
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
