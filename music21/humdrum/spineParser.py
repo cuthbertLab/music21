@@ -524,7 +524,7 @@ class HumdrumSpine(object):
             if eventC == ".":
                 pass
             else:
-                self.music21Objects.addNext(event)
+                self.music21Objects.append(event)
 
 class KernSpine(HumdrumSpine):
     def parse(self):
@@ -562,7 +562,7 @@ class KernSpine(HumdrumSpine):
             elif eventC.startswith('='):
                 ## barline/measure processing
                 if thisContainer is not None:
-                    self.music21Objects.addNext(thisContainer)
+                    self.music21Objects.append(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)                
             elif eventC.startswith('!'):
                 ## TODO: process comments
@@ -581,9 +581,9 @@ class KernSpine(HumdrumSpine):
                 thisObject.humdrumPosition = event.position
                 thisObject.humdrumSpineId  = event.spineId                
                 if thisContainer is None:
-                    self.music21Objects.addNext(thisObject)
+                    self.music21Objects.append(thisObject)
                 else:
-                    thisContainer.addNext(thisObject)
+                    thisContainer.append(thisObject)
 
 class DynamSpine(HumdrumSpine):
     def parse(self):
@@ -600,7 +600,7 @@ class DynamSpine(HumdrumSpine):
                     thisObject = tempObject
             elif eventC.startswith('='):
                 if thisContainer is not None:
-                    self.music21Objects.addNext(thisContainer)
+                    self.music21Objects.append(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)                
             elif eventC.startswith('!'):
                 ## TODO: process comments
@@ -618,9 +618,9 @@ class DynamSpine(HumdrumSpine):
                 thisObject.humdrumPosition = event.position
                 thisObject.humdrumSpineId  = event.spineId                
                 if thisContainer is None:
-                    self.music21Objects.addNext(thisObject)
+                    self.music21Objects.append(thisObject)
                 else:
-                    thisContainer.addNext(thisObject)
+                    thisContainer.append(thisObject)
 
 
         
@@ -928,13 +928,13 @@ def hdStringToNote(contents):
     # 3.2.10 Beaming
     # TODO: Support really complex beams
     for i in range(0, contents.count('L')):
-        thisObject.beams.addNext('start')
+        thisObject.beams.append('start')
     for i in range(0, contents.count('J')):
-        thisObject.beams.addNext('stop')
+        thisObject.beams.append('stop')
     for i in range(0, contents.count('k')):
-        thisObject.beams.addNext('partial', 'right')
+        thisObject.beams.append('partial', 'right')
     for i in range(0, contents.count('K')):
-        thisObject.beams.addNext('partial', 'right')
+        thisObject.beams.append('partial', 'right')
     
     return thisObject
 

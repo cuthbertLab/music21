@@ -256,9 +256,9 @@ class Test(unittest.TestCase):
     n24.duration.type = "eighth"
     
     stream1 = Stream()
-    stream1.addNext([n11,n12,n13,n14])
+    stream1.append([n11,n12,n13,n14])
     stream2 = Stream()
-    stream2.addNext([n21,n22,n23,n24])
+    stream2.append([n21,n22,n23,n24])
 
     twoStream1 = TwoStreamComparer(stream1, stream2)
     attackedTogether = twoStream1.attackedTogether()

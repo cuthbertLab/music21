@@ -46,7 +46,7 @@ class TwelveToneRow(ToneRow):
             for pitch in row:
                 note1 = music21.note.Note()
                 note1.pitchClass = pitch
-                rowObject.addNext(note1)
+                rowObject.append(note1)
             matrixObj.append(rowObject)
         
         return matrixObj
@@ -70,7 +70,7 @@ def pcToToneRow(pcSet):
         for thisPc in pcSet:
             newNote = music21.note.Note()
             newNote.pitchClass = thisPc
-            a.addNext(newNote)
+            a.append(newNote)
         return a
     else:
         raise SerialException("pcToToneRow requires a 12-tone-row")

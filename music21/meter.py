@@ -2004,7 +2004,7 @@ class TestExternal(unittest.TestCase):
         for x in b:
             n = note.Note()
             n.duration = x
-            s.addNext(n)
+            s.append(n)
         s.show()
 
 

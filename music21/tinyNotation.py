@@ -100,7 +100,7 @@ class TinyNotationLine(object):
         if timeSignature is not None and hasattr(timeSignature, "barDuration"):
             self.stream.append(timeSignature)
         for thisNote in noteList:
-            self.stream.addNext(thisNote)
+            self.stream.append(thisNote)
         
     def getNote(self, stringRep, storedDict = {}):
         try:

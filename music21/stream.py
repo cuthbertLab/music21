@@ -349,7 +349,7 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> fSharp = note.Note("F#")
         >>> a.repeatInsert(note.Note("A#"), range(10))
-        >>> a.addNext(fSharp)
+        >>> a.append(fSharp)
         >>> a.index(fSharp)
         10
         '''
@@ -469,7 +469,7 @@ class Stream(music21.Music21Object):
         '''Add a (sub)Stream, Music21Object, or object (wrapped into a default 
         element) to the Stream at the stored offset of the object, or at 0.0.
          
-        For adding to the last open location of the stream, use addNext.
+        For adding to the last open location of the stream, use append.
 
         Adds an entry in Locations as well.
 
@@ -542,7 +542,7 @@ class Stream(music21.Music21Object):
         self._elementsChanged()         # maybe much slower?
         self.isSorted = storeSorted
 
-    def addNext(self, others):
+    def append(self, others):
         '''Add an objects or Elements (including other Streams) to the Stream 
         (or multiple if passed a list)
         with offset equal to the highestTime (that is the latest "release" of an object) plus
@@ -557,13 +557,13 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.duration.quarterLength = 3
         ...     notes.append(n)
-        >>> a.addNext(notes[0])
+        >>> a.append(notes[0])
         >>> a.highestOffset, a.highestTime
         (0.0, 3.0)
-        >>> a.addNext(notes[1])
+        >>> a.append(notes[1])
         >>> a.highestOffset, a.highestTime
         (3.0, 6.0)
-        >>> a.addNext(notes[2])
+        >>> a.append(notes[2])
         >>> a.highestOffset, a.highestTime
         (6.0, 9.0)
         >>> notes2 = []
@@ -574,7 +574,7 @@ class Stream(music21.Music21Object):
         ...     n.duration.quarterLength = 3
         ...     n.offset = 0
         ...     notes2.append(n)                
-        >>> a.addNext(notes2) # add em all again
+        >>> a.append(notes2) # add em all again
         >>> a.highestOffset, a.highestTime
         (15.0, 18.0)
         >>> a.isSequence()
@@ -584,7 +584,7 @@ class Stream(music21.Music21Object):
         >>> n3 = note.Note("B-")
         >>> n3.offset = 1
         >>> n3.duration.quarterLength = 3
-        >>> a.addNext(n3)
+        >>> a.append(n3)
         >>> a.highestOffset, a.highestTime
         (19.0, 22.0)
         
@@ -622,18 +622,17 @@ class Stream(music21.Music21Object):
 
 
 
-    def insertAtElementIndex(self, pos, item):
+    def insertAtIndex(self, pos, item):
         '''Insert in elements by index position.
 
         >>> a = Stream()
         >>> a.repeatAddNext(note.Note('A-'), 30)
         >>> a[0].name == 'A-'
         True
-        >>> a.insertAtElementIndex(0, note.Note('B'))
+        >>> a.insertAtIndex(0, note.Note('B'))
         >>> a[0].name == 'B'
         True
         '''
-        # possible rename insertAtIndex()?
 
         if not hasattr(item, "locations"):
             raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
@@ -841,9 +840,9 @@ class Stream(music21.Music21Object):
         >>> n3 = note.Note("E")
         >>> n3.groups.append('tuba')
         >>> s1 = Stream()
-        >>> s1.addNext(n1)
-        >>> s1.addNext(n2)
-        >>> s1.addNext(n3)
+        >>> s1.append(n1)
+        >>> s1.append(n2)
+        >>> s1.append(n3)
         >>> tboneSubStream = s1.getElementsByGroup("trombone")
         >>> for thisNote in tboneSubStream:
         ...     print thisNote.name
@@ -1156,7 +1155,7 @@ class Stream(music21.Music21Object):
 
         >>> s1 = Stream()
         >>> c = chord.Chord(['a', 'b'])
-        >>> s1.addNext(c)
+        >>> s1.append(c)
         >>> s2 = s1.getNotes()
         >>> len(s2) == 1
         True
@@ -1373,7 +1372,7 @@ class Stream(music21.Music21Object):
 
     def repeatAddNext(self, item, numberOfTimes):
         '''
-        Given an object and a number, run addNext that many times on the object.
+        Given an object and a number, run append that many times on the object.
         numberOfTimes should of course be a positive integer.
         
         >>> a = Stream()
@@ -1392,7 +1391,7 @@ class Stream(music21.Music21Object):
             element = item # TODO: remove for new-old-style
             
         for i in range(0, numberOfTimes):
-            self.addNext(deepcopy(element))
+            self.append(deepcopy(element))
     
     def repeatInsert(self, item, offsets):
         '''Given an object, create many DEEPcopies at the positions specified by 
@@ -1437,7 +1436,7 @@ class Stream(music21.Music21Object):
         >>> qtrStream.repeatInsert(qn, [0, 1, 2, 3, 4, 5])
         >>> hn = note.HalfNote()
         >>> hn.name = "B-"
-        >>> qtrStream.addNext(hn)
+        >>> qtrStream.append(hn)
         >>> qtrStream.repeatInsert(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
         >>> hnStream._reprText()
@@ -3392,7 +3391,7 @@ class TestExternal(unittest.TestCase):
         
         
         for i in range(0,5):
-            b.addNext(deepcopy(q))
+            b.append(deepcopy(q))
             b.elements[i].accidental = note.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
@@ -3416,11 +3415,11 @@ class TestExternal(unittest.TestCase):
         d = note.Note("D4")
         ts = meter.TimeSignature("2/4")
         s1 = Part()
-        s1.addNext(deepcopy(c))
-        s1.addNext(deepcopy(d))
+        s1.append(deepcopy(c))
+        s1.append(deepcopy(d))
         s2 = Part()
-        s2.addNext(deepcopy(d))
-        s2.addNext(deepcopy(c))
+        s2.append(deepcopy(d))
+        s2.append(deepcopy(c))
         score1 = Score()
         score1.insert(ts)
         score1.insert(s1)
@@ -3436,8 +3435,8 @@ class TestExternal(unittest.TestCase):
             b = Measure()
             for pitch in ['a', 'g', 'c#', 'a#']:
                 a = note.Note(pitch)
-                b.addNext(a)
-            c.addNext(b)
+                b.append(a)
+            c.append(b)
         c.show()
 
     def testMxMeasures(self):
@@ -3467,11 +3466,11 @@ class TestExternal(unittest.TestCase):
         for x in ['c3','a3','g#4','d2'] * 10:
             n = note.Note(x)
             n.quarterLength = .25
-            q.addNext(n)
+            q.append(n)
 
             m = note.Note(x)
             m.quarterLength = 1.125
-            r.addNext(m)
+            r.append(m)
 
         s = Stream() # container
         s.insert(q)
@@ -3523,7 +3522,7 @@ class TestExternal(unittest.TestCase):
             for pitchName in a:
                 n = note.Note(pitchName)
                 n.quarterLength = 1.5
-                p.addNext(n)
+                p.append(n)
             p.offset = partOffset
             s.insert(p)
             partOffset += partOffsetShift
@@ -3539,7 +3538,7 @@ class TestExternal(unittest.TestCase):
         for x in [.125, .25, .25, .125, .125, .125] * 30:
             n = note.Note('c')
             n.quarterLength = x
-            q.addNext(n)
+            q.append(n)
 
         s = Stream() # container
         s.insert(q)
@@ -3562,15 +3561,15 @@ class TestExternal(unittest.TestCase):
             n = note.Note(x)
             #n.quarterLength = random.choice([.25, .125, .5])
             n.quarterLength = random.choice([.25])
-            q.addNext(n)
+            q.append(n)
 
             m = note.Note(x)
             m.quarterLength = .5
-            r.addNext(m)
+            r.append(m)
 
             o = note.Note(x)
             o.quarterLength = .125
-            p.addNext(o)
+            p.append(o)
 
         s = Stream() # container
         s.append(q)
@@ -3659,12 +3658,12 @@ class Test(unittest.TestCase):
         n3.id = "n3"
         n4.id = "n4"
 
-        p1.addNext(n1)
-        p1.addNext(n2)
+        p1.append(n1)
+        p1.append(n2)
 
                 
-        p2.addNext(n3)
-        p2.addNext(n4)
+        p2.append(n3)
+        p2.append(n4)
 
         p2.offset = 20.0
 
@@ -3894,7 +3893,7 @@ class Test(unittest.TestCase):
         
         
         for i in range(0,5):
-            b.addNext(deepcopy(q))
+            b.append(deepcopy(q))
             b.elements[i].accidental = note.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
@@ -3914,11 +3913,11 @@ class Test(unittest.TestCase):
         d = note.Note("D4")
         ts = meter.TimeSignature("2/4")
         s1 = Part()
-        s1.addNext(deepcopy(c))
-        s1.addNext(deepcopy(d))
+        s1.append(deepcopy(c))
+        s1.append(deepcopy(d))
         s2 = Part()
-        s2.addNext(deepcopy(d))
-        s2.addNext(deepcopy(c))
+        s2.append(deepcopy(d))
+        s2.append(deepcopy(c))
         score1 = Score()
         score1.insert(ts)
         score1.insert(s1)
@@ -3948,9 +3947,9 @@ class Test(unittest.TestCase):
 
 
         m = Stream()
-        m.addNext(a)
-        m.addNext(b)
-        m.addNext(c)
+        m.append(a)
+        m.append(b)
+        m.append(c)
     
         self.assertEqual(m[1].offset, (20 * a.barDuration.quarterLength))    
         self.assertEqual(m[2].offset, ((20 * a.barDuration.quarterLength) + 
@@ -3967,11 +3966,11 @@ class Test(unittest.TestCase):
         for x in ['c3','a3','g#4','d2'] * 10:
             n = note.Note(x)
             n.quarterLength = .25
-            q.addNext(n)
+            q.append(n)
 
             m = note.Note(x)
             m.quarterLength = 1
-            r.addNext(m)
+            r.append(m)
 
         s = Stream() # container
         s.insert(q)
@@ -4032,10 +4031,10 @@ class Test(unittest.TestCase):
         for x in ['c3','a3','c#4','d3'] * 30:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
-            q.addNext(n)
+            q.append(n)
             m = note.Note(x)
             m.quarterLength = .5
-            r.addNext(m)
+            r.append(m)
         s = Stream() # container
         s.insert(q)
         s.insert(r)
@@ -4112,10 +4111,10 @@ class Test(unittest.TestCase):
         for x in ['c3','a3','c#4','d3'] * 30:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
-            q.addNext(n)
+            q.append(n)
             m = note.Note(x)
             m.quarterLength = .5
-            r.addNext(m)
+            r.append(m)
         s = Stream() # container
 
         s.insert(q)
@@ -4168,10 +4167,10 @@ class Test(unittest.TestCase):
         for x in ['c3','a3','c#4','d3'] * 30:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
-            q.addNext(n)
+            q.append(n)
             m = note.Note(x)
             m.quarterLength = .5
-            r.addNext(m)
+            r.append(m)
         s = Stream() # container
 
         s.insert(q)
@@ -4198,10 +4197,10 @@ class Test(unittest.TestCase):
         for x in ['c3','a3','c#4','d3'] * 5:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
-            q.addNext(n)
+            q.append(n)
             m = note.Note(x)
             m.quarterLength = .5
-            r.addNext(m)
+            r.append(m)
         src = Stream() # container
         src.insert(q)
         src.insert(r)
@@ -4275,7 +4274,7 @@ class Test(unittest.TestCase):
         s = Stream()
         for x in ['c3','a3','c#4','d3'] * 5:
             n = note.Note(x)
-            s.addNext(n)
+            s.append(n)
         clefObj = s.bestClef()
         self.assertEqual(clefObj.sign, 'F')
         measureStream = s.makeMeasures()

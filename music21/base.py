@@ -1460,7 +1460,7 @@ class Test(unittest.TestCase):
         note1 = note.Note("B-")
         note1.type = "whole"
         stream1 = stream.Stream()
-        stream1.addNext(note1)
+        stream1.append(note1)
         subStream = stream1.getNotes()
 
     def testLocationsRefs(self):

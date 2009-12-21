@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
                                ['rest', 'slur', 'register'])
         for phrase in phraseStream:
             phraseNew = phrase.clone() 
-            phraseNew.addNext(articulations.BreathMark)
+            phraseNew.append(articulations.BreathMark)
             # how do we edit/update the old score? assuming that
             # the objects are not linked, we need to find and replace
             partStream.replace(phrase, phraseNew)

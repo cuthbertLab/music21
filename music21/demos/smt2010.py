@@ -47,7 +47,7 @@ def ex02():
     for i in range(len(pitches)-3):
         testChord = chord.Chord(pitches[i:i+4])
         if testChord.isDominantSeventh():
-            found.addNext(testChord)
+            found.append(testChord)
     found.show()
     
    

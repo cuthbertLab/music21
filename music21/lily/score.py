@@ -1,3 +1,4 @@
+### DEPRECATED -- REMOVE ---
 import copy
 
 import music21
@@ -134,7 +135,7 @@ class LilyMidi(LilyContainer):
 
 
 def test():
-    import music21.noteStream
+    from music21.stream import Stream
     
     n1 = music21.note.Note()
     n1.name = "E"
@@ -149,11 +150,13 @@ def test():
     n2.octave = 5
     n2.duration.type = "half"
     
-    n4 = copy.deepcopy(n3)
+    n4 = n3.clone()
     n4.octave = 5
 
-    st1 = music21.noteStream.Stream([n1, n3])
-    st2 = music21.noteStream.Stream([n2, n4])
+    st1 = Stream()
+    st2 = Stream()
+    st1.append([n1, n3])
+    st2.append([n2, n4])
 
     staff1 = LilyStaff()
     staff1.appendElement(st1)

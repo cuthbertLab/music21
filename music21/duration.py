@@ -2118,7 +2118,7 @@ class TestExternal(unittest.TestCase):
             b = Duration()
             b.quarterLength = ql
             n.duration = b
-            a.addNext(n)
+            a.append(n)
 
         a.show()
 

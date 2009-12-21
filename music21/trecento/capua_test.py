@@ -27,9 +27,9 @@ def colorCapuaFictaTest():
     n24.duration.type = "quarter"
 
     stream1 = Stream()
-    stream1.addNext([n11, n12, n13, n14])
+    stream1.append([n11, n12, n13, n14])
     stream2 = Stream()
-    stream2.addNext([n21, n22, n23, n24])
+    stream2.append([n21, n22, n23, n24])
 
 
     ### Need twoStreamComparer to Work

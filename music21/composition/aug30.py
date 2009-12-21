@@ -32,7 +32,7 @@ def rhythmLine(baseDuration = QuarterNote(), minLength = 8.0, maxProbability = 0
             print x, currentProbability
             newNote.duration = alterRhythm(newNote.duration)
             x = random.random()
-        newStream.addNext(newNote)
+        newStream.append(newNote)
         #newStream.getNoteTimeInfo()
         
     return newStream

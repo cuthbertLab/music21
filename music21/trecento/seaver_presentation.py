@@ -22,7 +22,7 @@ def createScalePart():
     b = QuarterNote(); b.step = "B"
     
     s1 = Stream()
-    s1.addNext([c, d, b])
+    s1.append([c, d, b])
     print s1.lily
     lS1 = LilyString("{" + s1.lily + "}")
     lS1.showPNG()

@@ -205,7 +205,7 @@ class Beams(object):
         return '<music21.note.Beams %s>' % '/'.join(msg)
 
 
-    def addNext(self, type=None, direction=None):
+    def append(self, type=None, direction=None):
         obj = Beam(type, direction)
         obj.number = len(self.beamsList) + 1
         self.beamsList.append(obj)
@@ -1255,7 +1255,7 @@ class TestExternal(unittest.TestCase):
             b.name = pitchName
             b.color = '#FF00FF'
             # print a.musicxml
-            a.addNext(b)
+            a.append(b)
 
         a.show()
 
