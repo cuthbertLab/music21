@@ -543,11 +543,13 @@ class Stream(music21.Music21Object):
         self.isSorted = storeSorted
 
     def append(self, others):
-        '''Add an objects or Elements (including other Streams) to the Stream 
+        '''
+        Add Music21Objects (including other Streams) to the Stream 
         (or multiple if passed a list)
-        with offset equal to the highestTime (that is the latest "release" of an object) plus
-        any offset in the ElementWrapper or Stream to be added.  If that offset is zero (or a bare
-        object is added) then this object will directly after the last ElementWrapper ends. 
+        with offset equal to the highestTime (that is the latest "release" of an object), 
+        that is, directly after the last element ends. 
+
+        if the objects are not Music21Objects, they are wrapped in ElementWrappers
 
         runs fast for multiple addition and will preserve isSorted if True
 
@@ -580,17 +582,17 @@ class Stream(music21.Music21Object):
         >>> a.isSequence()
         True
         
-        Add a note that already has an offset set
+        Add a note that already has an offset set -- does nothing different!
         >>> n3 = note.Note("B-")
         >>> n3.offset = 1
         >>> n3.duration.quarterLength = 3
         >>> a.append(n3)
         >>> a.highestOffset, a.highestTime
-        (19.0, 22.0)
+        (18.0, 21.0)
         
         '''
 
-        highestTimeTemp = self.highestTime
+        highestTime = self.highestTime
         if not common.isListLike(others):
             # back into a list for list processing if single
             others = [others]
@@ -602,18 +604,16 @@ class Stream(music21.Music21Object):
             else:
                 element = item
 
-            addOffset = highestTimeTemp + element.getOffsetBySite(None)            
+            element.locations.add(highestTime, self)
+            # need to explicitly set the parent of the element
+            element.parent = self 
+            self._elements.append(element)  
+
+
             # this should look to the contained object duration
             if (hasattr(element, "duration") and 
                 hasattr(element.duration, "quarterLength")):
-                highestTimeTemp = addOffset + element.duration.quarterLength
-            else:
-                highestTimeTemp = addOffset
-
-            element.locations.add(addOffset, self)
-            # need to explicitly set the parent of the elment
-            element.parent = self 
-            self._elements.append(element)  
+                highestTime += element.duration.quarterLength
 
         ## does not change sorted state
         storeSorted = self.isSorted    
@@ -626,7 +626,7 @@ class Stream(music21.Music21Object):
         '''Insert in elements by index position.
 
         >>> a = Stream()
-        >>> a.repeatAddNext(note.Note('A-'), 30)
+        >>> a.repeatAppend(note.Note('A-'), 30)
         >>> a[0].name == 'A-'
         True
         >>> a.insertAtIndex(0, note.Note('B'))
@@ -648,6 +648,27 @@ class Stream(music21.Music21Object):
         self._elements.insert(pos, item)
         self._elementsChanged()
 
+    def insertAtNativeOffset(self, item):
+        '''
+        inserts the item at the offset that was defined before the item was inserted into a stream
+        (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)
+
+        >>> n1 = note.Note("F-")
+        >>> n1.offset = 20.0
+        >>> stream1 = Stream()
+        >>> stream1.append(n1)
+        >>> n1.getOffsetBySite(stream1)
+        0.0
+        >>> n1.offset
+        0.0
+        >>> stream2 = Stream()
+        >>> stream2.insertAtNativeOffset(n1)
+        >>> stream2[0].offset
+        20.0
+        >>> n1.getOffsetBySite(stream2)
+        20.0
+        '''
+        self.insert(item.getOffsetBySite(None), item)
 
     def isClass(self, className):
         '''
@@ -729,8 +750,8 @@ class Stream(music21.Music21Object):
         a certain class) are set.
          
         >>> a = Stream()
-        >>> a.repeatAddNext(note.Note('A-'), 30)
-        >>> a.repeatAddNext(note.Rest(), 30)
+        >>> a.repeatAppend(note.Note('A-'), 30)
+        >>> a.repeatAppend(note.Rest(), 30)
         >>> a.addGroupForElements('flute')
         >>> a[0].groups 
         ['flute']
@@ -874,7 +895,7 @@ class Stream(music21.Music21Object):
 
         >>> a = Stream()
         >>> n = note.Note()
-        >>> a.repeatAddNext(n, 30)
+        >>> a.repeatAppend(n, 30)
         >>> a.addGroupForElements('P1')
         >>> a.getGroups()
         {'P1': 30}
@@ -1370,7 +1391,7 @@ class Stream(music21.Music21Object):
     #--------------------------------------------------------------------------
     # utilities for creating large numbers of elements
 
-    def repeatAddNext(self, item, numberOfTimes):
+    def repeatAppend(self, item, numberOfTimes):
         '''
         Given an object and a number, run append that many times on the object.
         numberOfTimes should of course be a positive integer.
@@ -1378,7 +1399,7 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> n = note.Note()
         >>> n.duration.type = "whole"
-        >>> a.repeatAddNext(n, 10)
+        >>> a.repeatAppend(n, 10)
         >>> a.duration.quarterLength
         40.0
         >>> a[9].offset
@@ -1517,7 +1538,7 @@ class Stream(music21.Music21Object):
         If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.
         
         >>> a = Stream()
-        >>> a.repeatAddNext(note.Rest(), 3)
+        >>> a.repeatAppend(note.Rest(), 3)
         >>> b = a.makeMeasures()
         >>> c = meter.TimeSignature('3/4')
         >>> a.insert(0.0, c)
@@ -1527,7 +1548,7 @@ class Stream(music21.Music21Object):
     
         >>> d = Stream()
         >>> n = note.Note()
-        >>> d.repeatAddNext(n, 10)
+        >>> d.repeatAppend(n, 10)
         >>> d.repeatInsert(n, [x+.5 for x in range(10)])
         >>> x = d.makeMeasures()
         '''
@@ -1706,7 +1727,7 @@ class Stream(music21.Music21Object):
         >>> d = Stream()
         >>> n = note.Note()
         >>> n.quarterLength = 12
-        >>> d.repeatAddNext(n, 10)
+        >>> d.repeatAppend(n, 10)
         >>> d.repeatInsert(n, [x+.5 for x in range(10)])
         >>> #x = d.makeMeasures()
         >>> #x = x.makeTies()
@@ -1836,7 +1857,7 @@ class Stream(music21.Music21Object):
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
         >>> aNote = note.Note()
         >>> aNote.quarterLength = .25
-        >>> aMeasure.repeatAddNext(aNote,16)
+        >>> aMeasure.repeatAppend(aNote,16)
         >>> bMeasure = aMeasure.makeBeams()
         '''
 
@@ -3589,7 +3610,7 @@ class TestExternal(unittest.TestCase):
         aMeasure.timeSignature = meter.TimeSignature('4/4')
         aNote = note.Note()
         aNote.quarterLength = .25
-        aMeasure.repeatAddNext(aNote,16)
+        aMeasure.repeatAppend(aNote,16)
         bMeasure = aMeasure.makeBeams()
         bMeasure.show()
 
