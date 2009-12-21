@@ -240,7 +240,7 @@ class HumdrumDataCollection(object):
             masterStream = Stream()
             for thisSpine in self.spineCollection:
                 thisSpine.music21Objects.id = "spine_" + str(thisSpine.id)
-                masterStream.append(thisSpine.music21Objects)
+                masterStream.insert(thisSpine.music21Objects)
             return masterStream
 
     stream = property(_getStream)

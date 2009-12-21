@@ -123,7 +123,7 @@ class Stream(music21.Music21Object):
     # sequence like operations
 
     # if we want to have all the features of a mutable sequence, 
-    # we should impliment
+    # we should implement
     # append(), count(), index(), extend(), insert(), 
     # pop(), remove(), reverse() and sort(), like Python standard list objects.
     # But we're not there yet.
@@ -135,15 +135,15 @@ class Stream(music21.Music21Object):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     e = note.Note('G#')
-        ...     e.offset = x * 3
-        ...     a.append(e)
+        ...     n = note.Note('G#')
+        ...     n.offset = x * 3
+        ...     a.insert(n)
         >>> len(a)
         4
 
         >>> b = Stream()
         >>> for x in range(4):
-        ...     b.append(deepcopy(a) ) # append streams
+        ...     b.insert(deepcopy(a) ) # append streams
         >>> len(b)
         4
         >>> len(b.flat)
@@ -174,7 +174,7 @@ class Stream(music21.Music21Object):
         ## maybe it should, but does not yet:    if a float is given, returns the element at that offset
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Rest(), range(6))
+        >>> a.repeatInsert(note.Rest(), range(6))
         >>> subslice = a[2:5]
         >>> len(subslice)
         3
@@ -183,7 +183,7 @@ class Stream(music21.Music21Object):
         >>> b = note.Note()
         >>> b.id = 'green'
         >>> b.groups.append('violin')
-        >>> a.append(b)
+        >>> a.insert(b)
         >>> a[note.Note][0] == b
         True
         >>> a['violin'][0] == b
@@ -264,14 +264,14 @@ class Stream(music21.Music21Object):
     def _setElements(self, value):
         '''
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(10))
+        >>> a.repeatInsert(note.Note("C"), range(10))
         >>> b = Stream()
-        >>> b.repeatCopy(note.Note("C"), range(10))
+        >>> b.repeatInsert(note.Note("C"), range(10))
         >>> b.offset = 6
         >>> c = Stream()
-        >>> c.repeatCopy(note.Note("C"), range(10))
+        >>> c.repeatInsert(note.Note("C"), range(10))
         >>> c.offset = 12
-        >>> b.append(c)
+        >>> b.insert(c)
         >>> b.isFlat
         False
         >>> a.isFlat
@@ -291,14 +291,14 @@ class Stream(music21.Music21Object):
         on position in self.elements. 
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(10))
+        >>> a.repeatInsert(note.Note("C"), range(10))
         >>> b = Stream()
-        >>> b.repeatCopy(note.Note("C"), range(10))
+        >>> b.repeatInsert(note.Note("C"), range(10))
         >>> b.offset = 6
         >>> c = Stream()
-        >>> c.repeatCopy(note.Note("C"), range(10))
+        >>> c.repeatInsert(note.Note("C"), range(10))
         >>> c.offset = 12
-        >>> b.append(c)
+        >>> b.insert(c)
         >>> a.isFlat
         True
         >>> a[3] = b
@@ -320,7 +320,7 @@ class Stream(music21.Music21Object):
         on position in self.elements. 
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(10))
+        >>> a.repeatInsert(note.Note("C"), range(10))
         >>> del a[0]
         >>> len(a)
         9
@@ -333,7 +333,7 @@ class Stream(music21.Music21Object):
         '''return the matched object from the list. 
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(10))
+        >>> a.repeatInsert(note.Note("C"), range(10))
         >>> junk = a.pop(0)
         >>> len(a)
         9
@@ -348,7 +348,7 @@ class Stream(music21.Music21Object):
 
         >>> a = Stream()
         >>> fSharp = note.Note("F#")
-        >>> a.repeatCopy(note.Note("A#"), range(10))
+        >>> a.repeatInsert(note.Note("A#"), range(10))
         >>> a.addNext(fSharp)
         >>> a.index(fSharp)
         10
@@ -430,7 +430,7 @@ class Stream(music21.Music21Object):
 #        >>> for x in range(5):
 #        ...     e = note.Rest()
 #        ...     e.offset = x * 3
-#        ...     a.append(e)
+#        ...     a.insert(e)
 #        >>> a.isSorted
 #        True
 #        >>> a.elements[4].offset
@@ -439,7 +439,7 @@ class Stream(music21.Music21Object):
 #        >>> for x in range(3):
 #        ...     e = note.Note('D#')
 #        ...     e.offset = (x * 3) + 1
-#        ...     b.append(e)
+#        ...     b.insert(e)
 #        >>> b.isSorted
 #        True
 #        >>> c = a + b
@@ -462,10 +462,10 @@ class Stream(music21.Music21Object):
 #                self.highestTime <= other.offset:
 #                    new.isSorted = True
 #        else: # if other is not a Stream, object is appended 
-#            new.append(other)
+#            new.insert(other)
 #        return new
 
-    def append(self, item):
+    def appendOld(self, item):
         '''Add a (sub)Stream, Music21Object, or object (wrapped into a default 
         element) to the Stream at the stored offset of the object, or at 0.0.
          
@@ -474,8 +474,8 @@ class Stream(music21.Music21Object):
         Adds an entry in Locations as well.
 
         >>> a = Stream()
-        >>> a.append(music21.Music21Object())
-        >>> a.append(music21.note.Note('G#'))
+        >>> a.insert(music21.Music21Object())
+        >>> a.insert(music21.note.Note('G#'))
         >>> len(a)
         2
         '''
@@ -778,19 +778,19 @@ class Stream(music21.Music21Object):
         is set to the new stream that contains it. 
         
         >>> a = Stream()
-        >>> a.repeatCopy(note.Rest(), range(10))
+        >>> a.repeatInsert(note.Rest(), range(10))
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
-        ...     a.append(n)
+        ...     a.insert(n)
         >>> found = a.getElementsByClass(note.Note)
         >>> len(found)
         4
         >>> found[0].pitch.accidental.name
         'sharp'
         >>> b = Stream()
-        >>> b.repeatCopy(note.Rest(), range(15))
-        >>> a.append(b)
+        >>> b.repeatInsert(note.Rest(), range(15))
+        >>> a.insert(b)
         >>> # here, it gets elements from within a stream
         >>> # this probably should not do this, as it is one layer lower
         >>> found = a.getElementsByClass(note.Rest)
@@ -899,12 +899,12 @@ class Stream(music21.Music21Object):
 
 
     def getElementById(self, id, classFilter=None):
-        '''Returns the first encountered ElementWrapper for a given id. Return None
+        '''Returns the first encountered element for a given id. Return None
         if no match
 
         >>> e = 'test'
         >>> a = Stream()
-        >>> a.append(e)
+        >>> a.insert(0, e)
         >>> a[0].id = 'green'
         >>> None == a.getElementById(3)
         True
@@ -962,7 +962,7 @@ class Stream(music21.Music21Object):
         match is included.
         
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(10)) 
+        >>> a.repeatInsert(note.Note("C"), range(10)) 
         >>> b = a.getElementsByOffset(4,6)
         >>> len(b)
         3
@@ -973,9 +973,9 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> n = note.Note('G')
         >>> n.quarterLength = .5
-        >>> a.repeatCopy(n, range(8))
+        >>> a.repeatInsert(n, range(8))
         >>> b = Stream()
-        >>> b.repeatCopy(a, [0, 3, 6])
+        >>> b.repeatInsert(a, [0, 3, 6])
         >>> c = b.getElementsByOffset(2,6.9)
         >>> len(c)
         2
@@ -1007,7 +1007,7 @@ class Stream(music21.Music21Object):
                     match = True
 
             if match:
-                found.append(element)
+                found.insert(element)
         return found
 
 
@@ -1199,8 +1199,8 @@ class Stream(music21.Music21Object):
     
         >>> a = Stream()
         >>> b = meter.TimeSignature('3/4')
-        >>> a.append(b)
-        >>> a.repeatCopy(note.Note("C#"), range(10)) 
+        >>> a.insert(b)
+        >>> a.repeatInsert(note.Note("C#"), range(10)) 
         >>> c = a.getTimeSignatures()
         >>> len(c) == 1
         True
@@ -1262,7 +1262,7 @@ class Stream(music21.Music21Object):
         >>> for x in range(30):
         ...    n = note.Note()
         ...    n.midi = random.choice(range(60,72))
-        ...    a.append(n)
+        ...    a.insert(n)
         >>> b = a.bestClef()
         >>> b.line
         2
@@ -1273,7 +1273,7 @@ class Stream(music21.Music21Object):
         >>> for x in range(30):
         ...    n = note.Note()
         ...    n.midi = random.choice(range(35,55))
-        ...    c.append(n)
+        ...    c.insert(n)
         >>> d = c.bestClef()
         >>> d.line
         4
@@ -1333,7 +1333,7 @@ class Stream(music21.Music21Object):
         TODO: add a class filter to set what is shifted
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(0,10))
+        >>> a.repeatInsert(note.Note("C"), range(0,10))
         >>> a.shiftElements(30)
         >>> a.lowestOffset
         30.0
@@ -1351,7 +1351,7 @@ class Stream(music21.Music21Object):
         the offset of this stream to zero.
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.Note("C"), range(0,10))
+        >>> a.repeatInsert(note.Note("C"), range(0,10))
         >>> a.offset = 30
         >>> a.transferOffsetToElements()
         >>> a.lowestOffset
@@ -1394,7 +1394,7 @@ class Stream(music21.Music21Object):
         for i in range(0, numberOfTimes):
             self.addNext(deepcopy(element))
     
-    def repeatCopy(self, item, offsets):
+    def repeatInsert(self, item, offsets):
         '''Given an object, create many DEEPcopies at the positions specified by 
         the offset list:
 
@@ -1402,7 +1402,7 @@ class Stream(music21.Music21Object):
         >>> n = note.Note('G-')
         >>> n.quarterLength = 1
         
-        >>> a.repeatCopy(n, [0, 2, 3, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12])
+        >>> a.repeatInsert(n, [0, 2, 3, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12])
         >>> len(a)
         13
         >>> a[10].offset
@@ -1434,11 +1434,11 @@ class Stream(music21.Music21Object):
         >>> from music21 import note
         >>> qn = note.QuarterNote()
         >>> qtrStream = Stream()
-        >>> qtrStream.repeatCopy(qn, [0, 1, 2, 3, 4, 5])
+        >>> qtrStream.repeatInsert(qn, [0, 1, 2, 3, 4, 5])
         >>> hn = note.HalfNote()
         >>> hn.name = "B-"
         >>> qtrStream.addNext(hn)
-        >>> qtrStream.repeatCopy(qn, [8, 9, 10, 11])
+        >>> qtrStream.repeatInsert(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
         >>> hnStream._reprText()
         '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>'
@@ -1481,13 +1481,14 @@ class Stream(music21.Music21Object):
         All elements where fx returns True go in the first stream.
         All other elements are put in the second stream.
         
-        >>> a = Stream()
+        >>> stream1 = Stream()
         >>> for x in range(30,81):
         ...     n = note.Note()
+        ...     n.offset = x
         ...     n.midi = x
-        ...     a.append(n)
+        ...     stream1.insert(n)
         >>> fx = lambda n: n.midi > 60
-        >>> b, c = a.splitByClass(note.Note, fx)
+        >>> b, c = stream1.splitByClass(note.Note, fx)
         >>> len(b)
         20
         >>> len(c)
@@ -1497,9 +1498,9 @@ class Stream(music21.Music21Object):
         b = Stream()
         for element in self.getElementsByClass(objName):
             if fx(element):
-                a.append(element)
+                a.insert(element)
             else:
-                b.append(element)
+                b.insert(element)
         return a, b
             
 
@@ -1528,7 +1529,7 @@ class Stream(music21.Music21Object):
         >>> d = Stream()
         >>> n = note.Note()
         >>> d.repeatAddNext(n, 10)
-        >>> d.repeatCopy(n, [x+.5 for x in range(10)])
+        >>> d.repeatInsert(n, [x+.5 for x in range(10)])
         >>> x = d.makeMeasures()
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
@@ -1707,7 +1708,7 @@ class Stream(music21.Music21Object):
         >>> n = note.Note()
         >>> n.quarterLength = 12
         >>> d.repeatAddNext(n, 10)
-        >>> d.repeatCopy(n, [x+.5 for x in range(10)])
+        >>> d.repeatInsert(n, [x+.5 for x in range(10)])
         >>> #x = d.makeMeasures()
         >>> #x = x.makeTies()
     
@@ -1889,7 +1890,7 @@ class Stream(music21.Music21Object):
         >>> n = note.QuarterNote()
         >>> n.duration.quarterLength
         1.0
-        >>> stream1.repeatCopy(n, [0, 10, 20, 30, 40])
+        >>> stream1.repeatInsert(n, [0, 10, 20, 30, 40])
         >>> dyn = music21.dynamics.Dynamic('ff')
         >>> stream1.insert(15, dyn)
         >>> sort1 = stream1.sorted
@@ -1969,8 +1970,8 @@ class Stream(music21.Music21Object):
         ## TODO: CLEF ORDER RULES, etc.
         
         >>> s = Stream()
-        >>> s.repeatCopy(note.Note("C#"), [0, 2, 4])
-        >>> s.repeatCopy(note.Note("D-"), [1, 3, 5])
+        >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
+        >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
         >>> s.isSorted
         False
         >>> g = ""
@@ -1989,7 +1990,7 @@ class Stream(music21.Music21Object):
         >>> farRight = note.Note("E")
         >>> farRight.priority = 5
         >>> farRight.offset = 2.0
-        >>> y.append(farRight)
+        >>> y.insert(farRight)
         >>> g = ""
         >>> for myElement in y:
         ...    g += "%s: %s; " % (myElement.offset, myElement.name)
@@ -2024,8 +2025,8 @@ class Stream(music21.Music21Object):
         returns a new Stream where no elements nest within other elements
         
         >>> s = Stream()
-        >>> s.repeatCopy(note.Note("C#"), [0, 2, 4])
-        >>> s.repeatCopy(note.Note("D-"), [1, 3, 5])
+        >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
+        >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
         >>> s.isSorted
         False
         >>> g = ""
@@ -2045,7 +2046,7 @@ class Stream(music21.Music21Object):
         >>> q = Stream()
         >>> for i in range(5):
         ...   p = Stream()
-        ...   p.repeatCopy(music21.Music21Object(), range(5))
+        ...   p.repeatInsert(music21.Music21Object(), range(5))
         ...   q.insert(i * 10, p) 
         >>> len(q)
         5
@@ -2061,7 +2062,7 @@ class Stream(music21.Music21Object):
         ...   q = Stream()
         ...   for i in range(5):
         ...      p = Stream()
-        ...      p.repeatCopy(music21.Music21Object(), range(5))
+        ...      p.repeatInsert(music21.Music21Object(), range(5))
         ...      q.insert(i * 10, p) 
         ...   r.insert(j * 100, q)
         >>> len(r)
@@ -2127,7 +2128,7 @@ class Stream(music21.Music21Object):
     def _getHighestOffset(self):
         '''
         >>> p = Stream()
-        >>> p.repeatCopy(note.Note("C"), range(5))
+        >>> p.repeatInsert(note.Note("C"), range(5))
         >>> p.highestOffset
         4.0
         '''
@@ -2151,13 +2152,12 @@ class Stream(music21.Music21Object):
     highestOffset = property(_getHighestOffset, doc='''
         Get start time of element with the highest offset in the Stream
 
-        >>> a = Stream()
+        >>> stream1 = Stream()
         >>> for x in [3, 4]:
-        ...     e = note.Note('G#')
-        ...     e.offset = x * 3
-        ...     a.append(e)
-        ...
-        >>> a.highestOffset
+        ...     n = note.Note('G#')
+        ...     n.offset = x * 3.0
+        ...     stream1.insert(n)
+        >>> stream1.highestOffset
         12.0
 
         ''')
@@ -2168,14 +2168,14 @@ class Stream(music21.Music21Object):
         >>> n = note.Note('A-')
         >>> n.quarterLength = 3
         >>> p1 = Stream()
-        >>> p1.repeatCopy(n, [0, 1, 2, 3, 4])
+        >>> p1.repeatInsert(n, [0, 1, 2, 3, 4])
         >>> p1.highestTime # 4 + 3
         7.0
         
         >>> q = Stream()
         >>> for i in [20, 0, 10, 30, 40]:
         ...    p = Stream()
-        ...    p.repeatCopy(n, [0, 1, 2, 3, 4])
+        ...    p.repeatInsert(n, [0, 1, 2, 3, 4])
         ...    q.insert(i, p) # insert out of order
         >>> len(q.flat)
         25
@@ -2231,15 +2231,15 @@ class Stream(music21.Music21Object):
     def _getLowestOffset(self):
         '''
         >>> p = Stream()
-        >>> p.repeatCopy(None, range(5))
+        >>> p.repeatInsert(None, range(5))
         >>> q = Stream()
-        >>> q.repeatCopy(p, range(0,50,10))
+        >>> q.repeatInsert(p, range(0,50,10))
         >>> len(q.flat)        
         25
         >>> q.lowestOffset
         0.0
         >>> r = Stream()
-        >>> r.repeatCopy(q, range(97, 500, 100))
+        >>> r.repeatInsert(q, range(97, 500, 100))
         >>> len(r.flat)
         125
         >>> r.lowestOffset
@@ -2265,15 +2265,15 @@ class Stream(music21.Music21Object):
     lowestOffset = property(_getLowestOffset, doc='''
         Get start time of element with the lowest offset in the Stream
 
-        >>> a = Stream()
-        >>> a.lowestOffset
+        >>> stream1 = Stream()
+        >>> stream1.lowestOffset
         0.0
         >>> for x in range(3,5):
-        ...     e = note.Note('G#')
-        ...     e.offset = x * 3
-        ...     a.append(e)
+        ...     n = note.Note('G#')
+        ...     n.offset = x * 3.0
+        ...     stream1.insert(n)
         ...
-        >>> a.lowestOffset
+        >>> stream1.lowestOffset
         9.0
 
         ''')
@@ -2319,7 +2319,7 @@ class Stream(music21.Music21Object):
 
     >>> a = Stream()
     >>> q = note.QuarterNote()
-    >>> a.repeatCopy(q, [0,1,2,3])
+    >>> a.repeatInsert(q, [0,1,2,3])
     >>> a.highestOffset
     3.0
     >>> a.highestTime
@@ -2447,12 +2447,12 @@ class Stream(music21.Music21Object):
     def _getMX(self):
         '''Create and return a musicxml score.
 
-        >>> a = note.Note()
-        >>> b = Measure()
-        >>> b.append(a)
-        >>> c = Stream()
-        >>> c.append(b)
-        >>> mxScore = c.mx
+        >>> n1 = note.Note()
+        >>> measure1 = Measure()
+        >>> measure1.insert(n1)
+        >>> str1 = Stream()
+        >>> str1.insert(measure1)
+        >>> mxScore = str1.mx
         '''
         #environLocal.printDebug('calling Stream._getMX')
 
@@ -2498,7 +2498,7 @@ class Stream(music21.Music21Object):
                 ht = obj.highestTime
                 if ht > highestTime:
                     highestTime = ht
-                midStream.append(obj)
+                midStream.insert(obj)
 
             refStream = Stream()
             refStream.insert(0, True) # placeholder at 0
@@ -2508,7 +2508,7 @@ class Stream(music21.Music21Object):
             # replace object inside of the stream
             for obj in midStream.getElementsByClass(Stream):
                 obj = obj.makeRests(refStream)
-                finalStream.append(obj)
+                finalStream.insert(obj)
 
             environLocal.printDebug(['handling multi-part Stream of length:',
                                     len(finalStream)])
@@ -2568,7 +2568,7 @@ class Stream(music21.Music21Object):
         instrumentObj.groups.append(partId)
 
         streamPart = Part() # create a part instance for each part
-        streamPart.append(instrumentObj) # add instrument at zero offset
+        streamPart.insert(instrumentObj) # add instrument at zero offset
 
         # offset is in quarter note length
         oMeasure = 0
@@ -2634,7 +2634,7 @@ class Stream(music21.Music21Object):
         values that represent dur spans, or start and end times.
 
         >>> a = Stream()
-        >>> a.repeatCopy(note.HalfNote(), range(5))
+        >>> a.repeatInsert(note.HalfNote(), range(5))
         >>> a._getDurSpan(a.flat)
         [(0.0, 2.0), (1.0, 3.0), (2.0, 4.0), (3.0, 5.0), (4.0, 6.0)]
         '''
@@ -2813,7 +2813,7 @@ class Stream(music21.Music21Object):
                 gapElement = music21.ElementWrapper(obj = None, offset = highestCurrentEndTime)
                 gapElement.duration = duration.Duration()
                 gapElement.duration.quarterLength = thisElement.offset - highestCurrentEndTime
-                gapStream.append(gapElement)
+                gapStream.insert(gapElement)
             highestCurrentEndTime = max(highestCurrentEndTime, thisElement.offset + thisElement.duration.quarterLength)
 
         if len(gapStream) == 0:
@@ -2837,26 +2837,26 @@ class Stream(music21.Music21Object):
             
     def getSimultaneous(self, includeNoneDur=True):
         '''Find and return any elements that start at the same time. 
-        >>> a = Stream()
+        >>> stream1 = Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 0
-        ...     a.append(n)
+        ...     stream1.insert(n)
         ...
-        >>> b = a.getSimultaneous()
+        >>> b = stream1.getSimultaneous()
         >>> len(b[0]) == 4
         True
-        >>> c = Stream()
+        >>> stream2 = Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
-        ...     c.append(n)
+        ...     stream2.insert(n)
         ...
-        >>> d = c.getSimultaneous()
+        >>> d = stream2.getSimultaneous()
         >>> len(d) == 0
         True
         '''
-        checkOverlap = False
+#        checkOverlap = False
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
                                                     includeNoneDur)
@@ -2879,7 +2879,7 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('quarter')
         ...     n.offset = x * 1
-        ...     a.append(n)
+        ...     a.insert(n)
         ...
         >>> d = a.getOverlaps(True, False) 
         >>> len(d)
@@ -2894,7 +2894,7 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
         ...     n.offset = x * 1
-        ...     a.append(n)
+        ...     a.insert(n)
         ...
         >>> d = a.getOverlaps() 
         >>> len(d[0])
@@ -2906,7 +2906,7 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x * 1
-        ...     a.append(n)
+        ...     a.insert(n)
         ...
         >>> # default is to not include coincident boundaries
         >>> d = a.getOverlaps() 
@@ -2932,7 +2932,7 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x * 1
-        ...     a.append(n)
+        ...     a.insert(n)
         ...
         >>> a.isSequence()
         False
@@ -3365,12 +3365,12 @@ class TestExternal(unittest.TestCase):
         b = Stream()
         q = note.QuarterNote()
         q.octave = 5
-        b.repeatCopy(q, [0,1,2,3])
+        b.repeatInsert(q, [0,1,2,3])
         
         bestC = b.bestClef(allowTreble8vb = True)
-        a.append(bestC)
-        a.append(ts)
-        a.append(b)
+        a.insert(0, bestC)
+        a.insert(0, ts)
+        a.insert(0, b)
         a.lily.showPNG()
 
     def testLilySemiComplex(self):
@@ -3400,14 +3400,17 @@ class TestExternal(unittest.TestCase):
         b.elements[2].editorial.comment.text = "a real C"
          
         bestC = b.bestClef(allowTreble8vb = True)
-        a.append(bestC)
-        a.append(ts)
-        a.append(b)
+        a.insert(0, bestC)
+        a.insert(0, ts)
+        a.insert(0, b)
         a.lily.showPNG()
-
 
         
     def testScoreLily(self):
+        '''
+        Test the lilypond output of various score operations.
+        '''
+
         import meter
         c = note.Note("C4")
         d = note.Note("D4")
@@ -3419,12 +3422,11 @@ class TestExternal(unittest.TestCase):
         s2.addNext(deepcopy(d))
         s2.addNext(deepcopy(c))
         score1 = Score()
-        score1.append(ts)
-        score1.append(s1)
-        score1.append(s2)
+        score1.insert(ts)
+        score1.insert(s1)
+        score1.insert(s2)
         score1.lily.showPNG()
         
-
 
     def testMXOutput(self):
         '''A simple test of adding notes to measures in a stream. 
@@ -3445,7 +3447,7 @@ class TestExternal(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatCopy(n, range(0,120,3))
+        a.repeatInsert(n, range(0,120,3))
         #a.show() # default time signature used
         
         a.insert( 0, meter.TimeSignature("5/4")  )
@@ -3472,8 +3474,8 @@ class TestExternal(unittest.TestCase):
             r.addNext(m)
 
         s = Stream() # container
-        s.append(q)
-        s.append(r)
+        s.insert(q)
+        s.insert(r)
         s.insert(0, meter.TimeSignature("3/4") )
         s.insert(3, meter.TimeSignature("5/4") )
         s.insert(8, meter.TimeSignature("3/4") )
@@ -3497,9 +3499,9 @@ class TestExternal(unittest.TestCase):
         d = a[3][30:40]
 
         s = Stream()
-        s.append(b)
-        s.append(c)
-        s.append(d)
+        s.insert(b)
+        s.insert(c)
+        s.insert(d)
         s.show()
 
 
@@ -3523,7 +3525,7 @@ class TestExternal(unittest.TestCase):
                 n.quarterLength = 1.5
                 p.addNext(n)
             p.offset = partOffset
-            s.append(p)
+            s.insert(p)
             partOffset += partOffsetShift
 
         s.show()
@@ -3540,7 +3542,7 @@ class TestExternal(unittest.TestCase):
             q.addNext(n)
 
         s = Stream() # container
-        s.append(q)
+        s.insert(q)
 
         s.insert(0, meter.TimeSignature("3/4") )
         s.insert(3, meter.TimeSignature("5/4") )
@@ -3619,7 +3621,7 @@ class Test(unittest.TestCase):
     def testAdd(self):
         a = Stream()
         for i in range(5):
-            a.append(music21.Music21Object())
+            a.insert(0, music21.Music21Object())
         self.assertTrue(a.isFlat)
         a[2] = note.Note("C#")
         self.assertTrue(a.isFlat)
@@ -3628,8 +3630,8 @@ class Test(unittest.TestCase):
 
     def testSort(self):
         s = Stream()
-        s.repeatCopy(note.Note("C#"), [0.0, 2.0, 4.0])
-        s.repeatCopy(note.Note("D-"), [1.0, 3.0, 5.0])
+        s.repeatInsert(note.Note("C#"), [0.0, 2.0, 4.0])
+        s.repeatInsert(note.Note("D-"), [1.0, 3.0, 5.0])
         self.assertFalse(s.isSorted)
         y = s.sorted
         self.assertTrue(y.isSorted)
@@ -3666,8 +3668,8 @@ class Test(unittest.TestCase):
 
         p2.offset = 20.0
 
-        s1.append(p1)
-        s1.append(p2)
+        s1.insert(p1)
+        s1.insert(p2)
 
         
         sf1 = s1.flat
@@ -3698,7 +3700,7 @@ class Test(unittest.TestCase):
             #for n in srcNew: pass
 
             srcNew.offset = x * 10 
-            midStream.append(srcNew)
+            midStream.insert(srcNew)
             self.assertEqual(srcNew.offset, x * 10)
 
         # no offset is set yet
@@ -3728,7 +3730,7 @@ class Test(unittest.TestCase):
             n = note.Note('G#')
             n.duration = duration.Duration('quarter')
             n.offset = x * 1
-            srcStream.append(n)
+            srcStream.insert(n)
 
         self.assertEqual(len(srcStream), 6)
         self.assertEqual(len(srcStream.flat), 6)
@@ -3739,7 +3741,7 @@ class Test(unittest.TestCase):
         for x in range(4):
             srcNew = deepcopy(srcStream)
             srcNew.offset = x * 10 
-            midStream.append(srcNew)
+            midStream.insert(srcNew)
 
         self.assertEqual(len(midStream), 4)
         environLocal.printDebug(['pre flat of mid stream'])
@@ -3750,7 +3752,7 @@ class Test(unittest.TestCase):
         for x in range(7):
             midNew = deepcopy(midStream)
             midNew.offset = x * 100 
-            farStream.append(midNew)
+            farStream.insert(midNew)
 
         self.assertEqual(len(farStream), 7)
         self.assertEqual(len(farStream.flat), 168)
@@ -3802,7 +3804,7 @@ class Test(unittest.TestCase):
             n.duration = duration.Duration()
             n.duration.quarterLength = dur
             n.offset = offset
-            a.append(n)
+            a.insert(n)
 
         includeNoneDur = True
         includeCoincidentBoundaries = False
@@ -3829,7 +3831,7 @@ class Test(unittest.TestCase):
             n.duration = duration.Duration()
             n.duration.quarterLength = dur
             n.offset = offset
-            a.append(n)
+            a.insert(n)
 
         includeNoneDur = True
         includeCoincidentBoundaries = True
@@ -3846,7 +3848,7 @@ class Test(unittest.TestCase):
     def testStreamDuration(self):
         a = Stream()
         q = note.QuarterNote()
-        a.repeatCopy(q, [0,1,2,3])
+        a.repeatInsert(q, [0,1,2,3])
         self.assertEqual(a.highestOffset, 3)
         self.assertEqual(a.highestTime, 4)
         self.assertEqual(a.duration.quarterLength, 4.0)
@@ -3865,12 +3867,12 @@ class Test(unittest.TestCase):
         b = Stream()
         q = note.QuarterNote()
         q.octave = 5
-        b.repeatCopy(q, [0,1,2,3])
+        b.repeatInsert(q, [0,1,2,3])
         
         bestC = b.bestClef(allowTreble8vb = True)
-        a.append(bestC)
-        a.append(ts)
-        a.append(b)
+        a.insert(bestC)
+        a.insert(ts)
+        a.insert(b)
         self.assertEqual(a.lily.value, u' { \\clef "treble"  \\time 3/4   { c\'\'4 c\'\'4 c\'\'4 c\'\'4  }   } ')
 
     def testLilySemiComplex(self):
@@ -3902,9 +3904,9 @@ class Test(unittest.TestCase):
         c.comment.text = "a real C"
         
         bestC = b.bestClef(allowTreble8vb = True)
-        a.append(bestC)
-        a.append(ts)
-        a.append(b)
+        a.insert(bestC)
+        a.insert(ts)
+        a.insert(b)
         self.assertEqual(a.lily.value,  u' { \\clef "bass"  \\time 3/8   { \\times 3/5 {ceses,8 ces,8 c,8_"a real C" cis,8 cisis,8}  }   } ')
 
     def testScoreLily(self):
@@ -3918,9 +3920,9 @@ class Test(unittest.TestCase):
         s2.addNext(deepcopy(d))
         s2.addNext(deepcopy(c))
         score1 = Score()
-        score1.append(ts)
-        score1.append(s1)
-        score1.append(s2)
+        score1.insert(ts)
+        score1.insert(s1)
+        score1.insert(s2)
         self.assertEqual(u" << \\time 2/4  \\new Staff  { c'4 d'4  }  \\new Staff  { d'4 c'4  }  >> ", score1.lily.value)
 
 
@@ -3972,8 +3974,8 @@ class Test(unittest.TestCase):
             r.addNext(m)
 
         s = Stream() # container
-        s.append(q)
-        s.append(r)
+        s.insert(q)
+        s.insert(r)
         s.insert(0, meter.TimeSignature("3/4") )
         s.insert(3, meter.TimeSignature("5/4") )
         s.insert(8, meter.TimeSignature("3/4") )
@@ -3987,9 +3989,9 @@ class Test(unittest.TestCase):
         d = a[3][30:40]
 
         s = Stream()
-        s.append(b)
-        s.append(c)
-        s.append(d)
+        s.insert(b)
+        s.insert(c)
+        s.insert(d)
 
 
 
@@ -4035,8 +4037,8 @@ class Test(unittest.TestCase):
             m.quarterLength = .5
             r.addNext(m)
         s = Stream() # container
-        s.append(q)
-        s.append(r)
+        s.insert(q)
+        s.insert(r)
 
         self.assertEqual(q.parent, s)
         self.assertEqual(r.parent, s)
@@ -4048,8 +4050,8 @@ class Test(unittest.TestCase):
         b = Stream()
         n = note.Note("G#")
         n.offset = 10
-        a.append(n)
-        b.append(n)
+        a.insert(n)
+        b.insert(n)
         # the objects elements has been transfered to each parent
         # stream in the same way
         self.assertEqual(n.getOffsetBySite(a), n.getOffsetBySite(b))
@@ -4116,9 +4118,8 @@ class Test(unittest.TestCase):
             r.addNext(m)
         s = Stream() # container
 
-        # probably should not use append here!
-        s.append(q)
-        s.append(r)
+        s.insert(q)
+        s.insert(r)
 
         instObj = q.getInstrument()
         self.assertEqual(instObj.partName, defaults.partName)
@@ -4143,7 +4144,7 @@ class Test(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatCopy(n, range(0,120,3))        
+        a.repeatInsert(n, range(0,120,3))        
         a.insert( 0, meter.TimeSignature("5/4")  )
         a.insert(10, meter.TimeSignature("2/4")  )
         a.insert( 3, meter.TimeSignature("3/16") )
@@ -4173,9 +4174,8 @@ class Test(unittest.TestCase):
             r.addNext(m)
         s = Stream() # container
 
-        # probably should not use append here!
-        s.append(q)
-        s.append(r)
+        s.insert(q)
+        s.insert(r)
 
         # copying the whole: this works
         w = deepcopy(s)
@@ -4203,13 +4203,13 @@ class Test(unittest.TestCase):
             m.quarterLength = .5
             r.addNext(m)
         src = Stream() # container
-        src.append(q)
-        src.append(r)
+        src.insert(q)
+        src.insert(r)
 
         a = Stream()
 
         for obj in src.getElementsByClass(Stream):
-            a.append(obj)
+            a.insert(obj)
 
         environLocal.printDebug(['expected length', len(a)])
         counter = 0
@@ -4238,7 +4238,7 @@ class Test(unittest.TestCase):
         offsets = [x.offset for x in a]
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
-        a.repeatCopy(n, range(0,120,3))        
+        a.repeatInsert(n, range(0,120,3))        
 
         b = a.getTimeSignatures()
         self.assertEqual(len(b), 5)
