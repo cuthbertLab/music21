@@ -379,7 +379,7 @@ class ProtoSpine(object):
 class HumdrumSpine(object):
     '''
     A HumdrumSpine is a collection of events arranged vertically that have a connection to each other
-    Each HumdrumSpine MUST have an id attached to it.
+    Each HumdrumSpine MUST have an id (numeric or string) attached to it.
 
     spine1 = HumdrumSpine(5, [SpineEvent1, SpineEvent2])
     spine1.beginningPosition = 5

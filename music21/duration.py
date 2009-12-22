@@ -993,12 +993,28 @@ class Tuplet(object):
     >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> print myTup.tupletMultiplier()
     0.8
+    >>> myTup2 = Tuplet(8, 5)
+    >>> print myTup2.tupletMultiplier()
+    0.625
+    >>> myTup2 = Tuplet(6, 4, "16th")
+    >>> print myTup2.durationActual.type
+    16th
     '''
 
     def __init__(self, *arguments, **keywords):
         #environLocal.printDebug(['creating Tuplet instance'])
 
         # necessary for some complex tuplets, interrupted, for instance
+
+        if len(arguments) == 3:
+            keywords['numberNotesActual'] = arguments[0]
+            keywords['numberNotesNormal'] = arguments[1]
+            keywords['durationActual'] = arguments[2]
+        elif len(arguments) == 2:
+            keywords['numberNotesActual'] = arguments[0]
+            keywords['numberNotesNormal'] = arguments[1]
+        
+        
         if 'tupletId' in keywords:
             self.tupletId = keywords['tupletId']
         else:
