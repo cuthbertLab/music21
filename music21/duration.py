@@ -999,6 +999,8 @@ class Tuplet(object):
     >>> myTup2 = Tuplet(6, 4, "16th")
     >>> print myTup2.durationActual.type
     16th
+    >>> print myTup2.tupletMultiplier()
+    0.666...
     '''
 
     def __init__(self, *arguments, **keywords):
@@ -1010,6 +1012,7 @@ class Tuplet(object):
             keywords['numberNotesActual'] = arguments[0]
             keywords['numberNotesNormal'] = arguments[1]
             keywords['durationActual'] = arguments[2]
+            keywords['durationNormal'] = arguments[2]
         elif len(arguments) == 2:
             keywords['numberNotesActual'] = arguments[0]
             keywords['numberNotesNormal'] = arguments[1]
