@@ -48,6 +48,27 @@ englishNames  = {'ppp': 'extremely soft',
                  'fff': 'extremely loud'} 
 
 
+def unitIntervalToName(n):
+    '''Given a unit interfal value, map to a dynamic name
+    '''
+    if n > 0 and n < .1:
+        return 'ppp'
+    elif n >= .1 and n < .2:
+        return 'pp'
+    elif n >= .2 and n < .35:
+        return 'p'
+    elif n >= .35 and n < .5:
+        return 'mp'
+    elif n >= .5 and n < .65:
+        return 'mf'
+    elif n >= .65 and n < .8:
+        return 'f'
+    elif n >= .8 and n < .9:
+        return 'ff'
+    elif n > .9:
+        return 'fff'
+
+
 class DynamicException(Exception):
     pass
 
@@ -62,11 +83,17 @@ class Dynamic(music21.Music21Object):
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
 
+        if not common.isStr(value):
+            # assume it is a number, try to convert
+            value = unitIntervalToName(value)
+
         self.value = value
+
         if self.value in longNames:
             self.longName = longNames[self.value]
         else:
             self.longName = None
+
         if self.value in englishNames:
             self.englishName = englishNames[self.value]
         else:
@@ -76,7 +103,7 @@ class Dynamic(music21.Music21Object):
         # position is needed as default positions are often incorrect
         self.posDefaultX = None
         self.posDefaultY = None
-        self.posRelativeX = None
+        self.posRelativeX = -36 # this value provides good 16th note alignment
         self.posRelativeY = None
         self.posPlacement = 'below' # attr in mxDirection, below or above
 

@@ -1179,7 +1179,6 @@ class MeterSequence(MeterTerminal):
         return MeterSequence(self._getLevelList(level))
 
 
-
     def getLevelWeight(self, level=0):
         '''The weightList is an array of weights found in the components.
         The MeterSequence has a ._weight attribute, but it is not used here
@@ -1767,6 +1766,7 @@ class TimeSignature(music21.Music21Object):
     def getAccent(self, qLenPos):
         '''Return true or false if the qLenPos is at the start of an accent
         division
+
         >>> a = TimeSignature('3/4', 3)
         >>> a.accent.partition([2,1])
         >>> a.accent
@@ -1786,10 +1786,38 @@ class TimeSignature(music21.Music21Object):
         return False
 
 
-    def getAccentLevel(self, qLenPos):
+    def setAccentWeight(self, weightList, level=0):
+        '''Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used.
+
+        If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.
+
+        >>> a = TimeSignature('4/4', 4)
+        >>> len(a.accent)
+        4
+        >>> a.setAccentWeight([.8, .2])
+        >>> a.getAccentWeight(0)
+        0.800...
+        >>> a.getAccentWeight(.5)
+        0.800...
+        >>> a.getAccentWeight(1)
+        0.200...
+        >>> a.getAccentWeight(2.5)
+        0.800...
+        >>> a.getAccentWeight(3.5)
+        0.200...
+        '''
+        if not common.isListLike(weightList):
+            weightList = [weightList]
+
+        msLevel = self.accent.getLevel(level)
+        for i in range(len(msLevel)):
+            msLevel[i].weight = weightList[i % len(weightList)]
+
+    def getAccentWeight(self, qLenPos, level=0):
         '''Given a qLenPos,  return an accent level. 
         '''
-        pass
+        msLevel = self.accent.getLevel(level)
+        return msLevel[msLevel.positionToIndex(qLenPos)].weight
 
     def getBeat(self, qLenPos):
         '''Given a quarterLenght position, get the beat, where beats count from 1
@@ -1805,6 +1833,7 @@ class TimeSignature(music21.Music21Object):
         '''
 
         return self.beat.positionToIndex(qLenPos) + 1
+
 
 
     def quarterPositionToBeat(self, currentQtrPosition = 0):
