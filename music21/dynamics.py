@@ -65,7 +65,7 @@ def unitIntervalToName(n):
         return 'f'
     elif n >= .8 and n < .9:
         return 'ff'
-    elif n > .9:
+    elif n >= .9:
         return 'fff'
 
 
