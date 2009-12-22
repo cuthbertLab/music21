@@ -1664,7 +1664,7 @@ class TimeSignature(music21.Music21Object):
                     # get a partial beam if we cannot come form a beam
                     if (beamPrevious == None or 
                         beamNumber not in beamPrevious.getNumbers()):
-                        environLocal.printDebug(['triggering partial left where a stop normally falls'])
+                        #environLocal.printDebug(['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
 
                 # here on we know that it is neither the first nor last
@@ -1686,7 +1686,7 @@ class TimeSignature(music21.Music21Object):
                     # not archetypeSpanNext
                     if (common.greaterThanOrEqual(startNext, 
                         archetypeSpan[1])):
-                        environLocal.printDebug(['matching partial left'])
+                        #environLocal.printDebug(['matching partial left'])
                         beamType = 'partial-left'
 
                 # last beams was active, last beamNumber was active,                # and it was stopped or was a partial-left
