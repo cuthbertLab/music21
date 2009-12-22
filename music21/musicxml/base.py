@@ -1467,7 +1467,7 @@ class Rest(MusicXMLElementList):
     # this could take a clef as an argument
     def setDefaults(self):
         displayStep = DisplayStep()
-        displayStep.set('charData', 'D')
+        displayStep.set('charData', 'B') # was D4
         displayOctave = DisplayOctave()
         displayOctave.set('charData', '4')
         self.append(displayStep)

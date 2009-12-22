@@ -332,7 +332,9 @@ class MeterTerminal(object):
         return ms    
 
     def subdivide(self, value):
-        '''Retuirn a MeterSequence
+        '''Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence.
+
+        This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object.
 
         If an integer is provided, assume it is a partition count
         '''
@@ -868,7 +870,9 @@ class MeterSequence(MeterTerminal):
             raise MeterException('Cannot set partition for unequal MeterSequences')
 
     def partition(self, value):
-        '''A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
+        ''' Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence.
+
+        A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
 
         >>> a = MeterSequence('5/4+3/8')
         >>> len(a)
@@ -1253,7 +1257,9 @@ class MeterSequence(MeterTerminal):
                     match = i
                     break
             else:    
-                if qLenPos >= start and qLenPos < end:
+                if (common.greaterThanOrEqual(qLenPos, start) and
+                    common.lessThan(qLenPos, end)):
+#                if qLenPos >= start and qLenPos < end:
                     match = i
                     break
             qPos += self[i].duration.quarterLength
@@ -1521,8 +1527,10 @@ class TimeSignature(music21.Music21Object):
     #---------------------------------------------------------------------------
     # access data for other processing
 
-    def getBeams(self, durList):
+    def getBeams(self, srcList):
         '''Given a qLen position and a list of Duration objects, return a list of Beams object.
+
+        Can alternatively provide a flat stream, from which Durations are extracted.
 
         Duration objects are assumed to be adjoining; offsets are not used.
 
@@ -1550,13 +1558,27 @@ class TimeSignature(music21.Music21Object):
         [<music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>]
         '''
 
+        if isinstance(srcList, music21.Music21Object):
+            durList = []
+            for n in srcList:
+                durList.append(n.duration)
+            srcStream = srcList
+        else: # a lost of durations
+            durList = srcList
+            srcStream = None
+
         if len(durList) <= 1:
             raise MeterException('length of durList must be 2 or greater, not %s' % len(durList))
 
         pos = 0 # assume we are always starting at zero w/n this meter
         beamsList = [] # hold complted Beams objects
-        for dur in durList:
+        for i in range(len(durList)):
+            # if a dur cannot be beamable under any circumstance, replace 
+            # it with None; this includes Rests
+            dur = durList[i]
             if dur.type not in self._beamableDurationTypes:
+                beamsList.append(None) # placeholder
+            elif srcStream != None and isinstance(srcStream[i], note.Rest):
                 beamsList.append(None) # placeholder
             else:
                 # we have a beamable duration
@@ -1620,6 +1642,16 @@ class TimeSignature(music21.Music21Object):
                 else:
                     archetypeSpanNext = archetype.positionToSpan(startNext)
 
+                # watch for a special case where a duration completely fills
+                # the archetype; this generally should not be beamed
+                if (common.almostEquals(start, archetypeSpan[0]) and
+                    common.almostEquals(end, archetypeSpan[1])):
+                    # increment position and continue loop
+                    beamsList[i] = None # replace with None! 
+                    pos += dur.quarterLength
+                    continue
+
+
                 # determine beamType
                 if i == 0: # if the first, we always start
                     beamType = 'start'
@@ -1655,6 +1687,7 @@ class TimeSignature(music21.Music21Object):
                     # not archetypeSpanNext
                     if (common.greaterThanOrEqual(startNext, 
                         archetypeSpan[1])):
+                        environLocal.printDebug(['matching partial left'])
                         beamType = 'partial-left'
 
                 # last beams was active, last beamNumber was active,                # and it was stopped or was a partial-left
@@ -1677,6 +1710,7 @@ class TimeSignature(music21.Music21Object):
                 # not sure what to do
                 # use common.lessThan to avoid floating point noise
                 elif common.lessThan(startNext, archetypeSpan[1]):
+                    #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan', dur.type, startNext, archetypeSpan])
                     beamType = 'continue'
 
                 # we stop if the next beam is not in the same beaming archetype
@@ -1694,7 +1728,7 @@ class TimeSignature(music21.Music21Object):
 #                     if beamNumber in beamPrevious.getNumbers():
 #                         environLocal.printDebug(['beamPrevious type', beamPrevious.getByNumber(beamNumber).type])
                         
-                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType', beamNumber, start, archetypeSpan, beamType])
+                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType', beamNumber, start, dur.type, archetypeSpan, beamType])
 
                 beams.setByNumber(beamNumber, beamType)
 

@@ -1130,6 +1130,12 @@ class Rest(GeneralNote):
     isRest = True
     name = "rest"
 
+    # TODO: may need to set a display pitch, 
+    # as this is necessary in mxl
+
+    def __init__(self, *arguments, **keywords):
+        GeneralNote.__init__(self)
+
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
 

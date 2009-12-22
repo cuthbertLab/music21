@@ -1181,7 +1181,8 @@ class Stream(music21.Music21Object):
         >>> len(s2) == 1
         True
         '''
-        return self.getElementsByClass(note.GeneralNote, chord.Chord)
+        # note: class names must be provuided in one argument as a list
+        return self.getElementsByClass([note.GeneralNote, chord.Chord])
 
     notes = property(getNotes)
 
@@ -1885,13 +1886,18 @@ class Stream(music21.Music21Object):
     
             # environLocal.printDebug(['beaming with ts', ts])
             noteStream = m.getNotes()
+            if len(noteStream) <= 1: 
+                continue # nothing to beam
             durList = []
             for n in noteStream:
                 durList.append(n.duration)
-            if len(durList) <= 1: 
-                continue
-            beamsList = lastTimeSignature.getBeams(durList)
+            # getBeams can take a list of Durations; however, this cannot
+            # distinguish a Note from a Rest; thus, we can submit a flat 
+            # stream of note or note-like entities; will return
+            # the saem lost of beam objects
+            beamsList = lastTimeSignature.getBeams(noteStream)
             for i in range(len(noteStream)):
+                # this may try to assign a beam to a Rest
                 noteStream[i].beams = beamsList[i]
             # apply tuple types in place
             duration.updateTupletType(durList)

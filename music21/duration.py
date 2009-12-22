@@ -1215,7 +1215,6 @@ class Tuplet(object):
         else: # set to type of duration
             self.setDurationType(musicXMLTypeToType(mxNote.get('type')))
 
-
         mxNotations = mxNote.get('notations')
         #environLocal.printDebug(['got mxNotations', mxNotations])
 

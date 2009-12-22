@@ -46,8 +46,8 @@ partGroupAbbreviation = 'PG'
 
 durationType = 'quarter'
 
-instrumentName = 'recorder'
-partName = 'recorder'
+instrumentName = ''
+partName = ''
 partId = 'P1'
 
 keyFifths = 0
