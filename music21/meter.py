@@ -223,7 +223,7 @@ class TimeSignatureException(MeterException):
 
 #-------------------------------------------------------------------------------
 class MeterTerminal(object):
-    '''A meter is a nestable primitive of rhythmic division
+    '''A MeterTerminal is a nestable primitive of rhythmic division
 
     >>> a = MeterTerminal('2/4')
     >>> a.duration.quarterLength
@@ -288,6 +288,7 @@ class MeterTerminal(object):
 
     def ratioEqual(self, other):        
         '''Compare the numerator and denominator of another object.
+        Note that these have to be exact matches; 3/4 is not the same as 6/8
         '''
         if other == None: return False
         if (other.numerator == self.numerator and 
@@ -829,7 +830,22 @@ class MeterSequence(MeterTerminal):
             for n in numeratorList:
                 optMatch.append('%s/%s' % (n, self.denominator))
 
-        else: # search options
+        # low integer multiples
+        elif sum(numeratorList) == self.numerator * 2:
+            optMatch = []
+            for n in numeratorList:
+                optMatch.append('%s/%s' % (n, self.denominator * 2))
+        elif sum(numeratorList) == self.numerator * 3:
+            optMatch = []
+            for n in numeratorList:
+                optMatch.append('%s/%s' % (n, self.denominator * 3))
+        elif sum(numeratorList) == self.numerator * 4:
+            optMatch = []
+            for n in numeratorList:
+                optMatch.append('%s/%s' % (n, self.denominator * 4))
+
+        # last resot: search options
+        else: 
             opts = self._getOptions()
             optMatch = None
             for opt in opts:
@@ -838,6 +854,7 @@ class MeterSequence(MeterTerminal):
                 if nFound == numeratorList:
                     optMatch = opt
                     break
+
         # if a n/d match, now set this MeterSequence
         if optMatch != None:
             targetWeight = self.weight
@@ -1670,7 +1687,7 @@ class TimeSignature(music21.Music21Object):
                 # here on we know that it is neither the first nor last
 
                 # if last beam was not defined, we need to either
-                # start or have a partial beam; what determines this?
+                # start or have a partial left beam
                 # or, if beam number was not active in last beams 
                 elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
                     beamType = 'start'
@@ -1735,6 +1752,7 @@ class TimeSignature(music21.Music21Object):
                 pos += dur.quarterLength
 
         return beamsList
+
 
     def setDisplay(self, value, partitionRequest=None):
         '''Set an indendent display value

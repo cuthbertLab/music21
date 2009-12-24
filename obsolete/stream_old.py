@@ -55,7 +55,7 @@ class Groups(object):
         return repr(self._ids)
 
     def append(self, groupId):
-        '''Add a group identifier string to an Element
+        '''Add a group identifier string to an ElementWrapper
 
         >>> a = Groups()
         >>> a.append('red')
@@ -95,7 +95,7 @@ class Groups(object):
 
 
     def __eq__(self, other):
-        '''Test Element equality.
+        '''Test ElementWrapper equality.
         '''
         if not isinstance(other, Groups):
             return False
@@ -141,14 +141,14 @@ class Groups(object):
 
 
 #-------------------------------------------------------------------------------
-class Element(object):
+class ElementWrapper(object):
     '''An individual object within a stream.
 
     __slots__ might be defined for efficiency?
 
     groups is an optional list identifying internal subcollections
         to which this element belongs.
-    id is an optional string identifying this Element
+    id is an optional string identifying this ElementWrapper
     '''
     def __init__(self, obj=None):
         self._obj = obj # object stored here
@@ -166,7 +166,7 @@ class Element(object):
 
         Need a parameter to determine if we clone contained object or not.
         
-        >>> a = Element()
+        >>> a = ElementWrapper()
         >>> n = note.Note('A-')
         >>> n.quarterLength = 2
         >>> a.obj = n
@@ -179,7 +179,7 @@ class Element(object):
 
 
         >>> data = [3,4,5]
-        >>> a = Element(data)
+        >>> a = ElementWrapper(data)
         >>> a.offset = 3
         >>> b = a.clone(False)
         >>> b.obj
@@ -202,7 +202,7 @@ class Element(object):
         [3, 4, 5, 6, 7]
 
         >>> data = duration.Duration()
-        >>> a = Element(data)
+        >>> a = ElementWrapper(data)
         >>> b = a.clone()
         >>> b.obj.quarterLength = 30
         >>> a.obj.quarterLength 
@@ -213,7 +213,7 @@ class Element(object):
         56.0
 
         '''
-        new = Element()
+        new = ElementWrapper()
         if hasattr(self._obj, 'clone'):
             if copyObj:
                 new._obj = self._obj.clone()
@@ -244,26 +244,26 @@ class Element(object):
 
 
     def __eq__(self, other):
-        '''Test Element equality.
+        '''Test ElementWrapper equality.
 
         This does not look at Parents. 
 
-        >>> a = Element()
+        >>> a = ElementWrapper()
         >>> a.offset = 3
-        >>> b = Element()
+        >>> b = ElementWrapper()
         >>> b.offset = 5
-        >>> c = Element()
+        >>> c = ElementWrapper()
         >>> c.offset = 3
         >>> a == c
         True
         >>> id(a) != id(c)
         True
 
-        >>> a = Element()
+        >>> a = ElementWrapper()
         >>> a == None
         False
         '''
-        if other == None or not isinstance(other, Element):
+        if other == None or not isinstance(other, ElementWrapper):
             return False
 
         if (self._obj == other._obj and self._offset == other._offset and 
@@ -276,7 +276,7 @@ class Element(object):
     def __ne__(self, other):
         '''
         '''
-        if other == None or not isinstance(other, Element):
+        if other == None or not isinstance(other, ElementWrapper):
             return True
         if (self._obj == other._obj and self._offset == other._offset and 
             self._priority == other._priority and self.id == other.id and
@@ -295,7 +295,7 @@ class Element(object):
     def _setOffset(self, offset):
         '''Set the offset as a quarterNote length
 
-        >>> a = Element(note.Note('A#'))
+        >>> a = ElementWrapper(note.Note('A#'))
         >>> a.offset = 23
         >>> a.offset
         23
@@ -322,7 +322,7 @@ class Element(object):
     def _getDuration(self):
         '''Gets the duration of the component object if available, otherwise
         returns None.
-        >>> a = Element()
+        >>> a = ElementWrapper()
         >>> n = note.Note('F#')
         >>> n.quarterLength = 2
         >>> n.duration.quarterLength 
@@ -391,7 +391,7 @@ class Element(object):
         same offset.  This produces the familiar order of materials at the
         start of a musical score.
         
-        >>> a = Element()
+        >>> a = ElementWrapper()
         >>> a.priority = 3
         >>> a.priority = 'high'
         Traceback (most recent call last):
@@ -411,12 +411,12 @@ class Element(object):
         '''This might be used to quickly extract a number of elements by classes
         from a Stream
 
-        >>> a = Element(None)
+        >>> a = ElementWrapper(None)
         >>> a.isClass(note.Note)
         False
         >>> a.isClass(types.NoneType)
         True
-        >>> b = Element(note.Note('A4'))
+        >>> b = ElementWrapper(note.Note('A4'))
         >>> b.isClass(note.Note)
         True
         >>> b.isClass(types.NoneType)
@@ -431,7 +431,7 @@ class Element(object):
 
 
 #-------------------------------------------------------------------------------
-class Stream(Element):
+class Stream(ElementWrapper):
     '''This is basic unit for timed Elements. In most cases these timed
     Elements will be of the same class of things; notes, clefs, etc. This is
     not required. If Elements in Streams have a duration attribute, it will
@@ -452,9 +452,9 @@ class Stream(Element):
         '''
         
         '''
-        Element.__init__(self)
+        ElementWrapper.__init__(self)
 
-        # self._elements stores Element objects. These are not ordered.
+        # self._elements stores ElementWrapper objects. These are not ordered.
         # this should have a public attribute/property self.elements
         self._elements = []
         self._obj = self._elements
@@ -471,7 +471,7 @@ class Stream(Element):
         # store a sorted version of elements that is only updated 
         # when requested and out of date
         self._unsorted = True
-        # this stores a flat representation with offset, priority, dur, Element
+        # this stores a flat representation with offset, priority, dur, ElementWrapper
         self._elementsSorted = None 
 
         self._index = 0
@@ -526,12 +526,12 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         >>> b = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     b.append(e)
         >>> c = a + b
@@ -578,15 +578,15 @@ class Stream(Element):
 
     def addNext(self, other, offsetShift=0):
         '''Add objects or Elements (including other Streams) to the Stream after 
-        the Element with the lastly added onset.  The new element will have an offset equal to the last Element's offset plus the last Element's duration (that is, it will start directly after the last Element ends). 
+        the ElementWrapper with the lastly added onset.  The new element will have an offset equal to the last ElementWrapper's offset plus the last ElementWrapper's duration (that is, it will start directly after the last ElementWrapper ends). 
         If last object has no duration, the 
         new object will be added at the same offset as the last.
 
-        Optional offsetShift will put a gap between the previous last Element 
+        Optional offsetShift will put a gap between the previous last ElementWrapper 
         an the new element
         
-        QUESTION: if we create a new Element should it have the same groups
-        as the Element it is following?  I vote yes, since that makes easy things
+        QUESTION: if we create a new ElementWrapper should it have the same groups
+        as the ElementWrapper it is following?  I vote yes, since that makes easy things
         easier but hard things still possible.
 
         >>> a = Stream()
@@ -610,10 +610,10 @@ class Stream(Element):
         False
         '''
         # assume other is an element or stream
-        if isinstance(other, Element): # if an element or a stream
+        if isinstance(other, ElementWrapper): # if an element or a stream
             element = other
         else: # create an element for this stream
-            element = Element(other)
+            element = ElementWrapper(other)
 
         if self._view in ['shallow']:
             # if shallow, simply get the offset + dur of the last-added
@@ -635,7 +635,7 @@ class Stream(Element):
 
 
     def append(self, item):
-        '''Append an Element to the Stream. 
+        '''Append an ElementWrapper to the Stream. 
 
         >>> a = Stream()
         >>> a.append(None)
@@ -643,8 +643,8 @@ class Stream(Element):
         >>> len(a)
         2
         '''
-        if not isinstance(item, Element): # if not an element, embed
-            element = Element(item)
+        if not isinstance(item, ElementWrapper): # if not an element, embed
+            element = ElementWrapper(item)
         else:
             element = item
         # store light copys to last
@@ -656,13 +656,13 @@ class Stream(Element):
 
 
     def insertAtOffset(self, item, offset):
-        '''Append an object with a given offset. Wrap in an Element and 
+        '''Append an object with a given offset. Wrap in an ElementWrapper and 
         set offset time. 
 
         >>> a = Stream()
         '''
-        if not isinstance(item, Element): # if not an element, embed
-            element = Element(item)
+        if not isinstance(item, ElementWrapper): # if not an element, embed
+            element = ElementWrapper(item)
         else:
             element = item
         element.offset = offset
@@ -684,7 +684,7 @@ class Stream(Element):
 
 
     #---------------------------------------------------------------------------
-    # manipulating all Element id attributes
+    # manipulating all ElementWrapper id attributes
 
     def setIdElements(self, id, classFilter=None):
         '''Set all componenent Elements to the given id. Do not change the id
@@ -754,7 +754,7 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         >>> len(a)
@@ -813,7 +813,7 @@ class Stream(Element):
 
 
     def __getitem__(self, key):
-        '''Get an Element from the stream in sorted flat order.
+        '''Get an ElementWrapper from the stream in sorted flat order.
 
         If getting an item in the unsorted, nested order, we can only access 
         Elements on the top-most level of self._elements. 
@@ -868,7 +868,7 @@ class Stream(Element):
         '''
         if scope == None:
             scope = self
-        # get Element at first index
+        # get ElementWrapper at first index
         post = scope._elements[indexList[0]]
         if len(indexList) == 1:
             # pop out the object at this index
@@ -876,7 +876,7 @@ class Stream(Element):
         else:
             indexList = indexList[1:] # crop indices
             # call with what is left of index and the last found
-            # Element as scope
+            # ElementWrapper as scope
             post = self._delete(indexList, post)
 
         scope._unsorted = True
@@ -907,14 +907,14 @@ class Stream(Element):
         '''
         if scope == None:
             scope = self
-        # get Element at first index
+        # get ElementWrapper at first index
         post = scope._elements[indexList[0]]
         if len(indexList) == 1:
             return post # return object if no more indices
         else:
             indexList = indexList[1:] # crop indices
             # call with what is left of index and the last found
-            # Element as scope
+            # ElementWrapper as scope
             post = self._access(indexList, post)
         return post
 
@@ -1008,20 +1008,20 @@ class Stream(Element):
         >>> b[6][4].id = 'testing'
         >>> b.flat.index(b[6][4])
         64
-        >>> b.flat[64] = Element(None)
+        >>> b.flat[64] = ElementWrapper(None)
         >>> b[6][4].id == None
         True
         '''
         if self._view in ['shallow']:
-            if not isinstance(value, Element): # if not an element, embed
-                self._elements[index] = Element(value)
+            if not isinstance(value, ElementWrapper): # if not an element, embed
+                self._elements[index] = ElementWrapper(value)
             else:
                 self._elements[index] = value
         elif self._view in ['flat']:
             dst = self.getElements()[index]
             address = self._find(dst)
-            if not isinstance(value, Element): # if not an element, embed
-                value = Element(value)
+            if not isinstance(value, ElementWrapper): # if not an element, embed
+                value = ElementWrapper(value)
                 # get old offset if not an element
                 value.offset = dst.offset
 
@@ -1179,8 +1179,8 @@ class Stream(Element):
         >>> a[10].offset
         10
         '''
-        if not isinstance(item, Element): # if not an element, embed
-            element = Element(item)
+        if not isinstance(item, ElementWrapper): # if not an element, embed
+            element = ElementWrapper(item)
         else:
             element = item
 
@@ -1280,7 +1280,7 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         ...
@@ -1404,7 +1404,7 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(3,5):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         ...
@@ -1437,7 +1437,7 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(3,5):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         ...
@@ -1470,7 +1470,7 @@ class Stream(Element):
         >>> for x in range(0,4):
         ...     n = note.Note('G#')
         ...     n.duration.quarterLength = 2
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x
         ...     a.append(e)
         ...
@@ -1495,9 +1495,9 @@ class Stream(Element):
         to get to the next elemnt
 
         >>> a = Stream()
-        >>> b = Element()
+        >>> b = ElementWrapper()
         >>> b.offset = 3
-        >>> c = Element()
+        >>> c = ElementWrapper()
         >>> c.offset = 9
         >>> a.append(b)
         >>> a.append(c)
@@ -1509,7 +1509,7 @@ class Stream(Element):
         # this will return the self._elementsSorted list
         # unless it needs to be sorted
         if index >= self.__len__():
-            raise StreamException('no Element at stream position %s' % index)
+            raise StreamException('no ElementWrapper at stream position %s' % index)
 
         if index == self.__len__() - 1:
             # this is the last index
@@ -1542,7 +1542,7 @@ class Stream(Element):
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('quarter')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 2
         ...     c.append(e)
         ...
@@ -1582,7 +1582,7 @@ class Stream(Element):
 
 
 
-    # override methods from Element to provide acess to a duration
+    # override methods from ElementWrapper to provide acess to a duration
     # object that represents the duration of this Stream
     def _getDuration(self):
         '''Gets the duration of the component object if available, otherwise
@@ -1610,10 +1610,10 @@ class Stream(Element):
         '''Set the offset as a quarterNote length
         '''
         # call base class
-        Element._setOffset(self, offset)
+        ElementWrapper._setOffset(self, offset)
         self._unsorted = True
 
-    offset = property(Element._getOffset, _setOffset, doc='''
+    offset = property(ElementWrapper._getOffset, _setOffset, doc='''
         >>> a = Stream()
         >>> a.fillNone(6)
         >>> a._getOffset()
@@ -1819,7 +1819,7 @@ class Stream(Element):
 
         >>> a = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 0
         ...     a.append(e)
         ...
@@ -1829,7 +1829,7 @@ class Stream(Element):
 
         >>> c = Stream()
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     c.append(e)
         ...
@@ -1860,7 +1860,7 @@ class Stream(Element):
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('quarter')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 1
         ...     a.append(e)
         ...
@@ -1880,7 +1880,7 @@ class Stream(Element):
         >>> for x in [0,0,0,0,13,13,13]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 1
         ...     a.append(e)
         ...
@@ -1895,7 +1895,7 @@ class Stream(Element):
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 1
         ...     a.append(e)
         ...
@@ -1926,7 +1926,7 @@ class Stream(Element):
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 1
         ...     a.append(e)
         ...
@@ -1955,7 +1955,7 @@ class Stream(Element):
     #---------------------------------------------------------------------------
     # getting new streams and elements from streams
 
-    # neew method: getObjectsByClass that returns Element.obj
+    # neew method: getObjectsByClass that returns ElementWrapper.obj
     # shold sort; return a list not a Stream    
     # never return a list of Elements, always return a Stream
     # decomposer streams into losts of component objects
@@ -1969,7 +1969,7 @@ class Stream(Element):
         >>> a = Stream()
         >>> a.fillNone(10) # adds Elements with obj == None
         >>> for x in range(4):
-        ...     e = Element(note.Note('G#'))
+        ...     e = ElementWrapper(note.Note('G#'))
         ...     e.offset = x * 3
         ...     a.append(e)
         >>> found = a.getElementsByClass(note.Note)
@@ -2308,7 +2308,7 @@ class NoteStream(Stream):
         >>> for x in range(len(pitches)):
         ...     n = note.Note(pitches[x])
         ...     n.duration = duration.Duration('quarter')
-        ...     e = Element(n)
+        ...     e = ElementWrapper(n)
         ...     e.offset = x * 3
         ...     a.append(e)
         >>> found = a.getAccidentalDistribution()
@@ -2708,8 +2708,8 @@ class TestSpeed(object):
 
     def __init__(self):
         import stream_msc
-        self.classNames = [(Stream, Element), 
-                           (stream_msc.Stream, stream_msc.Element)]
+        self.classNames = [(Stream, ElementWrapper), 
+                           (stream_msc.Stream, stream_msc.ElementWrapper)]
         self.results = {}
 
     def _timeFlatCreation(self):
@@ -2850,7 +2850,7 @@ class Test(unittest.TestCase):
         for x in range(6):
             n = note.Note('G#')
             n.duration = duration.Duration('quarter')
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = x * 1
             srcStream.append(e)
 
@@ -2901,7 +2901,7 @@ class Test(unittest.TestCase):
         for x in range(6):
             n = note.Note('G#')
             n.duration = duration.Duration('quarter')
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = x * 1
             a.append(e)
         
@@ -2909,7 +2909,7 @@ class Test(unittest.TestCase):
         for x in range(6):
             n = note.Note('G#')
             n.duration = duration.Duration('quarter')
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = x * 10
             b.append(e)
 
@@ -2918,7 +2918,7 @@ class Test(unittest.TestCase):
         for x in range(6):
             n = note.Note('G#')
             n.duration = duration.Duration('quarter')
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = x * 100
             c.append(e)
 
@@ -2950,7 +2950,7 @@ class Test(unittest.TestCase):
             n = note.Note('G#')
             n.duration = duration.Duration()
             n.duration.quarterLength = dur
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = offset
             a.append(e)
 
@@ -2978,7 +2978,7 @@ class Test(unittest.TestCase):
             n = note.Note('G#')
             n.duration = duration.Duration()
             n.duration.quarterLength = dur
-            e = Element(n)
+            e = ElementWrapper(n)
             e.offset = offset
             a.append(e)
 
@@ -3504,7 +3504,7 @@ if __name__ == "__main__":
 #         for x in range(6):
 #             n = note.Note('G#')
 #             n.duration = duration.Duration('quarter')
-#             e = Element(n)
+#             e = ElementWrapper(n)
 #             e.offset = x * 1
 #             a.append(e)
 #         
@@ -3512,7 +3512,7 @@ if __name__ == "__main__":
 #         for x in range(6):
 #             n = note.Note('G#')
 #             n.duration = duration.Duration('quarter')
-#             e = Element(n)
+#             e = ElementWrapper(n)
 #             e.offset = x * 10
 #             b.append(e)
 # 
@@ -3521,7 +3521,7 @@ if __name__ == "__main__":
 #         for x in range(6):
 #             n = note.Note('G#')
 #             n.duration = duration.Duration('quarter')
-#             e = Element(n)
+#             e = ElementWrapper(n)
 #             e.offset = x * 100
 #             c.append(e)
 # 
@@ -3659,7 +3659,7 @@ if __name__ == "__main__":
 #        else:
 #            indexList = indexList[1:] # crop indices
 #            # call with what is left of index and the last found
-#            # Element as scope
+#            # ElementWrapper as scope
 #            post = self._delete(indexList, post)
 #
 #        scope._unsorted = True
@@ -3690,14 +3690,14 @@ if __name__ == "__main__":
 #        '''
 #        if scope == None:
 #            scope = self
-#        # get Element at first index
+#        # get ElementWrapper at first index
 #        post = scope._elements[indexList[0]]
 #        if len(indexList) == 1:
 #            return post # return object if no more indices
 #        else:
 #            indexList = indexList[1:] # crop indices
 #            # call with what is left of index and the last found
-#            # Element as scope
+#            # ElementWrapper as scope
 #            post = self._access(indexList, post)
 #        return post
 #
@@ -3758,7 +3758,7 @@ if __name__ == "__main__":
 #
 #        Note: the challenge is finding where in _elements the element is
 #        '''
-#        element = self.getSorted()[index][3] # item 3 is Element
+#        element = self.getSorted()[index][3] # item 3 is ElementWrapper
 #        # transverse through _elements to find this element
 #        
 #        self._elements
@@ -3776,7 +3776,7 @@ if __name__ == "__main__":
 ##         >>> a = Stream()
 ##         >>> a.repeatCopy(note.Note('A'), range(20))
 ##         >>> a.repeatCopy(None, range(10,20))
-##         >>> e = Element(None)
+##         >>> e = ElementWrapper(None)
 ##         >>> e.offset = 12
 ##         >>> a.index(e)
 ##         10
