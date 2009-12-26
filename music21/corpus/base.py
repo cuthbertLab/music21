@@ -40,6 +40,7 @@ from music21.corpus.mozart import k458
 from music21.corpus.schumann import opus41no1
 
 from music21.corpus import luca
+from music21.corpus import bach
 
 
 MODULES = [
@@ -59,6 +60,7 @@ MODULES = [
 
             opus41no1,
             luca,
+            bach,
     ]
 
 
@@ -206,6 +208,7 @@ paths = getPaths()
 beethoven = getComposer('beethoven')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
+bach = getComposer('bach')
 
 
 

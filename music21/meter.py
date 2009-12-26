@@ -27,8 +27,8 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 
-validDenominators = [1,2,4,8,16,32,64] # in order
-# also [pow(2,x) for x in range(7)]
+validDenominators = [1,2,4,8,16,32,64,128] # in order
+# also [pow(2,x) for x in range(8)]
 
 
 def slashToFraction(value):
