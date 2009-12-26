@@ -3333,8 +3333,26 @@ class Measure(Stream):
     musicxml = property(_getMusicXML, _setMusicXML)
 
 #-------------------------------------------------------------------------------
+class Voice(Stream):
+    '''
+    A Stream subclass for declaring that all the music in the
+    stream belongs to a certain "voice" for analysis or display
+    purposes.
+    
+    Note that both Finale's Layers and Voices as concepts are
+    considered Voices here.
+    '''
+    pass
+
 class Part(Stream):
-    '''A stream subclass for containing parts.
+    '''A Stream subclass for designating music that is
+    considered a single part.
+    
+    May be enclosed in a staff (for instance, 2nd and 3rd trombone
+    on a single staff), may enclose staves (piano treble and piano bass),
+    or may not enclose or be enclosed by a staff (in which case, it
+    assumes that this part fits on one staff and shares it with no other
+    part
     '''
 
     def _getLily(self):
@@ -3344,8 +3362,56 @@ class Part(Stream):
     
     lily = property(_getLily)
 
+class Staff(Stream):
+    '''
+    A Stream subclass for designating music on a single staff
+    '''
+    
+    staffLines = 5
+
+class Performer(Stream):
+    '''
+    A Stream subclass for designating music to be performed by a
+    single Performer.  Should only be used when a single performer
+    performs on multiple parts.  E.g. Bass Drum and Triangle on separate
+    staves performed by one player.
+
+    a Part + changes of Instrument is fine for designating most cases
+    where a player changes instrument in a piece.  A part plus staves
+    with individual instrument changes could also be a way of designating
+    music that is performed by a single performer (see, for instance
+    the Piano doubling Celesta part in Lukas Foss's Time Cycle).  The
+    Performer Stream-subclass could be useful for analyses of, for instance,
+    how 5 percussionists chose to play a piece originally designated for 4
+    (or 6) percussionists in the score.
+    '''
+    pass
+
+
+class System(Stream):
+    '''Totally optional: designation that all the music in this Stream
+    belongs in a single system.
+    '''
+    systemNumber = 0
+    systemNumbering = "Score" # or Page; when do system numbers reset?
+
+class Page(Stream):
+    '''
+    Totally optional: designation that all the music in this Stream
+    belongs on a single notated page
+    '''
+    pageNumber = 0
+    
 class Score(Stream):
-    """A Stream subclass for handling multi-part music."""
+    """A Stream subclass for handling multi-part music.
+    
+    Absolutely optional (the largest containing Stream in a piece could be
+    a generic Stream, or a Part, or a Staff).  And Scores can be
+    embedded in other Scores (in fact, our original thought was to call
+    this class a Fragment because of this possibility of continuous
+    embedding), but we figure that many people will like calling the largest
+    container a Score and that this will become a standard.
+    """
 
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)

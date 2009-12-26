@@ -56,4 +56,5 @@ def bergEx01():
 
     score.show()
 
-bergEx01()
+if __name__ == '__main__':
+    bergEx01()
