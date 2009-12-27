@@ -1144,6 +1144,8 @@ class MeterSequence(MeterTerminal):
 
     def _getDepth(self):
         '''Return how many unique levels deep this part is
+        
+        This should be optimized to store values unless the structure has changed.
         '''
         depth = 0 # start with 0, will count this level
     
@@ -1226,6 +1228,33 @@ class MeterSequence(MeterTerminal):
         <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
         return MeterSequence(self._getLevelList(level, flat))
+
+    def getLevelSpan(self, level=0):
+        '''For a given level, return the time span of each terminal or sequnece
+
+        >>> b = MeterSequence('4/4', 4)
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        >>> b.getLevelSpan(0)
+        [(0.0, 1.0), (1.0, 2.0), (2.0, 3.0), (3.0, 4.0)]
+        >>> b.getLevelSpan(1)
+        [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.5), (3.5, 4.0)]
+        >>> b.getLevelSpan(2)
+        [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]
+        ''' 
+        ms = self._getLevelList(level, flat=True)
+        map = []
+        pos = 0.0
+
+        for i in range(len(ms)):
+            start = pos
+            end = pos + ms[i].duration.quarterLength
+            map.append((start, end))
+            pos += ms[i].duration.quarterLength
+        return map
 
 
     def getLevelWeight(self, level=0):
@@ -1398,15 +1427,49 @@ class MeterSequence(MeterTerminal):
         return start, end
 
 
-    def positionToDepth(self, qLenPos):
-        '''Given a lenPos, return the maximum available depth at this position
+    def positionToDepth(self, qLenPos, align='quantize'):
+        '''Given a qLenPos, return the maximum available depth at this position
 
-        >>> a = MeterSequence('3/4', 3)
-
+        >>> b = MeterSequence('4/4', 4)
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        >>> b.positionToDepth(0)
+        3
+        >>> b.positionToDepth(0.25) # quantizing active by default
+        3
+        >>> b.positionToDepth(1)
+        3
+        >>> b.positionToDepth(1.5)
+        2
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s' % qLenPos)
-        return len(self.positionToAddress(qLenPos))
+
+        # need to quantize by lowest level
+        mapMin = self.getLevelSpan(self.depth-1)
+        msMin = self.getLevel(self.depth-1)
+        qStart, qEnd = mapMin[msMin.positionToIndex(qLenPos)]
+        if align == 'quantize':
+            posMatch = qStart
+        else:
+            posMatch = qLenPos
+
+        score = 0
+        for level in range(self.depth):
+            map = self.getLevelSpan(level) # get map for each level
+            for start, end in map:
+                if align in ['start', 'quantize']:
+                    srcMatch = start
+                elif align == 'end':
+                    srcMatch = end
+                if common.almostEquals(srcMatch, posMatch):
+                    score += 1
+
+        return score
+            
 
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
@@ -1914,10 +1977,34 @@ class TimeSignature(music21.Music21Object):
         return beatIndex + 1, qLenPos - start
 
 
+    def getBeatDepth(self, qLenPos, align='quantize'):
+        '''
+        >>> a = TimeSignature('3/4', 3)
+        >>> a.getBeatDepth(0)
+        1
+        >>> a.getBeatDepth(1)
+        1
+        >>> a.getBeatDepth(2)
+        1
+
+        >>> b = TimeSignature('3/4', 1)
+        >>> b.beat[0] = b.beat[0].subdivide(3)
+        >>> b.beat[0][0] = b.beat[0][0].subdivide(2)
+        >>> b.beat[0][1] = b.beat[0][1].subdivide(2)
+        >>> b.beat[0][2] = b.beat[0][2].subdivide(2)
+        >>> b.getBeatDepth(0)
+        3
+        >>> b.getBeatDepth(.5)
+        1
+        >>> b.getBeatDepth(1)
+        2
+        '''
+        return self.beat.positionToDepth(qLenPos, align)
+
 
 
     def quarterPositionToBeat(self, currentQtrPosition = 0):
-        '''For backward compatibility.
+        '''For backward compatibility. Ultimately, remove. 
         '''
         #return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
         return self.getBeat(currentQtrPosition)
@@ -2223,7 +2310,37 @@ class Test(unittest.TestCase):
 
 
 
+    def testPositionToDepth(self):
 
+        # get a maximally divided 4/4 to the level of 1/8
+        a = MeterSequence('4/4')
+        for h in range(len(a)):
+            a[h] = a[h].subdivide(2)
+            for i in range(len(a[h])):
+                a[h][i] = a[h][i].subdivide(2)
+                for j in range(len(a[h][i])):
+                    a[h][i][j] = a[h][i][j].subdivide(2)
+
+        # matching with starts result in a lerdahl jackendoff style depth
+        match = [4,1,2,1,3,1,2,1]
+        for x in range(8):
+            pos = x * .5
+            test = a.positionToDepth(pos, align='start')
+            self.assertEqual(test, match[x])
+
+        match = [1,2,1,3,1,2,1]
+        for x in range(7):
+            pos = (x * .5) + .5
+            test = a.positionToDepth(pos, align='end')
+            #environLocal.printDebug(['here', test])
+            self.assertEqual(test, match[x])
+
+        # can quantize by lowest value
+        match = [4,1,2,1,3,1,2,1]
+        for x in range(8):
+            pos = (x * .5) + .25
+            test = a.positionToDepth(pos, align='quantize')
+            self.assertEqual(test, match[x])
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
