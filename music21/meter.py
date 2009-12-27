@@ -446,6 +446,16 @@ class MeterTerminal(object):
     duration = property(_getDuration, _setDuration)
 
 
+    def _getDepth(self):
+        '''Return how many levels deep this part is. Depth of a terminal is always 1
+        '''
+        return 1
+
+    depth = property(_getDepth)
+
+
+
+
 #     def _getBeatLengthToQuarterLengthRatio(self):
 #         '''
 #         >>> a = MeterTerminal()
@@ -599,7 +609,6 @@ class MeterSequence(MeterTerminal):
         >>> a._divisionOptionsAlgo(12,8)
         [['3/8', '3/8', '3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2'], ['12/8'], ['6/8', '6/8'], ['6/4'], ['3/2'], ['24/16'], ['48/32'], ['96/64'], ['192/128']]
 
-
         >>> a._divisionOptionsAlgo(5,8)
         [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
 
@@ -743,7 +752,7 @@ class MeterSequence(MeterTerminal):
         '''
         if common.isStr(value):
             mt = MeterTerminal(value)
-        elif isinstance(value, MeterTerminal):
+        elif isinstance(value, MeterTerminal): # may be a MeterSequence
             mt = value
         else:
             raise MeterException('cannot add %s to this sequence' % value)
@@ -972,9 +981,10 @@ class MeterSequence(MeterTerminal):
             # do not need to set weight, as based on terminal
             #environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
     
-        elif common.isListLike(value): # a list of Terminals
+        elif common.isListLike(value): # a list of Terminals or Sequenc es
             self._clearPartition()
             for obj in value:
+                #environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj) 
             self._updateRatio()
             self.weight = targetWeight # may be None
@@ -1132,11 +1142,31 @@ class MeterSequence(MeterTerminal):
     flatWeight = property(_getFlatWeight)
 
 
+    def _getDepth(self):
+        '''Return how many unique levels deep this part is
+        '''
+        depth = 0 # start with 0, will count this level
+    
+        lastMatch = None
+        while True:
+            test = self._getLevelList(depth)
+            if test != lastMatch:
+                depth += 1
+                lastMatch = test
+            else:
+                break
+        return depth
+
+    depth = property(_getDepth)
+
+
 
     #---------------------------------------------------------------------------
     # alternative representations
 
-    def _getLevelList(self, levelCount):
+
+
+    def _getLevelList(self, levelCount, flat=True):
         '''Recursive utility function
 
         >>> b = MeterSequence('4/4', 4)
@@ -1160,21 +1190,24 @@ class MeterSequence(MeterTerminal):
             if not isinstance(self[i], MeterSequence):
                 mt = self[i] # a meter terminal
                 mtList.append(mt)   
-            else: # its a sequence; need to make into a single terminal
+            else: # its a sequence
                 if levelCount > 0: # retain this sequence but get lower level
                     # reduce level by 1 when recursing; do not
                     # change levelCount here
-                    mtList += self[i]._getLevelList(levelCount-1)
+                    mtList += self[i]._getLevelList(levelCount-1, flat)
                 else: # level count is at zero
-                    mt = MeterTerminal('%s/%s' % (
-                              self[i].numerator, self[i].denominator))
-                    # set weight to that of the sequence
-                    mt.weight = self[i].weight
-                    mtList.append(mt)   
+                    if flat: # make sequence into a terminal
+                        mt = MeterTerminal('%s/%s' % (
+                                  self[i].numerator, self[i].denominator))
+                        # set weight to that of the sequence
+                        mt.weight = self[i].weight
+                        mtList.append(mt)   
+                    else: # its not a terminal, its a meter sequence
+                        mtList.append(self[i])   
         return mtList
 
 
-    def getLevel(self, level=0):
+    def getLevel(self, level=0, flat=True):
         '''Return a complete MeterSequence with the same numerator/denominator
         reationship but that represents any partitions found at the rquested
         level. A sort of flatness with variable depth.
@@ -1192,7 +1225,7 @@ class MeterSequence(MeterTerminal):
         >>> b.getLevel(2)
         <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
-        return MeterSequence(self._getLevelList(level))
+        return MeterSequence(self._getLevelList(level, flat))
 
 
     def getLevelWeight(self, level=0):
@@ -1365,6 +1398,16 @@ class MeterSequence(MeterTerminal):
         return start, end
 
 
+    def positionToDepth(self, qLenPos):
+        '''Given a lenPos, return the maximum available depth at this position
+
+        >>> a = MeterSequence('3/4', 3)
+
+        '''
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+        return len(self.positionToAddress(qLenPos))
+
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
 
@@ -1398,7 +1441,7 @@ class TimeSignature(music21.Music21Object):
         return "<music21.meter.TimeSignature %s>" % self.__str__()
 
     def ratioEqual(self, other):
-        '''A basic form comparison; does not determine if any internatl structures are equal; only outermost ratio. 
+        '''A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio. 
         '''
         if other == None: return False
         if (other.numerator == self.numerator and 
@@ -1848,8 +1891,28 @@ class TimeSignature(music21.Music21Object):
         >>> a.getBeat(2.5)
         2
         '''
-
         return self.beat.positionToIndex(qLenPos) + 1
+
+
+    def getBeatProgress(self, qLenPos):
+        '''Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos
+        is. 
+
+        >>> a = TimeSignature('3/4', 3)
+        >>> a.getBeatProgress(0)
+        (1, 0)
+        >>> a.getBeatProgress(0.75)
+        (1, 0.75)
+        >>> a.getBeatProgress(2.5)
+        (3, 0.5)
+        >>> a.beat.partition(['3/8', '3/8'])
+        >>> a.getBeatProgress(2.5)
+        (2, 1.0)
+        '''
+        beatIndex = self.beat.positionToIndex(qLenPos)
+        start, end = self.beat.positionToSpan(qLenPos)
+        return beatIndex + 1, qLenPos - start
+
 
 
 
@@ -1932,7 +1995,7 @@ class TimeSignature(music21.Music21Object):
         4
         '''
         if len(mxTimeList) == 0:
-            raise MeterException('cannot create a TimeSignature from a empty MusicXML timeList: %s' % musicxml.Attributes() )
+            raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % musicxml.Attributes() )
         mxTime = mxTimeList[0] # only one for now
         n = []
         d = []
