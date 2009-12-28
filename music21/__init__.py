@@ -48,7 +48,7 @@ __all__ = ["composition", "counterpoint", "doc", "humdrum", \
            "notationMod", "note", \
            "pitch", "ratios", \
            "scale", "serial", "stream", 
-           "tempo", "text", "tinyNotation", "twoStreams", \
+           "tempo", "text", "tinyNotation", \
            "voiceLeading"]
 
 #--------------------------------------------------------------------#

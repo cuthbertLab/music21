@@ -98,3 +98,34 @@ def ex01Alt():
 
 
 
+def findHighestNotes():
+    import copy
+    import music21
+    from music21 import corpus, meter, stream
+    
+    score = corpus.parseWork('bach/bwv366')
+    ts = score.flat.getElementsByClass(meter.TimeSignature)[0]
+    ts.beat.partition(3)
+    
+    found = stream.Stream()
+    for part in score:
+        found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
+        highestNoteNum = 0
+        for m in part.measures:
+            for n in m.notes:
+                if n.midi > highestNoteNum:
+                    highestNoteNum = n.midi
+                    highestNote = copy.deepcopy(n) # optional
+    
+                    # These two lines will keep the look of the original
+                    # note values but make each note 1 4/4 measure long:
+    
+                    highestNote.duration.components[0].unlink()
+                    highestNote.quarterLength = 4
+                    highestNote.lyric = '%s: M. %s: beat %s' % (
+                        part.getInstrument().partName[0], m.measureNumber, ts.getBeat(n.offset))
+        found.append(highestNote)
+
+    print found.write('musicxml')
+
+findHighestNotes()

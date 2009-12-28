@@ -534,7 +534,6 @@ class GeneralNote(music21.Music21Object):
 
 
 
-
     def _getMusicXML(self):
         '''This must call _getMX to get basic mxNote objects
         '''
@@ -648,7 +647,7 @@ class GeneralNote(music21.Music21Object):
 
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
-                tempNote = copy.deepcoy(self)
+                tempNote = copy.deepcopy(self)
                 tempNote.clearDurations()
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
@@ -1032,7 +1031,7 @@ class Note(NotRest):
             if self.tie.type == 'start':
                 mxNoteList[-1].tieList += mxTieList
                 mxNoteList[-1].notationsObj.componentList += mxTiedList
-            # if ending a tie, set first mxNote ot stop
+            # if ending a tie, set first mxNote to stop
             # TODO: this may need to continue if there are components here
             elif self.tie.type == 'stop':
                 mxNoteList[0].tieList += mxTieList
