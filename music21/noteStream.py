@@ -5,8 +5,7 @@ from music21 import note
 #from note import Note
 #doesn't work with loop from note.py
 from music21 import common
-from music21 import lily
-lilyModule = lily
+from music21 import lily as lilyModule
 from music21 import clef
 from music21 import chord
 from music21.common import *

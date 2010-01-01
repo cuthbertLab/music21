@@ -155,10 +155,6 @@ class Stream(music21.Music21Object):
         '''
         A Stream can return an iterator.  Same as running x in a.elements
         '''
-        # need to reset index each time an iterator is obtained
-        # if a previous iteration calls break, _index will not be reset to zero
-#         self._index = 0 
-#         return self
         return StreamIterator(self)
 
 
@@ -193,10 +189,6 @@ class Stream(music21.Music21Object):
         '''
 
         if common.isNum(key):
-# let the list do its own IndexError trapping.  this was too buggy 
-#            if abs(key) > self.__len__():
-#                raise IndexError(str(key) + " is out of range " + str(self.__len__()))
-#            else:
             returnEl = self.elements[key]
             returnEl.parent = self
             return returnEl
@@ -252,10 +244,6 @@ class Stream(music21.Music21Object):
             if isinstance(thisElement, Stream): 
                 self.isFlat = False
                 break
-            # this may not be necessary
-#             elif hasattr(thisElement, "elements"):
-#                 self.isFlat = False
-#                 break
         self._cache = common.defHash()
 
     def _getElements(self):
@@ -309,9 +297,9 @@ class Stream(music21.Music21Object):
         storedIsFlat = self.isFlat
         self._elementsChanged()
 
-        # alternative way:
-        #if not isinstance(thisElement, Stream): 
-        if not hasattr(value, "elements"):
+        if isinstance(value, Stream): 
+            self.isFlat = False
+        else:
             self.isFlat = storedIsFlat
 
 
@@ -420,76 +408,6 @@ class Stream(music21.Music21Object):
 
 
 
-#    def __add__(self, other):
-#        '''
-#        Returns a new stream that is the second added to the first.
-#        this will not shift any offsets; it will simply
-#        combine the elements.
-#
-#        >>> a = Stream()
-#        >>> for x in range(5):
-#        ...     e = note.Rest()
-#        ...     e.offset = x * 3
-#        ...     a.insert(e)
-#        >>> a.isSorted
-#        True
-#        >>> a.elements[4].offset
-#        12.0
-#        >>> b = Stream()
-#        >>> for x in range(3):
-#        ...     e = note.Note('D#')
-#        ...     e.offset = (x * 3) + 1
-#        ...     b.insert(e)
-#        >>> b.isSorted
-#        True
-#        >>> c = a + b
-#        >>> c.__class__.__name__
-#        'Stream'
-#        >>> len(c)
-#        8
-#        >>> c.isSorted
-#        False
-#        >>> c.isFlat
-#        True
-#        '''        
-#        # if an element or a stream
-#        if not isinstance(other, music21.Music21Object): 
-#            other = music21.ElementWrapper(other)
-#        new = self.copy()
-#        if isinstance(other, Stream):
-#            new.elements = self.elements + other.elements
-#            if self.isSorted is True and other.isSorted is True and \
-#                self.highestTime <= other.offset:
-#                    new.isSorted = True
-#        else: # if other is not a Stream, object is appended 
-#            new.insert(other)
-#        return new
-
-    def appendOld(self, item):
-        '''Add a (sub)Stream, Music21Object, or object (wrapped into a default 
-        element) to the Stream at the stored offset of the object, or at 0.0.
-         
-        For adding to the last open location of the stream, use append.
-
-        Adds an entry in Locations as well.
-
-        >>> a = Stream()
-        >>> a.insert(music21.Music21Object())
-        >>> a.insert(music21.note.Note('G#'))
-        >>> len(a)
-        2
-        '''
-        # if not an element, embed
-        if not isinstance(item, music21.Music21Object): 
-            #environLocal.printDebug(['insert called with non Music21Object', item])
-            element = music21.ElementWrapper(item)
-        else:
-            element = item
-
-        # always get append value from None site, or unposititoned 
-        appendOffset = element.getOffsetBySite(None)            
-        self.insert(appendOffset, element)
-
     def insert(self, offsetOrItem, itemOrNone = None):
         '''
         Has two forms: in the two argument form, inserts an element at the given offset:
@@ -511,10 +429,6 @@ class Stream(music21.Music21Object):
         30.0
         
         '''
-        # TODO: possible permit inserting of an item, an element, without
-        # an offset, where the element's native offset is used as the offset.
-
-        # if not an element, embed
         if itemOrNone == None:
             item = offsetOrItem
             offset = item.offset
@@ -522,6 +436,7 @@ class Stream(music21.Music21Object):
             offset = offsetOrItem
             item = itemOrNone
         
+        # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             environLocal.printDebug(['insert called with non Music21Object', item])
             element = music21.ElementWrapper(item)
@@ -637,12 +552,12 @@ class Stream(music21.Music21Object):
         if not hasattr(item, "locations"):
             raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
 
-        # NOTE: this may have enexpected side effects, as the None location
+        # NOTE: this may have unexpected side effects, as the None location
         # may have been set much later in this objects life.
         # optionally, could use last assigned site to get the offset        
         # or, use zero
         item.locations.add(item.getOffsetBySite(None), self)
-        # need to explicitly set the parent of the elment
+        # need to explicitly set the parent of the element
         item.parent = self 
 
         self._elements.insert(pos, item)
@@ -725,7 +640,7 @@ class Stream(music21.Music21Object):
 
 #     def writePickle(self, fp):
 #         f = open(fp, 'wb') # binary
-#         # a negative protocal value will get the highest protocal; 
+#         # a negative protocol value will get the highest protocol; 
 #         # this is generally desirable 
 #         pickleMod.dump(self, f, protocol=-1)
 #         f.close()
@@ -942,30 +857,6 @@ class Stream(music21.Music21Object):
                     return element
         return None
 
-
-#    def countId(self, classFilter=None):
-#        ## TODO: see if necessary
-#        # presently, this just creates a dictionary of id and counts
-#        
-#        '''Get all component Elements id as dictionary of id:count entries.
-#
-#        Alternative name: getElementIdByClass()
-#        '''
-#        post = {}
-#        for element in self.elements:
-#            count = False
-#            if classFilter != None:
-#                if element.isClass(classFilter):
-#                    count = True
-#            else:
-#                count = True
-#            if count:
-#                if element.id not in post.keys():
-#                    post[element.id] = 0
-#                post[element.id] += 1
-#        return post
-
-
     def getElementsByOffset(self, offsetStart, offsetEnd,
                     includeCoincidentBoundaries=True, onsetOnly=True):
         '''
@@ -1000,11 +891,9 @@ class Stream(music21.Music21Object):
         >>> len(c)
         2
         
-        # TODO: Fix
-        >>> ### CANNOT FLATTEN IF EMBEDDED -- 
-        >>> ### c = b.flat.getElementsByOffset(2,6.9)
-        >>> ###len(c)
-        ###10
+         >>> c = b.flat.getElementsByOffset(2,6.9)
+        >>> len(c)
+        10
         '''
         found = Stream()
 
@@ -1038,7 +927,7 @@ class Stream(music21.Music21Object):
         Return one element or None if no elements are at or preceded by this 
         offset. 
 
-        TODO: inlcude sort order for concurrent matches?
+        TODO: include sort order for concurrent matches?
 
         >>> a = Stream()
 
@@ -1274,7 +1163,7 @@ class Stream(music21.Music21Object):
 
 
     def bestClef(self, allowTreble8vb = False):
-        '''Eeturns the clef that is the best fit for notes and chords found in thisStream.
+        '''Returns the clef that is the best fit for notes and chords found in thisStream.
 
         Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets
 
@@ -1351,8 +1240,6 @@ class Stream(music21.Music21Object):
     def shiftElements(self, offset):
         '''Add offset value to every offset of contained Elements.
 
-        TODO: add a class filter to set what is shifted
-
         >>> a = Stream()
         >>> a.repeatInsert(note.Note("C"), range(0,10))
         >>> a.shiftElements(30)
@@ -1394,7 +1281,7 @@ class Stream(music21.Music21Object):
 
     def repeatAppend(self, item, numberOfTimes):
         '''
-        Given an object and a number, run append that many times on the object.
+        Given an object and a number, run append that many times on a deepcopy of the object.
         numberOfTimes should of course be a positive integer.
         
         >>> a = Stream()
@@ -1410,7 +1297,7 @@ class Stream(music21.Music21Object):
         if not isinstance(item, music21.Music21Object): 
             element = music21.ElementWrapper(item)
         else:
-            element = item # TODO: remove for new-old-style
+            element = item
             
         for i in range(0, numberOfTimes):
             self.append(deepcopy(element))
@@ -1662,13 +1549,13 @@ class Stream(music21.Music21Object):
 
 
     def makeRests(self, refStream=None, inPlace=True):
-        '''Given a streamObj with an ElementWrapper with an offset not equal to zero, 
+        '''Given a streamObj with an  with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
     
         If refStream is provided, use this to get min and max offsets. Rests 
         will be added to fill all time defined within refStream.
     
-        TODO: rename fillRests() or something else
+        TODO: rename fillRests() or something else.  CHRIS: I Don't Understand what refStream does for this method!
     
         >>> a = Stream()
         >>> a.insert(20, note.Note())
@@ -1719,7 +1606,7 @@ class Stream(music21.Music21Object):
         '''Given a stream containing measures, examine each element in the stream 
         if the elements duration extends beyond the measures bound, create a tied  entity.
     
-        Edits the current stream in-place. 
+        Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false
         
         TODO: take a list of clases to act as filter on what elements are tied.
     
@@ -3982,7 +3869,7 @@ class Test(unittest.TestCase):
         tup1.tupletNormal = [3, dur1]
 
         q.octave = 2
-        q.duration.tuplets.append(tup1)
+        q.duration.appendTuplet(tup1)
         
         
         for i in range(0,5):

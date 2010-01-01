@@ -193,7 +193,7 @@ class TinyNotationNote(object):
                 newTup.numNotesNormal = 3.0            
             if storedDict['beginTuplet']:
                 newTup.type = "start"
-            noteObj.duration.tuplets.append(newTup)
+            noteObj.duration.appendTuplet(newTup)
 
         if (storedDict['inTrip'] == True and storedDict['endTuplet']):
             noteObj.duration.tuplets[0].type = "stop"

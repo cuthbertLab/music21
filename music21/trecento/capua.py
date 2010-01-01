@@ -1,8 +1,10 @@
+import unittest
+
 import music21
 import cadencebook
 from music21 import note
 from music21.note import Accidental
-from music21.interval import *
+from music21.interval import generateInterval
 from music21 import twoStreams
 from music21.twoStreams import TwoStreamComparer
 from music21 import lily
@@ -16,7 +18,7 @@ RULEFOURA = 8
 RULEFOURB = 16
 
 def capuaRuleOne(stream):
-    '''Applies Capua's first rule to the given stream, i.e. if a line descends
+    '''Applies Nicolaus de Capua's first rule to the given stream, i.e. if a line descends
     a major second then ascends back to the original note, the major second is
     made into a minor second. Also copies the relevant accidentals into
     note.editorial.misc under "saved-accidental" and changes note.editorial.color
@@ -813,28 +815,33 @@ def improvedHarmony():
 
     print checkDict
 
-def test():
-    ballataObj = cadencebook.BallataSheet()
-    pieceObj   = ballataObj.makeWork(20)  ## N.B. -- we now use Excel column numbers
-    if pieceObj.incipitClass() is None:
-        return None
-    cadenceA   = pieceObj.cadenceAClass()
-    if len(cadenceA.streams) >= 2:
-        stream1    = cadenceA.streams[0]
-        stream2    = cadenceA.streams[1]  ## ignore 3rd voice for now...
-        twoStreams1 = twoStreams.TwoStreamComparer(stream1, stream2)
-#    raise("hi?")
-#    clearFicta(stream1)
-#    compareThreeFictas(stream1, stream2)
-#    scoreList = compareOneStream(stream1, stream2)
-#    if debug == True:
-#        for note in stream1:
-#            print note.name
-#            print note.editorial.ficta
-#            print note.editorial.harmonicInterval.diatonic.name
-#    restoreFicta(stream1)
-#    print scoreList
-    
+class ATest(unittest.TestCase):
+
+    def run1test(self):
+        ballataObj = cadencebook.BallataSheet()
+        pieceObj   = ballataObj.makeWork(20)  ## N.B. -- we now use Excel column numbers
+        if pieceObj.incipitClass() is None:
+            return None
+        cadenceA   = pieceObj.cadenceAClass()
+        if len(cadenceA.streams) >= 2:
+            stream1    = cadenceA.streams[0]
+            stream2    = cadenceA.streams[1]  ## ignore 3rd voice for now...
+            twoStreams1 = twoStreams.TwoStreamComparer(stream1, stream2)
+    #    raise("hi?")
+    #    clearFicta(stream1)
+    #    compareThreeFictas(stream1, stream2)
+    #    scoreList = compareOneStream(stream1, stream2)
+    #    if debug == True:
+    #        for note in stream1:
+    #            print note.name
+    #            print note.editorial.ficta
+    #            print note.editorial.harmonicInterval.diatonic.name
+    #    restoreFicta(stream1)
+    #    print scoreList
+
+    def maryTest(self):
+        pass
+        
 if (__name__ == "__main__"):
 #    test()
 #    correctedMin6()

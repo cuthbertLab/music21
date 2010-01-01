@@ -185,8 +185,6 @@ def convertQuarterLengthToType(qLen):
 
 def dottedMatch(qLen, maxDots = 4):
     '''
-    (was quarterLengthToDotCandidate)
-    
     given a qLen, determine if there is a dotted (or non-dotted) type
     that exactly matches.  Returns (numDots, type) or (False, False)
     if non matches exactly.
@@ -220,9 +218,9 @@ def dottedMatch(qLen, maxDots = 4):
 
 def quarterLengthToTuplet(qLen, maxToReturn = 4):
     '''    
-    Returns a list of possible Tuplet objects for a given qLen up to the maxTotReturn
+    Returns a list of possible Tuplet objects for a given qLen up to the maxToReturn
 
-    Searches for numerators specified in defaultTupletNumerators (3, 5, 7, 11, 13)
+    Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13)
     does not return dotted tuplets, nor nested tuplets.
         (was quarterLengthToTupletCandidate)
 
@@ -232,8 +230,8 @@ def quarterLengthToTuplet(qLen, maxToReturn = 4):
     >>> quarterLengthToTuplet(.33333333)
     [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>]
 
-    By specifying only 1 count, the tuple with the smallest type will be 
-    returned.    
+    By specifying only 1 count, the a single-length list containing the Tuplet with the 
+    smallest type will be returned.    
     >>> quarterLengthToTuplet(.3333333, 1)
     [<music21.duration.Tuplet 3/2/eighth>]
 
@@ -275,8 +273,6 @@ def quarterLengthToTuplet(qLen, maxToReturn = 4):
 
 def quarterLengthToDurations(qLen):
     '''
-    (was quarterLengthToUnitSpec)
-    
     Returns a List of new Durations (each with only a single component) given a quarter length.
     For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list
     could contain several durations (presumably to be tied to each other).
@@ -287,8 +283,7 @@ def quarterLengthToDurations(qLen):
     This is mainly a utility function.  Much faster for many purposes is:
        d = Duration()
        d.quarterLength = 251.231312
-    and only have the components created as needed.
-
+    and then let Duration automatically create Duration Components as necessary.
 
     These examples use unitSpec() to get a concise summary of the contents
     >>> unitSpec(quarterLengthToDurations(2))
@@ -398,7 +393,7 @@ def quarterLengthToDurations(qLen):
         if len(tupleCandidates) > 0:
             # assume that the first, using the smallest type, is best
             dNew = Duration(typeNext)
-            dNew.tuplets = [tupleCandidates[0]]
+            dNew.tuplets = (tupleCandidates[0], )
             post.append(dNew)
             match = True
 
@@ -504,7 +499,7 @@ def convertTypeToQuarterLength(dType, dots = 0, tuplets=[], dotGroups=[]):
     >>> convertTypeToQuarterLength('quarter', 2)
     1.75
     
-    Also can handle medieval dot groups.
+    Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8).
     >>> convertTypeToQuarterLength('half', dotGroups = [1,1])
     4.5
     '''
@@ -586,16 +581,16 @@ def updateTupletType(durationList):
             partGroup = [part] # emulate Duration.components
         for dur in partGroup: # all DurationUnits
             tuplets = dur.tuplets
-            if tuplets in [[], None]: # no tuplets, lenth is zero
+            if tuplets in [(), None]: # no tuplets, length is zero
                 tupletMap.append([None, dur])
             elif len(tuplets) > 1:
-                raise Exception('got mutli-tuplet DurationUnit; cannot yet handle this. %s' % tuplets)
+                raise Exception('got multi-tuplet DurationUnit; cannot yet handle this. %s' % tuplets)
             elif len(tuplets) == 1:
                 tupletMap.append([tuplets[0], dur])
                 if tuplets[0] != dur.tuplets[0]:
                     raise Exception('cannot access Tuplets object from within DurationUnit')
             else:
-                raise Exception('chanot handle this tuplets: %s' % tuplets)
+                raise Exception('cannot handle these tuplets: %s' % tuplets)
 
     # have a list of tuplet, DurationUnit pairs
     completionCount = 0 # qLen currently filled
@@ -675,12 +670,12 @@ class DurationCommon(object):
         Needed for MusicXML time-modification 
 
         >>> complexDur = Duration('eighth')
-        >>> complexDur.tuplets.append(Tuplet())
+        >>> complexDur.appendTuplet(Tuplet())
         >>> complexDur.aggregateTupletRatio()
         (3, 2)
         >>> tup2 = Tuplet()
         >>> tup2.setRatio(5, 4)
-        >>> complexDur.tuplets.append(tup2)
+        >>> complexDur.appendTuplet(tup2)
         >>> complexDur.aggregateTupletRatio()
         (15, 8)
         '''        
@@ -713,7 +708,7 @@ class DurationUnit(DurationCommon):
         # rarely used: dotted-dotted notes; e.g. dotted-dotted half in 9/8
         # dots can be a float for expressing Crumb dots (1/2 dots)
         self._dots = [0] 
-        self._tuplets = []
+        self._tuplets = ()
         
         if common.isNum(prototype):
             self._qtrLength = prototype
@@ -834,7 +829,7 @@ class DurationUnit(DurationCommon):
             if len(tempDurations) > 1:
                 self.type = 'unexpressible'
                 self.dots = 0
-                self.tuplets = []
+                self.tuplets = ()
             else:
                 self.type = tempDurations[0].type
                 self.dots = tempDurations[0].dots
@@ -943,27 +938,34 @@ class DurationUnit(DurationCommon):
     dots = property(_getDots, _setDots)
 
     def _getTuplets(self):
-        '''Return a list of Tuplet objects '''
+        '''Return a tuple of Tuplet objects '''
         if self._typeNeedsUpdating:
             self.updateType()
         return self._tuplets
 
     def _setTuplets(self, value):
-        '''Takes in a list of Tuplet objects
+        '''Takes in a tuple of Tuplet objects
         '''
-        if common.isNum(value):
+        if not isinstance(value, tuple):
             raise DurationException(
-            "value submitted (%s) is not a list of tuplets" % value)
+            "value submitted (%s) is not a tuple of tuplets" % value)
         if self._tuplets != value:
             self._quarterLengthNeedsUpdating = True
         # note that in some cases this methods seems to be called more 
         # often than necessary
         #environLocal.printDebug(['assigning tuplets in DurationUnit', 
         #                         value, id(value)])
+        for thisTuplet in value:
+            thisTuplet.frozen = True
+        
         self._tuplets = value
 
     tuplets = property(_getTuplets, _setTuplets)
 
+    def appendTuplet(self, newTuplet):
+        newTuplet.frozen = True
+        self._tuplets = self._tuplets + (newTuplet, )
+        self._quarterLengthNeedsUpdating = True
 
     def _getLily(self):
         '''Simple lily duration: does not include tuplets; 
@@ -978,8 +980,6 @@ class DurationUnit(DurationCommon):
         return (str(number_type) + dots)
 
     lily = property(_getLily)
-
-
 
 
 
@@ -1001,7 +1001,29 @@ class Tuplet(object):
     16th
     >>> print myTup2.tupletMultiplier()
     0.666...
+    
+    
+    Tuplets may be frozen, in which case they become immutable.  Tuplets
+    which are attached to Durations are automatically frozen
+
+    # TODO: use __setattr__ to freeze all properties, and make a metaclass
+    # exceptions: tuplet type, tuplet id: things that don't affect length
+    
+    >>> myTup.frozen = True
+    >>> myTup.tupletActual = [3, 2]
+    Traceback (most recent call last):
+    ...
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    
+    >>> myHalf = Duration("half")
+    >>> myHalf.appendTuplet(myTup2)
+    >>> myTup2.tupletActual = [5, 4]
+    Traceback (most recent call last):
+    ...
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
     '''
+
+    frozen = False
 
     def __init__(self, *arguments, **keywords):
         #environLocal.printDebug(['creating Tuplet instance'])
@@ -1079,6 +1101,8 @@ class Tuplet(object):
     # properties
 
     def _setTupletActual(self, tupList = []):
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesActual, self.durationActual = tupList
  
     def _getTupletActual(self):
@@ -1088,6 +1112,8 @@ class Tuplet(object):
 
 
     def _setTupletNormal(self, tupList = []):
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesNormal, self.durationNormal = tupList   
  
     def _getTupletNormal(self):
@@ -1164,6 +1190,9 @@ class Tuplet(object):
         >>> a.totalTupletLength()
         2.0
         '''
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
         self.numberNotesActual = actual
         self.numberNotesNormal = normal
 
@@ -1182,6 +1211,8 @@ class Tuplet(object):
         4.0
         '''
         # these used to be Duration; now using DurationUnits
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.durationActual = DurationUnit(type) 
         self.durationNormal = DurationUnit(type)        
 
@@ -1216,6 +1247,9 @@ class Tuplet(object):
     def _setMX(self, mxNote):
         '''Given an mxNote, based on mxTimeModification and mxTuplet objects, return a Tuplet object
         ''' 
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
         mxTimeModification = mxNote.get('timemodification')
         #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
 
@@ -1249,6 +1283,8 @@ class Tuplet(object):
 
     mx = property(_getMX, _setMX)
 
+class TupletException(Exception):
+    pass
 
 #-------------------------------------------------------------------------------
 class ZeroDuration(DurationUnit):
@@ -1511,17 +1547,22 @@ class Duration(DurationCommon):
         else: # there must be 1 or more components
             raise DurationException("zero DurationUnits in components")
 
-    def _setTuplets(self, value):
-        #environLocal.printDebug(['assigning tuplets in Duration', value])
+    def _setTuplets(self, tupletTuple):
+        #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
         if len(self.components) > 1:
             raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
         elif len(self.components) == 1:
-            self.components[0].tuplets = value
+            for thisTuplet in tupletTuple:
+                thisTuplet.frozen = True
+            self.components[0].tuplets = tupletTuple
             self._quarterLengthNeedsUpdating = True
         else: # there must be 1 or more components
             raise DurationException("zero DurationUnits in components")
         
     tuplets = property(_getTuplets, _setTuplets)
+
+    def appendTuplet(self, newTuplet):
+        self.tuplets = self.tuplets + (newTuplet, )
 
 
 
@@ -1701,7 +1742,7 @@ class Duration(DurationCommon):
                 durUnit.type = type
                 durUnit.dots = len(mxDotList)
                 if not tup == None:
-                    durUnit.tuplets = [tup]
+                    durUnit.appendTuplet(tup)
                 durCooked = Duration(components=[durUnit])
     
                 #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
@@ -2198,7 +2239,7 @@ class Test(unittest.TestCase):
         dur3 = Duration()
         dur3.type = "quarter"
         dur3.dots = 1
-        dur3.tuplets = [tup1]
+        dur3.tuplets = (tup1,)
         #print "So a tuplet-dotted-quarter's length is",
         self.assertEqual(round(dur3.quarterLength, 2), 1.05)
 
@@ -2221,7 +2262,7 @@ class Test(unittest.TestCase):
         self.assertEqual(common.almostEquals(
             tup2.tupletMultiplier(), 0.666666666667), True)
 
-        dur3.tuplets = [tup1,tup2]
+        dur3.tuplets = (tup1,tup2)
 #         print "So a tuplet-dotted-quarter's length under both tuplets is",
 #         print dur3.getQuarterLength(),
 #         print "quarter notes"

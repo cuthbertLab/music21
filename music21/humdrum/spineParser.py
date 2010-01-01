@@ -912,7 +912,7 @@ def hdStringToNote(contents):
             if contents.count('.'):
                 newTup.durationNormal.dots = contents.count('.')
             
-            thisObject.duration.tuplets.append(newTup)
+            thisObject.duration.appendTuplet(newTup)
                     
     # 3.2.9 Grace Notes and Groupettos
     # TODO: Rewrite after music21 gracenotes are implimented
