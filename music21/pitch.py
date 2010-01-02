@@ -419,19 +419,6 @@ class Pitch(music21.Music21Object):
         4
         >>> a == b
         False
-        '''
-        if other == None:
-            return False
-        if (self.octave == other.octave and self.step == other.step and 
-            self.accidental == other.accidental):
-            return True
-        else:
-            return False
-
-    def __ne__(self, other):
-        '''Do not accept enharmonic equivialance.
-        >>> a = Pitch('c4')
-        >>> b = Pitch('c#4')
         >>> a != b
         True
         '''
@@ -439,9 +426,9 @@ class Pitch(music21.Music21Object):
             return False
         if (self.octave == other.octave and self.step == other.step and 
             self.accidental == other.accidental):
-            return False
-        else:
             return True
+        else:
+            return False
 
     def __lt__(self, other):
         '''Do not accept enharmonic equivalence. Based entirely on pitch space 

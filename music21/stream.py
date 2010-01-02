@@ -408,16 +408,18 @@ class Stream(music21.Music21Object):
 
 
 
-    def insert(self, offsetOrItem, itemOrNone = None):
+    def insert(self, offsetOrItemOrList, itemOrNone = None):
         '''
-        Has two forms: in the two argument form, inserts an element at the given offset:
+        Inserts an item(s) at the given offset(s)
+        
+        Has three forms: in the two argument form, inserts an element at the given offset:
         
         >>> st1 = Stream()
         >>> st1.insert(32, note.Note("B-"))
         >>> st1._getHighestOffset()
         32.0
         
-        In the single argument form, inserts the element at its stored offset:
+        In the single argument form with an object, inserts the element at its stored offset:
         
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
@@ -428,13 +430,34 @@ class Stream(music21.Music21Object):
         >>> n1.getOffsetBySite(st1)
         30.0
         
+        In single argument form list a list of alternating offsets and items, inserts the items
+        at the specified offsets:
+        
+        >>> n1 = note.Note("G")
+        >>> n2 = note.Note("F#")
+        >>> st3 = Stream()
+        >>> st3.insert([1.0, n1, 2.0, n2])
+        >>> n1.getOffsetBySite(st3)
+        1.0
+        >>> n2.getOffsetBySite(st3)
+        2.0
+        >>> len(st3)
+        2
         '''
-        if itemOrNone == None:
-            item = offsetOrItem
-            offset = item.offset
+        if itemOrNone != None:
+            offset = offsetOrItemOrList
+            item = itemOrNone            
+        elif itemOrNone == None and isinstance(offsetOrItemOrList, list):
+            i = 0
+            while i < len(offsetOrItemOrList):
+                offset = offsetOrItemOrList[i]
+                item   = offsetOrItemOrList[i+1]
+                self.insert(offset, item)
+                i += 2
+            return
         else:
-            offset = offsetOrItem
-            item = itemOrNone
+            item = offsetOrItemOrList
+            offset = item.offset
         
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
@@ -1021,10 +1044,6 @@ class Stream(music21.Music21Object):
 
 
 
-
-
-
-
     def groupElementsByOffset(self, returnDict = False, unpackElement = False):
         '''
         returns a List of lists in which each entry in the
@@ -1058,39 +1077,8 @@ class Stream(music21.Music21Object):
 
 
     #--------------------------------------------------------------------------
-    # convenieunce routines for obtaining elements form a Stream
-
-    def getNotes(self):
-        '''Return all Note, Chord, Rest, etc. objects in a Stream()
-
-        >>> s1 = Stream()
-        >>> c = chord.Chord(['a', 'b'])
-        >>> s1.append(c)
-        >>> s2 = s1.getNotes()
-        >>> len(s2) == 1
-        True
-        '''
-        # note: class names must be provuided in one argument as a list
-        return self.getElementsByClass([note.GeneralNote, chord.Chord])
-
-    notes = property(getNotes)
-
-    def getPitches(self):
-        '''
-        Return all pitches found in any element in the stream as a list
-
-        (since Pitches have no duration, it's a list not a stream)
-        '''  
-        returnPitches = []
-        for thisEl in self.elements:
-            if hasattr(thisEl, "pitch"):
-                returnPitches.append(thisEl.pitch)
-            elif hasattr(thisEl, "pitches"):
-                for thisPitch in thisEl.pitches:
-                    returnPitches.append(thisPitch)
-        return returnPitches
-    
-    pitches = property(getPitches)
+    # routines for obtaining specific types of elements form a Stream
+    # getNotes and getPitches are found with the interval routines
         
 
     def getMeasures(self):
@@ -1739,7 +1727,7 @@ class Stream(music21.Music21Object):
 
         In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.
 
-        TODO: inPlace==False does not work in many cases
+        TODO: inPlace=False does not work in many cases
 
         >>> aMeasure = Measure()
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
@@ -2537,13 +2525,139 @@ class Stream(music21.Music21Object):
     musicxml = property(_getMusicXML, _setMusicXML)
 
 
+    #------------ interval routines --------------------------------------------
+    def getNotes(self):
+        '''Return all Note, Chord, Rest, etc. objects in a Stream()
+
+        >>> s1 = Stream()
+        >>> c = chord.Chord(['a', 'b'])
+        >>> s1.append(c)
+        >>> s2 = s1.getNotes()
+        >>> len(s2) == 1
+        True
+        '''
+        # note: class names must be provided in one argument as a list
+        return self.getElementsByClass([note.GeneralNote, chord.Chord])
+
+    notes = property(getNotes)
+
+    def getPitches(self):
+        '''
+        Return all pitches found in any element in the stream as a list
+
+        (since Pitches have no duration, it's a list not a stream)
+        '''  
+        returnPitches = []
+        for thisEl in self.elements:
+            if hasattr(thisEl, "pitch"):
+                returnPitches.append(thisEl.pitch)
+            elif hasattr(thisEl, "pitches"):
+                for thisPitch in thisEl.pitches:
+                    returnPitches.append(thisPitch)
+        return returnPitches
+    
+    pitches = property(getPitches)
+
+    
+    def findConsecutiveNotes(self, skipRests = False, skipChords = False, skipUnisons = False, 
+                               skipGaps = False, getOverlaps = False):
+        '''
+        Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
+        at any point there is a discontinuity (such as if there is a rest between two pitches).
+        The method is used by melodicIntervals.
+        
+        How to determine consecutive pitches is a little tricky.  In the simplest example [[XXX]]
+
+        skipUnison uses the midi-note value to determine unisons, so enharmonic transitions (F# -> Gb) are
+        also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because
+        of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
+        will give you the number of P1s in the piece, because there could be d2's in there as well.
+        
+        TODO: WRITE
+        '''
+        sortedSelf = self.sorted
+        returnList = []
+        lastStart = 0.0
+        lastEnd = 0.0
+        lastWasNone = False
+        lastPitch = None
+        for el in sortedSelf.elements:
+            if lastWasNone is False and skipGaps is False and el.offset > lastEnd:
+                returnList.append(None)
+                lastWasNone = True
+            if hasattr(el, "pitch"):
+                if skipUnisons is False or isinstance(lastPitch, list) or lastPitch is None or el.pitch.ps != lastPitch.ps:
+                    if getOverlaps is True or el.offset >= lastEnd:
+                        if el.offset >= lastEnd:  # is not an overlap...
+                            lastStart = el.offset
+                            if hasattr(el, "duration"):
+                                lastEnd = lastStart + el.duration.quarterLength
+                            else:
+                                lastEnd = lastStart
+                            lastWasNone = False
+                            lastPitch = el.pitch
+                        else:  # do not update anything for overlaps
+                            pass 
+
+                        returnList.append(el)
+
+            elif hasattr(el, "pitches"):
+                if skipChords is True:
+                    if lastWasNone is False:
+                        returnList.append(None)
+                        lastWasNone = True
+                        lastPitch = None
+                else:
+                    if (skipUnisons is True and isinstance(lastPitch, list) and
+                        el.pitches[0].ps == lastPitch[0].ps):
+                        pass
+                    else:
+                        if getOverlaps is True or el.offset >= lastEnd:
+                            if el.offset >= lastEnd:  # is not an overlap...
+                                lastStart = el.offset
+                                if hasattr(el, "duration"):
+                                    lastEnd = lastStart + el.duration.quarterLength
+                                else:
+                                    lastEnd = lastStart
+            
+                                lastPitch = el.pitches
+                                lastWasNone = False 
+
+                            else:  # do not update anything for overlaps
+                                pass 
+                            returnList.append(el)
+
+            elif skipRests is False and isinstance(el, note.Rest) and lastWasNone is False:
+                returnList.append(None)
+                lastWasNone = True
+                lastPitch = None
+            elif skipRests is True and isinstance(el, note.Rest):
+                lastEnd = el.offset + el.duration.quarterLength
+        
+        if lastWasNone is True:
+            returnList.pop()
+        return returnList
+    
+    def melodicIntervals(self, *skipArgs, **skipKeywords):
+        '''
+        returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream.
+        the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, 
+        then it is equal to the offset of the second note)
+        
+        see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords 
+        are allowed.
+        
+        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0].
+        For more complex interval calculations, run findConsecutiveNotes and then use generateInterval
+        '''
+        pass
 
 
 
 
     #---------------------------------------------------------------------------
     def _getDurSpan(self, flatStream):
-        '''Given elementsSorted, create a lost of parallel
+        '''Given elementsSorted, create a list of parallel
         values that represent dur spans, or start and end times.
 
         >>> a = Stream()
@@ -2568,7 +2682,7 @@ class Stream(music21.Music21Object):
     def _durSpanOverlap(self, a, b, includeCoincidentBoundaries=False):
         '''
         Compare two durSpans and find overlaps; optionally, 
-        includ coincident boundaries. a and b are sorted to permit any ordering.
+        include coincident boundaries. a and b are sorted to permit any ordering.
 
         If an element ends at 3.0 and another starts at 3.0, this may or may not
         be considered an overlap. The includeCoincidentEnds parameter determines
@@ -2602,13 +2716,13 @@ class Stream(music21.Music21Object):
 
 
 
-    def _findLayering(self, flatStream, includeNoneDur=True,
+    def _findLayering(self, flatStream, includeDurationless=True,
                    includeCoincidentBoundaries=False):
         '''Find any elements in an elementsSorted list that have simultaneities 
         or durations that cause overlaps.
         
         Returns two lists. Each list contains a list for each element in 
-        elementsSorted. If that elements has overalps or simultaneities, 
+        elementsSorted. If that elements has overlaps or simultaneities, 
         all index values that match are included in that list. 
         
         See testOverlaps, in unit tests, for examples. 
@@ -2628,7 +2742,7 @@ class Stream(music21.Music21Object):
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
             # second entry is duration
-            if not includeNoneDur and flatStream[i].duration == None: 
+            if not includeDurationless and flatStream[i].duration == None: 
                 continue
             # compare to all past and following durations
             for j in range(len(durSpanSorted)):
@@ -2648,7 +2762,7 @@ class Stream(music21.Music21Object):
 
     def _consolidateLayering(self, flatStream, map):
         '''
-        Given elementsSorted and a map of equal lenght with lists of 
+        Given elementsSorted and a map of equal length with lists of 
         index values that meet a given condition (overlap or simultaneities),
         organize into a dictionary by the relevant or first offset
         '''
@@ -2748,7 +2862,7 @@ class Stream(music21.Music21Object):
             
     isGapless = property(_getIsGapless)
             
-    def getSimultaneous(self, includeNoneDur=True):
+    def getSimultaneous(self, includeDurationless=True):
         '''Find and return any elements that start at the same time. 
         >>> stream1 = Stream()
         >>> for x in range(4):
@@ -2772,19 +2886,22 @@ class Stream(music21.Music21Object):
 #        checkOverlap = False
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
-                                                    includeNoneDur)
+                                                    includeDurationless)
         
         return self._consolidateLayering(elementsSorted, simultaneityMap)
 
 
-    def getOverlaps(self, includeNoneDur=True,
+    def getOverlaps(self, includeDurationless=True,
                      includeCoincidentBoundaries=False):
-        '''Find any elements that overlap. Overlaping might include elements
+        '''
+        Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous. 
-        Whether elements with None durations are included is determined by includeNoneDur.
+        Whether elements with None durations are included is determined by includeDurationless.
+        
+        CHRIS: What does this return? and how can someone use this?
         
         This example demonstrates end-joing overlaps: there are four quarter notes each
-        following each other. Whether or not these count as overalps
+        following each other. Whether or not these count as overlaps
         is determined by the includeCoincidentBoundaries parameter. 
 
         >>> a = Stream()
@@ -2806,7 +2923,7 @@ class Stream(music21.Music21Object):
         >>> for x in [0,0,0,0,13,13,13]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
-        ...     n.offset = x * 1
+        ...     n.offset = x
         ...     a.insert(n)
         ...
         >>> d = a.getOverlaps() 
@@ -2818,7 +2935,7 @@ class Stream(music21.Music21Object):
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
-        ...     n.offset = x * 1
+        ...     n.offset = x
         ...     a.insert(n)
         ...
         >>> # default is to not include coincident boundaries
@@ -2830,12 +2947,12 @@ class Stream(music21.Music21Object):
         checkOverlap = True
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
-                                includeNoneDur, includeCoincidentBoundaries)
+                                includeDurationless, includeCoincidentBoundaries)
         return self._consolidateLayering(elementsSorted, overlapMap)
 
 
 
-    def isSequence(self, includeNoneDur=True, 
+    def isSequence(self, includeDurationless=True, 
                         includeCoincidentBoundaries=False):
         '''A stream is a sequence if it has no overlaps.
 
@@ -2852,7 +2969,7 @@ class Stream(music21.Music21Object):
         '''
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
-                                includeNoneDur, includeCoincidentBoundaries)
+                                includeDurationless, includeCoincidentBoundaries)
         post = True
         for indexList in overlapMap:
             if len(indexList) > 0:
@@ -3785,11 +3902,11 @@ class Test(unittest.TestCase):
             n.offset = offset
             a.insert(n)
 
-        includeNoneDur = True
+        includeDurationless = True
         includeCoincidentBoundaries = False
 
         simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeNoneDur, includeCoincidentBoundaries)
+                                  includeDurationless, includeCoincidentBoundaries)
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1,2], [0], [0]])
 
@@ -3797,7 +3914,7 @@ class Test(unittest.TestCase):
         post = a._consolidateLayering(a.flat, overlapMap)
         # print post
 
-        #found = a.getOverlaps(includeNoneDur, includeCoincidentBoundaries)
+        #found = a.getOverlaps(includeDurationless, includeCoincidentBoundaries)
         # there should be one overlap group
         #self.assertEqual(len(found.keys()), 1)
         # there should be three items in this overlap group
@@ -3812,11 +3929,11 @@ class Test(unittest.TestCase):
             n.offset = offset
             a.insert(n)
 
-        includeNoneDur = True
+        includeDurationless = True
         includeCoincidentBoundaries = True
 
         simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeNoneDur, includeCoincidentBoundaries)
+                                  includeDurationless, includeCoincidentBoundaries)
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1], [0,2], [1]])
 
@@ -4248,8 +4365,6 @@ class Test(unittest.TestCase):
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 
-
-
     def testClefs(self):
         s = Stream()
         for x in ['c3','a3','c#4','d3'] * 5:
@@ -4261,5 +4376,69 @@ class Test(unittest.TestCase):
         clefObj = measureStream[0].clef
         self.assertEqual(clefObj.sign, 'F')
 
-if __name__ == "__main__":
+    def testFindConsecutiveNotes(self):
+        s = Stream()
+        n1 = note.Note("c3")
+        n1.quarterLength = 1
+        n2 = chord.Chord(["c4", "e4", "g4"])
+        n2.quarterLength = 4
+        s.insert(0, n1)
+        s.insert(1, n2)
+        l1 = s.findConsecutiveNotes()
+        self.assertTrue(l1[0] is n1)
+        self.assertTrue(l1[1] is n2)
+        l2 = s.findConsecutiveNotes(skipChords = True)
+        self.assertTrue(len(l2) == 1)
+        self.assertTrue(l2[0] is n1)
+        
+        r1 = note.Rest()
+        s2 = Stream()
+        s2.insert([0.0, n1,
+                   1.0, r1, 
+                   2.0, n2])
+        l3 = s2.findConsecutiveNotes()
+        self.assertTrue(l3[1] is None)
+        l4 = s2.findConsecutiveNotes(skipRests = True)
+        self.assertTrue(len(l4) == 2)
+        s3 = Stream()
+        s3.insert([0.0, n1,
+                   1.0, r1,
+                   10.0, n2])
+        l5 = s3.findConsecutiveNotes(skipRests = False)
+        self.assertTrue(len(l5) == 3)  # not 4 because two Nones allowed in a row!
+        l6 = s3.findConsecutiveNotes(skipRests = True, skipGaps = True)
+        self.assertTrue(len(l6) == 2)
+        
+        n1.quarterLength = 10
+        n3 = note.Note("B-")
+        s4 = Stream()
+        s4.insert([0.0, n1,
+                   1.0, n2,
+                   10.0, n3])
+        l7 = s4.findConsecutiveNotes()
+        self.assertTrue(len(l7) == 2) # n2 is hidden because it is in an overlap
+        l8 = s4.findConsecutiveNotes(getOverlaps = True)
+        self.assertTrue(len(l8) == 3)
+        self.assertTrue(l8[1] is n2)
+        l9 = s4.findConsecutiveNotes(getOverlaps = True, skipChords = True)
+        self.assertTrue(len(l9) == 3)
+        self.assertTrue(l9[1] is None)
+        
+        n4 = note.Note("A#")
+        n1.quarterLength = 1
+        n2.quarterLength = 1
+        
+        s5 = Stream()
+        s5.insert([0.0, n1,
+                   1.0, n2,
+                   2.0, n3,
+                   3.0, n4])
+        l10 = s5.findConsecutiveNotes()
+        self.assertTrue(len(l10) == 4)
+        l11 = s5.findConsecutiveNotes(skipUnisons = True)
+        self.assertTrue(len(l11) == 3)
+        self.assertTrue(l11[2] is n3)
+
+if __name__ == "__main__":    
     music21.mainTest(Test)
+        
