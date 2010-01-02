@@ -3,6 +3,7 @@
 # Purpose:      music21 classes for representing articulations
 #
 # Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
@@ -18,48 +19,125 @@ import doctest, unittest
 
 import music21
 
+from music21 import musicxml
+from music21 import environment
 _MOD = "articulations.py"
+environLocal = environment.Environment(_MOD)
 
 
 
+class ClefException(Exception):
+    pass
+
+#-------------------------------------------------------------------------------
 class Articulation(music21.Music21Object):
-    pass
+    def __init__(self):
+        music21.Music21Object.__init__(self)
+        self._mxName = None # specified in subclasses
 
+    def _getMX(self):
+        '''
+        >>> a = Accent()
+        >>> mxArticulations = a.mx
+        >>> mxArticulations.componentList[0].tag
+        'accent'
+        '''
+
+        mxArticulations = musicxml.Articulations()
+        mxArticulationMark = musicxml.ArticulationMark(self._mxName)
+        mxArticulationMark.set('placement', 'above')
+
+        mxArticulations.append(mxArticulationMark)
+        return mxArticulations
+
+
+    def _setMX(self, value):
+        '''
+        '''
+        pass
+
+    mx = property(_getMX, _setMX)
+
+
+#-------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
-    pass
+    def __init__(self):
+        Articulation.__init__(self)
 
 class DynamicArticulation(Articulation):
-    pass
+    def __init__(self):
+        Articulation.__init__(self)
 
 class PitchArticulation(Articulation):
-    pass
+    def __init__(self):
+        Articulation.__init__(self)
 
 class TimbreArticulation(Articulation):
-    pass
+    def __init__(self):
+        Articulation.__init__(self)
 
+
+#-------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> a = Accent()
+        '''
+        DynamicArticulation.__init__(self)
+        self._mxName = 'accent'
 
 class StrongAccent(Accent):
-    pass
+    def __init__(self):
+        '''
+        >>> a = StrongAccent()
+        '''
+        Accent.__init__(self)
+        self._mxName = 'strong-accent'
 
 class Staccato(LengthArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> a = Staccato()
+        '''
+        LengthArticulation.__init__(self)
+        self._mxName = 'staccato'
 
 class Staccatissimo(Staccato):
-    pass
+    def __init__(self):
+        '''
+        >>> a = Staccatissimo()
+        '''
+        Staccato.__init__(self)
+        self._mxName = 'staccatissimo'
 
 class Spiccato(Staccato):
-    pass
+    def __init__(self):
+        '''
+        >>> a = Spiccato()
+        '''
+        Staccato.__init__(self)
+        self._mxName = 'spiccato'
 
 class Tenuto(LengthArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> a = Tenuto()
+        '''
+        LengthArticulation.__init__(self)
+        self._mxName = 'tenuto'
 
 class DetachedLegato(LengthArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> a = DetachedLegato()
+        '''
+        LengthArticulation.__init__(self)
+        self._mxName = 'detached-legato'
+
 
 class IndeterminantSlide(PitchArticulation):    
-    pass
+    def __init__(self):
+        PitchArticulation.__init__(self)
 
 class Scoop(IndeterminantSlide):
     pass

@@ -25,6 +25,9 @@ class ClefException(Exception):
     pass
 
 
+
+# TODO: should lilyName, here and elsewhere, be a private variable, _lilyName?
+
 #-------------------------------------------------------------------------------
 class Clef(music21.Music21Object):
     def __init__(self):
