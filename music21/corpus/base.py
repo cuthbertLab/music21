@@ -84,7 +84,9 @@ def getPaths(extList=None):
     True
     '''
     if extList == None:
-        extList = common.findInputExtension('lily') + common.findInputExtension('mx')
+        extList = (common.findInputExtension('lily') +
+                   common.findInputExtension('mx') +
+                   common.findInputExtension('humdrum'))
     else:
         if not common.isListLike(extList):
             extList = [extList]
