@@ -90,9 +90,9 @@ class Clef(music21.Music21Object):
         if self.sign in ['TAB', 'percussion', 'none']:
             if self.sign == 'TAB':
                 self.__class__ = TabClef
-            if self.sign == 'percussion':
+            elif self.sign == 'percussion':
                 self.__class__ = PercussionClef
-            if self.sign == 'none':
+            elif self.sign == 'none':
                 self.__class__ = NoClef
 
         else:

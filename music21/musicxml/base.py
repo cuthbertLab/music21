@@ -503,12 +503,28 @@ class MusicXMLElementList(MusicXMLElement):
     def __iter__(self):
         return common.Iterator(self.componentList)
 
-
     def __getitem__(self, key):
         '''Get item via index value
         '''
         return self.componentList[key]
 
+    def __add__(self, other):
+        '''Used to combine component lists of objects. There may be other object
+        attributes not on component list that are not 'added' with this method.
+
+        >>> a = MusicXMLElementList()
+        >>> a.componentList.append(1)
+        >>> b = MusicXMLElementList()
+        >>> b.componentList.append(2)
+        >>> c = a + b
+        >>> c.componentList
+        [1, 2]
+        >>> a.componentList # original is not changed
+        [1]
+        '''
+        new = copy.deepcopy(self)
+        new.componentList += other.componentList
+        return new
 
 
 
@@ -594,7 +610,7 @@ class Score(MusicXMLElementList):
         True
         >>> from music21.musicxml import testPrimitive
         >>> b = Document()
-        >>> b.read(testPrimitive.ALL[0])
+        >>> b.read(testPrimitive.pitches01a)
         >>> b.score.getInstrument(b.score.getPartNames().keys()[0])
         <score-part id=P1 part-name=MusicXML Part>
         '''
@@ -1516,6 +1532,19 @@ class Notations(MusicXMLElementList):
                 post.append(part)
         return post
 
+    def getArticulations(self):
+        '''A quick way to get all articulations objects; there may be more than 
+        one.
+
+        Returns a list of ArticulationMark objects
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Articulations):
+                # note: articulation marks are being stripped out
+                post += part.componentList
+        return post
+
 
 class Dynamics(MusicXMLElementList):
     def __init__(self, type=None):
@@ -1540,7 +1569,7 @@ class Articulations(MusicXMLElementList):
         MusicXMLElementList.__init__(self)
         self._tag = 'articulations'
         # attributes
-        # elements are dynamics
+        # elements are articulation marks
         self.componentList = []  # objects tt are part of this node
 
     def _getComponents(self):

@@ -27,7 +27,7 @@ import inspect
 # define file extensions for various foramts
 fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
-    'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'mxl'},
+    'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
@@ -68,11 +68,11 @@ def findFormat(fmt):
     an extension, return the format name as well as the output exensions
 
     >>> findFormat('mx')
-    ('musicxml', '.mxl')
+    ('musicxml', '.xml')
     >>> findFormat('.mxl')
-    ('musicxml', '.mxl')
+    ('musicxml', '.xml')
     >>> findFormat('musicxml')
-    ('musicxml', '.mxl')
+    ('musicxml', '.xml')
     >>> findFormat('jpeg')
     ('jpeg', '.jpg')
     >>> findFormat('lily')

@@ -554,6 +554,24 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ts), 1)
 
 
+    def testConversionMXArticulations(self):
+        from music21.musicxml import testPrimitive
+        mxString = testPrimitive.articulations01
+        a = parse(mxString)
+        part = a[0]
+
+        notes = part.flat.getElementsByClass(note.Note)
+        self.assertEqual(len(notes), 4)
+        post = []
+        match = ["<class 'music21.articulations.Staccatissimo'>", 
+        "<class 'music21.articulations.Accent'>", 
+        "<class 'music21.articulations.Staccato'>", 
+        "<class 'music21.articulations.Tenuto'>"]
+        for i in range(len(notes)):
+            post.append(str(notes[i].articulations[0].__class__))
+        self.assertEqual(post, match)
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)

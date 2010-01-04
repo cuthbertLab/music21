@@ -34,6 +34,7 @@ class Articulation(music21.Music21Object):
     def __init__(self):
         music21.Music21Object.__init__(self)
         self._mxName = None # specified in subclasses
+        self.placement = 'above'
 
     def _getMX(self):
         '''
@@ -45,16 +46,39 @@ class Articulation(music21.Music21Object):
 
         mxArticulations = musicxml.Articulations()
         mxArticulationMark = musicxml.ArticulationMark(self._mxName)
-        mxArticulationMark.set('placement', 'above')
+        mxArticulationMark.set('placement', self.placement)
 
         mxArticulations.append(mxArticulationMark)
         return mxArticulations
 
 
-    def _setMX(self, value):
+    def _setMX(self, mxArticulationMark):
+        '''Provided an mxArticulation object (not an mxArticulations object)
+        to configure the object.
+
+        >>> mxArticulationMark = musicxml.ArticulationMark('accent')
+        >>> a = Articulation()
+        >>> a.mx = mxArticulationMark
+        >>> a._mxName
+        'accent'
         '''
-        '''
-        pass
+        self.placement = mxArticulationMark.get('placement')
+        self._mxName = mxArticulationMark.tag
+        if self._mxName == 'accent':
+            self.__class__ = Accent
+        elif self._mxName == 'strong-accent':
+            self.__class__ = StrongAccent
+        elif self._mxName == 'staccato':
+            self.__class__ = Staccato
+        elif self._mxName == 'staccatissimo':
+            self.__class__ = Staccatissimo
+        elif self._mxName == 'spiccato':
+            self.__class__ = Spiccato
+        elif self._mxName == 'tenuto':
+            self.__class__ = Tenuto
+        elif self._mxName == 'detached-legato':
+            self.__class__ = DetachedLegato
+        # add more, below
 
     mx = property(_getMX, _setMX)
 
@@ -165,7 +189,7 @@ class Unstress(DynamicArticulation):
 
 
 
-########
+#-------------------------------------------------------------------------------
 class TechnicalIndication(object):
     '''
     TechnicalIndications (MusicXML: technical) give performance indications specific to different instrument types.
@@ -178,6 +202,8 @@ class Harmonic(TechnicalIndication):
 class Bowing(TechnicalIndication):  
     pass
 
+
+#-------------------------------------------------------------------------------
 class UpBow(Bowing):
     pass
 

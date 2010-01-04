@@ -18,6 +18,7 @@ import string, copy, math
 import unittest, doctest
 
 import music21
+from music21 import articulations
 from music21 import common
 from music21 import defaults
 from music21 import duration
@@ -594,6 +595,7 @@ class GeneralNote(music21.Music21Object):
         mxMeasure.setDefaults()
         for mxNote in mxNoteList:
             mxMeasure.append(mxNote)
+
         mxPart = musicxml.Part()
         mxPart.setDefaults()
         mxPart.append(mxMeasure)
@@ -1087,14 +1089,26 @@ class Note(NotRest):
         # need to apply beams to notes, but application needs to be
         # reconfigured based on what is gotten from self.duratoin.mx
 
-        # likely, this means that many continue beams
-        # will need to be added
+        # likely, this means that many continue beams will need to be added
 
         # this is setting the same beams for each part of this 
-        # note; this may not be correct, as we may be dividing the note
+        # note; this may not be correct, as we may be dividing the note into
+        # more than one part
         for mxNote in mxNoteList:
             if self.beams != None:
                 mxNote.beamList = self.beams.mx
+
+        # if we have any articulations, they only go on the first of any 
+        # component notes
+        mxArticulations = None
+        for i in range(len(self.articulations)):
+            obj = self.articulations[i]
+            if i == 0: # assign first
+                mxArticulations = obj.mx # mxArt... stores more than one artic
+            else: # concatenate any remaining
+                mxArticulations += obj.mx
+        if mxArticulations != None:
+            mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
         return mxNoteList
 
@@ -1120,6 +1134,15 @@ class Note(NotRest):
             tieObj.mx = mxNote # provide entire Note
             # self.tie is defined in GeneralNote as None by default
             self.tie = tieObj
+
+        mxNotations = mxNote.get('notations')
+        if mxNotations != None:
+            # get a list of mxArticulationMarks, not mxArticulations
+            mxArticulationMarkList = mxNotations.getArticulations()
+            for mxObj in mxArticulationMarkList:
+                articulationObj = articulations.Articulation()
+                articulationObj.mx = mxObj
+                self.articulations.append(articulationObj)
 
     mx = property(_getMX, _setMX)    
 
