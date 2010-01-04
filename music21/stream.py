@@ -2362,7 +2362,7 @@ class Stream(music21.Music21Object):
         multiPart = False
         meterStream = self.getTimeSignatures() # get from containter first
 
-        # we need independent sub-stream elements to shfit in presentation
+        # we need independent sub-stream elements to shift in presentation
         highestTime = 0
 
         for obj in self:
@@ -2560,20 +2560,25 @@ class Stream(music21.Music21Object):
 
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, skipUnisons = False, 
-                               skipGaps = False, getOverlaps = False):
+                               skipGaps = False, getOverlaps = False, noNone = False, **keywords):
         '''
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
         at any point there is a discontinuity (such as if there is a rest between two pitches).
         The method is used by melodicIntervals.
         
-        How to determine consecutive pitches is a little tricky.  In the simplest example [[XXX]]
+        How to determine consecutive pitches is a little tricky and there are many options.  
 
-        skipUnison uses the midi-note value to determine unisons, so enharmonic transitions (F# -> Gb) are
+        skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are
         also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because
         of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
         will give you the number of P1s in the piece, because there could be d2's in there as well.
         
-        TODO: WRITE
+        N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX
+        
+        See Test.testFindConsecutiveNotes() for usage details.
+        
+        (**keywords is there so that other methods that pass along dicts to findConsecutiveNotes don't have to remove 
+        their own args)
         '''
         sortedSelf = self.sorted
         returnList = []
@@ -2583,8 +2588,9 @@ class Stream(music21.Music21Object):
         lastPitch = None
         for el in sortedSelf.elements:
             if lastWasNone is False and skipGaps is False and el.offset > lastEnd:
-                returnList.append(None)
-                lastWasNone = True
+                if not noNone:
+                    returnList.append(None)
+                    lastWasNone = True
             if hasattr(el, "pitch"):
                 if skipUnisons is False or isinstance(lastPitch, list) or lastPitch is None or el.pitch.ps != lastPitch.ps:
                     if getOverlaps is True or el.offset >= lastEnd:
@@ -2604,9 +2610,10 @@ class Stream(music21.Music21Object):
             elif hasattr(el, "pitches"):
                 if skipChords is True:
                     if lastWasNone is False:
-                        returnList.append(None)
-                        lastWasNone = True
-                        lastPitch = None
+                        if not noNone:
+                            returnList.append(None)
+                            lastWasNone = True
+                            lastPitch = None
                 else:
                     if (skipUnisons is True and isinstance(lastPitch, list) and
                         el.pitches[0].ps == lastPitch[0].ps):
@@ -2628,9 +2635,10 @@ class Stream(music21.Music21Object):
                             returnList.append(el)
 
             elif skipRests is False and isinstance(el, note.Rest) and lastWasNone is False:
-                returnList.append(None)
-                lastWasNone = True
-                lastPitch = None
+                if noNone is False:
+                    returnList.append(None)
+                    lastWasNone = True
+                    lastPitch = None
             elif skipRests is True and isinstance(el, note.Rest):
                 lastEnd = el.offset + el.duration.quarterLength
         
@@ -2650,9 +2658,8 @@ class Stream(music21.Music21Object):
         The interval between a Note and a Chord (or between two chords) is the interval between pitches[0].
         For more complex interval calculations, run findConsecutiveNotes and then use generateInterval
         '''
-        pass
-
-
+        returnList = self.findConsecutiveNotes(**skipKeywords)
+        returnStream = self.__class__()
 
 
     #---------------------------------------------------------------------------
@@ -4441,4 +4448,3 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":    
     music21.mainTest(Test)
-        

@@ -1230,7 +1230,9 @@ class Tuplet(object):
         mxTimeModification.set('normal-notes', self.numberNotesNormal)
         mxTimeModification.set('normal-type', self.durationNormal.type)
 
-        if self.type != None:
+        if self.type != None and self.type != "":
+            if self.type not in ["start", "stop"]:
+                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
             mxTuplet = musicxmlMod.Tuplet()
             # start/stop; needs to bet set by group
             mxTuplet.set('type', self.type) 
@@ -2355,4 +2357,4 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)

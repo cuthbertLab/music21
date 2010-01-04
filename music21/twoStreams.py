@@ -33,8 +33,16 @@ class TwoStreamComparer(object):
 
     def attackedTogether(self):
         '''returns an ordered list of pairs of notes that are attacked
-        at the same time'''
+        at the same time
+        
+        inefficient because does not use offset lists
+        
+        TODO: write an efficient method.
+        '''
         sameAttack = []
+        for el1 in self.stream1:
+            for el2 in self.stream2:
+                
         for i in range(len(self.stream1.noteTimeInfo)):
             for j in range(len(self.stream2.noteTimeInfo)):
                 if (self.stream1.noteTimeInfo[i]['start'] == self.stream2.noteTimeInfo[j]['start']):

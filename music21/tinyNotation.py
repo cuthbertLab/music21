@@ -26,6 +26,9 @@ from music21 import stream
 from music21 import notationMod
 from music21 import meter
 
+def lineToStream(line):
+    tnl = TinyNotationLine(line)
+    return tnl.stream
 
 class TinyNotationLine(object):
     '''A TinyNotationLine begins as a string representation similar to Lilypond format
@@ -280,15 +283,29 @@ Total duration of Stream: 6.0
 '''
         self.assertTrue(common.basicallyEqual(canonical, ret))
     
+    def testConvert(self):
+        st1 = lineToStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
+        self.assertEqual(st1[1].offset, 2.0) 
+        self.assertTrue(isinstance(st1[2], music21.note.Rest))     
+    
 class TestExternal(unittest.TestCase):    
 
-    def testCreateEasyScale(self):
+    def xtestCreateEasyScale(self):
         myScale = "d8 e f g a b"
         time1 = meter.TimeSignature("3/4")
         tinyNotation = TinyNotationLine(myScale, time1)
         s1 = tinyNotation.stream
         s1.lily.showPDF()
+    
+    def testMusicXMLExt(self):
+        cadB = lineToStream("C2 c8 B- B- A c trip{d16 c B-} A8 B-")
+#        last = cadB[10]
+#        cadB = stream.Stream()
+#        n1 = music21.note.Note()
+#        n1.duration.type = "whole"
+#        cadB.append(n1)
+        cadB.show()
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal, Test)
