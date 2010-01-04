@@ -1028,6 +1028,12 @@ def kernTandamToControl(tandam):
             return music21.clef.NoClef()
         elif clefType == "X":
             return music21.clef.PercussionClef()
+        elif clefType == "Gv2": # undocumented in Humdrum, but appears in Huron's Chorales
+            return music21.clef.Treble8vbClef()
+        elif clefType == "G^2": # unknown if ever used but better safe...
+            return music21.clef.Treble8vaClef()
+        elif clefType == "Fv4": # unknown if ever used but better safe...
+            return music21.clef.Bass8vbClef()
         else:
             try:
                 clefifier = music21.clef.standardClefFromXN(clefType)
@@ -1161,7 +1167,7 @@ class Test(unittest.TestCase):
         expectedOutput = canonicalOutput.mazurka6repr
 #        self.assertTrue(common.basicallyEqual
 #                          (common.stripAddresses(expectedOutput),
-#                           common.stripAddresses(masterStream.recurseRepr())))
+#                           common.stripAddresses(masterStream._reprText())))
 #        print common.stripAddresses(expectedOutput)
 #       print common.stripAddresses(masterStream.recurseRepr())
         

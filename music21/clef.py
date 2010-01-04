@@ -201,6 +201,8 @@ class Treble8vbClef(TrebleClef):
         >>> a = Treble8vbClef()
         >>> a.sign
         'G'
+        >>> a.octaveChange
+        -1
         '''
         TrebleClef.__init__(self)
         self.lilyName = "treble_8"
@@ -213,6 +215,8 @@ class Treble8vaClef(TrebleClef):
         >>> a = Treble8vaClef()
         >>> a.sign
         'G'
+        >>> a.octaveChange
+        1
         '''
         TrebleClef.__init__(self)
         self.octaveChange = 1
@@ -279,6 +283,9 @@ class TenorClef(CClef):
         >>> a = TenorClef()
         >>> a.sign
         'C'
+        >>> a.line
+        4
+        
         '''
         CClef.__init__(self)
         self.line = 4
@@ -290,6 +297,8 @@ class CBaritoneClef(CClef):
         >>> a = CBaritoneClef()
         >>> a.sign
         'C'
+        >>> a.line
+        5
         '''
         CClef.__init__(self)
         self.line = 5
@@ -313,6 +322,13 @@ class FBaritoneClef(FClef):
         >>> a = FBaritoneClef()
         >>> a.sign
         'F'
+        >>> a.line
+        3
+        >>> b = CBaritoneClef()
+        >>> a.lowestLine == b.lowestLine
+        True
+        >>> a.sign == b.sign
+        False
         '''
         FClef.__init__(self)
         self.line = 3
@@ -336,6 +352,8 @@ class Bass8vbClef(FClef):
         >>> a = Bass8vbClef()
         >>> a.sign
         'F'
+        >>> a.octaveChange
+        -1
         '''
         FClef.__init__(self)
         self.line = 4

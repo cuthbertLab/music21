@@ -26,8 +26,8 @@ from music21 import stream
 from music21 import notationMod
 from music21 import meter
 
-def lineToStream(line):
-    tnl = TinyNotationLine(line)
+def lineToStream(line, timeSignature = None):
+    tnl = TinyNotationLine(line, timeSignature)
     return tnl.stream
 
 class TinyNotationLine(object):
@@ -53,8 +53,8 @@ class TinyNotationLine(object):
         elif (hasattr(timeSignature, "barDuration")): # is a TimeSignature object
             barDuration = timeSignature.barDuration
         else: # is a string
-            tempTs = meter.TimeSignature(timeSignature)
-            barDuration = tempTs.barDuration
+            timeSignature = meter.TimeSignature(timeSignature)
+            barDuration = timeSignature.barDuration
 
         noteList = []
         dict1 = { 'inTrip': False,
@@ -298,12 +298,13 @@ class TestExternal(unittest.TestCase):
         s1.lily.showPDF()
     
     def testMusicXMLExt(self):
-        cadB = lineToStream("C4 c8 B- B- A c trip{d16 c B-} A8 B-")
+        cadB = lineToStream("c8 B- B- A c trip{d16 c B-} A8 B- A0", "2/4")
 #        last = cadB[10]
 #        cadB = stream.Stream()
 #        n1 = music21.note.Note()
 #        n1.duration.type = "whole"
 #        cadB.append(n1)
+#        cadB.lily.showPDF()
         cadB.show()
 
 
