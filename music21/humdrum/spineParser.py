@@ -869,7 +869,7 @@ def hdStringToNote(contents):
         thisObject.articulations.append(music21.articulations.Pizzicato())
     if contents.count('`'):
         ### HMMMMM? WHAT DOES THIS MEAN?  Can't find it anywhere.
-        raise HumdrumException("Attacca mark found -- what is that?  I cannot find any references to attacca marks anywhere!")
+        raise HumdrumException("Attacca mark found -- what is that?  I cannot find any references to attacca marks anywhere on the web or reference books!")
     if contents.count('~'):
         thisObject.articulations.append(music21.articulations.Tenuto())
     if contents.count('^'):

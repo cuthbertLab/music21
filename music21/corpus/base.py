@@ -160,9 +160,7 @@ def getWork(workName, movementNumber = None):
     if common.isListLike(workName):
         workName = os.path.sep.join(workName)
 
-    # below, should '\\' be replaced by os.path.sep?
-    # or removed, and not encouraged?
-    workSlashes = re.sub('/', r'\\', workName)
+    workSlashes = workName.replace('/', os.path.sep)
 
     for path in paths:
         if workName.lower() in path.lower():
