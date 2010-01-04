@@ -3493,7 +3493,7 @@ class TestExternal(unittest.TestCase):
         tup1.tupletNormal = [3, dur1]
 
         q.octave = 2
-        q.duration.tuplets.append(tup1)
+        q.duration.addTuplet(tup1)
         
         
         for i in range(0,5):

@@ -19,10 +19,9 @@ def showDots():
     
     for m in partBass.measures:
         for n in m.notes:
-            n.lyrics = []
             for i in range(ts.getBeatDepth(n.offset)):
                 n.lyrics.append(note.Lyric('.', i+1))
     
-    partBass.measures[0:7].show('musicxml') 
+    partBass.measures[0:7].show() 
 
 showDots()

@@ -507,8 +507,7 @@ class GeneralNote(music21.Music21Object):
         '''
         # this presently only creates one lyric, and destroys any existing
         # lyric
-        if not self.lyrics:
-            self.lyrics = [] 
+        self.lyrics = [] 
         self.lyrics.append(Lyric(value))
 
     lyric = property(_getLyric, _setLyric)
