@@ -3,7 +3,7 @@ def showDots():
     from music21 import corpus, meter
     
     score = corpus.parseWork('bach/bwv281.xml') 
-    partBass = score[3]
+    partBass = score.getElementById('Bass')
     ts = partBass.flat.getElementsByClass(
          meter.TimeSignature)[0]
     
@@ -24,10 +24,11 @@ def showDots():
     
     partBass.measures[0:7].show() 
 
+
+
 def findRaisedSevenths():
     import music21
-    from music21 import corpus, meter, stream, note
-    from music21.note import Lyric
+    from music21 import corpus, meter, stream
 
     score = corpus.parseWork('bach/bwv366.xml')  
     ts = score.flat.getElementsByClass(
@@ -54,6 +55,38 @@ def findRaisedSevenths():
 
     found.show('musicxml')
 
+
+
+def newAccent():
+    from music21 import corpus, meter, articulations
+    
+    score = corpus.parseWork('bach/bwv366.xml')
+    partBass = score.getElementById('Bass')
+    
+    ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]
+    ts.beat.partition(['3/8', '3/8'])
+    ts.accent.partition(['3/8', '3/8'])
+    ts.setAccentWeight([1, .5])
+    
+    for m in partBass.measures:
+        lastBeat = None
+        for n in m.notes:
+            beat, progress = ts.getBeatProgress(n.offset)
+            if beat != lastBeat and progress == 0:
+                if n.tie != None and n.tie.type == 'stop':
+                    continue
+                if ts.getAccentWeight(n.offset) == 1:
+                    mark = articulations.StrongAccent()
+                elif ts.getAccentWeight(n.offset) == .5:
+                    mark = articulations.Accent()
+                n.articulations.append(mark)
+                lastBeat = beat
+            m = m.sorted
+    
+    partBass.measures[0:8].show('musicxml')
+
+
 if __name__ == "__main__":
     showDots()
     findRaisedSevenths()
+    newAccent()

@@ -25,7 +25,7 @@ def simple1():
         score = corpus.parseWork(work, movementNumber)
     
         for part in score:
-            instrumentName = part.getElementsByClass(instrument.Instrument)[0].findName()
+            instrumentName = part.getElementsByClass(instrument.Instrument)[0].bestName()
             grapher = correlate.NoteAnalysis(part.flat.sorted)    
             grapher.pitchToLengthScatter(title='%s, Movement %s, %s' % (work, movementNumber, instrumentName))
 
@@ -36,7 +36,7 @@ def simple1():
 #            na = correlate.NoteAnalysis(part.flat.sorted)    
 #            na.noteAttributeScatter('quarterLength', 'midi', 
 #                                    xLabel='Duration', yLabel='Pitch',
-#                                    title='%s, Movement %s, %s' % (work, movementNumber, iObj.findName()),
+#                                    title='%s, Movement %s, %s' % (work, movementNumber, iObj.bestName()),
 #                                    yTicks=correlate.ticksPitchSpace(),
 #                                    xTicks=correlate.ticksQuarterLength()
 #                                    )
@@ -126,7 +126,7 @@ def simple4a():
         # get the instrument object from the stream
         iObj = part.getElementsByClass(instrument.Instrument)[0]
         am = correlate.ActivityMatch(part.flat.sorted)
-        titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.findName())
+        titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
         am.pitchToDynamic(title=titleStr)
 
 

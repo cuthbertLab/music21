@@ -103,7 +103,7 @@ def findHighestNotes():
     import music21
     from music21 import corpus, meter, stream
     
-    score = corpus.parseWork('bach/bwv366')
+    score = corpus.parseWork('bach/bwv366.xml')
     ts = score.flat.getElementsByClass(meter.TimeSignature)[0]
     ts.beat.partition(3)
     

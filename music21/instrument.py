@@ -26,7 +26,6 @@ environLocal = environment.Environment(_MOD)
 
 class Instrument(music21.Music21Object):
 
-
     def __init__(self):
         music21.Music21Object.__init__(self)
 
@@ -45,18 +44,18 @@ class Instrument(music21.Music21Object):
     def __repr__(self):
         return "<music21.instrument.Instrument %s>" % self.__str__()
 
-    def findName(self):
+    def bestName(self):
         '''Find a viable name, looking first at instrument, then part, then 
         abbreviations.
         '''
-        if self.instrumentName != None:
-            return self.instrumentName
-        elif self.partName != None:
+        if self.partName != None:
             return self.partName
-        elif self.instrumentAbbreviation != None:
-            return self.instrumentAbbreviation
+        elif self.instrumentName != None:
+            return self.instrumentName
         elif self.partAbbreviation != None:
             return self.partAbbreviation
+        elif self.instrumentAbbreviation != None:
+            return self.instrumentAbbreviation
         else:
             return None
 

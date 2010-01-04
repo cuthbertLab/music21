@@ -2471,6 +2471,8 @@ class Stream(music21.Music21Object):
         instrumentObj.groups.append(partId)
 
         streamPart = Part() # create a part instance for each part
+        if instrumentObj.bestName() != None:
+            streamPart.id = instrumentObj.bestName()
         streamPart.insert(instrumentObj) # add instrument at zero offset
 
         # offset is in quarter note length
