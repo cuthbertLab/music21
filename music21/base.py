@@ -1198,11 +1198,12 @@ class ElementWrapper(Music21Object):
         2.0
 
         ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY
-        >>> import music21.key
-        >>> ks1 = ElementWrapper(music21.key.KeySignature())
+        >>> class KindaStupid(object):
+        ...     pass
+        >>> ks1 = ElementWrapper(KindaStupid())
         >>> ks1.obj.duration
         Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
+        AttributeError: 'KindaStupid' object has no attribute 'duration'
         
         >>> import duration
         >>> ks1.duration = duration.Duration("whole")
@@ -1210,7 +1211,7 @@ class ElementWrapper(Music21Object):
         4.0
         >>> ks1.obj.duration  # still not defined
         Traceback (most recent call last):
-        AttributeError: 'KeySignature' object has no attribute 'duration'
+        AttributeError: 'KindaStupid' object has no attribute 'duration'
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration

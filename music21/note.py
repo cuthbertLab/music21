@@ -492,27 +492,74 @@ class GeneralNote(music21.Music21Object):
 
 
     def _getLyric(self):
+        '''
+        returns the first Lyric's text
+        
+        todo: should return a \\n separated string of lyrics
+        '''
+        
         if len(self.lyrics) > 0:
             return self.lyrics[0].text
         else:
             return None
 
     def _setLyric(self, value): 
-        '''should check data here
+        '''
+        
+        TODO: should check data here
+        should split \\n separated lyrics into different lyrics
+
+        presently only creates one lyric, and destroys any existing
+        lyrics
 
         >>> a = GeneralNote()
         >>> a.lyric = 'test'
         >>> a.lyric
         'test'
         '''
-        # this presently only creates one lyric, and destroys any existing
-        # lyric
         self.lyrics = [] 
         self.lyrics.append(Lyric(value))
 
     lyric = property(_getLyric, _setLyric)
 
+    def addLyric(self, text, lyricNumber = None):
+        '''
+        adds another lyric to the note's lyric list optionally with a certain lyric number
 
+        >>> n1 = Note()
+        >>> n1.addLyric("hello")
+        >>> n1.lyrics[0].text
+        'hello'
+        >>> n1.lyrics[0].number
+        1
+        
+        ## note that the option number specified gives the lyric number, not the list position
+        >>> n1.addLyric("bye", 3)
+        >>> n1.lyrics[1].text
+        'bye'
+        >>> n1.lyrics[1].number
+        3
+        
+        ## replace existing lyric
+        >>> n1.addLyric("ciao", 3)
+        >>> n1.lyrics[1].text
+        'ciao'
+        >>> n1.lyrics[1].number
+        3
+        '''
+                
+        if lyricNumber is None:
+            maxLyrics = len(self.lyrics) + 1
+            self.lyrics.append(Lyric(text, maxLyrics))
+        else:
+            foundLyric = False
+            for thisLyric in self.lyrics:
+                if thisLyric.number == lyricNumber:
+                    thisLyric.text = text
+                    foundLyric = True
+                    break
+            if foundLyric is False:
+                self.lyrics.append(Lyric(text, lyricNumber))
 
 
     #---------------------------------------------------------------------------

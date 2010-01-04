@@ -57,6 +57,7 @@ class KeySignature(music21.Music21Object):
     numberSharps = None  # None is different from 0; negative used for flats.
 
     def __init__(self, numSharps = None):
+        music21.Music21Object.__init__(self)
         self.numberSharps = numSharps
 
     def strSharpsFlats(self):
