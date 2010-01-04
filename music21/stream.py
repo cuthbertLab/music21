@@ -1454,7 +1454,7 @@ class Stream(music21.Music21Object):
             offset = round(e.getOffsetBySite(srcObj), 8)
             offsetMap.append([offset, offset + dur, copy.copy(e)])
     
-        environLocal.printDebug(['makesMeasures()', offsetMap])    
+        #environLocal.printDebug(['makesMeasures()', offsetMap])    
     
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([start for start, end, e in offsetMap])
