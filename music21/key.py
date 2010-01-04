@@ -53,7 +53,7 @@ def keyFromString(strKey):
     #raise KeyException("keyFromString not yet written")
 
 
-class KeySignature(object):
+class KeySignature(music21.Music21Object):
     numberSharps = None  # None is different from 0; negative used for flats.
 
     def __init__(self, numSharps = None):
