@@ -298,7 +298,7 @@ class TestExternal(unittest.TestCase):
         s1.lily.showPDF()
     
     def testMusicXMLExt(self):
-        cadB = lineToStream("C2 c8 B- B- A c trip{d16 c B-} A8 B-")
+        cadB = lineToStream("C4 c8 B- B- A c trip{d16 c B-} A8 B-")
 #        last = cadB[10]
 #        cadB = stream.Stream()
 #        n1 = music21.note.Note()
