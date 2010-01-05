@@ -5,18 +5,24 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 import doctest, unittest
 
-
 import music21
-
+from music21 import pitch
 from music21 import note
-from music21 import stream
 from music21 import interval
+from music21 import musicxml
 
+
+#-------------------------------------------------------------------------------
+class KeySignatureException(Exception):
+    pass
+
+
+#-------------------------------------------------------------------------------
 
 class Key(music21.Music21Object):
     '''
@@ -47,21 +53,43 @@ class Key(music21.Music21Object):
         self.accidental = accidental
         self.type = type
 
+
 def keyFromString(strKey):
     #TODO: Write keyFromString
     return None
     #raise KeyException("keyFromString not yet written")
 
 
+
+
+
+
+
+#-------------------------------------------------------------------------------
 class KeySignature(music21.Music21Object):
-    numberSharps = None  # None is different from 0; negative used for flats.
 
-    def __init__(self, numSharps = None):
+    # note that musicxml permits non-tradtional keys by specifying
+    # one or more altered tones; these are given as pairs of 
+    # step names and semiton alterations
+
+    def __init__(self, sharps = None):
+        '''
+        >>> a = KeySignature(3)
+        >>> a._strDescription()
+        '3 sharps'
+        '''
         music21.Music21Object.__init__(self)
-        self.numberSharps = numSharps
+        # position on the circle of fifths, where 1 is one sharp, -1 is one flat
+        self.sharps = sharps
+        # optionally store mode, if known
+        self.mode = None
+        # need to store a list of pitch objects, used for creating a 
+        # non traditional key
+        self.alteredTones = []
 
-    def strSharpsFlats(self):
-        ns = self.numberSharps
+    #---------------------------------------------------------------------------
+    def _strDescription(self):
+        ns = self.sharps
         if ns == None:
             return 'None'
         elif ns > 1:
@@ -76,8 +104,49 @@ class KeySignature(music21.Music21Object):
             return "%s flats" % str(abs(ns))
         
     def __repr__(self):
-        return "<music21.key.KeySignature of %s>" % self.strSharpsFlats()
+        return "<music21.key.KeySignature of %s>" % self._strDescription()
         
+
+    #---------------------------------------------------------------------------
+    # properties
+
+    def _getMX(self):
+        '''Returns a musicxml.KeySignature object
+       
+        >>> a = KeySignature(3)
+        >>> a.sharps = -3
+        >>> mxKey = a.mx
+        >>> mxKey.get('fifths')
+        -3
+        '''
+        mxKey = musicxml.Key()
+        mxKey.set('fifths', self.sharps)
+        if self.mode != None:
+            mxKey.set('mode', self.mode)
+        return mxKey
+
+
+    def _setMX(self, mxKeyList):
+        '''Given a mxKey object or keyList, load internal attributes
+        >>> a = musicxml.Key()
+        >>> a.set('fifths', 5)
+        >>> b = KeySignature()
+        >>> b.mx = [a]
+        >>> b.sharps
+        5 
+        '''
+        if len(mxKeyList) == 1:
+            mxKey = mxKeyList[0]
+        else:
+            raise KeySignatureException('found a key from MusicXML that has more than one key defined')
+
+        self.sharps = int(mxKey.get('fifths'))
+        mxMode = mxKey.get('mode')
+        if mxMode != None:
+            self.mode = mxMode
+
+
+    mx = property(_getMX, _setMX)
 
 
 
@@ -114,7 +183,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         a = KeySignature()
-        self.assertEqual(a.numberSharps, None)
+        self.assertEqual(a.sharps, None)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import instrument
+from music21 import key
 from music21 import lily as lilyModule
 from music21 import measure
 from music21 import meter
@@ -2471,6 +2472,7 @@ class Stream(music21.Music21Object):
         instrumentObj.groups.append(partId)
 
         streamPart = Part() # create a part instance for each part
+        # set part id to stream best name
         if instrumentObj.bestName() != None:
             streamPart.id = instrumentObj.bestName()
         streamPart.insert(instrumentObj) # add instrument at zero offset
@@ -3006,6 +3008,7 @@ class Measure(Stream):
 
         self.timeSignatureIsNew = False
         self.clefIsNew = False
+        self.keyIsNew = False
 
         self.filled = False
         self.measureNumber = 0   # 0 means undefined or pickup
@@ -3140,6 +3143,40 @@ class Measure(Stream):
 
     timeSignature = property(_getTimeSignature, _setTimeSignature)   
 
+
+    def _getKey(self):
+        '''
+        >>> a = Measure()
+        >>> a.key = key.KeySignature(0)
+        >>> a.key.sharps 
+        0
+        '''
+        keyList = self.getElementsByClass(key.KeySignature)
+        # only return key that has a zero offset
+        keyList = keyList.getElementsByOffset(0,0)
+        if len(keyList) == 0:
+            return None
+        else:
+            return keyList[0]    
+    
+    def _setKey(self, keyObj):
+        '''
+        >>> a = Measure()
+        >>> a.key = key.KeySignature(3)
+        >>> a.key.sharps   
+        3
+        >>> a.key = key.KeySignature(6)
+        >>> a.key.sharps
+        6
+        '''
+        oldKey = self._getKey()
+        if oldKey != None:
+            environLocal.printDebug(['removing key', oldKey])
+            junk = self.pop(self.index(oldKey))
+        self.insert(0, keyObj)
+
+    key = property(_getKey, _setKey)   
+
     #---------------------------------------------------------------------------
     def _getMX(self):
         '''Return a musicxml Measure, populated with notes, chords, rests
@@ -3169,6 +3206,10 @@ class Measure(Stream):
         # the clef in the clef last defined in the parent
         if self.clef != None:
             mxAttributes.clefList = [self.clef.mx]
+
+        if self.key != None: 
+            # key.mx returns a Key ojbect, needs to be in a list
+            mxAttributes.keyList = [self.key.mx]
         
         if self.timeSignature != None:
             mxAttributes.timeList = self.timeSignature.mx 
@@ -3207,28 +3248,20 @@ class Measure(Stream):
                 raise StreamException(
                     'no mxAttribues available for this measure')
 
-        # if no time is defined, get the last defined value from external
-#         if len(mxAttributes.timeList) == 0:
-#             if mxMeasure.external['time'] != None:
-#                 mxTimeList = [mxMeasure.external['time']]
-#             else:
-#                 mxTime = musicxmlMod.Time()
-#                 mxTime.setDefaults()
-#                 mxTimeList = [mxTime]
-#         else:
-#             mxTimeList = mxAttributes.timeList
+        #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
+        #                        mxAttributesInternal])
 
         if mxAttributesInternal and len(mxAttributes.timeList) != 0:
             self.timeSignature = meter.TimeSignature()
             self.timeSignature.mx = mxAttributes.timeList
 
-        # only set clef if it is defined 
-        # we must check that attributes are derived from the measure proper
-        #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
-        #                        mxAttributesInternal])
         if mxAttributesInternal == True and len(mxAttributes.clefList) != 0:
             self.clef = clef.Clef()
             self.clef.mx = mxAttributes.clefList
+
+        if mxAttributesInternal == True and len(mxAttributes.keyList) != 0:
+            self.key = key.KeySignature()
+            self.key.mx = mxAttributes.keyList
 
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure        

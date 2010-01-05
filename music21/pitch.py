@@ -828,26 +828,6 @@ class Pitch(music21.Music21Object):
 
 
 
-#     def write(self, format='musicxml', fp=None):
-#         '''Write a file.
-#         
-#         A None file path will result in temporary file
-#         '''
-#         if format == 'musicxml':
-#             if fp == None:
-#                 fp = environLocal.getTempFile('.xml')
-#             dataStr = self.musicxml
-#         f = open(fp, 'w')
-#         f.write(dataStr)
-#         f.close()
-#         return fp
-# 
-#     def show(self, format='musicxml'):
-#         '''This might need to return the file path.
-#         '''
-#         environLocal.launch(format, self.write(format))
-
-
     #---------------------------------------------------------------------------
     def _getDiatonicNoteNum(self):
         '''

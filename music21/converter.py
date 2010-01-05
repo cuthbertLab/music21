@@ -27,6 +27,7 @@ from music21 import common
 from music21 import dynamics
 from music21 import humdrum
 from music21 import instrument
+from music21 import key
 from music21 import meter
 from music21 import musicxml
 from music21 import note
@@ -570,6 +571,17 @@ class Test(unittest.TestCase):
         for i in range(len(notes)):
             post.append(str(notes[i].articulations[0].__class__))
         self.assertEqual(post, match)
+
+
+    def testConversionMXKey(self):
+        from music21.musicxml import testPrimitive
+        mxString = testPrimitive.keySignatures13a
+        a = parse(mxString)
+        part = a[0]
+
+        keyList = part.flat.getElementsByClass(key.KeySignature)
+        self.assertEqual(len(keyList), 46)
+
 
 
 if __name__ == "__main__":

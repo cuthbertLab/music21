@@ -193,17 +193,6 @@ class Dynamic(music21.Music21Object):
     def _getMusicXML(self):
         '''Provide a complete MusicXM: representation.
         '''
-        #mxDynamicMark = self._getMX()
-        #mxDynamics = musicxml.Dynamics()
-#         mxDynamics = self._getMX()
-# 
-#         mxDirectionType = musicxml.DirectionType()
-#         mxDirectionType.append(mxDynamics)
-# 
-#         mxDirection = musicxml.Direction()
-#         mxDirection.append(mxDirectionType)
-
-
         mxDirection = self._getMX()
 
         mxMeasure = musicxml.Measure()

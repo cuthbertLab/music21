@@ -1051,7 +1051,7 @@ class Attributes(MusicXMLElement):
         self.keyList.append(mxKey)
 
 class Key(MusicXMLElement):
-    # musicXml permits traditional and non-traditional keys
+    # permits traditional and non-traditional keys
     # non traditional keys use key-step and key-alter pairs
     # traditional uses fifths, mode
     def __init__(self):
@@ -1062,7 +1062,7 @@ class Key(MusicXMLElement):
         # optional attributes that refers to staff numbers
         self._attr['number'] = None
         # cancel is given as a fifths value of the canceld key
-        self.cancel = None # if a pervious key signature should be canceled
+        self.cancel = None # if a previous key signature should be canceled
         self.fifths = None
         self.mode = None
         # non-traditional keys are defined as three tags
