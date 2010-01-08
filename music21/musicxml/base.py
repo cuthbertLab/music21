@@ -37,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 2, 0) 
+VERSION_MINIMUM = (0, 2, 2) 
 
 
 #-------------------------------------------------------------------------------
@@ -1351,6 +1351,10 @@ class Note(MusicXMLElement):
 
         # attributes: mostly position information default-x, etc
         self._attr['color'] = None
+        self._attr['print-object'] = None # may be yes or no
+        self._attr['print-dot'] = None # may be yes or no
+        self._attr['print-spacing'] = None # may be yes or no
+
         # simple elements
         self.chord = False # boolean, default is false
         self.duration = None # number, in div per quarter
@@ -1373,6 +1377,7 @@ class Note(MusicXMLElement):
         self.tieList = [] # list of objects, at most two; for sound, not notation
 
         self._crossReference['pitchObj'] = ['pitch']
+        self._crossReference['graceObj'] = ['grace']
         self._crossReference['accidentalObj'] = ['accidental']
         self._crossReference['timeModificationObj'] = ['timemodification']
         self._crossReference['noteheadObj'] = ['notehead']
@@ -1997,6 +2002,7 @@ class Handler(xml.sax.ContentHandler):
             self._noteObj.external['measure'] = self._measureObj
             self._noteObj.external['attributes'] = self._attributesObjLast
             self._noteObj.external['divisions'] = self._divisionsLast
+            self._noteObj.loadAttrs(attrs)
 
         elif name == 'beam':
             self._beamObj = Beam()
@@ -2086,6 +2092,7 @@ class Handler(xml.sax.ContentHandler):
 
 
         elif name == 'grace':
+            #environLocal.printDebug('creating mxGrace object')
             self._graceObj = Grace()
             self._graceObj.loadAttrs(attrs)
 

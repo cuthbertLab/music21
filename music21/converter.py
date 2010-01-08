@@ -204,9 +204,10 @@ class ConverterMusicXML(object):
             # check if this pickle is up to date
             if (hasattr(c.score, 'm21Version') and 
                 c.score.m21Version >= musicxml.VERSION_MINIMUM):
-                environLocal.printDebug(['pickled file version is compatible'])
+                environLocal.printDebug(['pickled file version is compatible',
+                c.score.m21Version])
             else:
-                environLocal.printDebug(['pickled file version is not compatible'])
+                environLocal.printDebug(['pickled file version is not compatible', c.score.m21Version])
                 pickleError = True
                 writePickle = True
                 fpDst = fp # set to orignal file path

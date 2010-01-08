@@ -36,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-VERSION = (0, 2, 0)
+VERSION = (0, 2, 2)
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + '-alpha'
 WEAKREF_ACTIVE = True
 

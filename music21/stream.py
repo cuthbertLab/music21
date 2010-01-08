@@ -3234,7 +3234,8 @@ class Measure(Stream):
         # measure number may be a string and not a number (always?)
         self.measureNumber = mxMeasure.get('number')
         junk = mxMeasure.get('implicit')
-        # may not be available; may need to be obtained from 
+#         environLocal.printDebug(['_setMX: working on measure:',
+#                                 self.measureNumber])
 
         mxAttributes = mxMeasure.get('attributes')
         mxAttributesInternal = True
@@ -3279,9 +3280,19 @@ class Measure(Stream):
                     mxNoteNext = mxObjNext
                 else:
                     mxNoteNext = None
-                # the first note of a chord is not identified; only
-                # by looking at the next note can we tell if we have a 
-                # chord
+
+                if mxNote.get('print-object') == 'no':
+                    environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
+                    continue
+
+                mxGrace = mxNote.get('grace')
+                if mxGrace != None: # graces have a type but not a duration
+                    environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
+                    self.measureNumber])
+                    continue
+
+                # the first note of a chord is not identified directly; only
+                # by looking at the next note can we tell if we have a chord
                 if mxNoteNext != None and mxNoteNext.get('chord') == True:
                     if mxNote.get('chord') != True:
                         mxNote.set('chord', True) # set the first as a chord

@@ -839,14 +839,6 @@ class Note(NotRest):
     it needs to be represented on page.  It does not know this now.
     '''
 
-# Attributes:
-#     freq440: frequency if A=440 and 12ET is used (set automatically, but 
-# can be overridden) 
-#     frequency: same as above, but should be overridden by modules that 
-# alter frequency assumptions
-#     pitchClass : a number from 0 (C) to 11 (B)
-# 
-
     isNote = True
     isUnpitched = False
     isRest = False
@@ -1116,15 +1108,17 @@ class Note(NotRest):
     def _setMX(self, mxNote):
         '''Given an mxNote, fill the necessary parameters
         '''
-        # meausure reference may be needed
-        # here, it is assigned just for reference
-        # duration obtains from mxNote to get divisions
-        #mxMeasure = mxNote.external['measure']
-        #mxNote.get('chord')
+        # print ojbect == 'no' and grace notes may have a type but not
+        # a duration. they may be filtered out at the level of Stream 
+        # processing
+        if mxNote.get('printObject') == 'no':
+            environLocal.printDebug(['got mxNote with printObject == no'])
 
-        #self.isRest = mxNote.get('rest')
-        #if not self.isRest:
-        self.pitch.mx = mxNote # required info will be taken from entore note
+        mxGrace = mxNote.get('grace')
+        if mxGrace != None: # graces have a type but not a duration
+            environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
+
+        self.pitch.mx = mxNote # required info will be taken from entire note
         self.duration.mx = mxNote
         self.beams.mx = mxNote.beamList
 
