@@ -1608,8 +1608,8 @@ class Stream(music21.Music21Object):
         >>> n.quarterLength = 12
         >>> d.repeatAppend(n, 10)
         >>> d.repeatInsert(n, [x+.5 for x in range(10)])
-        >>> #x = d.makeMeasures()
-        >>> #x = x.makeTies()
+        >>> x = d.makeMeasures()
+        >>> x = x.makeTies()
     
         '''
 
@@ -1637,18 +1637,19 @@ class Stream(music21.Music21Object):
         lastTimeSignature = None
         while True:
             # update measureStream on each iteration, 
-            # as new measure may have been added to the stream 
+            # as new measure may have been added to the returnObj stream 
             measureStream = returnObj.getElementsByClass(Measure)
             if mCount >= len(measureStream):
-                break
+                break # reached the end of all measures available or added
             # get the current measure to look for notes that need ties
             m = measureStream[mCount]
             if m.timeSignature != None:
                 lastTimeSignature = m.timeSignature
 
+            # get a next measure; we may not need it, but have it ready
             if mCount + 1 < len(measureStream):
                 mNext = measureStream[mCount+1]
-                mNextAdd = False
+                mNextAdd = False # already present; do not append
             else: # create a new measure
                 mNext = Measure()
                 # set offset to last offset plus total length
@@ -1666,9 +1667,10 @@ class Stream(music21.Music21Object):
                     mNext.timeSignature = deepcopy(ts)
                 # increment measure number
                 mNext.measureNumber = m.measureNumber + 1
-                mNextAdd = True
+                mNextAdd = True # new measure, needs to be appended
     
-            # seems like should be able to use m.duration.quarterLengths
+            # for each measure, go through each element and see if its
+            # duraton fits in the bar that contains it
             mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
             for e in m:
                 #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
@@ -1695,17 +1697,16 @@ class Stream(music21.Music21Object):
                         eRemain.duration.quarterLength = qLenRemain
     
                         # set ties
-                        if (e.isClass(note.Note) or 
-                            e.isClass(note.Unpitched)):
+                        if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
                             #environLocal.printDebug(['tieing in makeTies', e])
                             e.tie = note.Tie('start')
-                            # TODO: not sure if we can assume to stop remainder
-                            #e.Remain.tie = note.Tie('stop')
+                            # we can set eRamin to be a stop on this iteration
+                            # if it needs to be tied to something on next
+                            # iteration, the tie object will be re-created
+                            eRemain.tie = note.Tie('stop')
     
-                        # TODO: this does not seem the best way to do this!
-                        # need to find a better way to insert this first in elements
-
-                        # used to do this:
+                        # TODO: not sure this is the best way to make sure
+                        # eRamin comes first                     
                         eRemain.offset = 0
                         mNext.elements = [eRemain] + mNext.elements
 
@@ -1861,6 +1862,101 @@ class Stream(music21.Music21Object):
         return returnObj
     
 
+
+    def stripTies(self, inPlace=False, matchByPitch=False):
+        '''Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied 
+        constituents. Lastly, remove the formerly-tied notes.
+
+        Presently, this only works if tied notes are sequentual; ultimately
+        this will need to look at .to and .from attributes (if they exist)
+
+        In some cases (under makeMeasures()) a continuation note will not have a 
+        Tie object with a stop attribute set. In that case, we need to look
+        for sequential notes with matching pitches. The matchByPitch option can 
+        be used to use this technique. 
+
+        >>> a = Stream()
+        >>> n = note.Note()
+        >>> n.quarterLength = 6
+        >>> a.append(n)
+        >>> m = a.makeMeasures()
+        >>> m = m.makeTies()
+        >>> len(m.flat.notes)
+        2
+        >>> 
+        '''
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        # not sure if this must be sorted
+        # but: tied notes must be in consecutive order
+        returnObj = returnObj.sorted
+        notes = returnObj.flat.notes
+
+        posConnected = []
+        posDelete = [] # store delations to process afterward
+
+        for i in range(len(notes)):
+            endMatch = None
+
+            n = notes[i]
+            if i > 0:
+                iLast = i-1
+                nLast = notes[iLast]
+            else:
+                iLast = None
+                nLast = None
+
+            if hasattr(n, 'tie') and n.tie != None and n.tie.type == 'start':
+                # find a true start
+                if iLast == None or iLast not in posConnected:
+                    posConnected = [i] # reset list with start
+                # find a continuation: the last note was a tie      
+                # start and this note is a tie start
+                elif iLast in posConnected:
+                    posConnected.append(i)
+                endMatch = False            
+
+            # establish end condition
+            if endMatch == None: # not yet set, not a start
+                if hasattr(n, 'tie') and n.tie != None and n.tie.type == 'stop':
+                    endMatch = True
+                elif matchByPitch:
+                    if (nLast != None and iLast in posConnected 
+                        and nLast.pitch == n.pitch):
+                        endMatch = True
+
+            # process end condition
+            if endMatch:
+                posConnected.append(i) # add this last position
+                if len(posConnected) < 2:
+                    raise StreamException('cannot consolidate ties when only one tie is present')
+                # get sum of duratoins for all parts to add to first
+                durSum = 0
+                for q in posConnected[1:]: # all but the first
+                    durSum += notes[q].quarterLength
+                    posDelete.append(q) # store for deleting later
+                if durSum == 0:
+                    raise StreamException('aggregated ties have a zero duration sum')
+                # add duration to lead
+                qLen = notes[posConnected[0]].quarterLength
+                notes[posConnected[0]].quarterLength = qLen + durSum
+
+                # set tie to None
+                notes[posConnected[0]].tie = None
+
+                posConnected = [] # resset to empty
+                    
+        # presently removing from notes, not resultObj, as index positions
+        # in result object may not be the same
+        posDelete.reverse() # start from highest and go down
+        for i in posDelete:
+            environLocal.printDebug(['removing note', notes[i]])
+            junk = notes.pop(i)
+
+        return notes
 
 
     #---------------------------------------------------------------------------
@@ -2565,8 +2661,9 @@ class Stream(music21.Music21Object):
     pitches = property(getPitches)
 
     
-    def findConsecutiveNotes(self, skipRests = False, skipChords = False, skipUnisons = False, skipOctaves = False,
-                               skipGaps = False, getOverlaps = False, noNone = False, **keywords):
+    def findConsecutiveNotes(self, skipRests = False, skipChords = False, 
+        skipUnisons = False, skipOctaves = False,
+        skipGaps = False, getOverlaps = False, noNone = False, **keywords):
         '''
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
         at any point there is a discontinuity (such as if there is a rest between two pitches).
@@ -3287,13 +3384,14 @@ class Measure(Stream):
                     mxNoteNext = None
 
                 if mxNote.get('print-object') == 'no':
-                    environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
+                    #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
                     continue
 
                 mxGrace = mxNote.get('grace')
                 if mxGrace != None: # graces have a type but not a duration
-                    environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
-                    self.measureNumber])
+                    #TODO: add grace notes with duration equal to ZeroDuration
+                    #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
+                    #self.measureNumber])
                     continue
 
                 # the first note of a chord is not identified directly; only
@@ -4500,6 +4598,7 @@ class Test(unittest.TestCase):
         
         self.assertTrue(l11[2] is n3)
 
+
         n5 = note.Note("c4")
         s6 = Stream()
         s6.insert([0.0, n1,
@@ -4513,6 +4612,50 @@ class Test(unittest.TestCase):
         self.assertTrue(len(l14) == 2)
         self.assertTrue(l14[0] is n1)
         self.assertTrue(l14[1] is n2)
+
+
+
+    def testStripTies(self):
+        s1 = Stream()
+        n1 = note.Note()
+        n1.quarterLength = 6
+        s1.append(n1)
+        self.assertEqual(len(s1.notes), 1)
+
+        s1 = s1.makeMeasures()
+        s1 = s1.makeTies() # makes ties but no end tie positions!
+        # flat version has 2 notes
+        self.assertEqual(len(s1.flat.notes), 2)
+
+        sUntied = s1.stripTies()
+        self.assertEqual(len(sUntied), 1)
+        self.assertEqual(sUntied[0].quarterLength, 6)
+
+
+
+        n = note.Note()        
+        n.quarterLength = 3
+        a = Stream()
+        a.repeatInsert(n, range(0,120,3))
+
+        self.assertEqual(len(a), 40)
+        
+        a.insert( 0, meter.TimeSignature("5/4")  )
+        a.insert(10, meter.TimeSignature("2/4")  )
+        a.insert( 3, meter.TimeSignature("3/16") )
+        a.insert(20, meter.TimeSignature("9/8")  )
+        a.insert(40, meter.TimeSignature("10/4") )
+
+        b = a.makeMeasures()
+        b = b.makeTies()
+        
+        # we now have 65 notes, as ties have been created
+        self.assertEqual(len(b.flat.notes), 65)
+
+        c = b.stripTies() # gets flat, removes measures
+        self.assertEqual(len(c.notes), 40)
+
+
 
 
 if __name__ == "__main__":    

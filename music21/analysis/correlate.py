@@ -230,18 +230,63 @@ class NoteAnalysis(object):
 # overlaid
 
 
+    def _autoLabel(self, valueStr):
+        '''Given an a Python attribute name, try to convert it to a XML name.
+        If already an XML name, leave alone.
+
+        >>> sMock = stream.Stream()
+        >>> na = NoteAnalysis(sMock)
+        >>> na._autoLabel('offset')
+        'Offset'
+        >>> na._autoLabel('pitchClass')
+        'Pitch Class'
+        '''
+        nameDst = []
+        for i in range(len(valueStr)):
+            char = valueStr[i]
+            if i == 0:
+                nameDst.append(char.upper())                
+            elif char.isupper():
+                nameDst.append(' %s' % char) # add space
+            else:
+                nameDst.append(char)
+        return ''.join(nameDst)
+
+
     def _autoLambda(self, valueStr):
         '''If a user provudes a string instea of a lambda expression, assume 
         that it is a method of a note object
         '''
-        #if common.isStr(value):
-        label = valueStr
+        # capitalize and separate value names
+        label = self._autoLabel(valueStr)
         lambdaExp = lambda n: getattr(n, valueStr)
         return lambdaExp, label        
 
 
+    def _autoTicks(self, value):
+        '''Try to provide a match for a given label string
+        '''
+        ticks = None
+        # provide function name, string names
+        mapping = [
+            (correlate.ticksPitchClass, ['pitchclass']),
+            (correlate.ticksQuarterLength, ['ql', 'quarterlength']),
+            (correlate.ticksPitchSpace, ['pitchspace', 'midi']),
+            (correlate.ticksDynamics, ['dynamics']),
+        ]
+        # remove spaces
+        valueTest = value.replace(' ', '')
+        valueTest = valueTest.lower()
+
+        for fName, matches in mapping:
+            if valueTest in matches:
+                ticks = fName()
+                break
+        return ticks
+
+
     def noteAttributeCount(self, fx=None, fy=None, *args, **keywords):
-        '''A 3d dimensional graph, of two paramters, with counts of the second parameters
+        '''
 
         >>> a = stream.Stream()
         >>> b = NoteAnalysis(a)
@@ -265,17 +310,19 @@ class NoteAnalysis(object):
             xLabel = keywords['xLabel']
         if 'yLabel' in keywords:
             yLabel = keywords['yLabel']
+
         if 'xTicks' in keywords:
             xTicks = keywords['xTicks']
         else: xTicks = None
+
         if 'yTicks' in keywords:
             yTicks = keywords['yTicks']
-        else: yTicks = None
+        else: # try to get auto match; returns none of no match
+            yTicks = self._autoTicks(yLabel)
+
         if 'title' in keywords:
             title = keywords['title']
         else: title = None
-
-
 
 
         # need a list of durations for each pitch, and a count of each duration
@@ -347,7 +394,6 @@ class NoteAnalysis(object):
             xLabel = 'Quarter Length'
         elif common.isStr(fx):
             fx, xLabel = self._autoLambda(fx)
-
 
         if 'xLabel' in keywords:
             xLabel = keywords['xLabel']
