@@ -265,21 +265,30 @@ class NoteAnalysis(object):
 
     def _autoTicks(self, value):
         '''Try to provide a match for a given label string
+
+        >>> sMock = stream.Stream()
+        >>> na = NoteAnalysis(sMock)
+        >>> na._autoLabel('offset')
+        'Offset'
+        >>> na._autoTicks(na._autoLabel('pitchClass')) != None
+        True
         '''
         ticks = None
         # provide function name, string names
         mapping = [
-            (correlate.ticksPitchClass, ['pitchclass']),
-            (correlate.ticksQuarterLength, ['ql', 'quarterlength']),
-            (correlate.ticksPitchSpace, ['pitchspace', 'midi']),
-            (correlate.ticksDynamics, ['dynamics']),
+            (ticksPitchClass, ['pitchclass']),
+            (ticksQuarterLength, ['ql', 'quarterlength']),
+            (ticksPitchSpace, ['pitchspace', 'midi']),
+            (ticksDynamics, ['dynamics']),
         ]
         # remove spaces
         valueTest = value.replace(' ', '')
         valueTest = valueTest.lower()
 
+        environLocal.printDebug(['value test', valueTest])
         for fName, matches in mapping:
             if valueTest in matches:
+                environLocal.printDebug(['matched'])
                 ticks = fName()
                 break
         return ticks
@@ -399,12 +408,16 @@ class NoteAnalysis(object):
             xLabel = keywords['xLabel']
         if 'yLabel' in keywords:
             yLabel = keywords['yLabel']
+
         if 'xTicks' in keywords:
             xTicks = keywords['xTicks']
         else: xTicks = None
+
         if 'yTicks' in keywords:
             yTicks = keywords['yTicks']
-        else: yTicks = None
+        else: # try to get auto match; returns none of no match
+            yTicks = self._autoTicks(yLabel)
+
         if 'title' in keywords:
             title = keywords['title']
         else: title = None

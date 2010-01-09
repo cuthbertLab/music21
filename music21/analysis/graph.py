@@ -80,7 +80,7 @@ class Graph(object):
         if 'colorBackgroundData' in keywords:
             self.colorBackgroundData = keywords['colorBackgroundData']
         else:
-            self.colorBackgroundData = '#cccccc'
+            self.colorBackgroundData = '#ffffff'
 
         if 'title' in keywords:
             self.setTitle(keywords['title'])
