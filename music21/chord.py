@@ -235,6 +235,7 @@ class Chord(note.NotRest):
             chordPos = 0
             for pitchObj in self.pitches:
                 mxNote = copy.deepcopy(mxNoteBase)
+
                 #mxNote.pitch = None # clear before each iteration
                 mxNote = mxNote.merge(pitchObj.mx)
                 if chordPos > 0:
@@ -249,6 +250,35 @@ class Chord(note.NotRest):
                 mxNoteList.append(mxNote)
                 chordPos += 1
 
+        # only applied to first note
+        for lyricObj in self.lyrics:
+            mxNoteList[0].lyricList.append(lyricObj.mx)
+
+        # if this note, not a component duration, but this note has a tie, 
+        # need to add this to the last-encountered mxNote
+        if self.tie != None:
+            mxTieList, mxTiedList = self.tie.mx # get mxl objs from tie obj
+            # if starting a tie, add to last mxNote in mxNote list
+            if self.tie.type == 'start':
+                mxNoteList[-1].tieList += mxTieList
+                mxNoteList[-1].notationsObj.componentList += mxTiedList
+            # if ending a tie, set first mxNote to stop
+            # TODO: this may need to continue if there are components here
+            elif self.tie.type == 'stop':
+                mxNoteList[0].tieList += mxTieList
+                mxNoteList[0].notationsObj.componentList += mxTiedList
+
+        # if we have any articulations, they only go on the first of any 
+        # component notes
+        mxArticulations = None
+        for i in range(len(self.articulations)):
+            obj = self.articulations[i]
+            if i == 0: # assign first
+                mxArticulations = obj.mx # mxArt... stores more than one artic
+            else: # concatenate any remaining
+                mxArticulations += obj.mx
+        if mxArticulations != None:
+            mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
         return mxNoteList
 

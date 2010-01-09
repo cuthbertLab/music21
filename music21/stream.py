@@ -3327,11 +3327,14 @@ class Measure(Stream):
         #need to handle objects in order when creating musicxml 
         for obj in self.flat:
             if obj.isClass(note.GeneralNote):
-                # .mx here returns a lost of notes
+                # .mx here returns a list of notes
                 mxMeasure.componentList += obj.mx
             elif obj.isClass(dynamics.Dynamic):
                 # returns an mxDirection object
                 mxMeasure.append(obj.mx)
+            else:
+                pass
+                #environLocal.printDebug(['_getMX of Measure is not processing', obj])
         return mxMeasure
 
 

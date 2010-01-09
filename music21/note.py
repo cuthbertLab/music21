@@ -1059,10 +1059,11 @@ class Note(NotRest):
             mxNote = mxNote.merge(self.pitch.mx)
             # get color from within .editorial using attribute
             mxNote.set('color', self.color)
-
-            for lyricObj in self.lyrics:
-                mxNote.lyricList.append(lyricObj.mx)
             mxNoteList.append(mxNote)
+
+        # note: lyric only applied to first note
+        for lyricObj in self.lyrics:
+            mxNoteList[0].lyricList.append(lyricObj.mx)
 
         # if this note, not a component duration, but this note has a tie, 
         # need to add this to the last-encountered mxNote
