@@ -128,4 +128,36 @@ def findHighestNotes():
 
     print found.write('musicxml')
 
-findHighestNotes()
+
+from music21 import *
+
+def ex1_revised():
+    beethovenScore = corpus.parseWork('beethoven/opus133.xml') 
+    violin2 = beethovenScore[1]      # most programming languages start counting from 0, 
+    #  so part 0 = violin 1, part 1 = violin 2, etc.
+    display = stream.Stream() # an empty container for filling with found notes
+    for thisMeasure in violin2.measures:
+        notes = thisMeasure.findConsecutiveNotes(skipUnisons = True, skipChords = True,
+                       skipOctaves = True, skipRests = True, noNone = True )
+        pitches = [n.pitch for n in notes]
+        for i in range(len(pitches) - 3):
+            testChord = chord.Chord(pitches[i:i+4])
+            testChord.duration.type = "whole"
+            if testChord.isDominantSeventh() is True:
+                # since a chord was found in this measure, append the found pitches in closed position
+                testChord.lyric = "m. " + str(thisMeasure.measureNumber)
+                emptyMeasure = stream.Measure()
+                emptyMeasure.append(testChord.closedPosition())
+                display.append(emptyMeasure)
+    
+                # append the whole measure as well, tagging the first note of the measure with an
+                # ordered list of all the pitch classes used in the measure.
+                pcGroup = [p.pitchClass for p in thisMeasure.pitches]
+                firstNote = thisMeasure.getElementsByClass(note.Note)[0]
+                firstNote.lyric = str(sorted(set(pcGroup)))
+                thisMeasure.setRightBarline("double")
+                display.append(thisMeasure)
+    
+    display.show('musicxml')
+
+ex1_revised()

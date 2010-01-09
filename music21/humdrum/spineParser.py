@@ -945,7 +945,7 @@ def hdStringToMeasure(contents):
     '''
     m1 = music21.stream.Measure()
     rematchMN = re.search("(\d+)([a-z]?)", contents)
-    m1.addRightBarline()
+    m1.setRightBarline()
     
     if rematchMN:
         m1.measureNumber = int(rematchMN.group(1))

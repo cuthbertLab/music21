@@ -2542,8 +2542,8 @@ class Stream(music21.Music21Object):
         >>> len(s2) == 1
         True
         '''
-        # note: class names must be provided in one argument as a list
         return self.getElementsByClass([note.GeneralNote, chord.Chord])
+        # note: class names must be provided in one argument as a list
 
     notes = property(getNotes)
 
@@ -2565,7 +2565,7 @@ class Stream(music21.Music21Object):
     pitches = property(getPitches)
 
     
-    def findConsecutiveNotes(self, skipRests = False, skipChords = False, skipUnisons = False, 
+    def findConsecutiveNotes(self, skipRests = False, skipChords = False, skipUnisons = False, skipOctaves = False,
                                skipGaps = False, getOverlaps = False, noNone = False, **keywords):
         '''
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
@@ -2592,13 +2592,17 @@ class Stream(music21.Music21Object):
         lastEnd = 0.0
         lastWasNone = False
         lastPitch = None
+        if skipOctaves is True:
+            skipUnisons = True  # implied
+            
         for el in sortedSelf.elements:
             if lastWasNone is False and skipGaps is False and el.offset > lastEnd:
                 if not noNone:
                     returnList.append(None)
                     lastWasNone = True
             if hasattr(el, "pitch"):
-                if skipUnisons is False or isinstance(lastPitch, list) or lastPitch is None or el.pitch.ps != lastPitch.ps:
+                if (skipUnisons is False or isinstance(lastPitch, list) or lastPitch is None or 
+                    el.pitch.pitchClass != lastPitch.pitchClass or (skipOctaves is False and el.pitch.ps != lastPitch.ps)):
                     if getOverlaps is True or el.offset >= lastEnd:
                         if el.offset >= lastEnd:  # is not an overlap...
                             lastStart = el.offset
@@ -3051,11 +3055,11 @@ class Measure(Stream):
         # TODO: write
         pass
 
-    def addRightBarline(self, blStyle = None):
+    def setRightBarline(self, blStyle = None):
         self.rightbarline = measure.Barline(blStyle)
         return self.rightbarline
     
-    def addLeftBarline(self, blStyle = None):
+    def setLeftBarline(self, blStyle = None):
         self.leftbarline = measure.Barline(blStyle)
         return self.leftbarline
     
@@ -3175,6 +3179,7 @@ class Measure(Stream):
             junk = self.pop(self.index(oldKey))
         self.insert(0, keyObj)
 
+    # TODO: RENAME TO KEYSIGNATURE
     key = property(_getKey, _setKey)   
 
     #---------------------------------------------------------------------------
@@ -3539,7 +3544,7 @@ class TestExternal(unittest.TestCase):
         tup1.tupletNormal = [3, dur1]
 
         q.octave = 2
-        q.duration.addTuplet(tup1)
+        q.duration.appendTuplet(tup1)
         
         
         for i in range(0,5):
@@ -4492,7 +4497,23 @@ class Test(unittest.TestCase):
         self.assertTrue(len(l10) == 4)
         l11 = s5.findConsecutiveNotes(skipUnisons = True)
         self.assertTrue(len(l11) == 3)
+        
         self.assertTrue(l11[2] is n3)
+
+        n5 = note.Note("c4")
+        s6 = Stream()
+        s6.insert([0.0, n1,
+                   1.0, n5,
+                   2.0, n2])
+        l12 = s6.findConsecutiveNotes(noNone = True)
+        self.assertTrue(len(l12) == 3)
+        l13 = s6.findConsecutiveNotes(noNone = True, skipUnisons = True)
+        self.assertTrue(len(l13) == 3)
+        l14 = s6.findConsecutiveNotes(noNone = True, skipOctaves = True)
+        self.assertTrue(len(l14) == 2)
+        self.assertTrue(l14[0] is n1)
+        self.assertTrue(l14[1] is n2)
+
 
 if __name__ == "__main__":    
     music21.mainTest(Test)

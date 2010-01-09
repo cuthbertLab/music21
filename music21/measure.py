@@ -35,6 +35,11 @@ class Barline(music21.Music21Object):
     pause = None  # can be music21.notationMod.Fermata object
     
     def __init__(self, blStyle = None):
+        if blStyle == "final":
+            blStyle = "light-heavy"
+        if blStyle == "double":
+            blStyle = "light-light"
+        
         if blStyle in self.valid_styles:
             self.style = blStyle
             

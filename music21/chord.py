@@ -957,6 +957,25 @@ class Chord(note.NotRest):
                 raise ChordException("Not a normal inversion")
         else:
             raise ChordException("Not a triad")
+ 
+    def closedPosition(self):
+        '''
+        returns a new Chord object with the same pitch classes, but now in closed position
+
+        >>> chord1 = Chord(["C#4", "G5", "E6"])
+        >>> chord2 = chord1.closedPosition()
+        >>> print chord2.lily.value
+        <cis' e' g'>4
+        '''
+        newChord = copy.copy(self)
+        tempChordNotes = copy.deepcopy(self.pitches)
+        chordBassPS = self.bass().ps
+        for thisPitch in tempChordNotes:
+            while thisPitch.ps > chordBassPS + 12:
+                thisPitch.octave = thisPitch.octave - 1      
+        newChord.pitches = tempChordNotes
+        return newChord.sortAscending() # creates a second new chord object!
+ 
     
     def sortAscending(self):
         # TODO Check context
@@ -1373,6 +1392,12 @@ class Test(unittest.TestCase):
     def testLily(self):
         chord1 = Chord(["C#4","E4","G5"])
         self.assertEqual("<cis' e' g''>4", chord1.lily.value)
+
+    def testClosedPosition(self):
+        chord1 = Chord(["C#4", "G5", "E6"])
+        chord2 = chord1.closedPosition()
+        self.assertEqual("<cis' e' g'>4", chord2.lily.value)
+        
 
 if __name__ == '__main__':
     music21.mainTest(Test)
