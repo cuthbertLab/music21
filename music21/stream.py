@@ -1932,7 +1932,12 @@ class Stream(music21.Music21Object):
             if endMatch:
                 posConnected.append(i) # add this last position
                 if len(posConnected) < 2:
-                    raise StreamException('cannot consolidate ties when only one tie is present')
+                    # should be an error; presently, just skipping
+                    #raise StreamException('cannot consolidate ties when only one tie is present', notes[posConnected[0]])
+                    environLocal.printDebug(['cannot consolidate ties when only one tie is present', notes[posConnected[0]]])
+                    posConnected = [] 
+                    continue
+
                 # get sum of duratoins for all parts to add to first
                 durSum = 0
                 for q in posConnected[1:]: # all but the first
