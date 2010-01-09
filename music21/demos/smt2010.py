@@ -158,6 +158,6 @@ def ex1_revised():
                 thisMeasure.setRightBarline("double")
                 display.append(thisMeasure)
     
-    display.show('musicxml')
-
+    display.write('musicxml')
+    
 ex1_revised()
