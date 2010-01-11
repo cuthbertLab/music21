@@ -151,12 +151,13 @@ class Graph(object):
     def _applyFormatting(self, ax):
         '''Apply formatting to the Axes container     
         '''
+        #environLocal.printDebug('calling _applyFormatting')
+
         rect = ax.axesPatch
         # this sets the color of the main data presentation window
         rect.set_facecolor(self.colorBackgroundData)
         # this does not do anything yet
         #rect.set_edgecolor('red')
-
 
         for axis in self.axisKeys:
             if self.axis[axis]['range'] != None:
@@ -182,6 +183,15 @@ class Graph(object):
                         ax.set_ylabel(self.axis[axis]['label'])
                     elif axis == 'z':
                         ax.set_zlabel(self.axis[axis]['label'])
+
+            if 'scale' in self.axis[axis]:
+                if self.axis[axis]['scale'] != None:
+                    if axis == 'x':
+                        ax.set_xscale(self.axis[axis]['scale'])
+                    elif axis == 'y':
+                        ax.set_yscale(self.axis[axis]['scale'])
+                    elif axis == 'z':
+                        ax.set_zscale(self.axis[axis]['scale'])
 
             if 'ticks' in self.axis[axis]:
                 if axis == 'x':
@@ -401,6 +411,7 @@ class Graph3DPolygonBars(Graph):
         else:
             self.barWidth = .8
 
+
     def process(self):
 
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(arg, 
@@ -446,6 +457,10 @@ class Graph3DPolygonBars(Graph):
         if self.axis['y']['range'] == None:
             self.axis['y']['range'] =  min(zVals), max(zVals)+1
             
+
+        # this kinda orks but does not adjust the ticks / scale range on this axis
+        #self.axis['x']['scale'] = 'symlog'
+
         low, high = self.axis['y']['range']
         low = int(math.floor(low))
         high = int(math.ceil(high))

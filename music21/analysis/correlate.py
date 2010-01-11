@@ -285,7 +285,7 @@ class NoteAnalysis(object):
         valueTest = value.replace(' ', '')
         valueTest = valueTest.lower()
 
-        environLocal.printDebug(['value test', valueTest])
+        #environLocal.printDebug(['value test', valueTest])
         for fName, matches in mapping:
             if valueTest in matches:
                 environLocal.printDebug(['matched'])
@@ -295,7 +295,7 @@ class NoteAnalysis(object):
 
 
     def noteAttributeCount(self, fx=None, fy=None, *args, **keywords):
-        '''
+        '''3D graph of three parameters
 
         >>> a = stream.Stream()
         >>> b = NoteAnalysis(a)
@@ -322,7 +322,9 @@ class NoteAnalysis(object):
 
         if 'xTicks' in keywords:
             xTicks = keywords['xTicks']
-        else: xTicks = None
+        else:
+            xTicks = self._autoTicks(xLabel)
+            environLocal.printDebug(['xTicks', xTicks])
 
         if 'yTicks' in keywords:
             yTicks = keywords['yTicks']
@@ -332,7 +334,6 @@ class NoteAnalysis(object):
         if 'title' in keywords:
             title = keywords['title']
         else: title = None
-
 
         # need a list of durations for each pitch, and a count of each duration
         #qLenPos = [x*.25 for x in range(1,10)]
@@ -368,7 +369,6 @@ class NoteAnalysis(object):
             if data[fy(noteObj)][indexToIncrement][1] > maxCount:
                 maxCount = data[fy(noteObj)][indexToIncrement][1] 
 
-
         g = graph.Graph3DPolygonBars(**keywords)
         g.setData(data)
 
@@ -378,8 +378,14 @@ class NoteAnalysis(object):
         # thi actually appearsa as the z
         g.setAxisRange('y', (yValues[0], yValues[-1]))
         g.setAxisLabel('y', yLabel)
+        #g.setAxisRange('x', (xValues[0], xValues[-1]))
         g.setAxisRange('x', (xValues[0], xValues[-1]))
         g.setAxisLabel('x', xLabel)
+
+        # note: these do not work: cause massive destortion
+        #g.setTicks('x', xTicks)
+        #g.setTicks('y', yTicks)
+
         g.process()
 
 
