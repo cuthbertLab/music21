@@ -71,19 +71,33 @@ def convertPsToStep(ps):
     ('G', <accidental sharp>)
     >>> convertPsToStep(-2)
     ('A', <accidental sharp>)
+
+    >>> convertPsToStep(60.5)
+    ('C', <accidental half-sharp>)
+    >>> convertPsToStep(61.5)
+    ('C', <accidental one-and-a-half-sharp>)
+    >>> convertPsToStep(62)
+    ('D', <accidental natural>)
+    >>> convertPsToStep(62.5)
+    ('D', <accidental half-sharp>)
     '''
     # if this is a microtone it may have floating point vals
     pcReal = ps % 12 
     pc, micro = divmod(pcReal, 1)
+    if round(micro, 1) == 0.5:
+        micro = 0.5
+    else:
+        micro = 0
+
     pc = int(pc)
     if pc in STEPREF.values():
-        acc = Accidental(0)
+        acc = Accidental(0+micro)
         pcName = pc 
     elif pc-1 in STEPREF.values():
-        acc = Accidental(1)
+        acc = Accidental(1+micro)
         pcName = pc-1
     elif pc+1 in STEPREF.values():
-        acc = Accidental(-1)  # can't happen
+        acc = Accidental(-1+micro)  # can't happen
         pcName = pc+1
     for key, value in STEPREF.items():
         if pcName == value:
