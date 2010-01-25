@@ -369,6 +369,67 @@ class Accidental(music21.Music21Object):
 
 
 
+    def _getMx(self):
+        """From music21 to MusicXML
+        >>> a = Accidental()
+        >>> a.set('half-sharp')
+        >>> a.alter == .5
+        True
+        >>> mxAccidental = a.mx
+        >>> mxAccidental.get('content')
+        'quarter-sharp'
+        """
+
+        if self.name == "half-sharp": 
+            mxName = "quarter-sharp"
+        elif self.name == "one-and-a-half-sharp": 
+            mxName = "three-quarters-sharp"
+        elif self.name == "half-flat": 
+            mxName = "quarter-flat"
+        elif self.name == "one-and-a-half-flat": 
+            mxName = "three-quarters-flat"
+        else: # all others are the same
+            mxName = self.name
+
+        mxAccidental = musicxmlMod.Accidental()
+        mxAccidental.set('content', mxName)
+        return mxAccidental
+
+
+    def _setMx(self, mxAccidental):
+        """From MusicXML to Music21
+        
+        >>> a = musicxml.Accidental()
+        >>> a.set('content', 'half-flat')
+        >>> a.get('content')
+        'half-flat'
+        >>> b = Accidental()
+        >>> b.mx = a
+        >>> b.name
+        'half-flat'
+        """
+        mxName = mxAccidental.get('content')
+        if mxName == "quarter-sharp": 
+            name = "half-sharp"
+        elif mxName == "three-quarters-sharp": 
+            name = "one-and-a-half-sharp"
+        elif mxName == "quarter-flat": 
+            name = "half-flat"
+        elif mxName == "three-quarters-flat": 
+            name = "one-and-a-half-flat"
+        elif mxName == "flat-flat": 
+            name = "double-flat"
+        elif mxName == "sharp-sharp": 
+            name = "double-sharp"
+        else:
+            name = mxName
+        # need to use set her to get all attributes up to date
+        self.set(name)
+
+    # property
+    mx = property(_getMx, _setMx)
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -757,9 +818,7 @@ class Pitch(music21.Music21Object):
         mxNote.set('pitch', mxPitch)
 
         if self.accidental is not None:
-            mxAccidental = musicxmlMod.Accidental()
-            mxAccidental.set('content', self.accidental.name)
-            mxNote.set('accidental', mxAccidental)
+            mxNote.set('accidental', self.accidental.mx)
         # should this also return an xml accidental object
         return mxNote # return element object
 
@@ -780,11 +839,21 @@ class Pitch(music21.Music21Object):
         '''
         # assume this is an object
         mxPitch = mxNote.get('pitch')
+        mxAccidental = mxNote.get('accidental')
+
         self.step = mxPitch.get('step')
 
         acc = mxPitch.get('alter')
         if acc != None: # None is used in musicxml but not in music21
-            self.accidental = Accidental(float(acc))
+            if mxAccidental != None:
+                accObj = Accidental()
+                accObj.mx = mxAccidental
+            # used to to just use acc value
+            #self.accidental = Accidental(float(acc))
+            # better to use accObj if possible
+                self.accidental = accObj
+            else:
+                self.accidental = Accidental(float(acc))
         self.octave = int(mxPitch.get('octave'))
         self._pitchSpaceNeedsUpdating = True
 
