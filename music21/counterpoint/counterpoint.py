@@ -17,8 +17,9 @@ from music21 import duration
 from music21 import interval
 from music21 import lily
 from music21 import scale
-from music21.noteStream import Stream
-from music21.twoStreams import TwoStreamComparer
+from music21 import twoStreams
+
+from music21.stream import Stream
 from music21.voiceLeading import VoiceLeadingQuartet
 
 class ModalCounterpointException(Exception):
@@ -31,26 +32,22 @@ class ModalCounterpoint(object):
         self.legalHarmonicIntervals = ['P1', 'P5', 'P8', 'm3', 'M3', 'm6', 'M6']
         self.legalMelodicIntervals = ['P4', 'P5', 'P8', 'm2', 'M2', 'm3', 'M3', 'm6']
 
-    def findParallelFifths(self, stream1, stream2):
+    def findParallelFifths(self, srcStream, cmpStream):
         '''Given two streams, returns the number of parallel fifths and also
         assigns a flag under note.editorial.misc under "Parallel Fifth" for
         any note that has harmonic interval of a fifth and is preceded by a
         first harmonic interval of a fifth.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        
+        twoStreams.attachIntervals(srcStream, cmpStream)
         numParallelFifths = 0
-        for note1 in stream1:
-            note2 = stream1.noteFollowingNote(note1, False)
+        srcNotes = srcStream.notes
+        
+        for note1 in srcStream:
+            note2 = srcStream.getElementAfterElement(note1, [Note])
             if note2 is not None:
-                if note1.editorial.harmonicInterval.name == "P5":
-                    if note2.editorial.harmonicInterval.name == "P5":
+                if note1.editorial.harmonicInterval.name == "P5" and \
+                   note2.editorial.harmonicInterval.name == "P5":
                         numParallelFifths += 1
-                        note2.editorial.misc["Parallel Fifth"] = True
-        for note1 in stream2:
-            note2 = stream2.noteFollowingNote(note1, False)
-            if note2 is not None:
-                if note1.editorial.harmonicInterval.name == "P5":
-                    if note2.editorial.harmonicInterval.name == "P5":
                         note2.editorial.misc["Parallel Fifth"] = True
         return numParallelFifths
 
@@ -919,4 +916,4 @@ def twoStreamLily(st1, st2):
     return lilyOut
     
 if (__name__ == "__main__"):
-    music21.mainTest(TestExternal)
+    music21.mainTest() #TestExternal

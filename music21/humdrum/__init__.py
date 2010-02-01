@@ -78,7 +78,7 @@ solfg           Note.frenchSolfege  NOT YET WRITTEN -- see also to be written ch
 strophe         Note.lyric.strophe[i] NOT YET WRITTEN
 synco           analysis.leeLHiggins    NOT YET WRITTEN -- low priority
 tacet           midi.allOff()       see midireset above; -i will not be supported
-timebase        None                Not needed.  stream.getNoteAtTime() will cover most uses
+timebase        None                Not needed.  stream.getElementsByOffset() will cover most uses
 tonh            Note.germanName     NOT YET WRITTEN -- simple, but low priority
 trans           Note.transpose(Interval), Stream.transpose(Interval), etc -- not yet written, but interval.getNoteAboveNote(Note, Interval) works fine.  Modal transpositions still are needed
 urrhythm        analysis.JohnsonLaird.urrhythm(Stream)  NOT YET WRITTEN -- low priority

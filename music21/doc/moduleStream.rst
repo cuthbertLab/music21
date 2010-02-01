@@ -331,6 +331,10 @@ Inherited from stream.Stream
 
 **getElementsByOffset()**
 
+.. image:: images/getElementsByOffset.*
+    :width: 532
+
+
 **getElementsByGroup()**
 
 **getElementsByClass()**

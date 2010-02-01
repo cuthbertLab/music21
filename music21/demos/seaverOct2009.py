@@ -277,6 +277,81 @@ def simple4h():
     # 252.    Identify the lowest note in a score
 
 
+def threeDimChopin():
+    from music21 import converter
+    from music21.humdrum import testFiles  
+    from music21.analysis import correlate
+
+    streamObject = converter.parse(testFiles.mazurka6)
+#    n1 = music21.note.Note("C7")
+#    n1.duration.quarterLength = 3
+#    n1.tie = music21.note.Tie("start")
+#    streamObject.append(n1)
+#    
+#    n2 = music21.note.Note("C7")
+#    n2.duration.quarterLength = 3
+#    n2.tie = music21.note.Tie("stop")
+#    streamObject.append(n2)
+    
+    stream2 = streamObject.stripTies()
+    correlated = correlate.NoteAnalysis(stream2)  
+    correlated.noteAttributeCount()
+
+def threeDimMozart():
+    from music21 import converter
+    from music21.musicxml import testFiles  
+    from music21.analysis import correlate
+
+    streamObject = converter.parse(testFiles.mozartTrioK581Excerpt)
+#    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
+    correlated = correlate.NoteAnalysis(streamObject.flat)  
+    correlated.noteAttributeCount()
+
+
+def threeDimBoth():
+    from music21 import converter
+    from music21.musicxml import testFiles as xmlTest
+    from music21.humdrum import testFiles as kernTest  
+    from music21.analysis import correlate
+
+    mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
+    correlated1 = correlate.NoteAnalysis(mozartStream.flat)  
+    correlated1.noteAttributeCount()
+    
+    chopinStream = converter.parse(kernTest.mazurka6) 
+    correlated2 = correlate.NoteAnalysis(chopinStream.flat)  
+    correlated2.noteAttributeCount()
+
+
+def januaryThankYou():
+#    names = ['opus133', 'opus132', 'opus18no3', 'opus18no4', 'opus18no5', 'opus74']
+    names = ['opus59no1', 'opus59no2', 'opus59no3']
+
+    for workName in names:
+        beethovenScore = corpus.parseWork('beethoven/' + workName, 1)
+        for partNum in range(4):
+            print workName, str(partNum)
+            thisPart = beethovenScore[partNum]
+            display = stream.Stream()
+            notes = thisPart.flat.findConsecutiveNotes(skipUnisons = True, skipChords = True,
+                       skipOctaves = True, skipRests = True, noNone = True )
+            for i in range(len(notes) - 4):
+                if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A' and notes[i+3].name == 'E':
+                        notes[i].lyric = str(i)
+                        m = stream.Measure()
+                        m.append(notes[i])
+                        m.append(notes[i+1])
+                        m.append(notes[i+2])
+                        m.append(notes[i+3])
+                        display.append(m)
+            try:
+                display.show()
+            except:
+                pass
+    
+
+
+
 #-------------------------------------------------------------------------------
 
 
@@ -397,5 +472,4 @@ def js_q5():
     returnStream.show()
 
 if (__name__ == "__main__"):
-    simple4e()
-    
+    januaryThankYou()

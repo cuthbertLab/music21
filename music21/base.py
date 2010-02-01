@@ -784,7 +784,7 @@ class Music21Object(object):
                     part, name])
                 raise Music21Exception('streams as attributes requires special handling')
             else: # use copy.deepcopy, will call __deepcopy__ if available
-                newValue = copy.deepcopy(part)
+                newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
                 

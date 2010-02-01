@@ -17,7 +17,25 @@ RULE_THREE = 4
 RULE_FOUR_A = 8
 RULE_FOUR_B = 16
 
-def runRuleOne(srcStream):
+def applyCapua(thisWork):
+    for thisSnippet in thisWork.snippets:
+        applyCapuaSnippet(thisSnippet)
+
+def applyCapuaSnippet(thisPolyphonicSnippet):
+    for thisStream in thisPolyphonicSnippet.streams:
+        applyCapuaStream(thisStream)
+
+def applyCapuaStream(thisStream):
+    clearFicta(thisStream)
+    capuaRuleOne(thisStream)
+    capuaRuleTwo(thisStream)
+    capuaRuleThree(thisStream)
+    capuaRuleFourB(thisStream)
+
+## TODO: ruleTwoB
+
+
+def capuaRuleOne(srcStream):
     '''Applies Nicolaus de Capua's first rule to the given srcStream, i.e. if a line descends
     a major second then ascends back to the original note, the major second is
     made into a minor second. Also copies the relevant accidentals into
@@ -57,19 +75,19 @@ def runRuleOne(srcStream):
                 n2.editorial.ficta = Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = Accidental("natural")
                 n1.editorial.color = "blue"
-                n2.editorial.color = "green"
+                n2.editorial.color = "ForestGreen"
                 n3.editorial.color = "blue"
             else:
                 n2.editorial.ficta = Accidental("sharp")
                 n2.editorial.misc["capua-ficta"] = Accidental("sharp")
                 n1.editorial.color = "blue"
-                n2.editorial.color = "green"
+                n2.editorial.color = "ForestGreen"
                 n3.editorial.color = "blue"
 
-def runRuleTwo(srcStream):
+def capuaRuleTwo(srcStream):
     '''Applies Capua's second rule to the given srcStream, i.e. if four notes are
     ascending with the pattern M2 m2 M2, the intervals shall be made M2 M2 m2.
-    Also changes note.editorial.color for rule 2 (yellow yellow green yellow).'''
+    Also changes note.editorial.color for rule 2 (purple purple green purple).'''
     for i in range(0, len(srcStream.notes)-3):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -110,24 +128,24 @@ def runRuleTwo(srcStream):
                 n3.accidental = None
                 n3.editorial.ficta = Accidental("natural")
                 n3.editorial.misc["capua-ficta"] = Accidental("natural")
-                n1.editorial.color = "yellow"
-                n2.editorial.color = "yellow"
-                n3.editorial.color = "green"
-                n4.editorial.color = "yellow"
+                n1.editorial.color = "purple"
+                n2.editorial.color = "purple"
+                n3.editorial.color = "ForestGreen"
+                n4.editorial.color = "purple"
             else:
                 n3.editorial.ficta = Accidental("sharp")
                 n3.editorial.misc["capua-ficta"] = Accidental("sharp")
-                n1.editorial.color = "yellow"
-                n2.editorial.color = "yellow"
-                n3.editorial.color = "green"
-                n4.editorial.color = "yellow"
+                n1.editorial.color = "purple"
+                n2.editorial.color = "purple"
+                n3.editorial.color = "ForestGreen"
+                n4.editorial.color = "purple"
 
-def runRuleThree(srcStream):
+def capuaRuleThree(srcStream):
     '''Applies Capua's third rule to the given srcStream, i.e. if there is a
     descending major third followed by an ascending major second, the second
     note will be made a half-step higher so that there is a descending minor
     third followed by an ascending minor second. Also changes
-    note.editorial.color for rule 3 (green pink green).'''
+    note.editorial.color for rule 3 (pink green pink).'''
     for i in range(0, len(srcStream.notes)-2):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -159,11 +177,11 @@ def runRuleThree(srcStream):
                 n2.editorial.misc['capua_rule_number'] = RULE_THREE
             n2.editorial.ficta = Accidental("sharp")
             n2.editorial.misc["capua-ficta"] = Accidental("sharp")
-            n1.editorial.color = "pink"
-            n2.editorial.color = "green"
-            n3.editorial.color = "pink"
+            n1.editorial.color = "DeepPink"
+            n2.editorial.color = "ForestGreen"
+            n3.editorial.color = "DeepPink"
 
-def runRuleFourA(srcStream):
+def capuaRuleFourA(srcStream):
     '''Applies one interpretation of Capua's fourth rule to the given srcStream,
     i.e. if a descending minor third is followed by a descending major second,
     the intervals will be changed to a major third followed by a minor second.
@@ -200,10 +218,10 @@ def runRuleFourA(srcStream):
             n2.editorial.ficta = Accidental("flat")
             n2.editorial.misc["capua-ficta"] = Accidental("flat")
             n1.editorial.color = "orange"
-            n2.editorial.color = "green"
+            n2.editorial.color = "ForestGreen"
             n3.editorial.color = "orange"
 
-def runRuleFourB(srcStream):
+def capuaRuleFourB(srcStream):
     '''Applies more probable interpretation of Capua's fourth rule to the given
     srcStream, i.e. if a descending minor third is followed by a descending major
     second, the intervals will be changed to a major third followed by a minor
@@ -257,7 +275,7 @@ def clearFicta(srcStream1):
     '''In the given srcStream, moves anything under note.editorial.ficta into
     note.editorial.misc under "saved-ficta".'''
 
-    for n2 in srcStream1:
+    for n2 in srcStream1.notes:
         if  n2.editorial.ficta is not None:
             n2.editorial.misc["saved-ficta"] = n2.editorial.ficta
         n2.editorial.ficta = None   
@@ -305,14 +323,14 @@ def capuaFictaToAccidental(note1):
             note1.editorial.misc["saved-accidental"] = note1.accidental
         note1.accidental = note1.editorial.misc["capua-ficta"]
 
-def runRulesOnsrcStream(srcStream1):
+def capuaRulesOnsrcStream(srcStream1):
     '''runs clearFicta and then each of the four Capua rules on the srcStream (4b not 4a)'''
     clearFicta(srcStream1)
-    runRuleOne(srcStream1)
-    runRuleTwo(srcStream1)
-    runRuleThree(srcStream1)
-#    runRuleFourA(srcStream1)
-    runRuleFourB(srcStream1)
+    capuaRuleOne(srcStream1)
+    capuaRuleTwo(srcStream1)
+    capuaRuleThree(srcStream1)
+#    capuaRuleFourA(srcStream1)
+    capuaRuleFourB(srcStream1)
 
 def evaluateRules(srcStream1, srcStream2):
     '''Runs evaluation method for capua on one srcStream only, and evaluating harmonies,
@@ -328,7 +346,7 @@ def evaluateCapuaOnesrcStream(srcStream1, srcStream2):
     '''Runs Capua rules on one srcStream only and evaluates the harmonies; stores harmonies
     under "capua1FictaHarmony" in note.editorial.misc; returns a list of the number of
     [perfect cons, imperfect cons, dissonances].'''
-    runRulesOnsrcStream(srcStream1)
+    capuaRulesOnsrcStream(srcStream1)
     for note1 in srcStream1:
         capuaFictaToAccidental(note1)
     srcStream1Count = compareOnesrcStream(srcStream1, srcStream2, "capua1srcStream")
@@ -341,8 +359,8 @@ def evaluateCapuatwoStreams(srcStream1, srcStream2):
     under "capua2FictaHarmony" in note.editorial.misc; returns a dictionary that contains
     the number of [perfect cons, imperfect cons, dissonances] for each srcStream, which can
     be obtained with keys "srcStream1Count" and "srcStream2Count".'''
-    runRulesOnsrcStream(srcStream1)
-    runRulesOnsrcStream(srcStream2)
+    capuaRulesOnsrcStream(srcStream1)
+    capuaRulesOnsrcStream(srcStream2)
     for note1 in srcStream1:
         capuaFictaToAccidental(note1)
     for note2 in srcStream2:
@@ -586,18 +604,6 @@ def ruleOne(nonCapuaHarmony, capuaHarmony):
     elif nonCapuaHarmony == "perfect cons" and capuaHarmony == "dissonance":
         note.editorial.misc["ficta-color"] = worseColor
 
-def runPiece(pieceNum = 258):  # random default piece...
-    ballataObj = cadencebook.BallataSheet()
-    pieceObj   = ballataObj.makeWork(pieceNum)
-    cadenceA   = pieceObj.cadenceAClass()
-    srcStream1    = cadenceA.srcStreams[0]
-    srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
-
-    twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
-    twoStreams1.intervalToOtherStreamWhenAttacked()
-    for note in srcStream1:
-        if note.editorial.harmonicInterval is not None:
-            print note.editorial.harmonicInterval.niceName
 
 debug = True
 
@@ -623,7 +629,7 @@ def testCompare1():
             srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
             twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
             twoStreams1.intervalToOtherStreamWhenAttacked()
-            runRulesOnsrcStream(srcStream1)
+            capuaRulesOnsrcStream(srcStream1)
             thisDict = comparesrcStreamCapuaToEditor(srcStream1)
             for thisKey in thisDict.keys():
                 totalDict[thisKey] += thisDict[thisKey]
@@ -659,7 +665,7 @@ def correctedMaj3():
             srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
             twoStreams1 = twoStreams.TwoStreamComparer(srcStream2, srcStream1)
             twoStreams1.intervalToOtherStreamWhenAttacked()
-            runRulesOnsrcStream(srcStream2)
+            capuaRulesOnsrcStream(srcStream2)
 
             for note1 in srcStream2:
                 if note1.editorial.harmonicInterval is None or \
@@ -717,7 +723,7 @@ def correctedMin6():
             srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
             twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
             twoStreams1.intervalToOtherStreamWhenAttacked()
-            runRulesOnsrcStream(srcStream1)
+            capuaRulesOnsrcStream(srcStream1)
 
             for note1 in srcStream1:
                 if note1.editorial.harmonicInterval is None or \
@@ -774,7 +780,7 @@ def improvedHarmony():
                 except:
                     print "UGGGH ERROR!"
                     continue
-                runRulesOnsrcStream(srcStream1)
+                capuaRulesOnsrcStream(srcStream1)
     
                 for note1 in srcStream1:
                     hI = note1.editorial.harmonicInterval
@@ -815,11 +821,26 @@ def improvedHarmony():
 
     print checkDict
 
+def runPiece(pieceNum = 331):  # random default piece...
+    ballataObj = cadencebook.BallataSheet()
+    pieceObj   = ballataObj.makeWork(pieceNum)
+    applyCapua(pieceObj)
+    pieceObj.snippets[0].lily.showPNG()
+    srcStream    = pieceObj.snippets[0].streams[0]
+    cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
+    twoStreams.attachIntervals(srcStream, cmpStream)
+
+    for note in srcStream.notes:
+        if note.editorial.harmonicInterval is not None:
+            print note.name
+            print note.editorial.harmonicInterval.niceName
+
+
 class ATest(unittest.TestCase):
 
     def run1test(self):
-        ballataObj = cadencebook.BallataSheet()
-        pieceObj   = ballataObj.makeWork(20)  ## N.B. -- we now use Excel column numbers
+        ballataSht = cadencebook.BallataSheet()
+        pieceObj   = ballataSht.makeWork(20)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipitClass() is None:
             return None
         cadenceA   = pieceObj.cadenceAClass()
@@ -841,6 +862,7 @@ class ATest(unittest.TestCase):
 
     def maryTest(self):
         pass
+
         
 if (__name__ == "__main__"):
 #    test()

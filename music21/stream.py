@@ -29,6 +29,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import instrument
+from music21 import interval
 from music21 import key
 from music21 import lily as lilyModule
 from music21 import measure
@@ -96,7 +97,7 @@ class Stream(music21.Music21Object):
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
 
-    def __init__(self):
+    def __init__(self, givenElements = None):
         '''
         
         '''
@@ -104,7 +105,7 @@ class Stream(music21.Music21Object):
 
         # self._elements stores ElementWrapper objects. These are not ordered.
         # this should have a public attribute/property self.elements
-        self._elements = []
+        self._elements = [] # givenElements
         self._unlinkedDuration = None
 
         # the .obj attributes was held over from old ElementWrapper model
@@ -118,6 +119,10 @@ class Stream(music21.Music21Object):
         self.flattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
         
         self._cache = common.defHash()
+
+        if givenElements is not None:
+            for thisEl in givenElements:
+                self.insert(thisEl)
 
 
     #---------------------------------------------------------------------------
@@ -348,9 +353,11 @@ class Stream(music21.Music21Object):
             # access object inside of element
             match = None
             for i in range(len(self._elements)):
-                if obj == self._elements[i].obj:
+                if hasattr(self._elements[i], "obj") and \
+                     obj == self._elements[i].obj:
                     match = i
                     break
+            raise ValueError("Could not find object in index")
         return match
 
 
@@ -384,7 +391,7 @@ class Stream(music21.Music21Object):
                 # must manually add elements to 
                 for e in self._elements: 
                     # this will work for all with __deepcopy___
-                    newElement = copy.deepcopy(e)
+                    newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
                     # user here to provide new offset
                     new.insert(e.getOffsetBySite(old), newElement)
@@ -400,7 +407,7 @@ class Stream(music21.Music21Object):
             else: # use copy.deepcopy   
                 #environLocal.printDebug(['forced to use copy.deepcopy:',
                 #    self, name, part])
-                newValue = copy.deepcopy(part)
+                newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
 
@@ -881,36 +888,77 @@ class Stream(music21.Music21Object):
                     return element
         return None
 
-    def getElementsByOffset(self, offsetStart, offsetEnd,
-                    includeCoincidentBoundaries=True, onsetOnly=True):
+    def getElementsByOffset(self, offsetStart, offsetEnd = None,
+                    includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
         '''
-        Return a Stream/list of all Elements that are found within a 
-        certain offset time range, specified as start and stop values, 
-        and including boundaries.
+        Return a Stream of all Elements that are found at a certain offset or within a 
+        certain offset time range, specified as start and stop values.
 
-        If onsetOnly is true, only the onset of an event is taken into 
-        consideration; the offset is not.
+        If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends
+        after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: 
 
-        The time range is taken as the context for the flat representation.
-
-        The includeCoincidentBoundaries option determines if an end boundary
-        match is included.
+        The includeEndBoundary option determines if an element begun just at offsetEnd 
+        should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan
+        is set to True is probably NOT what you ever want to do.
         
-        >>> a = Stream()
-        >>> a.repeatInsert(note.Note("C"), range(10)) 
-        >>> b = a.getElementsByOffset(4,6)
-        >>> len(b)
-        3
-        >>> b = a.getElementsByOffset(4,5.5)
-        >>> len(b)
+        Setting mustBeginInSpan to False is a good way of finding 
+        
+        >>> st1 = Stream()
+        >>> n0 = note.Note("C")
+        >>> n0.duration.type = "half"
+        >>> n0.offset = 0
+        >>> st1.insert(n0)
+        >>> n2 = note.Note("D")
+        >>> n2.duration.type = "half"
+        >>> n2.offset = 2
+        >>> st1.insert(n2)
+        
+        >>> out1 = st1.getElementsByOffset(2)
+        >>> len(out1)
+        1
+        >>> out1[0].step
+        'D'
+        
+        >>> out2 = st1.getElementsByOffset(1, 3)
+        >>> len(out2)
+        1
+        >>> out2[0].step
+        'D'
+        
+        >>> out3 = st1.getElementsByOffset(1, 3, mustFinishInSpan = True)
+        >>> len(out3)
+        0
+        
+        >>> out4 = st1.getElementsByOffset(1, 2)
+        >>> len(out4)
+        1
+        >>> out4[0].step
+        'D'
+        
+        >>> out5 = st1.getElementsByOffset(1, 2, includeEndBoundary = False)
+        >>> len(out5)
+        0
+        
+        >>> out6 = st1.getElementsByOffset(1, 2, includeEndBoundary = False, mustBeginInSpan = False)
+        >>> len(out6)
+        1
+        >>> out6[0].step
+        'C'
+        
+        >>> out7 = st1.getElementsByOffset(1, 3, mustBeginInSpan = False)
+        >>> len(out7)
         2
+        >>> [el.step for el in out7]
+        ['C', 'D']
 
         >>> a = Stream()
         >>> n = note.Note('G')
         >>> n.quarterLength = .5
         >>> a.repeatInsert(n, range(8))
+
         >>> b = Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
+
         >>> c = b.getElementsByOffset(2,6.9)
         >>> len(c)
         2
@@ -919,32 +967,41 @@ class Stream(music21.Music21Object):
         >>> len(c)
         10
         '''
+        if offsetEnd is None:
+            offsetEnd = offsetStart
+        
         found = Stream()
 
         #(offset, priority, dur, element). 
         for element in self:
             match = False
             offset = element.offset
-            dur = element.duration
 
-            if dur == None or onsetOnly:          
+            dur = element.duration
+            if dur is None or mustFinishInSpan is False:
                 elementEnd = offset
             else:
-                elementEnd = offset + dur
+                elementEnd = offset + dur.quarterLength
 
-            if includeCoincidentBoundaries:
-                if offset >= offsetStart and elementEnd <= offsetEnd:
+            if mustBeginInSpan is False and dur is not None:
+                elementStart = offset + dur.quarterLength
+            else:
+                elementStart = offset
+
+            if includeEndBoundary is True:
+                if elementStart >= offsetStart and elementEnd <= offsetEnd:
                     match = True
             else: # 
-                if offset >= offsetStart and elementEnd < offsetEnd:
+                if elementStart >= offsetStart and elementEnd < offsetEnd:
                     match = True
+                
 
             if match:
                 found.insert(element)
         return found
 
 
-    def getElementAtOrBefore(self, offset, unpackElement=False):
+    def getElementAtOrBefore(self, offset, classList=None):
         '''Given an offset, find the element at this offset, or with the offset
         less than and nearest to.
 
@@ -1006,46 +1063,84 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def getElementAtOrAfter(self, offset, unpackElement=False):
+    def getElementAtOrAfter(self, offset, classList=None):
         '''Given an offset, find the element at this offset, or with the offset
         greater than and nearest to.
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
-
-
-
-    def getElementBeforeOffset(self, offset, unpackElement=False):
+    def getElementBeforeOffset(self, offset, classList=None):
         '''Get element before a provided offset
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
-    def getElementAfterOffset(self, offset, unpackElement=False):
+    def getElementAfterOffset(self, offset, classList = None):
         '''Get element after a provided offset
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
 
-
-
-    def getElementBeforeElement(self, element, unpackElement=False):
+    def getElementBeforeElement(self, element, classList = None):
         '''given an element, get the element before
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
-    def getElementAfterElement(self, element, unpackElement=False):
-        '''given an element, get the element next
-        TODO: write this
+    def getElementAfterElement(self, element, classList = None):
+        '''given an element, get the next element.  If classList is specified, 
+        check to make sure that the element is an instance of the class list
+        
+        >>> st1 = Stream()
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> r3 = note.Rest()
+        >>> st1.append(n1)
+        >>> st1.append(n2)
+        >>> st1.append(r3)
+        >>> t2 = st1.getElementAfterElement(n1)
+        >>> t2 is n2
+        True
+        >>> t3 = st1.getElementAfterElement(t2)
+        >>> t3 is r3
+        True
+        >>> t4 = st1.getElementAfterElement(t3)
+        >>> t4
+        
+        >>> st1.getElementAfterElement("hi")
+        Traceback (most recent call last):
+        StreamException: ...
+        >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
+        >>> t5 is r3
+        True
+        >>> t6 = st1.getElementAfterElement(n1, [note.Rest, note.Note])
+        >>> t6 is n2
+        True
         '''
+        try:
+            elPos = self.index(element)
+        except ValueError:
+            raise StreamException("Could not find element in index")
+
+       
+        if classList is None:
+            if elPos == len(self.elements) - 1:
+                return None
+            else:
+                return self.elements[elPos + 1]
+        else:
+            for i in range(elPos + 1, len(self.elements)):
+                for cl in classList:
+                    if isinstance(self.elements[i], cl): 
+                        return self.elements[i]
+            return None
+        
         raise Exception("not yet implemented")
 
 
-
-    def groupElementsByOffset(self, returnDict = False, unpackElement = False):
+    def groupElementsByOffset(self, returnDict = False):
         '''
         returns a List of lists in which each entry in the
         main list is a list of elements occurring at the same time.
@@ -1063,10 +1158,7 @@ class Stream(music21.Music21Object):
         for el in self.elements:
             if not offsetsRepresented[el.offset]:
                 offsetsRepresented[el.offset] = []
-            if unpackElement is False:
-                offsetsRepresented[el.offset].append(el)
-            else:
-                offsetsRepresented[el.offset].append(el.obj)
+            offsetsRepresented[el.offset].append(el)
         if returnDict is True:
             return offsetsRepresented
         else:
@@ -2634,7 +2726,7 @@ class Stream(music21.Music21Object):
 
     #------------ interval routines --------------------------------------------
     def getNotes(self):
-        '''Return all Note, Chord, Rest, etc. objects in a Stream()
+        '''Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream
 
         >>> s1 = Stream()
         >>> c = chord.Chord(['a', 'b'])
@@ -2650,7 +2742,7 @@ class Stream(music21.Music21Object):
 
     def getPitches(self):
         '''
-        Return all pitches found in any element in the stream as a list
+        Return all pitches found in any element in the stream as a List
 
         (since Pitches have no duration, it's a list not a stream)
         '''  
@@ -2672,7 +2764,6 @@ class Stream(music21.Music21Object):
         '''
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
         at any point there is a discontinuity (such as if there is a rest between two pitches).
-        The method is used by melodicIntervals.
         
         How to determine consecutive pitches is a little tricky and there are many options.  
 
@@ -2686,7 +2777,7 @@ class Stream(music21.Music21Object):
         See Test.testFindConsecutiveNotes() for usage details.
         
         (**keywords is there so that other methods that pass along dicts to findConsecutiveNotes don't have to remove 
-        their own args)
+        their own args; this method is used in melodicIntervals.)
         '''
         sortedSelf = self.sorted
         returnList = []
@@ -2769,10 +2860,38 @@ class Stream(music21.Music21Object):
         
         The interval between a Note and a Chord (or between two chords) is the interval between pitches[0].
         For more complex interval calculations, run findConsecutiveNotes and then use generateInterval
+                
+        returns None of there are not at least two elements found by findConsecutiveNotes
+
+        See Test.testMelodicIntervals() for usage details.
+
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
+        if len(returnList) < 2:
+            return None
+        
         returnStream = self.__class__()
+        for i in range(len(returnList) - 1):
+            firstNote = returnList[i]
+            secondNote = returnList[i+1]
+            firstPitch = None
+            secondPitch = None
+            if firstNote is not None and secondNote is not None:
+                if hasattr(firstNote, "pitch") and firstNote.pitch is not None:
+                    firstPitch = firstNote.pitch
+                elif hasattr(firstNote, "pitches") and len(firstNote.pitches) > 0:
+                    firstPitch = firstNote.pitches[0]
+                if hasattr(secondNote, "pitch") and secondNote.pitch is not None:
+                    secondPitch = secondNote.pitch
+                elif hasattr(secondNote, "pitches") and len(secondNote.pitches) > 0:
+                    secondPitch = secondNote.pitches[0]
+                if firstPitch is not None and secondPitch is not None:
+                    returnInterval = interval.generateInterval(firstPitch, secondPitch)
+                    returnInterval.offset = firstNote.offset + firstNote.duration.quarterLength
+                    returnInterval.duration = duration.Duration(secondNote.offset - returnInterval.offset)
+                    returnStream.insert(returnInterval)
 
+        return returnStream
 
     #---------------------------------------------------------------------------
     def _getDurSpan(self, flatStream):
@@ -2798,7 +2917,7 @@ class Stream(music21.Music21Object):
         return post
 
 
-    def _durSpanOverlap(self, a, b, includeCoincidentBoundaries=False):
+    def _durSpanOverlap(self, a, b, includeEndBoundary=False):
         '''
         Compare two durSpans and find overlaps; optionally, 
         include coincident boundaries. a and b are sorted to permit any ordering.
@@ -2806,7 +2925,7 @@ class Stream(music21.Music21Object):
         If an element ends at 3.0 and another starts at 3.0, this may or may not
         be considered an overlap. The includeCoincidentEnds parameter determines
         this behaviour, where ending and starting 3.0 being a type of overlap
-        is set by the includeCoincidentBoundaries being True. 
+        is set by the includeEndBoundary being True. 
 
         >>> a = Stream()
         >>> a._durSpanOverlap([0, 10], [11, 12], False)
@@ -2824,7 +2943,7 @@ class Stream(music21.Music21Object):
         durSpans.sort() 
         found = False
 
-        if includeCoincidentBoundaries:
+        if includeEndBoundary:
             # if the start of b is before the end of a
             if durSpans[1][0] <= durSpans[0][1]:   
                 found = True
@@ -2836,7 +2955,7 @@ class Stream(music21.Music21Object):
 
 
     def _findLayering(self, flatStream, includeDurationless=True,
-                   includeCoincidentBoundaries=False):
+                   includeEndBoundary=False):
         '''Find any elements in an elementsSorted list that have simultaneities 
         or durations that cause overlaps.
         
@@ -2867,12 +2986,12 @@ class Stream(music21.Music21Object):
             for j in range(len(durSpanSorted)):
                 if j == i: continue # do not compare to self
                 dst = durSpanSorted[j]
-                # print src, dst, self._durSpanOverlap(src, dst, includeCoincidentBoundaries)
+                # print src, dst, self._durSpanOverlap(src, dst, includeEndBoundary)
         
                 if src[0] == dst[0]: # if start times are the same
                     simultaneityMap[i].append(j)
         
-                if self._durSpanOverlap(src, dst, includeCoincidentBoundaries):
+                if self._durSpanOverlap(src, dst, includeEndBoundary):
                     overlapMap[i].append(j)
         
         return simultaneityMap, overlapMap
@@ -3011,7 +3130,7 @@ class Stream(music21.Music21Object):
 
 
     def getOverlaps(self, includeDurationless=True,
-                     includeCoincidentBoundaries=False):
+                     includeEndBoundary=False):
         '''
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous. 
@@ -3021,7 +3140,7 @@ class Stream(music21.Music21Object):
         
         This example demonstrates end-joing overlaps: there are four quarter notes each
         following each other. Whether or not these count as overlaps
-        is determined by the includeCoincidentBoundaries parameter. 
+        is determined by the includeEndBoundary parameter. 
 
         >>> a = Stream()
         >>> for x in range(4):
@@ -3066,13 +3185,13 @@ class Stream(music21.Music21Object):
         checkOverlap = True
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
-                                includeDurationless, includeCoincidentBoundaries)
+                                includeDurationless, includeEndBoundary)
         return self._consolidateLayering(elementsSorted, overlapMap)
 
 
 
     def isSequence(self, includeDurationless=True, 
-                        includeCoincidentBoundaries=False):
+                        includeEndBoundary=False):
         '''A stream is a sequence if it has no overlaps.
 
         TODO: check that co-incident boundaries are properly handled
@@ -3088,7 +3207,7 @@ class Stream(music21.Music21Object):
         '''
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
-                                includeDurationless, includeCoincidentBoundaries)
+                                includeDurationless, includeEndBoundary)
         post = True
         for indexList in overlapMap:
             if len(indexList) > 0:
@@ -3189,8 +3308,8 @@ class Measure(Stream):
         '''
         # TODO: perhaps sort by priority?
         clefList = self.getElementsByClass(clef.Clef)
-        # only return cleff that has a zero offset
-        clefList = clefList.getElementsByOffset(0,0)
+        # only return clefs that have offset = 0.0 
+        clefList = clefList.getElementsByOffset(0)
         if len(clefList) == 0:
             return None
         else:
@@ -3224,8 +3343,8 @@ class Measure(Stream):
         '''
         # there could be more than one
         tsList = self.getElementsByClass(meter.TimeSignature)
-        # only return ts that has a zero offset
-        tsList = tsList.getElementsByOffset(0,0)
+        # only return timeSignatures at offset = 0.0
+        tsList = tsList.getElementsByOffset(0)
         if len(tsList) == 0:
             return None
         else:
@@ -3258,8 +3377,8 @@ class Measure(Stream):
         0
         '''
         keyList = self.getElementsByClass(key.KeySignature)
-        # only return key that has a zero offset
-        keyList = keyList.getElementsByOffset(0,0)
+        # only return keySignatures with offset = 0.0
+        keyList = keyList.getElementsByOffset(0)
         if len(keyList) == 0:
             return None
         else:
@@ -4069,10 +4188,10 @@ class Test(unittest.TestCase):
             a.insert(n)
 
         includeDurationless = True
-        includeCoincidentBoundaries = False
+        includeEndBoundary = False
 
         simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeDurationless, includeCoincidentBoundaries)
+                                  includeDurationless, includeEndBoundary)
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1,2], [0], [0]])
 
@@ -4080,7 +4199,7 @@ class Test(unittest.TestCase):
         post = a._consolidateLayering(a.flat, overlapMap)
         # print post
 
-        #found = a.getOverlaps(includeDurationless, includeCoincidentBoundaries)
+        #found = a.getOverlaps(includeDurationless, includeEndBoundary)
         # there should be one overlap group
         #self.assertEqual(len(found.keys()), 1)
         # there should be three items in this overlap group
@@ -4096,10 +4215,10 @@ class Test(unittest.TestCase):
             a.insert(n)
 
         includeDurationless = True
-        includeCoincidentBoundaries = True
+        includeEndBoundary = True
 
         simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeDurationless, includeCoincidentBoundaries)
+                                  includeDurationless, includeEndBoundary)
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1], [0,2], [1]])
 
@@ -4622,6 +4741,18 @@ class Test(unittest.TestCase):
         self.assertTrue(l14[1] is n2)
 
 
+    def testMelodicIntervals(self):
+        c4 = note.Note("C4")
+        c4.offset = 10
+        d5 = note.Note("D5")
+        d5.offset = 11
+        s1 = Stream([c4, d5])
+        intS1 = s1.melodicIntervals()
+        self.assertTrue(len(intS1) == 1)
+        M9 = intS1[0]
+        self.assertEqual(M9.niceName, "Major Ninth") 
+        ## TODO: Many more tests
+        
 
     def testStripTies(self):
         s1 = Stream()

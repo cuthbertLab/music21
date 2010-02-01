@@ -409,7 +409,7 @@ class Graph3DPolygonBars(Graph):
         if 'barWidth' in keywords:
             self.barWidth = keywords['barWidth']
         else:
-            self.barWidth = .8
+            self.barWidth = .4
 
 
     def process(self):

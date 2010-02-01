@@ -21,7 +21,7 @@ def sortMelodicFifths():
         if pieceObj.incipitClass() is None:
             continue
         print pieceObj.title
-        for polyphonicSnippet in pieceObj.allNotation():
+        for polyphonicSnippet in pieceObj.snippets:
             if polyphonicSnippet is None:
                 continue
             for thisStream in polyphonicSnippet.streams:

@@ -155,11 +155,11 @@ class TrecentoCadenceWork(object):
         self.timeSigBegin  = rowvalues[7]
         self.entryNotes    = rowvalues[-1]
 
-        self.snippetBlocks = []
-        self.snippetBlocks.append(self.getIncipit())
+        self.snippets = []
+        self.snippets.append(self.getIncipit())
         otherS = self.getOtherSnippets()
         if otherS is not None:
-            self.snippetBlocks += otherS        
+            self.snippets += otherS        
                 
         if isinstance(self.fischerNum, float):
             self.fischerNum = int(self.fischerNum)
@@ -191,7 +191,7 @@ class TrecentoCadenceWork(object):
         
         >>> bs = BallataSheet()
         >>> accur = bs.makeWork(2)
-        >>> accurIncipit = accur.getIncipit()
+        >>> accurIncipit = accur.incipit
         >>> print accurIncipit
         <polyphonicSnippet.Incipit object at 0x...>
         '''
@@ -202,6 +202,8 @@ class TrecentoCadenceWork(object):
         else: 
             self.convertBlockToStreams(rowBlock)
             return Incipit(rowBlock, self)
+
+    incipit = property(getIncipit)
 
     def getOtherSnippets(self):
         '''
@@ -253,7 +255,7 @@ class TrecentoCadenceWork(object):
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information and converts it to a list of streams:
+        Takes a block of music information and converts it to a list of Streams and other information
         
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         >>> bs = BallataSheet()
@@ -266,7 +268,8 @@ class TrecentoCadenceWork(object):
         <BLANKLINE>
         no-cadence
         2/4
-        >>> print stream.recurseRepr(block1[0])
+        >>> block1[0].show('text')
+        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note F>
         {2.0} <music21.note.Note G>
@@ -301,55 +304,54 @@ class TrecentoCadenceWork(object):
         if columnNumber in [8]: return True
         return False
 
-    def allNotation(self):
-        '''returns a list of all the 
-        PolyphonicSnippet objects in the database; currently 
-        this is the incipit and all the cadences
-        '''
-        return self.snippetBlocks
-
     def allCadences(self):
         '''returns a list of all the PolyphonicSnippet 
         objects which are actually cadences
         '''
-        x = len(self.snippetBlocks)
-        return self.snippetBlocks[1:x]
+        x = len(self.snippets)
+        return self.snippets[1:x]
 
-    def incipitClass(self):
-        return self.snippetBlocks[0]
+#    def incipitClass(self):
+#        return self.snippets[0]
 
     def cadenceAClass(self):
         try:
-            fc = self.snippetBlocks[1]
+            fc = self.snippets[1]
         except IndexError:
             return None
         if fc is not None:
             fc.cadenceName = "A section cadence"
         return fc
 
+    cadenceA = property(cadenceAClass)
+
     def cadenceB1Class(self):
         try:
-            fc = self.snippetBlocks[2]
+            fc = self.snippets[2]
         except IndexError:
             return None
         if fc is not None:
             fc.cadenceName = "B section cadence (1st or only ending)"
         return fc
+
+    cadenceBOuvert = property(cadenceB1Class)
     
     def cadenceB2Class(self):
         try:
-            fc = self.snippetBlocks[3]
+            fc = self.snippets[3]
         except IndexError:
             return None        
         if fc is not None:
             fc.cadenceName = "B section cadence (2nd ending)"
         return fc
 
+    cadenceBClos = property(cadenceB2Class)
+
     def getAllStreams(self):
         '''Get all streams in the work, losing association with
         the other polyphonic units.
         '''
-        snippets = self.allNotation()
+        snippets = self.snippets
         streams = []
         for thisPolyphonicSnippet in snippets:
             PSStreams = thisPolyphonicSnippet.streams
@@ -361,7 +363,7 @@ class TrecentoCadenceWork(object):
         '''
         Get the total lily output for the entire work
         '''
-        all = self.allNotation()
+        all = self.snippets
         alllily = ''
         for thing in all:
             if thing.lily != '' and thing.lily != ' ' and thing.lily is not None:
@@ -426,7 +428,7 @@ class TestExternal(unittest.TestCase):
         cs1 = CredoSheet() #filename = r'd:\docs\trecento\fischer\cadences.xls')
     #    cs1 = BallataSheet()
         credo1 = cs1.makeWork(2)
-        inc1 = credo1.snippetBlocks[4]
+        inc1 = credo1.snippets[4]
         inc1.lily.showPNG()
 
     def testSnippetShow(self):

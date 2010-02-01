@@ -17,7 +17,7 @@ import music21
 import music21.note
 
 class TempoMark(music21.Music21Object):
-    def __init__(self, value):
+    def __init__(self, value = None):
         music21.Music21Object.__init__(self)
         self.value = value
     
@@ -32,7 +32,7 @@ class MetronomeMark(TempoMark):
     >>> a.number
     40
     '''
-    def __init__(self, number, referent = None):
+    def __init__(self, number = 60, referent = None):
         TempoMark.__init__(self, number)
 
         self.number = number

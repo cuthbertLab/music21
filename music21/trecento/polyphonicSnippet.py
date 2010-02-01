@@ -1,10 +1,11 @@
+import copy
+
 import music21
 from music21 import meter
 from music21 import lily as lilyModule
 from music21 import note
 from music21 import stream
 
-import capua
 
 class PolyphonicSnippet(music21.Music21Object):
     def __init__(self, fiveExcelCells, parentPiece):
@@ -49,15 +50,7 @@ class PolyphonicSnippet(music21.Music21Object):
     
     def header(self):
         return self.headerWithPageNums()
-        
-    def applyCapua(self):
-        for thisStream in self.streams:
-            capua.clearFicta(thisStream)
-            capua.capuaRuleOne(thisStream)
-            capua.capuaRuleTwo(thisStream)
-            capua.capuaRuleThree(thisStream)
-            capua.capuaRuleFourB(thisStream)
-            
+                    
     def lilyFromStream(self, thisStream):
         lilyOut = lilyModule.LilyString("  \\new Staff { " + thisStream.bestClef().lily.value + " " + thisStream.lily.value + " } \n")
         return lilyOut
@@ -111,7 +104,7 @@ class FrontPaddedCadence(PolyphonicSnippet):
             newNotes = stream.Stream()
             for i in range(0, shortmeasures):
                 newRest = note.Rest()
-                newRest.duration = shortDuration.clone()
+                newRest.duration = copy.deepcopy(shortDuration)
                 newRest.transparent = 1
                 newNotes.append(newRest)
             newNotes[0].startTransparency = 1

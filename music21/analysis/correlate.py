@@ -375,7 +375,7 @@ class NoteAnalysis(object):
         # this actually appears as the w
         g.setAxisRange('z', (0, maxCount))
         g.setAxisLabel('z', 'Count')
-        # thi actually appearsa as the z
+        # thi actually appears as the z
         g.setAxisRange('y', (yValues[0], yValues[-1]))
         g.setAxisLabel('y', yLabel)
         #g.setAxisRange('x', (xValues[0], xValues[-1]))

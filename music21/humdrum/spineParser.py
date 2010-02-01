@@ -826,7 +826,7 @@ def hdStringToNote(contents):
             pass # slur end
     if contents.count('['):
         thisObject.tie = music21.note.Tie("start")
-    elif contents.count('['):
+    elif contents.count(']'):
         thisObject.tie = music21.note.Tie("stop")
     elif contents.count('_'):
         thisObject.tie = music21.note.Tie("continue")

@@ -80,7 +80,7 @@ def searchForNotes(notesStr):
     streamLily = ""
 
     for thisWork in ballataObj:
-        for thisCadence in thisWork.allNotation():
+        for thisCadence in thisWork.snippets:
             if (thisCadence is None or thisCadence.streams is None):
                 continue
             for i in range(len(thisCadence.streams)):
@@ -121,7 +121,7 @@ def searchForIntervals(notesStr):
     streamLily = ""
 
     for thisWork in ballataObj:
-        for thisCadence in thisWork.allNotation():
+        for thisCadence in thisWork.snippets:
             if (thisCadence is None or thisCadence.streams is None):
                 continue
             for i in range(len(thisCadence.streams)):

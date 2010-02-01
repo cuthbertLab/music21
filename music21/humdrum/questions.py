@@ -62,17 +62,17 @@ class Test(unittest.TestCase):
             meterObj = measure['meter']
             # get a list of pairs, specifying offset and accent
             for offset, accent in meterObj.accentPattern():
-                if accent > 'mf': # assuming sumbolic representation
-                    # get all reelvant elements
+                if accent > 'mf': # assuming symbolic representation
+                    # get all relevant elements
                     subStream = measure.getElementsByOffset(offset, 
                                     offset + meterObj.denominator)
                     # get a stream of just dynamics
                     dynamics = subStream.filterClass(
                                  articulations.DynamicArticulation)
                     for obj in dynamics:
-                        # can we increment dynamics by dynamcs?
+                        # can we increment dynamics by dynamics?
                         obj += 'pppp'
-                    # whill these changes be reflected in the source part stram?
+                    # will these changes be reflected in the source part stream?
 
     def test004(self):
         '''Align and display all of the bass lines for all of the variations concurrently.

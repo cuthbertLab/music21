@@ -135,6 +135,9 @@ class Interval(music21.Music21Object):
             self.directedSimpleName = self.diatonic.directedSimpleName
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
 
+    def __repr__(self):
+        return "<music21.interval.Interval %s>" % self.name
+
 class DiatonicInterval(music21.Music21Object):
     #TODO: add more documentation
     def __init__(self, specifier = None, generic = None):
@@ -182,6 +185,10 @@ class DiatonicInterval(music21.Music21Object):
     def mod7_object(self):
         '''generates a new Interval (not DiatonicInterval) object where descending 3rds are 6ths, etc.'''
         return generateIntervalFromString(self.mod7)
+
+    def __repr__(self):
+        return "<music21.interval.DiatonicInterval %s>" % self.name
+
             
 class GenericInterval(music21.Music21Object):
     '''
@@ -278,6 +285,10 @@ class GenericInterval(music21.Music21Object):
         '''generates a new GenericInterval object where descending 3rds are 6ths, etc.'''
         return GenericInterval(self.mod7)
 
+    def __repr__(self):
+        return "<music21.interval.GenericInterval %s>" % self.directed
+
+
 class ChromaticInterval(music21.Music21Object):
     '''Chromatic interval class -- thinks of everything in semitones
 
@@ -315,6 +326,10 @@ class ChromaticInterval(music21.Music21Object):
         self.intervalClass = self.mod12
         if (self.mod12 > 6):
             self.intervalClass = 12 - self.mod12
+
+    def __repr__(self):
+        return "<music21.interval.ChromaticInterval %s>" % self.directed
+
 
 class IntervalException(Exception):
     pass
