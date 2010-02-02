@@ -1,3 +1,17 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         mgtaPart1.py
+# Purpose:      demonstration
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    (c) 2009-2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+
+import unittest, doctest
 
 ### CHAPTER 1 
 

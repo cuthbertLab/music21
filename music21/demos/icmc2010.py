@@ -1,4 +1,22 @@
-def showDots():
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         icmc2010.py
+# Purpose:      icmc2010.py
+#
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
+#
+# Copyright:    (c) 2009-2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+
+import unittest, doctest
+
+
+
+
+def showDots(show=True):
     import music21
     from music21 import corpus, meter
     
@@ -21,12 +39,12 @@ def showDots():
         for n in m.notes:
             for i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('.')
-    
-    partBass.measures[0:7].show() 
+    if show:
+        partBass.measures[0:7].show() 
 
 
 
-def findRaisedSevenths():
+def findRaisedSevenths(show=True):
     import music21
     from music21 import corpus, meter, stream
 
@@ -52,12 +70,12 @@ def findRaisedSevenths():
         ts.getBeat(n.offset))
                     found.insert(count, n)
                     count += 4
+    if show:
+        found.show('musicxml')
 
-    found.show('musicxml')
 
 
-
-def newAccent():
+def newAccent(show=True):
     from music21 import corpus, meter, articulations
     
     score = corpus.parseWork('bach/bwv366.xml')
@@ -83,10 +101,25 @@ def newAccent():
                 lastBeat = beat
             m = m.sorted
     
-    partBass.measures[0:8].show('musicxml')
+    if show:
+        partBass.measures[0:8].show('musicxml')
 
+
+
+
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        '''Test non-showing functions
+        '''
+        for func in [showDots, findRaisedSevenths, newAccent]:
+            func(show=False)
 
 if __name__ == "__main__":
-    showDots()
-    findRaisedSevenths()
-    newAccent()
+    import music21
+    music21.mainTest(Test)
+
+
