@@ -21,6 +21,7 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21 import converter
+from music21 import corpus
 from music21 import duration
 from music21 import dynamics
 from music21 import environment
@@ -49,26 +50,25 @@ MODULES = [
     base,
     common, 
     converter,
+    corpus, 
+    chord, 
     duration, 
+    dynamics,
     environment, 
+    instrument,
+    interval, 
     meter, 
     note, 
     pitch, 
-    stream, 
+    stream,     
 
-    
-#    chord, 
-#     instrument,
-#  #   interval, 
-#     dynamics,
-#     instrument,
-#  #   interval, 
+
 #   musicxml, 
 #   #  scale,
 #     tempo,  
 
 # trecento
-    trecentoCadencebook
+#    trecentoCadencebook
 ]
 
 
@@ -115,7 +115,6 @@ class RestrtucturedWriter(object):
         msg.append('\n'*1)
         return msg
 
-
     def formatParent(self, mroEntry):
         '''Return a class name as a parent, showing module when necessary
 
@@ -135,8 +134,6 @@ class RestrtucturedWriter(object):
             return className
         else:
             return '%s.%s' % (modName, className)
-
-
 
     def formatClassInheritance(self, mro):
         '''Given a lost of classes from inspect.getmro, return a formatted
@@ -364,7 +361,7 @@ class ModuleDoc(RestrtucturedWriter):
             elif isinstance(obj, environment.Environment):
                 continue # skip environment object
             else:
-                environLocal.printDebug(['cannot process: %s' % obj])
+                environLocal.printDebug(['cannot process: %s' % repr(obj)])
 
 
     #---------------------------------------------------------------------------
@@ -406,8 +403,6 @@ class ModuleDoc(RestrtucturedWriter):
                 for nameFound in attrPublic:
                     msg.append('**%s**\n\n' % nameFound)
 
-
-
         for groupName, groupKey, postfix in [
                                     ('Methods', 'methods', '()'), 
                                     ('Properties', 'properties', '')]:
@@ -444,10 +439,6 @@ class ModuleDoc(RestrtucturedWriter):
                 if i == 0: # only provide full doc
                     msg.append('%s\n' % 
                         self.classes[className][groupKey][nameFound]['doc'])
-
-
-
-
 
         msg.append('\n'*1)
         return msg
@@ -486,6 +477,9 @@ class ModuleDoc(RestrtucturedWriter):
 #         a.getRestructured()
 
 
+
+
+
 #-------------------------------------------------------------------------------
 class Documentation(RestrtucturedWriter):
 
@@ -494,9 +488,16 @@ class Documentation(RestrtucturedWriter):
 
         self.titleMain = 'Music21 Documentation'
         # include additional rst files that are not auto-generated
-        self.chaptersMain = ['install', 
-                             'environment', 
+        self.chaptersMain = ['what',
+                             'quickStart',
+                             'overviewNotes', 
+                             'overviewStreams', 
+                             'overviewFormats', 
                              'examples', 
+                             'about', 
+
+                             'install', 
+                             'environment', 
                              'graphing', 
                              'glossary', 
                              'faq']

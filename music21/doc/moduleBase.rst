@@ -11,12 +11,127 @@ base -- the convention within music21 is that __init__ files contain:
    
 so everything in this file can be accessed as music21.XXXX
 
-Class Element
--------------
+Class Contexts
+--------------
+
+Inherits from: object
+
+An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant. 
+
+Methods
+~~~~~~~
+
+
+Locally Defined
+
+**setAttrByName()**
+
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(object): attr1=234
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aContexts = Contexts()
+    >>> aContexts.addReference(aObj)
+    >>> aContexts.addReference(bObj)
+    >>> aContexts.setAttrByName('attr1', 'test')
+    >>> aContexts.getAttrByName('attr1') == 'test'
+    True 
+
+**scrub()**
+
+    Remove all weak ref objects that point to objects that no longer exist. 
+
+**remove()**
+
+    Remove the entry specified by sites 
+
+    
+
+**getReferences()**
+
+
+**getLocations()**
+
+
+**getById()**
+
+
+**getByGroup()**
+
+
+**getByClass()**
+
+    Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Contexts of all members 
+
+    >>> class Mock(object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = Contexts()
+    >>> aContexts.addReference(aObj)
+    >>> aContexts.addReference(bObj)
+    >>> aContexts.getByClass('mock') == bObj
+    True 
+    >>> aContexts.getByClass(Mock) == bObj
+    True 
+
+    
+
+**getAttrByName()**
+
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(object): attr1=234
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aContexts = Contexts()
+    >>> aContexts.addReference(aObj)
+    >>> aContexts.addReference(bObj)
+    >>> aContexts.getAttrByName('attr1') == 98
+    True 
+    >>> del bObj
+    >>> aContexts.getAttrByName('attr1') == 234
+    True 
+
+**get()**
+
+    Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
+
+    >>> class Mock(object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = Contexts()
+    >>> aContexts.addReference(aObj)
+    >>> aContexts.addReference(bObj)
+    >>> aContexts.getReferences() == [bObj, aObj]
+    True 
+
+**find()**
+
+
+**countRef()**
+
+
+**countLoc()**
+
+
+**clear()**
+
+    Clear all data. 
+
+**addReference()**
+
+    Add a reference 
+
+
+Class ElementWrapper
+--------------------
 
 Inherits from: base.Music21Object, object
 
-An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the Element will call Object is now mandatory -- calls to Element without an object fail, because in the new (11/29) object model, Element should only be used to wrap an object. 
+An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the ElementWrapper will call Object is now mandatory -- calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object. 
 
 
 
@@ -52,7 +167,7 @@ Locally Defined
     a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
 
     >>> import note
-    >>> aE = Element(obj = note.Note("A-"))
+    >>> aE = ElementWrapper(obj = note.Note("A-"))
     >>> aE.id = "aflat-Note"
     >>> aE.groups.append("out-of-range")
     >>> aE.offset = 4.0
@@ -136,7 +251,7 @@ Class Locations
 
 Inherits from: object
 
-An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store 'self' as a site -- this becomes the default offset for any newly added sites that don't have any sites 
+An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site -- this becomes the default offset for any newly added sites that do not have any sites 
 
 Methods
 ~~~~~~~
@@ -343,7 +458,7 @@ Locally Defined
 
 **isClass()**
 
-    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an Element or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
 **id()**
 

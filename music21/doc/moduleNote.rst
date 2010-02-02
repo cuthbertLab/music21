@@ -6,11 +6,6 @@ music21.note
 Classes and functions for creating and manipulating notes, ties, and durations.
 Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.
 
-Function factory()
-------------------
-
-convenience method to get Notes 
-
 Function noteFromDiatonicNumber()
 ---------------------------------
 
@@ -95,6 +90,18 @@ Inherited from base.Music21Object
 
 
 Locally Defined
+
+**mx**
+
+    From music21 to MusicXML 
+
+    >>> a = Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True 
+    >>> mxAccidental = a.mx
+    >>> mxAccidental.get('content')
+    'quarter-sharp' 
 
 **lily**
 
@@ -204,6 +211,19 @@ Locally Defined
     >>> a.getTypes()
     ['start', 'start'] 
 
+**getTypeByNumber()**
+
+    Get beam type, with direction, by number 
+
+    >>> a = Beams()
+    >>> a.fill('16th')
+    >>> a.setAll('start')
+    >>> a.setByNumber(2, 'partial-right')
+    >>> a.getTypeByNumber(2)
+    'partial-right' 
+    >>> a.getTypeByNumber(1)
+    'start' 
+
 **getNumbers()**
 
     Retrun a lost of all defind numbers 
@@ -235,7 +255,7 @@ Locally Defined
     >>> len(a)
     3 
 
-**addNext()**
+**append()**
 
 
 Properties
@@ -252,7 +272,7 @@ Locally Defined
 Class EighthNote
 ----------------
 
-Inherits from: note.Note, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
 
 
 Attributes
@@ -301,21 +321,22 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
+
+
+Inherited from note.NotRest
+
+**splitNoteAtPoint()**
 
 
 Inherited from note.Note
@@ -432,26 +453,6 @@ Inherited from base.Music21Object
 
 Locally Defined
 
-**splitNoteAtPoint()**
-
-    Split a Note into two Notes. 
-
-    >>> a = GeneralNote()
-    >>> a.duration.type = 'whole'
-    >>> b, c = a.splitNoteAtPoint(3)
-    >>> b.duration.type
-    'half' 
-    >>> b.duration.dots
-    1 
-    >>> b.duration.quarterLength
-    3.0 
-    >>> c.duration.type
-    'quarter' 
-    >>> c.duration.dots
-    0 
-    >>> c.duration.quarterLength
-    1.0 
-
 **splitAtDurations()**
 
     Takes a Note and returns a list of notes with only a single duration.Duration each. 
@@ -472,9 +473,6 @@ Locally Defined
     >>> b[1].duration.type
     'whole' 
 
-**reinit()**
-
-
 **isChord()**
 
     bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
@@ -482,9 +480,6 @@ Locally Defined
 **compactNoteInfo()**
 
     nice debugging info tool -- returns information about a note E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet) 
-
-**clone()**
-
 
 **clearDurations()**
 
@@ -504,6 +499,29 @@ Locally Defined
     6.0 
 
     
+
+**addLyric()**
+
+    adds another lyric to the note's lyric list optionally with a certain lyric number 
+
+    >>> n1 = Note()
+    >>> n1.addLyric("hello")
+    >>> n1.lyrics[0].text
+    'hello' 
+    >>> n1.lyrics[0].number
+    1 
+    ## note that the option number specified gives the lyric number, not the list position 
+    >>> n1.addLyric("bye", 3)
+    >>> n1.lyrics[1].text
+    'bye' 
+    >>> n1.lyrics[1].number
+    3 
+    ## replace existing lyric 
+    >>> n1.addLyric("ciao", 3)
+    >>> n1.lyrics[1].text
+    'ciao' 
+    >>> n1.lyrics[1].number
+    3 
 
 Properties
 ~~~~~~~~~~
@@ -537,6 +555,7 @@ Locally Defined
 
 **lyric**
 
+    returns the first Lyric's text todo: should return a \n separated string of lyrics 
 
 **color**
 
@@ -545,7 +564,7 @@ Locally Defined
 Class HalfNote
 --------------
 
-Inherits from: note.Note, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
 
 
 Attributes
@@ -594,21 +613,22 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
+
+
+Inherited from note.NotRest
+
+**splitNoteAtPoint()**
 
 
 Inherited from note.Note
@@ -787,10 +807,120 @@ Locally Defined
     'hello' 
 
 
+Class NotRest
+-------------
+
+Inherits from: note.GeneralNote, base.Music21Object, object
+
+Parent class for objects that are not rests; or, object that can be tied. 
+
+Attributes
+~~~~~~~~~~
+
+**articulations**
+
+**contexts**
+
+**editorial**
+
+**groups**
+
+**locations**
+
+**lyrics**
+
+**notations**
+
+**tie**
+
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object
+
+**write()**
+
+**show()**
+
+**searchParent()**
+
+**isClass()**
+
+**id()**
+
+**getOffsetBySite()**
+
+**contexts()**
+
+
+Inherited from note.GeneralNote
+
+**splitAtDurations()**
+
+**isChord()**
+
+**compactNoteInfo()**
+
+**clearDurations()**
+
+**appendDuration()**
+
+**addLyric()**
+
+
+Locally Defined
+
+**splitNoteAtPoint()**
+
+    Split a Note into two Notes. 
+
+    >>> a = NotRest()
+    >>> a.duration.type = 'whole'
+    >>> b, c = a.splitNoteAtPoint(3)
+    >>> b.duration.type
+    'half' 
+    >>> b.duration.dots
+    1 
+    >>> b.duration.quarterLength
+    3.0 
+    >>> c.duration.type
+    'quarter' 
+    >>> c.duration.dots
+    0 
+    >>> c.duration.quarterLength
+    1.0 
+
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object
+
+**priority**
+
+**parent**
+
+**offset**
+
+**duration**
+
+
+Inherited from note.GeneralNote
+
+**quarterLength**
+
+**musicxml**
+
+**lyric**
+
+**color**
+
+
 Class Note
 ----------
 
-Inherits from: note.GeneralNote, base.Music21Object, object
+Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object
 
 Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
@@ -840,21 +970,22 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
+
+
+Inherited from note.NotRest
+
+**splitNoteAtPoint()**
 
 
 Locally Defined
@@ -963,6 +1094,17 @@ Class Pitch
 
 Inherits from: base.Music21Object, object
 
+
+Attributes
+~~~~~~~~~~
+
+**contexts**
+
+**defaultOctave**
+
+**groups**
+
+**locations**
 
 Methods
 ~~~~~~~
@@ -1138,7 +1280,7 @@ Locally Defined
 Class QuarterNote
 -----------------
 
-Inherits from: note.Note, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
 
 
 Attributes
@@ -1187,21 +1329,22 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
+
+
+Inherited from note.NotRest
+
+**splitNoteAtPoint()**
 
 
 Inherited from note.Note
@@ -1318,21 +1461,17 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
 
 
 Locally Defined
@@ -1444,6 +1583,12 @@ Inherited from base.Music21Object
 **duration**
 
 
+Locally Defined
+
+**mx**
+
+
+
 Class Unpitched
 ---------------
 
@@ -1493,21 +1638,17 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
 
 
 Locally Defined
@@ -1557,7 +1698,7 @@ Inherited from note.GeneralNote
 Class WholeNote
 ---------------
 
-Inherits from: note.Note, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
 
 
 Attributes
@@ -1606,21 +1747,22 @@ Inherited from base.Music21Object
 
 Inherited from note.GeneralNote
 
-**splitNoteAtPoint()**
-
 **splitAtDurations()**
-
-**reinit()**
 
 **isChord()**
 
 **compactNoteInfo()**
 
-**clone()**
-
 **clearDurations()**
 
 **appendDuration()**
+
+**addLyric()**
+
+
+Inherited from note.NotRest
+
+**splitNoteAtPoint()**
 
 
 Inherited from note.Note

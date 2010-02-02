@@ -63,6 +63,14 @@ Utility conversion; does not process internals. Takes in a midiNote number (Assu
 ('G', <accidental sharp>) 
 >>> convertPsToStep(-2)
 ('A', <accidental sharp>) 
+>>> convertPsToStep(60.5)
+('C', <accidental half-sharp>) 
+>>> convertPsToStep(61.5)
+('C', <accidental one-and-a-half-sharp>) 
+>>> convertPsToStep(62)
+('D', <accidental natural>) 
+>>> convertPsToStep(62.5)
+('D', <accidental half-sharp>) 
 
 Function convertStepToPs()
 --------------------------
@@ -152,6 +160,18 @@ Inherited from base.Music21Object
 
 Locally Defined
 
+**mx**
+
+    From music21 to MusicXML 
+
+    >>> a = Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True 
+    >>> mxAccidental = a.mx
+    >>> mxAccidental.get('content')
+    'quarter-sharp' 
+
 **lily**
 
 
@@ -161,6 +181,17 @@ Class Pitch
 
 Inherits from: base.Music21Object, object
 
+
+Attributes
+~~~~~~~~~~
+
+**contexts**
+
+**defaultOctave**
+
+**groups**
+
+**locations**
 
 Methods
 ~~~~~~~

@@ -56,11 +56,11 @@ Function findFormat()
 Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
 
 >>> findFormat('mx')
-('musicxml', '.mxl') 
+('musicxml', '.xml') 
 >>> findFormat('.mxl')
-('musicxml', '.mxl') 
+('musicxml', '.xml') 
 >>> findFormat('musicxml')
-('musicxml', '.mxl') 
+('musicxml', '.xml') 
 >>> findFormat('jpeg')
 ('jpeg', '.jpg') 
 >>> findFormat('lily')
@@ -69,6 +69,8 @@ Given a format defined either by a format name or an extension, return the forma
 ('jpeg', '.jpg') 
 >>> findFormat('humdrum')
 ('humdrum', '.krn') 
+>>> findFormat('txt')
+('text', '.txt') 
 
 Function findFormatFile()
 -------------------------
@@ -123,6 +125,12 @@ Function fromRoman()
 --------------------
 
 
+
+>>> fromRoman('ii')
+2 
+>>> fromRoman('vii')
+7 
+
 Function getMd5()
 -----------------
 
@@ -140,6 +148,11 @@ Function greaterThan()
 ----------------------
 
 greaterThan returns True if x is greater than and not almostEquals y 
+
+Function greaterThanOrEqual()
+-----------------------------
+
+greaterThan returns True if x is greater than or almostEquals y 
 
 Function isIterable()
 ---------------------
@@ -272,6 +285,12 @@ while this is left alone:
 Function toRoman()
 ------------------
 
+
+
+>>> toRoman(2)
+'II' 
+>>> toRoman(7)
+'VII' 
 
 Function unwrapWeakref()
 ------------------------

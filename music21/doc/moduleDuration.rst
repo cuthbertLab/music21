@@ -32,14 +32,14 @@ Given a rhythm type, number of dots, and list of Tuplet objects, give its quarte
 0.25 
 >>> convertTypeToQuarterLength('quarter', 2)
 1.75 
-Also can handle medieval dot groups. 
+Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8). 
 >>> convertTypeToQuarterLength('half', dotGroups = [1,1])
 4.5 
 
 Function dottedMatch()
 ----------------------
 
-(was quarterLengthToDotCandidate) given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default. 
+given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default. 
 
 >>> dottedMatch(3.0)
 (1, 'half') 
@@ -55,6 +55,19 @@ maxDots can be lowered for certain searches
 (False, False) 
 
 
+
+Function musicXMLTypeToType()
+-----------------------------
+
+Convert a MusicXML type to an m21 type. 
+
+>>> musicXMLTypeToType('long')
+'longa' 
+>>> musicXMLTypeToType('quarter')
+'quarter' 
+>>> musicXMLTypeToType(None)
+Traceback (most recent call last): 
+DurationException... 
 
 Function nextLargerType()
 -------------------------
@@ -128,9 +141,7 @@ Function quarterLengthToClosestType()
 Function quarterLengthToDurations()
 -----------------------------------
 
-(was quarterLengthToUnitSpec) Returns a List of new Durations (each with only a single component) given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (n.b. all quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that). This is mainly a utility function.  Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and only have the components created as needed. 
-
-These examples use unitSpec() to get a concise summary of the contents 
+Returns a List of new Durations (each with only a single component) given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (n.b. all quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that). This is mainly a utility function.  Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and then let Duration automatically create Duration Components as necessary. These examples use unitSpec() to get a concise summary of the contents 
 
 >>> unitSpec(quarterLengthToDurations(2))
 [(2.0, 'half', 0, None, None, None)] 
@@ -188,16 +199,16 @@ and recurse, adding as my units as necessary.
 Function quarterLengthToTuplet()
 --------------------------------
 
-Returns a list of possible Tuplet objects for a given qLen up to the maxTotReturn Searches for numerators specified in defaultTupletNumerators (3, 5, 7, 11, 13) does not return dotted tuplets, nor nested tuplets. (was quarterLengthToTupletCandidate) Note that 4:3 tuplets won't be found, but will be found as dotted notes by dottedMatch 
+Returns a list of possible Tuplet objects for a given qLen up to the maxToReturn Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13) does not return dotted tuplets, nor nested tuplets. (was quarterLengthToTupletCandidate) Note that 4:3 tuplets won't be found, but will be found as dotted notes by dottedMatch 
 
 >>> quarterLengthToTuplet(.33333333)
-[[3, 2, 'eighth'], [3, 1, 'quarter']] 
-By specifying only 1 count, the tuple with the smallest type will be 
-returned. 
+[<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>] 
+By specifying only 1 count, the a single-length list containing the Tuplet with the 
+smallest type will be returned. 
 >>> quarterLengthToTuplet(.3333333, 1)
-[[3, 2, 'eighth']] 
+[<music21.duration.Tuplet 3/2/eighth>] 
 >>> quarterLengthToTuplet(.20)
-[[5, 4, '16th'], [5, 2, 'eighth'], [5, 1, 'quarter']] 
+[<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>] 
 >>> c = quarterLengthToTuplet(.3333333, 1)[0]
 >>> c.tupletMultiplier()
 0.6666... 
@@ -206,10 +217,46 @@ Function roundDuration()
 ------------------------
 
 
+Function typeToMusicXMLType()
+-----------------------------
+
+Convert a MusicXML type to an m21 type. 
+
+>>> typeToMusicXMLType('longa')
+'long' 
+>>> typeToMusicXMLType('quarter')
+'quarter' 
+
 Function unitSpec()
 -------------------
 
 simple representation of most durationObjects. works on a single DurationObject or a List of them, returning a list of unitSpecs if given a list otherwise returns a single one A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, tupletType (assuming top and bottom are the same). Does not deal with nested tuplets, etc. 
+
+Function updateTupletType()
+---------------------------
+
+Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary. 
+
+>>> a = Duration(); a.quarterLength = .33333
+>>> b = Duration(); b.quarterLength = .33333
+>>> c = DurationUnit(); c.quarterLength = .33333
+>>> d = Duration(); d.quarterLength = 2
+>>> e = Duration(); e.quarterLength = .33333
+>>> f = DurationUnit(); f.quarterLength = .33333
+>>> g = Duration(); g.quarterLength = .33333
+>>> a.tuplets[0].type == None
+True 
+>>> updateTupletType([a, b, c, d, e, f, g])
+>>> a.tuplets[0].type == 'start'
+True 
+>>> b.tuplets[0].type == None
+True 
+>>> c.tuplets[0].type == 'stop'
+True 
+>>> e.tuplets[0].type == 'start'
+True 
+>>> g.tuplets[0].type == 'stop'
+True 
 
 Class AppogiaturaStartDuration
 ------------------------------
@@ -251,9 +298,9 @@ Inherited from duration.Duration
 
 **componentIndexAtQtrPosition()**
 
-**clone()**
-
 **clear()**
+
+**appendTuplet()**
 
 **addDuration()**
 
@@ -322,9 +369,9 @@ Inherited from duration.Duration
 
 **componentIndexAtQtrPosition()**
 
-**clone()**
-
 **clear()**
+
+**appendTuplet()**
 
 **addDuration()**
 
@@ -487,9 +534,6 @@ Locally Defined
     self.componentIndexAtQtrPosition(2.0) == d3 
     self.componentIndexAtQtrPosition(2.5) == d3 
 
-**clone()**
-
-
 **clear()**
 
     Permit all componets to be removed. (It is not clear yet if this is needed) 
@@ -503,6 +547,9 @@ Locally Defined
     0.0 
     >>> a.type
     'zero' 
+
+**appendTuplet()**
+
 
 **addDuration()**
 
@@ -535,10 +582,17 @@ Locally Defined
 
 **mx**
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. TODO: tuplets, notations, ties 
+    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
 
     >>> a = Duration()
     >>> a.quarterLength = 3
+    >>> b = a.mx
+    >>> len(b) == 1
+    True 
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True 
+    >>> a = Duration()
+    >>> a.quarterLength = .33333333
     >>> b = a.mx
     >>> len(b) == 1
     True 
@@ -584,12 +638,12 @@ Locally Defined
     say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
 
     >>> complexDur = Duration('eighth')
-    >>> complexDur.tuplets.append(Tuplet())
+    >>> complexDur.appendTuplet(Tuplet())
     >>> complexDur.aggregateTupletRatio()
     (3, 2) 
     >>> tup2 = Tuplet()
     >>> tup2.setRatio(5, 4)
-    >>> complexDur.tuplets.append(tup2)
+    >>> complexDur.appendTuplet(tup2)
     >>> complexDur.aggregateTupletRatio()
     (15, 8) 
 
@@ -633,6 +687,9 @@ Locally Defined
 **link()**
 
 
+**appendTuplet()**
+
+
 Properties
 ~~~~~~~~~~
 
@@ -645,7 +702,7 @@ Locally Defined
 
 **tuplets**
 
-    Return a list of Tuplet objects 
+    Return a tuple of Tuplet objects 
 
 **quarterLength**
 
@@ -714,9 +771,9 @@ Inherited from duration.Duration
 
 **componentIndexAtQtrPosition()**
 
-**clone()**
-
 **clear()**
+
+**appendTuplet()**
 
 **addDuration()**
 
@@ -785,9 +842,9 @@ Inherited from duration.Duration
 
 **componentIndexAtQtrPosition()**
 
-**clone()**
-
 **clear()**
+
+**appendTuplet()**
 
 **addDuration()**
 
@@ -826,21 +883,48 @@ tuplet class: creates tuplet objects which modify duration objects note that thi
 >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
 >>> print myTup.tupletMultiplier()
 0.8 
+>>> myTup2 = Tuplet(8, 5)
+>>> print myTup2.tupletMultiplier()
+0.625 
+>>> myTup2 = Tuplet(6, 4, "16th")
+>>> print myTup2.durationActual.type
+16th 
+>>> print myTup2.tupletMultiplier()
+0.666... 
+
+
+Tuplets may be frozen, in which case they become immutable.  Tuplets 
+which are attached to Durations are automatically frozen 
+# TODO: use __setattr__ to freeze all properties, and make a metaclass 
+# exceptions: tuplet type, tuplet id: things that don't affect length 
+>>> myTup.frozen = True
+>>> myTup.tupletActual = [3, 2]
+Traceback (most recent call last): 
+... 
+TupletException: A frozen tuplet (or one attached to a duration) is immutable 
+>>> myHalf = Duration("half")
+>>> myHalf.appendTuplet(myTup2)
+>>> myTup2.tupletActual = [5, 4]
+Traceback (most recent call last): 
+... 
+TupletException: A frozen tuplet (or one attached to a duration) is immutable 
 
 Attributes
 ~~~~~~~~~~
 
+**bracket**
+
 **durationActual**
 
 **durationNormal**
-
-**nestedInside**
 
 **nestedLevel**
 
 **numberNotesActual**
 
 **numberNotesNormal**
+
+**placement**
 
 **tupletActualShow**
 
@@ -926,6 +1010,10 @@ Locally Defined
     >>> a.totalTupletLength()
     4.0 
 
+**frozen()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
 Properties
 ~~~~~~~~~~
 
@@ -937,6 +1025,14 @@ Locally Defined
 
 **tupletActual**
 
+
+**mx**
+
+    From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
+
+    >>> a = Tuplet()
+    >>> a.bracket = True
+    >>> b, c = a.mx
 
 
 Class ZeroDuration
@@ -970,6 +1066,8 @@ Inherited from duration.DurationUnit
 **setTypeFromNum()**
 
 **link()**
+
+**appendTuplet()**
 
 Properties
 ~~~~~~~~~~

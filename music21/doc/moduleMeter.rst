@@ -123,15 +123,27 @@ Inherited from base.Music21Object
 
 Inherited from meter.TimeSignature
 
+**setDisplay()**
+
+**setAccentWeight()**
+
+**ratioEqual()**
+
 **quarterPositionToBeat()**
 
 **loadRatio()**
 
 **load()**
 
+**getBeatProgress()**
+
+**getBeatDepth()**
+
 **getBeat()**
 
 **getBeams()**
+
+**getAccentWeight()**
 
 **getAccent()**
 
@@ -226,15 +238,27 @@ Inherited from base.Music21Object
 
 Inherited from meter.TimeSignature
 
+**setDisplay()**
+
+**setAccentWeight()**
+
+**ratioEqual()**
+
 **quarterPositionToBeat()**
 
 **loadRatio()**
 
 **load()**
 
+**getBeatProgress()**
+
+**getBeatDepth()**
+
 **getBeat()**
 
 **getBeams()**
+
+**getAccentWeight()**
 
 **getAccent()**
 
@@ -284,6 +308,8 @@ A meter sequence is a list of MeterTerminals, or other MeterSequences
 Attributes
 ~~~~~~~~~~
 
+**parenthesis**
+
 **summedNumerator**
 
 Methods
@@ -323,7 +349,7 @@ Locally Defined
     >>> a.positionToIndex(5)
     Traceback (most recent call last): 
     ... 
-    MeterException: cannot access from qLenPos 5 
+    MeterException: cannot access from qLenPos 5 where total duration is 4.0 
     >>> a = MeterSequence('4/4')
     >>> a.positionToIndex(.5)
     0 
@@ -340,6 +366,25 @@ Locally Defined
     >>> a.positionToIndex(2.9)
     1 
 
+**positionToDepth()**
+
+    Given a qLenPos, return the maximum available depth at this position 
+
+    >>> b = MeterSequence('4/4', 4)
+    >>> b[1] = b[1].subdivide(2)
+    >>> b[3] = b[3].subdivide(2)
+    >>> b[3][0] = b[3][0].subdivide(2)
+    >>> b
+    <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}> 
+    >>> b.positionToDepth(0)
+    3 
+    >>> b.positionToDepth(0.25) # quantizing active by default
+    3 
+    >>> b.positionToDepth(1)
+    3 
+    >>> b.positionToDepth(1.5)
+    2 
+
 **positionToAddress()**
 
     Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen. 
@@ -347,19 +392,19 @@ Locally Defined
     >>> a = MeterSequence('3/4', 3)
     >>> a[1] = a[1].subdivide(4)
     >>> a
-    {1/4+{1/16+1/16+1/16+1/16}+1/4} 
+    <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}> 
     >>> len(a)
     3 
     >>> a.positionToAddress(.5)
     [0] 
     >>> a[0]
-    1/4 
+    <MeterTerminal 1/4> 
     >>> a.positionToAddress(1.0)
     [1, 0] 
     >>> a.positionToAddress(1.5)
     [1, 2] 
     >>> a[1][2]
-    1/16 
+    <MeterTerminal 1/16> 
     >>> a.positionToAddress(1.99)
     [1, 3] 
     >>> a.positionToAddress(2.5)
@@ -379,7 +424,7 @@ Locally Defined
 
 **partitionByList()**
 
-    
+    Given a numerator list, partition MeterSequence inot a new list of MeterTerminals 
 
     >>> a = MeterSequence('4/4')
     >>> a.partitionByList([1,1,1,1])
@@ -387,7 +432,7 @@ Locally Defined
     '{1/4+1/4+1/4+1/4}' 
     >>> a.partitionByList(['3/4', '1/8', '1/8'])
     >>> a
-    {3/4+1/8+1/8} 
+    <MeterSequence {3/4+1/8+1/8}> 
     >>> a.partitionByList(['3/4', '1/8', '5/8'])
     Traceback (most recent call last): 
     MeterException: Cannot set partition by ['3/4', '1/8', '5/8'] 
@@ -408,7 +453,7 @@ Locally Defined
 
 **partition()**
 
-    A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
+    Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
 
     >>> a = MeterSequence('5/4+3/8')
     >>> len(a)
@@ -425,7 +470,7 @@ Locally Defined
 
 **load()**
 
-    User can enter a list of values or an abbreviated slash notation 
+    This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight 
 
     >>> a = MeterSequence()
     >>> a.load('4/4', 4)
@@ -443,6 +488,47 @@ Locally Defined
 
     
 
+**getLevelWeight()**
+
+    The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here 
+
+    >>> a = MeterSequence('4/4', 4)
+    >>> a.getLevelWeight()
+    [0.25, 0.25, 0.25, 0.25] 
+    >>> b = MeterSequence('4/4', 4)
+    >>> b.getLevelWeight(0)
+    [0.25, 0.25, 0.25, 0.25] 
+    >>> b[1] = b[1].subdivide(2)
+    >>> b[3] = b[3].subdivide(2)
+    >>> b.getLevelWeight(0)
+    [0.25, 0.25, 0.25, 0.25] 
+    >>> b[3][0] = b[3][0].subdivide(2)
+    >>> b
+    <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}> 
+    >>> b.getLevelWeight(0)
+    [0.25, 0.25, 0.25, 0.25] 
+    >>> b.getLevelWeight(1)
+    [0.25, 0.125, 0.125, 0.25, 0.125, 0.125] 
+    >>> b.getLevelWeight(2)
+    [0.25, 0.125, 0.125, 0.25, 0.0625, 0.0625, 0.125] 
+
+**getLevelSpan()**
+
+    For a given level, return the time span of each terminal or sequnece 
+
+    >>> b = MeterSequence('4/4', 4)
+    >>> b[1] = b[1].subdivide(2)
+    >>> b[3] = b[3].subdivide(2)
+    >>> b[3][0] = b[3][0].subdivide(2)
+    >>> b
+    <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}> 
+    >>> b.getLevelSpan(0)
+    [(0.0, 1.0), (1.0, 2.0), (2.0, 3.0), (3.0, 4.0)] 
+    >>> b.getLevelSpan(1)
+    [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.5), (3.5, 4.0)] 
+    >>> b.getLevelSpan(2)
+    [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)] 
+
 **getLevel()**
 
     Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth. 
@@ -452,15 +538,13 @@ Locally Defined
     >>> b[3] = b[3].subdivide(2)
     >>> b[3][0] = b[3][0].subdivide(2)
     >>> b
-    {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}} 
+    <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}> 
     >>> b.getLevel(0)
-    {1/4+1/4+1/4+1/4} 
-    >>> b
-    {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}} 
+    <MeterSequence {1/4+1/4+1/4+1/4}> 
     >>> b.getLevel(1)
-    {1/4+1/8+1/8+1/4+1/8+1/8} 
+    <MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}> 
     >>> b.getLevel(2)
-    {1/4+1/8+1/8+1/4+1/16+1/16+1/8} 
+    <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}> 
 
 Properties
 ~~~~~~~~~~
@@ -468,14 +552,24 @@ Properties
 
 Inherited from meter.MeterTerminal
 
+**weight**
+
 **numerator**
 
 **duration**
+
+**depth**
 
 **denominator**
 
 
 Locally Defined
+
+**flatWeight**
+
+    Retrun a list of flat weight valuess 
+
+    
 
 **flat**
 
@@ -491,7 +585,7 @@ Locally Defined
     6 
     >>> a[1][2] = a[1][2].subdivide(4)
     >>> a
-    {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4} 
+    <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}> 
     >>> b = a.flat
     >>> len(b)
     9 
@@ -504,7 +598,7 @@ Class MeterTerminal
 
 Inherits from: object
 
-A meter is a nestable primitive of rhythmic division This object might also store accent patterns based on numerator or set as another internal representation. 
+A MeterTerminal is a nestable primitive of rhythmic division 
 
 >>> a = MeterTerminal('2/4')
 >>> a.duration.quarterLength
@@ -546,17 +640,20 @@ Locally Defined
 
 **subdivide()**
 
-    Retuirn a MeterSequence If an integer is provided, assume it is a partition count 
+    Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count 
 
 **ratioEqual()**
 
-    Compare the numerator and denominator of another object. 
+    Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8 
 
 Properties
 ~~~~~~~~~~
 
 
 Locally Defined
+
+**weight**
+
 
 **numerator**
 
@@ -575,6 +672,10 @@ Locally Defined
     1 
     >>> d.quarterLength
     1.5 
+
+**depth**
+
+    Return how many levels deep this part is. Depth of a terminal is always 1 
 
 **denominator**
 
@@ -634,15 +735,27 @@ Inherited from base.Music21Object
 
 Inherited from meter.TimeSignature
 
+**setDisplay()**
+
+**setAccentWeight()**
+
+**ratioEqual()**
+
 **quarterPositionToBeat()**
 
 **loadRatio()**
 
 **load()**
 
+**getBeatProgress()**
+
+**getBeatDepth()**
+
 **getBeat()**
 
 **getBeams()**
+
+**getAccentWeight()**
 
 **getAccent()**
 
@@ -736,9 +849,49 @@ Inherited from base.Music21Object
 
 Locally Defined
 
+**setDisplay()**
+
+    Set an indendent display value 
+
+    >>> a = TimeSignature()
+    >>> a.load('3/4')
+    >>> a.setDisplay('2/8+2/8+2/8')
+    >>> a.display
+    <MeterSequence {2/8+2/8+2/8}> 
+    >>> a.beam
+    <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}> 
+    >>> a.beat
+    <MeterSequence {3/4}> 
+    >>> a.setDisplay(a.beat)
+    >>> a.display
+    <MeterSequence {3/4}> 
+
+**setAccentWeight()**
+
+    Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument. 
+
+    >>> a = TimeSignature('4/4', 4)
+    >>> len(a.accent)
+    4 
+    >>> a.setAccentWeight([.8, .2])
+    >>> a.getAccentWeight(0)
+    0.800... 
+    >>> a.getAccentWeight(.5)
+    0.800... 
+    >>> a.getAccentWeight(1)
+    0.200... 
+    >>> a.getAccentWeight(2.5)
+    0.800... 
+    >>> a.getAccentWeight(3.5)
+    0.200... 
+
+**ratioEqual()**
+
+    A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio. 
+
 **quarterPositionToBeat()**
 
-    For backward compatibility. 
+    For backward compatibility. Ultimately, remove. 
 
 **loadRatio()**
 
@@ -748,9 +901,47 @@ Locally Defined
 
     Loading a meter destroys all internal representations 
 
+**getBeatProgress()**
+
+    Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is. 
+
+    >>> a = TimeSignature('3/4', 3)
+    >>> a.getBeatProgress(0)
+    (1, 0) 
+    >>> a.getBeatProgress(0.75)
+    (1, 0.75) 
+    >>> a.getBeatProgress(2.5)
+    (3, 0.5) 
+    >>> a.beat.partition(['3/8', '3/8'])
+    >>> a.getBeatProgress(2.5)
+    (2, 1.0) 
+
+**getBeatDepth()**
+
+    
+
+    >>> a = TimeSignature('3/4', 3)
+    >>> a.getBeatDepth(0)
+    1 
+    >>> a.getBeatDepth(1)
+    1 
+    >>> a.getBeatDepth(2)
+    1 
+    >>> b = TimeSignature('3/4', 1)
+    >>> b.beat[0] = b.beat[0].subdivide(3)
+    >>> b.beat[0][0] = b.beat[0][0].subdivide(2)
+    >>> b.beat[0][1] = b.beat[0][1].subdivide(2)
+    >>> b.beat[0][2] = b.beat[0][2].subdivide(2)
+    >>> b.getBeatDepth(0)
+    3 
+    >>> b.getBeatDepth(.5)
+    1 
+    >>> b.getBeatDepth(1)
+    2 
+
 **getBeat()**
 
-    Get the beat, where beats count from 1 
+    Given a quarterLenght position, get the beat, where beats count from 1 
 
     >>> a = TimeSignature('3/4', 3)
     >>> a.getBeat(0)
@@ -763,19 +954,28 @@ Locally Defined
 
 **getBeams()**
 
-    Given a qLen position and a list of Duration objects, return a list of Beams object. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations. 
+    Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations. 
 
     >>> a = TimeSignature('2/4', 2)
     >>> a.beam[0] = a.beam[0].subdivide(2)
     >>> a.beam[1] = a.beam[1].subdivide(2)
     >>> a.beam
-    {{1/8+1/8}+{1/8+1/8}} 
+    <MeterSequence {{1/8+1/8}+{1/8+1/8}}> 
     >>> b = [duration.Duration('16th')] * 8
     >>> c = a.getBeams(b)
     >>> len(c) == len(b)
     True 
     >>> print c
-    [<music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/start/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/stop/None>>, <music21.note.Beams <music21.note.Beam 1/continue/None>/<music21.note.Beam 2/start/None>>, <music21.note.Beams <music21.note.Beam 1/stop/None>/<music21.note.Beam 2/stop/None>>] 
+    [<music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>] 
+    >>> a = TimeSignature('6/8')
+    >>> b = [duration.Duration('eighth')] * 6
+    >>> c = a.getBeams(b)
+    >>> print c
+    [<music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>] 
+
+**getAccentWeight()**
+
+    Given a qLenPos,  return an accent level. 
 
 **getAccent()**
 
@@ -784,7 +984,7 @@ Locally Defined
     >>> a = TimeSignature('3/4', 3)
     >>> a.accent.partition([2,1])
     >>> a.accent
-    {2/4+1/4} 
+    <MeterSequence {2/4+1/4}> 
     >>> a.getAccent(0)
     True 
     >>> a.getAccent(1)
