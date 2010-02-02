@@ -491,6 +491,64 @@ class Test(unittest.TestCase):
             self.assertEqual(c.octaveChange, params[2])
             self.assertEqual(isinstance(c, className), True)
 
+    def testContexts(self):
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
+        
+        n1 = note.Note("C")
+        n1.offset = 10
+        c1 = AltoClef()
+        c1.offset = 0
+        s1 = stream.Stream([c1, n1])
+        
+        self.assertTrue(s1.getContextByClass(Clef) is c1)
+           ## equally good: getContextsByClass(Clef)[0]
+
+        del(s1)
+        
+        n2 = note.Note("D")
+        n2.duration.type = "whole"
+        n3 = note.Note("E")
+        n3.duration.type = "whole"
+        ts1 = meter.TimeSignature("4/4")
+        s2 = stream.Stream()
+        s2.append(c1)
+        s2.append(ts1)
+        s2.append(n2)
+        s2.append(n3)
+        s2.makeMeasures()
+        self.assertFalse(n2.getContextByClass(stream.Measure) is n3.getContextByClass(stream.Measure))
+        self.assertTrue(n2.getContextByClass(Clef) is c1)
+
+        del(s2)
+        
+        n4 = note.Note("F")
+        n4.duration.type = "half"
+        n5 = note.Note("G")
+        n5.duration.type = "half"
+        n6 = note.Note("A")
+        n6.duration.type = "whole"
+        
+        ts2 = meter.TimeSignature("4/4")
+        bc1 = BassClef()
+        tc1 = TrebleClef()
+        
+        s3 = stream.Stream()
+        s3.append(bc1)
+        s3.append(ts2)
+        s3.append(n4)
+        s3.append(tc1)
+        s3.append(n5)
+        s3.append(n6)
+        s3.makeMeasures()
+
+        self.assertTrue(n4.getContextByClass(stream.Measure) is n5.getContextByClass(stream.Measure))
+        self.assertTrue(n4.getContextByClass(Clef) is bc1)
+        self.assertTrue(n5.getContextByClass(Clef) is tc1)
+        self.assertTrue(n6.getContextByClass(Clef) is tc1)
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 
