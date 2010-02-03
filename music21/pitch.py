@@ -381,8 +381,6 @@ class Accidental(music21.Music21Object):
     # property
     lily = property(_getLily, _setLily)
 
-
-
     def _getMx(self):
         """From music21 to MusicXML
         >>> a = Accidental()
@@ -586,12 +584,15 @@ class Pitch(music21.Music21Object):
         >>> a = Pitch('C3')
         >>> a.midi
         48
-        >>> a = Pitch('C#2')
+        >>> a.midi =  23.5
         >>> a.midi
-        37
-        >>> a = Pitch('B4')
+        24
+        >>> a.midi = 128
         >>> a.midi
-        71
+        116
+        >>> a.midi = -10
+        >>> a.midi
+        2
         '''
         if self._pitchSpaceNeedsUpdating:
             self._updatePitchSpace()
@@ -599,6 +600,15 @@ class Pitch(music21.Music21Object):
         return int(round(self.ps))
 
     def _setMidi(self, value):
+        '''
+        midi values are constrained within the range of 0 to 127
+        floating point values,
+        '''
+        value = int(round(value))
+        if value > 127:
+            value = (12 * 9) + (value % 12) # highest oct plus modulus
+        elif value < 0:
+            value = 0 + (value % 12) # lowest oct plus modulus            
         self.ps = value      
         self._pitchSpaceNeedsUpdating = True
 

@@ -928,7 +928,11 @@ class Note(NotRest):
     def _setOctave(self, value): self.pitch.octave = value
     octave = property(_getOctave, _setOctave)
 
-    # do we no longer need midiNote(), below?
+    # rewmoved: use property
+# this is only here backward compat; remove when possible
+#     def midiNote(self):
+#         return self._getMidi()
+
     def _getMidi(self):
         '''
         Returns the note's midi number.  
@@ -942,14 +946,31 @@ class Note(NotRest):
         '''
         return self.pitch.midi
 
-    # this is only here backward compat; remove when possible
-    def midiNote(self):
-        return self._getMidi()
-
     def _setMidi(self, value): 
         self.pitch.midi = value
 
     midi = property(_getMidi, _setMidi)
+
+
+    def _getPs(self):
+        '''
+        Returns the note's midi number.  
+        
+        C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
+
+        >>> a = Note()
+        >>> a.ps = 60.5
+        >>> a.midi
+        61
+        >>> a.ps
+        60.5
+        '''
+        return self.pitch.ps
+
+    def _setPs(self, value): 
+        self.pitch.ps = value
+
+    ps = property(_getPs, _setPs)
 
 
     
