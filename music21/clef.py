@@ -491,7 +491,7 @@ class Test(unittest.TestCase):
             self.assertEqual(c.octaveChange, params[2])
             self.assertEqual(isinstance(c, className), True)
 
-    def testContexts(self):
+    def xtestContexts(self):
         from music21 import stream
         from music21 import note
         from music21 import meter

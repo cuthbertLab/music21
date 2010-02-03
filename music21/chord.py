@@ -924,16 +924,16 @@ class Chord(note.NotRest):
     
     def canBeDominantV(self):
         if (self.isMajorTriad() or self.isDominantSeventh()):
-            return 1
+            return True
         else: 
-            return 0
+            return False
         
 
     def canBeTonic(self):
         if (self.isMajorTriad() or self.isMinorTriad()):
-            return 1
+            return True
         else: 
-            return 0
+            return False
 
     def inversion(self):
         ''' returns an integer representing which standard inversion the chord is in. Chord
@@ -1058,6 +1058,54 @@ class Chord(note.NotRest):
     
 
 
+# new methods for forte/pitch class data
+# get data from chordTables.py
+
+# 
+# c1 = Chord(["D4", "A4", "F#5", "D6"])
+# c1.forteClass
+# '3-11'
+# c1.pcCardinality
+# 3
+# c1.multisetCardinality
+# 4
+# c1.forteClassNumber
+# 11
+# 
+# c1.pitchClasses
+# [2, 9, 6, 2]
+# c1.orderedPitchClasses
+# [2, 6, 9]
+# c1.normalForm
+# [0, 4, 7] 
+# c1.primeForm
+# [0, 3, 7]
+# c1.intervalVector
+# [0,0,1,1,1,0]
+# 
+# c1.isPrimeFormInversion
+# True
+# c1.hasZRelation
+# False
+# c1.commonName
+# "Major Chord"
+# c1.pitchedCommonName
+# "D-Major Chord"
+# 
+# c2 = chord.fromPitchClasses([0, 1, 3, 7])
+# c3 = chord.fromPitchClasses([0, 1, 4, 6])
+# c2.intervalVector
+# [1, 1, 1, 1, 1, 1]
+# 
+# c2.hasZRelation
+# True
+# c2.areZRelations(c3)
+# True
+# c2.getZRelation()  # returns a list in non-ET12 space...
+# <music21.chord.ForteSet at 0x234892>
+# c2.getZRelation().primeForm
+# [0, 1, 4, 6]
+# 
 
 
 
