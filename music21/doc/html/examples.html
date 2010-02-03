@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Examples &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="Authors, Contributing, and Licensing" href="about.html" />
+    <link rel="prev" title="Overview: File and Data Formats" href="overviewFormats.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="about.html" title="Authors, Contributing, and Licensing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples">
+<span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="some-simple-ideas-to-get-started">
+<h2>Some simple ideas to get started<a class="headerlink" href="#some-simple-ideas-to-get-started" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Load a musicxml file and count the number of G#&#8217;s in it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">chopinScore</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;mazurka6.xml&quot;</span><span class="p">)</span>
+
+<span class="c">## a flat representation puts all notes, dynamics, etc.</span>
+<span class="c">## from all parts into one giant data stream</span>
+<span class="n">chopinFlat</span> <span class="o">=</span> <span class="n">chopinScore</span><span class="o">.</span><span class="n">flat</span>
+<span class="n">pitches</span> <span class="o">=</span> <span class="n">chopinFlat</span><span class="o">.</span><span class="n">getPitches</span><span class="p">()</span>
+
+<span class="n">totalGSharps</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="k">for</span> <span class="n">thisPitch</span> <span class="ow">in</span> <span class="n">pitches</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">thisPitch</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;G#&#39;</span><span class="p">:</span>
+        <span class="n">totalGSharps</span> <span class="o">+=</span> <span class="mf">1</span>
+
+<span class="k">print</span> <span class="n">totalGSharps</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="style-analysis">
+<h2>Style Analysis<a class="headerlink" href="#style-analysis" title="Permalink to this headline">¶</a></h2>
+<p>These are examples only to test syntax coloring.</p>
+<p>Create a note and process it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>There are many varieties of Note objects:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">SimpleNote</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="statistical-processing">
+<h2>Statistical Processing<a class="headerlink" href="#statistical-processing" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Examples</a><ul>
+<li><a class="reference external" href="#some-simple-ideas-to-get-started">Some simple ideas to get started</a></li>
+<li><a class="reference external" href="#style-analysis">Style Analysis</a></li>
+<li><a class="reference external" href="#statistical-processing">Statistical Processing</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="overviewFormats.html"
+                                  title="previous chapter">Overview: File and Data Formats</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="about.html"
+                                  title="next chapter">Authors, Contributing, and Licensing</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/examples.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="about.html" title="Authors, Contributing, and Licensing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

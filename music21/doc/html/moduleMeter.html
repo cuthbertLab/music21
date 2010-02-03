@@ -1,0 +1,971 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.meter &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.note" href="moduleNote.html" />
+    <link rel="prev" title="music21.interval" href="moduleInterval.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleNote.html" title="music21.note"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleInterval.html" title="music21.interval"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-meter">
+<h1>music21.meter<a class="headerlink" href="#music21-meter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-fractionsum">
+<h2>Function fractionSum()<a class="headerlink" href="#function-fractionsum" title="Permalink to this headline">¶</a></h2>
+<p>Given a list of fractions represented as a list, find the sum</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span><span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">5</span><span class="p">,</span><span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">8</span><span class="p">)])</span>
+<span class="go">(9, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">1</span><span class="p">,</span><span class="mf">6</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">)])</span>
+<span class="go">(5, 6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">)])</span>
+<span class="go">(5, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">1</span><span class="p">,</span><span class="mf">13</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">17</span><span class="p">)])</span>
+<span class="go">(43, 221)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-fractiontoslashmixed">
+<h2>Function fractionToSlashMixed()<a class="headerlink" href="#function-fractiontoslashmixed" title="Permalink to this headline">¶</a></h2>
+<p>Given a lost of fraction values, compact numerators by sum if denominators are the same</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fractionToSlashMixed</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">16</span><span class="p">)])</span>
+<span class="go">[(&#39;3+2+5&#39;, 8), (&#39;3&#39;, 4), (&#39;2+1+4&#39;, 16)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-slashcompoundtofraction">
+<h2>Function slashCompoundToFraction()<a class="headerlink" href="#function-slashcompoundtofraction" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;3/8+2/8&#39;</span><span class="p">)</span>
+<span class="go">[(3, 8), (2, 8)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">)</span>
+<span class="go">[(5, 8)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;5/8+2/4+6/8&#39;</span><span class="p">)</span>
+<span class="go">[(5, 8), (2, 4), (6, 8)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-slashmixedtofraction">
+<h2>Function slashMixedToFraction()<a class="headerlink" href="#function-slashmixedtofraction" title="Permalink to this headline">¶</a></h2>
+<p>Given a mixture if possible meter fraction representations, return a list of pairs. If originally given as a summed numerator; break into separate fractions.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3/8+2/8&#39;</span><span class="p">)</span>
+<span class="go">([(3, 8), (2, 8)], False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2/8&#39;</span><span class="p">)</span>
+<span class="go">([(3, 8), (2, 8)], True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2+5/8&#39;</span><span class="p">)</span>
+<span class="go">([(3, 8), (2, 8), (5, 8)], True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2+5/8+3/4&#39;</span><span class="p">)</span>
+<span class="go">([(3, 8), (2, 8), (5, 8), (3, 4)], True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2+5/8+3/4+2+1+4/16&#39;</span><span class="p">)</span>
+<span class="go">([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)], True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2+5/8+3/4+2+1+4&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-slashtofraction">
+<h2>Function slashToFraction()<a class="headerlink" href="#function-slashtofraction" title="Permalink to this headline">¶</a></h2>
+<p>TODO: it seems like this should return only integers; not sure why these originally were floats.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashToFraction</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
+<span class="go">(3, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slashToFraction</span><span class="p">(</span><span class="s">&#39;7/32&#39;</span><span class="p">)</span>
+<span class="go">(7, 32)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-compoundtimesignature">
+<h2>Class CompoundTimeSignature<a class="headerlink" href="#class-compoundtimesignature" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: meter.TimeSignature, base.Music21Object, object</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>accent</strong></p>
+<p><strong>beam</strong></p>
+<p><strong>beat</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>display</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>inherited</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>summedNumerator</strong></p>
+<p><strong>symbol</strong></p>
+<p><strong>symbolizeDenominator</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>setDisplay()</strong></p>
+<p><strong>setAccentWeight()</strong></p>
+<p><strong>ratioEqual()</strong></p>
+<p><strong>quarterPositionToBeat()</strong></p>
+<p><strong>loadRatio()</strong></p>
+<p><strong>load()</strong></p>
+<p><strong>getBeatProgress()</strong></p>
+<p><strong>getBeatDepth()</strong></p>
+<p><strong>getBeat()</strong></p>
+<p><strong>getBeams()</strong></p>
+<p><strong>getAccentWeight()</strong></p>
+<p><strong>getAccent()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>totalLength</strong></p>
+<p><strong>quarterLengthToBeatLengthRatio</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>denominator</strong></p>
+<p><strong>beatLengthToQuarterLengthRatio</strong></p>
+<p><strong>barDuration</strong></p>
+</div>
+</div>
+<div class="section" id="class-durationdenominatortimesignature">
+<h2>Class DurationDenominatorTimeSignature<a class="headerlink" href="#class-durationdenominatortimesignature" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: meter.TimeSignature, base.Music21Object, object</p>
+<p>If you have played Hindemith you know these, 3/(dot-quarter) etc.</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>accent</strong></p>
+<p><strong>beam</strong></p>
+<p><strong>beat</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>display</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>inherited</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>summedNumerator</strong></p>
+<p><strong>symbol</strong></p>
+<p><strong>symbolizeDenominator</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>setDisplay()</strong></p>
+<p><strong>setAccentWeight()</strong></p>
+<p><strong>ratioEqual()</strong></p>
+<p><strong>quarterPositionToBeat()</strong></p>
+<p><strong>loadRatio()</strong></p>
+<p><strong>load()</strong></p>
+<p><strong>getBeatProgress()</strong></p>
+<p><strong>getBeatDepth()</strong></p>
+<p><strong>getBeat()</strong></p>
+<p><strong>getBeams()</strong></p>
+<p><strong>getAccentWeight()</strong></p>
+<p><strong>getAccent()</strong></p>
+</div>
+<div class="section" id="id3">
+<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>totalLength</strong></p>
+<p><strong>quarterLengthToBeatLengthRatio</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>denominator</strong></p>
+<p><strong>beatLengthToQuarterLengthRatio</strong></p>
+<p><strong>barDuration</strong></p>
+</div>
+</div>
+<div class="section" id="class-metersequence">
+<h2>Class MeterSequence<a class="headerlink" href="#class-metersequence" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: meter.MeterTerminal, object</p>
+<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>parenthesis</strong></p>
+<p><strong>summedNumerator</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from meter.MeterTerminal</p>
+<p><strong>subdivideByList()</strong></p>
+<p><strong>subdivideByCount()</strong></p>
+<p><strong>subdivide()</strong></p>
+<p><strong>ratioEqual()</strong></p>
+<p>Locally Defined</p>
+<p><strong>positionToSpan()</strong></p>
+<blockquote>
+<p>Given a lenPos, return the span of the active region. Only applies to the top most level of partitions</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">(0, 1.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">(1.0, 2.0)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>positionToIndex()</strong></p>
+<blockquote>
+<p>Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">MeterException: cannot access from qLenPos 5 where total duration is 4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">2.9</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>positionToDepth()</strong></p>
+<blockquote>
+<p>Given a qLenPos, return the maximum available depth at this position</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
+<span class="go">&lt;MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span> <span class="c"># quantizing active by default</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>positionToAddress()</strong></p>
+<blockquote>
+<p>Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">&lt;MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToAddress</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">[0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;MeterTerminal 1/4&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToAddress</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">[1, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToAddress</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">[1, 2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">][</span><span class="mf">2</span><span class="p">]</span>
+<span class="go">&lt;MeterTerminal 1/16&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToAddress</span><span class="p">(</span><span class="mf">1.99</span><span class="p">)</span>
+<span class="go">[1, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToAddress</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">[2]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>partitionByOther()</strong></p>
+<blockquote>
+<p>Set partition to that found in another object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByOther</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>partitionByList()</strong></p>
+<blockquote>
+<p>Given a numerator list, partition MeterSequence inot a new list of MeterTerminals</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByList</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{1/4+1/4+1/4+1/4}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByList</span><span class="p">([</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="s">&#39;1/8&#39;</span><span class="p">,</span> <span class="s">&#39;1/8&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">&lt;MeterSequence {3/4+1/8+1/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByList</span><span class="p">([</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="s">&#39;1/8&#39;</span><span class="p">,</span> <span class="s">&#39;5/8&#39;</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">MeterException</span>: <span class="n-Identifier">Cannot set partition by [&#39;3/4&#39;, &#39;1/8&#39;, &#39;5/8&#39;]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>partitionByCount()</strong></p>
+<blockquote>
+<p>This will destroy any struct in the _partition</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByCount</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{1/2+1/2}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByCount</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{1/4+1/4+1/4+1/4}&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>partition()</strong></p>
+<blockquote>
+<p>Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther().</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;5/4+3/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;13/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">13</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">13</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">13</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>load()</strong></p>
+<blockquote>
+<p>This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{1/4+1/4+1/4+1/4}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span> <span class="c"># request 2 beats</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{1/2+1/2}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span> <span class="c"># request 2 beats</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{2/8+3/8}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;5/8+4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;{5/8+4/4}&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getLevelWeight()</strong></p>
+<blockquote>
+<p>The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">()</span>
+<span class="go">[0.25, 0.25, 0.25, 0.25]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[0.25, 0.25, 0.25, 0.25]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[0.25, 0.25, 0.25, 0.25]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
+<span class="go">&lt;MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[0.25, 0.25, 0.25, 0.25]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">[0.25, 0.125, 0.125, 0.25, 0.125, 0.125]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">[0.25, 0.125, 0.125, 0.25, 0.0625, 0.0625, 0.125]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getLevelSpan()</strong></p>
+<blockquote>
+<p>For a given level, return the time span of each terminal or sequnece</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
+<span class="go">&lt;MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelSpan</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[(0.0, 1.0), (1.0, 2.0), (2.0, 3.0), (3.0, 4.0)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelSpan</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">[(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.5), (3.5, 4.0)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelSpan</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">[(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getLevel()</strong></p>
+<blockquote>
+<p>Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
+<span class="go">&lt;MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/4+1/4+1/4+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}&gt;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="id6">
+<h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from meter.MeterTerminal</p>
+<p><strong>weight</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>duration</strong></p>
+<p><strong>depth</strong></p>
+<p><strong>denominator</strong></p>
+<p>Locally Defined</p>
+<p><strong>flatWeight</strong></p>
+<blockquote>
+Retrun a list of flat weight valuess</blockquote>
+<p><strong>flat</strong></p>
+<blockquote>
+<p>Retrun a new MeterSequence composed of the flattend representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">flat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">flat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">][</span><span class="mf">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">][</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">&lt;MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">flat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">9</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-meterterminal">
+<h2>Class MeterTerminal<a class="headerlink" href="#class-meterterminal" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>A MeterTerminal is a nestable primitive of rhythmic division</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;5/2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>Methods<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>subdivideByList()</strong></p>
+<blockquote>
+<p>Return a MeterSequence countRequest is within the context of the beatIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">subdivideByList</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>subdivideByCount()</strong></p>
+<blockquote>
+<p>retrun a MeterSequence</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">subdivideByCount</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">MeterSequence</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>subdivide()</strong></p>
+<blockquote>
+Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count</blockquote>
+<p><strong>ratioEqual()</strong></p>
+<blockquote>
+Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8</blockquote>
+</div>
+<div class="section" id="id8">
+<h3>Properties<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>weight</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>duration</strong></p>
+<blockquote>
+<p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">numerator</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">denominator</span> <span class="o">=</span> <span class="mf">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">dots</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.5</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>depth</strong></p>
+<blockquote>
+Return how many levels deep this part is. Depth of a terminal is always 1</blockquote>
+<p><strong>denominator</strong></p>
+</div>
+</div>
+<div class="section" id="class-nonpoweroftwotimesignature">
+<h2>Class NonPowerOfTwoTimeSignature<a class="headerlink" href="#class-nonpoweroftwotimesignature" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: meter.TimeSignature, base.Music21Object, object</p>
+<div class="section" id="id9">
+<h3>Attributes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p><strong>accent</strong></p>
+<p><strong>beam</strong></p>
+<p><strong>beat</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>display</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>inherited</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>summedNumerator</strong></p>
+<p><strong>symbol</strong></p>
+<p><strong>symbolizeDenominator</strong></p>
+</div>
+<div class="section" id="id10">
+<h3>Methods<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>setDisplay()</strong></p>
+<p><strong>setAccentWeight()</strong></p>
+<p><strong>ratioEqual()</strong></p>
+<p><strong>quarterPositionToBeat()</strong></p>
+<p><strong>loadRatio()</strong></p>
+<p><strong>load()</strong></p>
+<p><strong>getBeatProgress()</strong></p>
+<p><strong>getBeatDepth()</strong></p>
+<p><strong>getBeat()</strong></p>
+<p><strong>getBeams()</strong></p>
+<p><strong>getAccentWeight()</strong></p>
+<p><strong>getAccent()</strong></p>
+</div>
+<div class="section" id="id11">
+<h3>Properties<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from meter.TimeSignature</p>
+<p><strong>totalLength</strong></p>
+<p><strong>quarterLengthToBeatLengthRatio</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>denominator</strong></p>
+<p><strong>beatLengthToQuarterLengthRatio</strong></p>
+<p><strong>barDuration</strong></p>
+</div>
+</div>
+<div class="section" id="class-timesignature">
+<h2>Class TimeSignature<a class="headerlink" href="#class-timesignature" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: base.Music21Object, object</p>
+<div class="section" id="id12">
+<h3>Attributes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p><strong>accent</strong></p>
+<p><strong>beam</strong></p>
+<p><strong>beat</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>display</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>inherited</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>summedNumerator</strong></p>
+<p><strong>symbol</strong></p>
+<p><strong>symbolizeDenominator</strong></p>
+</div>
+<div class="section" id="id13">
+<h3>Methods<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Locally Defined</p>
+<p><strong>setDisplay()</strong></p>
+<blockquote>
+<p>Set an indendent display value</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDisplay</span><span class="p">(</span><span class="s">&#39;2/8+2/8+2/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">display</span>
+<span class="go">&lt;MeterSequence {2/8+2/8+2/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span>
+<span class="go">&lt;MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beat</span>
+<span class="go">&lt;MeterSequence {3/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDisplay</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">display</span>
+<span class="go">&lt;MeterSequence {3/4}&gt;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>setAccentWeight()</strong></p>
+<blockquote>
+<p>Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">accent</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setAccentWeight</span><span class="p">([</span><span class="o">.</span><span class="mf">8</span><span class="p">,</span> <span class="o">.</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">0.800...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">0.800...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">0.200...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">0.800...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+<span class="go">0.200...</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>ratioEqual()</strong></p>
+<blockquote>
+A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio.</blockquote>
+<p><strong>quarterPositionToBeat()</strong></p>
+<blockquote>
+For backward compatibility. Ultimately, remove.</blockquote>
+<p><strong>loadRatio()</strong></p>
+<blockquote>
+Convenience method</blockquote>
+<p><strong>load()</strong></p>
+<blockquote>
+Loading a meter destroys all internal representations</blockquote>
+<p><strong>getBeatProgress()</strong></p>
+<blockquote>
+<p>Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">(1, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="go">(1, 0.75)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">(3, 0.5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">(2, 1.0)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getBeatDepth()</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p><strong>getBeat()</strong></p>
+<blockquote>
+<p>Given a quarterLenght position, get the beat, where beats count from 1</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getBeams()</strong></p>
+<blockquote>
+<p>Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span>
+<span class="go">&lt;MeterSequence {{1/8+1/8}+{1/8+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)]</span> <span class="o">*</span> <span class="mf">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getBeams</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">c</span>
+<span class="go">[&lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;/&lt;music21.note.Beam 2/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;/&lt;music21.note.Beam 2/stop&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;/&lt;music21.note.Beam 2/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;/&lt;music21.note.Beam 2/stop&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;/&lt;music21.note.Beam 2/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;/&lt;music21.note.Beam 2/stop&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;/&lt;music21.note.Beam 2/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;/&lt;music21.note.Beam 2/stop&gt;&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;eighth&#39;</span><span class="p">)]</span> <span class="o">*</span> <span class="mf">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getBeams</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">c</span>
+<span class="go">[&lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;&gt;]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getAccentWeight()</strong></p>
+<blockquote>
+Given a qLenPos,  return an accent level.</blockquote>
+<p><strong>getAccent()</strong></p>
+<blockquote>
+<p>Return true or false if the qLenPos is at the start of an accent division</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span>
+<span class="go">&lt;MeterSequence {2/4+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccent</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccent</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getAccent</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="id14">
+<h3>Properties<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Locally Defined</p>
+<p><strong>totalLength</strong></p>
+<p><strong>quarterLengthToBeatLengthRatio</strong></p>
+<p><strong>numerator</strong></p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4+2/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+Return a complete MusicXML string</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+<p>returns the lilypond representation of the timeSignature</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/16&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lily</span>
+<span class="go">\time 3/16</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>denominator</strong></p>
+<p><strong>beatLengthToQuarterLengthRatio</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beatLengthToQuarterLengthRatio</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+<p><strong>barDuration</strong></p>
+<blockquote>
+<p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">barDuration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">dots</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.5</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.meter</a><ul>
+<li><a class="reference external" href="#function-fractionsum">Function fractionSum()</a></li>
+<li><a class="reference external" href="#function-fractiontoslashmixed">Function fractionToSlashMixed()</a></li>
+<li><a class="reference external" href="#function-slashcompoundtofraction">Function slashCompoundToFraction()</a></li>
+<li><a class="reference external" href="#function-slashmixedtofraction">Function slashMixedToFraction()</a></li>
+<li><a class="reference external" href="#function-slashtofraction">Function slashToFraction()</a></li>
+<li><a class="reference external" href="#class-compoundtimesignature">Class CompoundTimeSignature</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-durationdenominatortimesignature">Class DurationDenominatorTimeSignature</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id3">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-metersequence">Class MeterSequence</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
+<li><a class="reference external" href="#id6">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-meterterminal">Class MeterTerminal</a><ul>
+<li><a class="reference external" href="#id7">Methods</a></li>
+<li><a class="reference external" href="#id8">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-nonpoweroftwotimesignature">Class NonPowerOfTwoTimeSignature</a><ul>
+<li><a class="reference external" href="#id9">Attributes</a></li>
+<li><a class="reference external" href="#id10">Methods</a></li>
+<li><a class="reference external" href="#id11">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-timesignature">Class TimeSignature</a><ul>
+<li><a class="reference external" href="#id12">Attributes</a></li>
+<li><a class="reference external" href="#id13">Methods</a></li>
+<li><a class="reference external" href="#id14">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleInterval.html"
+                                  title="previous chapter">music21.interval</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleNote.html"
+                                  title="next chapter">music21.note</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleMeter.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleNote.html" title="music21.note"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleInterval.html" title="music21.interval"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

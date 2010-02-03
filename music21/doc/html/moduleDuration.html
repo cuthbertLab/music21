@@ -1,0 +1,1033 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.duration &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.dynamics" href="moduleDynamics.html" />
+    <link rel="prev" title="music21.chord" href="moduleChord.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleDynamics.html" title="music21.dynamics"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleChord.html" title="music21.chord"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-duration">
+<h1>music21.duration<a class="headerlink" href="#music21-duration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-convertquarterlengthtotype">
+<h2>Function convertQuarterLengthToType()<a class="headerlink" href="#function-convertquarterlengthtotype" title="Permalink to this headline">¶</a></h2>
+<p>similar to quarterLengthToClosestType but only returns exact matches</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertQuarterLengthToType</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">&#39;half&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertQuarterLengthToType</span><span class="p">(</span><span class="mf">0.125</span><span class="p">)</span>
+<span class="go">&#39;32nd&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-converttypetonumber">
+<h2>Function convertTypeToNumber()<a class="headerlink" href="#function-converttypetonumber" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToNumber</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToNumber</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-converttypetoquarterlength">
+<h2>Function convertTypeToQuarterLength()<a class="headerlink" href="#function-converttypetoquarterlength" title="Permalink to this headline">¶</a></h2>
+<p>Given a rhythm type, number of dots, and list of Tuplet objects, give its quarter length.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
+<span class="go">0.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">1.75</span>
+<span class="go">Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="n">dotGroups</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="go">4.5</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-dottedmatch">
+<h2>Function dottedMatch()<a class="headerlink" href="#function-dottedmatch" title="Permalink to this headline">¶</a></h2>
+<p>given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="go">(1, &#39;half&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.75</span><span class="p">)</span>
+<span class="go">(2, &#39;quarter&#39;)</span>
+<span class="go">This value is not equal to any dotted note length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.6</span><span class="p">)</span>
+<span class="go">(False, False)</span>
+<span class="go">maxDots can be lowered for certain searches</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.875</span><span class="p">)</span>
+<span class="go">(3, &#39;quarter&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.875</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">(False, False)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-musicxmltypetotype">
+<h2>Function musicXMLTypeToType()<a class="headerlink" href="#function-musicxmltypetotype" title="Permalink to this headline">¶</a></h2>
+<p>Convert a MusicXML type to an m21 type.</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; musicXMLTypeToType('long')
+'longa'
+&gt;&gt;&gt; musicXMLTypeToType('quarter')
+'quarter'
+&gt;&gt;&gt; musicXMLTypeToType(None)
+Traceback (most recent call last):
+DurationException...</pre>
+</div>
+</div>
+<div class="section" id="function-nextlargertype">
+<h2>Function nextLargerType()<a class="headerlink" href="#function-nextlargertype" title="Permalink to this headline">¶</a></h2>
+<p>given a type return the next larger one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">nextLargerType</span><span class="p">(</span><span class="s">&quot;16th&quot;</span><span class="p">)</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nextLargerType</span><span class="p">(</span><span class="s">&quot;whole&quot;</span><span class="p">)</span>
+<span class="go">&#39;breve&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-partitionquarterlength">
+<h2>Function partitionQuarterLength()<a class="headerlink" href="#function-partitionquarterlength" title="Permalink to this headline">¶</a></h2>
+<p>Given a quarterLength and a base quarterLength to divide it into (default 4 = whole notes), return a list of Durations that partition the given quarterLength after each division. (Little demonstration method)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pql</span><span class="p">(</span><span class="n">qLen</span><span class="p">,</span> <span class="n">qLenDiv</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">partitionList</span> <span class="o">=</span> <span class="n">partitionQuarterLength</span><span class="p">(</span><span class="n">qLen</span><span class="p">,</span> <span class="n">qLenDiv</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="k">for</span> <span class="n">dur</span> <span class="ow">in</span> <span class="n">partitionList</span><span class="p">:</span>
+<span class="gp">... </span>       <span class="k">print</span> <span class="n">unitSpec</span><span class="p">(</span><span class="n">dur</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">Dividing 5 qLen into 2.5 qLen bundles</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+<span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
+<span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
+<span class="go">Dividing 5.25 qLen into dotted halves</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">5.25</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span>
+<span class="go">(3.0, &#39;half&#39;, 1, None, None, None)</span>
+<span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
+<span class="go">(0.25, &#39;16th&#39;, 0, None, None, None)</span>
+<span class="go">Dividing 1.33333 qLen into triplet eighths:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">Dividing 1.5 into triplet eighths</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span><span class="o">.</span><span class="mf">33333333333333</span><span class="p">)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">(0.1666..., &#39;16th&#39;, 0, 3, 2, &#39;16th&#39;)</span>
+<span class="go">No problem if the division unit is larger then the source duration.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="go">(1.5, &#39;quarter&#39;, 1, None, None, None)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-quarterlengthtoclosesttype">
+<h2>Function quarterLengthToClosestType()<a class="headerlink" href="#function-quarterlengthtoclosesttype" title="Permalink to this headline">¶</a></h2>
+<p>## was quarterLengthToTypeCandidate Returns a two-unit tuple consisting of 1. the type string (&#8220;quarter&#8221;) that is smaller than or equal to the qLen 2. bool, True or False whether the conversion was exact.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToClosestType</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">(&#39;eighth&#39;, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToClosestType</span><span class="p">(</span><span class="o">.</span><span class="mf">75</span><span class="p">)</span>
+<span class="go">(&#39;eighth&#39;, False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToClosestType</span><span class="p">(</span><span class="mf">1.8</span><span class="p">)</span>
+<span class="go">(&#39;quarter&#39;, False)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-quarterlengthtodurations">
+<h2>Function quarterLengthToDurations()<a class="headerlink" href="#function-quarterlengthtodurations" title="Permalink to this headline">¶</a></h2>
+<p>Returns a List of new Durations (each with only a single component) given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (n.b. all quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don&#8217;t like doing that). This is mainly a utility function.  Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and then let Duration automatically create Duration Components as necessary. These examples use unitSpec() to get a concise summary of the contents</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2</span><span class="p">))</span>
+<span class="go">[(2.0, &#39;half&#39;, 0, None, None, None)]</span>
+<span class="go">dots are supported</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3</span><span class="p">))</span>
+<span class="go">[(3.0, &#39;half&#39;, 1, None, None, None)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">6.0</span><span class="p">))</span>
+<span class="go">[(6.0, &#39;whole&#39;, 1, None, None, None)]</span>
+<span class="go">Double and triple dotted half note.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3.5</span><span class="p">))</span>
+<span class="go">[(3.5, &#39;half&#39;, 2, None, None, None)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3.75</span><span class="p">))</span>
+<span class="go">[(3.75, &#39;half&#39;, 3, None, None, None)]</span>
+<span class="go">A triplet quarter note, lasting .6666 qLen</span>
+<span class="go">Or, a quarter that is 1/3 of a half.</span>
+<span class="go">Or, a quarter that is 2/3 of a quarter.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
+<span class="go">[(0.666..., &#39;quarter&#39;, 0, 3, 2, &#39;quarter&#39;)]</span>
+<span class="go">A triplet eighth note, where 3 eights are in the place of 2.</span>
+<span class="go">Or, an eighth that is 1/3 of a quarter</span>
+<span class="go">Or, an eighth that is 2/3 of eighth</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">common</span><span class="o">.</span><span class="n">almostEquals</span><span class="p">(</span><span class="n">post</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">],</span> <span class="o">.</span><span class="mf">3333333</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">post</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">:]</span>
+<span class="go">(&#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
+<span class="go">A half that is 1/3 of a whole, or a triplet half note.</span>
+<span class="go">Or, a half that is 2/3 of a half</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
+<span class="go">[(1.33..., &#39;half&#39;, 0, 3, 2, &#39;half&#39;)]</span>
+<span class="go">A sixteenth that is 1/5 of a quarter</span>
+<span class="go">Or, a sixteenth that is 4/5ths of a 16th</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">5.0</span><span class="p">))</span>
+<span class="go">[(0.2..., &#39;16th&#39;, 0, 5, 4, &#39;16th&#39;)]</span>
+<span class="go">A 16th that is  1/7th of a quarter</span>
+<span class="go">Or, a 16th that is 4/7 of a 16th</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
+<span class="go">[(0.142857..., &#39;16th&#39;, 0, 7, 4, &#39;16th&#39;)]</span>
+<span class="go">A 4/7ths of a whole note, or</span>
+<span class="go">A quarter that is 4/7th of of a quarter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
+<span class="go">[(0.571428..., &#39;quarter&#39;, 0, 7, 4, &#39;quarter&#39;)]</span>
+<span class="go">If a duration is not containable in a single unit, the method</span>
+<span class="go">will break off the largest type that fits within this type</span>
+<span class="go">and recurse, adding as my units as necessary.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="go">[(2.0, &#39;half&#39;, 0, None, None, None), (0.5, &#39;eighth&#39;, 0, None, None, None)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.3333333</span><span class="p">))</span>
+<span class="go">[(2.0, &#39;half&#39;, 0, None, None, None), (0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">6.0</span><span class="p">))</span>
+<span class="go">[(0.1666..., &#39;16th&#39;, 0, 3, 2, &#39;16th&#39;)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-quarterlengthtotuplet">
+<h2>Function quarterLengthToTuplet()<a class="headerlink" href="#function-quarterlengthtotuplet" title="Permalink to this headline">¶</a></h2>
+<p>Returns a list of possible Tuplet objects for a given qLen up to the maxToReturn Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13) does not return dotted tuplets, nor nested tuplets. (was quarterLengthToTupletCandidate) Note that 4:3 tuplets won&#8217;t be found, but will be found as dotted notes by dottedMatch</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">33333333</span><span class="p">)</span>
+<span class="go">[&lt;music21.duration.Tuplet 3/2/eighth&gt;, &lt;music21.duration.Tuplet 3/1/quarter&gt;]</span>
+<span class="go">By specifying only 1 count, the a single-length list containing the Tuplet with the</span>
+<span class="go">smallest type will be returned.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">[&lt;music21.duration.Tuplet 3/2/eighth&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">20</span><span class="p">)</span>
+<span class="go">[&lt;music21.duration.Tuplet 5/4/16th&gt;, &lt;music21.duration.Tuplet 5/2/eighth&gt;, &lt;music21.duration.Tuplet 5/1/quarter&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.6666...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-roundduration">
+<h2>Function roundDuration()<a class="headerlink" href="#function-roundduration" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="function-typetomusicxmltype">
+<h2>Function typeToMusicXMLType()<a class="headerlink" href="#function-typetomusicxmltype" title="Permalink to this headline">¶</a></h2>
+<p>Convert a MusicXML type to an m21 type.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">typeToMusicXMLType</span><span class="p">(</span><span class="s">&#39;longa&#39;</span><span class="p">)</span>
+<span class="go">&#39;long&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">typeToMusicXMLType</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="go">&#39;quarter&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-unitspec">
+<h2>Function unitSpec()<a class="headerlink" href="#function-unitspec" title="Permalink to this headline">¶</a></h2>
+<p>simple representation of most durationObjects. works on a single DurationObject or a List of them, returning a list of unitSpecs if given a list otherwise returns a single one A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, tupletType (assuming top and bottom are the same). Does not deal with nested tuplets, etc.</p>
+</div>
+<div class="section" id="function-updatetuplettype">
+<h2>Function updateTupletType()<a class="headerlink" href="#function-updatetuplettype" title="Permalink to this headline">¶</a></h2>
+<p>Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">b</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">();</span> <span class="n">c</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">e</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">g</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updateTupletType</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;start&#39;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;stop&#39;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;start&#39;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;stop&#39;</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-appogiaturastartduration">
+<h2>Class AppogiaturaStartDuration<a class="headerlink" href="#class-appogiaturastartduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.Duration, duration.DurationCommon, object</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Inherited from duration.Duration</p>
+<p><strong>write()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>fill()</strong></p>
+<p><strong>expand()</strong></p>
+<p><strong>consolidate()</strong></p>
+<p><strong>componentStartTime()</strong></p>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<p><strong>clear()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.Duration</p>
+<p><strong>type</strong></p>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-appogiaturastopduration">
+<h2>Class AppogiaturaStopDuration<a class="headerlink" href="#class-appogiaturastopduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.Duration, duration.DurationCommon, object</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Inherited from duration.Duration</p>
+<p><strong>write()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>fill()</strong></p>
+<p><strong>expand()</strong></p>
+<p><strong>consolidate()</strong></p>
+<p><strong>componentStartTime()</strong></p>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<p><strong>clear()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+</div>
+<div class="section" id="id3">
+<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.Duration</p>
+<p><strong>type</strong></p>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-duration">
+<h2>Class Duration<a class="headerlink" href="#class-duration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.DurationCommon, object</p>
+<p>Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, &#8220;57 quarter notes&#8221; or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note&#8221;</p>
+<p>A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit.</p>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Locally Defined</p>
+<p><strong>write()</strong></p>
+<blockquote>
+Write a file in the given format (default, musicxml) A None file path will result in temporary file</blockquote>
+<p><strong>updateQuarterLength()</strong></p>
+<blockquote>
+Look to components and determine quarter length.</blockquote>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<blockquote>
+<p>Given a quarter position within a component, divide that component into two components.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c"># need to remove default</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sliceComponentAtPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>show()</strong></p>
+<blockquote>
+This might need to return the file path.</blockquote>
+<p><strong>fill()</strong></p>
+<blockquote>
+Utility method for testing; a quick way to fill components. This will remove any exisiting values.</blockquote>
+<p><strong>expand()</strong></p>
+<blockquote>
+Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength</blockquote>
+<p><strong>consolidate()</strong></p>
+<blockquote>
+<p>Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="s">&#39;quarter&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">consolidate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="go">But it gains a type!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;whole&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>componentStartTime()</strong></p>
+<blockquote>
+<p>For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
+<span class="gp">... </span>   <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateQuarterLength</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentStartTime</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentStartTime</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<blockquote>
+<p>returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="go">TODO: remove &quot;for x in [1,1,1]&quot; notation; it&#39;s confusing (Perl-like)</span>
+<span class="go">better is just to copy and paste three times.  Very easy to see what</span>
+<span class="go">is happening.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
+<span class="gp">... </span>  <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateQuarterLength</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="go">this is odd behavior:</span>
+<span class="go">e.g. given d1, d2, d3 as 3 quarter notes and</span>
+<span class="go">self.components = [d1, d2, d3]</span>
+<span class="go">then</span>
+<span class="go">self.componentIndexAtQtrPosition(1.5) == d2</span>
+<span class="go">self.componentIndexAtQtrPosition(2.0) == d3</span>
+<span class="go">self.componentIndexAtQtrPosition(2.5) == d3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>clear()</strong></p>
+<blockquote>
+<p>Permit all componets to be removed. (It is not clear yet if this is needed)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;whole&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;zero&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+<blockquote>
+<p>Add a DurationUnit or a Duration&#8217;s components to this Duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;complex&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="id6">
+<h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>type</strong></p>
+<blockquote>
+Get the duration type.</blockquote>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<blockquote>
+Can be the same as the base class.</blockquote>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">musicxmlMod</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">musicxmlMod</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+Return a complete MusicXML string with defaults.</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups</blockquote>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<blockquote>
+Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error.</blockquote>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-durationcommon">
+<h2>Class DurationCommon<a class="headerlink" href="#class-durationcommon" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>base class for Duration and DurationUnit to borrow from</p>
+<div class="section" id="id7">
+<h3>Methods<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<blockquote>
+<p>say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;eighth&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">appendTuplet</span><span class="p">(</span><span class="n">Tuplet</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">aggregateTupletRatio</span><span class="p">()</span>
+<span class="go">(3, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tup2</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tup2</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">appendTuplet</span><span class="p">(</span><span class="n">tup2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">aggregateTupletRatio</span><span class="p">()</span>
+<span class="go">(15, 8)</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-durationunit">
+<h2>Class DurationUnit<a class="headerlink" href="#class-durationunit" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.DurationCommon, object</p>
+<p>A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Additional types are needed: &#8216;zero&#8217; type for zero durations &#8216;unexpressable&#8217; type for anything that needs a Duration (such as 2.5 quarters)</p>
+<div class="section" id="id8">
+<h3>Attributes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkStatus</strong></p>
+</div>
+<div class="section" id="id9">
+<h3>Methods<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Locally Defined</p>
+<p><strong>updateType()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<blockquote>
+Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set)</blockquote>
+<p><strong>unlink()</strong></p>
+<p><strong>setTypeFromNum()</strong></p>
+<p><strong>link()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+</div>
+<div class="section" id="id10">
+<h3>Properties<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>type</strong></p>
+<blockquote>
+Get the duration type.</blockquote>
+<p><strong>tuplets</strong></p>
+<blockquote>
+Return a tuple of Tuplet objects</blockquote>
+<p><strong>quarterLength</strong></p>
+<blockquote>
+determine the length in quarter notes from current information</blockquote>
+<p><strong>ordinal</strong></p>
+<blockquote>
+<p>Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ordinal</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;maxima&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">ordinal</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;1024th&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">ordinal</span>
+<span class="go">14</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets</blockquote>
+<p><strong>dots</strong></p>
+<blockquote>
+_dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that&#8217;s what _getDots returns...</blockquote>
+</div>
+</div>
+<div class="section" id="class-graceduration">
+<h2>Class GraceDuration<a class="headerlink" href="#class-graceduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.Duration, duration.DurationCommon, object</p>
+<div class="section" id="id11">
+<h3>Attributes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="id12">
+<h3>Methods<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Inherited from duration.Duration</p>
+<p><strong>write()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>fill()</strong></p>
+<p><strong>expand()</strong></p>
+<p><strong>consolidate()</strong></p>
+<p><strong>componentStartTime()</strong></p>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<p><strong>clear()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+</div>
+<div class="section" id="id13">
+<h3>Properties<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.Duration</p>
+<p><strong>type</strong></p>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-longgraceduration">
+<h2>Class LongGraceDuration<a class="headerlink" href="#class-longgraceduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.Duration, duration.DurationCommon, object</p>
+<div class="section" id="id14">
+<h3>Attributes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="id15">
+<h3>Methods<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Inherited from duration.Duration</p>
+<p><strong>write()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>fill()</strong></p>
+<p><strong>expand()</strong></p>
+<p><strong>consolidate()</strong></p>
+<p><strong>componentStartTime()</strong></p>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<p><strong>clear()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+</div>
+<div class="section" id="id16">
+<h3>Properties<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.Duration</p>
+<p><strong>type</strong></p>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-tuplet">
+<h2>Class Tuplet<a class="headerlink" href="#class-tuplet" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>tuplet class: creates tuplet objects which modify duration objects note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myTup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">5</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">myTup</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTup2</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="mf">8</span><span class="p">,</span> <span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">myTup2</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.625</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTup2</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="s">&quot;16th&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">myTup2</span><span class="o">.</span><span class="n">durationActual</span><span class="o">.</span><span class="n">type</span>
+<span class="go">16th</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">myTup2</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.666...</span>
+</pre></div>
+</div>
+<p>Tuplets may be frozen, in which case they become immutable.  Tuplets
+which are attached to Durations are automatically frozen
+# TODO: use __setattr__ to freeze all properties, and make a metaclass
+# exceptions: tuplet type, tuplet id: things that don&#8217;t affect length
+&gt;&gt;&gt; myTup.frozen = True
+&gt;&gt;&gt; myTup.tupletActual = [3, 2]
+Traceback (most recent call last):
+...
+TupletException: A frozen tuplet (or one attached to a duration) is immutable
+&gt;&gt;&gt; myHalf = Duration(&#8220;half&#8221;)
+&gt;&gt;&gt; myHalf.appendTuplet(myTup2)
+&gt;&gt;&gt; myTup2.tupletActual = [5, 4]
+Traceback (most recent call last):
+...
+TupletException: A frozen tuplet (or one attached to a duration) is immutable</p>
+<div class="section" id="id17">
+<h3>Attributes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p><strong>bracket</strong></p>
+<p><strong>durationActual</strong></p>
+<p><strong>durationNormal</strong></p>
+<p><strong>nestedLevel</strong></p>
+<p><strong>numberNotesActual</strong></p>
+<p><strong>numberNotesNormal</strong></p>
+<p><strong>placement</strong></p>
+<p><strong>tupletActualShow</strong></p>
+<p><strong>tupletId</strong></p>
+<p><strong>tupletNormalShow</strong></p>
+<p><strong>type</strong></p>
+</div>
+<div class="section" id="id18">
+<h3>Methods<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>tupletMultiplier()</strong></p>
+<blockquote>
+<p>Get a floating point value by which to scale the duration that this Tuplet is associated with.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myTuplet</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="nb">round</span><span class="p">(</span><span class="n">myTuplet</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
+<span class="go">0.667</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTuplet</span><span class="o">.</span><span class="n">tupletActual</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5</span><span class="p">,</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;eighth&#39;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTuplet</span><span class="o">.</span><span class="n">numberNotesActual</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTuplet</span><span class="o">.</span><span class="n">durationActual</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">myTuplet</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.4</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>totalTupletLength()</strong></p>
+<blockquote>
+<p>The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it&#8217;s only the denominator that matters)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationActual</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationNormal</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">8.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">4.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>setRatio()</strong></p>
+<blockquote>
+<p>Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.666...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.333...</span>
+<span class="go">One way of expressing 6/4-ish triplets without numbers:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationActual</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationNormal</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.666...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>setDurationType()</strong></p>
+<blockquote>
+<p>Set the Duration for both actual and normal.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.666...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDurationType</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.6666...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">4.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>frozen()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+</div>
+<div class="section" id="id19">
+<h3>Properties<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>tupletNormal</strong></p>
+<p><strong>tupletActual</strong></p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">bracket</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-zeroduration">
+<h2>Class ZeroDuration<a class="headerlink" href="#class-zeroduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.DurationUnit, duration.DurationCommon, object</p>
+<div class="section" id="id20">
+<h3>Attributes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkStatus</strong></p>
+</div>
+<div class="section" id="id21">
+<h3>Methods<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Inherited from duration.DurationUnit</p>
+<p><strong>updateType()</strong></p>
+<p><strong>updateQuarterLength()</strong></p>
+<p><strong>unlink()</strong></p>
+<p><strong>setTypeFromNum()</strong></p>
+<p><strong>link()</strong></p>
+<p><strong>appendTuplet()</strong></p>
+</div>
+<div class="section" id="id22">
+<h3>Properties<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationUnit</p>
+<p><strong>type</strong></p>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<p><strong>ordinal</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>dots</strong></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.duration</a><ul>
+<li><a class="reference external" href="#function-convertquarterlengthtotype">Function convertQuarterLengthToType()</a></li>
+<li><a class="reference external" href="#function-converttypetonumber">Function convertTypeToNumber()</a></li>
+<li><a class="reference external" href="#function-converttypetoquarterlength">Function convertTypeToQuarterLength()</a></li>
+<li><a class="reference external" href="#function-dottedmatch">Function dottedMatch()</a></li>
+<li><a class="reference external" href="#function-musicxmltypetotype">Function musicXMLTypeToType()</a></li>
+<li><a class="reference external" href="#function-nextlargertype">Function nextLargerType()</a></li>
+<li><a class="reference external" href="#function-partitionquarterlength">Function partitionQuarterLength()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtoclosesttype">Function quarterLengthToClosestType()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtodurations">Function quarterLengthToDurations()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtotuplet">Function quarterLengthToTuplet()</a></li>
+<li><a class="reference external" href="#function-roundduration">Function roundDuration()</a></li>
+<li><a class="reference external" href="#function-typetomusicxmltype">Function typeToMusicXMLType()</a></li>
+<li><a class="reference external" href="#function-unitspec">Function unitSpec()</a></li>
+<li><a class="reference external" href="#function-updatetuplettype">Function updateTupletType()</a></li>
+<li><a class="reference external" href="#class-appogiaturastartduration">Class AppogiaturaStartDuration</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-appogiaturastopduration">Class AppogiaturaStopDuration</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id3">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-duration">Class Duration</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
+<li><a class="reference external" href="#id6">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-durationcommon">Class DurationCommon</a><ul>
+<li><a class="reference external" href="#id7">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-durationunit">Class DurationUnit</a><ul>
+<li><a class="reference external" href="#id8">Attributes</a></li>
+<li><a class="reference external" href="#id9">Methods</a></li>
+<li><a class="reference external" href="#id10">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-graceduration">Class GraceDuration</a><ul>
+<li><a class="reference external" href="#id11">Attributes</a></li>
+<li><a class="reference external" href="#id12">Methods</a></li>
+<li><a class="reference external" href="#id13">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-longgraceduration">Class LongGraceDuration</a><ul>
+<li><a class="reference external" href="#id14">Attributes</a></li>
+<li><a class="reference external" href="#id15">Methods</a></li>
+<li><a class="reference external" href="#id16">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tuplet">Class Tuplet</a><ul>
+<li><a class="reference external" href="#id17">Attributes</a></li>
+<li><a class="reference external" href="#id18">Methods</a></li>
+<li><a class="reference external" href="#id19">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-zeroduration">Class ZeroDuration</a><ul>
+<li><a class="reference external" href="#id20">Attributes</a></li>
+<li><a class="reference external" href="#id21">Methods</a></li>
+<li><a class="reference external" href="#id22">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleChord.html"
+                                  title="previous chapter">music21.chord</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleDynamics.html"
+                                  title="next chapter">music21.dynamics</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleDuration.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleDynamics.html" title="music21.dynamics"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleChord.html" title="music21.chord"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

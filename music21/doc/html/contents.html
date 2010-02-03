@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Music21 Documentation &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="What Is Music21?" href="what.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="what.html" title="What Is Music21?"
+             accesskey="N">next</a> |</li>
+        <li><a href="">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-documentation">
+<h1>Music21 Documentation<a class="headerlink" href="#music21-documentation" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="what.html">What Is Music21?</a><ul>
+<li class="toctree-l2"><a class="reference external" href="what.html#applications-x">Applications: x</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="quickStart.html">Quick Start: Getting Started with music21</a><ul>
+<li class="toctree-l2"><a class="reference external" href="quickStart.html#applications-x">Applications: x</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="overviewNotes.html">Overview: Notes and Pitches</a><ul>
+<li class="toctree-l2"><a class="reference external" href="overviewNotes.html#applications-x">Applications: x</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="overviewStreams.html">Overview: Streams, Scores, Measures</a><ul>
+<li class="toctree-l2"><a class="reference external" href="overviewStreams.html#applications-x">Applications: x</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="overviewFormats.html">Overview: File and Data Formats</a><ul>
+<li class="toctree-l2"><a class="reference external" href="overviewFormats.html#musicxml">MusicXML</a></li>
+<li class="toctree-l2"><a class="reference external" href="overviewFormats.html#humdrum">Humdrum</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference external" href="examples.html#some-simple-ideas-to-get-started">Some simple ideas to get started</a></li>
+<li class="toctree-l2"><a class="reference external" href="examples.html#style-analysis">Style Analysis</a></li>
+<li class="toctree-l2"><a class="reference external" href="examples.html#statistical-processing">Statistical Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="about.html">Authors, Contributing, and Licensing</a><ul>
+<li class="toctree-l2"><a class="reference external" href="about.html#about-the-authors">About the Authors</a></li>
+<li class="toctree-l2"><a class="reference external" href="about.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference external" href="about.html#licensing">Licensing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="install.html">Installing Music21</a><ul>
+<li class="toctree-l2"><a class="reference external" href="install.html#installing-from-source">Installing from Source</a></li>
+<li class="toctree-l2"><a class="reference external" href="install.html#installing-from-subversion-svn">Installing from Subversion (SVN)</a></li>
+<li class="toctree-l2"><a class="reference external" href="install.html#installing-additional-python-components">Installing Additional Python Components</a></li>
+<li class="toctree-l2"><a class="reference external" href="install.html#installing-additional-software-components">Installing Additional Software Components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="environment.html">Setting up and Configuring Environment</a><ul>
+<li class="toctree-l2"><a class="reference external" href="environment.html#creating-and-configuring-an-environment">Creating and Configuring an Environment</a></li>
+<li class="toctree-l2"><a class="reference external" href="environment.html#location-of-environment-files">Location of Environment Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="graphing.html">Graphing Utilities</a><ul>
+<li class="toctree-l2"><a class="reference external" href="graphing.html#installing-and-using-matplotlib">Installing and Using matplotlib</a></li>
+<li class="toctree-l2"><a class="reference external" href="graphing.html#selecting-the-matplotlib-backend">Selecting the matplotlib Backend</a></li>
+<li class="toctree-l2"><a class="reference external" href="graphing.html#primitive-graphing-formats">Primitive Graphing Formats</a></li>
+<li class="toctree-l2"><a class="reference external" href="graphing.html#high-level-graphing-objects">High Level Graphing Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference external" href="faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference external" href="faq.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference external" href="faq.html#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleBase.html">music21.base</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleBase.html#class-contexts">Class Contexts</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleBase.html#class-elementwrapper">Class ElementWrapper</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleBase.html#class-groups">Class Groups</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleBase.html#class-locations">Class Locations</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleBase.html#class-music21object">Class Music21Object</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleCommon.html">music21.common</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-euclidgcd">Function EuclidGCD()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-almostequals">Function almostEquals()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-basicallyequal">Function basicallyEqual()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-decimaltotuplet">Function decimalToTuplet()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-dirpartitioned">Function dirPartitioned()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-dotmultiplier">Function dotMultiplier()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-findformat">Function findFormat()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-findformatfile">Function findFormatFile()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-findinputextension">Function findInputExtension()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-findsimplefraction">Function findSimpleFraction()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-formatstr">Function formatStr()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-fromroman">Function fromRoman()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-getmd5">Function getMd5()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-getplatform">Function getPlatform()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-greaterthan">Function greaterThan()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-greaterthanorequal">Function greaterThanOrEqual()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-isiterable">Function isIterable()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-islistlike">Function isListLike()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-isnum">Function isNum()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-ispoweroftwo">Function isPowerOfTwo()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-isstr">Function isStr()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-isweakref">Function isWeakref()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-lcm">Function lcm()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-lessthan">Function lessThan()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-sortfilesrecent">Function sortFilesRecent()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-sortmodules">Function sortModules()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-stripaddresses">Function stripAddresses()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-toroman">Function toRoman()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-unwrapweakref">Function unwrapWeakref()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#function-wrapweakref">Function wrapWeakref()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#class-iterator">Class Iterator</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#class-scalar">Class Scalar</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#class-timer">Class Timer</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#class-defhash">Class defHash</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCommon.html#class-deflist">Class defList</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleConverter.html">music21.converter</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#function-parse">Function parse()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#function-parsedata">Function parseData()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#function-parsefile">Function parseFile()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#class-converter">Class Converter</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#class-converterhumdrum">Class ConverterHumdrum</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#class-convertermusicxml">Class ConverterMusicXML</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleConverter.html#class-picklefilter">Class PickleFilter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleCorpus.html">music21.corpus</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleCorpus.html#function-getcomposer">Function getComposer()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCorpus.html#function-getpaths">Function getPaths()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCorpus.html#function-getwork">Function getWork()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleCorpus.html#function-parsework">Function parseWork()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleChord.html">music21.chord</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleChord.html#class-chord">Class Chord</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleChord.html#class-duration">Class Duration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleChord.html#class-lilystring">Class LilyString</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleDuration.html">music21.duration</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-convertquarterlengthtotype">Function convertQuarterLengthToType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-converttypetonumber">Function convertTypeToNumber()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-converttypetoquarterlength">Function convertTypeToQuarterLength()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-dottedmatch">Function dottedMatch()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-musicxmltypetotype">Function musicXMLTypeToType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-nextlargertype">Function nextLargerType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-partitionquarterlength">Function partitionQuarterLength()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-quarterlengthtoclosesttype">Function quarterLengthToClosestType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-quarterlengthtodurations">Function quarterLengthToDurations()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-quarterlengthtotuplet">Function quarterLengthToTuplet()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-roundduration">Function roundDuration()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-typetomusicxmltype">Function typeToMusicXMLType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-unitspec">Function unitSpec()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#function-updatetuplettype">Function updateTupletType()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-appogiaturastartduration">Class AppogiaturaStartDuration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-appogiaturastopduration">Class AppogiaturaStopDuration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-duration">Class Duration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-durationcommon">Class DurationCommon</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-durationunit">Class DurationUnit</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-graceduration">Class GraceDuration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-longgraceduration">Class LongGraceDuration</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-tuplet">Class Tuplet</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDuration.html#class-zeroduration">Class ZeroDuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleDynamics.html">music21.dynamics</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleDynamics.html#function-unitintervaltoname">Function unitIntervalToName()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDynamics.html#class-dynamic">Class Dynamic</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleDynamics.html#class-wedge">Class Wedge</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleEnvironment.html">music21.environment</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleEnvironment.html#class-environment">Class Environment</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleEnvironment.html#class-preference">Class Preference</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleEnvironment.html#class-settings">Class Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleInstrument.html">music21.instrument</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleInstrument.html#class-instrument">Class Instrument</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleInterval.html">music21.interval</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-convertstaffdistancetointerval">Function convertStaffDistanceToInterval()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generatechromatic">Function generateChromatic()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generatediatonic">Function generateDiatonic()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generategeneric">Function generateGeneric()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generateinterval">Function generateInterval()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generateintervalfromstring">Function generateIntervalFromString()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generatenote">Function generateNote()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-generatepitch">Function generatePitch()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-getabsolutehighernote">Function getAbsoluteHigherNote()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-getabsolutelowernote">Function getAbsoluteLowerNote()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-getspecifier">Function getSpecifier()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-getwrittenhighernote">Function getWrittenHigherNote()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#function-getwrittenlowernote">Function getWrittenLowerNote()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#class-chromaticinterval">Class ChromaticInterval</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#class-diatonicinterval">Class DiatonicInterval</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#class-genericinterval">Class GenericInterval</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleInterval.html#class-interval">Class Interval</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleMeter.html">music21.meter</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#function-fractionsum">Function fractionSum()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#function-fractiontoslashmixed">Function fractionToSlashMixed()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#function-slashcompoundtofraction">Function slashCompoundToFraction()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#function-slashmixedtofraction">Function slashMixedToFraction()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#function-slashtofraction">Function slashToFraction()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-compoundtimesignature">Class CompoundTimeSignature</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-durationdenominatortimesignature">Class DurationDenominatorTimeSignature</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-metersequence">Class MeterSequence</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-meterterminal">Class MeterTerminal</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-nonpoweroftwotimesignature">Class NonPowerOfTwoTimeSignature</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleMeter.html#class-timesignature">Class TimeSignature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleNote.html">music21.note</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#function-notefromdiatonicnumber">Function noteFromDiatonicNumber()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#function-sendnoteinfo">Function sendNoteInfo()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-accidental">Class Accidental</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-beam">Class Beam</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-beams">Class Beams</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-eighthnote">Class EighthNote</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-generalnote">Class GeneralNote</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-halfnote">Class HalfNote</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-lilystring">Class LilyString</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-lyric">Class Lyric</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-notrest">Class NotRest</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-note">Class Note</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-pitch">Class Pitch</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-quarternote">Class QuarterNote</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-rest">Class Rest</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-tie">Class Tie</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-unpitched">Class Unpitched</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleNote.html#class-wholenote">Class WholeNote</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="modulePitch.html">music21.pitch</a><ul>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertdiatonicnumbertostep">Function convertDiatonicNumberToStep()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertfqtops">Function convertFqToPs()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertpstofq">Function convertPsToFq()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertpstooct">Function convertPsToOct()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertpstostep">Function convertPsToStep()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#function-convertsteptops">Function convertStepToPs()</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#class-accidental">Class Accidental</a></li>
+<li class="toctree-l2"><a class="reference external" href="modulePitch.html#class-pitch">Class Pitch</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="moduleStream.html">music21.stream</a><ul>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#function-deepcopy">Function deepcopy()</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-measure">Class Measure</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-page">Class Page</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-part">Class Part</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-performer">Class Performer</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-score">Class Score</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-staff">Class Staff</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-stream">Class Stream</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-system">Class System</a></li>
+<li class="toctree-l2"><a class="reference external" href="moduleStream.html#class-voice">Class Voice</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="glossary.html#glossary"><em>Glossary</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Music21 Documentation</a><ul>
+</ul>
+</li>
+<li><a class="reference external" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+
+            <h4>Next topic</h4>
+            <p class="topless"><a href="what.html"
+                                  title="next chapter">What Is Music21?</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/contents.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="what.html" title="What Is Music21?"
+             >next</a> |</li>
+        <li><a href="">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

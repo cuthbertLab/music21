@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Graphing Utilities &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Setting up and Configuring Environment" href="environment.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="environment.html" title="Setting up and Configuring Environment"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="graphing-utilities">
+<h1>Graphing Utilities<a class="headerlink" href="#graphing-utilities" title="Permalink to this headline">¶</a></h1>
+<p>Music21 can provide data graphs and plots of multiple musical attributes using high-level analysis tools.</p>
+<p>Users can create their own custom graphing routines by extending or reworking existing Music21 models.</p>
+<div class="section" id="installing-and-using-matplotlib">
+<h2>Installing and Using matplotlib<a class="headerlink" href="#installing-and-using-matplotlib" title="Permalink to this headline">¶</a></h2>
+<p>The matplotlib library provides powerful and flexible graphing routines. Download from the following URL:</p>
+<p><a class="reference external" href="http://sourceforge.net/projects/matplotlib/files/">http://sourceforge.net/projects/matplotlib/files/</a></p>
+<p>For installation and configuration instructions, see the following URL:</p>
+<p><a class="reference external" href="http://matplotlib.sourceforge.net/users/installing.html">http://matplotlib.sourceforge.net/users/installing.html</a></p>
+<p>Note that numpy is required for matplotlib. Information about numpy can be found at the following URL:</p>
+<p><a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a></p>
+</div>
+<div class="section" id="selecting-the-matplotlib-backend">
+<h2>Selecting the matplotlib Backend<a class="headerlink" href="#selecting-the-matplotlib-backend" title="Permalink to this headline">¶</a></h2>
+<p>The matplotlib backend determines what system is used to render and display images. See the following discussion for more information.</p>
+<p><a class="reference external" href="http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend">http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend</a></p>
+</div>
+<div class="section" id="primitive-graphing-formats">
+<h2>Primitive Graphing Formats<a class="headerlink" href="#primitive-graphing-formats" title="Permalink to this headline">¶</a></h2>
+<p>Music21 provides low-level access to basic graphing routines.</p>
+<div class="section" id="two-dimensional-scatter-plot">
+<h3>Two-Dimensional Scatter Plot<a class="headerlink" href="#two-dimensional-scatter-plot" title="Permalink to this headline">¶</a></h3>
+<p>A two-dimensional scatter graph can be made from any list of <em>x</em>, <em>y</em> data pairs.</p>
+<p>The doneAction keyword argument determines what happens after the process() method is called. A &#8216;show&#8217; value will immediately open the output format in platform- and backend-specific viewer. A &#8216;write&#8217; value will write the output in backend-specific format using a music21-generated temporary file.</p>
+<p>A basic example follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.analysis</span> <span class="kn">import</span> <span class="n">graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph2DScatter</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/graphingScatter-basic.png" src="_images/graphingScatter-basic.png" style="width: 500px;" />
+<p>Numerous parameters can be specified through keyword arguments when creating a scatter plot.</p>
+<p>The &#8216;alpha&#8217; keyword argument sets transparency, from 0 (transparent) to 1 (opaque).</p>
+<p>The &#8216;title&#8217; keyword argument sets the title of the graph.</p>
+<p>The &#8216;colors&#8217; keyword argument sets the colors of data points, specified as HTML color codes or matplotlib&#8217;s single-letter abbreviations.</p>
+<p>This example provides basic customization to a scatter graph:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.analysis</span> <span class="kn">import</span> <span class="n">graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph2DScatter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Exponential Graph&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="n">doneAction</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/graphingScatter-args.png" src="_images/graphingScatter-args.png" style="width: 500px;" />
+</div>
+<div class="section" id="two-dimensional-histogram">
+<h3>Two-Dimensional Histogram<a class="headerlink" href="#two-dimensional-histogram" title="Permalink to this headline">¶</a></h3>
+<p>A histogram provides a bar graph for measuring the count of single items. Data for this graph is provided as a list of <em>x</em>, <em>y</em> data pairs; however, unlike with a scatter plot, there can be only one definition for each <em>x</em> value.</p>
+<p>A basic example follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.analysis</span> <span class="kn">import</span> <span class="n">graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph2DHistogram</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">)))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="three-dimensional-bar-graphs">
+<h3>Three-Dimensional Bar Graphs<a class="headerlink" href="#three-dimensional-bar-graphs" title="Permalink to this headline">¶</a></h3>
+<p>A three dimensional graph made of numerous rows of bars can be used to plot three-dimensional data. Data for this graph is provided by a dictionary of key-value pairs, where values are equal-sized-lists of values.</p>
+<p>In addition to keyword arguments described for other graphs, this graph supports the following additional keyword arguments.</p>
+<p>The &#8216;barWidth&#8217; keyword argument sets the width of bars.</p>
+<p>A basic example follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.analysis</span> <span class="kn">import</span> <span class="n">graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph3DPolygonBars</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1</span><span class="p">:[],</span> <span class="mf">2</span><span class="p">:[],</span> <span class="mf">3</span><span class="p">:[]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+<span class="gp">... </span>   <span class="n">q</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">1</span><span class="p">))))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">20</span><span class="p">)]</span>
+<span class="gp">... </span>   <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">q</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/graphing3dbar-basic.png" src="_images/graphing3dbar-basic.png" style="width: 500px;" />
+<p>The following examples demonstrates basic customization with keyword arguments using the same data obtained above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph3DPolygonBars</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Random Data&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mf">8</span><span class="p">,</span>\
+<span class="go">    barWidth=.2, doneAction=&#39;show&#39;, colors=[&#39;b&#39;,&#39;r&#39;,&#39;g&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/graphing3dbar-args.png" src="_images/graphing3dbar-args.png" style="width: 500px;" />
+</div>
+</div>
+<div class="section" id="high-level-graphing-objects">
+<h2>High Level Graphing Objects<a class="headerlink" href="#high-level-graphing-objects" title="Permalink to this headline">¶</a></h2>
+<p>Music21 features high level graphing objects for common musical operations and analysis routines.</p>
+<div class="section" id="the-activitymatch-object">
+<h3>The ActivityMatch Object<a class="headerlink" href="#the-activitymatch-object" title="Permalink to this headline">¶</a></h3>
+<p>The ActivityMatch object provides a way to examine, for a given parameter, what other parameters are active.</p>
+</div>
+<div class="section" id="the-noteanalysis-object">
+<h3>The NoteAnalysis Object<a class="headerlink" href="#the-noteanalysis-object" title="Permalink to this headline">¶</a></h3>
+<p>The NoteAnalysis object permits graphing and correlating two parameters of a Note objects in a Stream.</p>
+<p>The NoteAnalysis object provides graphing routines using the Graph2DHistogram object.</p>
+<p>The following example demonstrates the default settings of the noteAttributeCount(), which correlate MIDI Note Number and Quarter Length of notes in a stream:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">converter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.analysis</span> <span class="kn">import</span> <span class="n">correlate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">corpus</span><span class="o">.</span><span class="n">getWork</span><span class="p">(</span><span class="s">&#39;luca/gloria&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">correlate</span><span class="o">.</span><span class="n">NoteAnalysis</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">noteAttributeCount</span><span class="p">(</span><span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;#aa46ff&#39;</span><span class="p">],</span> <span class="n">barWidth</span><span class="o">=.</span><span class="mf">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mf">7</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/graphingNoteAnalysis-default.png" src="_images/graphingNoteAnalysis-default.png" style="width: 500px;" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Graphing Utilities</a><ul>
+<li><a class="reference external" href="#installing-and-using-matplotlib">Installing and Using matplotlib</a></li>
+<li><a class="reference external" href="#selecting-the-matplotlib-backend">Selecting the matplotlib Backend</a></li>
+<li><a class="reference external" href="#primitive-graphing-formats">Primitive Graphing Formats</a><ul>
+<li><a class="reference external" href="#two-dimensional-scatter-plot">Two-Dimensional Scatter Plot</a></li>
+<li><a class="reference external" href="#two-dimensional-histogram">Two-Dimensional Histogram</a></li>
+<li><a class="reference external" href="#three-dimensional-bar-graphs">Three-Dimensional Bar Graphs</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#high-level-graphing-objects">High Level Graphing Objects</a><ul>
+<li><a class="reference external" href="#the-activitymatch-object">The ActivityMatch Object</a></li>
+<li><a class="reference external" href="#the-noteanalysis-object">The NoteAnalysis Object</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="environment.html"
+                                  title="previous chapter">Setting up and Configuring Environment</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="glossary.html"
+                                  title="next chapter">Glossary</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/graphing.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="environment.html" title="Setting up and Configuring Environment"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

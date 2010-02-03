@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.tempo &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-tempo">
+<h1>music21.tempo<a class="headerlink" href="#music21-tempo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="class-metronomemark">
+<h2>Class MetronomeMark<a class="headerlink" href="#class-metronomemark" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MetronomeMark</span><span class="p">(</span><span class="mf">40</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">number</span>
+<span class="go">40</span>
+</pre></div>
+</div>
+<div class="section" id="public-methods">
+<h3>Public Methods<a class="headerlink" href="#public-methods" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>copy()</strong></p>
+<blockquote>
+Return a shallow copy, or a linked reference to the source.</blockquote>
+<p><strong>deepcopy()</strong></p>
+<blockquote>
+<p>Return a depp copy of an object with no reference to the source.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;quarter&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;flute&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span>
+<span class="go">[&#39;flute&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;half&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="ow">is</span> <span class="n">b</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">accidental</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;A&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;bassoon&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s">&quot;flute&quot;</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span> <span class="s">&quot;flute&quot;</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
+<span class="go">(False, True)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>duration()</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+<p><strong>id()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>isClass()</strong></p>
+<blockquote>
+returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not.</blockquote>
+<p><strong>offset()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>parent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>priority()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>searchParent()</strong></p>
+<blockquote>
+If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encounted match is returned, or None if no match.</blockquote>
+<p><strong>show()</strong></p>
+<blockquote>
+Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</blockquote>
+<p><strong>write()</strong></p>
+<blockquote>
+Write a file. A None file path will result in temporary file</blockquote>
+</div>
+<div class="section" id="private-methods">
+<h3>Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h3>
+<p><strong>_duration()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getDuration()</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+<p><strong>_getOffset()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getParent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getPriority()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_offset()</strong></p>
+<blockquote>
+float(x) -&gt; floating point number Convert a string or number to a floating point number, if possible.</blockquote>
+<p><strong>_overriddenLily()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_parent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_priority()</strong></p>
+<blockquote>
+int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
+<p><strong>_setDuration()</strong></p>
+<blockquote>
+Set the offset as a quarterNote length</blockquote>
+<p><strong>_setOffset()</strong></p>
+<blockquote>
+<p>Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">23.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">23.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;whole&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">4.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>_setParent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_setPriority()</strong></p>
+<blockquote>
+<p>value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="s">&#39;high&#39;</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">ElementException</span>: <span class="n-Identifier">priority values must be integers.</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-tempomark">
+<h2>Class TempoMark<a class="headerlink" href="#class-tempomark" title="Permalink to this headline">¶</a></h2>
+<p>No documentation.</p>
+<div class="section" id="id1">
+<h3>Public Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>copy()</strong></p>
+<blockquote>
+Return a shallow copy, or a linked reference to the source.</blockquote>
+<p><strong>deepcopy()</strong></p>
+<blockquote>
+<p>Return a depp copy of an object with no reference to the source.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;quarter&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;flute&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span>
+<span class="go">[&#39;flute&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;half&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="ow">is</span> <span class="n">b</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">accidental</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;A&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;bassoon&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s">&quot;flute&quot;</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span> <span class="s">&quot;flute&quot;</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
+<span class="go">(False, True)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>duration()</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+<p><strong>id()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>isClass()</strong></p>
+<blockquote>
+returns bool depending on if the object is a particular class or not same as isinstance here, but different for Elements, where it checks to see if the embedded object is of a certain class.  Use it throughout music21 and only use isinstance if you really want to see if something is an Element or not.</blockquote>
+<p><strong>offset()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>parent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>priority()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>searchParent()</strong></p>
+<blockquote>
+If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encounted match is returned, or None if no match.</blockquote>
+<p><strong>show()</strong></p>
+<blockquote>
+Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</blockquote>
+<p><strong>write()</strong></p>
+<blockquote>
+Write a file. A None file path will result in temporary file</blockquote>
+</div>
+<div class="section" id="id2">
+<h3>Private Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><strong>_duration()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getDuration()</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+<p><strong>_getOffset()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getParent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_getPriority()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_offset()</strong></p>
+<blockquote>
+float(x) -&gt; floating point number Convert a string or number to a floating point number, if possible.</blockquote>
+<p><strong>_overriddenLily()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_parent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_priority()</strong></p>
+<blockquote>
+int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
+<p><strong>_setDuration()</strong></p>
+<blockquote>
+Set the offset as a quarterNote length</blockquote>
+<p><strong>_setOffset()</strong></p>
+<blockquote>
+<p>Set the offset as a quarterNote length (N.B. offsets are quarterNote lengths, not Duration objects...)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">23.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">23.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;whole&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">4.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>_setParent()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>_setPriority()</strong></p>
+<blockquote>
+<p>value is an int. Priority specifies the order of processing from left (LOWEST #) to right (HIGHEST #) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="s">&#39;high&#39;</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">ElementException</span>: <span class="n-Identifier">priority values must be integers.</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-test">
+<h2>Class Test<a class="headerlink" href="#class-test" title="Permalink to this headline">¶</a></h2>
+<p>No documentation.</p>
+<div class="section" id="private-attributes">
+<h3>Private Attributes<a class="headerlink" href="#private-attributes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>_testMethodDoc</li>
+<li>_testMethodName</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Public Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><strong>assertAlmostEqual()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>assertAlmostEquals()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>assertEqual()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>assertEquals()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>assertFalse()</strong></p>
+<blockquote>
+Fail the test if the expression is true.</blockquote>
+<p><strong>assertNotAlmostEqual()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>assertNotAlmostEquals()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>assertNotEqual()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>assertNotEquals()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>assertRaises()</strong></p>
+<blockquote>
+Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception.</blockquote>
+<p><strong>assertTrue()</strong></p>
+<blockquote>
+Fail the test unless the expression is true.</blockquote>
+<p><strong>assert_()</strong></p>
+<blockquote>
+Fail the test unless the expression is true.</blockquote>
+<p><strong>countTestCases()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>debug()</strong></p>
+<blockquote>
+Run the test without collecting errors in a TestResult</blockquote>
+<p><strong>defaultTestResult()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>fail()</strong></p>
+<blockquote>
+Fail immediately, with the given message.</blockquote>
+<p><strong>failIf()</strong></p>
+<blockquote>
+Fail the test if the expression is true.</blockquote>
+<p><strong>failIfAlmostEqual()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>failIfEqual()</strong></p>
+<blockquote>
+Fail if the two objects are equal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>failUnless()</strong></p>
+<blockquote>
+Fail the test unless the expression is true.</blockquote>
+<p><strong>failUnlessAlmostEqual()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero. Note that decimal places (from zero) are usually not the same as significant digits (measured from the most signficant digit).</blockquote>
+<p><strong>failUnlessEqual()</strong></p>
+<blockquote>
+Fail if the two objects are unequal as determined by the &#8216;==&#8217; operator.</blockquote>
+<p><strong>failUnlessRaises()</strong></p>
+<blockquote>
+Fail unless an exception of class excClass is thrown by callableObj when invoked with arguments args and keyword arguments kwargs. If a different type of exception is thrown, it will not be caught, and the test case will be deemed to have suffered an error, exactly as for an unexpected exception.</blockquote>
+<p><strong>failureException()</strong></p>
+<blockquote>
+Assertion failed.</blockquote>
+<p><strong>id()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>run()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>runTest()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>setUp()</strong></p>
+<blockquote>
+Hook method for setting up the test fixture before exercising it.</blockquote>
+<p><strong>setupTest()</strong></p>
+<blockquote>
+No documentation.</blockquote>
+<p><strong>shortDescription()</strong></p>
+<blockquote>
+Returns a one-line description of the test, or None if no description has been provided. The default implementation of this method returns the first line of the specified test method&#8217;s docstring.</blockquote>
+<p><strong>tearDown()</strong></p>
+<blockquote>
+Hook method for deconstructing the test fixture after testing it.</blockquote>
+</div>
+<div class="section" id="id4">
+<h3>Private Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>_exc_info()</strong></p>
+<blockquote>
+Return a version of sys.exc_info() with the traceback frame minimised; usually the top level of the traceback frame is not needed.</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.tempo</a><ul>
+<li><a class="reference external" href="#class-metronomemark">Class MetronomeMark</a><ul>
+<li><a class="reference external" href="#public-methods">Public Methods</a></li>
+<li><a class="reference external" href="#private-methods">Private Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tempomark">Class TempoMark</a><ul>
+<li><a class="reference external" href="#id1">Public Methods</a></li>
+<li><a class="reference external" href="#id2">Private Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-test">Class Test</a><ul>
+<li><a class="reference external" href="#private-attributes">Private Attributes</a></li>
+<li><a class="reference external" href="#id3">Public Methods</a></li>
+<li><a class="reference external" href="#id4">Private Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleTempo.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.base &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.common" href="moduleCommon.html" />
+    <link rel="prev" title="Frequently Asked Questions" href="faq.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleCommon.html" title="music21.common"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="Frequently Asked Questions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-base">
+<h1>music21.base<a class="headerlink" href="#music21-base" title="Permalink to this headline">¶</a></h1>
+<p>Music21 base classes and important utilities</p>
+<p>base &#8211; the convention within music21 is that __init__ files contain:</p>
+<blockquote>
+from base import *</blockquote>
+<p>so everything in this file can be accessed as music21.XXXX</p>
+<div class="section" id="class-contexts">
+<h2>Class Contexts<a class="headerlink" href="#class-contexts" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.</p>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>setAttrByName()</strong></p>
+<blockquote>
+<p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span> <span class="o">=</span> <span class="n">Contexts</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">setAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;test&#39;</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>scrub()</strong></p>
+<blockquote>
+Remove all weak ref objects that point to objects that no longer exist.</blockquote>
+<p><strong>remove()</strong></p>
+<blockquote>
+Remove the entry specified by sites</blockquote>
+<p><strong>getReferences()</strong></p>
+<p><strong>getLocations()</strong></p>
+<p><strong>getById()</strong></p>
+<p><strong>getByGroup()</strong></p>
+<p><strong>getByClass()</strong></p>
+<blockquote>
+<p>Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Contexts of all members</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span> <span class="o">=</span> <span class="n">Contexts</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="s">&#39;mock&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">bObj</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="n">Mock</span><span class="p">)</span> <span class="o">==</span> <span class="n">bObj</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getAttrByName()</strong></p>
+<blockquote>
+<p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span> <span class="o">=</span> <span class="n">Contexts</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">98</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">bObj</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">234</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>get()</strong></p>
+<blockquote>
+<p>Get references; unwrap from weakrefs; place in order from most recently added to least recently added</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span> <span class="o">=</span> <span class="n">Contexts</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">addReference</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">getReferences</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">bObj</span><span class="p">,</span> <span class="n">aObj</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>find()</strong></p>
+<p><strong>countRef()</strong></p>
+<p><strong>countLoc()</strong></p>
+<p><strong>clear()</strong></p>
+<blockquote>
+Clear all data.</blockquote>
+<p><strong>addReference()</strong></p>
+<blockquote>
+Add a reference</blockquote>
+</div>
+</div>
+<div class="section" id="class-elementwrapper">
+<h2>Class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: base.Music21Object, object</p>
+<p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
+<div class="section" id="id1">
+<h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Locally Defined</p>
+<p><strong>setId()</strong></p>
+<p><strong>obj()</strong></p>
+<p><strong>isTwin()</strong></p>
+<blockquote>
+<p>a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A-&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&quot;aflat-Note&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;out-of-range&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="ow">is</span> <span class="n">bE</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">==</span> <span class="n">bE</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">isTwin</span><span class="p">(</span><span class="n">bE</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">14.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">==</span> <span class="n">bE</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">isTwin</span><span class="p">(</span><span class="n">bE</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getId()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>id</strong></p>
+<p><strong>duration</strong></p>
+</div>
+</div>
+<div class="section" id="class-groups">
+<h2>Class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: list, object</p>
+<p>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from list</p>
+<p><strong>sort()</strong></p>
+<p><strong>reverse()</strong></p>
+<p><strong>remove()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>extend()</strong></p>
+<p><strong>count()</strong></p>
+<p><strong>append()</strong></p>
+</div>
+</div>
+<div class="section" id="class-locations">
+<h2>Class Locations<a class="headerlink" href="#class-locations" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site &#8211; this becomes the default offset for any newly added sites that do not have any sites</p>
+<div class="section" id="id3">
+<h3>Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>setOffsetBySite()</strong></p>
+<blockquote>
+<p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">cSite</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>scrubEmptySites()</strong></p>
+<blockquote>
+<p>If a parent has been deleted, we will still have an empty ref in _coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">aSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#aLocations.scrubEmptySites()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#len(aLocations)</span>
+<span class="go">#1</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>remove()</strong></p>
+<blockquote>
+<p>Remove the entry specified by sites</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getTimes()</strong></p>
+<p><strong>getSites()</strong></p>
+<blockquote>
+Get parents; unwrap from weakrefs</blockquote>
+<p><strong>getSiteByOffset()</strong></p>
+<blockquote>
+<p>For a given offset return the parent More than one parent may have the same offset; this will return the last site added.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="go">Adding another site at offset 23 will change getSiteByOffset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">cSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getSiteByIndex()</strong></p>
+<blockquote>
+<p>Get parent by index value, unwrapping the weakref.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByIndex</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getOffsets()</strong></p>
+<blockquote>
+<p>Return a list of all offsets.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset or another</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsets</span><span class="p">()</span>
+<span class="go">[0, 234]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getOffsetBySite()</strong></p>
+<blockquote>
+<p>For a given site return its offset.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cParent</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">23</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">bSite</span><span class="p">)</span>
+<span class="go">121.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">cParent</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getOffsetByIndex()</strong></p>
+<blockquote>
+<p>For a given parent return an offset.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetByIndex</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">121.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetByIndex</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">IndexError</span>: <span class="n-Identifier">list index out of range</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>clear()</strong></p>
+<blockquote>
+Clear all data.</blockquote>
+<p><strong>add()</strong></p>
+<blockquote>
+<p>Add a location to the object. If site already exists, this will update that entry.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span> <span class="c"># will change the offset for aSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">12</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-music21object">
+<h2>Class Music21Object<a class="headerlink" href="#class-music21object" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a Locations object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
+<p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id4">
+<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>write()</strong></p>
+<blockquote>
+Write a file. A None file path will result in temporary file</blockquote>
+<p><strong>show()</strong></p>
+<blockquote>
+Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</blockquote>
+<p><strong>searchParent()</strong></p>
+<blockquote>
+If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</blockquote>
+<p><strong>isClass()</strong></p>
+<blockquote>
+returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</blockquote>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">30.0</span>
+</pre></div>
+</div>
+<p><strong>contexts()</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.base</a><ul>
+<li><a class="reference external" href="#class-contexts">Class Contexts</a><ul>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-elementwrapper">Class ElementWrapper</a><ul>
+<li><a class="reference external" href="#id1">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-groups">Class Groups</a><ul>
+<li><a class="reference external" href="#id2">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-locations">Class Locations</a><ul>
+<li><a class="reference external" href="#id3">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-music21object">Class Music21Object</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#id4">Methods</a></li>
+<li><a class="reference external" href="#id5">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="faq.html"
+                                  title="previous chapter">Frequently Asked Questions</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleCommon.html"
+                                  title="next chapter">music21.common</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleBase.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleCommon.html" title="music21.common"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="Frequently Asked Questions"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setting up and Configuring Environment &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="Graphing Utilities" href="graphing.html" />
+    <link rel="prev" title="Installing Music21" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="graphing.html" title="Graphing Utilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installing Music21"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="setting-up-and-configuring-environment">
+<h1>Setting up and Configuring Environment<a class="headerlink" href="#setting-up-and-configuring-environment" title="Permalink to this headline">¶</a></h1>
+<p>Music21 features and optional environment configuration system. This permits the user to configure settings used by all Music21 objects.</p>
+<p>Environment configuration is particularly useful in setting default third-party application for handling Music21 output in different media formats (e.g. MusicXML, lilypond, graphics files).</p>
+<div class="section" id="creating-and-configuring-an-environment">
+<h2>Creating and Configuring an Environment<a class="headerlink" href="#creating-and-configuring-an-environment" title="Permalink to this headline">¶</a></h2>
+<p>Environment files are not created by default. To create an environment file, import environment form Music21 and create an Environment object. Then, call the  write() method to create an XML environment file.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">environment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>After creating an environment file, this XML preference file can be edited directly by the user. To find where the XML file is written, the getSettingsPath() method can be called. This path will be different depending on your platform and user name.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getSettingsPath</span><span class="p">()</span>
+<span class="go">&#39;/Users/ariza/.music21rc&#39;</span>
+</pre></div>
+</div>
+<p>Settings can be edited in the XML file or through the object interface. The Environment object acts as a Python dictionary. To view the names of user-configurable parameters, call the keys() method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&#39;lilypondBackend&#39;, &#39;lilypondVersion&#39;, &#39;graphicsPath&#39;, &#39;lilypondPath&#39;,</span>
+<span class="go">&#39;directoryScratch&#39;, &#39;lilypondFormat&#39;, &#39;debug&#39;, &#39;musicxmlPath&#39;, &#39;midiPath&#39;]</span>
+</pre></div>
+</div>
+<p>To set a preference, a key value pair of the Environment object can be set. For example, to set the Music21 scratch directory, the &#8216;directoryScratch&#8217; key can be set to a file path of the users choice. Note that changes are not permanent until the object&#8217;s write() method is called.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="s">&#39;directoryScratch&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;/_scratch&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that Music21 objects may need to be reloaded, and/or the Python session restarted, to get chagnes made to the Environment object.</p>
+</div>
+<div class="section" id="location-of-environment-files">
+<h2>Location of Environment Files<a class="headerlink" href="#location-of-environment-files" title="Permalink to this headline">¶</a></h2>
+<p>Environment files are stored in platform-specific locations.</p>
+<p>On Linux and MacOS computers, XML settings are stored as the file .music21rc, located in the user&#8217;s home directory.</p>
+<p>On Windows computers the XML settings file is generally located in the Application Data directory as the file &#8216;music21-settings.xml&#8217;. In some cases the XML settings file may be stored in the user directory.</p>
+<p>The path to the environment settings file can always be found with the getSettingsPath() method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">environment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getSettingsPath</span><span class="p">()</span>
+<span class="go">&#39;/Users/ariza/.music21rc&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Setting up and Configuring Environment</a><ul>
+<li><a class="reference external" href="#creating-and-configuring-an-environment">Creating and Configuring an Environment</a></li>
+<li><a class="reference external" href="#location-of-environment-files">Location of Environment Files</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="install.html"
+                                  title="previous chapter">Installing Music21</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="graphing.html"
+                                  title="next chapter">Graphing Utilities</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/environment.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="graphing.html" title="Graphing Utilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installing Music21"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

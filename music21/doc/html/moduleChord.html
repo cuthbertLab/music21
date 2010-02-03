@@ -1,0 +1,731 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.chord &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.duration" href="moduleDuration.html" />
+    <link rel="prev" title="music21.corpus" href="moduleCorpus.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleDuration.html" title="music21.duration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleCorpus.html" title="music21.corpus"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-chord">
+<h1>music21.chord<a class="headerlink" href="#music21-chord" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="class-chord">
+<h2>Class Chord<a class="headerlink" href="#class-chord" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = &#8216;C&#8217; E = note.Note(), E.name = &#8216;E&#8217; G = note.Note(), G.name = &#8216;G&#8217; And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>articulations</strong></p>
+<p><strong>beams</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>duration</strong></p>
+<p><strong>editorial</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>lyrics</strong></p>
+<p><strong>notations</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>tie</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>duration()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from note.GeneralNote</p>
+<p><strong>splitAtDurations()</strong></p>
+<p><strong>isChord()</strong></p>
+<p><strong>compactNoteInfo()</strong></p>
+<p><strong>clearDurations()</strong></p>
+<p><strong>appendDuration()</strong></p>
+<p><strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest</p>
+<p><strong>splitNoteAtPoint()</strong></p>
+<p>Locally Defined</p>
+<p><strong>sortFrequencyAscending()</strong></p>
+<blockquote>
+Same as above, but uses a note&#8217;s frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types.</blockquote>
+<p><strong>sortDiatonicAscending()</strong></p>
+<blockquote>
+<p>After talking with Daniel Jackson, let&#8217;s try to make the chord object as immutable as possible, so we return a new Chord object with the notes arranged from lowest to highest The notes are sorted by Scale degree and then by Offset (so F## sorts below G-). Notes that are the identical pitch retain their order</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cMajUnsorted</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;E4&#39;</span><span class="p">,</span> <span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;G4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cMajSorted</span> <span class="o">=</span> <span class="n">cMajUnsorted</span><span class="o">.</span><span class="n">sortDiatonicAscending</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cMajSorted</span><span class="o">.</span><span class="n">pitches</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;C&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>sortChromaticAscending()</strong></p>
+<blockquote>
+Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.</blockquote>
+<p><strong>sortAscending()</strong></p>
+<p><strong>root()</strong></p>
+<blockquote>
+<p>Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">root</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>numNotes()</strong></p>
+<blockquote>
+Returns the number of notes in the chord</blockquote>
+<p><strong>isTriad()</strong></p>
+<blockquote>
+<p>returns True or False &#8220;Contains vs. Is:&#8221; A dominant-seventh chord is NOT a triad. returns True if the chord contains at least one Third and one Fifth and all notes are equivalent to either of those notes. Only returns True if triad is spelled correctly. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isTriad</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isSeventh()</strong></p>
+<blockquote>
+<p>Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isSeventh</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isSeventh</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isRest()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isNote()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isMinorTriad()</strong></p>
+<blockquote>
+<p>Returns True if chord is a Minor Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isMinorTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isMinorTriad</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isMajorTriad()</strong></p>
+<blockquote>
+<p>Returns True if chord is a Major Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isMajorTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isMajorTriad</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isHalfDiminishedSeventh()</strong></p>
+<blockquote>
+<p>Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root. Chord must be spelled correctly. Otherwise returns false.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span><span class="s">&#39;E-4&#39;</span><span class="p">,</span><span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;B-4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="go">Incorrectly spelled chords are not considered half-diminished sevenths</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span><span class="s">&#39;E-4&#39;</span><span class="p">,</span><span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;A#4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="go">Nor are incomplete chords</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c3</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;B-4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c3</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isFalseDiminishedSeventh()</strong></p>
+<blockquote>
+Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false.</blockquote>
+<p><strong>isDominantSeventh()</strong></p>
+<blockquote>
+Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</blockquote>
+<p><strong>isDiminishedTriad()</strong></p>
+<blockquote>
+<p>Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G-&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;F#&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isDiminishedSeventh()</strong></p>
+<blockquote>
+Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</blockquote>
+<p><strong>isAugmentedTriad()</strong></p>
+<blockquote>
+<p>Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.chord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="go">Other spellings will give other roots!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
+<span class="go">A-4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;F-4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;B#4&quot;</span><span class="p">,</span> <span class="s">&quot;F-4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>inversionName()</strong></p>
+<blockquote>
+Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None.</blockquote>
+<p><strong>inversion()</strong></p>
+<blockquote>
+returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root.</blockquote>
+<p><strong>hasThird()</strong></p>
+<blockquote>
+Shortcut for hasScaleX(3)</blockquote>
+<p><strong>hasSpecificX()</strong></p>
+<blockquote>
+<p>Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c">#will return the interval between C and E</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span> <span class="c">#will return the interval between C and G</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span> <span class="c">#will return False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>hasSeventh()</strong></p>
+<blockquote>
+Shortcut for hasScaleX(7)</blockquote>
+<p><strong>hasScaleX()</strong></p>
+<blockquote>
+<p>Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., &#8220;c&#8221; =&gt; &#8220;e&#8212;-&#8220;), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we&#8217;re using &#8220;Scale&#8221; to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c">#</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span> <span class="c"># will return 7</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span> <span class="c"># will return False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>hasRepeatedScaleX()</strong></p>
+<blockquote>
+<p>Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasRepeatedScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c"># returns true</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>hasFifth()</strong></p>
+<blockquote>
+Shortcut for hasScaleX(5)</blockquote>
+<p><strong>hasAnyRepeatedScale()</strong></p>
+<blockquote>
+<p>Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasAnyRepeatedScale</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">hasAnyRepeatedScale</span><span class="p">()</span> <span class="c"># returns false (chromatically identical notes of different scale degrees do not count.</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>findRoot()</strong></p>
+<blockquote>
+<p>Looks for the root by finding the note with the most 3rds above it Generally use root() instead, since if a chord doesn&#8217;t know its root, root() will run findRoot() automatically. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">findRoot</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>findBass()</strong></p>
+<blockquote>
+<p>Returns the lowest note in the chord The only time findBass should be called is by bass() when it is figuring out what the bass note of the chord is. Generally call bass() instead example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;E3&#39;</span><span class="p">,</span> <span class="s">&#39;G4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">findBass</span><span class="p">()</span> <span class="c"># returns E3</span>
+<span class="go">E3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>determineType()</strong></p>
+<blockquote>
+returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? TODO: determine permanent designation abbreviation for every type of chord and inversion</blockquote>
+<p><strong>containsTriad()</strong></p>
+<blockquote>
+<p>returns True or False if there is no triad above the root. &#8220;Contains vs. Is&#8221;: A dominant-seventh chord contains a triad. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">containsTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">containsTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>containsSeventh()</strong></p>
+<blockquote>
+<p>returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can&#8217;t be determined example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">containsSeventh</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">containsSeventh</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>closedPosition()</strong></p>
+<blockquote>
+<p>returns a new Chord object with the same pitch classes, but now in closed position</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chord1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C#4&quot;</span><span class="p">,</span> <span class="s">&quot;G5&quot;</span><span class="p">,</span> <span class="s">&quot;E6&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chord2</span> <span class="o">=</span> <span class="n">chord1</span><span class="o">.</span><span class="n">closedPosition</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">chord2</span><span class="o">.</span><span class="n">lily</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&lt;cis&#39; e&#39; g&#39;&gt;4</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>checkDurationSanity()</strong></p>
+<blockquote>
+TO WRITE Checks to make sure all notes have the same duration Does not run automatically</blockquote>
+<p><strong>canBeTonic()</strong></p>
+<p><strong>canBeDominantV()</strong></p>
+<p><strong>bass()</strong></p>
+<blockquote>
+<p>returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">bass</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p>Inherited from note.GeneralNote</p>
+<p><strong>quarterLength</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>lyric</strong></p>
+<p><strong>color</strong></p>
+<p>Locally Defined</p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;D-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;E-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">pitches</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxNoteList</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">mxNoteList</span><span class="p">)</span> <span class="c"># get three mxNotes</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxNoteList</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;chord&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxNoteList</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;chord&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxNoteList</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;chord&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+The name of the note as it would appear in Lilypond format.</blockquote>
+</div>
+</div>
+<div class="section" id="class-duration">
+<h2>Class Duration<a class="headerlink" href="#class-duration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: duration.DurationCommon, object</p>
+<p>Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, &#8220;57 quarter notes&#8221; or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note&#8221;</p>
+<p>A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit.</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>linkages</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from duration.DurationCommon</p>
+<p><strong>aggregateTupletRatio()</strong></p>
+<p>Locally Defined</p>
+<p><strong>write()</strong></p>
+<blockquote>
+Write a file in the given format (default, musicxml) A None file path will result in temporary file</blockquote>
+<p><strong>updateQuarterLength()</strong></p>
+<blockquote>
+Look to components and determine quarter length.</blockquote>
+<p><strong>sliceComponentAtPosition()</strong></p>
+<blockquote>
+<p>Given a quarter position within a component, divide that component into two components.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c"># need to remove default</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sliceComponentAtPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>show()</strong></p>
+<blockquote>
+This might need to return the file path.</blockquote>
+<p><strong>fill()</strong></p>
+<blockquote>
+Utility method for testing; a quick way to fill components. This will remove any exisiting values.</blockquote>
+<p><strong>expand()</strong></p>
+<blockquote>
+Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength</blockquote>
+<p><strong>consolidate()</strong></p>
+<blockquote>
+<p>Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="s">&#39;quarter&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">consolidate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="go">But it gains a type!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;whole&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>componentStartTime()</strong></p>
+<blockquote>
+<p>For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
+<span class="gp">... </span>   <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateQuarterLength</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentStartTime</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentStartTime</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>componentIndexAtQtrPosition()</strong></p>
+<blockquote>
+<p>returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="go">TODO: remove &quot;for x in [1,1,1]&quot; notation; it&#39;s confusing (Perl-like)</span>
+<span class="go">better is just to copy and paste three times.  Very easy to see what</span>
+<span class="go">is happening.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
+<span class="gp">... </span>  <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateQuarterLength</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="go">this is odd behavior:</span>
+<span class="go">e.g. given d1, d2, d3 as 3 quarter notes and</span>
+<span class="go">self.components = [d1, d2, d3]</span>
+<span class="go">then</span>
+<span class="go">self.componentIndexAtQtrPosition(1.5) == d2</span>
+<span class="go">self.componentIndexAtQtrPosition(2.0) == d3</span>
+<span class="go">self.componentIndexAtQtrPosition(2.5) == d3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>clear()</strong></p>
+<blockquote>
+<p>Permit all componets to be removed. (It is not clear yet if this is needed)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;whole&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;zero&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>appendTuplet()</strong></p>
+<p><strong>addDuration()</strong></p>
+<blockquote>
+<p>Add a DurationUnit or a Duration&#8217;s components to this Duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;complex&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="id3">
+<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>type</strong></p>
+<blockquote>
+Get the duration type.</blockquote>
+<p><strong>tuplets</strong></p>
+<p><strong>quarterLength</strong></p>
+<blockquote>
+Can be the same as the base class.</blockquote>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">musicxmlMod</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333333</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">musicxmlMod</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+Return a complete MusicXML string with defaults.</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups</blockquote>
+<p><strong>isComplex</strong></p>
+<p><strong>dots</strong></p>
+<blockquote>
+Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error.</blockquote>
+<p><strong>components</strong></p>
+</div>
+</div>
+<div class="section" id="class-lilystring">
+<h2>Class LilyString<a class="headerlink" href="#class-lilystring" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>value</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>writeTemp()</strong></p>
+<p><strong>wrapForMidi()</strong></p>
+<p><strong>showPNGandPlayMIDI()</strong></p>
+<p><strong>showPNG()</strong></p>
+<blockquote>
+Take the LilyString, run it through LilyPond, and then show it as a PNG file. On Windows, the PNG file will not be deleted, so you  will need to clean out TEMP every once in a while</blockquote>
+<p><strong>showPDF()</strong></p>
+<p><strong>showImageDirect()</strong></p>
+<blockquote>
+borrowed from and modified from the excellent PIL image library, but needed some changes to the NT handling</blockquote>
+<p><strong>savePNG()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>runThroughLily()</strong></p>
+<p><strong>quickHeader()</strong></p>
+<blockquote>
+Returns a quick and dirty lilyPond header for the stream</blockquote>
+<p><strong>playMIDIfile()</strong></p>
+<p><strong>midiWrapped()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>createPDF()</strong></p>
+<p><strong>checkForMidiAndAdd()</strong></p>
+<p><strong>checkForMidi()</strong></p>
+<p><strong>addMidi()</strong></p>
+<blockquote>
+override this in subclasses, such as LilyScore</blockquote>
+</div>
+<div class="section" id="id6">
+<h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>wrappedValue</strong></p>
+<blockquote>
+returns a value that is wrapped with { } if it doesn&#8217;t contain a score element so that it can run through lilypond</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.chord</a><ul>
+<li><a class="reference external" href="#class-chord">Class Chord</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-duration">Class Duration</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id3">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-lilystring">Class LilyString</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
+<li><a class="reference external" href="#id6">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleCorpus.html"
+                                  title="previous chapter">music21.corpus</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleDuration.html"
+                                  title="next chapter">music21.duration</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleChord.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleDuration.html" title="music21.duration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleCorpus.html" title="music21.corpus"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

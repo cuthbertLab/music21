@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.dynamics &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.environment" href="moduleEnvironment.html" />
+    <link rel="prev" title="music21.duration" href="moduleDuration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleEnvironment.html" title="music21.environment"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleDuration.html" title="music21.duration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-dynamics">
+<h1>music21.dynamics<a class="headerlink" href="#music21-dynamics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-unitintervaltoname">
+<h2>Function unitIntervalToName()<a class="headerlink" href="#function-unitintervaltoname" title="Permalink to this headline">¶</a></h2>
+<p>Given a unit interfal value, map to a dynamic name</p>
+</div>
+<div class="section" id="class-dynamic">
+<h2>Class Dynamic<a class="headerlink" href="#class-dynamic" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: base.Music21Object, object</p>
+<p>Object representation of Dyanmics.</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>englishName</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>longName</strong></p>
+<p><strong>posDefaultX</strong></p>
+<p><strong>posDefaultY</strong></p>
+<p><strong>posPlacement</strong></p>
+<p><strong>posRelativeX</strong></p>
+<p><strong>posRelativeY</strong></p>
+<p><strong>value</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Locally Defined</p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>returns a musicxml.Direction object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">posRelativeY</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tag&#39;</span><span class="p">)</span>
+<span class="go">&#39;ppp&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;placement&#39;</span><span class="p">)</span>
+<span class="go">&#39;below&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+Provide a complete MusicXM: representation.</blockquote>
+</div>
+</div>
+<div class="section" id="class-wedge">
+<h2>Class Wedge<a class="headerlink" href="#class-wedge" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: base.Music21Object, object</p>
+<p>Object model of crescendeo/decrescendo wedges.</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>posPlacement</strong></p>
+<p><strong>spread</strong></p>
+<p><strong>type</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+</div>
+<div class="section" id="id3">
+<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Locally Defined</p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>returns a musicxml.Direction object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Wedge</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;crescendo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxDirection</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxWedge</span> <span class="o">=</span> <span class="n">mxDirection</span><span class="o">.</span><span class="n">getWedge</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxWedge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+<span class="go">&#39;crescendo&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.dynamics</a><ul>
+<li><a class="reference external" href="#function-unitintervaltoname">Function unitIntervalToName()</a></li>
+<li><a class="reference external" href="#class-dynamic">Class Dynamic</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-wedge">Class Wedge</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id3">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleDuration.html"
+                                  title="previous chapter">music21.duration</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleEnvironment.html"
+                                  title="next chapter">music21.environment</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleDynamics.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleEnvironment.html" title="music21.environment"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleDuration.html" title="music21.duration"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

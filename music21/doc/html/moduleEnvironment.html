@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.environment &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="next" title="music21.instrument" href="moduleInstrument.html" />
+    <link rel="prev" title="music21.dynamics" href="moduleDynamics.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleInstrument.html" title="music21.instrument"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleDynamics.html" title="music21.dynamics"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-environment">
+<h1>music21.environment<a class="headerlink" href="#music21-environment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="class-environment">
+<h2>Class Environment<a class="headerlink" href="#class-environment" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: object</p>
+<p>Environment stores platform-specific, user preferences</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>modNameParent</strong></p>
+<p><strong>ref</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined</p>
+<p><strong>write()</strong></p>
+<blockquote>
+Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref</blockquote>
+<p><strong>read()</strong></p>
+<blockquote>
+Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</blockquote>
+<p><strong>printDebug()</strong></p>
+<blockquote>
+Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr().</blockquote>
+<p><strong>loadDefaults()</strong></p>
+<blockquote>
+Keys are derived from these defaults</blockquote>
+<p><strong>launch()</strong></p>
+<blockquote>
+Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI</blockquote>
+<p><strong>keys()</strong></p>
+<p><strong>getTempFile()</strong></p>
+<blockquote>
+Return a file path to a temporary file with the specified suffix</blockquote>
+<p><strong>getSettingsPath()</strong></p>
+<blockquote>
+Return the path to the platform specific settings file.</blockquote>
+</div>
+</div>
+<div class="section" id="class-preference">
+<h2>Class Preference<a class="headerlink" href="#class-preference" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: node.Node, object</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>charData</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from node.Node</p>
+<p><strong>xmlStr()</strong></p>
+<p><strong>toxml()</strong></p>
+<p><strong>setDefaults()</strong></p>
+<p><strong>set()</strong></p>
+<p><strong>merge()</strong></p>
+<p><strong>loadAttrs()</strong></p>
+<p><strong>getNewDoc()</strong></p>
+<p><strong>get()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from node.Node</p>
+<p><strong>tag</strong></p>
+</div>
+</div>
+<div class="section" id="class-settings">
+<h2>Class Settings<a class="headerlink" href="#class-settings" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: node.NodeList, node.Node, object</p>
+<div class="section" id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><strong>charData</strong></p>
+<p><strong>componentList</strong></p>
+</div>
+<div class="section" id="id4">
+<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from node.Node</p>
+<p><strong>xmlStr()</strong></p>
+<p><strong>toxml()</strong></p>
+<p><strong>setDefaults()</strong></p>
+<p><strong>set()</strong></p>
+<p><strong>merge()</strong></p>
+<p><strong>loadAttrs()</strong></p>
+<p><strong>getNewDoc()</strong></p>
+<p><strong>get()</strong></p>
+<p>Inherited from node.NodeList</p>
+<p><strong>append()</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from node.Node</p>
+<p><strong>tag</strong></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.environment</a><ul>
+<li><a class="reference external" href="#class-environment">Class Environment</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-preference">Class Preference</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-settings">Class Settings</a><ul>
+<li><a class="reference external" href="#id3">Attributes</a></li>
+<li><a class="reference external" href="#id4">Methods</a></li>
+<li><a class="reference external" href="#id5">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleDynamics.html"
+                                  title="previous chapter">music21.dynamics</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleInstrument.html"
+                                  title="next chapter">music21.instrument</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleEnvironment.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleInstrument.html" title="music21.instrument"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleDynamics.html" title="music21.dynamics"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

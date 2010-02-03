@@ -1,0 +1,1885 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.stream &mdash; music21 v0.2.2a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.2a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="prev" title="music21.pitch" href="modulePitch.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modulePitch.html" title="music21.pitch"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-stream">
+<h1>music21.stream<a class="headerlink" href="#music21-stream" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-deepcopy">
+<h2>Function deepcopy()<a class="headerlink" href="#function-deepcopy" title="Permalink to this headline">¶</a></h2>
+<p>Deep copy operation on arbitrary Python objects. See the module&#8217;s __doc__ string for more info.</p>
+</div>
+<div class="section" id="class-measure">
+<h2>Class Measure<a class="headerlink" href="#class-measure" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream&#8217;s elements.</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>clefIsNew</strong></p>
+<p><strong>contexts</strong></p>
+<p><strong>filled</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>keyIsNew</strong></p>
+<p><strong>leftbarline</strong></p>
+<p><strong>locations</strong></p>
+<p><strong>measureNumber</strong></p>
+<p><strong>measureNumberSuffix</strong></p>
+<p><strong>rightbarline</strong></p>
+<p><strong>timeSignatureIsNew</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+<p>Locally Defined</p>
+<p><strong>setRightBarline()</strong></p>
+<p><strong>setLeftBarline()</strong></p>
+<p><strong>measureNumberWithSuffix()</strong></p>
+<p><strong>addTimeDependentDirection()</strong></p>
+<p><strong>addRepeat()</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+<p>Locally Defined</p>
+<p><strong>timeSignature</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span><span class="o">.</span><span class="n">denominator</span>
+<span class="go">(2, 4)</span>
+</pre></div>
+</div>
+<p><strong>key</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">sharps</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p><strong>clef</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clef</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clef</span><span class="o">.</span><span class="n">sign</span>    <span class="c"># clef is an element</span>
+<span class="go">&#39;G&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="class-page">
+<h2>Class Page<a class="headerlink" href="#class-page" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>Totally optional: designation that all the music in this Stream belongs on a single notated page</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+<p>Locally Defined</p>
+<p><strong>pageNumber()</strong></p>
+<blockquote>
+int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
+</div>
+<div class="section" id="id3">
+<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-part">
+<h2>Class Part<a class="headerlink" href="#class-part" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part</p>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+</div>
+<div class="section" id="id6">
+<h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-performer">
+<h2>Class Performer<a class="headerlink" href="#class-performer" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A Stream subclass for designating music to be performed by a single Performer.  Should only be used when a single performer performs on multiple parts.  E.g. Bass Drum and Triangle on separate staves performed by one player. a Part + changes of Instrument is fine for designating most cases where a player changes instrument in a piece.  A part plus staves with individual instrument changes could also be a way of designating music that is performed by a single performer (see, for instance the Piano doubling Celesta part in Lukas Foss&#8217;s Time Cycle).  The Performer Stream-subclass could be useful for analyses of, for instance, how 5 percussionists chose to play a piece originally designated for 4 (or 6) percussionists in the score.</p>
+<div class="section" id="id7">
+<h3>Attributes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id8">
+<h3>Methods<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+</div>
+<div class="section" id="id9">
+<h3>Properties<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-score">
+<h2>Class Score<a class="headerlink" href="#class-score" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard.</p>
+<div class="section" id="id10">
+<h3>Attributes<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id11">
+<h3>Methods<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+</div>
+<div class="section" id="id12">
+<h3>Properties<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-staff">
+<h2>Class Staff<a class="headerlink" href="#class-staff" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A Stream subclass for designating music on a single staff</p>
+<div class="section" id="id13">
+<h3>Attributes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id14">
+<h3>Methods<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+<p>Locally Defined</p>
+<p><strong>staffLines()</strong></p>
+<blockquote>
+int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
+</div>
+<div class="section" id="id15">
+<h3>Properties<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-stream">
+<h2>Class Stream<a class="headerlink" href="#class-stream" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: base.Music21Object, object</p>
+<p>This is basic container for Music21Objects that occur at certain times. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams. TODO: Get Stream Duration working &#8211; should be the total length of the Stream. &#8211; see the ._getDuration() and ._setDuration() methods</p>
+<div class="section" id="id16">
+<h3>Attributes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id17">
+<h3>Methods<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Locally Defined</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<blockquote>
+<p>Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">transferOffsetToElements</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">30.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">transferOffsetToElements</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">50.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>stripTies()</strong></p>
+<blockquote>
+<p>Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">makeTies</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">notes</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>splitByClass()</strong></p>
+<blockquote>
+<p>Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">,</span><span class="mf">81</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fx</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">midi</span> <span class="o">&gt;</span> <span class="mf">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">stream1</span><span class="o">.</span><span class="n">splitByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">,</span> <span class="n">fx</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">31</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>shiftElements()</strong></p>
+<blockquote>
+<p>Add offset value to every offset of contained Elements.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">shiftElements</span><span class="p">(</span><span class="mf">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">30.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">shiftElements</span><span class="p">(</span><span class="o">-</span><span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">20.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>repeatInsert()</strong></p>
+<blockquote>
+<p>Given an object, create many DEEPcopies at the positions specified by the offset list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="mf">6</span><span class="p">,</span> <span class="mf">7</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">9</span><span class="p">,</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">11</span><span class="p">,</span> <span class="mf">12</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">13</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">10</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>repeatAppend()</strong></p>
+<blockquote>
+<p>Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">40.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">9</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">36.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>pop()</strong></p>
+<blockquote>
+<p>return the matched object from the list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">junk</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">9</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>melodicIntervals()</strong></p>
+<blockquote>
+returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream. the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, then it is equal to the offset of the second note) see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed. The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval returns None of there are not at least two elements found by findConsecutiveNotes See Test.testMelodicIntervals() for usage details.</blockquote>
+<p><strong>makeTies()</strong></p>
+<blockquote>
+<p>Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false TODO: take a list of clases to act as filter on what elements are tied. configure &#8220;.previous&#8221; and &#8220;.next&#8221; attributes</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="o">+.</span><span class="mf">5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">makeTies</span><span class="p">()</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>makeRests()</strong></p>
+<blockquote>
+<p>Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, use this to get min and max offsets. Rests will be added to fill all time defined within refStream. TODO: rename fillRests() or something else.  CHRIS: I Don&#8217;t Understand what refStream does for this method!</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">makeRests</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>makeMeasures()</strong></p>
+<blockquote>
+<p>Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
+<span class="go">TODO: Test something here...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="o">+.</span><span class="mf">5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>makeBeams()</strong></p>
+<blockquote>
+<p>Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes. TODO: inPlace=False does not work in many cases</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span><span class="mf">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bMeasure</span> <span class="o">=</span> <span class="n">aMeasure</span><span class="o">.</span><span class="n">makeBeams</span><span class="p">()</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>isSequence()</strong></p>
+<blockquote>
+<p>A stream is a sequence if it has no overlaps. TODO: check that co-incident boundaries are properly handled</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">1</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isSequence</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>insertAtNativeOffset()</strong></p>
+<blockquote>
+<p>inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F-&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">stream1</span><span class="p">)</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="o">.</span><span class="n">insertAtNativeOffset</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">stream2</span><span class="p">)</span>
+<span class="go">20.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>insertAtIndex()</strong></p>
+<blockquote>
+<p>Insert in elements by index position.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">),</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;A-&#39;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insertAtIndex</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;B&#39;</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>insert()</strong></p>
+<blockquote>
+<p>Inserts an item(s) at the given offset(s) Has three forms: in the two argument form, inserts an element at the given offset:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">32</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_getHighestOffset</span><span class="p">()</span>
+<span class="go">32.0</span>
+<span class="go">In the single argument form with an object, inserts the element at its stored offset:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">40.0</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
+<span class="go">30.0</span>
+<span class="go">In single argument form list a list of alternating offsets and items, inserts the items</span>
+<span class="go">at the specified offsets:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st3</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st3</span><span class="o">.</span><span class="n">insert</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">n2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st3</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st3</span><span class="p">)</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">st3</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>index()</strong></p>
+<blockquote>
+<p>return the index for the specified object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fSharp</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A#&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fSharp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fSharp</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>groupElementsByOffset()</strong></p>
+<blockquote>
+returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can&#8217;t hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first.</blockquote>
+<p><strong>getTimeSignatures()</strong></p>
+<blockquote>
+<p>Collect all time signatures in this stream. If no TimeSignature objects are defined, get a default Note: this could be a method of Stream.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getTimeSignatures</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getSimultaneous()</strong></p>
+<blockquote>
+<p>Find and return any elements that start at the same time.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">0</span>
+<span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">stream1</span><span class="o">.</span><span class="n">getSimultaneous</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span> <span class="o">==</span> <span class="mf">4</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">3</span>
+<span class="gp">... </span>    <span class="n">stream2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">stream2</span><span class="o">.</span><span class="n">getSimultaneous</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getPitches()</strong></p>
+<blockquote>
+Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</blockquote>
+<p><strong>getOverlaps()</strong></p>
+<blockquote>
+<p>Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">1</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getOverlaps</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getOverlaps</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span> <span class="c"># including coincident boundaries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">13</span><span class="p">,</span><span class="mf">13</span><span class="p">,</span><span class="mf">13</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getOverlaps</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">13</span><span class="p">])</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># default is to not include coincident boundaries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getOverlaps</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="go">7</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getNotes()</strong></p>
+<blockquote>
+<p>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNotes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getMeasures()</strong></p>
+<blockquote>
+Return all Measure objects in a Stream()</blockquote>
+<p><strong>getInstrument()</strong></p>
+<blockquote>
+<p>Search this stream or parent streams for instruments, otherwise return a default</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getInstrument</span><span class="p">()</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getGroups()</strong></p>
+<blockquote>
+<p>Get a dictionary for each groupId and the count of instances.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addGroupForElements</span><span class="p">(</span><span class="s">&#39;P1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getGroups</span><span class="p">()</span>
+<span class="go">{&#39;P1&#39;: 30}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">12</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;green&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getGroups</span><span class="p">()</span>
+<span class="go">{&#39;P1&#39;: 30, &#39;green&#39;: 1}</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementsByOffset()</strong></p>
+<blockquote>
+<p>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;half&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;half&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out1</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out1</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;D&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out2</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out2</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out2</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;D&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out3</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="n">mustFinishInSpan</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out3</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out4</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out4</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out4</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;D&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out5</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="n">includeEndBoundary</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out5</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out6</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="n">includeEndBoundary</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">mustBeginInSpan</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out6</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out6</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;C&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out7</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="n">mustBeginInSpan</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">out7</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">step</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">out7</span><span class="p">]</span>
+<span class="go">[&#39;C&#39;, &#39;D&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mf">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">6.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">6.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementsByGroup()</strong></p>
+<blockquote>
+<p># TODO: group comparisons are not YET case insensitive.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;trombone&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;trombone&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tuba&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tuba&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tboneSubStream</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">getElementsByGroup</span><span class="p">(</span><span class="s">&quot;trombone&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">thisNote</span> <span class="ow">in</span> <span class="n">tboneSubStream</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">thisNote</span><span class="o">.</span><span class="n">name</span>
+<span class="go">C</span>
+<span class="go">D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tubaSubStream</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">getElementsByGroup</span><span class="p">(</span><span class="s">&quot;tuba&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">thisNote</span> <span class="ow">in</span> <span class="n">tubaSubStream</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">thisNote</span><span class="o">.</span><span class="n">name</span>
+<span class="go">D</span>
+<span class="go">E</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementsByClass()</strong></p>
+<blockquote>
+<p>Return a list of all Elements that match the className. Note that, as this appends Elements to a new Stream, whatever former parent relationship the ElementWrapper had is lost. The ElementWrapper&#8217;s parent is set to the new stream that contains it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">3</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;sharp&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">15</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># here, it gets elements from within a stream</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># this probably should not do this, as it is one layer lower</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+<span class="go">25</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementById()</strong></p>
+<blockquote>
+<p>Returns the first encountered element for a given id. Return None if no match</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;green&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="bp">None</span> <span class="o">==</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;green&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;green&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementBeforeOffset()</strong></p>
+<blockquote>
+Get element before a provided offset TODO: write this</blockquote>
+<p><strong>getElementBeforeElement()</strong></p>
+<blockquote>
+given an element, get the element before TODO: write this</blockquote>
+<p><strong>getElementAtOrBefore()</strong></p>
+<blockquote>
+<p>Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset. TODO: include sort order for concurrent matches?</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;x&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;y&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;z&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mf">0</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">21</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span>
+<span class="go">(20.0, &#39;x&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">19</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span>
+<span class="go">(10.0, &#39;y&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span>
+<span class="go">(0.0, &#39;z&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span>
+<span class="go">(0.0, &#39;z&#39;)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>getElementAtOrAfter()</strong></p>
+<blockquote>
+Given an offset, find the element at this offset, or with the offset greater than and nearest to. TODO: write this</blockquote>
+<p><strong>getElementAfterOffset()</strong></p>
+<blockquote>
+Get element after a provided offset TODO: write this</blockquote>
+<p><strong>getElementAfterElement()</strong></p>
+<blockquote>
+<p>given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="ow">is</span> <span class="n">n2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="ow">is</span> <span class="n">r3</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t4</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="n">t3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="s">&quot;hi&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">StreamException</span>: <span class="n-Identifier">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t5</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="p">[</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t5</span> <span class="ow">is</span> <span class="n">r3</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t6</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">getElementAfterElement</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="p">[</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t6</span> <span class="ow">is</span> <span class="n">n2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>findGaps()</strong></p>
+<blockquote>
+returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why &#8220;isSequence&#8221; calls self.flat.isGapless</blockquote>
+<p><strong>findConsecutiveNotes()</strong></p>
+<blockquote>
+Returns a list of consecutive <em>pitched</em> Notes in a Stream.  A single &#8220;None&#8221; is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -&gt; Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2&#8217;s in there as well. N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX See Test.testFindConsecutiveNotes() for usage details. (<a href="#id18"><span class="problematic" id="id19">**</span></a>keywords is there so that other methods that pass along dicts to findConsecutiveNotes don&#8217;t have to remove their own args; this method is used in melodicIntervals.)</blockquote>
+<p><strong>extractContext()</strong></p>
+<blockquote>
+<p>extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) TODO: maxBefore &#8211; maximum number of elements to return before; etc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qn</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">qn</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hn</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">HalfNote</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hn</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;B-&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hn</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">qn</span><span class="p">,</span> <span class="p">[</span><span class="mf">8</span><span class="p">,</span> <span class="mf">9</span><span class="p">,</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">11</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hnStream</span> <span class="o">=</span> <span class="n">qtrStream</span><span class="o">.</span><span class="n">extractContext</span><span class="p">(</span><span class="n">hn</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hnStream</span><span class="o">.</span><span class="n">_reprText</span><span class="p">()</span>
+<span class="go">&#39;{5.0} &lt;music21.note.Note C&gt;\n{6.0} &lt;music21.note.Note B-&gt;\n{8.0} &lt;music21.note.Note C&gt;&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>extendDuration()</strong></p>
+<blockquote>
+<p>Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.dynamics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">20</span><span class="p">,</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dyn</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ff&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">15</span><span class="p">,</span> <span class="n">dyn</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sort1</span> <span class="o">=</span> <span class="n">stream1</span><span class="o">.</span><span class="n">sorted</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sort1</span><span class="p">[</span><span class="o">-</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span> <span class="c"># offset of last element</span>
+<span class="go">40.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sort1</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="c"># total duration</span>
+<span class="go">41.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sort1</span><span class="p">)</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span> <span class="o">=</span> <span class="n">sort1</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">extendDuration</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">GeneralNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">stream2</span><span class="p">)</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="c"># all note durs are 10</span>
+<span class="go">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="p">[</span><span class="o">-</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="c"># or extend to end of stream</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">41.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream2</span><span class="p">[</span><span class="o">-</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">40.0</span>
+<span class="go">TODO: Chris; what file is testFiles.ALL[2]??</span>
+<span class="go">#        &gt;&gt;&gt; from music21.musicxml import testFiles</span>
+<span class="go">#        &gt;&gt;&gt; from music21 import converter</span>
+<span class="go">#        &gt;&gt;&gt; mxString = testFiles.ALL[2] # has dynamics</span>
+<span class="go">#        &gt;&gt;&gt; a = converter.parse(mxString)</span>
+<span class="go">#        &gt;&gt;&gt; b = a.flat.extendDuration(dynamics.Dynamic)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>bestClef()</strong></p>
+<blockquote>
+<p>Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename &#8216;getClef&#8217;; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">... </span>   <span class="n">n</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">60</span><span class="p">,</span><span class="mf">72</span><span class="p">))</span>
+<span class="gp">... </span>   <span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">bestClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">line</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">sign</span>
+<span class="go">&#39;G&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">... </span>   <span class="n">n</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">35</span><span class="p">,</span><span class="mf">55</span><span class="p">))</span>
+<span class="gp">... </span>   <span class="n">c</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">bestClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">line</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">sign</span>
+<span class="go">&#39;F&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>append()</strong></p>
+<blockquote>
+<p>Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest &#8220;release&#8221; of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">notes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">... </span>    <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">notes</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">(0.0, 3.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">notes</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">(3.0, 6.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">notes</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">(6.0, 9.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">notes2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># since notes are not embedded in Elements here, their offset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># changes when added to a stream!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A-&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">... </span>    <span class="n">notes2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">notes2</span><span class="p">)</span> <span class="c"># add em all again</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">(15.0, 18.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isSequence</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="go">Add a note that already has an offset set -- does nothing different!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">(18.0, 21.0)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>addGroupForElements()</strong></p>
+<blockquote>
+<p>Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">),</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addGroupForElements</span><span class="p">(</span><span class="s">&#39;flute&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span>
+<span class="go">[&#39;flute&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addGroupForElements</span><span class="p">(</span><span class="s">&#39;quietTime&#39;</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span>
+<span class="go">[&#39;flute&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">50</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span>
+<span class="go">[&#39;flute&#39;, &#39;quietTime&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quietTime&#39;</span><span class="p">)</span> <span class="c"># set one note to it</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="s">&quot;B&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementsByGroup</span><span class="p">(</span><span class="s">&#39;quietTime&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">31</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;B-&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="id20">
+<h3>Properties<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Locally Defined</p>
+<p><strong>sorted</strong></p>
+<blockquote>
+<p>returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted ## TODO: CLEF ORDER RULES, etc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">isSorted</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sorted</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">isSorted</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">farRight</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">sorted</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">z</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">(&#39;C#&#39;, &#39;E&#39;)</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<blockquote>
+Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</blockquote>
+<p><strong>notes</strong></p>
+<blockquote>
+<p>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNotes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>Create and return a musicxml score.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">str1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">str1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">measure1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxScore</span> <span class="o">=</span> <span class="n">str1</span><span class="o">.</span><span class="n">mx</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+Provide a complete MusicXM: representation.</blockquote>
+<p><strong>measures</strong></p>
+<blockquote>
+Return all Measure objects in a Stream()</blockquote>
+<p><strong>lowestOffset</strong></p>
+<blockquote>
+<p>Get start time of element with the lowest offset in the Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">5</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">3.0</span>
+<span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">9.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>lily</strong></p>
+<blockquote>
+Returns the stream translated into Lilypond format.</blockquote>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<blockquote>
+returns the max(el.offset + el.duration.quarterLength) over all elements, usually representing the last &#8220;release&#8221; in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.  See below.</blockquote>
+<p><strong>highestOffset</strong></p>
+<blockquote>
+<p>Get start time of element with the highest offset in the Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">3.0</span>
+<span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">highestOffset</span>
+<span class="go">12.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>flat</strong></p>
+<blockquote>
+<p>returns a new Stream where no elements nest within other elements</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">isSorted</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sorted</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">isSorted</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">p</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">... </span>  <span class="n">p</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">))</span>
+<span class="gp">... </span>  <span class="n">q</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mf">10</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qf</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">flat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">qf</span><span class="p">)</span>
+<span class="go">25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qf</span><span class="p">[</span><span class="mf">24</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">44.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">q</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">... </span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+<span class="gp">... </span>     <span class="n">p</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">... </span>     <span class="n">p</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">))</span>
+<span class="gp">... </span>     <span class="n">q</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mf">10</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+<span class="gp">... </span>  <span class="n">r</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">j</span> <span class="o">*</span> <span class="mf">100</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
+<span class="go">125</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mf">124</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">444.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-system">
+<h2>Class System<a class="headerlink" href="#class-system" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>Totally optional: designation that all the music in this Stream belongs in a single system.</p>
+<div class="section" id="id21">
+<h3>Attributes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id22">
+<h3>Methods<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+<p>Locally Defined</p>
+<p><strong>systemNumber()</strong></p>
+<blockquote>
+int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
+</div>
+<div class="section" id="id23">
+<h3>Properties<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+<div class="section" id="class-voice">
+<h2>Class Voice<a class="headerlink" href="#class-voice" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream, base.Music21Object, object</p>
+<p>A Stream subclass for declaring that all the music in the stream belongs to a certain &#8220;voice&#8221; for analysis or display purposes. Note that both Finale&#8217;s Layers and Voices as concepts are considered Voices here.</p>
+<div class="section" id="id24">
+<h3>Attributes<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id25">
+<h3>Methods<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>write()</strong></p>
+<p><strong>show()</strong></p>
+<p><strong>searchParent()</strong></p>
+<p><strong>isClass()</strong></p>
+<p><strong>id()</strong></p>
+<p><strong>getOffsetBySite()</strong></p>
+<p><strong>contexts()</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>transferOffsetToElements()</strong></p>
+<p><strong>stripTies()</strong></p>
+<p><strong>splitByClass()</strong></p>
+<p><strong>shiftElements()</strong></p>
+<p><strong>repeatInsert()</strong></p>
+<p><strong>repeatAppend()</strong></p>
+<p><strong>pop()</strong></p>
+<p><strong>melodicIntervals()</strong></p>
+<p><strong>makeTies()</strong></p>
+<p><strong>makeRests()</strong></p>
+<p><strong>makeMeasures()</strong></p>
+<p><strong>makeBeams()</strong></p>
+<p><strong>isSequence()</strong></p>
+<p><strong>insertAtNativeOffset()</strong></p>
+<p><strong>insertAtIndex()</strong></p>
+<p><strong>insert()</strong></p>
+<p><strong>index()</strong></p>
+<p><strong>groupElementsByOffset()</strong></p>
+<p><strong>getTimeSignatures()</strong></p>
+<p><strong>getSimultaneous()</strong></p>
+<p><strong>getPitches()</strong></p>
+<p><strong>getOverlaps()</strong></p>
+<p><strong>getNotes()</strong></p>
+<p><strong>getMeasures()</strong></p>
+<p><strong>getInstrument()</strong></p>
+<p><strong>getGroups()</strong></p>
+<p><strong>getElementsByOffset()</strong></p>
+<p><strong>getElementsByGroup()</strong></p>
+<p><strong>getElementsByClass()</strong></p>
+<p><strong>getElementById()</strong></p>
+<p><strong>getElementBeforeOffset()</strong></p>
+<p><strong>getElementBeforeElement()</strong></p>
+<p><strong>getElementAtOrBefore()</strong></p>
+<p><strong>getElementAtOrAfter()</strong></p>
+<p><strong>getElementAfterOffset()</strong></p>
+<p><strong>getElementAfterElement()</strong></p>
+<p><strong>findGaps()</strong></p>
+<p><strong>findConsecutiveNotes()</strong></p>
+<p><strong>extractContext()</strong></p>
+<p><strong>extendDuration()</strong></p>
+<p><strong>bestClef()</strong></p>
+<p><strong>append()</strong></p>
+<p><strong>addGroupForElements()</strong></p>
+</div>
+<div class="section" id="id26">
+<h3>Properties<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<p>Inherited from stream.Stream</p>
+<p><strong>sorted</strong></p>
+<p><strong>semiFlat</strong></p>
+<p><strong>pitches</strong></p>
+<p><strong>notes</strong></p>
+<p><strong>mx</strong></p>
+<p><strong>musicxml</strong></p>
+<p><strong>measures</strong></p>
+<p><strong>lowestOffset</strong></p>
+<p><strong>lily</strong></p>
+<p><strong>isGapless</strong></p>
+<p><strong>highestTime</strong></p>
+<p><strong>highestOffset</strong></p>
+<p><strong>flat</strong></p>
+<p><strong>elements</strong></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.stream</a><ul>
+<li><a class="reference external" href="#function-deepcopy">Function deepcopy()</a></li>
+<li><a class="reference external" href="#class-measure">Class Measure</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-page">Class Page</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id3">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-part">Class Part</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
+<li><a class="reference external" href="#id6">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-performer">Class Performer</a><ul>
+<li><a class="reference external" href="#id7">Attributes</a></li>
+<li><a class="reference external" href="#id8">Methods</a></li>
+<li><a class="reference external" href="#id9">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-score">Class Score</a><ul>
+<li><a class="reference external" href="#id10">Attributes</a></li>
+<li><a class="reference external" href="#id11">Methods</a></li>
+<li><a class="reference external" href="#id12">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-staff">Class Staff</a><ul>
+<li><a class="reference external" href="#id13">Attributes</a></li>
+<li><a class="reference external" href="#id14">Methods</a></li>
+<li><a class="reference external" href="#id15">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-stream">Class Stream</a><ul>
+<li><a class="reference external" href="#id16">Attributes</a></li>
+<li><a class="reference external" href="#id17">Methods</a></li>
+<li><a class="reference external" href="#id20">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-system">Class System</a><ul>
+<li><a class="reference external" href="#id21">Attributes</a></li>
+<li><a class="reference external" href="#id22">Methods</a></li>
+<li><a class="reference external" href="#id23">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-voice">Class Voice</a><ul>
+<li><a class="reference external" href="#id24">Attributes</a></li>
+<li><a class="reference external" href="#id25">Methods</a></li>
+<li><a class="reference external" href="#id26">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="modulePitch.html"
+                                  title="previous chapter">music21.pitch</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleStream.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modulePitch.html" title="music21.pitch"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 02, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
