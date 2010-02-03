@@ -27,7 +27,7 @@ from music21 import converter
 def ch1_basic_I_A(show=True, *arguments, **keywords):
     '''
     p2.
-    For a given spitch name, give two possible enharmonic equivalents with
+    For a given pitch name, give two possible enharmonic equivalents with
     octave designation
     '''
     pitches = ['d#3', 'g3', 'g#3', 'c#4', 'd4', 'a4', 'a#4', 'e5', 'f#5', 'a5']
