@@ -14,7 +14,9 @@
 import unittest, doctest
 
 import music21
+from music21 import pitch
 from music21 import clef
+from music21 import note
 from music21 import instrument
 from music21 import converter
 
@@ -22,13 +24,24 @@ from music21 import converter
 # CHAPTER 1 
 
 
-def ch1_basic_I_A():
+def ch1_basic_I_A(show=True, *arguments, **keywords):
     '''
     p2.
-    Two possible letter names for each pitch parked above and below a position    
+    For a given spitch name, give two possible enharmonic equivalents with
+    octave designation
     '''
-    pass
-
+    pitches = ['d#3', 'g3', 'g#3', 'c#4', 'd4', 'a4', 'a#4', 'e5', 'f#5', 'a5']
+    found = []
+    for p in pitches:
+        n = note.Note(p)
+        
+        # get direction of enharmonic move?
+        # a move upward goes from f to g-, then a---
+        #n.pitch.getEnharmonic(1) 
+        found.append(None)
+    if show:
+        for i in range(len(pitches)):
+            print(str(pitches[i]).ljust(10) + str(found[i]))
 
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
@@ -59,14 +72,14 @@ def ch1_basic_II_A_1(show=True, *arguments, **keywords):
         thisNote.lyric = thisNote.nameWithOctave
     if show: exercise.show()
 
-def ch1_basic_II_A_2():
+def ch1_basic_II_A_2(show=True, *arguments, **keywords):
     '''
     bass clef
     '''
     pass
 
 
-def ch1_writing_I_B_3():
+def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     '''
     p. 7.
     Transcribe Purcell, "Music for a While" for bassoon in tenor clef
@@ -90,7 +103,8 @@ class Test(unittest.TestCase):
         pass
             
     def testBasic(self):
-        for func in [ch1_basic_II_A_1]:
+        for func in [ch1_basic_I_A, 
+                     ch1_basic_II_A_1]:
             func(show=False, play=False)
 
 

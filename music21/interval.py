@@ -243,7 +243,7 @@ class ChromaticInterval(music21.Music21Object):
         else:
             self.direction = DESCENDING
 
-        self.mod12            = self.semitones % 12
+        self.mod12 = self.semitones % 12
         self.simpleUndirected = self.undirected % 12
         if (self.direction == DESCENDING):
             self.simpleDirected = -1 * self.simpleUndirected
