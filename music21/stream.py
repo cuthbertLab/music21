@@ -988,15 +988,22 @@ class Stream(music21.Music21Object):
             else:
                 elementStart = offset
 
-            if includeEndBoundary is True:
-                if elementStart >= offsetStart and elementEnd <= offsetEnd:
+            if includeEndBoundary is True and mustBeginInSpan is True and \
+                elementStart >= offsetStart and elementEnd <= offsetEnd:
+                    match = True
+            elif includeEndBoundary is True and mustBeginInSpan is False and \
+                elementStart > offsetStart and elementEnd <= offsetEnd:
+                    match = True
+            elif includeEndBoundary is False and mustBeginInSpan is True and \
+                elementStart >= offsetStart and elementEnd < offsetEnd:
+                    match = True
+            elif includeEndBoundary is False and mustBeginInSpan is False and \
+                elementStart > offsetStart and elementEnd < offsetEnd:
                     match = True
             else: # 
-                if elementStart >= offsetStart and elementEnd < offsetEnd:
-                    match = True
-                
+                match = False
 
-            if match:
+            if match is True:
                 found.insert(element)
         return found
 

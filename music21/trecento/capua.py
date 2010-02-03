@@ -6,7 +6,6 @@ from music21 import note
 from music21.note import Accidental
 from music21.interval import generateInterval
 from music21 import twoStreams
-from music21.twoStreams import TwoStreamComparer
 from music21 import lily
 
 debug = True
@@ -824,6 +823,7 @@ def improvedHarmony():
 def runPiece(pieceNum = 331):  # random default piece...
     ballataObj = cadencebook.BallataSheet()
     pieceObj   = ballataObj.makeWork(pieceNum)
+#    pieceObj.snippets[0].lily.showPNG()
     applyCapua(pieceObj)
     pieceObj.snippets[0].lily.showPNG()
     srcStream    = pieceObj.snippets[0].streams[0]
@@ -833,10 +833,35 @@ def runPiece(pieceNum = 331):  # random default piece...
     for note in srcStream.notes:
         if note.editorial.harmonicInterval is not None:
             print note.name
-            print note.editorial.harmonicInterval.niceName
+            print note.editorial.harmonicInterval.simpleName
+            if "capua-ficta" in note.editorial.misc:
+                print note.editorial.misc['capua-ficta']
 
 
-class ATest(unittest.TestCase):
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testRunPiece(self):
+        pieceNum = 331 # Francesco, PMFC 4 6-7: Non creder, donna
+        ballataObj = cadencebook.BallataSheet()
+        pieceObj   = ballataObj.makeWork(pieceNum)
+        applyCapua(pieceObj)
+        srcStream    = pieceObj.snippets[0].streams[0]
+        cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
+        twoStreams.attachIntervals(srcStream, cmpStream)
+
+        outList = []
+        for note in srcStream.notes:
+            if note.editorial.harmonicInterval is not None:
+                outList.append(note.name)
+                outList.append(note.editorial.harmonicInterval.simpleName)
+                if "capua-ficta" in note.editorial.misc:
+                    outList.append(repr(note.editorial.misc['capua-ficta']))
+                    
+        self.assertEqual(outList, [u'A', 'P5', u'A', 'M6', u'G', 'P5', u'G', 'm6', u'A', 'm7', u'F', 'd5', '<accidental sharp>', u'G', 'm6', u'A', 'P1', u'B', 'M6', u'A', 'P5', u'G', 'm7', u'G', 'm6', u'F', 'd5', u'E', 'M3', u'D', 'P1'])
+
 
     def run1test(self):
         ballataSht = cadencebook.BallataSheet()
@@ -847,7 +872,7 @@ class ATest(unittest.TestCase):
         if len(cadenceA.srcStreams) >= 2:
             srcStream1    = cadenceA.srcStreams[0]
             srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
-            twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
+    #        twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
     #    raise("hi?")
     #    clearFicta(srcStream1)
     #    compareThreeFictas(srcStream1, srcStream2)
@@ -865,8 +890,8 @@ class ATest(unittest.TestCase):
 
         
 if (__name__ == "__main__"):
+    music21.mainTest(Test)
 #    test()
 #    correctedMin6()
 #    correctedMaj3()
-    runPiece()
 #    improvedHarmony()

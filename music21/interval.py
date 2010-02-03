@@ -69,8 +69,6 @@ directionTerms = {DESCENDING:"Descending", OBLIQUE:"Oblique",
 class IntervalException(Exception):
     pass
 
-
-
 class DiatonicInterval(music21.Music21Object):
     #TODO: add more documentation
     def __init__(self, specifier = None, generic = None):
@@ -114,10 +112,6 @@ class DiatonicInterval(music21.Music21Object):
                 self.mod7 = self.mod7inversion
             else:
                 self.mod7 = self.simpleName
-
-    def mod7_object(self):
-        '''generates a new Interval (not DiatonicInterval) object where descending 3rds are 6ths, etc.'''
-        return generateIntervalFromString(self.mod7)
 
     def __repr__(self):
         return "<music21.interval.DiatonicInterval %s>" % self.name
@@ -214,9 +208,9 @@ class GenericInterval(music21.Music21Object):
     def __int__(self):
         return self.directed
 
-    def mod7_object(self):
+    def complement(self):
         '''generates a new GenericInterval object where descending 3rds are 6ths, etc.'''
-        return GenericInterval(self.mod7)
+        return GenericInterval(self.mod7inversion)
 
     def __repr__(self):
         return "<music21.interval.GenericInterval %s>" % self.directed
@@ -350,6 +344,11 @@ class Interval(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.interval.Interval %s>" % self.name
+
+    def getComplement(self):
+        return Interval(self.diatonic.mod7inversion)
+    
+    complement = property(getComplement)
 
 
 
@@ -772,8 +771,12 @@ class Test(unittest.TestCase):
         assert descendingFourth.diatonic.directedSimpleName == "P-4"
         assert descendingFourth.diatonic.simpleName == "P4"
         assert descendingFourth.diatonic.mod7 == "P5"
-        assert descendingFourth.diatonic.mod7_object().niceName == "Perfect Fifth"
-        assert descendingFourth.diatonic.mod7_object().diatonic.mod7_object().niceName == "Perfect Fifth"
+        
+        perfectFifth = descendingFourth.complement
+        self.assertEqual(perfectFifth.niceName, "Perfect Fifth")
+        assert perfectFifth.diatonic.simpleName == "P5"
+        assert perfectFifth.diatonic.mod7 == "P5"
+        self.assertEqual(perfectFifth.complement.niceName, "Perfect Fourth")
 
 if __name__ == "__main__":
     music21.mainTest(Test)

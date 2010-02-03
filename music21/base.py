@@ -36,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-VERSION = (0, 2, 2)
+VERSION = (0, 2, 3)
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a1'
 WEAKREF_ACTIVE = True
 
@@ -412,10 +412,11 @@ class Locations(object):
         if WEAKREF_ACTIVE:
             post = []
             for dict in self._coordinates:
-                if dict['site'] == None: # leave None alone
-                    post.append(dict['site'])
+                s1 = dict['site']
+                if s1 is None: # leave None alone
+                    post.append(None)
                 else:
-                    post.append(common.unwrapWeakref(dict['site']))
+                    post.append(common.unwrapWeakref(s1))
             return post
         else:
             return [x['site'] for x in self._coordinates]
@@ -699,6 +700,8 @@ class Music21Object(object):
 
         if "id" in keywords and not self.id:
             self.id = keywords["id"]            
+        else:
+            self.id = id(self)
         
         if "duration" in keywords and self.duration is None:
             self.duration = keywords["duration"]
@@ -715,7 +718,7 @@ class Music21Object(object):
             self.locations = keywords["locations"]
         else:
             self.locations = Locations()
-            # set up a default lcoaton for self at zero
+            # set up a default location for self at zero
             # use None as the name of the site
             self.locations.add(0.0, None)
 

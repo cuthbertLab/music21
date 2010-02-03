@@ -191,28 +191,28 @@ class HumdrumDataCollection(object):
                     elif thisEvent.contents == "*^":  ## split spine
                         newSpine1 = spineCollection.addSpine()
                         newSpine1.beginningPosition = i+1
-                        newSpine1.parents = [currentSpine.id]
+                        newSpine1.upstream = [currentSpine.id]
                         newSpine2 = spineCollection.addSpine()
                         newSpine2.beginningPosition = i+1
-                        newSpine2.parents = [currentSpine.id]
+                        newSpine2.upstream = [currentSpine.id]
                         currentSpine.endingPosition = i
-                        currentSpine.children = [newSpine1.id, newSpine2.id]
+                        currentSpine.downstream = [newSpine1.id, newSpine2.id]
                         newSpineList.append(newSpine1)
                         newSpineList.append(newSpine2)
                     elif thisEvent.contents == "*v":  #merge spine -- n.b. we allow non-adjacent lines to be merged this is incorrect
                         if mergerActive is False:     #               per humdrum syntax, but is easily done.
                             mergeSpine = spineCollection.addSpine()
                             mergeSpine.beginningPosition = i+1
-                            mergeSpine.parents = [currentSpine.id]
+                            mergeSpine.upstream = [currentSpine.id]
                             mergerActive = mergeSpine
                             currentSpine.endingPosition = i
-                            currentSpine.children = [mergeSpine.id]
+                            currentSpine.downstream = [mergeSpine.id]
                             newSpineList.append(mergeSpine)
                         else:  ## if second merger code is not found then a 1-1 spine "merge" occurs
                             mergeSpine = mergerActive
                             currentSpine.endingPosition = i
-                            currentSpine.children = [mergeSpine.id]
-                            mergeSpine.parents.append(currentSpine.id)
+                            currentSpine.downstream = [mergeSpine.id]
+                            mergeSpine.upstream.append(currentSpine.id)
                     elif thisEvent.contents == "*x":  # exchange spine    
                         if exchangeActive is False:
                             exchangeActive = currentSpine
@@ -384,12 +384,12 @@ class HumdrumSpine(object):
     spine1 = HumdrumSpine(5, [SpineEvent1, SpineEvent2])
     spine1.beginningPosition = 5
     spine1.endingPosition = 6
-    spine1.parents = [3]
-    spine1.children = [7,8]
+    spine1.upstream = [3]
+    spine1.downstream = [7,8]
     spine1.spineCollection = weakref.ref(SpineCollection1)
            ## we keep weak references to the spineCollection so that we don't have circular references
 
-    print spine1.spineType  ## searches the EventList or parentSpines to figure out the spineType
+    print spine1.spineType  ## searches the EventList or upstreamSpines to figure out the spineType
 
     '''
     def __init__(self, id, eventList = None):
@@ -403,14 +403,14 @@ class HumdrumSpine(object):
         self.music21Objects = Stream()
         self.beginningPosition = 0
         self.endingPosition = 0
-        self.parents = []
-        self.children = []
+        self.upstream = []
+        self.downstream = []
 
         self._spineCollection = None
         self._spineType = None
 
     def __repr__(self):
-        return str(self.id) + repr(self.parents) + repr(self.children)
+        return str(self.id) + repr(self.upstream) + repr(self.downstream)
 
     def append(self, event):
         self.eventList.append(event)
@@ -436,32 +436,32 @@ class HumdrumSpine(object):
     
     spineCollection = property(_getSpineCollection, _setSpineCollection)
 
-    def parentSpines(self):
+    def upstreamSpines(self):
         '''
-        Returns the HumdrumSpine(s) that are the parents (if the spineCollection is set)
+        Returns the HumdrumSpine(s) that are upstream (if the spineCollection is set)
         '''
-        if self.parents:
+        if self.upstream:
             sc1 = self.spineCollection
             if sc1:
                 spineReturn = []
-                for parentId in self.parents:
-                    spineReturn.append(sc1.getSpineById(parentId))
+                for upstreamId in self.upstream:
+                    spineReturn.append(sc1.getSpineById(upstreamId))
                 return spineReturn
             else:
                 return []
         else:
             return []
 
-    def childSpines(self):
+    def downstreamSpines(self):
         '''
-        Returns the HumdrumSpine(s) that are the children (if the spineCollection is set)
+        Returns the HumdrumSpine(s) that are downstream (if the spineCollection is set)
         '''
-        if self.children:
+        if self.downstream:
             sc1 = self.spineCollection
             if sc1:
                 spineReturn = []
-                for childId in self.children:
-                    spineReturn.append(sc1.getSpineById(childId))
+                for downstreamId in self.downstream:
+                    spineReturn.append(sc1.getSpineById(downstreamId))
                 return spineReturn
             else:
                 return []
@@ -479,8 +479,8 @@ class HumdrumSpine(object):
                     return self._spineType
             return None
     
-    def _getParentSpineType(self):
-        pS = self.parentSpines()
+    def _getUpstreamSpineType(self):
+        pS = self.upstreamSpines()
         if pS:
             ## leftFirst, DepthFirst search
             for thisPS in pS:
@@ -501,7 +501,7 @@ class HumdrumSpine(object):
                 self._spineType = st
                 return st
             else:
-                st = self._getParentSpineType()
+                st = self._getUpstreamSpineType()
                 if st is not None:
                     self._spineType = st
                     return st
@@ -1124,17 +1124,17 @@ class Test(unittest.TestCase):
     #            print "NONE"
         
     #    for mySpine in hf1.spineCollection:
-    #        print "\n\n***NEW SPINE: No. " + str(mySpine.id) + " follows: " \
-    #            + str(mySpine.parents) + " children: " + str(mySpine.children)
+    #        print "\n\n***NEW SPINE: No. " + str(mySpine.id) + " upstream: " \
+    #            + str(mySpine.upstream) + " downstream: " + str(mySpine.downstream)
     #        print mySpine.spineType
-    #        for childSpine in mySpine.childSpines():
-    #            print str(childSpine.id) + " *** testing spineCollection code ***"
+    #        for downstreamSpine in mySpine.downstreamSpines():
+    #            print str(downstreamSpine.id) + " *** testing spineCollection code ***"
     #        for thisEvent in mySpine:
     #            print thisEvent.contents
         spine5 = hf1.spineCollection.getSpineById(5)
         self.assertEqual(spine5.id, 5)
-        self.assertEqual(spine5.parents, [3,4])
-        self.assertEqual(spine5.children, [9,10])
+        self.assertEqual(spine5.upstream, [3,4])
+        self.assertEqual(spine5.downstream, [9,10])
         self.assertEqual(spine5.spineType, "kern")
         self.assertTrue(isinstance(spine5, KernSpine))
     

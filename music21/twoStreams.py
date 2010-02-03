@@ -77,14 +77,16 @@ def attachIntervals(srcStream, cmpStream):
 
     srcNotes = srcStream.notes
     for thisNote in srcNotes:
-        simultEls = cmpStream.getElementsByOffset(thisNote.offset, mustBeginInSpan = False, includeEndBoundary = False)
-        simultNote = None
+        if thisNote.isRest is True:
+            continue
+        simultEls = cmpStream.getElementsByOffset(thisNote.offset, mustBeginInSpan = False, mustFinishInSpan = False)
         if len(simultEls) > 0:
-            simultNote = (simultEls.notes)[0]
-
-        if simultNote is not None and thisNote.isRest == False:
-            interval1 = interval.generateInterval(thisNote, simultNote)
-            thisNote.editorial.harmonicInterval = interval1
+            for simultNote in simultEls.notes:
+                if simultNote.isRest is False:
+                    interval1 = interval.generateInterval(thisNote, simultNote)
+                    thisNote.editorial.harmonicInterval = interval1
+                    break
+                
 
 def mutualAttachIntervals(stream1, stream2):
     '''
@@ -140,7 +142,7 @@ def allPlayingWhenSounded(self, el, otherStream, requireClass = False, elStream 
     to the Stream.  If a list, it is used like classList in Stream to provide a list of classes 
     that the el must be a part of.
     
-    TODO: code requireClass
+    TODO: write: requireClass
     
     as above, elStream is an optional Stream to look up el's offset in.
 
@@ -163,155 +165,49 @@ def allPlayingWhenSounded(self, el, otherStream, requireClass = False, elStream 
     
     return otherElements
 
-
-class TwoStreamComparer(object):
-
-    def allPlayingWhileSounded(self, note, includeRests = True):
-        '''given a note in one stream, returns an ordered list of notes that
-        sound while the given note is sounding; includes beginning and end notes
-        that may overlap.'''
-        sounding = []
-        # add the first note to the final list to be returned
-        sounding.append(self.playingWhenSounded(note, includeRests))
-        
-        if note in self.stream1:
-            startTime = note.getOffsetBySite(self.stream1)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream2.notes)):
-                otherNote = self.stream2.notes[i]
-                otherStart = self.stream2.noteTimeInfo[i]['start']
-                if (otherStart>startTime and otherStart<endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
-
-        elif note in self.stream2:
-            startTime = note.getOffsetBySite(self.stream2)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream1.notes)):
-                otherNote = self.stream1.notes[i]
-                otherStart = self.stream1.noteTimeInfo[i]['start']
-                if (otherStart>startTime and otherStart<endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
-        
-        else: raise('note object is not found in either stream')
-
-        return sounding
-
-    def exclusivePlayingWhileSounded(self, note, includeRests = True):
-        '''given a note in one stream, returns an ordered list of notes that
-        sound while the given note is sounding; excludes last note if it
-        continues beyond the duration of the given note.'''
-        sounding = []
-        # add the first note to the final list to be returned
-        sounding.append(self.playingWhenSounded(note, includeRests))
-        
-        if note in self.stream1:
-            startTime = note.getOffsetBySite(self.stream1)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream2.notes)):
-                otherNote = self.stream2.notes[i]
-                otherStart = otherNote.getOffsetBySite(self.stream2)
-                otherEnd = otherStart + otherNote.duration.quarterLength
-                if (otherStart > startTime and otherStart < endTime and otherEnd <= endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
-
-        elif note in self.stream2:
-            startTime = note.getOffsetBySite(self.stream2)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream1.notes)):
-                otherNote = self.stream1.notes[i]
-                otherStart = otherNote.getOffsetBySite(self.stream1)
-                otherEnd = otherStart + otherNote.duration.quarterLength
-                if (otherStart > startTime and otherStart < endTime and otherEnd <= endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
-        
-        else: raise('note object is not found in either stream')
-
-        return sounding
+def trimPlayingWhenSounded(self, el, otherStream, requireClass = False, elStream = None, padStream = False):
+    '''
+    returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but
+    with any element that was sounding when el. begins trimmed to begin with el. and any element 
+    sounding when el ends trimmed to end with el.
     
-    def trimPlayingWhileSounded(self, note, includeRests = True):
-        '''given a note in one stream, returns an ordered list of notes that
-        sound while the given note is sounding; clips last note to end at same
-        time as given note.'''
-        sounding = []
-        # add the first note to the final list to be returned
-        sounding.append(self.playingWhenSounded(note, includeRests))
-        
-        if note in self.stream1:
-            startTime = note.getOffsetBySite(self.stream1)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream2.notes)):
-                otherNote = self.stream2.notes[i]
-                otherStart = otherNote.getOffsetBySite(self.stream2)
-                otherEnd = otherStart + otherNote.duration.quarterLength
-                if (otherStart > startTime and otherStart < endTime and otherEnd <= endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
+    if padStream is set to true then empty space at the beginning and end is filled with a generic
+    Music21Object, so that no matter what otherStream is the same length as el.
+    
+    Otherwise is the same as allPlayingWhenSounded -- but because these elements are deepcopies,
+    the difference might bite you if you're not careful.
+    
+    Note that you can make el an empty stream of offset X and duration Y to extract exactly
+    that much information from otherStream.  
 
-                elif (otherStart > startTime and otherStart < endTime and otherEnd > endTime):
-                    newDuration = endTime - otherStart
-                    if isinstance(otherNote, Rest):
-                        if includeRests:
-                            newNote = otherNote.copy()
-                            newNote.duration = Duration(newDuration)
-                            sounding.append(newNote)
-                    else:
-                        newNote = otherNote.copy()
-                        newNote.duration = Duration(newDuration)
-                        sounding.append(newNote)
+    TODO: write: ALL. requireClass, padStream
 
-        elif note in self.stream2:
-            startTime = note.getOffsetBySite(self.stream2)
-            endTime = startTime + note.duration.quarterLength
-            for i in range(len(self.stream1.notes)):
-                otherNote = self.stream1.notes[i]
-                otherStart = otherNote.getOffsetBySite(self.stream1)
-                otherEnd = otherStart + otherNote.duration.quarterLength
-                if (otherStart > startTime and otherStart < endTime and otherEnd <= endTime):
-                    if isinstance(otherNote, Rest):
-                        if includeRests: sounding.append(otherNote)
-                    else: sounding.append(otherNote)
+    always returns a Stream, but might be an empty Stream
+    '''
+    if requireClass is not False:
+        raise Exception("requireClass is not implemented")
+    if padStream is not False:
+        raise Exception("padStream is not implemented")
 
-                elif (otherStart > startTime and otherStart < endTime and otherEnd > endTime):
-                    newDuration = endTime - otherStart
-                    if isinstance(otherNote, Rest):
-                        if includeRests:
-                            newNote = copy.deepcopy(otherNote)
-                            newNote.duration = Duration()
-                            newNote.duration.setDurationFromQtrLength(newNote, newDuration)
-                            sounding.append(newNote)
-                    else:
-                        newNote = copy.deepcopy(otherNote)
-                        newNote.duration = Duration()
-                        newNote.duration.setDurationFromQtrLength(newNote, newDuration)
-                        sounding.append(newNote)
-        
-        else: raise('note object is not found in either stream')
+    raise Exception("Not written yet")
 
-        return sounding
+    if elStream is not None: # bit of safety
+        elOffset = el.getOffsetBySite(elStream)
+    else:
+        elOffset = el.offset
+    
+    otherElements = otherStream.getElementsByOffset(elOffset, elOffset + el.quarterLength, mustBeginInSpan = False)
 
-    def intervalToOtherStreamWhenAttacked(self):
-        '''For each note in stream1, creates an interval object in the note's
-        editorial that is the interval between it and the note in stream2 that
-        is playing while it sounds.'''
-        for note1 in self.stream1:
-            simultNote = self.playingWhenSounded(note1, False)
-            if simultNote is not None and note1.isRest == False:
-                interval1 = interval.generateInterval(note1, simultNote)
-                note1.editorial.harmonicInterval = interval1
-        for note2 in self.stream2:
-            simultNote = self.playingWhenSounded(note2, False)
-            if simultNote is not None and note2.isRest == False:
-                interval2 = interval.generateInterval(note2, simultNote)
-                note2.editorial.harmonicInterval = interval2
+    otherElements.offset = elOffset
+    otherElements.quarterLength = el.quarterLength
+    for thisEl in otherElements:
+        thisEl.offset = thisEl.offset - elOffset
+    
+    return otherElements
+
+
+
+
 
 class Test(unittest.TestCase):
 

@@ -46,7 +46,12 @@ class TrecentoSheet(object):
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
-                xbook = xlrd.open_workbook("trecento/" + self.filename)
+                try:
+                    xbook = xlrd.open_workbook("trecento/" + self.filename)
+                except IOError:
+                    xbook = xlrd.open_workbook("../trecento/" + self.filename)
+
+            
             if ("sheetname" in keywords): 
                 self.sheetname = keywords["sheetname"]
             

@@ -12,7 +12,7 @@ import music21.corpus
 from music21.musicxml import testFiles
 mxtf = testFiles
 import music21.lily
-
+import music21.trecento.capua
 
 def timeHumdrum():
     masterStream = music21.humdrum.parseData(htf.mazurka6).stream
@@ -23,6 +23,10 @@ def timeMozart():
 #    ls.showPNG()
 #    a = music21.converter.parse(mxtf.ALL[1])
 
+def timeCapua():
+    c1 = music21.trecento.capua.Test()
+    c1.testRunPiece()
+
 excludeList = ['pycallgraph.*','re.*','sre_*', 'copy.*']
 
 gf = pycallgraph.GlobbingFilter(exclude=excludeList)
@@ -31,7 +35,7 @@ print time.ctime()
 
 pycallgraph.start_trace(filter_func = gf)
 
-timeMozart()
+timeCapua()
 
 pycallgraph.make_dot_graph('d:\\desktop\\test1.png')
 
