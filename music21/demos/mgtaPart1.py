@@ -43,6 +43,20 @@ def ch1_basic_I_A(show=True, *arguments, **keywords):
         for i in range(len(pitches)):
             print(str(pitches[i]).ljust(10) + str(found[i]))
 
+
+
+def ch1_basic_I_B(show=True, *arguments, **keywords):
+    '''
+    p2.
+    given 2 pitches, mark on a keyboard their positions and mark 
+    intervals as W for hole step and H for half step, otherwise N
+    '''
+    pitches = [('a#', 'b'), ('b-', 'c#'), ('g-', 'a'), ('d-', 'c##'), 
+               ('f', 'e'), ('f#', 'e')]
+    
+
+
+
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
     p3.

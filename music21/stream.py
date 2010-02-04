@@ -1308,11 +1308,16 @@ class Stream(music21.Music21Object):
         else:
             averageHeight = (totalHeight + 0.0) / totalNotes
 
+        #environLocal.printDebug(['average height', averageHeight])
         if (allowTreble8vb == False):
-            if averageHeight > 28:    # c4
+            if averageHeight > 52: # value found with experimentation; revise
+                return clef.Treble8vaClef()
+            elif averageHeight > 28:    # c4
                 return clef.TrebleClef()
-            else:
+            elif averageHeight > 10: # value found with experimentation; revise
                 return clef.BassClef()
+            else: 
+                return clef.Bass8vbClef()
         else:
             if averageHeight > 32:    # g4
                 return clef.TrebleClef()
