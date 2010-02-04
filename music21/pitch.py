@@ -53,6 +53,8 @@ def convertPsToOct(ps):
     [3, 4, 4]
     >>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
     [0, -1, -2]
+    >>> convertPsToOct(135)
+    10
     '''
     return int(math.floor(ps / 12.)) - 1
 
@@ -138,6 +140,8 @@ def convertPsToFq(ps):
     261.62556530059862
     >>> convertPsToFq(2)
     9.1770239974189884
+    >>> convertPsToFq(135)
+    19912.126958213179
     '''
     try:
         fq = 440.0 * pow(2, (((ps-60)-9)/12.0))
