@@ -82,6 +82,8 @@ def convertPsToStep(ps):
     ('D', <accidental natural>)
     >>> convertPsToStep(62.5)
     ('D', <accidental half-sharp>)
+    >>> convertPsToStep(135)
+    ('D', <accidental sharp>)
     '''
     # if this is a microtone it may have floating point vals
     pcReal = ps % 12 

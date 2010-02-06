@@ -901,7 +901,6 @@ class DurationUnit(DurationCommon):
     
     ordinal = property(_getOrdinal)
 
-#
     def _getDots(self):
         '''
         _dots is a list (so we can do weird things like Crumb half-dots)
