@@ -317,18 +317,18 @@ class Accidental(music21.Music21Object):
             self.alter = -2.0
             self.modifier = '--'
         
-        elif name in ['half-sharp', 'quarter-sharp', 'ih', .5]:
+        elif name in ['half-sharp', 'quarter-sharp', 'ih', 'semisharp', .5]:
             self.name = 'half-sharp'
             self.alter = 0.5
         elif name in ['one-and-a-half-sharp', 'three-quarter-sharp', \
-             'three-quarters-sharp', 'isih', 1.5]:
+             'three-quarters-sharp', 'isih', 'sesquisharp', 1.5]:
             self.name = 'one-and-a-half-sharp'
             self.alter = 1.5  
-        elif name in ['half-flat', 'quarter-flat', 'eh', -.5]:
+        elif name in ['half-flat', 'quarter-flat', 'eh', 'semiflat', -.5]:
             self.name = 'half-flat'
             self.alter = -0.5
         elif name in ['one-and-a-half-flat', 'three-quarter-flat', \
-             'three-quarters-flat', 'eseh', -1.5]:
+             'three-quarters-flat', 'eseh', 'sesquiflat', -1.5]:
             self.name = 'one-and-a-half-flat'
             self.alter = -1.5
         else:

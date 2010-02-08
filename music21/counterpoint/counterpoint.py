@@ -38,7 +38,7 @@ class ModalCounterpoint(object):
         any note that has harmonic interval of a fifth and is preceded by a
         first harmonic interval of a fifth.'''
         
-        twoStreams.attachIntervals(srcStream, cmpStream)
+        srcStream.attachIntervalsBetweenStreams(cmpStream)
         numParallelFifths = 0
         srcNotes = srcStream.notes
         
@@ -61,13 +61,12 @@ class ModalCounterpoint(object):
 
         NOTE: Order matters! (stream1, stream2) might
         have no hidden fifths, while (stream2, stream1) does have them.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
         numHiddenFifths = 0
         for i in range(len(stream1.notes)-1):
             note1 = stream1.notes[i]
             note2 = stream1.noteFollowingNote(note1, False)
-            note3 = twoStreams1.playingWhenSounded(note1, False)
-            note4 = twoStreams1.playingWhenSounded(note2, False)
+            note3 = stream2.playingWhenAttacked(note1)
+            note4 = stream2.playingWhenAttacked(note2)
             if note2 is not None and note3 is not None and note4 is not None:
                 hidden = self.isHiddenFifth(note1, note2, note3, note4)
                 if hidden:
@@ -136,13 +135,12 @@ class ModalCounterpoint(object):
 
         NOTE: Order matters! (stream1, stream2) might
         have no hidden octaves, while (stream2, stream1) does have them.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
         numHiddenOctaves = 0
         for i in range(len(stream1.notes)-1):
             note1 = stream1.notes[i]
             note2 = stream1.noteFollowingNote(note1, False)
-            note3 = twoStreams1.playingWhenSounded(note1, False)
-            note4 = twoStreams1.playingWhenSounded(note2, False)
+            note3 = stream2.playingWhenAttacked(note1)
+            note4 = stream2.playingWhenAttacked(note2)
             if note2 is not None and note3 is not None and note4 is not None:
                 hidden = self.isHiddenOctave(note1, note2, note3, note4)
                 if hidden:

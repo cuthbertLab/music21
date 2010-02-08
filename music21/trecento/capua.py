@@ -828,7 +828,7 @@ def runPiece(pieceNum = 331):  # random default piece...
     pieceObj.snippets[0].lily.showPNG()
     srcStream    = pieceObj.snippets[0].streams[0]
     cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
-    twoStreams.attachIntervals(srcStream, cmpStream)
+    srcStream.attachIntervalsBetweenStreams(cmpStream)
 
     for note in srcStream.notes:
         if note.editorial.harmonicInterval is not None:
@@ -850,7 +850,7 @@ class TestExternal(unittest.TestCase):
         applyCapua(pieceObj)
         srcStream    = pieceObj.snippets[0].streams[0]
         cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
-        twoStreams.attachIntervals(srcStream, cmpStream)
+        srcStream.attachIntervalsBetweenStreams(cmpStream)
 
         outList = []
         for note in srcStream.notes:
@@ -873,7 +873,7 @@ class Test(unittest.TestCase):
         applyCapua(pieceObj)
         srcStream    = pieceObj.snippets[0].streams[0]
         cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
-        twoStreams.attachIntervals(srcStream, cmpStream)
+        srcStream.attachIntervalsBetweenStreams(cmpStream)
 
         outList = []
         for note in srcStream.notes:
@@ -963,7 +963,7 @@ class Test(unittest.TestCase):
 
         
 if (__name__ == "__main__"):
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 #    test()
 #    correctedMin6()
 #    correctedMaj3()

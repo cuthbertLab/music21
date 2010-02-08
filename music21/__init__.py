@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 '''
-The music21 Framework is Copyright (c) 2008-09 music21lab 
+The music21 Framework is Copyright (c) 2008-10 music21lab 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
@@ -34,22 +34,24 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 
 '''
 
-### put these in alphabetical order
-__all__ = ["composition", "counterpoint", "doc", "humdrum", \
-           "lily", "test", "trecento", \
+### put these in alphabetical order FIRST dirs then modules
+__all__ = ["analysis", "composition", "counterpoint", "corpus", \
+           "demos", "doc", "humdrum", \
+           "lily", "musicxml", "test", "trecento", \
            \
-           "analysis", "articulations", "base", \
-           "chord", "clef","common", "converter", \
-           "corpus", \
+           "articulations", \
+           "chord", "chordTables", "clef","common", "converter", \
            "defaults", "duration", "dynamics",\
            "editorial","enharmonic", "environment", \
-           "interval", "key", \
-           "measure", "meter", "musicxml", \
+           "interval", "instrument", "key", \
+           "measure", "meter", \
            "notationMod", "note", \
            "pitch", "ratios", \
            "scale", "serial", "stream", 
            "tempo", "text", "tinyNotation", \
            "voiceLeading"]
+
+# skipped purposely, "base", "node"
 
 #--------------------------------------------------------------------#
 # base Music21Object -- all objects should inherit from this!
