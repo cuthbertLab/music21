@@ -209,7 +209,7 @@ class Stream(music21.Music21Object):
         elif common.isStr(key):
             # first search id, then search groups
             idMatch = self.getElementById(key)
-            if idMatch != None:
+            if idMatch is not None:
                 return idMatch
             else: # search groups, return first element match
                 groupStream = self.getElementsByGroup(key)
@@ -452,10 +452,10 @@ class Stream(music21.Music21Object):
         >>> len(st3)
         2
         '''
-        if itemOrNone != None:
+        if itemOrNone is not None:
             offset = offsetOrItemOrList
             item = itemOrNone            
-        elif itemOrNone == None and isinstance(offsetOrItemOrList, list):
+        elif itemOrNone is None and isinstance(offsetOrItemOrList, list):
             i = 0
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
@@ -476,7 +476,7 @@ class Stream(music21.Music21Object):
 
         offset = float(offset)
         element.locations.add(offset, self)
-        # need to explicitly set the parent of the elment
+        # need to explicitly set the parent of the element
         element.parent = self 
 
         if self.isSorted is True and self.highestTime <= offset:
@@ -779,7 +779,7 @@ class Stream(music21.Music21Object):
         for myEl in self:
             appendedAlready = False
             for myCl in classFilterList:
-                if myEl.isClass(myCl) and appendedAlready == False:
+                if myEl.isClass(myCl) and appendedAlready is False:
                     appendedAlready = True
                     if unpackElement and hasattr(myEl, "obj"):
                         found.append(myEl.obj)
@@ -879,7 +879,7 @@ class Stream(music21.Music21Object):
         '''
         for element in self.elements:
             if element.id == id:
-                if classFilter != None:
+                if classFilter is not None:
                     if element.isClass(classFilter):
                         return element
                     else:
@@ -1242,7 +1242,7 @@ class Stream(music21.Music21Object):
                     instObj = self.parent.getInstrument()         
 
         # if still not defined, get default
-        if instObj == None:
+        if instObj is None:
             instObj = instrument.Instrument()
             instObj.partId = defaults.partId # give a default id
             instObj.partName = defaults.partName # give a default id
@@ -1309,7 +1309,7 @@ class Stream(music21.Music21Object):
             averageHeight = (totalHeight + 0.0) / totalNotes
 
         #environLocal.printDebug(['average height', averageHeight])
-        if (allowTreble8vb == False):
+        if (allowTreble8vb is False):
             if averageHeight > 52: # value found with experimentation; revise
                 return clef.Treble8vaClef()
             elif averageHeight > 28:    # c4
@@ -1539,7 +1539,7 @@ class Stream(music21.Music21Object):
         srcObj = self
 
         # may need to look in parent if no time signatures are found
-        if meterStream == None:
+        if meterStream is None:
             meterStream = srcObj.getTimeSignatures()
 
         # get a clef and for the entire stream
@@ -1549,7 +1549,7 @@ class Stream(music21.Music21Object):
         # assume that flat/sorted options will be set before procesing
         offsetMap = [] # list of start, start+dur, element
         for e in srcObj:
-            if hasattr(e, 'duration') and e.duration != None:
+            if hasattr(e, 'duration') and e.duration is not None:
                 dur = e.duration.quarterLength
             else:
                 dur = 0 
@@ -1572,7 +1572,7 @@ class Stream(music21.Music21Object):
     
         # if a ref stream is provided, get highst time from there
         # only if it is greater thant the highest time yet encountered
-        if refStream != None:
+        if refStream is not None:
             if refStream.highestTime > oMax:
                 oMax = refStream.highestTime
     
@@ -1616,7 +1616,7 @@ class Stream(music21.Music21Object):
             lastTimeSignature = None
             for i in range(len(post)):
                 m = post[i]
-                if m.timeSignature != None:
+                if m.timeSignature is not None:
                     lastTimeSignature = m.timeSignature
                 # get start and end offsets for each measure
                 # seems like should be able to use m.duration.quarterLengths
@@ -1672,7 +1672,7 @@ class Stream(music21.Music21Object):
     
         oLow = returnObj.lowestOffset
         oHigh = returnObj.highestTime
-        if refStream != None:
+        if refStream is not None:
             oLowTarget = refStream.lowestOffset
             oHighTarget = refStream.highestTime
             environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStream)])
@@ -1734,7 +1734,7 @@ class Stream(music21.Music21Object):
             raise StreamException('cannot process a stream without measures')        
     
         # may need to look in parent if no time signatures are found
-        if meterStream == None:
+        if meterStream is None:
             meterStream = returnObj.getTimeSignatures()
     
         mCount = 0
@@ -1747,7 +1747,7 @@ class Stream(music21.Music21Object):
                 break # reached the end of all measures available or added
             # get the current measure to look for notes that need ties
             m = measureStream[mCount]
-            if m.timeSignature != None:
+            if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
 
             # get a next measure; we may not need it, but have it ready
@@ -1779,7 +1779,7 @@ class Stream(music21.Music21Object):
             for e in m:
                 #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
 
-                if hasattr(e, 'duration') and e.duration != None:
+                if hasattr(e, 'duration') and e.duration is not None:
                     # check to see if duration is within Measure
                     eoffset = e.getOffsetBySite(m)
                     eEnd = eoffset + e.duration.quarterLength
@@ -1862,9 +1862,9 @@ class Stream(music21.Music21Object):
 
         lastTimeSignature = None
         for m in mColl:
-            if m.timeSignature != None:
+            if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
-            if lastTimeSignature == None:
+            if lastTimeSignature is None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
     
             # environLocal.printDebug(['beaming with ts', ts])
@@ -1947,7 +1947,7 @@ class Stream(music21.Music21Object):
         for element in returnObj.getElementsByClass(objName):
             if not hasattr(element, 'duration'):
                 raise StreamException('can only process objects with duration attributes')
-            if element.duration == None:
+            if element.duration is None:
                 element.duration = duration.Duration()
             elements.append(element)
     
@@ -2013,9 +2013,9 @@ class Stream(music21.Music21Object):
                 iLast = None
                 nLast = None
 
-            if hasattr(n, 'tie') and n.tie != None and n.tie.type == 'start':
+            if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'start':
                 # find a true start
-                if iLast == None or iLast not in posConnected:
+                if iLast is None or iLast not in posConnected:
                     posConnected = [i] # reset list with start
                 # find a continuation: the last note was a tie      
                 # start and this note is a tie start
@@ -2024,11 +2024,11 @@ class Stream(music21.Music21Object):
                 endMatch = False            
 
             # establish end condition
-            if endMatch == None: # not yet set, not a start
-                if hasattr(n, 'tie') and n.tie != None and n.tie.type == 'stop':
+            if endMatch is None: # not yet set, not a start
+                if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'stop':
                     endMatch = True
                 elif matchByPitch:
-                    if (nLast != None and iLast in posConnected 
+                    if (nLast is not None and iLast in posConnected 
                         and nLast.pitch == n.pitch):
                         endMatch = True
 
@@ -2206,7 +2206,7 @@ class Stream(music21.Music21Object):
             # check for stream instance instead
             if hasattr(myEl, "elements"): # recurse time:
                 recurseStreamOffset = myEl.locations.getOffsetBySite(self)
-                if retainContainers == True: ## semiFlat
+                if retainContainers is True: ## semiFlat
                     newStream.insert(recurseStreamOffset, myEl)
                     recurseStream = myEl.semiFlat
                 else:
@@ -2300,6 +2300,7 @@ class Stream(music21.Music21Object):
             pass # return cache unaltered
         elif len(self.elements) == 0:
             self._cache["HighestTime"] = 0.0
+            return 0.0
         elif self.isSorted is True:
             lastEl = self.elements[-1]
             if hasattr(lastEl, "duration") and hasattr(lastEl.duration, "quarterLength"):
@@ -2480,7 +2481,7 @@ class Stream(music21.Music21Object):
                     lilyout = lilyout.rstrip()
                     lilyout += "} "
 
-            if hasattr(thisObject, "stopTransparency") and thisObject.stopTransparency == True:
+            if hasattr(thisObject, "stopTransparency") and thisObject.stopTransparency is True:
                 lilyout += lilyModule.TRANSPARENCY_STOP
         
         lilyout += " } "
@@ -2508,7 +2509,7 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['calling Stream._getMXPart'])
 
-        if instObj == None:
+        if instObj is None:
             # see if an instrument is defined in this or a parent stream
             instObj = self.getInstrument()
 
@@ -2668,7 +2669,7 @@ class Stream(music21.Music21Object):
 
         # create a new music21 instrument
         instrumentObj = instrument.Instrument()
-        if mxInstrument != None:
+        if mxInstrument is not None:
             instrumentObj.mx = mxInstrument
 
         # add part id as group
@@ -2676,7 +2677,7 @@ class Stream(music21.Music21Object):
 
         streamPart = Part() # create a part instance for each part
         # set part id to stream best name
-        if instrumentObj.bestName() != None:
+        if instrumentObj.bestName() is not None:
             streamPart.id = instrumentObj.bestName()
         streamPart.insert(instrumentObj) # add instrument at zero offset
 
@@ -2687,9 +2688,9 @@ class Stream(music21.Music21Object):
             # create a music21 measure and then assign to mx attribute
             m = Measure()
             m.mx = mxMeasure  # assign data into music21 measure 
-            if m.timeSignature != None:
+            if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
-            elif lastTimeSignature == None and m.timeSignature == None:
+            elif lastTimeSignature is None and m.timeSignature is None:
                 # if no time sigature is defined, need to get a default
                 ts = meter.TimeSignature()
                 ts.load('%s/%s' % (defaults.meterNumerator, 
@@ -2916,7 +2917,7 @@ class Stream(music21.Music21Object):
         post = []        
         for i in range(len(flatStream)):
             element = flatStream[i]
-            if element.duration == None:
+            if element.duration is None:
                 durSpan = (element.offset, element.offset)
             else:
                 dur = element.duration.quarterLength
@@ -2990,7 +2991,7 @@ class Stream(music21.Music21Object):
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
             # second entry is duration
-            if not includeDurationless and flatStream[i].duration == None: 
+            if not includeDurationless and flatStream[i].duration is None: 
                 continue
             # compare to all past and following durations
             for j in range(len(durSpanSorted)):
@@ -3041,7 +3042,7 @@ class Stream(music21.Music21Object):
                             store = False
                             dstOffset = key
                             break
-                    if dstOffset == None:
+                    if dstOffset is None:
                         dstOffset = srcOffset
                     if store:
                         # print 'storing offset', dstOffset
@@ -3057,7 +3058,7 @@ class Stream(music21.Music21Object):
                         break
                 # dst offset may have been set when looking at indices
                 if store:
-                    if dstOffset == None:
+                    if dstOffset is None:
                         dstOffset = srcOffset
                     if dstOffset not in post.keys():
                         post[dstOffset] = [] # create dictionary entry
@@ -3336,7 +3337,7 @@ class Measure(Stream):
         'F'
         '''
         oldClef = self._getClef()
-        if oldClef != None:
+        if oldClef is not None:
             environLocal.printDebug(['removing clef', oldClef])
             junk = self.pop(self.index(oldClef))
         self.insert(0, clefObj)
@@ -3371,7 +3372,7 @@ class Measure(Stream):
         (2, 8)
         '''
         oldTimeSignature = self._getTimeSignature()
-        if oldTimeSignature != None:
+        if oldTimeSignature is not None:
             environLocal.printDebug(['removing ts', oldTimeSignature])
             junk = self.pop(self.index(oldTimeSignature))
         self.insert(0, tsObj)
@@ -3405,7 +3406,7 @@ class Measure(Stream):
         6
         '''
         oldKey = self._getKey()
-        if oldKey != None:
+        if oldKey is not None:
             environLocal.printDebug(['removing key', oldKey])
             junk = self.pop(self.index(oldKey))
         self.insert(0, keyObj)
@@ -3440,14 +3441,14 @@ class Measure(Stream):
 
         # may need to look here at the parent, and try to find
         # the clef in the clef last defined in the parent
-        if self.clef != None:
+        if self.clef is not None:
             mxAttributes.clefList = [self.clef.mx]
 
-        if self.key != None: 
+        if self.key is not None: 
             # key.mx returns a Key ojbect, needs to be in a list
             mxAttributes.keyList = [self.key.mx]
         
-        if self.timeSignature != None:
+        if self.timeSignature is not None:
             mxAttributes.timeList = self.timeSignature.mx 
 
         #mxAttributes.keyList = []
@@ -3478,13 +3479,13 @@ class Measure(Stream):
 
         mxAttributes = mxMeasure.get('attributes')
         mxAttributesInternal = True
-        if mxAttributes == None:    
+        if mxAttributes is None:    
             # need to keep track of where mxattributessrc is coming from
             mxAttributesInternal = False
             # not all measures have attributes definitions; this
             # gets the last-encountered measure attributes
             mxAttributes = mxMeasure.external['attributes']
-            if mxAttributes == None:
+            if mxAttributes is None:
                 raise StreamException(
                     'no mxAttribues available for this measure')
 
@@ -3495,11 +3496,11 @@ class Measure(Stream):
             self.timeSignature = meter.TimeSignature()
             self.timeSignature.mx = mxAttributes.timeList
 
-        if mxAttributesInternal == True and len(mxAttributes.clefList) != 0:
+        if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
             self.clef = clef.Clef()
             self.clef.mx = mxAttributes.clefList
 
-        if mxAttributesInternal == True and len(mxAttributes.keyList) != 0:
+        if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
             self.key = key.KeySignature()
             self.key.mx = mxAttributes.keyList
 
@@ -3525,7 +3526,7 @@ class Measure(Stream):
                     continue
 
                 mxGrace = mxNote.get('grace')
-                if mxGrace != None: # graces have a type but not a duration
+                if mxGrace is not None: # graces have a type but not a duration
                     #TODO: add grace notes with duration equal to ZeroDuration
                     #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
                     #self.measureNumber])
@@ -3533,13 +3534,13 @@ class Measure(Stream):
 
                 # the first note of a chord is not identified directly; only
                 # by looking at the next note can we tell if we have a chord
-                if mxNoteNext != None and mxNoteNext.get('chord') == True:
-                    if mxNote.get('chord') != True:
+                if mxNoteNext is not None and mxNoteNext.get('chord') is True:
+                    if mxNote.get('chord') is False:
                         mxNote.set('chord', True) # set the first as a chord
 
-                if mxNote.get('rest') in [None, False]: # its a note
+                if mxNote.get('rest') in [None, False]: # it is a note
 
-                    if mxNote.get('chord') == True:
+                    if mxNote.get('chord') is True:
                         mxNoteList.append(mxNote)
                         offsetIncrement = 0
                     else:
@@ -3551,7 +3552,7 @@ class Measure(Stream):
                         lyricObj = note.Lyric()
                         lyricObj.mx = mxLyric
                         n.lyrics.append(lyricObj)
-                    if mxNote.get('notations') != None:
+                    if mxNote.get('notations') is not None:
                         for mxObjSub in mxNote.get('notations'):
                             # deal with ornaments, strill, etc
                             pass
@@ -3564,8 +3565,8 @@ class Measure(Stream):
                 # if we we have notes in the note list and the next
                 # not either does not exist or is not a chord, we 
                 # have a complete chord
-                if len(mxNoteList) > 0 and (mxNoteNext == None 
-                    or mxNoteNext.get('chord') == False):
+                if len(mxNoteList) > 0 and (mxNoteNext is None 
+                    or mxNoteNext.get('chord') is False):
                     c = chord.Chord()
                     c.mx = mxNoteList
                     mxNoteList = [] # clear for next chord
@@ -3579,11 +3580,11 @@ class Measure(Stream):
             elif isinstance(mxObj, musicxmlMod.Direction):
 #                 mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
 #                 for mxDirection in mxDynamicsFound:
-                if mxObj.getDynamicMark() != None:
+                if mxObj.getDynamicMark() is not None:
                     d = dynamics.Dynamic()
                     d.mx = mxObj
                     self.insert(offsetMeasureNote, d)  
-                if mxObj.getWedge() != None:
+                if mxObj.getWedge() is not None:
                     w = dynamics.Wedge()
                     w.mx = mxObj     
                     self.insert(offsetMeasureNote, w)  

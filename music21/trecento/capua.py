@@ -838,6 +838,29 @@ def runPiece(pieceNum = 331):  # random default piece...
                 print note.editorial.misc['capua-ficta']
 
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testRunPiece(self):
+        pieceNum = 331 # Francesco, PMFC 4 6-7: Non creder, donna
+        ballataObj = cadencebook.BallataSheet()
+        pieceObj   = ballataObj.makeWork(pieceNum)
+        applyCapua(pieceObj)
+        srcStream    = pieceObj.snippets[0].streams[0]
+        cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
+        twoStreams.attachIntervals(srcStream, cmpStream)
+
+        outList = []
+        for note in srcStream.notes:
+            if note.editorial.harmonicInterval is not None:
+                note.lyric = note.editorial.harmonicInterval.simpleName
+        
+        pieceObj.snippets[0].lily.showPNG()
+
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -885,8 +908,58 @@ class Test(unittest.TestCase):
     #    restoreFicta(srcStream1)
     #    print scoreList
 
-    def maryTest(self):
-        pass
+    def xtestColorCapuaFicta(self):
+        from music21.note import Note
+        from music21.stream import Stream
+        (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
+        (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
+        n11.duration.type = "quarter"
+        n11.name = "D"
+        n12.duration.type = "quarter"
+        n12.name = "E"
+        n13.duration.type = "quarter"
+        n13.name = "F"
+        n14.duration.type = "quarter"
+        n14.name = "G"
+    
+        n21.name = "C"
+        n21.duration.type = "quarter"
+        n22.name = "C"
+        n22.duration.type = "quarter"
+        n23.name = "B"
+        n23.octave = 3
+        n23.duration.type = "quarter"
+        n24.name = "C"
+        n24.duration.type = "quarter"
+    
+        stream1 = Stream()
+        stream1.append([n11, n12, n13, n14])
+        stream2 = Stream()
+        stream2.append([n21, n22, n23, n24])
+    
+    
+        ### Need twoStreamComparer to Work
+        evaluateWithoutFicta(stream1, stream2)
+        assert n13.editorial.harmonicInterval.name == "d5", n13.editorial.harmonicInterval.name
+#        evaluateCapuaTwoStreams(stream1, stream2)
+#    
+#        colorCapuaFicta(stream1, stream2, "both")
+#        assert n13.editorial.harmonicInterval.name == "P5", n13.editorial.harmonicInterval.name
+#    
+#        assert n11.editorial.color == "yellow"
+#        assert n12.editorial.color == "yellow"
+#        assert n13.editorial.color == "green"
+#        assert n14.editorial.color == "yellow"
+#    
+#        assert n11.editorial.harmonicInterval.name == "M2"
+#        assert n21.editorial.harmonicInterval.name == "M2"
+#    
+#        assert n13.editorial.harmonicInterval.name == "P5"
+#        assert n13.editorial.misc["noFictaHarmony"] == "perfect cons"
+#        assert n13.editorial.misc["capua2FictaHarmony"] == "perfect cons"
+#        assert n13.editorial.misc["capua2FictaInterval"].name == "P5"
+#        assert n13.editorial.color == "green"
+#        assert stream1.lily.strip() == r'''\clef "treble" \color "yellow" d'4 \color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4'''
 
         
 if (__name__ == "__main__"):

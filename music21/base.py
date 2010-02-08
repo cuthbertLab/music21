@@ -111,7 +111,7 @@ class Groups(list):
         '''In normal lists, order matters; here it does not. 
         '''
 
-        if other == None or not isinstance(other, Groups):
+        if other is None or not isinstance(other, Groups):
             return True
         if (list.sort(self) == other.sort()):
             return False
@@ -166,7 +166,7 @@ class Contexts(object):
             delList = []
             for i in range(len(coll)):
                 if common.isWeakref(self._ref[i]): # only del weak refs
-                    if common.unwrapWeakref(self._ref[i]['obj']) == None:
+                    if common.unwrapWeakref(self._ref[i]['obj']) is None:
                         delList.append(i)
             delList.reverse() # go in reverse from largest to maintain positions
             for i in delList:
@@ -257,7 +257,7 @@ class Contexts(object):
 
         '''
         for obj in self.get(domain=domain):
-            if obj == None: continue # in case the reference is dead
+            if obj is None: continue # in case the reference is dead
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
                     return obj       
@@ -284,7 +284,7 @@ class Contexts(object):
         '''
         post = None
         for obj in self.get(domain=domain):
-            if obj == None: continue # in case the reference is dead
+            if obj is None: continue # in case the reference is dead
             try:
                 post = getattr(obj, attrName)
                 return post
@@ -308,7 +308,7 @@ class Contexts(object):
         '''
         post = None
         for obj in self.get(domain=domain):
-            if obj == None: continue # in case the reference is dead
+            if obj is None: continue # in case the reference is dead
             try:
                 junk = getattr(obj, attrName) # if attr already exists
                 setattr(obj, attrName, value) # if attr already exists
@@ -481,7 +481,7 @@ class Locations(object):
         self.coordinates[siteId]['offset'] = offset
 
         # store creation time in order to sort by time
-        if timeValue == None:
+        if timeValue is None:
             self.coordinates[siteId]['time'] = time.time()
         else: # a time vaue might be provided
             self.coordinates[siteId]['time'] = timeValue
@@ -646,7 +646,7 @@ class Locations(object):
 #        '''
 #        siteRef = self.coordinates[index]['site']
 #        if WEAKREF_ACTIVE:
-#            if siteRef == None: # let None parents pass
+#            if siteRef is None: # let None parents pass
 #                return siteRef
 #            if not common.isWeakref(siteRef):
 #                raise LocationsException('parent on _coordinates is not a weakref: %s' % siteRef)
@@ -827,7 +827,7 @@ class Music21Object(object):
             # not sure of passing here is the best action
             environLocal.printDebug(['searchParent call raised attribute error for attribute:', attrName])
             pass
-        if found == None:
+        if found is None:
             found = self.parent.searchParent(attrName)
         return found
         
@@ -1008,14 +1008,14 @@ class Music21Object(object):
         A None file path will result in temporary file
         '''
         format, ext = common.findFormat(fmt)
-        if format == None:
+        if format is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
         elif format == 'text':
-            if fp == None:
+            if fp is None:
                 fp = environLocal.getTempFile(ext)
             dataStr = self._reprText()
         elif format == 'musicxml':
-            if fp == None:
+            if fp is None:
                 fp = environLocal.getTempFile(ext)
             dataStr = self.musicxml
         else:

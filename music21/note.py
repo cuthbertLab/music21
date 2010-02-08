@@ -1048,10 +1048,15 @@ class Note(NotRest):
                 if (i != len(self.duration.components) - 1):
                     allNames += "~"
                     allNames += " "
+                if (i == 0): # first component
+                    if self.lyric is not None: # hack that uses markup...
+                        allNames += "_\markup { \"" + self.lyric + "\" } "
         else:
             allNames += baseName
             allNames += self.duration.lily
             allNames += self.editorial.lilyAttached()
+            if self.lyric is not None: # hack that uses markup...
+                allNames += "_\markup { \"" + self.lyric + "\" } "
             
         if (self.tie is not None):
             if (self.tie.type != "stop"):

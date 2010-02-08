@@ -120,7 +120,7 @@ def convertStepToPs(step, oct, acc=None):
     '''
     step = step.strip().upper()
     ps = ((oct + 1) * 12) + STEPREF[step]
-    if acc == None:
+    if acc is None:
         return ps
     # this does not work
     elif common.isNum(acc):
@@ -218,7 +218,7 @@ class Accidental(music21.Music21Object):
         >>> a == c
         False
         '''
-        if other == None or not isinstance(other, Accidental):
+        if other is None or not isinstance(other, Accidental):
             return False
         if self.name == other.name: 
             return True
@@ -228,7 +228,7 @@ class Accidental(music21.Music21Object):
     def __ne__(self, other):
         '''Inequality. Needed for pitch comparisons.
         '''
-        if other == None:
+        if other is None:
             return True
         if self.name == other.name: 
             return False
@@ -246,7 +246,7 @@ class Accidental(music21.Music21Object):
         >>> a > b
         True
         '''
-        if other == None:
+        if other is None:
             return False
         if self.alter > other.alter: 
             return True
@@ -263,7 +263,7 @@ class Accidental(music21.Music21Object):
         >>> a < b
         False
         '''
-        if other == None:
+        if other is None:
             return True
         if self.alter < other.alter: 
             return True
@@ -471,7 +471,7 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
 
         # name combines step, octave, and accidental
-        if name != None:       
+        if name is not None:       
             self._setName(name)
 
     def __repr__(self):
@@ -490,7 +490,7 @@ class Pitch(music21.Music21Object):
         >>> a != b
         True
         '''
-        if other == None:
+        if other is None:
             return False
         if (self.octave == other.octave and self.step == other.step and 
             self.accidental == other.accidental):
@@ -863,8 +863,8 @@ class Pitch(music21.Music21Object):
         self.step = mxPitch.get('step')
 
         acc = mxPitch.get('alter')
-        if acc != None: # None is used in musicxml but not in music21
-            if mxAccidental != None:
+        if acc is not None: # None is used in musicxml but not in music21
+            if mxAccidental is not None:
                 accObj = Accidental()
                 accObj.mx = mxAccidental
             # used to to just use acc value
