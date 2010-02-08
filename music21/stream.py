@@ -4270,8 +4270,7 @@ class Test(unittest.TestCase):
 #            print n4.locations.getOffsetBySite(site)
         
         self.assertEqual(len(sf1), 4)
-        g = sf1[1]
-        assert(g is n2)
+        assert(sf1[1] is n2)
         
 
     def testParentCopiedStreams(self):
@@ -4711,7 +4710,7 @@ class Test(unittest.TestCase):
         # a different test derived from a TestExternal
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 30:
+        for x in ['c3','a3','c#4','d3'] * 15:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
             q.append(n)
