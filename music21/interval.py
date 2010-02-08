@@ -20,7 +20,9 @@ import math
 import unittest, doctest
 
 import music21
-from music21 import pitch
+
+
+#from music21 import pitch # SHOULD NOT, b/c of enharmonics
 from music21 import common 
 
 DESCENDING = -1
@@ -358,6 +360,7 @@ def getWrittenHigherNote(note1, note2):
     numbers. Returns the note higher in pitch if the diatonic number is
     the same, or the first note if pitch is also the same.
 
+    >>> from music21 import pitch
     >>> cis = pitch.Pitch("C#")
     >>> deses = pitch.Pitch("D--")
     >>> higher = getWrittenHigherNote(cis, deses)
@@ -431,6 +434,7 @@ def generatePitch(pitch1, interval1):
     
     Generates a Pitch object at the specified interval from the specified Pitch.  
 
+    >>> from music21 import pitch
     >>> aPitch = pitch.Pitch('C4')
     >>> #aInterval = DiatonicInterval('perfect', 5)
 
@@ -449,10 +453,14 @@ def generatePitch(pitch1, interval1):
     #print distance, " staff distance"
 
     newDiatonicNumber = pitch1.diatonicNoteNum + distance
-    pitch2 = pitch.Pitch()
-    (newStep, newOctave) = pitch.convertDiatonicNumberToStep(newDiatonicNumber)
+    
+    # TODO 
+    pitch2 = copy.deepcopy(pitch1)
+
+    (newStep, newOctave) = convertDiatonicNumberToStep(newDiatonicNumber)
     pitch2.step = newStep
     pitch2.octave = newOctave
+    pitch2.accidental = None
        ## at this point note2 has the right note name (step), but possibly
        ## the wrong accidental.  We fix that below
 
@@ -472,6 +480,21 @@ def generateNote(note1, intervalString):
     newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
     return newNote
+
+
+STEPNAMES = ['C','D','E','F','G','A','B']
+
+def convertDiatonicNumberToStep(dn):
+    '''Utility conversion; does not process internals
+    returns a tuple of Step and Octave
+    >>> convertDiatonicNumberToStep(15)
+    ('C', 2)
+    >>> convertDiatonicNumberToStep(23)
+    ('D', 3)
+    '''
+    (remainder, octave) = math.modf((dn-1)/7.0)
+    return STEPNAMES[int((remainder*7)+.001)], int(octave)
+
 
 def _separateIntervalFromString(string):
     generic = int(string.lstrip('PMmAd'))
@@ -592,6 +615,7 @@ class Test(unittest.TestCase):
         pass
     
     def testFirst(self):       
+        from music21 import pitch
         from music21.note import Note
         from music21.pitch import Accidental
         n1 = Note()
@@ -683,8 +707,8 @@ class Test(unittest.TestCase):
         
         n5 = generatePitch(n4, interval1)
         n6 = generatePitch(n4, "P-5")
-        assert n5.name == "G-"
-        assert n6.name == n5.name
+        self.assertEqual(n5.name, "G-")
+        self.assertEqual(n6.name, n5.name)
         n7 = Note()
         n8 = generatePitch(n7, "P8")
         assert n8.name == "C"

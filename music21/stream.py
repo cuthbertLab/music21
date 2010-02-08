@@ -2205,15 +2205,13 @@ class Stream(music21.Music21Object):
         for myEl in self.elements:
             # check for stream instance instead
             if hasattr(myEl, "elements"): # recurse time:
+                recurseStreamOffset = myEl.locations.getOffsetBySite(self)
                 if retainContainers == True: ## semiFlat
-                    newOffset = myEl.locations.getOffsetBySite(self)
-                    newStream.insert(
-                        myEl.locations.getOffsetBySite(self), myEl)
+                    newStream.insert(recurseStreamOffset, myEl)
                     recurseStream = myEl.semiFlat
                 else:
                     recurseStream = myEl.flat
                 
-                recurseStreamOffset = myEl.locations.getOffsetBySite(self)
                 #environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
                 
                 for subEl in recurseStream:
@@ -4073,7 +4071,8 @@ class Test(unittest.TestCase):
 #            print n4.locations.getOffsetBySite(site)
         
         self.assertEqual(len(sf1), 4)
-        assert(sf1[1] is n2)
+        g = sf1[1]
+        assert(g is n2)
         
 
     def testParentCopiedStreams(self):
@@ -4116,6 +4115,14 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['midStream', midStream])
         x = midStream.flat
 
+    def testSimpleRecurse(self):
+        st1 = Stream()
+        st2 = Stream()
+        n1 = note.Note()
+        st2.insert(10, n1)
+        st1.insert(12, st2)
+        self.assertTrue(st1.flat.sorted[0] is n1)
+        self.assertEqual(st1.flat.sorted[0].offset, 22.0)
         
     def testStreamRecursion(self):
         srcStream = Stream()
@@ -4127,6 +4134,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(srcStream), 6)
         self.assertEqual(len(srcStream.flat), 6)
+        self.assertEqual(srcStream.flat[1].offset, 1.0)
 
 #        self.assertEqual(len(srcStream.getOverlaps()), 0)
 
@@ -4140,6 +4148,8 @@ class Test(unittest.TestCase):
         environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
+        mfs = midStream.flat.sorted
+        self.assertEqual(mfs[7].locations.getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
         for x in range(7):
@@ -4656,9 +4666,9 @@ class Test(unittest.TestCase):
         # there are two locations, default and the one just added
         self.assertEqual(len(a[0].locations), 2)
         # this works
-        self.assertEqual(a[0].locations.getOffsetByIndex(-1), 50.0)
+#        self.assertEqual(a[0].locations.getOffsetByIndex(-1), 50.0)
 
-        self.assertEqual(a[0].locations.getSiteByIndex(-1), a)
+#        self.assertEqual(a[0].locations.getSiteByIndex(-1), a)
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 

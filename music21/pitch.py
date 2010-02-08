@@ -160,17 +160,6 @@ def convertFqToPs(fq):
     60.0
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
-
-def convertDiatonicNumberToStep(dn):
-    '''Utility conversion; does not process internals
-    returns a tuple of Step and Octave
-    >>> convertDiatonicNumberToStep(15)
-    ('C', 2)
-    >>> convertDiatonicNumberToStep(23)
-    ('D', 3)
-    '''
-    (remainder, octave) = math.modf((dn-1)/7.0)
-    return STEPNAMES[int((remainder*7)+.001)], int(octave)
     
 
 
