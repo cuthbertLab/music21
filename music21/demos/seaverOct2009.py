@@ -4,6 +4,7 @@ from music21.humdrum import *
 import music21.note
 import music21.pitch
 import music21.stream
+from music21 import clef
 from music21 import common
 from music21 import corpus
 from music21 import converter
@@ -324,8 +325,8 @@ def threeDimBoth():
 
 
 def januaryThankYou():
-#    names = ['opus133', 'opus132', 'opus18no3', 'opus18no4', 'opus18no5', 'opus74']
-    names = ['opus59no1', 'opus59no2', 'opus59no3']
+    names = ['opus132', 'opus133', 'opus18no3', 'opus18no4', 'opus18no5', 'opus74']
+    names += ['opus59no1', 'opus59no2', 'opus59no3']
 
     for workName in names:
         beethovenScore = corpus.parseWork('beethoven/' + workName, 1)
@@ -336,13 +337,19 @@ def januaryThankYou():
             notes = thisPart.flat.findConsecutiveNotes(skipUnisons = True, skipChords = True,
                        skipOctaves = True, skipRests = True, noNone = True )
             for i in range(len(notes) - 4):
-                if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A' and notes[i+3].name == 'E':
-                        notes[i].lyric = str(i)
+                if (notes[i].name == 'E-' or notes[i].name == "D#") and notes[i+1].name == 'E' and notes[i+2].name == 'A':
+                        measureNumber = 0
+                        for site in notes[i].locations.getSites():
+                            if isinstance(site, stream.Measure):
+                                measureNumber = site.measureNumber
+                                display.append(site)
+                        notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
                         m = stream.Measure()
                         m.append(notes[i])
                         m.append(notes[i+1])
                         m.append(notes[i+2])
                         m.append(notes[i+3])
+                        m.insert(0, m.bestClef())
                         display.append(m)
             try:
                 display.show()

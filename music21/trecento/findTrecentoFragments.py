@@ -5,12 +5,13 @@
 
 import music21
 
-from common import *
-from note import Note
-import interval
-import cadencebook
-from re import match
+from music21.note import Note
+from music21 import interval
 from music21.lily import LilyString
+
+import cadencebook
+
+from re import match
 
 class IntervalSearcher(object):
     def __init__(self, intervalList = []):
@@ -147,6 +148,9 @@ def findRandomVerona():
 def findCasanatense522():
     searchForIntervals("D4 E4 D4 C4 D4 E4 F4")
 
+def findRavi3ORegina():
+    searchForNotes("G16 G16 F8 E16") # should be cadence A, cantus
+
 
 def searchForVat1969():
     '''There is a particular piece in Vatican MS 1969 that I have been searching for forever, its first
@@ -192,6 +196,7 @@ if __name__ == "__main__":
 
 #    landiniTonality()
 #    findCasanatense522()
-    findRandomVerona()
+#    findRandomVerona()
+    findRavi3ORegina()
     pass
 
