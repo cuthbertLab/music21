@@ -32,11 +32,18 @@ def lineToStream(line, timeSignature = None):
 
 class TinyNotationLine(object):
     '''A TinyNotationLine begins as a string representation similar to Lilypond format
-    but simplified somewhat.  This object holds the string representation and converts
-    it to music21 format as best it can
+    but simplified somewhat.  This object holds the string representation and stores a
+    Stream representation at .stream.
     
     example in 3/4:
-    e4 r f# g trip{b-8 a g} c' 
+    >>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
+    >>> stream1.getElementById("lastG").step
+    'G'
+    >>> stream1.notes[1].isRest
+    True
+    >>> stream1.notes[0].octave
+    3
+    
     '''
 
     TRIP    = compile('trip\{')
@@ -95,7 +102,7 @@ class TinyNotationLine(object):
                 elif dict1['inQuad'] == True:
                     dict1['inQuad'] = False
                 else:
-                    raise TinyNotationException("unexpected end bracket in cadence")
+                    raise TinyNotationException("unexpected end bracket in TinyNotationLine")
 
             dict1['beginTuplet'] = False
 
@@ -133,6 +140,7 @@ class TinyNotationNote(object):
     PRECTIE = compile('\~')  # front ties
     DBLDOT  = compile('\.\.') 
     DOT     = compile('\.')
+    ID_EL   = compile('\=(.*)')
 
     debug = False
 
@@ -151,7 +159,7 @@ class TinyNotationNote(object):
             noteObj = self._getPitch(self.OCTAVE2.match(stringRep), 2)
         elif (self.OCTAVE3.match(stringRep)):
             noteObj = self._getPitch(self.OCTAVE3.match(stringRep), 3)
-        elif (self.OCTAVE5.match(stringRep)): # note match 5 then 4!
+        elif (self.OCTAVE5.match(stringRep)): # must match octave 5 then 4!
             noteObj = self._getPitch(self.OCTAVE5.match(stringRep), 5)
         elif (self.OCTAVE4.match(stringRep)): 
             noteObj = self._getPitch(self.OCTAVE4.match(stringRep), 4)
@@ -225,6 +233,9 @@ class TinyNotationNote(object):
             elif (self.FLAT.search(stringRep)):
                 noteObj.accidental = "flat"
 
+        if self.ID_EL.search(stringRep):
+            noteObj.id = self.ID_EL.search(stringRep).group(1)
+            
         self.note = noteObj
 
     def getDots(self, stringRep, noteObj):

@@ -331,7 +331,7 @@ class Locations(object):
     for any newly added sites that do not have any sites
     '''
     def __init__(self):
-        self.coordinates = {} # a list of dictionaries
+        self.coordinates = {} # a dictionary of dictionaries
 
     def __len__(self):
         '''Return the total number of offsets.
@@ -368,13 +368,12 @@ class Locations(object):
             dict = self.coordinates[siteId]
             new.add(dict['offset'], dict['site'], dict['time'], siteId)
 
-#        junk = new.getSites()
         return new
 
 
     def scrubEmptySites(self):
         '''If a parent has been deleted, we will still have an empty ref in 
-        _coordinates; when called, this empty ref will return None.
+        coordinates; when called, this empty ref will return None.
         This method will remove all parents that deref to None
 
         DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED
@@ -393,8 +392,8 @@ class Locations(object):
         #1
         '''
         delList = []
-        for i in self._coordinate:
-            s = self._coordinate[i]['site']
+        for i in self.coordinates:
+            s = self.coordinates[i]['site']
             if s is None:
                 continue
             if common.unwrapWeakref(s) is None:
@@ -459,8 +458,8 @@ class Locations(object):
         ## should NOT be a weakref, but never can be too sure...
         site = common.unwrapWeakref(site)
 
-        if not common.isNum(offset):
-            raise LocationsException("offset must be a number (later, a Duration might be allowed)")
+#        if not common.isNum(offset):
+#            raise LocationsException("offset must be a number (later, a Duration might be allowed)")
 
         if siteId is None and site is not None:
             siteId = id(site)
@@ -483,7 +482,7 @@ class Locations(object):
         # store creation time in order to sort by time
         if timeValue is None:
             self.coordinates[siteId]['time'] = time.time()
-        else: # a time vaue might be provided
+        else: # a time value might be provided
             self.coordinates[siteId]['time'] = timeValue
 
     def remove(self, site):
@@ -563,7 +562,7 @@ class Locations(object):
             siteId = id(site)
         if siteId in self.coordinates: 
             #environLocal.printDebug(['site already defined in this Locations object', site])
-            # order is the same as in _coordinates
+            # order is the same as in coordinates
             self.coordinates[siteId]['offset'] = value
         else:
             raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
@@ -626,7 +625,7 @@ class Locations(object):
             if match is None:
                 return match
             if not common.isWeakref(match):
-                raise LocationsException('site on _coordinates is not a weak ref: %s' % match)
+                raise LocationsException('site on coordinates is not a weak ref: %s' % match)
             return common.unwrapWeakref(match)
         else:
             return match
@@ -649,7 +648,7 @@ class Locations(object):
 #            if siteRef is None: # let None parents pass
 #                return siteRef
 #            if not common.isWeakref(siteRef):
-#                raise LocationsException('parent on _coordinates is not a weakref: %s' % siteRef)
+#                raise LocationsException('parent on coordinates is not a weakref: %s' % siteRef)
 #            return common.unwrapWeakref(siteRef)
 #        else:
 #            return siteRef
@@ -1625,14 +1624,19 @@ def mainTest(*testClasses):
     else: 
         s1 = doctest.DocTestSuite('__main__', optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
 
+    if ('verbose') in testClasses:
+        verbosity = 2
+    else:
+        verbosity = 1
+
     for thisClass in testClasses:
-        if isinstance(thisClass, str) and thisClass == 'noDocTest':
+        if isinstance(thisClass, str):
             pass
         else:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(thisClass)
             s1.addTests(s2) 
     runner = unittest.TextTestRunner()
-    runner.verbosity = 1
+    runner.verbosity = verbosity
     runner.run(s1)  
 
 if __name__ == "__main__":

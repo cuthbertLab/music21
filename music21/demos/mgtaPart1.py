@@ -14,11 +14,12 @@
 import unittest, doctest
 
 import music21
-from music21 import pitch
 from music21 import clef
-from music21 import note
-from music21 import instrument
 from music21 import converter
+from music21 import instrument
+from music21 import interval
+from music21 import note
+from music21 import pitch
 
 #-------------------------------------------------------------------------------
 # CHAPTER 1 
@@ -49,11 +50,24 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
     '''
     p2.
     given 2 pitches, mark on a keyboard their positions and mark 
-    intervals as W for hole step and H for half step, otherwise N
+    intervals as W for whole step and H for half step, otherwise N
     '''
     pitches = [('a#', 'b'), ('b-', 'c#'), ('g-', 'a'), ('d-', 'c##'), 
                ('f', 'e'), ('f#', 'e')]
-    
+    for i,j in pitches:
+        n1 = note.Note(i)
+        n2 = note.Note(j)
+        i1 = interval.generateInterval(n1, n2)
+        if i1.ic == 1:
+            mark = "H"
+        elif i1.ic == 2:
+            mark = "W"
+        else:
+            mark = "N"
+        k1 = keyboard.Diagram()
+        k1.mark(n1, mark)
+        k1.mark(n2)
+        k1.show()
 
 
 

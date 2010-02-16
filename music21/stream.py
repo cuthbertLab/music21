@@ -394,7 +394,7 @@ class Stream(music21.Music21Object):
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
                     # user here to provide new offset
-                    new.insert(e.getOffsetBySite(old), newElement)
+                    new.insert(e.getOffsetBySite(old), newElement, ignoreSort = True)
                 # the elements, formerly had their stream as parent     
                 # they will still have that site in locations
                 # need to set new stream as parent 
@@ -416,9 +416,11 @@ class Stream(music21.Music21Object):
 
 
 
-    def insert(self, offsetOrItemOrList, itemOrNone = None):
+    def insert(self, offsetOrItemOrList, itemOrNone = None, ignoreSort = False):
         '''
-        Inserts an item(s) at the given offset(s)
+        Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not
+        change whether the stream is sorted or not (much faster if you're going to be inserting dozens
+        of items that don't change the sort status)
         
         Has three forms: in the two argument form, inserts an element at the given offset:
         
@@ -460,7 +462,7 @@ class Stream(music21.Music21Object):
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
                 item   = offsetOrItemOrList[i+1]
-                self.insert(offset, item)
+                self.insert(offset, item, ignoreSort = ignoreSort)
                 i += 2
             return
         else:
@@ -468,25 +470,30 @@ class Stream(music21.Music21Object):
             offset = item.offset
         
         # if not an element, embed
-        if not isinstance(item, music21.Music21Object): 
-            environLocal.printDebug(['insert called with non Music21Object', item])
-            element = music21.ElementWrapper(item)
-        else:
-            element = item
+#        if not isinstance(item, music21.Music21Object): 
+#            environLocal.printDebug(['insert called with non Music21Object', item])
+#            element = music21.ElementWrapper(item)
+#        else:
+#            element = item
 
+        element = item
+        
         offset = float(offset)
         element.locations.add(offset, self)
         # need to explicitly set the parent of the element
         element.parent = self 
 
-        if self.isSorted is True and self.highestTime <= offset:
-            storeSorted = True
-        else:
-            storeSorted = False
+        if ignoreSort is False:
+            if self.isSorted is True and self.highestTime <= offset:
+                storeSorted = True
+            else:
+                storeSorted = False
 
         self._elements.append(element)  # could also do self.elements = self.elements + [element]
         self._elementsChanged()         # maybe much slower?
-        self.isSorted = storeSorted
+
+        if ignoreSort is False:
+            self.isSorted = storeSorted
 
     def append(self, others):
         '''
@@ -736,12 +743,8 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # getElementsByX(self): anything that returns a collection of Elements should return a Stream
 
-    def getElementsByClass(self, classFilterList, unpackElement=False):
+    def getElementsByClass(self, classFilterList):
         '''Return a list of all Elements that match the className.
-
-        Note that, as this appends Elements to a new Stream, whatever former
-        parent relationship the ElementWrapper had is lost. The ElementWrapper's parent
-        is set to the new stream that contains it. 
         
         >>> a = Stream()
         >>> a.repeatInsert(note.Rest(), range(10))
@@ -766,31 +769,24 @@ class Stream(music21.Music21Object):
         >>> len(found)
         25
         '''
-        if unpackElement: # a list of objects
-            found = []
-        else: # return a Stream     
-            found = Stream()
+        ## should probably be whatever class the caller is
+        found = Stream()
 
-        if not common.isListLike(classFilterList):
-            classFilterList = [classFilterList]
+        if not isinstance(classFilterList, list):
+            if not isinstance(classFilterList, tuple):
+                classFilterList = [classFilterList]
+            # much faster in the most common case than calling common.isListLike
 
         # appendedAlready fixes bug where if an element matches two 
         # classes it was appendedTwice
         for myEl in self:
             appendedAlready = False
             for myCl in classFilterList:
-                if myEl.isClass(myCl) and appendedAlready is False:
+                if appendedAlready is False and myEl.isClass(myCl):
                     appendedAlready = True
-                    if unpackElement and hasattr(myEl, "obj"):
-                        found.append(myEl.obj)
-                    elif not isinstance(found, Stream):
-                        found.append(myEl)
-                    else:
-                        # using append here on a non list adds elements to a 
-                        # new stream without offsets in locations. thus
-                        # all offset information is lost. using
-                        # insert fixes the problem
-                        found.insert(myEl.getOffsetBySite(self), myEl)
+                    found.insert(myEl.getOffsetBySite(self), myEl, ignoreSort = True)
+
+        found.isSorted = self.isSorted
         return found
 
 
@@ -830,9 +826,10 @@ class Stream(music21.Music21Object):
             for myGrp in groupFilterList:
                 if hasattr(myEl, "groups") and myGrp in myEl.groups:
                     returnStream.insert(myEl.getOffsetBySite(self),
-                                                myEl)
+                                                myEl, ignoreSort = True)
                     #returnStream.append(myEl)
 
+        returnStream.isSorted = self.isSorted
         return returnStream
 
 
@@ -870,7 +867,7 @@ class Stream(music21.Music21Object):
 
         >>> e = 'test'
         >>> a = Stream()
-        >>> a.insert(0, e)
+        >>> a.insert(0, music21.ElementWrapper(e))
         >>> a[0].id = 'green'
         >>> None == a.getElementById(3)
         True
@@ -1283,7 +1280,7 @@ class Stream(music21.Music21Object):
         totalNotes = 0
         totalHeight = 0
 
-        notes = self.getElementsByClass(note.GeneralNote, unpackElement=True)
+        notes = self.getElementsByClass(note.GeneralNote)
 
         def findHeight(thisPitch):
             height = thisPitch.diatonicNoteNum
@@ -2609,8 +2606,8 @@ class Stream(music21.Music21Object):
                 midStream.insert(obj)
 
             refStream = Stream()
-            refStream.insert(0, True) # placeholder at 0
-            refStream.insert(highestTime, True) 
+            refStream.insert(0, music21.Music21Object()) # placeholder at 0
+            refStream.insert(highestTime, music21.Music21Object()) 
 
             # would like to do something like this but cannot
             # replace object inside of the stream
@@ -4858,7 +4855,7 @@ class Test(unittest.TestCase):
         '''Test basic Elements wrapping non music21 objects
         '''
         a = Stream()
-        a.insert(50, True)
+        a.insert(50, music21.Music21Object())
         self.assertEqual(len(a), 1)
 
         # there are two locations, default and the one just added

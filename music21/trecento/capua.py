@@ -5,7 +5,6 @@ import cadencebook
 from music21 import note
 from music21.note import Accidental
 from music21.interval import generateInterval
-from music21 import twoStreams
 from music21 import lily
 
 debug = True
@@ -39,7 +38,12 @@ def capuaRuleOne(srcStream):
     a major second then ascends back to the original note, the major second is
     made into a minor second. Also copies the relevant accidentals into
     note.editorial.misc under "saved-accidental" and changes note.editorial.color
-    for rule 1 (blue green blue).'''
+    for rule 1 (blue green blue).
+    
+    Returns the number of changes.    
+    '''
+    numChanged = 0
+    
     for i in range(0, len(srcStream.notes)-2):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -64,6 +68,7 @@ def capuaRuleOne(srcStream):
         ## e.g. G, F, G => G, F#, G
         if i1.directedName == "M-2" and \
            i2.directedName == "M2":
+            numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_ONE
             else:
@@ -83,10 +88,17 @@ def capuaRuleOne(srcStream):
                 n2.editorial.color = "ForestGreen"
                 n3.editorial.color = "blue"
 
+    return numChanged
+
 def capuaRuleTwo(srcStream):
     '''Applies Capua's second rule to the given srcStream, i.e. if four notes are
     ascending with the pattern M2 m2 M2, the intervals shall be made M2 M2 m2.
-    Also changes note.editorial.color for rule 2 (purple purple green purple).'''
+    Also changes note.editorial.color for rule 2 (purple purple green purple).
+    
+    returns the number of times a note was changed
+    '''
+    numChanged = 0
+    
     for i in range(0, len(srcStream.notes)-3):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -117,6 +129,7 @@ def capuaRuleTwo(srcStream):
         if i1.directedName == "M2" and \
            i2.directedName == "m2" and \
            i3.directedName == "M2":
+            numChanged += 1
             if ("capua" in n3.editorial.misc):
                 n3.editorial.misc['capua_rule_number'] += RULE_TWO
             else:
@@ -139,12 +152,19 @@ def capuaRuleTwo(srcStream):
                 n3.editorial.color = "ForestGreen"
                 n4.editorial.color = "purple"
 
+    return numChanged
+
 def capuaRuleThree(srcStream):
     '''Applies Capua's third rule to the given srcStream, i.e. if there is a
     descending major third followed by an ascending major second, the second
     note will be made a half-step higher so that there is a descending minor
     third followed by an ascending minor second. Also changes
-    note.editorial.color for rule 3 (pink green pink).'''
+    note.editorial.color for rule 3 (pink green pink).
+    
+    returns the number of times a note was changed
+    '''
+    numChanged = 0
+    
     for i in range(0, len(srcStream.notes)-2):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -170,6 +190,7 @@ def capuaRuleThree(srcStream):
         # e.g., E C D => E C# D
         if i1.directedName  == "M-3" and \
            i2.directedName  == "M2":
+            numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_THREE
             else:
@@ -180,11 +201,18 @@ def capuaRuleThree(srcStream):
             n2.editorial.color = "ForestGreen"
             n3.editorial.color = "DeepPink"
 
+    return numChanged
+
 def capuaRuleFourA(srcStream):
     '''Applies one interpretation of Capua's fourth rule to the given srcStream,
     i.e. if a descending minor third is followed by a descending major second,
     the intervals will be changed to a major third followed by a minor second.
-    Also changes note.editorial.color for rule 4 (orange green orange).'''
+    Also changes note.editorial.color for rule 4 (orange green orange).
+    
+    returns the number of notes that were changed
+    '''
+    numChanged = 0
+    
     for i in range(0, len(srcStream.notes)-2):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -209,7 +237,8 @@ def capuaRuleFourA(srcStream):
 
         # e.g., D B A => D Bb A
         if i1.directedName  == "m-3" and \
-           i2.directedName  == "M2":
+           i2.directedName  == "M-2":
+            numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_FOUR_A
             else:
@@ -220,13 +249,19 @@ def capuaRuleFourA(srcStream):
             n2.editorial.color = "ForestGreen"
             n3.editorial.color = "orange"
 
+    return numChanged
+
 def capuaRuleFourB(srcStream):
     '''Applies more probable interpretation of Capua's fourth rule to the given
     srcStream, i.e. if a descending minor third is followed by a descending major
     second, the intervals will be changed to a major third followed by a minor
     second. Also copies any relevant accidental to note.editorial.misc under
     "saved-accidental" and changes note.editorial.color for rule 4 (orange
-    green orange).'''
+    green orange).
+    
+    returns the number of times a note was changed.
+    '''
+    numChanged = 0
     for i in range(0, len(srcStream.notes)-2):
         n1 = srcStream.notes[i]
         n2 = srcStream.notes[i+1]
@@ -251,6 +286,7 @@ def capuaRuleFourB(srcStream):
         # e.g., D F G => D F# G  or G Bb C => G B C
         if i1.directedName  == "m3" and \
            i2.directedName  == "M2":
+            numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_FOUR_B
             else:
@@ -269,6 +305,8 @@ def capuaRuleFourB(srcStream):
                 n1.editorial.color = "orange"
                 n2.editorial.color = "green"
                 n3.editorial.color = "orange"
+
+    return numChanged
 
 def clearFicta(srcStream1):
     '''In the given srcStream, moves anything under note.editorial.ficta into
@@ -423,8 +461,8 @@ def compareThreeFictas(srcStream1, srcStream2):
         capuaficta[i] = 0
 
     ### populates the editorial.interval attribute on each note
-    twosrcStream1 = TwoStreamComparer(srcStream1, srcStream2)
-    twosrcStream1.intervalToOtherStreamWhenAttacked()
+#    twosrcStream1 = TwoStreamComparer(srcStream1, srcStream2)
+#    twosrcStream1.intervalToOtherStreamWhenAttacked()
 
     for note1 in srcStream1.notes:
         if "pmfc-ficta" in note1.editorial.misc or \
@@ -837,6 +875,18 @@ def runPiece(pieceNum = 331):  # random default piece...
             if "capua-ficta" in note.editorial.misc:
                 print note.editorial.misc['capua-ficta']
 
+def compare4a4b():
+    ballataObj = cadencebook.BallataSheet()
+    num4a = 0
+    num4b = 0
+    for i in range(2, 15): # all ballate
+        pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
+        theseStreams = pieceObj.getAllStreams()
+        for thisStream in theseStreams:
+            num4a += capuaRuleFourA(thisStream)
+            num4b += capuaRuleFourB(thisStream)
+    
+    return (num4a, num4b)
 
 class TestExternal(unittest.TestCase):
 
@@ -961,9 +1011,15 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.color == "green"
 #        assert stream1.lily.strip() == r'''\clef "treble" \color "yellow" d'4 \color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4'''
 
+    def testCompare4a4b(self):        
+        (a, b) = compare4a4b()
+        print a
+        print b
+#        self.assertEqual(a, 200)
+#        self.assertEqual(b, 400)
         
 if (__name__ == "__main__"):
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test) #, TestExternal)
 #    test()
 #    correctedMin6()
 #    correctedMaj3()

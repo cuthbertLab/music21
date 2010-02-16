@@ -359,9 +359,10 @@ class TrecentoCadenceWork(object):
         snippets = self.snippets
         streams = []
         for thisPolyphonicSnippet in snippets:
-            PSStreams = thisPolyphonicSnippet.streams
-            for thisStream in PSStreams:
-                streams.append(thisStream)
+            if thisPolyphonicSnippet is not None:
+                PSStreams = thisPolyphonicSnippet.streams
+                for thisStream in PSStreams:
+                    streams.append(thisStream)
         return streams
     
     def getAllLily(self):
@@ -394,6 +395,7 @@ class TrecentoCadenceWork(object):
             return str("pp. " + str(self.pmfcPageStart) + "-" + str(self.pmfcPageEnd))
         else:
             return str("p. " + str(self.pmfcPageStart))
+
 
 class Ballata(TrecentoCadenceWork):
     '''

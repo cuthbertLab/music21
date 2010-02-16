@@ -1,4 +1,7 @@
 # script to create a graph to time how fast some things are happening...
+# generates pretty graphs showing what the bottlenecks in the system are, for helping to
+# improve them.  Requires pycallgraph (not included with music21).  
+
 
 import pycallgraph
 import time
@@ -27,6 +30,9 @@ def timeCapua():
     c1 = music21.trecento.capua.Test()
     c1.testRunPiece()
 
+def timeCapua2():
+    music21.trecento.capua.compare4a4b()
+
 excludeList = ['pycallgraph.*','re.*','sre_*', 'copy.*']
 
 gf = pycallgraph.GlobbingFilter(exclude=excludeList)
@@ -35,7 +41,7 @@ print time.ctime()
 
 pycallgraph.start_trace(filter_func = gf)
 
-timeCapua()
+timeCapua2()
 
 pycallgraph.make_dot_graph('d:\\desktop\\test1.png')
 
