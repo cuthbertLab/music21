@@ -612,13 +612,12 @@ class Chord(note.NotRest):
         ''' returns True if the chord contains at least one of each of Third, Fifth, and Seventh.
         raises an exception if the Root can't be determined
         
-        example:
         >>> cchord = Chord (['C', 'E', 'G', 'B'])
         >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
         >>> cchord.containsSeventh() # returns True
         True
-         >>> other.containsSeventh() # returns True
-         True
+        >>> other.containsSeventh() # returns True
+        True
         '''
 
         third = self.hasThird()
@@ -641,8 +640,8 @@ class Chord(note.NotRest):
         >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
         >>> cchord.isSeventh() # returns True
         True
-         >>> other.isSeventh() # returns False
-         False
+        >>> other.isSeventh() # returns False
+        False
         '''
         
         third = self.hasThird()
@@ -722,7 +721,6 @@ class Chord(note.NotRest):
         root. Additionally, must contain at least one of each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
         
-        example:
         >>> cchord = Chord (['C', 'E-', 'G-'])
         >>> other = Chord (['C', 'E-', 'F#'])
 
@@ -754,7 +752,6 @@ class Chord(note.NotRest):
         
         Returns false if is not an augmented triad.
         
-        Examples
         >>> import music21.chord
         >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
         >>> c.isAugmentedTriad()
@@ -795,6 +792,10 @@ class Chord(note.NotRest):
         either in unison with the root, a major third above the root, a perfect fifth, or a major seventh
         above the root. Additionally, must contain at least one of each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
+
+        >>> a = Chord(['b', 'g', 'd', 'f'])
+        >>> a.isDominantSeventh()
+        True
         '''
         
         third = self.hasSpecificX(3)
@@ -815,6 +816,10 @@ class Chord(note.NotRest):
         either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh
         above the root. Additionally, must contain at least one of each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
+
+        >>> a = Chord(['c', 'e-', 'g-', 'b--'])
+        >>> a.isDiminishedSeventh()
+        True
         '''
         third = self.hasSpecificX(3)
         fifth = self.hasSpecificX(5)
@@ -897,6 +902,14 @@ class Chord(note.NotRest):
 
         TODO: determine permanent designation abbreviation for every 
         type of chord and inversion
+
+        >>> a = Chord(['a', 'c#', 'e'])
+        >>> a.determineType()
+        'Major Triad'
+
+        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a.determineType()
+        'Dominant Seventh'
         '''
         if (self.isTriad()):
             if (self.isMajorTriad()):
@@ -923,6 +936,12 @@ class Chord(note.NotRest):
     
     
     def canBeDominantV(self):
+        '''
+
+        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a.canBeDominantV()
+        True
+        '''
         if (self.isMajorTriad() or self.isDominantSeventh()):
             return True
         else: 
@@ -930,6 +949,15 @@ class Chord(note.NotRest):
         
 
     def canBeTonic(self):
+        '''
+
+        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a.canBeTonic()
+        False
+        >>> a = Chord(['g', 'b', 'd'])
+        >>> a.canBeTonic()
+        True
+        '''
         if (self.isMajorTriad() or self.isMinorTriad()):
             return True
         else: 
@@ -939,6 +967,10 @@ class Chord(note.NotRest):
         ''' returns an integer representing which standard inversion the chord is in. Chord
         does not have to be complete, but determines the inversion by looking at the relationship
         of the bass note to the root.
+
+        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a.inversion()
+        2
         '''
         
         bassNote = self.bass()
@@ -959,6 +991,10 @@ class Chord(note.NotRest):
     def inversionName(self):
         ''' Returns an integer representing the common abbreviation for the inversion the chord is in.
         If chord is not in a common inversion, returns None.
+
+        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a.inversionName()
+        43
         '''
         try:
             inv = self.inversion()
@@ -1005,8 +1041,126 @@ class Chord(note.NotRest):
                 thisPitch.octave = thisPitch.octave - 1      
         newChord.pitches = tempChordNotes
         return newChord.sortAscending() # creates a second new chord object!
- 
+
+    #---------------------------------------------------------------------------
+    # new methods for forte/pitch class data
+
+# c1.pitchClasses
+# [2, 9, 6, 2]
+
+    def _getPitchClasses(self):
+        '''Return a pitch class representation ordered as the original chord.
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.pitchClasses
+        [2, 9, 6, 2]
+        '''
+        pcGroup = []
+        for p in self.pitches:
+            pcGroup.append(p.pitchClass)
+        return pcGroup            
+        
+    pitchClasses = property(_getPitchClasses)    
+
+# c1.multisetCardinality
+# 4
+    def _getMultisetCardinality(self):
+        '''Return the number of pitch classes, regardless of redundancy.
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.multisetCardinality
+        4
+        '''            
+        return len(self.pitchClasses)
+
+    multisetCardinality = property(_getMultisetCardinality)   
+
+
+
+    def _getOrderedPitchClasses(self):
+        '''Return a pitch class representation ordered by pitch class and removing redundancies.
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.orderedPitchClasses
+        [2, 6, 9]
+        '''
+        pcGroup = []
+        for p in self.pitches:
+            if p.pitchClass in pcGroup: continue
+            pcGroup.append(p.pitchClass)
+        pcGroup.sort()
+        return pcGroup            
+        
+    orderedPitchClasses = property(_getOrderedPitchClasses)    
+
+
+# c1.pcCardinality
+# 3
+
+    def _getPitchClassCardinality(self):
+        '''Return the number of unique pitch classes
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.pitchClassCardinality
+        3
+        '''            
+        return len(self.orderedPitchClasses)
+
+    pitchClassCardinality = property(_getPitchClassCardinality)    
+
+
+
+    def _getForteClass(self):
+        pass            
+
+    forteClass = property(_getForteClass)    
+
+
+
+# c1.forteClassNumber
+# 11
+# 
+
+
+# c1.normalForm
+# [0, 4, 7] 
+# c1.primeForm
+# [0, 3, 7]
+# c1.forteClass
+# '3-11'
+
+# c1.intervalVector
+# [0,0,1,1,1,0]
+# 
+# c1.isPrimeFormInversion
+# True
+# c1.hasZRelation
+# False
+# c1.commonName
+# "Major Chord"
+# c1.pitchedCommonName
+# "D-Major Chord"
+# 
+# c2 = chord.fromPitchClasses([0, 1, 3, 7])
+# c3 = chord.fromPitchClasses([0, 1, 4, 6])
+# c2.intervalVector
+# [1, 1, 1, 1, 1, 1]
+# 
+# c2.hasZRelation
+# True
+# c2.areZRelations(c3)
+# True
+# c2.getZRelation()  # returns a list in non-ET12 space...
+# <music21.chord.ForteSet at 0x234892>
+# c2.getZRelation().primeForm
+# [0, 1, 4, 6]
+# 
+
     
+
+    #---------------------------------------------------------------------------
+    # sort routines
+
     def sortAscending(self):
         # TODO Check context
         return self.sortDiatonicAscending()
@@ -1058,54 +1212,6 @@ class Chord(note.NotRest):
     
 
 
-# new methods for forte/pitch class data
-# get data from chordTables.py
-
-# 
-# c1 = Chord(["D4", "A4", "F#5", "D6"])
-# c1.forteClass
-# '3-11'
-# c1.pcCardinality
-# 3
-# c1.multisetCardinality
-# 4
-# c1.forteClassNumber
-# 11
-# 
-# c1.pitchClasses
-# [2, 9, 6, 2]
-# c1.orderedPitchClasses
-# [2, 6, 9]
-# c1.normalForm
-# [0, 4, 7] 
-# c1.primeForm
-# [0, 3, 7]
-# c1.intervalVector
-# [0,0,1,1,1,0]
-# 
-# c1.isPrimeFormInversion
-# True
-# c1.hasZRelation
-# False
-# c1.commonName
-# "Major Chord"
-# c1.pitchedCommonName
-# "D-Major Chord"
-# 
-# c2 = chord.fromPitchClasses([0, 1, 3, 7])
-# c3 = chord.fromPitchClasses([0, 1, 4, 6])
-# c2.intervalVector
-# [1, 1, 1, 1, 1, 1]
-# 
-# c2.hasZRelation
-# True
-# c2.areZRelations(c3)
-# True
-# c2.getZRelation()  # returns a list in non-ET12 space...
-# <music21.chord.ForteSet at 0x234892>
-# c2.getZRelation().primeForm
-# [0, 1, 4, 6]
-# 
 
 
 
