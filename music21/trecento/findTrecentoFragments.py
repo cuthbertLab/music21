@@ -9,8 +9,7 @@ from music21.note import Note
 from music21 import interval
 from music21.lily import LilyString
 
-import cadencebook
-
+from music21.trecento import cadencebook
 from re import match
 
 class IntervalSearcher(object):

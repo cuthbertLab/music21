@@ -6,7 +6,7 @@ the contenance angloise in 14th and 15th century music
 
 '''
 
-import cadencebook
+from music21.trecento import cadencebook
 
 debug = True
 

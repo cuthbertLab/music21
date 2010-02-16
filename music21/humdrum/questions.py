@@ -164,7 +164,7 @@ class Test(unittest.TestCase):
 #                )
 # OR>:::           
             if (chordThis.setKey(key) == chordSequenceMatch[0](key) and 
-                chordNext.setKey(key) == chordSequenceMatch[1](key))
+                chordNext.setKey(key) == chordSequenceMatch[1](key)):
                 # here it is important that the offsets match that 
                 # of the source
                 # not sure where/how part stream places this
@@ -182,7 +182,7 @@ class Test(unittest.TestCase):
         dynMovementStream = analysis.dyanmicContour(partStream)
         swells = dynMovementStream.getElementsByClass(DynamicCrescendo)
         dips = dynMovementStream.getElementsByClass(DynamicDecrescendo)
-        if len(swells) > len(dips)
+        if len(swells) > len(dips):
             return 'swells win'
         else:
             return 'dips win'

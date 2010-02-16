@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import sys
-import xlrd
-import math
+import sys, math
+
+from music21.trecento import xlrd
+
 sys.path.append('/mit/cuthbert/www/music21')
 
 

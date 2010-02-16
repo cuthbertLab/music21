@@ -1,7 +1,7 @@
 '''Search for Vatican 1790 missing piece: find all ballatas in triple time'''
 
 from music21 import lily
-import cadencebook
+from music21.trecento import cadencebook
 
 def find():
     ballatas = cadencebook.BallataSheet()

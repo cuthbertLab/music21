@@ -5,9 +5,9 @@ Created on Nov 5, 2009
 '''
 
 import music21
-import music21.analysis.correlate
 from music21 import *
-import cadencebook
+import music21.analysis.correlate
+from music21.trecento import cadencebook
 
 def pitchToNoteLength():
     '''

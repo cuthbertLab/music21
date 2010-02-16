@@ -1,9 +1,10 @@
 import music21
 from music21 import *
 from music21 import lily
-import cadencebook
-import find_vatican1790 #this is a terrible way of doing this...
-from find_vatican1790 import *
+from music21.trecento import cadencebook
+#this is a terrible way of doing this...
+from music21.trecento import find_vatican1790 
+from music21.trecento.find_vatican1790 import *
 from music21.lily import *
 
 def find():

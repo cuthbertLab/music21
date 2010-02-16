@@ -1,8 +1,11 @@
 '''Python script to find out certain statistics about the trecento cadences'''
 
-import cadencebook
 import random
-from cadencebook import *
+import doctest, unittest
+
+import music21
+from music21.trecento import cadencebook
+from music21.trecento.cadencebook import *
 from music21.tinyNotation import TinyNotationException
 
 def test():
@@ -138,6 +141,22 @@ def checkValidity():
         except TinyNotationException, inst:
             raise Exception(randomPiece.title + " had problem " + inst.args)
 
-if (__name__ == "__main__"):
-#    countTimeSig()
+
+# temporarily commenting out for adding standard test approach
+# if (__name__ == "__main__"):
+# #    countTimeSig()
+#     makePDFfromPiecesWithCapua()
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
+if __name__ == "__main__":    
     makePDFfromPiecesWithCapua()
+    #music21.mainTest(Test)
+
+

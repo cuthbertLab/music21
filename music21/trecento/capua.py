@@ -1,7 +1,7 @@
 import unittest
 
 import music21
-import cadencebook
+from music21.trecento import cadencebook
 from music21 import note
 from music21.note import Accidental
 from music21.interval import generateInterval

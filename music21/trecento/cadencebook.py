@@ -10,20 +10,23 @@
 
 import doctest
 import unittest
+import random
 
 import music21
 import music21.duration
 from music21 import tinyNotation
 from music21.duration import DurationException
-import xlrd
-import xlrd.sheet
-import trecentoCadence
-import random
+
 from music21 import lily
 from music21 import meter
-import polyphonicSnippet
-from polyphonicSnippet import *
 from music21 import note
+
+from music21.trecento import xlrd
+from music21.trecento.xlrd import sheet # may not be necessary
+from music21.trecento import trecentoCadence
+from music21.trecento import polyphonicSnippet
+from music21.trecento.polyphonicSnippet import *
+
 
 class TrecentoSheet(object):
     '''
@@ -198,7 +201,7 @@ class TrecentoCadenceWork(object):
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
         >>> print accurIncipit
-        <polyphonicSnippet.Incipit object at 0x...>
+        <music21.trecento.polyphonicSnippet.Incipit object at 0x...>
         '''
         rowBlock = self.rowvalues[8:12]
         rowBlock.append(self.rowvalues[7])
@@ -220,8 +223,8 @@ class TrecentoCadenceWork(object):
         >>> accurSnippets = accur.getOtherSnippets()
         >>> for thisSnip in accurSnippets:
         ...     print thisSnip
-        <polyphonicSnippet.FrontPaddedCadence object at 0x...>
-        <polyphonicSnippet.FrontPaddedCadence object at 0x...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
          
         '''
 
@@ -243,7 +246,7 @@ class TrecentoCadenceWork(object):
         >>> bs = BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> print accur.getSnippetAtPosition(12)
-        <polyphonicSnippet.FrontPaddedCadence object at 0x...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
         '''
         
         if self.rowvalues[snippetPosition].strip() != "":
