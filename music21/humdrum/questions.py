@@ -3,18 +3,21 @@ import unittest
 import music21
 from music21 import *  # doing this because it will simplify the examples
 
+# note: this are temporarily commented out until they work
+# add optional show argument to mask output for automated testing
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
             
-    def test001(self):
+    def xtest001(self):
         '''Above G4 do higher pitches tend to be louder?
         Is this asking if all pithces above G4 are louder, or if, above G4, 
         as pitches get higher, are they louder?
         '''
 
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
 
         ## make monophonic or make chords have a single pitch object...
         notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
@@ -25,10 +28,10 @@ class Test(unittest.TestCase):
         # to determine trends
         table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
 
-    def test002(self):
+    def xtest002(self):
         '''Add explicit breath marks after each phrase.'''
 
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
         # we are frequently going to need a way to partition data into      
         # phrases. this will be a very common operation that will
         # need a number of different approaches
@@ -46,13 +49,13 @@ class Test(unittest.TestCase):
             partStream.replace(phrase, phraseNew)
 
 
-    def test003(self):
+    def xtest003(self):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
 
         Modify this to just adjust dynamics based on meter; this should be 
         reflected in muiscal output
         '''
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
         #for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-lenght part streams
@@ -74,12 +77,12 @@ class Test(unittest.TestCase):
                         obj += 'pppp'
                     # will these changes be reflected in the source part stream?
 
-    def test004(self):
+    def xtest004(self):
         '''Align and display all of the bass lines for all of the variations concurrently.
 '''
         pass
 
-    def test005(self):
+    def xtest005(self):
         '''Alphabetize a list of titles.'''
         corpusDir = 'path/to/files'
         sort = []
@@ -87,7 +90,7 @@ class Test(unittest.TestCase):
             if not fn.endswith('.xml'): continue
             # we may have more than one thing that looks like a title
             titleCandidates = []
-            partStream = music21.parseFile(fn)
+            partStream = music21.converter.parseFile(fn)
             # pages might be represented as a stream of Page objects
             # this could be contained w/n a part stream
             pageStream = partStream['pages']
@@ -105,13 +108,13 @@ class Test(unittest.TestCase):
 
 
 
-    def test006(self):
+    def xtest006(self):
         '''Amalgamate arpeggios into chords and display as notation.
 
         How are the arpeggios delineated? Is it a aprt with only arpeggios, or
         are they intermingled?
         '''
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
 
         # we might look at arpeggios as a type of extractable phrase, 
         # looking fo open spacings, even rhythms, and chordal forms
@@ -130,12 +133,12 @@ class Test(unittest.TestCase):
         newStream.append(partStream)  # this puts them in parallel
         newStream.show() 
         
-    def test007(self):
+    def xtest007(self):
         '''Annotate a score identifying possible cadential 6-4 chords.'''
 
         chordSequenceMatch = chord.factory('V64'), chord.factory('I')
 
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
         ## when we have a passing-tone etc. removal program run here...
         
         chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
@@ -171,9 +174,9 @@ class Test(unittest.TestCase):
                 annotation = articulations.Annotation('big cadential moment')
                 partStream.insert(chordThis.offset, annotation)
 
-    def test008(self):
+    def xtest008(self):
         '''Are dynamic swells (crescendo-diminuendos) more common than dips (diminuendos-crescendos)?'''
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
         
         # an analysis package can identify dynamic countours, movements from
         # low to high or vice versa, and return these as a stream of
@@ -188,33 +191,33 @@ class Test(unittest.TestCase):
             return 'dips win'
 
 
-    def test009(self):
+    def xtest009(self):
         '''Are lower pitches likely to be shorter and higher pitches likely to be longer?'''
 
-        partStream = music21.parseFile("dicterliebe1.xml")
+        partStream = music21.converter.parseFile("dicterliebe1.xml")
         noteStream = partStream['notes']
         table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
         # we must examine and interpoate the table in order to distinguish
         # trends
 
-    def test010(self):
+    def xtest010(self):
         '''Assemble individual parts into a full scores.'''
         partStream = PartStream()
         for part in PartsList:
             partStream['id'].add(part)
 
 
-    def test011(self):
+    def xtest011(self):
         '''Assemble syllables into words for some vocal text.'''
         pass
 
 
-    def test012(self):
+    def xtest012(self):
         '''Calculate all the permuted harmonic intervals in a chord.'''
         pass
 
-    def test013(self):
+    def xtest013(self):
         '''Calculate changes of listeners' heart-rate from physiological data.
         
         We'll do something different from the Humdrum example which assumes you already
@@ -229,16 +232,16 @@ class Test(unittest.TestCase):
         '''
         pass
 
-    def test014(self):
+    def xtest014(self):
         '''Calculate harmonic intervals between concurrent parts.'''
         pass
 
 
     
-    def test015(self):
+    def xtest015(self):
         '''Calculate harmonic intervals ignoring unisons.'''
         
-        score1 = music21.parseFile("dicterliebe1.xml")
+        score1 = music21.converter.parseFile("dicterliebe1.xml")
         monoScore = score1.chordsToNotes()    # returns a new Stream
         notePairs = monoScore.getAllSimultaneousNotes()  # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
         intervals2 = common.defHash(default = 0) 
@@ -751,3 +754,18 @@ class Test(unittest.TestCase):
 #     350.    Transpose to Dorian mode.
 #     351.    Transpose up a minor third.
 #
+
+
+
+
+
+#-------------------------------------------------------------------------------
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+
+

@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # Name:          chordTables.py
 # Purpose:       data and tables for chord and set class processing.
 #
@@ -7,20 +7,27 @@
 # Copyright:     (c) 2001-2010 Christopher Ariza
 # Copyright:     (c) 2010 The music21 Project
 # License:       LGPL
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 
 import unittest, doctest
 
-
 import music21
-
 from music21 import environment
 _MOD = "chordTables.py"
 environLocal = environment.Environment(_MOD)
 
 
-#-----------------------------------------------------------------||||||||||||--
-# TNI structures are defined first, in terms of pc, vectors, and z
+#-------------------------------------------------------------------------------
+class ChordTablesException(Exception):
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# TNI structures are defined
+# 0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)
+# invariance vector can be used to determein symmetry
+# at index 1, a value of 1 is symmetrical
 
 t0   = (0,) 
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), (0)) #1-1
@@ -304,18 +311,15 @@ t1   = ((0,1,2,3,4,5,6,7,8,9,10,11), (12,12,12,12,12,6), (12,12,12,12,0,0,0,0), 
 dodecachord = (t0, t1)
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 FORTE = (0, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord, nonachord, decachord, undecachord, dodecachord)
-
 
 # to access the data for a single form, use:
 # forte   [size(tetra)] = 4
 #         [number(forte)] = 3
 #         [data(0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)]
 #             [element in list]               
-# FORTE[4][11][2][1] = 0 :: has inversion that is non-redundant (variant)
-# FORTE[4][11][2][1] = 1 :: has inversion that is redundant (invariant)
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 
 
 #cardinality 1
@@ -1747,42 +1751,40 @@ card_12 ={(1 , 0) :(FORTE[12][1][0], #351
                          ),
             }
 
-
-
-
-#-----------------------------------------------------------------||||||||||||--
-
+#-------------------------------------------------------------------------------
 SCDICT = {1 : card_1,
-              2 : card_2,
-              3 : card_3, 
-              4 : card_4, 
-              5 : card_5, 
-              6 : card_6, 
-              7 : card_7, 
-              8 : card_8, 
-              9 : card_9,
-             10 : card_10,
-             11 : card_11,
-             12 : card_12
-             }
+          2 : card_2,
+          3 : card_3, 
+          4 : card_4, 
+          5 : card_5, 
+          6 : card_6, 
+          7 : card_7, 
+          8 : card_8, 
+          9 : card_9,
+         10 : card_10,
+         11 : card_11,
+         12 : card_12
+         }
 
 del card_1, card_2, card_3, card_4, card_5, card_6, 
 del card_7, card_8, card_9, card_10, card_11,card_12
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # thes dicts provide index max fr cardinality key
-TNMAX = { 0:1, 1:1, 2:6, 3:19, 4:43, 5:66, 6:80, 7:66, 8:43, 9:19, 10:6, 11:1, 12:1 } 
-TNIMAX = { 0:1, 1:1, 2:6, 3:12, 4:29, 5:38, 6:50, 7:38, 8:29, 9:12, 10:6, 11:1, 12:1 } 
+TNMAX = {0:1, 1:1, 2:6, 3:19, 4:43, 5:66, 6:80, 
+         7:66, 8:43, 9:19, 10:6, 11:1, 12:1 } 
+TNIMAX = {0:1, 1:1, 2:6, 3:12, 4:29, 5:38, 6:50, 
+          7:38, 8:29, 9:12, 10:6, 11:1, 12:1 } 
 
-# used to find index numbers under Tn classification
+# used to find TnI index numbers under Tn classification
 TNREF = {  (1, 1,     0)     : 1,     
-              (2, 1,      0)     : 1,     
-              (2, 2,      0)     : 2,     
-              (2, 3,      0)     : 3,     
-              (2, 4,      0)     : 4,     
-              (2, 5,      0)     : 5,     
-              (2, 6,      0)     : 6,     
+              (2, 1, 0)     : 1,     
+              (2, 2, 0)     : 2,     
+              (2, 3, 0)     : 3,     
+              (2, 4, 0)     : 4,     
+              (2, 5, 0)     : 5,     
+              (2, 6, 0)     : 6,     
               (3, 1,      0)     : 1,     
               (3, 2,      1)     : 2,     
               (3, 2,     -1)     : 3,     
@@ -2126,7 +2128,7 @@ TNREF = {  (1, 1,     0)     : 1,
               (10,5,      0)     : 5,     
               (10,6,      0)     : 6,
               (11,1,      0)     : 1,    
-              (12,1,      0)     : 1,
+              (12,1, 0)     : 1,
              }
 
 
@@ -2494,16 +2496,158 @@ SCREF= {(1, 1,    0)     : {"name":("monad","singleton", "unison")},
               (12,1,      0)     : {"name":("aggregate","dodecachord", "twelve-tone chromatic", "chromatic scale", "dodecamirror")}
              }
 
+#-------------------------------------------------------------------------------
+# function to access data
+
+def _validateAddress(address):
+    '''Check that an address is valid
+
+    >>> _validateAddress((3,1,0))
+    (3, 1, 0)
+    >>> _validateAddress((2,3))
+    (2, 3, 0)
+    >>> _validateAddress((20,1,0))
+    Traceback (most recent call last):
+    ChordTablesException: cardinality 20 not valod
+    >>> _validateAddress((8,3000,0))
+    Traceback (most recent call last):
+    ChordTablesException: index 3000 not valod
+    >>> _validateAddress((8,3,-30))
+    Traceback (most recent call last):
+    ChordTablesException: inversion -30 not valod
+    '''
+    address = list(address)
+    card = address[0]
+    index = address[1]
+    if len(address) == 3:
+        inversion = address[2]
+    else:
+        inversion = None
+
+    if card not in range(1,13):
+        raise ChordTablesException('cardinality %s not valod' % card)
+
+    # using TN mode for all comparions
+    indexMax = TNMAX[card]
+    indexMin = 1
+    if index < indexMin or index > indexMax:
+        raise ChordTablesException('index %s not valod' % index)
+
+    if inversion != None:
+        if inversion not in [-1, 0, 1]:
+            raise ChordTablesException('inversion %s not valod' % inversion)
+
+    # test caddress and try to get a normal form
+    nfSet = None
+    while True:
+        try:
+            nfSet = SCDICT[card][(index, inversion)][0]
+        except KeyError: # bacuase inversion was wrong or set to None
+            if inversion == None:
+                inversion = 0
+            elif inversion == 0:
+                inversion = 1 # default, prime form
+        if nfSet != None:
+            break
+
+    return (card, index, inversion)
+
+
+def addressToNormalForm(address):
+    '''Given a TN address, return the normal form
+
+    >>> addressToNormalForm((3,1,0))
+    (0, 1, 2)
+    >>> addressToNormalForm((3,11,-1))
+    (0, 4, 7)
+    >>> addressToNormalForm((3,11,1))
+    (0, 3, 7)
+    >>> addressToNormalForm((3,11))
+    (0, 3, 7)
+    >>> addressToNormalForm((3,11,None))
+    (0, 3, 7)
+    '''
+    card, index, inversion = _validateAddress(address)
+    return SCDICT[card][(index, inversion)][0]
+
+
+def addressToPrimeForm(address):
+    '''Given a TN address, return the normal form
+
+    >>> addressToPrimeForm((3,1,0))
+    (0, 1, 2)
+    >>> addressToPrimeForm((3,11,-1))
+    (0, 3, 7)
+    >>> addressToPrimeForm((3,11,1))
+    (0, 3, 7)
+    >>> addressToPrimeForm((3,11))
+    (0, 3, 7)
+    >>> addressToPrimeForm((3,11,None))
+    (0, 3, 7)
+    '''
+    # overridding inversion with None will aleways return prime form
+    card, index, inversion = _validateAddress(address[0:2])
+    return SCDICT[card][(index, inversion)][0]
+
+
+def addressToIntervalVector(address):
+    '''Given a TN address, return the normal form
+
+    >>> addressToIntervalVector((3,1,0))
+    (2, 1, 0, 0, 0, 0)
+    >>> addressToIntervalVector((3,11,-1))
+    (0, 0, 1, 1, 1, 0)
+    >>> addressToIntervalVector((3,11,1))
+    (0, 0, 1, 1, 1, 0)
+    >>> addressToIntervalVector((3,11))
+    (0, 0, 1, 1, 1, 0)
+    >>> addressToIntervalVector((3,11,None))
+    (0, 0, 1, 1, 1, 0)
+    '''
+    card, index, inversion = _validateAddress(address)
+    return SCDICT[card][(index, inversion)][2]
+
+
+def addressToZAddress(address):
+    '''Given a TN address, return the address of the z set, if not None
+
+    >>> addressToZAddress((5,12))
+    (5, 36, 1)
+    >>> addressToZAddress((5,36,None))
+    (5, 12, 0)
+    >>> addressToZAddress((5,37))
+    (5, 17, 0)
+    >>> addressToZAddress((8,29))
+    (8, 15, 1)
+    '''
+    card, index, inversion = _validateAddress(address)
+    z = FORTE[card][index][3]
+    zAddress = _validateAddress((card, z, None))
+    return zAddress
+
+
+def addressToName(address):
+    '''Given an addres, return the set-class name as a string.
+
+    >>> addressToName((8,15,1))
+    '8-15A'
+    >>> addressToName((8,15))
+    '8-15A'
+    >>> addressToName((5,37))
+    '5-37'
+    '''
+    card, index, inversion = _validateAddress(address)
+    if inversion == -1:
+        iStr = 'B'
+    elif inversion == 1:
+        iStr = 'A'
+    elif inversion == 0:
+        iStr = ''
+    return '%s-%s%s' % (card, index, iStr)
 
 
 
-def testDummy(self):
-    """
-    >>> a = FORTE
-    """
-    pass
-
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
     def runTest(self):
@@ -2551,7 +2695,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(FORTE[setSize])-1, setCount)
         
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 
 
 

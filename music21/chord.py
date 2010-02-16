@@ -27,6 +27,11 @@ from music21.lily import LilyString
 #from music21.pitch import Pitch
 from music21 import pitch
 
+from music21 import chordTables
+
+from music21 import environment
+_MOD = "chord.py"
+environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
@@ -1071,7 +1076,7 @@ class Chord(note.NotRest):
         >>> c1.multisetCardinality
         4
         '''            
-        return len(self.pitchClasses)
+        return len(self._getPitchClasses())
 
     multisetCardinality = property(_getMultisetCardinality)   
 
@@ -1079,6 +1084,8 @@ class Chord(note.NotRest):
 
     def _getOrderedPitchClasses(self):
         '''Return a pitch class representation ordered by pitch class and removing redundancies.
+
+        This is a traditional pitch class set
 
         >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.orderedPitchClasses
@@ -1104,16 +1111,128 @@ class Chord(note.NotRest):
         >>> c1.pitchClassCardinality
         3
         '''            
-        return len(self.orderedPitchClasses)
+        return len(self._getOrderedPitchClasses())
 
     pitchClassCardinality = property(_getPitchClassCardinality)    
 
 
 
+
+    def getChordTableAddress(self):
+        '''Utility method to return the address to the chord table.
+
+        Table addresses are TN based three character codes:
+        cardinaltiy, Forte index number, inversion 
+
+        Inversion is either 0 (for symmetrical) or -1/1
+
+        >>> c1 = Chord(['c3'])
+        >>> c1.orderedPitchClasses
+        [0]
+        >>> c1.getChordTableAddress()
+        (1, 1, 0)
+
+        >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
+        >>> c1.getChordTableAddress()
+        (11, 1, 0)
+
+        >>> c1 = Chord(['c', 'e', 'g'])
+        >>> c1.getChordTableAddress()
+        (3, 11, -1)
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.getChordTableAddress()
+        (3, 11, 1)
+
+        >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+        >>> c1.getChordTableAddress()
+        (7, 34, 0)
+
+        >>> c1 = Chord(['c', 'c#', 'd'])
+        >>> c1.getChordTableAddress()
+        (3, 1, 0)
+        '''
+        pcSet = self._getOrderedPitchClasses()   
+        card = len(pcSet)
+        if card == 1: # its a singleton: return
+            return (1,1,0)
+        elif card == 11: # its the only 11 note pcset
+            return (11,1,0)
+        elif card == 12: # its the aggregate
+            return (12,1,0)
+        # go through each rotation of pcSet
+        candidates = []
+        for rot in range(0, card):
+            testSet = pcSet[rot:] + pcSet[0:rot]
+            # transpose to lead with zero
+            testSet = [(x-testSet[0]) % 12 for x in testSet]
+            # create inversion; first take difference from 12 mod 12
+            testSetInvert = [(12-x) % 12 for x in testSet]
+            testSetInvert.reverse() # reverse order (first steps now last)
+            # transpose all steps (were last) to zero, mod 12
+            testSetInvert = [(x + (12 - testSetInvert[0])) % 12 
+                            for x in testSetInvert]
+            candidates.append([testSet, testSetInvert]) 
+
+        # compare sets to those in table
+        for indexCandidate in range(len(chordTables.FORTE[card])):
+            dataLine = chordTables.FORTE[card][indexCandidate]
+            for candidate, candidateInversion in candidates:
+                #environLocal.printDebug([candidate])
+                # need to only match form
+                if dataLine[0] == tuple(candidate): # must compare to tuple
+                    if chordTables.FORTE[card][indexCandidate][2][1] == 1:
+                        index, inversion = indexCandidate, 0
+                    else:
+                        index, inversion = indexCandidate, 1
+                    break
+                elif dataLine[0] == tuple(candidateInversion):
+                    if chordTables.FORTE[card][indexCandidate][2][1] == 1:
+                        index, inversion = indexCandidate, 0
+                    else:
+                        index, inversion = indexCandidate, -1
+                    break
+        return (card, index, inversion)                
+
+
+# c1.forteClass
+# '3-11'
+
     def _getForteClass(self):
-        pass            
+        '''Return a forte class name
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.forteClass
+        '3-11A'
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClass
+        '3-11B'
+        '''
+        # TODO: this value should be cashed
+        address = self.getChordTableAddress()        
+        return chordTables.addressToName(address)
 
     forteClass = property(_getForteClass)    
+
+
+# c1.normalForm
+# [0, 4, 7] 
+
+    def _getNormalForm(self):
+        '''
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.normalForm
+        (0, 3, 7)
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.normalForm
+        (0, 4, 7)
+        '''
+        address = self.getChordTableAddress()        
+        return chordTables.addressToNormalForm(address)
+        
+    normalForm = property(_getNormalForm)    
 
 
 
@@ -1122,12 +1241,8 @@ class Chord(note.NotRest):
 # 
 
 
-# c1.normalForm
-# [0, 4, 7] 
 # c1.primeForm
 # [0, 3, 7]
-# c1.forteClass
-# '3-11'
 
 # c1.intervalVector
 # [0,0,1,1,1,0]
