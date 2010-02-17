@@ -12,12 +12,12 @@ def find():
     alllily = ''
     for ballata in ballatas:
         #print ballata.fischerNum
-        try:
+#        try:
             if findinwork(ballata):
                 alllily = alllily + ballata.getAllLily()
                 print ballata.title + ' has a seventh somewhere'
-        except:
-            pass
+#        except:
+#            pass
     lS = lily.LilyString("{" + alllily + "}")
     lS.showPDF()
     #makePDF(alllily)
@@ -158,4 +158,5 @@ def findintervalinrange(startrow, endrow, intervalnum, makePDF=True):
             lS.showPDF()
     print 'done' 
 
-find()
+if __name__ == "__main__":
+    find()

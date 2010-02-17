@@ -216,7 +216,7 @@ class TrecentoCadenceWork(object):
     def getOtherSnippets(self):
         '''
         returns a list of bits of music notation encoded as
-        FrontPaddedCadence objects
+        FrontPaddedCadence objects.  That is, usually, all but the incipit
 
         >>> bs = BallataSheet()
         >>> accur = bs.makeWork(2)

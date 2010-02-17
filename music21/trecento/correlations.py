@@ -16,13 +16,14 @@ def pitchToNoteLength():
     allStream = stream.Stream()
     b = cadencebook.BallataSheet()
     for work in b:
-        for snippet in work.snippetBlocks:
+        for snippet in work.snippets:
             if snippet is None:
                 continue
             for thisStream in snippet.streams:
                 allStream.append(thisStream)
     c = music21.analysis.correlate.NoteAnalysis(allStream.flat)
     c.noteAttributeCount()
-        
-pitchToNoteLength()
-        
+
+if __name__ == "__main__":   
+    pitchToNoteLength()
+    

@@ -8,10 +8,11 @@ def find():
     allLily = lily.LilyString()
     for ballata in ballatas:
         if (ballata.timeSigBegin == "6/8" or ballata.timeSigBegin == "9/8"):
-            incipit = ballata.incipitClass()
+            incipit = ballata.incipit
             if incipit != None:
                 iLily = incipit.lily
                 allLily = allLily + iLily
     allLily.showPDF()
 
-find()
+if __name__ == "__main__":
+    find()
