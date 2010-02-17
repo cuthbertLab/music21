@@ -324,7 +324,7 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # manage pitches property and chordTablesAddress
 
-    def getChordTablesAddress(self):
+    def seekChordTablesAddress(self):
         '''Utility method to return the address to the chord table.
 
         Table addresses are TN based three character codes:
@@ -332,34 +332,36 @@ class Chord(note.NotRest):
 
         Inversion is either 0 (for symmetrical) or -1/1
 
+        NOTE: time consuming, and only should be run when necessary.
+
         >>> c1 = Chord(['c3'])
         >>> c1.orderedPitchClasses
         [0]
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (1, 1, 0)
 
         >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (11, 1, 0)
 
         >>> c1 = Chord(['c', 'e', 'g'])
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (3, 11, -1)
 
         >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (3, 11, 1)
 
         >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (7, 34, 0)
 
         >>> c1 = Chord(['c', 'c#', 'd'])
-        >>> c1.getChordTablesAddress()
+        >>> c1.seekChordTablesAddress()
         (3, 1, 0)
         '''
-        environLocal.printDebug(['calling getChordTablesAddress'])
         pcSet = self._getOrderedPitchClasses()   
+        environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
         card = len(pcSet)
         if card == 1: # its a singleton: return
             return (1,1,0)
@@ -382,30 +384,38 @@ class Chord(note.NotRest):
             candidates.append([testSet, testSetInvert]) 
 
         # compare sets to those in table
+        match = False
         for indexCandidate in range(len(chordTables.FORTE[card])):
             dataLine = chordTables.FORTE[card][indexCandidate]
             if dataLine == None: continue # spacer lines
+            inversionsAvailable = chordTables.forteIndexToInversionsAvailable(
+                                  card, indexCandidate)
+
             for candidate, candidateInversion in candidates:
                 #environLocal.printDebug([candidate])
                 # need to only match form
                 if dataLine[0] == tuple(candidate): # must compare to tuple
-                    if chordTables.FORTE[card][indexCandidate][2][1] == 1:
+                    if 0 in inversionsAvailable:
                         index, inversion = indexCandidate, 0
                     else:
                         index, inversion = indexCandidate, 1
+                    match = True
                     break
                 elif dataLine[0] == tuple(candidateInversion):
-                    if chordTables.FORTE[card][indexCandidate][2][1] == 1:
+                    if 0 in inversionsAvailable:
                         index, inversion = indexCandidate, 0
                     else:
                         index, inversion = indexCandidate, -1
+                    match = True
                     break
+        if not match:
+            raise ChordException('cannot find a chord table address for %s' % pcSet)
         return (card, index, inversion)                
 
 
     def _updateChordTablesAddress(self):
         if self._chordTablesAddressNeedsUpdating:
-            self._chordTablesAddress = self.getChordTablesAddress()
+            self._chordTablesAddress = self.seekChordTablesAddress()
         self._chordTablesAddressNeedsUpdating = False
 
     def _getPitches(self):
@@ -424,6 +434,24 @@ class Chord(note.NotRest):
         self._pitches = value
 
     pitches = property(_getPitches, _setPitches)
+
+
+    def _getChordTablesAddress(self):
+        '''
+        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c.chordTablesAddress
+        (3, 12, 0)
+        '''
+        self._updateChordTablesAddress()
+        return self._chordTablesAddress
+
+    chordTablesAddress = property(_getChordTablesAddress)
+
+
+
+# possibly add methods to create chords form pitch classes:
+# c2 = chord.fromPitchClasses([0, 1, 3, 7])
+
 
 
     #---------------------------------------------------------------------------
@@ -471,7 +499,7 @@ class Chord(note.NotRest):
         return lowest
     
 
-    def root(self, newroot = 0):
+    def root(self, newroot=False):
         '''Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.)
         
         example:
@@ -479,12 +507,10 @@ class Chord(note.NotRest):
         >>> cmaj.root() # returns C
         C
         '''
-
-        if (newroot):
+        if newroot:
             self._root = newroot
-        elif (self._root is None):
+        elif self._root is None:
             self._root = self.findRoot()
-
         return self._root
 
     def findRoot(self):
@@ -1232,7 +1258,7 @@ class Chord(note.NotRest):
         '3-11B'
         '''
         self._updateChordTablesAddress()
-        return chordTables.addressToName(self._chordTablesAddress)
+        return chordTables.addressToForteName(self._chordTablesAddress)
 
     forteClass = property(_getForteClass)    
 
@@ -1343,6 +1369,8 @@ class Chord(note.NotRest):
 
 # c1.hasZRelation
 # False
+# c2.hasZRelation
+# True
 
     def _hasZRelation(self):
         '''Get the Z-relation status
@@ -1364,27 +1392,84 @@ class Chord(note.NotRest):
         
     hasZRelation = property(_hasZRelation)    
 
-# c1.commonName
-# "Major Chord"
-# c1.pitchedCommonName
-# "D-Major Chord"
-# 
-# c2 = chord.fromPitchClasses([0, 1, 3, 7])
-# c3 = chord.fromPitchClasses([0, 1, 4, 6])
-# c2.intervalVector
-# [1, 1, 1, 1, 1, 1]
-# 
-# c2.hasZRelation
-# True
 # c2.areZRelations(c3)
 # True
+
 # c2.getZRelation()  # returns a list in non-ET12 space...
 # <music21.chord.ForteSet at 0x234892>
-# c2.getZRelation().primeForm
-# [0, 1, 4, 6]
-# 
 
-    
+    def areZRelations(self, other):
+        '''Check of chord other is also a z relations
+
+        >>> c1 = Chord(["C", "c#", "e", "f#"])
+        >>> c2 = Chord(["C", "c#", "e-", "g"])
+        >>> c3 = Chord(["C", "c#", "f#", "g"])
+        >>> c1.areZRelations(c2)
+        True
+        >>> c1.areZRelations(c3)
+        False
+        '''
+        self._updateChordTablesAddress()
+        post = chordTables.addressToZAddress(self._chordTablesAddress)
+        if post == None:
+            return False
+        else: # check of other is a z relation
+            zRelationAddress = chordTables.addressToZAddress(
+                self._chordTablesAddress)
+            if other.chordTablesAddress == zRelationAddress:
+                return True
+            else:
+                return False
+
+# c1.commonName
+# "Major Chord"
+
+    def _getCommonName(self):
+        '''Get the common name of the TN set class.
+
+        Possible rename forteIndex
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.commonName
+        ['minor triad']
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.commonName
+        ['major triad']
+        '''
+        self._updateChordTablesAddress()
+        return chordTables.addressToCommonNames(self._chordTablesAddress)
+        
+    commonName = property(_getCommonName)    
+
+
+# c1.pitchedCommonName
+# "D-Major Chord"
+
+    def _getPitchedCommonName(self):
+        '''Get the common name of the TN set class.
+
+        Possible rename forteIndex
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.pitchedCommonName
+        'C-minor triad'
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.pitchedCommonName
+        'C-major triad'
+        '''
+        self._updateChordTablesAddress()
+        post = chordTables.addressToCommonNames(self._chordTablesAddress)
+        if post != None:
+            nameStr = post[0] # get first
+        else:
+            nameStr = ''
+        return '%s-%s' % (self.root(), nameStr)
+    pitchedCommonName = property(_getPitchedCommonName)    
+
+
+
 
     #---------------------------------------------------------------------------
     # sort routines
@@ -1455,6 +1540,24 @@ class TestExternal(unittest.TestCase):
         for pitchList in [['g2', 'c4', 'c#6'], ['c', 'd-', 'f#', 'g']]:
             a = Chord(pitchList)
             a.show()
+
+    def testPostTonalChords(self): 
+        import random
+        from music21 import note, stream
+        s = stream.Stream()
+        for x in range(30):
+            chordRaw = []
+            for p in range(random.choice([3,4,5,6,7,8])):
+                pc = random.choice(range(0,12))
+                if pc not in chordRaw:
+                    chordRaw.append(pc)
+            c = Chord(chordRaw)
+            environLocal.printDebug(['got chord:', c])
+            c.quarterLength = 4
+            c.addLyric(c.forteClass)
+            c.addLyric(str(c.primeForm).replace(' ', ''))
+            s.append(c)
+        s.show()
 
 
 class Test(unittest.TestCase):
@@ -1809,7 +1912,23 @@ class Test(unittest.TestCase):
         chord1 = Chord(["C#4", "G5", "E6"])
         chord2 = chord1.closedPosition()
         self.assertEqual("<cis' e' g'>4", chord2.lily.value)
-        
+
+    def testPostTonalChords(self):
+        c1 = Chord([0,1,3,6,8,9,12])
+        self.assertEqual(c1.pitchClasses, [0, 1, 3, 6, 8, 9, 0])
+        self.assertEqual(c1.multisetCardinality, 7)
+        self.assertEqual(c1.orderedPitchClasses, [0, 1, 3, 6, 8, 9])
+        self.assertEqual(c1.pitchClassCardinality, 6)
+        self.assertEqual(c1.forteClass, '6-29')
+        self.assertEqual(c1.normalForm, (0, 1, 3, 6, 8, 9))
+        self.assertEqual(c1.forteClassNumber, 29)
+        self.assertEqual(c1.primeForm, (0, 1, 3, 6, 8, 9))
+        self.assertEqual(c1.intervalVector, (2, 2, 4, 2, 3, 2))
+        self.assertEqual(c1.isPrimeFormInversion, False)
+        self.assertEqual(c1.hasZRelation, True)
+        self.assertEqual(c1.areZRelations(Chord([0,1,4,6,7,9])), True)
+        self.assertEqual(c1.commonName[0], 'combinatorial RI (RI9)')
+        self.assertEqual(c1.pitchedCommonName, 'D#-combinatorial RI (RI9)')
 
 if __name__ == '__main__':
     music21.mainTest(Test)

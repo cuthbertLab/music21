@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

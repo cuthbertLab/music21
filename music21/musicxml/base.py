@@ -4,7 +4,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -1785,10 +1785,20 @@ class Lyric(MusicXMLElement):
         self.syllabic = None
         self.text = None
 
+    def filterLyric(self, text):
+        '''
+        Remove and fix character strings that cause problems in MusicXML
+        '''
+        text = xml.sax.saxutils.escape(text)
+        # need to remove hyphens; but &mdash; and similar do not work
+        text = text.replace('-', ':')
+        return text
+
     def _getComponents(self):
         c = []
         c.append(('syllabic', self.syllabic))
-        c.append(('text', self.text))
+        # only filter when getting components
+        c.append(('text', self.filterLyric(self.text)))
         return c
 
 

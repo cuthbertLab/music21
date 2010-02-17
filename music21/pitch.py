@@ -455,6 +455,13 @@ class Pitch(music21.Music21Object):
         
         optional parameter name should include a step and accidental character(s)
         it can also include a non-negative octave number.  ("C#4", "B--3", etc.)
+
+        >>> p1 = Pitch('a#')
+        >>> p1
+        A#
+        >>> p2 = Pitch(3)
+        >>> p2
+        D#
         '''
         music21.Music21Object.__init__(self)
 
@@ -474,8 +481,10 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
 
         # name combines step, octave, and accidental
-        if name is not None:       
+        if name is not None and not common.isNum(name):       
             self._setName(name)
+        elif name is not None and common.isNum(name):
+            self._setPitchClass(name)
 
     def __repr__(self):
         return self.nameWithOctave
