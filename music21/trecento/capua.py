@@ -929,6 +929,9 @@ class TestExternal(unittest.TestCase):
         
         pieceObj.snippets[0].lily.showPNG()
 
+    def testShowFourA(self):
+        showFourA()
+
 
 
 class Test(unittest.TestCase):
@@ -1041,8 +1044,6 @@ class Test(unittest.TestCase):
 #        self.assertEqual(num4a,  57)
 #        self.assertEqual(num4b, 104)
     
-    def testShowFourA(self):
-        showFourA()
         
 if (__name__ == "__main__"):
     music21.mainTest(Test) #, TestExternal)

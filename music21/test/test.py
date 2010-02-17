@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -39,11 +39,12 @@ class ModuleGather(object):
         self.moduleSkip = [
             'test.py', 
             'testExternal.py', 
+            'timePerformance.py',
             '__init__.py', 
             'timeGraphs.py',
-            
-            'twoStreams.py',
-            
+
+            'exceldiff.py',  
+            'keyDetectSketch.py',          
             ]
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 'xlrd']
@@ -72,7 +73,6 @@ class ModuleGather(object):
         fn = fn.replace(os.sep, ':') # replace w/ dots
         fn = fn.replace('.py', '')
         return fn
-
      
     def load(self):
         loadPass = []
@@ -94,6 +94,7 @@ class ModuleGather(object):
             name = self._getName(fp)
 
             try:
+                #environLocal.printDebug(['import:', fp]) 
                 mod = imp.load_source(name, fp)
             except Exception as excp: # this takes all exceptions!
                 environLocal.printDebug(['failed import:', fp, '\n', 
@@ -153,10 +154,7 @@ def main(testGroup=['test']):
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
     
-
     environLocal.printDebug('running Tests...\n')
-
-
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(s1)  
                  

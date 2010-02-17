@@ -17,7 +17,7 @@ from music21 import duration
 from music21 import interval
 from music21 import lily
 from music21 import scale
-from music21 import twoStreams
+#from music21 import twoStreams
 
 from music21.stream import Stream
 from music21.voiceLeading import VoiceLeadingQuartet
