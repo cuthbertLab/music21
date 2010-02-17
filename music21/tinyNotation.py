@@ -5,11 +5,10 @@ that uses a notation somewhat similar to Lilypond but with WAY fewer
 examples.  Originally developed to notate trecento (medieval Italian)
 music, but it's pretty useful for a lot of short examples.  
 
-tinyNotation is not meant to expand to cover every single case.  I
-might expand it to add specific ids to notes so they can be found easier
-to do complex things to.
-
-Trecento specific examples have migrated into the trecento directory
+tinyNotation is not meant to expand to cover every single case.  Instead
+it is meant to be subclassible to extend to the cases *your* project needs.
+See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
+or the Trecento specific examples in trecento/cadencebook.py
 '''
 
 import unittest, doctest
@@ -116,11 +115,7 @@ class TinyNotationLine(object):
         '''
         called out so as to be subclassable
         '''
-        try:
-            tcN = TinyNotationNote(stringRep, storedDict)
-            return tcN
-        except TinyNotationException, inst:
-            raise TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
+        return TinyNotationNote(stringRep, storedDict)
 
 class TinyNotationNote(object):
     ''' 
@@ -144,8 +139,8 @@ class TinyNotationNote(object):
     EDSHARP = compile('\(\#\)')
     EDFLAT  = compile('\(\-\)')
     EDNAT   = compile('\(n\)')
-    SHARP   = compile('\#')  # simple notation has 
-    FLAT    = compile('\-')  # no need for double sharps etc
+    SHARP   = compile('^[A-Ga-g]+\#')  # simple notation has 
+    FLAT    = compile('^[A-Ga-g]+\-')  # no need for double sharps etc
     TYPE    = compile('(\d+)')
     TIE     = compile('.\~') # not preceding ties
     PRECTIE = compile('\~')  # front ties
@@ -165,7 +160,7 @@ class TinyNotationNote(object):
             stringRep = self.PRECTIE.sub("", stringRep)
             storedtie = music21.note.Tie("stop")
 
-        x = self.customPitchMatch(stringRep)
+        x = self.customPitchMatch(stringRep, storedDict)
         
         if x is not None:
             noteObj = x
@@ -249,6 +244,8 @@ class TinyNotationNote(object):
             elif (self.FLAT.search(stringRep)):
                 noteObj.accidental = "flat"
 
+        self.customNotationMatch(noteObj, stringRep, storedDict)
+
         if self.ID_EL.search(stringRep):
             noteObj.id = self.ID_EL.search(stringRep).group(1)
         
@@ -269,12 +266,30 @@ class TinyNotationNote(object):
         noteObj.octave = octave
         return noteObj
 
-    def customPitchMatch(self, stringRep):
+    def customPitchMatch(self, stringRep, storedDict):
         '''
         method to create a note object in sub classes of tiny notation.  
         Should return a Note-like object or None
         '''
         return None
+
+    def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
+        return None
+
+class HarmonyLine(TinyNotationLine):
+    '''
+    example of subclassing TinyNotationLine to include a possible harmonic representation of the note
+    '''
+    def getNote(self, stringRep, storedDict = {}):
+        return HarmonyNote(stringRep, storedDict)
+
+class HarmonyNote(TinyNotationNote):
+    HARMONY   = compile('\*(.*)\*')
+    
+    def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
+        if self.HARMONY.search(stringRep):
+            harmony = self.HARMONY.search(stringRep).group(1)
+            m21NoteObject.editorial.misc['harmony'] = harmony
 
 
 class TinyNotationException(Exception):
@@ -325,6 +340,16 @@ Total duration of Stream: 6.0
         st1 = lineToStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
         self.assertEqual(st1[1].offset, 2.0) 
         self.assertTrue(isinstance(st1[2], music21.note.Rest))     
+
+    def testHarmonyNotation(self):
+        hnl = HarmonyLine("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
+        nst1 = hnl.stream.notes
+        self.assertEqual(nst1[0].step, "C")
+        self.assertEqual(nst1[0].editorial.misc['harmony'], "F")
+        self.assertEqual(nst1[0].lyric, "Mi-")
+        self.assertEqual(nst1[2].isRest, True)
+        self.assertEqual(nst1[5].name, "G")
+        self.assertEqual(nst1[7].name, "A-")
     
 class TestExternal(unittest.TestCase):    
 
