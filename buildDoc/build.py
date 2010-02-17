@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -511,8 +511,8 @@ class Documentation(RestrtucturedWriter):
 
     def updateDirs(self):
         self.dir = os.getcwd()
-        if not self.dir.endswith('music21%sbuildDoc' % os.sep):
-            raise Exception('not in the music21%sdoc directory' % os.sep)
+        if not self.dir.endswith("music21%sbuildDoc" % os.sep):
+            raise Exception("not in the music21%sbuildDoc directory: %s" % (os.sep, self.dir))
     
         parentDir = os.path.dirname(self.dir)
         self.dirBuild = os.path.join(parentDir, 'music21', 'doc')

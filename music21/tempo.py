@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -17,6 +17,12 @@ import music21
 import music21.note
 
 class TempoMark(music21.Music21Object):
+    '''
+    >>> tm = TempoMark("adagio")
+    >>> tm.value
+    'adagio'
+    '''
+    
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
         self.value = value
@@ -49,7 +55,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():

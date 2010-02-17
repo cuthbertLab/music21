@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         correlate.py
-# Purpose:      Stream analyizer designed to correlate and graph two properties
+# Purpose:      Stream analyzer designed to correlate and graph two properties
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -282,8 +282,11 @@ class NoteAnalysis(object):
             (ticksDynamics, ['dynamics']),
         ]
         # remove spaces
-        valueTest = value.replace(' ', '')
-        valueTest = valueTest.lower()
+        if value is not None:
+            valueTest = value.replace(' ', '')
+            valueTest = valueTest.lower()
+        else:
+            valueTest = ""
 
         #environLocal.printDebug(['value test', valueTest])
         for fName, matches in mapping:
@@ -340,8 +343,7 @@ class NoteAnalysis(object):
         data = {}
         xValues = []
         yValues = []
-        for noteObj in self.streamObj.getElementsByClass(note.Note,
-                                     unpackElement=True):
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
             x = fx(noteObj)
             if x not in xValues:
                 xValues.append(x)
@@ -359,8 +361,7 @@ class NoteAnalysis(object):
         #print _MOD, 'data keys', data.keys()
 
         maxCount = 0
-        for noteObj in self.streamObj.getElementsByClass(note.Note,
-                                     unpackElement=True):
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
             indexToIncrement = xValues.index(fx(noteObj))
             # second position stores increment
             #print _MOD, fy(noteObj), indexToIncrement
@@ -429,8 +430,7 @@ class NoteAnalysis(object):
         else: title = None
 
         data = []
-        for noteObj in self.streamObj.getElementsByClass(note.Note,
-                                     unpackElement=True):
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
             data.append([fx(noteObj), fy(noteObj)])
 
         xVals = [x for x,y in data]
@@ -498,8 +498,7 @@ class NoteAnalysis(object):
         data = {}
         dataTick = {}
 
-        for noteObj in self.streamObj.getElementsByClass(note.Note,
-                                     unpackElement=True):
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
             value = fx(noteObj)
             if value not in data.keys():
                 data[value] = 0
@@ -691,7 +690,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
-        music21.mainTest(Test)
+        music21.mainTest(Test, TestExternal)
 
     elif len(sys.argv) == 3:
         t = TestExternal()

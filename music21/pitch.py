@@ -181,7 +181,7 @@ class Accidental(music21.Music21Object):
     displayType = "normal"  
     # display if first in measure; other valid terms:
     # "always", "never", "unless-repeated" (show always unless
-    # the immedately preceding note is the same), "even-tied"
+    # the immediately preceding note is the same), "even-tied"
     # (stronger than always: shows even if it is tied to the
     # previous note
     displayEvaluated = ""   
@@ -190,6 +190,9 @@ class Accidental(music21.Music21Object):
     # the next program down the line cannot evaluate displayType
     displayStyle = "normal" # "parentheses", "bracket", "both"
     displaySize  = "full"   # "cue", "large", or a percentage
+
+    displayLocation = "normal" # "normal", "above" = ficta, "below"
+    # above and below could also be useful for gruppetti, etc.
 
     def __init__(self, specifier='natural'):
         self.name = None

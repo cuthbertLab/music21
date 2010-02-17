@@ -2198,8 +2198,8 @@ class TestExternal(unittest.TestCase):
         a = stream.Stream()
         for meterStrDenominator in [1,2,4,8,16,32]:
             for meterStrNumerator in [2,3,4,5,6,7,9,11,12,13]:
-                ts = TimeSignature('%s/%s' % (meterStrNumerator, 
-                                            meterStrDenominator))
+                ts = music21.meter.TimeSignature('%s/%s' % (meterStrNumerator, 
+                                                            meterStrDenominator))
                 m = stream.Measure()
                 m.timeSignature = ts
                 a.insert(m.timeSignature.barDuration.quarterLength, m)
@@ -2218,7 +2218,7 @@ class TestExternal(unittest.TestCase):
             for y in range(1, random.choice([2,4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
                                       random.choice(meterStrDenominator)))
-            ts = TimeSignature('+'.join(msg))
+            ts = music21.meter.TimeSignature('+'.join(msg))
             m = stream.Measure()
             m.timeSignature = ts
             a.insert(m.timeSignature.barDuration.quarterLength, m)
@@ -2227,7 +2227,7 @@ class TestExternal(unittest.TestCase):
 
     def testMeterBeam(self):
         from music21 import stream
-        ts = TimeSignature('6/8', 2)
+        ts = music21.meter.TimeSignature('6/8', 2)
         b = [duration.Duration('16th')] * 12
         s = stream.Stream()
         s.insert(0, ts)
@@ -2251,7 +2251,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
@@ -2344,8 +2344,8 @@ class Test(unittest.TestCase):
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    #music21.mainTest(Test, TestExternal)
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
+    #music21.mainTest(Test)
 
 
 
