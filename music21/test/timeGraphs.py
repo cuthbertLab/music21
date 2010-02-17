@@ -31,9 +31,10 @@ def timeCapua():
     c1.testRunPiece()
 
 def timeCapua2():
-    music21.trecento.capua.compare4a4b()
+    music21.trecento.capua.ruleFrequency()
 
-excludeList = ['pycallgraph.*','re.*','sre_*', 'copy.*']
+excludeList =  ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*',]
+excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
 gf = pycallgraph.GlobbingFilter(exclude=excludeList)
 

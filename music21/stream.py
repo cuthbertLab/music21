@@ -453,6 +453,12 @@ class Stream(music21.Music21Object):
         2.0
         >>> len(st3)
         2
+        
+        Raise an error if offset is not a number
+        >>> Stream().insert("l","g")
+        Traceback (most recent call last):
+        StreamException: ...
+        
         '''
         if itemOrNone is not None:
             offset = offsetOrItemOrList
@@ -477,11 +483,16 @@ class Stream(music21.Music21Object):
 #            element = item
 
         element = item
+
+        if not common.isNum(offset):
+            raise StreamException("offset %s must be a number", offset)
         
         offset = float(offset)
         element.locations.add(offset, self)
         # need to explicitly set the parent of the element
         element.parent = self 
+#        element.addLocationAndParent(offset, self)
+
 
         if ignoreSort is False:
             if self.isSorted is True and self.highestTime <= offset:

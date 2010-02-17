@@ -888,7 +888,39 @@ class Music21Object(object):
 
     parent = property(_getParent, _setParent)
 
+    def addLocationAndParent(self, offset, parent, parentWeakRef = None):
+        '''
+        ADVANCED: a speedup tool that adds a new location element and a new parent.  Called
+        by Stream.insert -- this saves some dual processing.  Does not do safety checks that
+        the siteId doesn't already exist etc., because that is done earlier.
+        
+        This speeds up things like stream.getElementsById substantially.
 
+        Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated)
+        >>> from stream import Stream
+        >>> st1 = Stream()
+        >>> o1 = Music21Object()
+        >>> st1_wr = common.wrapWeakref(st1)
+        >>> offset = 20.0
+        >>> st1._elements = [o1]
+        >>> o1.addLocationAndParent(offset, st1, st1_wr)
+        >>> o1.parent is st1
+        True
+        >>> o1.getOffsetBySite(st1)
+        20.0
+        '''
+        parentId = id(parent)
+        self.locations.add(offset, parent, siteId = parentId) 
+        
+        if WEAKREF_ACTIVE:
+                if parentWeakRef is None:
+                    parentWeakRef = common.wrapWeakref(parent)
+                self._currentParent = parentWeakRef
+                self._currentParentId = parentId
+        else:
+            self._currentParent = parent
+            self._currentParentId = parentId
+        
 
     def _getOffset(self):
         '''

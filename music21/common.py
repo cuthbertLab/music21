@@ -223,7 +223,7 @@ def isPowerOfTwo(n):
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
-    IMPROVE: when 2.6 is everwhere: add numbers class.
+    IMPROVE: when 2.6 is everywhere: add numbers class.
 
     >>> isNum(3.0)
     True
@@ -232,8 +232,8 @@ def isNum(usrData):
     >>> isNum('three')
     False
     '''
-    if (isinstance(usrData, float) or 
-        isinstance(usrData, int) or 
+    if (isinstance(usrData, int) or 
+        isinstance(usrData, float) or 
         isinstance(usrData, long) or
         isinstance(usrData, decimal.Decimal)):
         return True

@@ -875,18 +875,38 @@ def runPiece(pieceNum = 331):  # random default piece...
             if "capua-ficta" in note.editorial.misc:
                 print note.editorial.misc['capua-ficta']
 
-def compare4a4b():
+def ruleFrequency():
     ballataObj = cadencebook.BallataSheet()
+    num1 = 0
+    num2 = 0
+    num3 = 0
     num4a = 0
     num4b = 0
-    for i in range(2, 15): # all ballate
+    for i in range(2, 10): #459): # all ballate
         pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         theseStreams = pieceObj.getAllStreams()
         for thisStream in theseStreams:
-            num4a += capuaRuleFourA(thisStream)
+            num1 += 0#capuaRuleOne(thisStream)
+            num2 += 0#capuaRuleTwo(thisStream)
+            num3 += 0#capuaRuleThree(thisStream)
+            num4a += 0#capuaRuleFourA(thisStream)
             num4b += capuaRuleFourB(thisStream)
-    
-    return (num4a, num4b)
+            
+    return (num1, num2, num3, num4a, num4b)
+
+def showFourA():
+    ballataObj = cadencebook.BallataSheet()
+    showStream = music21.stream.Stream()
+    for i in range(2, 45): #459): # all ballate
+        pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
+
+        theseStreams = pieceObj.getAllStreams()
+        for thisStream in theseStreams:
+            if capuaRuleFourA(thisStream) > 0:
+                showStream.append(thisStream)
+
+    showStream.lily.showPNG()
+
 
 class TestExternal(unittest.TestCase):
 
@@ -1011,12 +1031,18 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.color == "green"
 #        assert stream1.lily.strip() == r'''\clef "treble" \color "yellow" d'4 \color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4'''
 
-    def testCompare4a4b(self):        
-        (a, b) = compare4a4b()
-        print a
-        print b
-#        self.assertEqual(a, 200)
-#        self.assertEqual(b, 400)
+    def xtestRuleFrequency(self):        
+        (num1, num2, num3, num4a, num4b) = ruleFrequency()
+        print num1
+        print num2
+        print num3
+        print num4a
+        print num4b
+#        self.assertEqual(num4a,  57)
+#        self.assertEqual(num4b, 104)
+    
+    def testShowFourA(self):
+        showFourA()
         
 if (__name__ == "__main__"):
     music21.mainTest(Test) #, TestExternal)

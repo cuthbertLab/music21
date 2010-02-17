@@ -113,6 +113,9 @@ class TinyNotationLine(object):
             self.stream.append(thisNote)
         
     def getNote(self, stringRep, storedDict = {}):
+        '''
+        called out so as to be subclassable
+        '''
         try:
             tcN = TinyNotationNote(stringRep, storedDict)
             return tcN
@@ -120,9 +123,17 @@ class TinyNotationLine(object):
             raise TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
 
 class TinyNotationNote(object):
-    ''' tcN = TinyNotationNote("AA-4.~")
-    note1 = tcN.note
-    note1.name # A-
+    ''' 
+    >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
+    >>> note1 = tcN.note
+    >>> note1.name
+    'A-'
+    >>> note1.octave
+    2
+    >>> note1.lyric
+    'hel-'
+    >>> note1.id
+    'aflat'
     '''
     
     REST    = compile('r')
@@ -140,7 +151,8 @@ class TinyNotationNote(object):
     PRECTIE = compile('\~')  # front ties
     DBLDOT  = compile('\.\.') 
     DOT     = compile('\.')
-    ID_EL   = compile('\=(.*)')
+    ID_EL   = compile('\=([A-Za-z0-9]*)')
+    LYRIC   = compile('\_(.*)')
 
     debug = False
 
@@ -153,7 +165,11 @@ class TinyNotationNote(object):
             stringRep = self.PRECTIE.sub("", stringRep)
             storedtie = music21.note.Tie("stop")
 
-        if (self.REST.match(stringRep) is not None): # rest
+        x = self.customPitchMatch(stringRep)
+        
+        if x is not None:
+            noteObj = x
+        elif (self.REST.match(stringRep) is not None): # rest
             noteObj = music21.note.Rest()
         elif (self.OCTAVE2.match(stringRep)): # BB etc.
             noteObj = self._getPitch(self.OCTAVE2.match(stringRep), 2)
@@ -235,6 +251,9 @@ class TinyNotationNote(object):
 
         if self.ID_EL.search(stringRep):
             noteObj.id = self.ID_EL.search(stringRep).group(1)
+        
+        if self.LYRIC.search(stringRep):
+            noteObj.lyric = self.LYRIC.search(stringRep).group(1)
             
         self.note = noteObj
 
@@ -249,6 +268,14 @@ class TinyNotationNote(object):
         noteObj.step = matchObj.group(1).upper()
         noteObj.octave = octave
         return noteObj
+
+    def customPitchMatch(self, stringRep):
+        '''
+        method to create a note object in sub classes of tiny notation.  
+        Should return a Note-like object or None
+        '''
+        return None
+
 
 class TinyNotationException(Exception):
     pass
