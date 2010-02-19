@@ -1552,7 +1552,6 @@ class TestExternal(unittest.TestCase):
                 if pc not in chordRaw:
                     chordRaw.append(pc)
             c = Chord(chordRaw)
-            environLocal.printDebug(['got chord:', c])
             c.quarterLength = 4
             c.addLyric(c.forteClass)
             c.addLyric(str(c.primeForm).replace(' ', ''))

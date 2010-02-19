@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -230,6 +230,16 @@ class Test(unittest.TestCase):
             self.assertNotEqual(len(a), 0)
             workSlashes = re.sub(r'\\', '/', a)
             self.assertEqual(workSlashes.endswith(known), True)
+
+
+    def testBachKeys(self):
+        from music21 import key
+        for fp in getComposer('bach')[-10:]: # get the last 10
+            s = parseWork(fp)
+            # get keys from first part
+            keyStream = s[0].flat.getElementsByClass(key.KeySignature)
+            keyObj = keyStream[0]
+            environLocal.printDebug([keyObj])
 
 
 if __name__ == "__main__":
