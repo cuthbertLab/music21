@@ -1773,7 +1773,7 @@ Note that the beam number does not distinguish sets of beams that overlap, as it
         self.charData = None # string, continue, begin, etc
 
 class Lyric(MusicXMLElement):
-    '''Multiple Lyric objects can be defined within a singlee Note.
+    '''Multiple Lyric objects can be defined within a single Note.
     '''
     def __init__(self, number=None):
         MusicXMLElement.__init__(self)
@@ -1791,7 +1791,7 @@ class Lyric(MusicXMLElement):
         '''
         text = xml.sax.saxutils.escape(text)
         # need to remove hyphens; but &mdash; and similar do not work
-        text = text.replace('-', ':')
+        text = text.replace('-', unichr(8211))
         return text
 
     def _getComponents(self):

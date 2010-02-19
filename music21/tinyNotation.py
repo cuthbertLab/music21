@@ -279,6 +279,23 @@ class TinyNotationNote(object):
 class HarmonyLine(TinyNotationLine):
     '''
     example of subclassing TinyNotationLine to include a possible harmonic representation of the note
+
+    >>> hnl = HarmonyLine("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle " + \
+                          "G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
+    >>> ns = hnl.stream.notes
+    >>> ns[0].step
+    'C'
+    >>> ns[0].editorial.misc['harmony']
+    'F'
+    >>> ns[0].lyric
+    'Mi-'
+    >>> ns[2].isRest
+    True
+    >>> ns[5].name
+    'G'
+    >>> ns[7].name
+    'A-'
+
     '''
     def getNote(self, stringRep, storedDict = {}):
         return HarmonyNote(stringRep, storedDict)
@@ -350,7 +367,7 @@ Total duration of Stream: 6.0
         self.assertEqual(nst1[2].isRest, True)
         self.assertEqual(nst1[5].name, "G")
         self.assertEqual(nst1[7].name, "A-")
-    
+
 class TestExternal(unittest.TestCase):    
 
     def xtestCreateEasyScale(self):

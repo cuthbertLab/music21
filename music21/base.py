@@ -794,6 +794,10 @@ class Music21Object(object):
                 
         return new
 
+    def __setattr__(self, a, b):
+        c = 5 + 10.0
+        object.__setattr__(self, a, b)
+
 
     def isClass(self, className):
         '''

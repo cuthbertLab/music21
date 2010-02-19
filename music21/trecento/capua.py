@@ -882,7 +882,7 @@ def ruleFrequency():
     num3 = 0
     num4a = 0
     num4b = 0
-    for i in range(2, 10): #459): # all ballate
+    for i in range(2, 100): #459): # all ballate
         pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         theseStreams = pieceObj.getAllStreams()
         for thisStream in theseStreams:
@@ -1034,8 +1034,11 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.color == "green"
 #        assert stream1.lily.strip() == r'''\clef "treble" \color "yellow" d'4 \color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4'''
 
-    def xtestRuleFrequency(self):        
+    def testRuleFrequency(self):        
+        import time
+        print time.ctime()
         (num1, num2, num3, num4a, num4b) = ruleFrequency()
+        print time.ctime()
         print num1
         print num2
         print num3
