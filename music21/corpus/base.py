@@ -64,7 +64,6 @@ MODULES = [
     ]
 
 
-
 #-------------------------------------------------------------------------------
 class CorpusException(Exception):
     pass
@@ -210,6 +209,11 @@ mozart = getComposer('mozart')
 haydn = getComposer('haydn')
 bach = getComposer('bach')
 
+# additional libraries to define
+
+bachChorales = []
+beethovenStringQuartets = []
+quartets = []
 
 
 #-------------------------------------------------------------------------------

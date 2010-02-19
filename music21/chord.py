@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -361,6 +361,9 @@ class Chord(note.NotRest):
         (3, 1, 0)
         '''
         pcSet = self._getOrderedPitchClasses()   
+        if len(pcSet) == 0:
+            raise ChordException('cannot access chord tables address for Chord with %s pitches' % len(pcSet))
+
         environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
         card = len(pcSet)
         if card == 1: # its a singleton: return
@@ -1176,11 +1179,39 @@ class Chord(note.NotRest):
         newChord.pitches = tempChordNotes
         return newChord.sortAscending() # creates a second new chord object!
 
+    def semiClosedPosition(self):
+        raise ChordException('not yet implemented')
+
+        # TODO:
+        # moves
+        # everything within an octave EXCEPT if there's already a pitch at that step,
+        # that it puts it up an octave?  That's a very useful display standard for dense
+        # post-tonal chords.
+
+
     #---------------------------------------------------------------------------
     # new methods for forte/pitch class data
 
-# c1.pitchClasses
-# [2, 9, 6, 2]
+    def _formatVectorString(self, vectorList):
+        '''
+        Return a string representation of a vector or set
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1._formatVectorString([3,4,5])
+        '<345>'
+        >>> c1._formatVectorString([10,11,3,5])
+        '<AB35>'
+        '''
+        msg = ['<']
+        for e in vectorList: # should be numbers
+            if e >= 10: 
+                eStr = '%X' % e  # using hex conversion, good up to 15
+            else:
+                eStr = str(e)
+            msg.append(eStr)
+        msg.append('>')
+        return ''.join(msg)
+
 
     def _getPitchClasses(self):
         '''Return a pitch class representation ordered as the original chord.
@@ -1196,8 +1227,7 @@ class Chord(note.NotRest):
         
     pitchClasses = property(_getPitchClasses)    
 
-# c1.multisetCardinality
-# 4
+
     def _getMultisetCardinality(self):
         '''Return the number of pitch classes, regardless of redundancy.
 
@@ -1228,9 +1258,6 @@ class Chord(note.NotRest):
         
     orderedPitchClasses = property(_getOrderedPitchClasses)    
 
-# c1.pcCardinality
-# 3
-
     def _getPitchClassCardinality(self):
         '''Return the number of unique pitch classes
 
@@ -1242,9 +1269,6 @@ class Chord(note.NotRest):
 
     pitchClassCardinality = property(_getPitchClassCardinality)    
 
-
-# c1.forteClass
-# '3-11'
 
     def _getForteClass(self):
         '''Return a forte class name
@@ -1263,27 +1287,31 @@ class Chord(note.NotRest):
     forteClass = property(_getForteClass)    
 
 
-# c1.normalForm
-# [0, 4, 7] 
-
     def _getNormalForm(self):
         '''
         >>> c1 = Chord(['c', 'e-', 'g'])
         >>> c1.normalForm
-        (0, 3, 7)
+        [0, 3, 7]
 
         >>> c2 = Chord(['c', 'e', 'g'])
         >>> c2.normalForm
-        (0, 4, 7)
+        [0, 4, 7]
         '''
         self._updateChordTablesAddress()
-        return chordTables.addressToNormalForm(self._chordTablesAddress)
+        return list(chordTables.addressToNormalForm(self._chordTablesAddress))
         
     normalForm = property(_getNormalForm)    
 
 
-# c1.forteClassNumber
-# 11
+    def _getNormalFormString(self):        
+        '''
+        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> c1.normalFormString
+        '<034>'
+        '''
+        return self._formatVectorString(self._getNormalForm())
+
+    normalFormString = property(_getNormalFormString)    
 
     def _getForteClassNumber(self):
         '''Get the Forte class index number.
@@ -1302,8 +1330,6 @@ class Chord(note.NotRest):
         
     forteClassNumber = property(_getForteClassNumber)    
 
-# c1.primeForm
-# [0, 3, 7]
 
     def _getPrimeForm(self):
         '''Get the Forte class index number.
@@ -1312,19 +1338,26 @@ class Chord(note.NotRest):
 
         >>> c1 = Chord(['c', 'e-', 'g'])
         >>> c1.primeForm
-        (0, 3, 7)
+        [0, 3, 7]
         >>> c2 = Chord(['c', 'e', 'g'])
         >>> c2.primeForm
-        (0, 3, 7)
+        [0, 3, 7]
         '''
         self._updateChordTablesAddress()
-        return chordTables.addressToPrimeForm(self._chordTablesAddress)
+        return list(chordTables.addressToPrimeForm(self._chordTablesAddress))
         
     primeForm = property(_getPrimeForm)    
 
+    def _getPrimeFormString(self):        
+        '''
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.primeFormString
+        '<037>'
+        '''
+        return self._formatVectorString(self._getPrimeForm())
 
-# c1.intervalVector
-# [0,0,1,1,1,0]
+    primeFormString = property(_getPrimeFormString)    
+
 
     def _getIntervalVector(self):
         '''Get the Forte class index number.
@@ -1333,18 +1366,27 @@ class Chord(note.NotRest):
 
         >>> c1 = Chord(['c', 'e-', 'g'])
         >>> c1.intervalVector
-        (0, 0, 1, 1, 1, 0)
+        [0, 0, 1, 1, 1, 0]
         >>> c2 = Chord(['c', 'e', 'g'])
         >>> c2.intervalVector
-        (0, 0, 1, 1, 1, 0)
+        [0, 0, 1, 1, 1, 0]
         '''
         self._updateChordTablesAddress()
-        return chordTables.addressToIntervalVector(self._chordTablesAddress)
+        return list(chordTables.addressToIntervalVector(
+               self._chordTablesAddress))
         
     intervalVector = property(_getIntervalVector)    
 
-# c1.isPrimeFormInversion
-# True
+    def _getIntervalVectorString(self):        
+        '''
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.intervalVectorString
+        '<001110>'
+        '''
+        return self._formatVectorString(self._getIntervalVector())
+
+    intervalVectorString = property(_getIntervalVectorString)    
+
 
     def _isPrimeFormInversion(self):
         '''Get the Forte class index number.
@@ -1367,11 +1409,6 @@ class Chord(note.NotRest):
     isPrimeFormInversion = property(_isPrimeFormInversion)    
 
 
-# c1.hasZRelation
-# False
-# c2.hasZRelation
-# True
-
     def _hasZRelation(self):
         '''Get the Z-relation status
 
@@ -1391,9 +1428,6 @@ class Chord(note.NotRest):
             return True
         
     hasZRelation = property(_hasZRelation)    
-
-# c2.areZRelations(c3)
-# True
 
 # c2.getZRelation()  # returns a list in non-ET12 space...
 # <music21.chord.ForteSet at 0x234892>
@@ -1421,9 +1455,6 @@ class Chord(note.NotRest):
             else:
                 return False
 
-# c1.commonName
-# "Major Chord"
-
     def _getCommonName(self):
         '''Get the common name of the TN set class.
 
@@ -1442,9 +1473,6 @@ class Chord(note.NotRest):
         
     commonName = property(_getCommonName)    
 
-
-# c1.pitchedCommonName
-# "D-Major Chord"
 
     def _getPitchedCommonName(self):
         '''Get the common name of the TN set class.
@@ -1465,6 +1493,12 @@ class Chord(note.NotRest):
             nameStr = post[0] # get first
         else:
             nameStr = ''
+
+        try:
+            root = self.root()
+        except ChordException: # if a root cannot be found
+            root = self.pitches[0]
+
         return '%s-%s' % (self.root(), nameStr)
     pitchedCommonName = property(_getPitchedCommonName)    
 
@@ -1919,10 +1953,10 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.orderedPitchClasses, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.pitchClassCardinality, 6)
         self.assertEqual(c1.forteClass, '6-29')
-        self.assertEqual(c1.normalForm, (0, 1, 3, 6, 8, 9))
+        self.assertEqual(c1.normalForm, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.forteClassNumber, 29)
-        self.assertEqual(c1.primeForm, (0, 1, 3, 6, 8, 9))
-        self.assertEqual(c1.intervalVector, (2, 2, 4, 2, 3, 2))
+        self.assertEqual(c1.primeForm, [0, 1, 3, 6, 8, 9])
+        self.assertEqual(c1.intervalVector, [2, 2, 4, 2, 3, 2])
         self.assertEqual(c1.isPrimeFormInversion, False)
         self.assertEqual(c1.hasZRelation, True)
         self.assertEqual(c1.areZRelations(Chord([0,1,4,6,7,9])), True)

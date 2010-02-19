@@ -55,6 +55,14 @@ class KeySignatureException(Exception):
     pass
 
 #-------------------------------------------------------------------------------
+
+# some ideas
+# c1 = chord.Chord(["D", "F", "A"])
+# k1 = key.Key("C")
+# c2 = k1.chordByRoman("ii")
+# c1 == c2
+# True
+
 class Key(music21.Music21Object):
     '''
     Note that a key is a sort of hypothetical/conceptual object.
@@ -179,27 +187,27 @@ class KeySignature(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
-    def _getPitchMode(self):
+    def _getPitchAndMode(self):
         '''Returns a musicxml.KeySignature object
        
         >>> keyArray = [KeySignature(x) for x in range(-7,8)]
-        >>> keyArray[0].pitchMode
+        >>> keyArray[0].pitchAndMode
         (C-, None)
-        >>> keyArray[1].pitchMode
+        >>> keyArray[1].pitchAndMode
         (G-, None)
-        >>> keyArray[2].pitchMode
+        >>> keyArray[2].pitchAndMode
         (D-, None)
-        >>> keyArray[3].pitchMode
+        >>> keyArray[3].pitchAndMode
         (A-, None)
-        >>> keyArray[4].pitchMode
+        >>> keyArray[4].pitchAndMode
         (E-, None)
-        >>> keyArray[5].pitchMode
+        >>> keyArray[5].pitchAndMode
         (B-, None)
-        >>> keyArray[6].pitchMode
+        >>> keyArray[6].pitchAndMode
         (F, None)
-        >>> keyArray[7].pitchMode
+        >>> keyArray[7].pitchAndMode
         (C, None)
-        >>> keyArray[8].pitchMode
+        >>> keyArray[8].pitchAndMode
         (G, None)
         '''
         # this works but returns sharps
@@ -207,7 +215,7 @@ class KeySignature(music21.Music21Object):
         pitchObj = sharpsToPitch(self.sharps)
         return pitchObj, self.mode
 
-    pitchMode = property(_getPitchMode)
+    pitchAndMode = property(_getPitchAndMode)
 
 
 
