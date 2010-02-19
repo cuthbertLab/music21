@@ -5,6 +5,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Jackie Rogoff
 #               Amy Hailes 
+#               Christopher Ariza
 #
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
@@ -20,10 +21,10 @@ import math
 import unittest, doctest
 
 import music21
-
+from music21 import common 
 
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
-from music21 import common 
+
 
 DESCENDING = -1
 OBLIQUE    = 0
@@ -40,27 +41,31 @@ TRPAUG     = 8
 TRPDIM     = 9
 
 
+STEPNAMES = ['C','D','E','F','G','A','B']
+
 niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished']
 
 prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd']
-
 orderedPerfSpecs = ['ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA']
 
-perfspecifiers = [TRPDIM, DBLDIM, DIMINISHED, PERFECT, AUGMENTED, DBLAUG, TRPAUG]
-perfoffset = 3 ## that is, Perfect is third on the list.
+perfspecifiers = [TRPDIM, DBLDIM, DIMINISHED, PERFECT, 
+                  AUGMENTED, DBLAUG, TRPAUG]
+perfoffset = 3 # that is, Perfect is third on the list.
 
 orderedImperfSpecs = ['ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA']
-
-specifiers = [TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR, AUGMENTED, DBLAUG, TRPAUG]
+specifiers = [TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR, 
+              AUGMENTED, DBLAUG, TRPAUG]
 majoffset  = 4
-
 stepList = ["C", "D", "E", "F", "G", "A", "B"]
 
-semitonesGeneric = {1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11} #assuming Perfect or Major
+#assuming Perfect or Major
+semitonesGeneric = {1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11} 
 
-semitonesAdjustPerfect = {"P":0, "A":1, "AA":2, "AAA":3, "d":-1, "dd":-2, "ddd":-3} #offset from Perfect
+semitonesAdjustPerfect = {"P":0, "A":1, "AA":2, "AAA":3, 
+                          "d":-1, "dd":-2, "ddd":-3} #offset from Perfect
 
-semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, "d":-2, "dd":-3, "ddd":-4} #offset from Major
+semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, 
+                         "d":-2, "dd":-3, "ddd":-4} #offset from Major
 
 directionTerms = {DESCENDING:"Descending", OBLIQUE:"Oblique", 
                   ASCENDING:"Ascending"}
@@ -235,9 +240,10 @@ class ChromaticInterval(music21.Music21Object):
         music21.Music21Object.__init__(self)
 
         self.semitones = value
-        self.cents     = value * 100
+        self.cents = value * 100
         self.directed = value
         self.undirected = abs(value)
+
         if (self.directed == 0):
             self.direction = OBLIQUE
         elif (self.directed == self.undirected):
@@ -281,6 +287,8 @@ class Interval(music21.Music21Object):
     >>> n1 = note.Note('c3')
     >>> n2 = note.Note('c5')
     >>> a = Interval(note1=n1, note2=n2)
+    >>> a
+    <music21.interval.Interval P15>
     '''
 
     diatonic = None
@@ -418,15 +426,14 @@ def generateInterval(n1, n2 = None):
     <music21.interval.Interval P12>
 
     '''
-    
-    if n2 is None: n2 = music21.note.Note() ## this is not done in the constructor because of looping
-         ## problems with tinyNotationNote
+    if n2 is None: 
+        n2 = music21.note.Note() # this is not done in the constructor because of looping problems with tinyNotationNote
     
     gInt = generateGeneric(n1, n2)
     cInt = generateChromatic(n1, n2)
     dInt = generateDiatonic(gInt, cInt)
     Int1 = Interval(diatonic = dInt, chromatic = cInt,
-                   note1 = n1, note2 = n2)
+                    note1 = n1, note2 = n2)
     return Int1
 
 def generatePitch(pitch1, interval1):
@@ -436,25 +443,29 @@ def generatePitch(pitch1, interval1):
 
     >>> from music21 import pitch
     >>> aPitch = pitch.Pitch('C4')
-    >>> #aInterval = DiatonicInterval('perfect', 5)
-
-    >>> #bPitch = generatePitch(aPitch, aInterval)
+    >>> aInterval = generateIntervalFromString('P5')
+    >>> bPitch = generatePitch(aPitch, aInterval)
+    >>> bPitch
+    G4
+    >>> bInterval = generateIntervalFromString('P-5')
+    >>> cPitch = generatePitch(aPitch, bInterval)
+    >>> cPitch
+    F3
     ''' 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    #print note1.name, "first note"
-    if str(interval1) == interval1:
+    if common.isStr(interval1):
         #print interval1, "same name"
         interval1 = generateIntervalFromString(interval1) 
         #print interval1.name, " int name" # del me
+    else:
+        pass # assuming it is an interval object
+        #raise IntervalException('numeric intervals not yet defined')
         
     firstStep = pitch1.step
     distance = interval1.diatonic.generic.staffDistance
-    #print distance, " staff distance"
-
     newDiatonicNumber = pitch1.diatonicNoteNum + distance
     
-    # TODO 
     pitch2 = copy.deepcopy(pitch1)
 
     (newStep, newOctave) = convertDiatonicNumberToStep(newDiatonicNumber)
@@ -463,13 +474,11 @@ def generatePitch(pitch1, interval1):
     pitch2.accidental = None
        ## at this point note2 has the right note name (step), but possibly
        ## the wrong accidental.  We fix that below
-
-    #print note2.name, "note 2"
-
     interval2 = generateInterval(pitch1, pitch2)
     #print interval2.name, "interval name"
     
-    halfStepsToFix = interval1.chromatic.semitones - interval2.chromatic.semitones
+    halfStepsToFix = (interval1.chromatic.semitones -
+                      interval2.chromatic.semitones)
     pitch2.accidental = halfStepsToFix
     #print note2.name, "note name"
 
@@ -480,9 +489,6 @@ def generateNote(note1, intervalString):
     newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
     return newNote
-
-
-STEPNAMES = ['C','D','E','F','G','A','B']
 
 def convertDiatonicNumberToStep(dn):
     '''Utility conversion; does not process internals
@@ -497,6 +503,16 @@ def convertDiatonicNumberToStep(dn):
 
 
 def _separateIntervalFromString(string):
+    '''
+    >>> _separateIntervalFromString('P5')
+    (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
+    >>> _separateIntervalFromString('P-5')
+    (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval -7>)
+    >>> _separateIntervalFromString('M3')
+    (<music21.interval.DiatonicInterval M3>, <music21.interval.ChromaticInterval 4>)
+    >>> _separateIntervalFromString('m3')
+    (<music21.interval.DiatonicInterval m3>, <music21.interval.ChromaticInterval 3>)
+    '''
     generic = int(string.lstrip('PMmAd'))
     specName = string.rstrip('-0123456789')
     gInterval = GenericInterval(generic)
@@ -511,7 +527,6 @@ def _separateIntervalFromString(string):
         specifier = specifiers[specIndex]
         
     dInterval = DiatonicInterval(specifier, gInterval)
-
     # calculating number of semitones
     octaveOffset = int(abs(gInterval.staffDistance)/7)
     semitonesStart = semitonesGeneric[gInterval.simpleUndirected]
@@ -523,9 +538,9 @@ def _separateIntervalFromString(string):
         semitonesAdjust = semitonesAdjustImperf[specName] # dictionary of semitones distance from major
 
     semitones = (octaveOffset*12) + semitonesStart + semitonesAdjust
-    if generic < 0: semitones *= -1 # want direction to be same as original direction
-                                    # (automatically positive until this step)
-
+    if generic < 0: # want direction to be same as original direction
+        semitones *= -1     # (automatically positive until this step)
+                                
     cInterval = ChromaticInterval(semitones)
     return (dInterval, cInterval)
 
@@ -607,8 +622,8 @@ def getSpecifier(gInt, cInt):
         specifier = specifiers[majoffset + theseSemis - normalSemis]
     return specifier    
 
-#-----------------------------------------------------------
 
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -766,7 +781,7 @@ class Test(unittest.TestCase):
         lower2 = getWrittenLowerNote(nFflat, nEsharp)
         lower3 = getWrittenLowerNote(nF1, nF2)
         
-        assert lower1 == nE
+        self.assertEqual(lower1, nE)
         assert lower2 == nEsharp
         assert lower3 == nF1  ## still returns first.
         

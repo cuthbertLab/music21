@@ -18,12 +18,43 @@ from music21 import musicxml
 
 
 #-------------------------------------------------------------------------------
+def sharpsToPitch(sharpCount):
+    '''Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value.
+
+    >>> sharpsToPitch(1)
+    G
+    >>> sharpsToPitch(1)
+    G
+    >>> sharpsToPitch(2)
+    D
+    >>> sharpsToPitch(-2)
+    B-
+    >>> sharpsToPitch(-6)
+    G-
+    >>> sharpsToPitch(6)
+    F#
+    '''
+    pitchInit = pitch.Pitch('C')
+    pitchInit.octave = None
+    # keyPc = (self.sharps * 7) % 12
+    if sharpCount > 0:
+        intervalStr = 'P5'
+    elif sharpCount < 0:
+        intervalStr = 'P-5'
+    else:
+        return pitchInit # C
+
+    intervalObj = interval.generateIntervalFromString(intervalStr)
+    for x in range(abs(sharpCount)):
+        pitchInit = interval.generatePitch(pitchInit, intervalObj)    
+    pitchInit.octave = None
+    return pitchInit
+
+
 class KeySignatureException(Exception):
     pass
 
-
 #-------------------------------------------------------------------------------
-
 class Key(music21.Music21Object):
     '''
     Note that a key is a sort of hypothetical/conceptual object.
@@ -145,12 +176,38 @@ class KeySignature(music21.Music21Object):
         if mxMode != None:
             self.mode = mxMode
 
-
     mx = property(_getMX, _setMX)
 
 
+    def _getPitchMode(self):
+        '''Returns a musicxml.KeySignature object
+       
+        >>> keyArray = [KeySignature(x) for x in range(-7,8)]
+        >>> keyArray[0].pitchMode
+        (C-, None)
+        >>> keyArray[1].pitchMode
+        (G-, None)
+        >>> keyArray[2].pitchMode
+        (D-, None)
+        >>> keyArray[3].pitchMode
+        (A-, None)
+        >>> keyArray[4].pitchMode
+        (E-, None)
+        >>> keyArray[5].pitchMode
+        (B-, None)
+        >>> keyArray[6].pitchMode
+        (F, None)
+        >>> keyArray[7].pitchMode
+        (C, None)
+        >>> keyArray[8].pitchMode
+        (G, None)
+        '''
+        # this works but returns sharps
+        # keyPc = (self.sharps * 7) % 12
+        pitchObj = sharpsToPitch(self.sharps)
+        return pitchObj, self.mode
 
-
+    pitchMode = property(_getPitchMode)
 
 
 
