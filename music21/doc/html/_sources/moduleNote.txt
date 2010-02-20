@@ -1,3 +1,5 @@
+.. _moduleNote:
+
 music21.note
 ============
 
@@ -50,6 +52,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined
@@ -288,6 +292,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -318,6 +324,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from note.GeneralNote
 
@@ -342,8 +350,6 @@ Inherited from note.NotRest
 Inherited from note.Note
 
 **setAccidental()**
-
-**midiNote()**
 
 **isUnpitched()**
 
@@ -380,6 +386,8 @@ Inherited from note.GeneralNote
 Inherited from note.Note
 
 **step**
+
+**ps**
 
 **pitchClass**
 
@@ -422,6 +430,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -449,6 +459,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined
@@ -580,6 +592,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -610,6 +624,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from note.GeneralNote
 
@@ -634,8 +650,6 @@ Inherited from note.NotRest
 Inherited from note.Note
 
 **setAccidental()**
-
-**midiNote()**
 
 **isUnpitched()**
 
@@ -672,6 +686,8 @@ Inherited from note.GeneralNote
 Inherited from note.Note
 
 **step**
+
+**ps**
 
 **pitchClass**
 
@@ -825,6 +841,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -852,6 +870,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from note.GeneralNote
@@ -937,6 +957,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -967,6 +989,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from note.GeneralNote
 
@@ -991,9 +1015,6 @@ Inherited from note.NotRest
 Locally Defined
 
 **setAccidental()**
-
-
-**midiNote()**
 
 
 **isUnpitched()**
@@ -1038,6 +1059,17 @@ Locally Defined
 
 **step**
 
+
+**ps**
+
+    Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
+
+    >>> a = Note()
+    >>> a.ps = 60.5
+    >>> a.midi
+    61 
+    >>> a.ps
+    60.5 
 
 **pitchClass**
 
@@ -1104,6 +1136,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 Methods
@@ -1125,6 +1159,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~
@@ -1296,6 +1332,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -1326,6 +1364,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from note.GeneralNote
 
@@ -1350,8 +1390,6 @@ Inherited from note.NotRest
 Inherited from note.Note
 
 **setAccidental()**
-
-**midiNote()**
 
 **isUnpitched()**
 
@@ -1388,6 +1426,8 @@ Inherited from note.GeneralNote
 Inherited from note.Note
 
 **step**
+
+**ps**
 
 **pitchClass**
 
@@ -1430,6 +1470,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -1457,6 +1499,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from note.GeneralNote
@@ -1544,6 +1588,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **type**
@@ -1567,6 +1613,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~
@@ -1607,6 +1655,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -1634,6 +1684,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from note.GeneralNote
@@ -1714,6 +1766,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
@@ -1744,6 +1798,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from note.GeneralNote
 
@@ -1768,8 +1824,6 @@ Inherited from note.NotRest
 Inherited from note.Note
 
 **setAccidental()**
-
-**midiNote()**
 
 **isUnpitched()**
 
@@ -1806,6 +1860,8 @@ Inherited from note.GeneralNote
 Inherited from note.Note
 
 **step**
+
+**ps**
 
 **pitchClass**
 

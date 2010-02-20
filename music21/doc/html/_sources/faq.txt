@@ -8,7 +8,7 @@ General
 
 How do I ask a question so that it becomes frequently asked?
 
-    Don't you hate FAQs that are not based on anything anyone's ever asked?  To ask, email cuthbert@mit.edu, after reading below.
+    Don't you hate FAQs that are not based on anything anyone's ever asked?  To ask, post to http://groups.google.com/group/music21list, after reading below.
 
 
 What is the native music21 data format?
@@ -31,7 +31,12 @@ What is the native music21 data format?
 
 Can I synthesize sounds with music21?
 
-    Maybe, maybe not.  But if that's your main goal, you're missing the point of the package. Music21 is for manipulating symbolic musical data. Symbolic output can, however, be used as control data within a large variety of synthesis packages.  And we do output MIDI, if that's good enough for your purposes.
+    Music21 is for manipulating symbolic musical data. Symbolic output can, however, be used as control data within a large variety of synthesis packages. Writing a python script to author alternative data formats is one of many plausible approaches.
+
+How do I install music21?
+
+    Please see the complete install instructions: :ref:`install`.
+
 
 
 Utilities

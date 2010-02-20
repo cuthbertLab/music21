@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installing Music21 &mdash; music21 v0.2.2a1 documentation</title>
+    <title>Installing Music21 &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,9 +20,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
-    <link rel="next" title="Setting up and Configuring Environment" href="environment.html" />
-    <link rel="prev" title="Authors, Contributing, and Licensing" href="about.html" /> 
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="Authors, Contributing, and Licensing" href="about.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
   </head>
   <body>
     <div class="related">
@@ -32,12 +32,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="environment.html" title="Setting up and Configuring Environment"
+          <a href="about.html" title="Authors, Contributing, and Licensing"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="about.html" title="Authors, Contributing, and Licensing"
+          <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,17 +47,72 @@
           <div class="body">
             
   <div class="section" id="installing-music21">
-<h1>Installing Music21<a class="headerlink" href="#installing-music21" title="Permalink to this headline">¶</a></h1>
-<p>Music21 can be installed with a number of different methods. Choose the installation method you are most comfortable with using.</p>
-<div class="section" id="installing-from-source">
-<h2>Installing from Source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
-<p>The music21.zip or music21.tgz distribution permits easy installation using Python&#8217;s setup utility.</p>
-<p>To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.</p>
+<span id="install"></span><h1>Installing Music21<a class="headerlink" href="#installing-music21" title="Permalink to this headline">¶</a></h1>
+<p>Music21 can be installed with a number of different methods. Based on your platform, choose the installation method you are most comfortable with using.</p>
+<div class="section" id="check-your-python">
+<h2>Check Your Python<a class="headerlink" href="#check-your-python" title="Permalink to this headline">¶</a></h2>
+<p>Music21 requires Python 2.6 to run. Python 3.x is not yet supported. Check that you have Python on your system, and that that Python is up to date.</p>
+<div class="section" id="downloading-python">
+<h3>Downloading Python<a class="headerlink" href="#downloading-python" title="Permalink to this headline">¶</a></h3>
+<p>Python 2.6 is available for all platforms and can be downloaded from the following URL:
+<a class="reference external" href="http://www.python.org/download">http://www.python.org/download</a></p>
 </div>
-<div class="section" id="installing-from-subversion-svn">
-<h2>Installing from Subversion (SVN)<a class="headerlink" href="#installing-from-subversion-svn" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="windows-finding-python-version">
+<h3>Windows: Finding Python Version<a class="headerlink" href="#windows-finding-python-version" title="Permalink to this headline">¶</a></h3>
+<p>TBW</p>
+</div>
+<div class="section" id="linux-mac-os-x-finding-python-version">
+<h3>Linux/Mac OS X: Finding Python Version<a class="headerlink" href="#linux-mac-os-x-finding-python-version" title="Permalink to this headline">¶</a></h3>
+<p>Open a shell or terminal (e.g. xterm, Terminal.app) and enter the following comand-line argument</p>
+<div class="highlight-python"><pre>$ python -V
+Python 2.6.2</pre>
+</div>
+</div>
+</div>
+<div class="section" id="downloading-a-music21-package">
+<h2>Downloading a Music21 Package<a class="headerlink" href="#downloading-a-music21-package" title="Permalink to this headline">¶</a></h2>
+<p>Download the most-recent music21 paackage from the following URL. Windows users should download the .exe file; Linux / Mac OS X users should download the .tar.gz file.</p>
+<p><a class="reference external" href="http://code.google.com/p/music21/downloads/list">http://code.google.com/p/music21/downloads/list</a></p>
 <p>For developers and advanced users, anonymous SVN access is available from Google Code. Enter the following command line argument or SVN commnds:</p>
 <div class="highlight-python"><pre>svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only</pre>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Installing Music21<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called &#8216;site-packages&#8217;. The site-packages directory is located in different places depending on your platform.</p>
+<div class="section" id="windows-installation">
+<h3>Windows Installation<a class="headerlink" href="#windows-installation" title="Permalink to this headline">¶</a></h3>
+<p>TBW</p>
+</div>
+<div class="section" id="linux-mac-os-x-installation">
+<h3>Linux/Mac OS X Installation<a class="headerlink" href="#linux-mac-os-x-installation" title="Permalink to this headline">¶</a></h3>
+<p>Open a shell or terminal (e.g. xterm, Terminal.app), enter the outer-most music21 directory (using cd), and use python to execute the setup.py file with the &#8216;install&#8217; argument:</p>
+<div class="highlight-python"><pre>$ cd /path/to/dir/music21-version
+$ python setup.py install</pre>
+</div>
+<p>On Mac OS X, and possible on other systems, you may need special permission to write in the Python site-packages directory. An easy way to tepmorarily gain this permission is to use the sudi command. If the above returns a permissions error, try the following:</p>
+<div class="highlight-python"><pre>$ sudo python setup.py install</pre>
+</div>
+</div>
+</div>
+<div class="section" id="downloading-and-installing-music21-with-setuptools-or-pip">
+<h2>Downloading and Installing Music21 with setuptools or pip<a class="headerlink" href="#downloading-and-installing-music21-with-setuptools-or-pip" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to download and install music21 is with one of the powerful automated Python package installers available. This tools can also be used to update an existing music21 installation to the most-recent version.</p>
+<div class="section" id="automated-installation-with-setuptools">
+<h3>Automated Installation with setuptools<a class="headerlink" href="#automated-installation-with-setuptools" title="Permalink to this headline">¶</a></h3>
+<p>First, install setuptools:</p>
+<p><a class="reference external" href="http://pypi.python.org/pypi/setuptools">http://pypi.python.org/pypi/setuptools</a></p>
+<p>Second, install and/or update music21 with the following command-line argument:</p>
+<div class="highlight-python"><pre>$ sudo easy_install music21</pre>
+</div>
+</div>
+<div class="section" id="automated-installation-with-pip">
+<h3>Automated Installation with pip<a class="headerlink" href="#automated-installation-with-pip" title="Permalink to this headline">¶</a></h3>
+<p>First, install pip:</p>
+<p><a class="reference external" href="http://pypi.python.org/pypi/pip">http://pypi.python.org/pypi/pip</a></p>
+<p>Second, install and/or update music21 with the following command-line argument:</p>
+<div class="highlight-python"><pre>$ pip install music21</pre>
+</div>
 </div>
 </div>
 <div class="section" id="installing-additional-python-components">
@@ -70,7 +125,7 @@
 </div>
 <div class="section" id="matplotlib">
 <h3>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h3>
-<p>Graphing and visual displays in Music21 are provided by Matplotlib.</p>
+<p>Graphing and visual displays in Music21 are provided by Matplotlib. Matplotlib itself has additional dependencies. Please read the detailed instructions below.</p>
 <p><a class="reference external" href="http://matplotlib.sourceforge.net/">http://matplotlib.sourceforge.net/</a></p>
 </div>
 </div>
@@ -99,8 +154,23 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Installing Music21</a><ul>
-<li><a class="reference external" href="#installing-from-source">Installing from Source</a></li>
-<li><a class="reference external" href="#installing-from-subversion-svn">Installing from Subversion (SVN)</a></li>
+<li><a class="reference external" href="#check-your-python">Check Your Python</a><ul>
+<li><a class="reference external" href="#downloading-python">Downloading Python</a></li>
+<li><a class="reference external" href="#windows-finding-python-version">Windows: Finding Python Version</a></li>
+<li><a class="reference external" href="#linux-mac-os-x-finding-python-version">Linux/Mac OS X: Finding Python Version</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#downloading-a-music21-package">Downloading a Music21 Package</a></li>
+<li><a class="reference external" href="#id1">Installing Music21</a><ul>
+<li><a class="reference external" href="#windows-installation">Windows Installation</a></li>
+<li><a class="reference external" href="#linux-mac-os-x-installation">Linux/Mac OS X Installation</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#downloading-and-installing-music21-with-setuptools-or-pip">Downloading and Installing Music21 with setuptools or pip</a><ul>
+<li><a class="reference external" href="#automated-installation-with-setuptools">Automated Installation with setuptools</a></li>
+<li><a class="reference external" href="#automated-installation-with-pip">Automated Installation with pip</a></li>
+</ul>
+</li>
 <li><a class="reference external" href="#installing-additional-python-components">Installing Additional Python Components</a><ul>
 <li><a class="reference external" href="#python-imaging-library-pil">Python Imaging Library (PIL)</a></li>
 <li><a class="reference external" href="#matplotlib">Matplotlib</a></li>
@@ -116,11 +186,11 @@
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="about.html"
-                                  title="previous chapter">Authors, Contributing, and Licensing</a></p>
+            <p class="topless"><a href="examples.html"
+                                  title="previous chapter">Examples</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="environment.html"
-                                  title="next chapter">Setting up and Configuring Environment</a></p>
+            <p class="topless"><a href="about.html"
+                                  title="next chapter">Authors, Contributing, and Licensing</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/install.txt"
@@ -150,17 +220,17 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="environment.html" title="Setting up and Configuring Environment"
+          <a href="about.html" title="Authors, Contributing, and Licensing"
              >next</a> |</li>
         <li class="right" >
-          <a href="about.html" title="Authors, Contributing, and Licensing"
+          <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

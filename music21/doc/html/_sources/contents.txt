@@ -11,12 +11,12 @@ Music21 Documentation
    overviewNotes
    overviewStreams
    overviewFormats
+   overviewPostTonal
    examples
-   about
    install
+   about
    environment
    graphing
-   glossary
    faq
    moduleBase
    moduleCommon
@@ -32,6 +32,7 @@ Music21 Documentation
    moduleNote
    modulePitch
    moduleStream
+   moduleSerial
 
 Indices and Tables
 ==================

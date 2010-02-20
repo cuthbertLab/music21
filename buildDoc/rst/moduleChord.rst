@@ -1,3 +1,5 @@
+.. _moduleChord:
+
 music21.chord
 =============
 
@@ -25,13 +27,13 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **lyrics**
 
 **notations**
-
-**pitches**
 
 **tie**
 
@@ -56,6 +58,8 @@ Inherited from base.Music21Object
 **duration()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from note.GeneralNote
@@ -99,6 +103,34 @@ Locally Defined
 
 **sortAscending()**
 
+
+**semiClosedPosition()**
+
+
+**seekChordTablesAddress()**
+
+    Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary. 
+
+    >>> c1 = Chord(['c3'])
+    >>> c1.orderedPitchClasses
+    [0] 
+    >>> c1.seekChordTablesAddress()
+    (1, 1, 0) 
+    >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
+    >>> c1.seekChordTablesAddress()
+    (11, 1, 0) 
+    >>> c1 = Chord(['c', 'e', 'g'])
+    >>> c1.seekChordTablesAddress()
+    (3, 11, -1) 
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.seekChordTablesAddress()
+    (3, 11, 1) 
+    >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+    >>> c1.seekChordTablesAddress()
+    (7, 34, 0) 
+    >>> c1 = Chord(['c', 'c#', 'd'])
+    >>> c1.seekChordTablesAddress()
+    (3, 1, 0) 
 
 **root()**
 
@@ -188,9 +220,13 @@ Locally Defined
 
     Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
+    >>> a = Chord(['b', 'g', 'd', 'f'])
+    >>> a.isDominantSeventh()
+    True 
+
 **isDiminishedTriad()**
 
-    Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
+    Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
     >>> cchord = Chord (['C', 'E-', 'G-'])
     >>> other = Chord (['C', 'E-', 'F#'])
@@ -203,9 +239,13 @@ Locally Defined
 
     Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
+    >>> a = Chord(['c', 'e-', 'g-', 'b--'])
+    >>> a.isDiminishedSeventh()
+    True 
+
 **isAugmentedTriad()**
 
-    Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. Examples 
+    Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. 
 
     >>> import music21.chord
     >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
@@ -231,9 +271,17 @@ Locally Defined
 
     Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None. 
 
+    >>> a = Chord(['g', 'b', 'd', 'f'])
+    >>> a.inversionName()
+    43 
+
 **inversion()**
 
     returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root. 
+
+    >>> a = Chord(['g', 'b', 'd', 'f'])
+    >>> a.inversion()
+    2 
 
 **hasThird()**
 
@@ -310,6 +358,13 @@ Locally Defined
 
     returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? TODO: determine permanent designation abbreviation for every type of chord and inversion 
 
+    >>> a = Chord(['a', 'c#', 'e'])
+    >>> a.determineType()
+    'Major Triad' 
+    >>> a = Chord(['g', 'b', 'd', 'f'])
+    >>> a.determineType()
+    'Dominant Seventh' 
+
 **containsTriad()**
 
     returns True or False if there is no triad above the root. "Contains vs. Is": A dominant-seventh chord contains a triad. example: 
@@ -323,7 +378,7 @@ Locally Defined
 
 **containsSeventh()**
 
-    returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can't be determined example: 
+    returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can't be determined 
 
     >>> cchord = Chord (['C', 'E', 'G', 'B'])
     >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
@@ -347,9 +402,26 @@ Locally Defined
 
 **canBeTonic()**
 
+    
+
+    
+
+    >>> a = Chord(['g', 'b', 'd', 'f'])
+    >>> a.canBeTonic()
+    False 
+    >>> a = Chord(['g', 'b', 'd'])
+    >>> a.canBeTonic()
+    True 
 
 **canBeDominantV()**
 
+    
+
+    
+
+    >>> a = Chord(['g', 'b', 'd', 'f'])
+    >>> a.canBeDominantV()
+    True 
 
 **bass()**
 
@@ -358,6 +430,18 @@ Locally Defined
     >>> cmaj = Chord(['C', 'E', 'G'])
     >>> cmaj.bass() # returns C
     C 
+
+**areZRelations()**
+
+    Check of chord other is also a z relations 
+
+    >>> c1 = Chord(["C", "c#", "e", "f#"])
+    >>> c2 = Chord(["C", "c#", "e-", "g"])
+    >>> c3 = Chord(["C", "c#", "f#", "g"])
+    >>> c1.areZRelations(c2)
+    True 
+    >>> c1.areZRelations(c3)
+    False 
 
 Properties
 ~~~~~~~~~~
@@ -385,6 +469,83 @@ Inherited from note.GeneralNote
 
 Locally Defined
 
+**primeFormString**
+
+    
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.primeFormString
+    '<037>' 
+
+**primeForm**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.primeForm
+    [0, 3, 7] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.primeForm
+    [0, 3, 7] 
+
+**pitches**
+
+    TODO: presently, whenever pitches are accessed, it sets the _chordTablesAddressNeedsUpdating value to false this is b/c the pitches list can be accessed and appended to a better way to do this needs to be found 
+
+**pitchedCommonName**
+
+    Get the common name of the TN set class. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.pitchedCommonName
+    'C-minor triad' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.pitchedCommonName
+    'C-major triad' 
+
+**pitchClasses**
+
+    Return a pitch class representation ordered as the original chord. 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.pitchClasses
+    [2, 9, 6, 2] 
+
+**pitchClassCardinality**
+
+    Return the number of unique pitch classes 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.pitchClassCardinality
+    3 
+
+**orderedPitchClasses**
+
+    Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.orderedPitchClasses
+    [2, 6, 9] 
+
+**normalFormString**
+
+    
+
+    >>> c1 = Chord(['f#', 'e-', 'g'])
+    >>> c1.normalFormString
+    '<034>' 
+
+**normalForm**
+
+    
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.normalForm
+    [0, 3, 7] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.normalForm
+    [0, 4, 7] 
+
 **mx**
 
     Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
@@ -407,9 +568,99 @@ Locally Defined
     >>> mxNoteList[2].get('chord')
     True 
 
+**multisetCardinality**
+
+    Return the number of pitch classes, regardless of redundancy. 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.multisetCardinality
+    4 
+
 **lily**
 
     The name of the note as it would appear in Lilypond format. 
+
+**isPrimeFormInversion**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.isPrimeFormInversion
+    False 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.isPrimeFormInversion
+    True 
+
+**intervalVectorString**
+
+    
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.intervalVectorString
+    '<001110>' 
+
+**intervalVector**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.intervalVector
+    [0, 0, 1, 1, 1, 0] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.intervalVector
+    [0, 0, 1, 1, 1, 0] 
+
+**hasZRelation**
+
+    Get the Z-relation status 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.hasZRelation
+    False 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.hasZRelation
+    False 
+
+**forteClassNumber**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClassNumber
+    11 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClassNumber
+    11 
+
+**forteClass**
+
+    Return a forte class name 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClass
+    '3-11A' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClass
+    '3-11B' 
+
+**commonName**
+
+    Get the common name of the TN set class. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.commonName
+    ['minor triad'] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.commonName
+    ['major triad'] 
+
+**chordTablesAddress**
+
+    
+
+    >>> c = Chord(["C4", "E4", "G#4"])
+    >>> c.chordTablesAddress
+    (3, 12, 0) 
 
 
 Class Duration

@@ -1,3 +1,5 @@
+.. _moduleDuration:
+
 music21.duration
 ================
 

@@ -4,7 +4,16 @@
 Overview: File and Data Formats
 ==========================================
 
-Music21 is a tool kit for computer-aided musicology
+Music21 supports numerous file and data formats.  
+
+For complete documentation on file and data formats, see :ref:`moduleConverter`.
+
+
+Text
+-----------------------
+
+Text output formats are useful for examining the contents of a Stream.
+
 
 
 MusicXML

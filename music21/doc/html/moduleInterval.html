@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.interval &mdash; music21 v0.2.2a1 documentation</title>
+    <title>music21.interval &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.meter" href="moduleMeter.html" />
     <link rel="prev" title="music21.instrument" href="moduleInstrument.html" /> 
   </head>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="moduleInstrument.html" title="music21.instrument"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,10 +47,20 @@
           <div class="body">
             
   <div class="section" id="music21-interval">
-<h1>music21.interval<a class="headerlink" href="#music21-interval" title="Permalink to this headline">¶</a></h1>
+<span id="moduleinterval"></span><h1>music21.interval<a class="headerlink" href="#music21-interval" title="Permalink to this headline">¶</a></h1>
 <p>Interval.py is a module for creating and manipulating interval objects.
 Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
 There are also a number of useful lists included in the module.</p>
+<div class="section" id="function-convertdiatonicnumbertostep">
+<h2>Function convertDiatonicNumberToStep()<a class="headerlink" href="#function-convertdiatonicnumbertostep" title="Permalink to this headline">¶</a></h2>
+<p>Utility conversion; does not process internals returns a tuple of Step and Octave</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">15</span><span class="p">)</span>
+<span class="go">(&#39;C&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">(&#39;D&#39;, 3)</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="function-convertstaffdistancetointerval">
 <h2>Function convertStaffDistanceToInterval()<a class="headerlink" href="#function-convertstaffdistancetointerval" title="Permalink to this headline">¶</a></h2>
 <p>convertStaffDistanceToInterval(staffDistance) -&gt; intervalDistance Returns the interval number from the given staff distance.</p>
@@ -105,9 +115,16 @@ There are also a number of useful lists included in the module.</p>
 <div class="section" id="function-generatepitch">
 <h2>Function generatePitch()<a class="headerlink" href="#function-generatepitch" title="Permalink to this headline">¶</a></h2>
 <p>generatePitch(Pitch1 (or Note1), Interval1) -&gt; Pitch Generates a Pitch object at the specified interval from the specified Pitch.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c">#aInterval = DiatonicInterval(&#39;perfect&#39;, 5)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c">#bPitch = generatePitch(aPitch, aInterval)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">generatePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">aInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
+<span class="go">G4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P-5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span> <span class="o">=</span> <span class="n">generatePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span>
+<span class="go">F3</span>
 </pre></div>
 </div>
 </div>
@@ -126,7 +143,8 @@ There are also a number of useful lists included in the module.</p>
 <div class="section" id="function-getwrittenhighernote">
 <h2>Function getWrittenHigherNote()<a class="headerlink" href="#function-getwrittenhighernote" title="Permalink to this headline">¶</a></h2>
 <p>Given two notes, returns the higher note based on diatonic note numbers. Returns the note higher in pitch if the diatonic number is the same, or the first note if pitch is also the same.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cis</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cis</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">deses</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;D--&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">higher</span> <span class="o">=</span> <span class="n">getWrittenHigherNote</span><span class="p">(</span><span class="n">cis</span><span class="p">,</span> <span class="n">deses</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">higher</span> <span class="ow">is</span> <span class="n">deses</span>
@@ -152,6 +170,7 @@ There are also a number of useful lists included in the module.</p>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 </div>
 <div class="section" id="properties">
 <h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
@@ -169,6 +188,7 @@ There are also a number of useful lists included in the module.</p>
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <p><strong>contexts</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>name</strong></p>
 <p><strong>specifier</strong></p>
@@ -183,10 +203,7 @@ There are also a number of useful lists included in the module.</p>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
-<p>Locally Defined</p>
-<p><strong>mod7_object()</strong></p>
-<blockquote>
-generates a new Interval (not DiatonicInterval) object where descending 3rds are 6ths, etc.</blockquote>
+<p><strong>addLocationAndParent()</strong></p>
 </div>
 <div class="section" id="id2">
 <h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
@@ -211,8 +228,9 @@ generates a new Interval (not DiatonicInterval) object where descending 3rds are
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
-<p><strong>mod7_object()</strong></p>
+<p><strong>complement()</strong></p>
 <blockquote>
 generates a new GenericInterval object where descending 3rds are 6ths, etc.</blockquote>
 </div>
@@ -233,12 +251,15 @@ generates a new GenericInterval object where descending 3rds are 6ths, etc.</blo
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c5&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="n">note1</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">note2</span><span class="o">=</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">&lt;music21.interval.Interval P15&gt;</span>
 </pre></div>
 </div>
 <div class="section" id="id5">
 <h3>Attributes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p><strong>contexts</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 </div>
 <div class="section" id="id6">
@@ -251,12 +272,14 @@ generates a new GenericInterval object where descending 3rds are 6ths, etc.</blo
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
 <p><strong>reinit()</strong></p>
 <blockquote>
 Reinitialize the internal interval objects in case something has changed.  Called also during __init__</blockquote>
 <p><strong>note2()</strong></p>
 <p><strong>note1()</strong></p>
+<p><strong>getComplement()</strong></p>
 <p><strong>generic()</strong></p>
 <p><strong>direction()</strong></p>
 <p><strong>diatonicType()</strong></p>
@@ -272,6 +295,8 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>parent</strong></p>
 <p><strong>offset</strong></p>
 <p><strong>duration</strong></p>
+<p>Locally Defined</p>
+<p><strong>complement</strong></p>
 </div>
 </div>
 </div>
@@ -285,6 +310,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.interval</a><ul>
+<li><a class="reference external" href="#function-convertdiatonicnumbertostep">Function convertDiatonicNumberToStep()</a></li>
 <li><a class="reference external" href="#function-convertstaffdistancetointerval">Function convertStaffDistanceToInterval()</a></li>
 <li><a class="reference external" href="#function-generatechromatic">Function generateChromatic()</a></li>
 <li><a class="reference external" href="#function-generatediatonic">Function generateDiatonic()</a></li>
@@ -364,12 +390,12 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
         <li class="right" >
           <a href="moduleInstrument.html" title="music21.instrument"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

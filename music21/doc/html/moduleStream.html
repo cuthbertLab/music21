@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.stream &mdash; music21 v0.2.2a1 documentation</title>
+    <title>music21.stream &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="music21.serial" href="moduleSerial.html" />
     <link rel="prev" title="music21.pitch" href="modulePitch.html" /> 
   </head>
   <body>
@@ -31,9 +32,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="moduleSerial.html" title="music21.serial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="modulePitch.html" title="music21.pitch"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -43,7 +47,7 @@
           <div class="body">
             
   <div class="section" id="music21-stream">
-<h1>music21.stream<a class="headerlink" href="#music21-stream" title="Permalink to this headline">¶</a></h1>
+<span id="modulestream"></span><h1>music21.stream<a class="headerlink" href="#music21-stream" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="function-deepcopy">
 <h2>Function deepcopy()<a class="headerlink" href="#function-deepcopy" title="Permalink to this headline">¶</a></h2>
 <p>Deep copy operation on arbitrary Python objects. See the module&#8217;s __doc__ string for more info.</p>
@@ -59,6 +63,7 @@
 <p><strong>filled</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>keyIsNew</strong></p>
@@ -79,14 +84,18 @@
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -121,7 +130,9 @@
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 <p>Locally Defined</p>
 <p><strong>setRightBarline()</strong></p>
@@ -185,6 +196,7 @@
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -199,14 +211,18 @@
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -241,7 +257,9 @@
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 <p>Locally Defined</p>
 <p><strong>pageNumber()</strong></p>
@@ -281,6 +299,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -295,14 +314,18 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -337,7 +360,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 </div>
 <div class="section" id="id6">
@@ -373,6 +398,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -387,14 +413,18 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -429,7 +459,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 </div>
 <div class="section" id="id9">
@@ -465,6 +497,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -479,14 +512,18 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -521,7 +558,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 </div>
 <div class="section" id="id12">
@@ -557,6 +596,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -571,14 +611,18 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -613,7 +657,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 <p>Locally Defined</p>
 <p><strong>staffLines()</strong></p>
@@ -653,6 +699,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -667,7 +714,11 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
+<blockquote>
+returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding &#8211; but because these elements are deepcopies, the difference might bite you if you&#8217;re not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream. TODO: write: ALL. requireClass, padStream always returns a Stream, but might be an empty Stream</blockquote>
 <p><strong>transferOffsetToElements()</strong></p>
 <blockquote>
 <p>Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero.</p>
@@ -716,6 +767,25 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <span class="go">20</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 <span class="go">31</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>simultaneousAttacks()</strong></p>
+<blockquote>
+<p>returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n11</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n12</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n21</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n22</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">n11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">n21</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">n12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20.5</span><span class="p">,</span> <span class="n">n22</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simultaneous</span> <span class="o">=</span> <span class="n">st1</span><span class="o">.</span><span class="n">simultaneousAttacks</span><span class="p">(</span><span class="n">st2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simultaneous</span>
+<span class="go">[10.0]</span>
 </pre></div>
 </div>
 </blockquote>
@@ -769,6 +839,37 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <span class="gp">&gt;&gt;&gt; </span><span class="n">junk</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">9</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>playingWhenAttacked()</strong></p>
+<blockquote>
+<p>Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el&#8217;s offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">21.0</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">n3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;G#&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">20.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;G#&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">21.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;D#&#39;</span>
+<span class="go">## optionally, specify the site to get the offset from</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mf">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;D#&#39;</span>
 </pre></div>
 </div>
 </blockquote>
@@ -885,7 +986,7 @@ returns a Stream of intervals between Notes (and by default, Chords) that follow
 </blockquote>
 <p><strong>insert()</strong></p>
 <blockquote>
-<p>Inserts an item(s) at the given offset(s) Has three forms: in the two argument form, inserts an element at the given offset:</p>
+<p>Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you&#8217;re going to be inserting dozens of items that don&#8217;t change the sort status) Has three forms: in the two argument form, inserts an element at the given offset:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">32</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_getHighestOffset</span><span class="p">()</span>
@@ -911,6 +1012,10 @@ returns a Stream of intervals between Notes (and by default, Chords) that follow
 <span class="go">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">st3</span><span class="p">)</span>
 <span class="go">2</span>
+<span class="go">Raise an error if offset is not a number</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Stream</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&quot;l&quot;</span><span class="p">,</span><span class="s">&quot;g&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">StreamException</span>: <span class="n-Identifier">...</span>
 </pre></div>
 </div>
 </blockquote>
@@ -1139,7 +1244,7 @@ Return all Measure objects in a Stream()</blockquote>
 </blockquote>
 <p><strong>getElementsByClass()</strong></p>
 <blockquote>
-<p>Return a list of all Elements that match the className. Note that, as this appends Elements to a new Stream, whatever former parent relationship the ElementWrapper had is lost. The ElementWrapper&#8217;s parent is set to the new stream that contains it.</p>
+<p>Return a list of all Elements that match the className.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
@@ -1170,7 +1275,7 @@ Return all Measure objects in a Stream()</blockquote>
 <p>Returns the first encountered element for a given id. Return None if no match</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;green&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="bp">None</span> <span class="o">==</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">True</span>
@@ -1338,6 +1443,9 @@ Returns a list of consecutive <em>pitched</em> Notes in a Stream.  A single &#82
 </pre></div>
 </div>
 </blockquote>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
+<blockquote>
+For each element in self, creates an interval object in the element&#8217;s editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked.</blockquote>
 <p><strong>append()</strong></p>
 <blockquote>
 <p>Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest &#8220;release&#8221; of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True</p>
@@ -1379,6 +1487,9 @@ Returns a list of consecutive <em>pitched</em> Notes in a Stream.  A single &#82
 </pre></div>
 </div>
 </blockquote>
+<p><strong>allPlayingWhileSounding()</strong></p>
+<blockquote>
+returns a new Stream of elements in this stream that sound at the same time as &#8220;el&#8221;, an element presumably in another Stream. The offset of this new Stream is set to el&#8217;s offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el &#8211; thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el&#8217;s offset in. TODO: write: requireClass: Takes as an optional parameter &#8220;requireClass&#8221;.  If this parameter is boolean True then only elements of the same class as el are added to the new Stream.  If requireClass is list, it is used like classList in elsewhere in stream to provide a list of classes that the el must be a part of. The method always returns a Stream, but it might be an empty Stream.</blockquote>
 <p><strong>addGroupForElements()</strong></p>
 <blockquote>
 <p>Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set.</p>
@@ -1590,6 +1701,7 @@ returns the max(el.offset + el.duration.quarterLength) over all elements, usuall
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -1604,14 +1716,18 @@ returns the max(el.offset + el.duration.quarterLength) over all elements, usuall
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -1646,7 +1762,9 @@ returns the max(el.offset + el.duration.quarterLength) over all elements, usuall
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 <p>Locally Defined</p>
 <p><strong>systemNumber()</strong></p>
@@ -1686,6 +1804,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>flattenedRepresentationOf</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>isFlat</strong></p>
 <p><strong>isSorted</strong></p>
 <p><strong>locations</strong></p>
@@ -1700,14 +1819,18 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from stream.Stream</p>
+<p><strong>trimPlayingWhileSounding()</strong></p>
 <p><strong>transferOffsetToElements()</strong></p>
 <p><strong>stripTies()</strong></p>
 <p><strong>splitByClass()</strong></p>
+<p><strong>simultaneousAttacks()</strong></p>
 <p><strong>shiftElements()</strong></p>
 <p><strong>repeatInsert()</strong></p>
 <p><strong>repeatAppend()</strong></p>
 <p><strong>pop()</strong></p>
+<p><strong>playingWhenAttacked()</strong></p>
 <p><strong>melodicIntervals()</strong></p>
 <p><strong>makeTies()</strong></p>
 <p><strong>makeRests()</strong></p>
@@ -1742,7 +1865,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>extractContext()</strong></p>
 <p><strong>extendDuration()</strong></p>
 <p><strong>bestClef()</strong></p>
+<p><strong>attachIntervalsBetweenStreams()</strong></p>
 <p><strong>append()</strong></p>
+<p><strong>allPlayingWhileSounding()</strong></p>
 <p><strong>addGroupForElements()</strong></p>
 </div>
 <div class="section" id="id26">
@@ -1842,6 +1967,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
             <h4>Previous topic</h4>
             <p class="topless"><a href="modulePitch.html"
                                   title="previous chapter">music21.pitch</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleSerial.html"
+                                  title="next chapter">music21.serial</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/moduleStream.txt"
@@ -1871,14 +1999,17 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="moduleSerial.html" title="music21.serial"
+             >next</a> |</li>
+        <li class="right" >
           <a href="modulePitch.html" title="music21.pitch"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

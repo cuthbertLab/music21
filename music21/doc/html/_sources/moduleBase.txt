@@ -1,3 +1,5 @@
+.. _moduleBase:
+
 music21.base
 ============
 
@@ -28,7 +30,7 @@ Locally Defined
 
     Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-    >>> class Mock(object): attr1=234
+    >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
     >>> bObj = Mock()
     >>> bObj.attr1 = 98
@@ -65,7 +67,7 @@ Locally Defined
 
     Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Contexts of all members 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
     >>> bObj = Mock()
     >>> aContexts = Contexts()
@@ -82,7 +84,7 @@ Locally Defined
 
     Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-    >>> class Mock(object): attr1=234
+    >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
     >>> bObj = Mock()
     >>> bObj.attr1 = 98
@@ -99,7 +101,7 @@ Locally Defined
 
     Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
     >>> bObj = Mock()
     >>> aContexts = Contexts()
@@ -152,6 +154,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined
@@ -253,6 +257,11 @@ Inherits from: object
 
 An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site -- this becomes the default offset for any newly added sites that do not have any sites 
 
+Attributes
+~~~~~~~~~~
+
+**coordinates**
+
 Methods
 ~~~~~~~
 
@@ -263,7 +272,7 @@ Locally Defined
 
     Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception. 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> cSite = Mock()
@@ -279,9 +288,9 @@ Locally Defined
 
 **scrubEmptySites()**
 
-    If a parent has been deleted, we will still have an empty ref in _coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED 
+    If a parent has been deleted, we will still have an empty ref in coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> aLocations = Locations()
@@ -298,7 +307,7 @@ Locally Defined
 
     Remove the entry specified by sites 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> aLocations = Locations()
@@ -320,9 +329,9 @@ Locally Defined
 
 **getSiteByOffset()**
 
-    For a given offset return the parent More than one parent may have the same offset; this will return the last site added. 
+    For a given offset return the parent ####More than one parent may have the same offset; ####this will return the last site added. No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> cSite = Mock()
@@ -331,31 +340,19 @@ Locally Defined
     >>> aLocations.add(121.5, bSite)
     >>> aSite == aLocations.getSiteByOffset(23)
     True 
-    Adding another site at offset 23 will change getSiteByOffset 
-    >>> aLocations.add(23, cSite)
-    >>> aSite == aLocations.getSiteByOffset(23)
-    False 
-    >>> cSite == aLocations.getSiteByOffset(23)
-    True 
-
-**getSiteByIndex()**
-
-    Get parent by index value, unwrapping the weakref. 
-
-    >>> class Mock(object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(121.5, bSite)
-    >>> bSite == aLocations.getSiteByIndex(-1)
-    True 
+    #### no longer works 
+    #Adding another site at offset 23 will change getSiteByOffset 
+    #>>> aLocations.add(23, cSite) 
+    #>>> aSite == aLocations.getSiteByOffset(23) 
+    #False 
+    #>>> cSite == aLocations.getSiteByOffset(23) 
+    #True 
 
 **getOffsets()**
 
     Return a list of all offsets. 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> aLocations = Locations()
@@ -368,7 +365,7 @@ Locally Defined
 
     For a given site return its offset. 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> cParent = Mock()
@@ -383,22 +380,6 @@ Locally Defined
     Traceback (most recent call last): 
     LocationsException: ... 
 
-**getOffsetByIndex()**
-
-    For a given parent return an offset. 
-
-    >>> class Mock(object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(121.5, bSite)
-    >>> aLocations.getOffsetByIndex(-1)
-    121.5 
-    >>> aLocations.getOffsetByIndex(2)
-    Traceback (most recent call last): 
-    IndexError: list index out of range 
-
 **clear()**
 
     Clear all data. 
@@ -407,7 +388,7 @@ Locally Defined
 
     Add a location to the object. If site already exists, this will update that entry. 
 
-    >>> class Mock(object): pass
+    >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
     >>> bSite = Mock()
     >>> aLocations = Locations()
@@ -435,6 +416,8 @@ Attributes
 **contexts**
 
 **groups**
+
+**id**
 
 **locations**
 
@@ -474,6 +457,22 @@ Locally Defined
 
 **contexts()**
 
+
+**addLocationAndParent()**
+
+    ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
+
+    >>> from stream import Stream
+    >>> st1 = Stream()
+    >>> o1 = Music21Object()
+    >>> st1_wr = common.wrapWeakref(st1)
+    >>> offset = 20.0
+    >>> st1._elements = [o1]
+    >>> o1.addLocationAndParent(offset, st1, st1_wr)
+    >>> o1.parent is st1
+    True 
+    >>> o1.getOffsetBySite(st1)
+    20.0 
 
 Properties
 ~~~~~~~~~~

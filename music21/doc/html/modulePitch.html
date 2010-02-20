@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.pitch &mdash; music21 v0.2.2a1 documentation</title>
+    <title>music21.pitch &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.stream" href="moduleStream.html" />
     <link rel="prev" title="music21.note" href="moduleNote.html" /> 
   </head>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="moduleNote.html" title="music21.note"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,19 +47,9 @@
           <div class="body">
             
   <div class="section" id="music21-pitch">
-<h1>music21.pitch<a class="headerlink" href="#music21-pitch" title="Permalink to this headline">¶</a></h1>
+<span id="modulepitch"></span><h1>music21.pitch<a class="headerlink" href="#music21-pitch" title="Permalink to this headline">¶</a></h1>
 <p>Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
 Used extensively by note.py</p>
-<div class="section" id="function-convertdiatonicnumbertostep">
-<h2>Function convertDiatonicNumberToStep()<a class="headerlink" href="#function-convertdiatonicnumbertostep" title="Permalink to this headline">¶</a></h2>
-<p>Utility conversion; does not process internals returns a tuple of Step and Octave</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">15</span><span class="p">)</span>
-<span class="go">(&#39;C&#39;, 2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
-<span class="go">(&#39;D&#39;, 3)</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="function-convertfqtops">
 <h2>Function convertFqToPs()<a class="headerlink" href="#function-convertfqtops" title="Permalink to this headline">¶</a></h2>
 <p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
@@ -79,6 +69,8 @@ Used extensively by note.py</p>
 <span class="go">261.62556530059862</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">9.1770239974189884</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">19912.126958213179</span>
 </pre></div>
 </div>
 </div>
@@ -89,6 +81,8 @@ Used extensively by note.py</p>
 <span class="go">[3, 4, 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">12</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">0</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="o">-</span><span class="mf">12</span><span class="p">)]</span>
 <span class="go">[0, -1, -2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">10</span>
 </pre></div>
 </div>
 </div>
@@ -113,6 +107,8 @@ Used extensively by note.py</p>
 <span class="go">(&#39;D&#39;, &lt;accidental natural&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">62.5</span><span class="p">)</span>
 <span class="go">(&#39;D&#39;, &lt;accidental half-sharp&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">(&#39;D&#39;, &lt;accidental sharp&gt;)</span>
 </pre></div>
 </div>
 </div>
@@ -148,6 +144,7 @@ Used extensively by note.py</p>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
 <p><strong>set()</strong></p>
 <blockquote>
@@ -203,6 +200,7 @@ Used extensively by note.py</p>
 <p><strong>contexts</strong></p>
 <p><strong>defaultOctave</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 </div>
 <div class="section" id="id2">
@@ -215,6 +213,7 @@ Used extensively by note.py</p>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 </div>
 <div class="section" id="id3">
 <h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
@@ -362,7 +361,6 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.pitch</a><ul>
-<li><a class="reference external" href="#function-convertdiatonicnumbertostep">Function convertDiatonicNumberToStep()</a></li>
 <li><a class="reference external" href="#function-convertfqtops">Function convertFqToPs()</a></li>
 <li><a class="reference external" href="#function-convertpstofq">Function convertPsToFq()</a></li>
 <li><a class="reference external" href="#function-convertpstooct">Function convertPsToOct()</a></li>
@@ -424,12 +422,12 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
         <li class="right" >
           <a href="moduleNote.html" title="music21.note"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

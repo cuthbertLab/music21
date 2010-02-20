@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.chord &mdash; music21 v0.2.2a1 documentation</title>
+    <title>music21.chord &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.duration" href="moduleDuration.html" />
     <link rel="prev" title="music21.corpus" href="moduleCorpus.html" /> 
   </head>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="moduleCorpus.html" title="music21.corpus"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,7 +47,7 @@
           <div class="body">
             
   <div class="section" id="music21-chord">
-<h1>music21.chord<a class="headerlink" href="#music21-chord" title="Permalink to this headline">¶</a></h1>
+<span id="modulechord"></span><h1>music21.chord<a class="headerlink" href="#music21-chord" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="class-chord">
 <h2>Class Chord<a class="headerlink" href="#class-chord" title="Permalink to this headline">¶</a></h2>
 <p>Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object</p>
@@ -60,10 +60,10 @@
 <p><strong>duration</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
-<p><strong>pitches</strong></p>
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="methods">
@@ -77,6 +77,7 @@
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>duration()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -104,6 +105,33 @@ Same as above, but uses a note&#8217;s frequency to determine height; so that C#
 <blockquote>
 Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.</blockquote>
 <p><strong>sortAscending()</strong></p>
+<p><strong>semiClosedPosition()</strong></p>
+<p><strong>seekChordTablesAddress()</strong></p>
+<blockquote>
+<p>Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c3&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClasses</span>
+<span class="go">[0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(1, 1, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(11, 1, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(3, 11, -1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(3, 11, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a#&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(7, 34, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
+<span class="go">(3, 1, 0)</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>root()</strong></p>
 <blockquote>
 <p>Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example:</p>
@@ -192,10 +220,16 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
 Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false.</blockquote>
 <p><strong>isDominantSeventh()</strong></p>
 <blockquote>
-Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</blockquote>
+<p>Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isDominantSeventh</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>isDiminishedTriad()</strong></p>
 <blockquote>
-<p>Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<p>Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G-&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;F#&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns True</span>
@@ -207,10 +241,16 @@ Returns True if chord is a Dominant Seventh, that is, if it contains only notes 
 </blockquote>
 <p><strong>isDiminishedSeventh()</strong></p>
 <blockquote>
-Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</blockquote>
+<p>Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g-&#39;</span><span class="p">,</span> <span class="s">&#39;b--&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isDiminishedSeventh</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>isAugmentedTriad()</strong></p>
 <blockquote>
-<p>Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. Examples</p>
+<p>Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.chord</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
@@ -235,10 +275,22 @@ Returns True if chord is a Diminished Seventh, that is, if it contains only note
 </blockquote>
 <p><strong>inversionName()</strong></p>
 <blockquote>
-Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None.</blockquote>
+<p>Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">inversionName</span><span class="p">()</span>
+<span class="go">43</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>inversion()</strong></p>
 <blockquote>
-returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root.</blockquote>
+<p>returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">inversion</span><span class="p">()</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>hasThird()</strong></p>
 <blockquote>
 Shortcut for hasScaleX(3)</blockquote>
@@ -315,7 +367,16 @@ Shortcut for hasScaleX(5)</blockquote>
 </blockquote>
 <p><strong>determineType()</strong></p>
 <blockquote>
-returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? TODO: determine permanent designation abbreviation for every type of chord and inversion</blockquote>
+<p>returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? TODO: determine permanent designation abbreviation for every type of chord and inversion</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">determineType</span><span class="p">()</span>
+<span class="go">&#39;Major Triad&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">determineType</span><span class="p">()</span>
+<span class="go">&#39;Dominant Seventh&#39;</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>containsTriad()</strong></p>
 <blockquote>
 <p>returns True or False if there is no triad above the root. &#8220;Contains vs. Is&#8221;: A dominant-seventh chord contains a triad. example:</p>
@@ -330,7 +391,7 @@ returns an abbreviation for the type of chord it is. Add option to add inversion
 </blockquote>
 <p><strong>containsSeventh()</strong></p>
 <blockquote>
-<p>returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can&#8217;t be determined example:</p>
+<p>returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can&#8217;t be determined</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">containsSeventh</span><span class="p">()</span> <span class="c"># returns True</span>
@@ -354,13 +415,39 @@ returns an abbreviation for the type of chord it is. Add option to add inversion
 <blockquote>
 TO WRITE Checks to make sure all notes have the same duration Does not run automatically</blockquote>
 <p><strong>canBeTonic()</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">canBeTonic</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">canBeTonic</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 <p><strong>canBeDominantV()</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">canBeDominantV</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 <p><strong>bass()</strong></p>
 <blockquote>
 <p>returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">bass</span><span class="p">()</span> <span class="c"># returns C</span>
 <span class="go">C</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>areZRelations()</strong></p>
+<blockquote>
+<p>Check of chord other is also a z relations</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;c#&quot;</span><span class="p">,</span> <span class="s">&quot;e&quot;</span><span class="p">,</span> <span class="s">&quot;f#&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;c#&quot;</span><span class="p">,</span> <span class="s">&quot;e-&quot;</span><span class="p">,</span> <span class="s">&quot;g&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c3</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;c#&quot;</span><span class="p">,</span> <span class="s">&quot;f#&quot;</span><span class="p">,</span> <span class="s">&quot;g&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">areZRelations</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">areZRelations</span><span class="p">(</span><span class="n">c3</span><span class="p">)</span>
+<span class="go">False</span>
 </pre></div>
 </div>
 </blockquote>
@@ -377,6 +464,81 @@ TO WRITE Checks to make sure all notes have the same duration Does not run autom
 <p><strong>lyric</strong></p>
 <p><strong>color</strong></p>
 <p>Locally Defined</p>
+<p><strong>primeFormString</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeFormString</span>
+<span class="go">&#39;&lt;037&gt;&#39;</span>
+</pre></div>
+</div>
+<p><strong>primeForm</strong></p>
+<blockquote>
+<p>Get the Forte class index number. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeForm</span>
+<span class="go">[0, 3, 7]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">primeForm</span>
+<span class="go">[0, 3, 7]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>pitches</strong></p>
+<blockquote>
+TODO: presently, whenever pitches are accessed, it sets the _chordTablesAddressNeedsUpdating value to false this is b/c the pitches list can be accessed and appended to a better way to do this needs to be found</blockquote>
+<p><strong>pitchedCommonName</strong></p>
+<blockquote>
+<p>Get the common name of the TN set class. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchedCommonName</span>
+<span class="go">&#39;C-minor triad&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">pitchedCommonName</span>
+<span class="go">&#39;C-major triad&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>pitchClasses</strong></p>
+<blockquote>
+<p>Return a pitch class representation ordered as the original chord.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClasses</span>
+<span class="go">[2, 9, 6, 2]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>pitchClassCardinality</strong></p>
+<blockquote>
+<p>Return the number of unique pitch classes</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClassCardinality</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>orderedPitchClasses</strong></p>
+<blockquote>
+<p>Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClasses</span>
+<span class="go">[2, 6, 9]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>normalFormString</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">normalFormString</span>
+<span class="go">&#39;&lt;034&gt;&#39;</span>
+</pre></div>
+</div>
+<p><strong>normalForm</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">normalForm</span>
+<span class="go">[0, 3, 7]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">normalForm</span>
+<span class="go">[0, 4, 7]</span>
+</pre></div>
+</div>
 <p><strong>mx</strong></p>
 <blockquote>
 <p>Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added</p>
@@ -400,9 +562,102 @@ TO WRITE Checks to make sure all notes have the same duration Does not run autom
 </pre></div>
 </div>
 </blockquote>
+<p><strong>multisetCardinality</strong></p>
+<blockquote>
+<p>Return the number of pitch classes, regardless of redundancy.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">multisetCardinality</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>lily</strong></p>
 <blockquote>
 The name of the note as it would appear in Lilypond format.</blockquote>
+<p><strong>isPrimeFormInversion</strong></p>
+<blockquote>
+<p>Get the Forte class index number. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">isPrimeFormInversion</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">isPrimeFormInversion</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>intervalVectorString</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">intervalVectorString</span>
+<span class="go">&#39;&lt;001110&gt;&#39;</span>
+</pre></div>
+</div>
+<p><strong>intervalVector</strong></p>
+<blockquote>
+<p>Get the Forte class index number. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">intervalVector</span>
+<span class="go">[0, 0, 1, 1, 1, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">intervalVector</span>
+<span class="go">[0, 0, 1, 1, 1, 0]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>hasZRelation</strong></p>
+<blockquote>
+<p>Get the Z-relation status</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">hasZRelation</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">hasZRelation</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>forteClassNumber</strong></p>
+<blockquote>
+<p>Get the Forte class index number. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClassNumber</span>
+<span class="go">11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassNumber</span>
+<span class="go">11</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>forteClass</strong></p>
+<blockquote>
+<p>Return a forte class name</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClass</span>
+<span class="go">&#39;3-11A&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span>
+<span class="go">&#39;3-11B&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>commonName</strong></p>
+<blockquote>
+<p>Get the common name of the TN set class. Possible rename forteIndex</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">commonName</span>
+<span class="go">[&#39;minor triad&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">commonName</span>
+<span class="go">[&#39;major triad&#39;]</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>chordTablesAddress</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">chordTablesAddress</span>
+<span class="go">(3, 12, 0)</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="class-duration">
@@ -719,12 +974,12 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
         <li class="right" >
           <a href="moduleCorpus.html" title="music21.corpus"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

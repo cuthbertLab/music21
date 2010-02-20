@@ -1,3 +1,5 @@
+.. _moduleMeter:
+
 music21.meter
 =============
 
@@ -90,6 +92,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **inherited**
 
 **locations**
@@ -119,6 +123,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from meter.TimeSignature
@@ -205,6 +211,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **inherited**
 
 **locations**
@@ -234,6 +242,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from meter.TimeSignature
@@ -702,6 +712,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **inherited**
 
 **locations**
@@ -731,6 +743,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Inherited from meter.TimeSignature
@@ -816,6 +830,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **inherited**
 
 **locations**
@@ -845,6 +861,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined

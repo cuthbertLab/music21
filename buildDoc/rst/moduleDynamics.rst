@@ -1,3 +1,5 @@
+.. _moduleDynamics:
+
 music21.dynamics
 ================
 
@@ -21,6 +23,8 @@ Attributes
 **englishName**
 
 **groups**
+
+**id**
 
 **locations**
 
@@ -57,6 +61,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~
@@ -106,6 +112,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **posPlacement**
@@ -133,6 +141,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~

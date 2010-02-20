@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.note &mdash; music21 v0.2.2a1 documentation</title>
+    <title>music21.note &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.2a1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.2a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.pitch" href="modulePitch.html" />
     <link rel="prev" title="music21.meter" href="moduleMeter.html" /> 
   </head>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,7 +47,7 @@
           <div class="body">
             
   <div class="section" id="music21-note">
-<h1>music21.note<a class="headerlink" href="#music21-note" title="Permalink to this headline">¶</a></h1>
+<span id="modulenote"></span><h1>music21.note<a class="headerlink" href="#music21-note" title="Permalink to this headline">¶</a></h1>
 <p>Classes and functions for creating and manipulating notes, ties, and durations.
 Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.</p>
 <div class="section" id="function-notefromdiatonicnumber">
@@ -77,6 +77,7 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
 <p><strong>set()</strong></p>
 <blockquote>
@@ -281,6 +282,7 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -297,6 +299,7 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -308,7 +311,6 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>splitNoteAtPoint()</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>setAccidental()</strong></p>
-<p><strong>midiNote()</strong></p>
 <p><strong>isUnpitched()</strong></p>
 <p><strong>isRest()</strong></p>
 <p><strong>isNote()</strong></p>
@@ -327,6 +329,7 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>color</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>step</strong></p>
+<p><strong>ps</strong></p>
 <p><strong>pitchClass</strong></p>
 <p><strong>octave</strong></p>
 <p><strong>nameWithOctave</strong></p>
@@ -350,6 +353,7 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -365,6 +369,7 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Locally Defined</p>
 <p><strong>splitAtDurations()</strong></p>
 <blockquote>
@@ -472,6 +477,7 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -488,6 +494,7 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -499,7 +506,6 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>splitNoteAtPoint()</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>setAccidental()</strong></p>
-<p><strong>midiNote()</strong></p>
 <p><strong>isUnpitched()</strong></p>
 <p><strong>isRest()</strong></p>
 <p><strong>isNote()</strong></p>
@@ -518,6 +524,7 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>color</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>step</strong></p>
+<p><strong>ps</strong></p>
 <p><strong>pitchClass</strong></p>
 <p><strong>octave</strong></p>
 <p><strong>nameWithOctave</strong></p>
@@ -612,6 +619,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -627,6 +635,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -682,6 +691,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -698,6 +708,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -709,7 +720,6 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>splitNoteAtPoint()</strong></p>
 <p>Locally Defined</p>
 <p><strong>setAccidental()</strong></p>
-<p><strong>midiNote()</strong></p>
 <p><strong>isUnpitched()</strong></p>
 <blockquote>
 bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
@@ -734,6 +744,18 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
 <p><strong>color</strong></p>
 <p>Locally Defined</p>
 <p><strong>step</strong></p>
+<p><strong>ps</strong></p>
+<blockquote>
+<p>Returns the note&#8217;s midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="mf">60.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">61</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span>
+<span class="go">60.5</span>
+</pre></div>
+</div>
+</blockquote>
 <p><strong>pitchClass</strong></p>
 <blockquote>
 <p>Return pitch class</p>
@@ -780,6 +802,7 @@ see Pitch.diatonicNoteNum</blockquote>
 <p><strong>contexts</strong></p>
 <p><strong>defaultOctave</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 </div>
 <div class="section" id="id27">
@@ -792,6 +815,7 @@ see Pitch.diatonicNoteNum</blockquote>
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 </div>
 <div class="section" id="id28">
 <h3>Properties<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
@@ -938,6 +962,7 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -954,6 +979,7 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -965,7 +991,6 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>splitNoteAtPoint()</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>setAccidental()</strong></p>
-<p><strong>midiNote()</strong></p>
 <p><strong>isUnpitched()</strong></p>
 <p><strong>isRest()</strong></p>
 <p><strong>isNote()</strong></p>
@@ -984,6 +1009,7 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>color</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>step</strong></p>
+<p><strong>ps</strong></p>
 <p><strong>pitchClass</strong></p>
 <p><strong>octave</strong></p>
 <p><strong>nameWithOctave</strong></p>
@@ -1007,6 +1033,7 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -1022,6 +1049,7 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -1076,6 +1104,7 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <h3>Attributes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
 <p><strong>contexts</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>type</strong></p>
 </div>
@@ -1089,6 +1118,7 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 </div>
 <div class="section" id="id37">
 <h3>Properties<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
@@ -1111,6 +1141,7 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -1126,6 +1157,7 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -1171,6 +1203,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>contexts</strong></p>
 <p><strong>editorial</strong></p>
 <p><strong>groups</strong></p>
+<p><strong>id</strong></p>
 <p><strong>locations</strong></p>
 <p><strong>lyrics</strong></p>
 <p><strong>notations</strong></p>
@@ -1187,6 +1220,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>id()</strong></p>
 <p><strong>getOffsetBySite()</strong></p>
 <p><strong>contexts()</strong></p>
+<p><strong>addLocationAndParent()</strong></p>
 <p>Inherited from note.GeneralNote</p>
 <p><strong>splitAtDurations()</strong></p>
 <p><strong>isChord()</strong></p>
@@ -1198,7 +1232,6 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>splitNoteAtPoint()</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>setAccidental()</strong></p>
-<p><strong>midiNote()</strong></p>
 <p><strong>isUnpitched()</strong></p>
 <p><strong>isRest()</strong></p>
 <p><strong>isNote()</strong></p>
@@ -1217,6 +1250,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>color</strong></p>
 <p>Inherited from note.Note</p>
 <p><strong>step</strong></p>
+<p><strong>ps</strong></p>
 <p><strong>pitchClass</strong></p>
 <p><strong>octave</strong></p>
 <p><strong>nameWithOctave</strong></p>
@@ -1381,12 +1415,12 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
         <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.2a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 03, 2010.
+      Last updated on Feb 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

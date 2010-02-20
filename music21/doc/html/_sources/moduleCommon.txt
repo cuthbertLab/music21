@@ -1,3 +1,5 @@
+.. _moduleCommon:
+
 music21.common
 ==============
 
@@ -187,7 +189,7 @@ False
 Function isNum()
 ----------------
 
-check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everwhere: add numbers class. 
+check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
 
 >>> isNum(3.0)
 True 

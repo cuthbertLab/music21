@@ -4,13 +4,26 @@
 Overview: Notes and Pitches
 ==========================================
 
-Music21 is a tool kit for computer-aided musicology
+Notes can be used as fundamental units in Music21. Notes and Chords store one or more Pitch objects.
+
+For complete documentation on pitches and notes, see :ref:`modulePitch` and :ref:`moduleNote`.
 
 
-Applications: x
+Creating a Pitch
 -----------------------
 
-The music21.zip or music21.tgz distribution permits easy installation using Python's setup utility.
+To create a Pitch object, simply call the class with a note name. 
 
-To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.
+
+
+
+
+Creating a Note
+-----------------------
+
+To create a Note object, simply call the class with optional arguments, if desired.
+
+
+
+
 

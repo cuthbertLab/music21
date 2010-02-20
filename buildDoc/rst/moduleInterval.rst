@@ -1,3 +1,5 @@
+.. _moduleInterval:
+
 music21.interval
 ================
 
@@ -6,6 +8,16 @@ music21.interval
 Interval.py is a module for creating and manipulating interval objects.
 Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
 There are also a number of useful lists included in the module.
+
+Function convertDiatonicNumberToStep()
+--------------------------------------
+
+Utility conversion; does not process internals returns a tuple of Step and Octave 
+
+>>> convertDiatonicNumberToStep(15)
+('C', 2) 
+>>> convertDiatonicNumberToStep(23)
+('D', 3) 
 
 Function convertStaffDistanceToInterval()
 -----------------------------------------
@@ -73,9 +85,16 @@ Function generatePitch()
 
 generatePitch(Pitch1 (or Note1), Interval1) -> Pitch Generates a Pitch object at the specified interval from the specified Pitch. 
 
+>>> from music21 import pitch
 >>> aPitch = pitch.Pitch('C4')
->>> #aInterval = DiatonicInterval('perfect', 5)
->>> #bPitch = generatePitch(aPitch, aInterval)
+>>> aInterval = generateIntervalFromString('P5')
+>>> bPitch = generatePitch(aPitch, aInterval)
+>>> bPitch
+G4 
+>>> bInterval = generateIntervalFromString('P-5')
+>>> cPitch = generatePitch(aPitch, bInterval)
+>>> cPitch
+F3 
 
 Function getAbsoluteHigherNote()
 --------------------------------
@@ -99,6 +118,7 @@ Function getWrittenHigherNote()
 
 Given two notes, returns the higher note based on diatonic note numbers. Returns the note higher in pitch if the diatonic number is the same, or the first note if pitch is also the same. 
 
+>>> from music21 import pitch
 >>> cis = pitch.Pitch("C#")
 >>> deses = pitch.Pitch("D--")
 >>> higher = getWrittenHigherNote(cis, deses)
@@ -137,6 +157,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 Properties
 ~~~~~~~~~~
 
@@ -165,6 +187,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 **name**
@@ -191,12 +215,7 @@ Inherited from base.Music21Object
 
 **contexts()**
 
-
-Locally Defined
-
-**mod7_object()**
-
-    generates a new Interval (not DiatonicInterval) object where descending 3rds are 6ths, etc. 
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~
@@ -240,10 +259,12 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Locally Defined
 
-**mod7_object()**
+**complement()**
 
     generates a new GenericInterval object where descending 3rds are 6ths, etc. 
 
@@ -273,6 +294,8 @@ requires either (1) a string ("P5" etc.) or (2) named arguments: (2a) either bot
 >>> n1 = note.Note('c3')
 >>> n2 = note.Note('c5')
 >>> a = Interval(note1=n1, note2=n2)
+>>> a
+<music21.interval.Interval P15> 
 
 Attributes
 ~~~~~~~~~~
@@ -280,6 +303,8 @@ Attributes
 **contexts**
 
 **groups**
+
+**id**
 
 **locations**
 
@@ -303,6 +328,8 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Locally Defined
 
@@ -314,6 +341,9 @@ Locally Defined
 
 
 **note1()**
+
+
+**getComplement()**
 
 
 **generic()**
@@ -345,5 +375,11 @@ Inherited from base.Music21Object
 **offset**
 
 **duration**
+
+
+Locally Defined
+
+**complement**
+
 
 

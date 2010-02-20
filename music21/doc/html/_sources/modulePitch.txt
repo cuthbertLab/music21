@@ -1,3 +1,5 @@
+.. _modulePitch:
+
 music21.pitch
 =============
 
@@ -5,16 +7,6 @@ music21.pitch
 
 Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
 Used extensively by note.py
-
-Function convertDiatonicNumberToStep()
---------------------------------------
-
-Utility conversion; does not process internals returns a tuple of Step and Octave 
-
->>> convertDiatonicNumberToStep(15)
-('C', 2) 
->>> convertDiatonicNumberToStep(23)
-('D', 3) 
 
 Function convertFqToPs()
 ------------------------
@@ -37,6 +29,8 @@ Utility conversion; does not process internals. NOT CURRENTLY USED: since freq44
 261.62556530059862 
 >>> convertPsToFq(2)
 9.1770239974189884 
+>>> convertPsToFq(135)
+19912.126958213179 
 
 Function convertPsToOct()
 -------------------------
@@ -47,6 +41,8 @@ Utility conversion; does not process internals. Assume C4 middle C, so 60 return
 [3, 4, 4] 
 >>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
 [0, -1, -2] 
+>>> convertPsToOct(135)
+10 
 
 Function convertPsToStep()
 --------------------------
@@ -71,6 +67,8 @@ Utility conversion; does not process internals. Takes in a midiNote number (Assu
 ('D', <accidental natural>) 
 >>> convertPsToStep(62.5)
 ('D', <accidental half-sharp>) 
+>>> convertPsToStep(135)
+('D', <accidental sharp>) 
 
 Function convertStepToPs()
 --------------------------
@@ -119,6 +117,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined
@@ -191,6 +191,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **locations**
 
 Methods
@@ -212,6 +214,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~

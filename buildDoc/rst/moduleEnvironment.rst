@@ -1,3 +1,5 @@
+.. _moduleEnvironment:
+
 music21.environment
 ===================
 

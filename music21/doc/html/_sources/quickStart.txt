@@ -4,13 +4,41 @@
 Quick Start: Getting Started with music21
 =============================================
 
-Music21 is a tool kit for computer-aided musicology
+Here are some quick steps to get up and running quickly with music21. 
 
 
-Applications: x
+
+
+
+Download and Install
 -----------------------
 
-The music21.zip or music21.tgz distribution permits easy installation using Python's setup utility.
+First, download and install music21. If you have installed other Python packages, do what you normally do (include using setuptools/easy_install or pip). Otherwise, please read the full instructions here: :ref:`install`.
 
-To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.
+
+
+
+Start Python
+-----------------------
+
+Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python intepreter. 
+
+
+
+Parse Some Music
+-----------------------
+
+Once music21 is installed, parsing some music is often the first step.
+
+Music21 comes with a large collection of music stored as MusicXML and humdrum.
+
+
+
+
+View Some Notation
+-----------------------
+
+After parsing, manipulationg, or creating music21 objects, viewing them as notation is a common way to share and evaluate what you have done.
+
+
 

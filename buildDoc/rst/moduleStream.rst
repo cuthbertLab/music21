@@ -1,3 +1,5 @@
+.. _moduleStream:
+
 music21.stream
 ==============
 
@@ -25,6 +27,8 @@ Attributes
 **flattenedRepresentationOf**
 
 **groups**
+
+**id**
 
 **isFlat**
 
@@ -64,14 +68,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -80,6 +90,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -149,7 +161,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -263,6 +279,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -289,14 +307,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -305,6 +329,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -374,7 +400,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -447,6 +477,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -473,14 +505,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -489,6 +527,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -558,7 +598,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -624,6 +668,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -650,14 +696,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -666,6 +718,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -735,7 +789,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -801,6 +859,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -827,14 +887,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -843,6 +909,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -912,7 +980,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -978,6 +1050,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -1004,14 +1078,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -1020,6 +1100,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -1089,7 +1171,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -1162,6 +1248,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -1188,8 +1276,14 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Locally Defined
+
+**trimPlayingWhileSounding()**
+
+    returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies, the difference might bite you if you're not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream. TODO: write: ALL. requireClass, padStream always returns a Stream, but might be an empty Stream 
 
 **transferOffsetToElements()**
 
@@ -1239,6 +1333,24 @@ Locally Defined
     >>> len(c)
     31 
 
+**simultaneousAttacks()**
+
+    returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2. 
+
+    >>> st1 = Stream()
+    >>> st2 = Stream()
+    >>> n11 = note.Note()
+    >>> n12 = note.Note()
+    >>> n21 = note.Note()
+    >>> n22 = note.Note()
+    >>> st1.insert(10, n11)
+    >>> st2.insert(10, n21)
+    >>> st1.insert(20, n12)
+    >>> st2.insert(20.5, n22)
+    >>> simultaneous = st1.simultaneousAttacks(st2)
+    >>> simultaneous
+    [10.0] 
+
 **shiftElements()**
 
     Add offset value to every offset of contained Elements. 
@@ -1287,6 +1399,38 @@ Locally Defined
     >>> junk = a.pop(0)
     >>> len(a)
     9 
+
+**playingWhenAttacked()**
+
+    Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el's offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want. 
+
+    >>> n1 = note.Note("G#")
+    >>> n2 = note.Note("D#")
+    >>> s1 = Stream()
+    >>> s1.insert(20.0, n1)
+    >>> s1.insert(21.0, n2)
+    >>> n3 = note.Note("C#")
+    >>> s2 = Stream()
+    >>> s2.insert(20.0, n3)
+    >>> s1.playingWhenAttacked(n3).name
+    'G#' 
+    >>> n3.locations.setOffsetBySite(s2, 20.5)
+    >>> s1.playingWhenAttacked(n3).name
+    'G#' 
+    >>> n3.locations.setOffsetBySite(s2, 21.0)
+    >>> n3.offset
+    21.0 
+    >>> s1.playingWhenAttacked(n3).name
+    'D#' 
+    ## optionally, specify the site to get the offset from 
+    >>> n3.locations.setOffsetBySite(None, 100)
+    >>> n3.parent = None
+    >>> s1.playingWhenAttacked(n3)
+    <BLANKLINE> 
+    >>> s1.playingWhenAttacked(n3, s2).name
+    'D#' 
+
+    
 
 **melodicIntervals()**
 
@@ -1399,7 +1543,7 @@ Locally Defined
 
 **insert()**
 
-    Inserts an item(s) at the given offset(s) Has three forms: in the two argument form, inserts an element at the given offset: 
+    Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you're going to be inserting dozens of items that don't change the sort status) Has three forms: in the two argument form, inserts an element at the given offset: 
 
     >>> st1 = Stream()
     >>> st1.insert(32, note.Note("B-"))
@@ -1426,6 +1570,12 @@ Locally Defined
     2.0 
     >>> len(st3)
     2 
+    Raise an error if offset is not a number 
+    >>> Stream().insert("l","g")
+    Traceback (most recent call last): 
+    StreamException: ... 
+
+    
 
 **index()**
 
@@ -1646,7 +1796,7 @@ Locally Defined
 
 **getElementsByClass()**
 
-    Return a list of all Elements that match the className. Note that, as this appends Elements to a new Stream, whatever former parent relationship the ElementWrapper had is lost. The ElementWrapper's parent is set to the new stream that contains it. 
+    Return a list of all Elements that match the className. 
 
     >>> a = Stream()
     >>> a.repeatInsert(note.Rest(), range(10))
@@ -1677,7 +1827,7 @@ Locally Defined
 
     >>> e = 'test'
     >>> a = Stream()
-    >>> a.insert(0, e)
+    >>> a.insert(0, music21.ElementWrapper(e))
     >>> a[0].id = 'green'
     >>> None == a.getElementById(3)
     True 
@@ -1848,6 +1998,10 @@ Locally Defined
     >>> d.sign
     'F' 
 
+**attachIntervalsBetweenStreams()**
+
+    For each element in self, creates an interval object in the element's editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked. 
+
 **append()**
 
     Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest "release" of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True 
@@ -1889,6 +2043,10 @@ Locally Defined
     (18.0, 21.0) 
 
     
+
+**allPlayingWhileSounding()**
+
+    returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream. The offset of this new Stream is set to el's offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el -- thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el's offset in. TODO: write: requireClass: Takes as an optional parameter "requireClass".  If this parameter is boolean True then only elements of the same class as el are added to the new Stream.  If requireClass is list, it is used like classList in elsewhere in stream to provide a list of classes that the el must be a part of. The method always returns a Stream, but it might be an empty Stream. 
 
 **addGroupForElements()**
 
@@ -2125,6 +2283,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -2151,14 +2311,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -2167,6 +2333,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -2236,7 +2404,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 
@@ -2309,6 +2481,8 @@ Attributes
 
 **groups**
 
+**id**
+
 **isFlat**
 
 **isSorted**
@@ -2335,14 +2509,20 @@ Inherited from base.Music21Object
 
 **contexts()**
 
+**addLocationAndParent()**
+
 
 Inherited from stream.Stream
+
+**trimPlayingWhileSounding()**
 
 **transferOffsetToElements()**
 
 **stripTies()**
 
 **splitByClass()**
+
+**simultaneousAttacks()**
 
 **shiftElements()**
 
@@ -2351,6 +2531,8 @@ Inherited from stream.Stream
 **repeatAppend()**
 
 **pop()**
+
+**playingWhenAttacked()**
 
 **melodicIntervals()**
 
@@ -2420,7 +2602,11 @@ Inherited from stream.Stream
 
 **bestClef()**
 
+**attachIntervalsBetweenStreams()**
+
 **append()**
+
+**allPlayingWhileSounding()**
 
 **addGroupForElements()**
 

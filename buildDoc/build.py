@@ -32,6 +32,7 @@ from music21 import pitch
 from music21 import meter
 from music21 import musicxml
 from music21 import scale
+from music21 import serial
 from music21 import stream
 from music21 import tempo
 
@@ -61,6 +62,7 @@ MODULES = [
     note, 
     pitch, 
     stream,     
+    serial,     
 
 
 #   musicxml, 
@@ -361,6 +363,8 @@ class ModuleDoc(RestrtucturedWriter):
             elif isinstance(obj, environment.Environment):
                 continue # skip environment object
             else:
+                if common.isNum(obj) or common.isListLike(obj): 
+                    continue
                 environLocal.printDebug(['cannot process: %s' % repr(obj)])
 
 
@@ -447,7 +451,17 @@ class ModuleDoc(RestrtucturedWriter):
     def getRestructured(self):
         '''Produce RST documentation for a complete module.
         '''
+        # produce a simple string name of module to tag top of rst file
+        modNameStr = self.modName.replace('music21.', '')
+        modNameStr = modNameStr[0].upper() + modNameStr[1:]
+
         msg = []
+
+        msg.append('.. _module%s:\n\n' % modNameStr)
+
+        # this does not work yet
+        #msg.append('.. module:: %s:\n\n' % modNameStr)
+
         msg += self._heading(self.modName , '=')
         msg += self._para(self.modDoc)
 
@@ -487,21 +501,25 @@ class Documentation(RestrtucturedWriter):
         RestrtucturedWriter.__init__(self)
 
         self.titleMain = 'Music21 Documentation'
+
         # include additional rst files that are not auto-generated
+        # order here is the order presented in text
         self.chaptersMain = ['what',
                              'quickStart',
                              'overviewNotes', 
                              'overviewStreams', 
                              'overviewFormats', 
+                             'overviewPostTonal', 
                              'examples', 
-                             'about', 
 
                              'install', 
+                             'about', 
                              'environment', 
                              'graphing', 
-                             'glossary', 
-                             'faq']
+                             'faq',
+                             ]
         self.chaptersGenerated = [] # to be populated
+
         self.titleAppendix = 'Indices and Tables'
         self.chaptersAppendix = ['glossary']
     

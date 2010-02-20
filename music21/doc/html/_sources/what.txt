@@ -4,13 +4,21 @@
 What Is Music21?
 ======================================
 
-Music21 is a tool kit for computer-aided musicology
+Music21 is a tool kit for computer-aided musicology. Additional applications include computational musicology, musical example extraction and generation, music notation editing and scripting, and a wide variety of approaches to compositiong, both algorithmic and directly specified. 
 
 
-Applications: x
+Getting Musical Data
 -----------------------
 
-The music21.zip or music21.tgz distribution permits easy installation using Python's setup utility.
+Music21 lets you quickly get at musical data stored in a symbol representation, such as MusicXML, Humdrum, or MIDI (forthcoming).
 
-To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.
+
+Authoring Musical Data
+-----------------------
+
+The object primitives of music21 permit the user to author a simple Python script to create symbolic notation in the form of simple musical lines or complex, multi-part music.
+
+
+
+
 

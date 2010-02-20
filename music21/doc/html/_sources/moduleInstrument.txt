@@ -1,3 +1,5 @@
+.. _moduleInstrument:
+
 music21.instrument
 ==================
 
@@ -13,6 +15,8 @@ Attributes
 **contexts**
 
 **groups**
+
+**id**
 
 **instrumentAbbreviation**
 
@@ -49,6 +53,8 @@ Inherited from base.Music21Object
 **getOffsetBySite()**
 
 **contexts()**
+
+**addLocationAndParent()**
 
 
 Locally Defined

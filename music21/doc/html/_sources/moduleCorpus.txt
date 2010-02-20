@@ -1,3 +1,5 @@
+.. _moduleCorpus:
+
 music21.corpus
 ==============
 

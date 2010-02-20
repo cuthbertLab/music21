@@ -1,3 +1,5 @@
+.. _moduleConverter:
+
 music21.converter
 =================
 

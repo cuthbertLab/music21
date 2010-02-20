@@ -4,13 +4,17 @@
 Overview: Streams, Scores, Measures
 ==========================================
 
-Music21 is a tool kit for computer-aided musicology
+Streams are the fundamental container of music21 objects.
+
+For complete documentation on strams, see :ref:`moduleStream`.
 
 
-Applications: x
+
+Streams
 -----------------------
 
-The music21.zip or music21.tgz distribution permits easy installation using Python's setup utility.
+Streams provide a way to structure and position music21 objects both hierarchically and temporally.
 
-To install, first decompress the .zip or .tgz file. Enter this directory launch setup.py.
+
+
 
