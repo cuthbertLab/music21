@@ -1036,20 +1036,22 @@ class Test(unittest.TestCase):
 
     def testRuleFrequency(self):        
         import time
-        print time.ctime()
+        #print time.ctime()
         (num1, num2, num3, num4a, num4b) = ruleFrequency()
-        print time.ctime()
-        print num1
-        print num2
-        print num3
-        print num4a
-        print num4b
+        #print time.ctime()
+        #print num1
+        #print num2
+        #print num3
+        #print num4a
+        #print num4b
 #        self.assertEqual(num4a,  57)
 #        self.assertEqual(num4b, 104)
     
-        
+
 if (__name__ == "__main__"):
     music21.mainTest(Test) #, TestExternal)
+    
+    
 #    test()
 #    correctedMin6()
 #    correctedMaj3()
