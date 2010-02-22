@@ -465,23 +465,11 @@ TO WRITE Checks to make sure all notes have the same duration Does not run autom
 <p><strong>color</strong></p>
 <p>Locally Defined</p>
 <p><strong>primeFormString</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeFormString</span>
-<span class="go">&#39;&lt;037&gt;&#39;</span>
-</pre></div>
-</div>
+<blockquote>
+Return a representation of the Chord as a prime-form set class string.</blockquote>
 <p><strong>primeForm</strong></p>
 <blockquote>
-<p>Get the Forte class index number. Possible rename forteIndex</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeForm</span>
-<span class="go">[0, 3, 7]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">primeForm</span>
-<span class="go">[0, 3, 7]</span>
-</pre></div>
-</div>
-</blockquote>
+Return a representation of the Chord as a prime-form list of pitch class integers.</blockquote>
 <p><strong>pitches</strong></p>
 <blockquote>
 TODO: presently, whenever pitches are accessed, it sets the _chordTablesAddressNeedsUpdating value to false this is b/c the pitches list can be accessed and appended to a better way to do this needs to be found</blockquote>
@@ -613,6 +601,30 @@ The name of the note as it would appear in Lilypond format.</blockquote>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">hasZRelation</span>
 <span class="go">False</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>forteClassTnI</strong></p>
+<blockquote>
+<p>Return a forte class name under TnI classification</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClassTnI</span>
+<span class="go">&#39;3-11&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassTnI</span>
+<span class="go">&#39;3-11&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>forteClassTn</strong></p>
+<blockquote>
+<p>Return a forte class name</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClass</span>
+<span class="go">&#39;3-11A&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span>
+<span class="go">&#39;3-11B&#39;</span>
 </pre></div>
 </div>
 </blockquote>
@@ -979,7 +991,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 20, 2010.
+      Last updated on Feb 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

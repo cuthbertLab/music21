@@ -170,7 +170,7 @@ def getComposerDir(composerName):
             candidate = str(moduleName)
         if composerName.lower() not in candidate.lower():
             continue
-
+        # might also slook at .__file__
         if not hasattr(moduleName, '__path__'): # its a list of files
             dirCandidate = moduleName[0]
             while True:

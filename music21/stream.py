@@ -1896,6 +1896,11 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
+
+    def makeAccidentals(self):
+        pass
+
+
     def extendDuration(self, objName, inPlace=True):
         '''Given a stream and an object name, go through stream and find each 
         object. The time between adjacent objects is then assigned to the 

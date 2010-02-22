@@ -471,22 +471,11 @@ Locally Defined
 
 **primeFormString**
 
-    
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.primeFormString
-    '<037>' 
+    Return a representation of the Chord as a prime-form set class string. 
 
 **primeForm**
 
-    Get the Forte class index number. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.primeForm
-    [0, 3, 7] 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.primeForm
-    [0, 3, 7] 
+    Return a representation of the Chord as a prime-form list of pitch class integers. 
 
 **pitches**
 
@@ -620,6 +609,28 @@ Locally Defined
     >>> c2 = Chord(['c', 'e', 'g'])
     >>> c2.hasZRelation
     False 
+
+**forteClassTnI**
+
+    Return a forte class name under TnI classification 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClassTnI
+    '3-11' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClassTnI
+    '3-11' 
+
+**forteClassTn**
+
+    Return a forte class name 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClass
+    '3-11A' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClass
+    '3-11B' 
 
 **forteClassNumber**
 

@@ -48,6 +48,12 @@
             
   <div class="section" id="music21-corpus">
 <span id="modulecorpus"></span><h1>music21.corpus<a class="headerlink" href="#music21-corpus" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-getbachchorales">
+<h2>Function getBachChorales()<a class="headerlink" href="#function-getbachchorales" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="function-getbeethovenstringquartets">
+<h2>Function getBeethovenStringQuartets()<a class="headerlink" href="#function-getbeethovenstringquartets" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="function-getcomposer">
 <h2>Function getComposer()<a class="headerlink" href="#function-getcomposer" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposer</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
@@ -59,9 +65,28 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="function-getcomposerdir">
+<h2>Function getComposerDir()<a class="headerlink" href="#function-getcomposerdir" title="Permalink to this headline">¶</a></h2>
+<p>Given the name of a composer, get the path to the top-level directory of that composer</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;beethoven&#39;</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;bach&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;bach&#39;</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;mozart&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;mozart&#39;</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;luca&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;luca&#39;</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="function-getpaths">
 <h2>Function getPaths()<a class="headerlink" href="#function-getpaths" title="Permalink to this headline">¶</a></h2>
-<p>Get all paths in the corpus that match a known extension, or an extenions provided by an argument.</p>
+<p>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">30</span>
 <span class="go">True</span>
@@ -102,7 +127,10 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.corpus</a><ul>
+<li><a class="reference external" href="#function-getbachchorales">Function getBachChorales()</a></li>
+<li><a class="reference external" href="#function-getbeethovenstringquartets">Function getBeethovenStringQuartets()</a></li>
 <li><a class="reference external" href="#function-getcomposer">Function getComposer()</a></li>
+<li><a class="reference external" href="#function-getcomposerdir">Function getComposerDir()</a></li>
 <li><a class="reference external" href="#function-getpaths">Function getPaths()</a></li>
 <li><a class="reference external" href="#function-getwork">Function getWork()</a></li>
 <li><a class="reference external" href="#function-parsework">Function parseWork()</a></li>
@@ -155,7 +183,7 @@
     </div>
     <div class="footer">
       &copy; Copyright music21 project.
-      Last updated on Feb 20, 2010.
+      Last updated on Feb 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

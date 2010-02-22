@@ -389,7 +389,6 @@ class Accidental(music21.Music21Object):
         >>> mxAccidental.get('content')
         'quarter-sharp'
         """
-
         if self.name == "half-sharp": 
             mxName = "quarter-sharp"
         elif self.name == "one-and-a-half-sharp": 
@@ -402,7 +401,12 @@ class Accidental(music21.Music21Object):
             mxName = self.name
 
         mxAccidental = musicxmlMod.Accidental()
+
+#         if self.displayEvaluated == "yes" or self.displayType == "always" \
+#             or self.displayType == "even-tied":
+            
         mxAccidental.set('content', mxName)
+
         return mxAccidental
 
 
@@ -848,7 +852,8 @@ class Pitch(music21.Music21Object):
         mxNote.setDefaults()
         mxNote.set('pitch', mxPitch)
 
-        if self.accidental is not None:
+        if (self.accidental is not None and 
+            self.accidental.displayEvaluated in ['yes', '']):
             mxNote.set('accidental', self.accidental.mx)
         # should this also return an xml accidental object
         return mxNote # return element object
@@ -876,15 +881,19 @@ class Pitch(music21.Music21Object):
 
         acc = mxPitch.get('alter')
         if acc is not None: # None is used in musicxml but not in music21
-            if mxAccidental is not None:
+            if mxAccidental is not None: # the source had wanted to show alter
                 accObj = Accidental()
                 accObj.mx = mxAccidental
             # used to to just use acc value
             #self.accidental = Accidental(float(acc))
             # better to use accObj if possible
                 self.accidental = accObj
+                self.accidental.displayEvaluated = 'yes'
             else:
+                # here we generate an accidental object from the alter value
+                # but in the source, there was not a defined accidental
                 self.accidental = Accidental(float(acc))
+                self.accidental.displayEvaluated = 'no'
         self.octave = int(mxPitch.get('octave'))
         self._pitchSpaceNeedsUpdating = True
 
@@ -1017,6 +1026,22 @@ class Test(unittest.TestCase):
         self.assertEqual(b.octave, 3)
     
 
+    def testAccidentalImport(self):
+        '''Test that we are getting the properly set accidentals
+        '''
+        from music21 import corpus
+        s = corpus.parseWork('bwv438.xml')
+        tenorMeasures = s[2].measures
+        pAltered = tenorMeasures[0].pitches[1]
+        self.assertEqual(pAltered.accidental.name, 'flat')
+        self.assertEqual(pAltered.accidental.displayType, 'normal')
+        # in key signature, so shuold not be shown
+        self.assertEqual(pAltered.accidental.displayEvaluated, 'no')
+
+        altoMeasures = s[1].measures
+        pAltered = altoMeasures[6].pitches[2]
+        self.assertEqual(pAltered.accidental.name, 'sharp')
+        self.assertEqual(pAltered.accidental.displayEvaluated, 'yes')
 
 
 if __name__ == "__main__":
