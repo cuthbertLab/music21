@@ -63,6 +63,47 @@ class KeySignatureException(Exception):
 # c1 == c2
 # True
 
+# 
+# key1 = Key("E", "major")
+# key1
+# <music21.key.Key E major>
+# key1.parallel
+# <music21.key.Key E minor>
+# key1.relative
+# <music21.key.Key c# minor>
+# 
+# ks1 = key1.signature
+# ks1
+# <music21.key.KeySignature 4 sharps>
+# ks1.sharpsOrFlats
+# 4
+# ks1.majorKey
+# <music21.key.Key E major>
+# ks1.minorKey
+# <music21.key.Key c# minor>
+# 
+# # Set this E major piece to use a signature of 1 flat
+# key1.signature = KeySignature(-1)
+# 
+# # Check that it's still E major
+# key1
+# <music21.key.Key E major>
+# key1.signature
+# <music21.key.KeySignature 1 flat>
+# key1.sharpsOrFlats
+# -1
+# 
+# # What major key would normally have this signature?
+# key1.signature.majorKey
+# <music21.key.Key F major>
+# 
+# # Modal piece in E
+# key2 = Key("E", None)
+# key2
+# <music21.key.Key E >
+# key2.signature
+# <music21.key.KeySignature natural>
+
 class Key(music21.Music21Object):
     '''
     Note that a key is a sort of hypothetical/conceptual object.
