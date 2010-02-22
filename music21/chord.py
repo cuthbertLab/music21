@@ -364,7 +364,8 @@ class Chord(note.NotRest):
         if len(pcSet) == 0:
             raise ChordException('cannot access chord tables address for Chord with %s pitches' % len(pcSet))
 
-        environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
+        #environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
+
         card = len(pcSet)
         if card == 1: # its a singleton: return
             return (1,1,0)
@@ -1282,9 +1283,27 @@ class Chord(note.NotRest):
         '3-11B'
         '''
         self._updateChordTablesAddress()
-        return chordTables.addressToForteName(self._chordTablesAddress)
+        return chordTables.addressToForteName(self._chordTablesAddress, 'tn')
 
     forteClass = property(_getForteClass)    
+
+    forteClassTn = property(_getForteClass)    
+
+    def _getForteClassTnI(self):
+        '''Return a forte class name under TnI classification
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.forteClassTnI
+        '3-11'
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClassTnI
+        '3-11'
+        '''
+        self._updateChordTablesAddress()
+        return chordTables.addressToForteName(self._chordTablesAddress, 'tni')
+
+    forteClassTnI = property(_getForteClassTnI)    
 
 
     def _getNormalForm(self):
@@ -1346,7 +1365,7 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return list(chordTables.addressToPrimeForm(self._chordTablesAddress))
         
-    primeForm = property(_getPrimeForm)    
+    primeForm = property(_getPrimeForm, None, 'Return a representation of the Chord as a prime-form list of pitch class integers.')    
 
     def _getPrimeFormString(self):        
         '''
@@ -1356,7 +1375,7 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getPrimeForm())
 
-    primeFormString = property(_getPrimeFormString)    
+    primeFormString = property(_getPrimeFormString, None, 'Return a representation of the Chord as a prime-form set class string.')    
 
 
     def _getIntervalVector(self):

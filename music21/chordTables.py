@@ -2654,22 +2654,27 @@ def addressToCommonNames(address):
     else:
         return None
 
-def addressToForteName(address):
+def addressToForteName(address, classification='tn'):
     '''Given an addres, return the set-class name as a string.
 
     >>> addressToForteName((8,15,1))
     '8-15A'
     >>> addressToForteName((8,15))
     '8-15A'
+    >>> addressToForteName((8,15), 'tni')
+    '8-15'
     >>> addressToForteName((5,37))
     '5-37'
     '''
     card, index, inversion = _validateAddress(address)
-    if inversion == -1:
-        iStr = 'B'
-    elif inversion == 1:
-        iStr = 'A'
-    elif inversion == 0:
+    if classification.lower() == 'tn':
+        if inversion == -1:
+            iStr = 'B'
+        elif inversion == 1:
+            iStr = 'A'
+        elif inversion == 0:
+            iStr = ''
+    else: # tni, ignore inversion
         iStr = ''
     return '%s-%s%s' % (card, index, iStr)
 
