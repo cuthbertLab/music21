@@ -11,6 +11,7 @@
 import doctest
 import unittest
 import random
+import os
 
 import music21
 import music21.duration
@@ -49,10 +50,7 @@ class TrecentoSheet(object):
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
-                try:
-                    xbook = xlrd.open_workbook("trecento/" + self.filename)
-                except IOError:
-                    xbook = xlrd.open_workbook("../trecento/" + self.filename)
+                xbook = xlrd.open_workbook(music21.trecento.__path__[0] + os.sep + self.filename)
 
             
             if ("sheetname" in keywords): 
