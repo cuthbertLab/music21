@@ -1083,7 +1083,7 @@ class Music21Object(object):
             ## we'll take it.
             offset = value.quarterLength
         else:
-            raise Exception, 'We cannot set  %s as an offset' % value
+            raise Exception('We cannot set  %s as an offset' % value)
  
         self.locations.setOffsetBySite(self.parent, offset)
 #        if self.parent is None:
@@ -1114,7 +1114,7 @@ class Music21Object(object):
             self._duration = durationObj
         else:
             # need to permit Duration object assignment here
-            raise Exception, 'this must be a Duration object, not %s' % durationObj
+            raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration)
 
@@ -1402,7 +1402,7 @@ class ElementWrapper(Music21Object):
         Set the offset as a quarterNote length
         '''
         if not hasattr(durationObj, "quarterLength"):
-            raise Exception, 'this must be a Duration object, not %s' % durationObj
+            raise Exception('this must be a Duration object, not %s' % durationObj)
         
         if hasattr(self.obj, 'duration'):
             # if a number assume it is a quarter length

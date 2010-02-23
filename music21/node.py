@@ -235,7 +235,8 @@ class Node(object):
                     else:
                         new.set(otherAttr[i], otherAttr.get(otherAttr[i]))
         else:
-            print _MOD, 'cannot merge:', self, other
+            raise NodeException('cannot merge: %s, %s' % (self, other))
+            #print _MOD, 
 
         # call local merge special
         # may upate new
@@ -306,6 +307,7 @@ class Node(object):
     def __repr__(self):
         '''Provide a linear string representation of the element. This is not XML, but a simple format for viewing contents of elements.'''
         msg = []
+        # NOTE: this fails in python3:
         msg.append(u'<%s ' % self._tag)
         sub = []
         for name, value in self._getAttributes():

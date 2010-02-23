@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Utility constants, dictionaries, functions, and objects used throughout music21.
@@ -775,17 +775,17 @@ class Scalar(object):
             return object.__getattribute__(self, attribute)
         except AttributeError:
             try:
-                print "Trying value method instead..."
+                print("Trying value method instead...")
                 return self.value.__getattribute__(attribute)
             except AttributeError:
-                print "Well, that didnt do it, hey, lets try lots of things!"
+                print("Well, that didnt do it, hey, lets try lots of things!")
                 try:
                     return int.__getattribute__(self.toInt(), attribute)
                 except AttributeError:
                     try:
                         return unicode.__getattribute__(self.toUnicode(), attribute)
                     except AttributeError:
-                        print "no more..."        
+                        print("no more...")
                          
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):
