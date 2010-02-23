@@ -306,6 +306,24 @@ class Relations(object):
     #---------------------------------------------------------------------------
     # for dealing with locations
 
+    def getOffsets(self):
+        '''Return a list of all offsets.
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> dSite = Mock()
+        >>> aLocations = Relations()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(cSite) # a context
+        >>> aLocations.add(bSite, 234) # can add at same offset or another
+        >>> aLocations.add(dSite) # a context
+        >>> aLocations.getOffsets()
+        [0, 234]
+        '''
+        return [self._relations[x]['offset'] for x in self._locationKeys] 
+
     def getOffsetBySite(self, site):
         '''For a given site return its offset.
 
