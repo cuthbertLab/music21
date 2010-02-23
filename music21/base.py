@@ -160,9 +160,9 @@ class Relations(object):
                     dict['time'], idKey)
         return new
 
-    def _selectDomain(self, arg):
+    def _getKeys(self, arg):
         '''Utility method to get one or more group of relations
-        Returns a lost of keys
+        Returns a list of keys
         '''
         if not common.isListLike(arg):
             arg = [arg]
@@ -180,7 +180,7 @@ class Relations(object):
 # 
 #         '''
 #         match = False
-#         for coll in self._selectDomain(domain):
+#         for coll in self._getKeys(domain):
 #             if obj in coll: 
 #                 del coll[coll.index(obj)]
 #                 match = True
@@ -197,7 +197,7 @@ class Relations(object):
     def scrub(self, domain=['contexts', 'locations']):
         '''Remove all weak ref objects that point to objects that no longer exist.
         '''
-        for key in self._selectDomain(domain):
+        for key in self._getKeys(domain):
             coll = self._relations[key]    
             delList = []
             if common.isWeakref(self.coll['obj']): # only del weak refs
@@ -230,6 +230,8 @@ class Relations(object):
         '''Add a reference
         if offset is None, it is interpreted as a context
         if offset is a value, it is intereted as location
+
+        NOTE: offset follows obj here, unlike with add() in old Locations
         '''
         if offset == None:
             domain = 'contexts'
@@ -244,33 +246,26 @@ class Relations(object):
             idKey = None
         
         objRef = self._prepareObject(obj, domain)
-        newContext = False
-        newLocation = False
         add = False
         update = False
         if domain == 'contexts':
             if idKey not in self._contextKeys:
                 self._contextKeys.append(idKey) # add to contexts
-                newContext = True
                 add = True
             if idKey in self._locationKeys:
                 add = False # do not add, as we already ahve a location
         elif domain == 'locations':
             if idKey not in self._locationKeys:
                 self._locationKeys.append(idKey)
-                newLocation = True
                 add = True
             # we already have this obj as contexts    
             if idKey in self._contextKeys: 
                 add = False
                 update = True
-
         dict = {}
         dict['obj'] = objRef
-        
-        # offset can be None
+        # offset can be None for contexts
         dict['offset'] = offset
-
         if name == None:
             dict['name'] = type(obj).__name__
         else:
@@ -284,8 +279,6 @@ class Relations(object):
             self._relations[idKey] = dict
         if update: # add new/missing information to dictionary
             self._relations[idKey].update(dict)
-
-
 
     def get(self, domain=['contexts', 'locations']):
         '''Get references; unwrap from weakrefs; place in order from 
@@ -301,7 +294,7 @@ class Relations(object):
         True
         '''
         post = []
-        for key in self._selectDomain(domain):
+        for key in self._getKeys(domain):
             dict = self._relations[key]
             # need to check if these is weakref
             if common.isWeakref(dict['obj']):
@@ -334,7 +327,7 @@ class Relations(object):
         siteId = None
         if site is not None:
             siteId = id(site)
-        if not siteId in self._relations.keys(): 
+        if not siteId in self._getKeys('locations'): 
             raise RelationsException('an entry for this object (%s) is not stored in Relations' % siteId)
         return self._relations[siteId]['offset']
 
@@ -362,7 +355,7 @@ class Relations(object):
         siteId = None
         if site is not None:
             siteId = id(site)
-        if siteId in self._relations.keys(): 
+        if siteId in self._getKeys('locations'): 
             #environLocal.printDebug(['site already defined in this Relations object', site])
             # order is the same as in coordinates
             self._relations[siteId]['offset'] = value
@@ -396,10 +389,10 @@ class Relations(object):
         #True
         '''
         match = None
-        for siteIndex in self._relations.keys():
+        for siteId in self._getKeys('locations'): 
             # might need to use almost equals here
-            if self._relations[siteIndex]['offset'] == offset:
-                match = self._relations[siteIndex]['obj']
+            if self._relations[siteId]['offset'] == offset:
+                match = self._relations[siteId]['obj']
                 break
         if WEAKREF_ACTIVE:
             if match is None:
