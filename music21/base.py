@@ -44,7 +44,7 @@ WEAKREF_ACTIVE = True
 class Music21Exception(Exception):
     pass
 
-class ContextsException(Exception):
+class RelationsException(Exception):
     pass
 
 class LocationsException(Exception):
@@ -123,136 +123,311 @@ class Groups(list):
 
 
 #-------------------------------------------------------------------------------
-class Contexts(object):
-    '''An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant.
+class Relations(object):
+    '''An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.
     '''
     #TODO: make locations, by default, use weak refs
     # make contexts, by default, not use weak refs
 
     def __init__(self):
-        self._ref = [] # references
-        self._loc = [] # locations
+        # a dictionary of dictionaries
+        self._relations = {} 
+        # store idKeys in lists for easy accesss
+        # the same key may be both in locationKeys and contextKeys
+        self._locationKeys = []
+        self._contextKeys = []
 
     def __len__(self):
         '''Return the total number of references.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
-        >>> aContexts = Contexts()
-        >>> aContexts.addReference(aObj)
-        >>> len(aContexts) 
+        >>> aRelations = Relations()
+        >>> aRelations.add(aObj)
+        >>> len(aRelations) 
         1
         '''
-        return len(self._ref) + len(self._loc)
+        return len(self._relations)
 
-    def countLoc(self):
-        return len(self._loc)
-
-    def countRef(self):
-        return len(self._ref)
+    def __deepcopy__(self, memo=None):
+        '''This produces a new, independent Relations object.
+        This does not, however, deepcopy site references stored therein
+        '''
+        new = self.__class__()
+        for idKey in self._relations.keys():
+            dict = self._relations[idKey]
+            new.add(dict['obj'], dict['offset'], dict['name'], 
+                    dict['time'], idKey)
+        return new
 
     def _selectDomain(self, arg):
-        post = []
-        if 'ref' in arg:
-            post.append(self._ref)
-        elif 'loc' in arg:
-            post.append(self._loc)
-        return post
+        '''Utility method to get one or more group of relations
+        Returns a lost of keys
+        '''
+        if not common.isListLike(arg):
+            arg = [arg]
+        if 'contexts' in arg and len(arg) == 1:
+            return self._contextKeys
+        elif 'locations' in arg and len(arg) == 1:
+            return self._locationKeys
+        elif 'contexts' in arg and 'locations' in arg:
+            return self._locationKeys + self._contextKeys
+        else:
+            raise RelationsException('no such relations domain: %s' % arg)
 
-    def scrub(self, domain=['ref', 'loc']):
+#     def remove(self, obj, domain=['contexts', 'locations']):
+#         '''Remove the entry specified by sites
+# 
+#         '''
+#         match = False
+#         for coll in self._selectDomain(domain):
+#             if obj in coll: 
+#                 del coll[coll.index(obj)]
+#                 match = True
+#         if not match:
+#             raise RelationsException('an entry for this object (%s) is not stored in this object' % obj)
+
+    def removeById(self, idKey):
+        del self._relations[idKey]
+        if idKey in self._locationKeys:
+            self._locationKeys.pop(self._locationKeys.index(idKey))
+        if idKey in self._contextKeys:
+            self._contextKeys.pop(self._contextKeys.index(idKey))
+
+    def scrub(self, domain=['contexts', 'locations']):
         '''Remove all weak ref objects that point to objects that no longer exist.
         '''
-        for coll in self._selectDomain(domain):
+        for key in self._selectDomain(domain):
+            coll = self._relations[key]    
             delList = []
-            for i in range(len(coll)):
-                if common.isWeakref(self._ref[i]): # only del weak refs
-                    if common.unwrapWeakref(self._ref[i]['obj']) is None:
-                        delList.append(i)
-            delList.reverse() # go in reverse from largest to maintain positions
-            for i in delList:
-                del self._ref[i]
+            if common.isWeakref(self.coll['obj']): # only del weak refs
+                if common.unwrapWeakref(self.coll['obj']) is None:
+                    delList.append(key)
+        for key in delList:
+            self.removeById(key)
 
     def clear(self):
         '''Clear all data.
         '''
-        self._ref = []
-        self._loc = []
+        self._relations = {} 
+        self._locationKeys = []
+        self._contextKeys = []
+
+    def _prepareObject(self, obj, domain):
+        '''Prepare an object for storage
+        '''
+        # can have this perform differently based on domain
+        if WEAKREF_ACTIVE:
+            if obj is None: # leave None alone
+                objRef = obj
+            else:
+                objRef = common.wrapWeakref(obj)
+        else: # a references
+            objRef = site
+        return objRef
+
+    def add(self, obj, offset=None, name=None, timeValue=None, idKey=None):
+        '''Add a reference
+        if offset is None, it is interpreted as a context
+        if offset is a value, it is intereted as location
+        '''
+        if offset == None:
+            domain = 'contexts'
+        else:
+            domain = 'locations'
+        # note: if we want both context and locations to exists
+        # for the same object, may need to append character code to id
+        if idKey == None and obj != None:
+            idKey = id(obj)
+        # a None object will have a key of None
+        elif idKey == None and obj == None:
+            idKey = None
+        
+        objRef = self._prepareObject(obj, domain)
+        newContext = False
+        newLocation = False
+        add = False
+        update = False
+        if domain == 'contexts':
+            if idKey not in self._contextKeys:
+                self._contextKeys.append(idKey) # add to contexts
+                newContext = True
+                add = True
+            if idKey in self._locationKeys:
+                add = False # do not add, as we already ahve a location
+        elif domain == 'locations':
+            if idKey not in self._locationKeys:
+                self._locationKeys.append(idKey)
+                newLocation = True
+                add = True
+            # we already have this obj as contexts    
+            if idKey in self._contextKeys: 
+                add = False
+                update = True
+
+        dict = {}
+        dict['obj'] = objRef
+        
+        # offset can be None
+        dict['offset'] = offset
+
+        if name == None:
+            dict['name'] = type(obj).__name__
+        else:
+            dict['name'] = name
+        if timeValue == None:
+            dict['time'] = time.time()
+        else:
+            dict['time'] = timeValue
+
+        if add:
+            self._relations[idKey] = dict
+        if update: # add new/missing information to dictionary
+            self._relations[idKey].update(dict)
 
 
-    def get(self, domain=['ref', 'loc']):
+
+    def get(self, domain=['contexts', 'locations']):
         '''Get references; unwrap from weakrefs; place in order from 
         most recently added to least recently added
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = Contexts()
-        >>> aContexts.addReference(aObj)
-        >>> aContexts.addReference(bObj)
-        >>> aContexts.getReferences() == [bObj, aObj]
+        >>> aRelations = Relations()
+        >>> aRelations.add(aObj)
+        >>> aRelations.add(bObj)
+        >>> aRelations.get('contexts') == [aObj, bObj]
         True
         '''
         post = []
-        for coll in self._selectDomain(domain):
-            for i in range(len(self._ref)-1, -1, -1):
-                dict = self._ref[i]
-                # need to check if these is weakref
-                if common.isWeakref(dict['obj']):
-                    post.append(common.unwrapWeakref(dict['obj']))
-                else:
-                    post.append(dict['obj'])
+        for key in self._selectDomain(domain):
+            dict = self._relations[key]
+            # need to check if these is weakref
+            if common.isWeakref(dict['obj']):
+                post.append(common.unwrapWeakref(dict['obj']))
+            else:
+                post.append(dict['obj'])
         return post
 
-    def getReferences(self):
-        return self.get('ref')
+    #---------------------------------------------------------------------------
+    # for dealing with locations
 
-    def getLocations(self):
-        return self.get('loc')
+    def getOffsetBySite(self, site):
+        '''For a given site return its offset.
 
-    def addReference(self, obj, weakRef=False):
-        '''Add a reference
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cParent = Mock()
+        >>> aLocations = Relations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.getOffsetBySite(aSite)
+        23
+        >>> aLocations.getOffsetBySite(bSite)
+        121.5
+        >>> aLocations.getOffsetBySite(cParent)    
+        Traceback (most recent call last):
+        RelationsException: ...
         '''
-        # only add if not already here
-        if obj not in self.getReferences(): 
-            objRef = common.wrapWeakref(obj)
-            self._ref.append({}) # create new
-            self._ref[-1]['obj'] = objRef
-            self._ref[-1]['name'] = type(obj).__name__
-            self._ref[-1]['time'] = time.time()
+        siteId = None
+        if site is not None:
+            siteId = id(site)
+        if not siteId in self._relations.keys(): 
+            raise RelationsException('an entry for this object (%s) is not stored in Relations' % siteId)
+        return self._relations[siteId]['offset']
 
-    def remove(self, obj, domain=['ref', 'loc']):
-        '''Remove the entry specified by sites
 
+    def setOffsetBySite(self, site, value):
         '''
-        match = False
-        for coll in self._selectDomain(domain):
-            if obj in coll: 
-                del coll[coll.index(obj)]
-                match = True
-        if not match:
-            raise ContextsException('an entry for this object (%s) is not stored in this object' % obj)
+        Changes the offset of the site specified.  Note that this can also be
+        done with add, but the difference is that if the site is not in 
+        Relations, it will raise an exception.
+        
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> aLocations = Relations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.setOffsetBySite(aSite, 20)
+        >>> aLocations.getOffsetBySite(aSite)
+        20
+        >>> aLocations.setOffsetBySite(cSite, 30)        
+        Traceback (most recent call last):
+        RelationsException: ...
+        '''
+        siteId = None
+        if site is not None:
+            siteId = id(site)
+        if siteId in self._relations.keys(): 
+            #environLocal.printDebug(['site already defined in this Relations object', site])
+            # order is the same as in coordinates
+            self._relations[siteId]['offset'] = value
+        else:
+            raise RelationsException('an entry for this object (%s) is not stored in Relations' % site)
+
+    def getSiteByOffset(self, offset):
+        '''For a given offset return the parent
+
+        # More than one parent may have the same offset; 
+        # this can return the last site added by sorting time
+
+        No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts!
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> aLocations = Relations()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 23121.5)
+        >>> aSite == aLocations.getSiteByOffset(23)
+        True
+        
+        #### no longer works
+        #Adding another site at offset 23 will change getSiteByOffset
+        #>>> aLocations.add(cSite, 23)
+        #>>> aSite == aLocations.getSiteByOffset(23)
+        #False
+        #>>> cSite == aLocations.getSiteByOffset(23)
+        #True
+        '''
+        match = None
+        for siteIndex in self._relations.keys():
+            # might need to use almost equals here
+            if self._relations[siteIndex]['offset'] == offset:
+                match = self._relations[siteIndex]['obj']
+                break
+        if WEAKREF_ACTIVE:
+            if match is None:
+                return match
+            if not common.isWeakref(match):
+                raise RelationsException('site on coordinates is not a weak ref: %s' % match)
+            return common.unwrapWeakref(match)
+        else:
+            return match
 
 
-    def getById(self, id, domain=['ref', 'loc']):
-        pass
-    
-    def getByGroup(self, id, domain=['ref', 'loc']):
-        pass
+    #---------------------------------------------------------------------------
+    # for dealing with contexts or getting other information
 
-    def getByClass(self, className, domain=['ref', 'loc']):
+    def getByClass(self, className, domain=['contexts', 'locations']):
         '''Return the most recently added reference based on className. Class name can be a string or the real class name.
 
-        TODO: do this recursively, searching the Contexts of all members
+        TODO: do this recursively, searching the Relations of all members
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = Contexts()
-        >>> aContexts.addReference(aObj)
-        >>> aContexts.addReference(bObj)
-        >>> aContexts.getByClass('mock') == bObj
+        >>> aRelations = Relations()
+        >>> aRelations.add(aObj)
+        >>> aRelations.add(bObj)
+        >>> aRelations.getByClass('mock') == aObj
         True
-        >>> aContexts.getByClass(Mock) == bObj
+        >>> aRelations.getByClass(Mock) == aObj
         True
 
         '''
@@ -265,7 +440,7 @@ class Contexts(object):
                 if isinstance(obj, className):
                     return obj
 
-    def getAttrByName(self, attrName, domain=['rec', 'loc']):
+    def getAttrByName(self, attrName, domain=['contexts', 'locations']):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -273,13 +448,13 @@ class Contexts(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = Contexts()
-        >>> aContexts.addReference(aObj)
-        >>> aContexts.addReference(bObj)
-        >>> aContexts.getAttrByName('attr1') == 98
+        >>> aRelations = Relations()
+        >>> aRelations.add(aObj)
+        >>> aRelations.getAttrByName('attr1') == 234
         True
-        >>> del bObj
-        >>> aContexts.getAttrByName('attr1') == 234
+        >>> aRelations.removeById(id(aObj))
+        >>> aRelations.add(bObj)
+        >>> aRelations.getAttrByName('attr1') == 98
         True
         '''
         post = None
@@ -291,7 +466,7 @@ class Contexts(object):
             except AttributeError:
                 pass
 
-    def setAttrByName(self, attrName, value, domain=['rec', 'loc']):
+    def setAttrByName(self, attrName, value, domain=['contexts', 'locations']):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
@@ -299,11 +474,11 @@ class Contexts(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = Contexts()
-        >>> aContexts.addReference(aObj)
-        >>> aContexts.addReference(bObj)
-        >>> aContexts.setAttrByName('attr1', 'test')
-        >>> aContexts.getAttrByName('attr1') == 'test'
+        >>> aRelations = Relations()
+        >>> aRelations.add(aObj)
+        >>> aRelations.add(bObj)
+        >>> aRelations.setAttrByName('attr1', 'test')
+        >>> aRelations.getAttrByName('attr1') == 'test'
         True
         '''
         post = None
@@ -315,10 +490,15 @@ class Contexts(object):
             except AttributeError:
                 pass
 
+#     def find(self, classList, recursive=True, hasAttr=None):
+#         pass
 
 
-    def find(self, classList, recursive=True, hasAttr=None):
-        pass
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -455,9 +635,8 @@ class Locations(object):
         >>> aSite == aLocations.getSiteByOffset(12)
         True
         '''
-        ## should NOT be a weakref, but never can be too sure...
+        # should NOT be a weakref, but never can be too sure...
         site = common.unwrapWeakref(site)
-
 #        if not common.isNum(offset):
 #            raise LocationsException("offset must be a number (later, a Duration might be allowed)")
 
@@ -473,12 +652,9 @@ class Locations(object):
                 siteRef = common.wrapWeakref(site)
         else:
             siteRef = site
-
         # site here is wrapped in weakref
         self.coordinates[siteId]['site'] = siteRef
-
         self.coordinates[siteId]['offset'] = offset
-
         # store creation time in order to sort by time
         if timeValue is None:
             self.coordinates[siteId]['time'] = time.time()
@@ -498,7 +674,6 @@ class Locations(object):
         >>> aLocations.remove(aSite)
         >>> len(aLocations)
         0
-        
         '''
         siteId = None
         if site is not None: 
@@ -527,13 +702,11 @@ class Locations(object):
         Traceback (most recent call last):
         LocationsException: ...
         '''
-
         siteId = None
         if site is not None:
             siteId = id(site)
         if not siteId in self.coordinates: 
             raise LocationsException('an entry for this object (%s) is not stored in Locations' % siteId)
-
         return self.coordinates[siteId]['offset']
 
 
@@ -567,31 +740,12 @@ class Locations(object):
         else:
             raise LocationsException('an entry for this object (%s) is not stored in Locations' % site)
 
-
-#    def getOffsetByIndex(self, index):
-#        '''For a given parent return an offset.
-#
-#        >>> class Mock(Music21Object): pass
-#        >>> aSite = Mock()
-#        >>> bSite = Mock()
-#        >>> aLocations = Locations()
-#        >>> aLocations.add(23, aSite)
-#        >>> aLocations.add(121.5, bSite)
-#        >>> aLocations.getOffsetByIndex(-1)
-#        121.5
-#        >>> aLocations.getOffsetByIndex(2)
-#        Traceback (most recent call last):
-#        IndexError: list index out of range
-#        '''
-#        return self.coordinates[index]['offset']
-
-
-
     def getSiteByOffset(self, offset):
         '''For a given offset return the parent
 
-        ####More than one parent may have the same offset; 
-        ####this will return the last site added.
+        # More than one parent may have the same offset; 
+        # this can return the last site added by sorting time
+
         No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts!
 
         >>> class Mock(Music21Object): pass
@@ -629,30 +783,6 @@ class Locations(object):
             return common.unwrapWeakref(match)
         else:
             return match
-
-
-#    def getSiteByIndex(self, index):
-#        '''Get parent by index value, unwrapping the weakref.
-#
-#        >>> class Mock(Music21Object): pass
-#        >>> aSite = Mock()
-#        >>> bSite = Mock()
-#        >>> aLocations = Locations()
-#        >>> aLocations.add(23, aSite)
-#        >>> aLocations.add(121.5, bSite)
-#        >>> bSite == aLocations.getSiteByIndex(-1)
-#        True
-#        '''
-#        siteRef = self.coordinates[index]['site']
-#        if WEAKREF_ACTIVE:
-#            if siteRef is None: # let None parents pass
-#                return siteRef
-#            if not common.isWeakref(siteRef):
-#                raise LocationsException('parent on coordinates is not a weakref: %s' % siteRef)
-#            return common.unwrapWeakref(siteRef)
-#        else:
-#            return siteRef
-
 
 
 
