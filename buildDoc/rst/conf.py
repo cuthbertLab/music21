@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ extensions = ['rst2pdf.pdfbuilder']
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = 'music21 project'
+copyright = '2009-2010 The music21 Project'
 
 
 html_last_updated_fmt = '%b %d, %Y'
@@ -35,7 +35,7 @@ html_last_updated_fmt = '%b %d, %Y'
 # Content template for the index page.
 html_index = 'index.html'
 
-
+html_theme = 'sphinxdoc'
 
 def _shell():
     '''

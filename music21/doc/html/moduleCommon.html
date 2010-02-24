@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>music21.common &mdash; music21 v0.2.4a1 documentation</title>
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -39,7 +39,95 @@
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.common</a><ul>
+<li><a class="reference external" href="#function-euclidgcd">Function EuclidGCD()</a></li>
+<li><a class="reference external" href="#function-almostequals">Function almostEquals()</a></li>
+<li><a class="reference external" href="#function-basicallyequal">Function basicallyEqual()</a></li>
+<li><a class="reference external" href="#function-decimaltotuplet">Function decimalToTuplet()</a></li>
+<li><a class="reference external" href="#function-dirpartitioned">Function dirPartitioned()</a></li>
+<li><a class="reference external" href="#function-dotmultiplier">Function dotMultiplier()</a></li>
+<li><a class="reference external" href="#function-findformat">Function findFormat()</a></li>
+<li><a class="reference external" href="#function-findformatfile">Function findFormatFile()</a></li>
+<li><a class="reference external" href="#function-findinputextension">Function findInputExtension()</a></li>
+<li><a class="reference external" href="#function-findsimplefraction">Function findSimpleFraction()</a></li>
+<li><a class="reference external" href="#function-formatstr">Function formatStr()</a></li>
+<li><a class="reference external" href="#function-fromroman">Function fromRoman()</a></li>
+<li><a class="reference external" href="#function-getmd5">Function getMd5()</a></li>
+<li><a class="reference external" href="#function-getplatform">Function getPlatform()</a></li>
+<li><a class="reference external" href="#function-greaterthan">Function greaterThan()</a></li>
+<li><a class="reference external" href="#function-greaterthanorequal">Function greaterThanOrEqual()</a></li>
+<li><a class="reference external" href="#function-isiterable">Function isIterable()</a></li>
+<li><a class="reference external" href="#function-islistlike">Function isListLike()</a></li>
+<li><a class="reference external" href="#function-isnum">Function isNum()</a></li>
+<li><a class="reference external" href="#function-ispoweroftwo">Function isPowerOfTwo()</a></li>
+<li><a class="reference external" href="#function-isstr">Function isStr()</a></li>
+<li><a class="reference external" href="#function-isweakref">Function isWeakref()</a></li>
+<li><a class="reference external" href="#function-lcm">Function lcm()</a></li>
+<li><a class="reference external" href="#function-lessthan">Function lessThan()</a></li>
+<li><a class="reference external" href="#function-sortfilesrecent">Function sortFilesRecent()</a></li>
+<li><a class="reference external" href="#function-sortmodules">Function sortModules()</a></li>
+<li><a class="reference external" href="#function-stripaddresses">Function stripAddresses()</a></li>
+<li><a class="reference external" href="#function-toroman">Function toRoman()</a></li>
+<li><a class="reference external" href="#function-unwrapweakref">Function unwrapWeakref()</a></li>
+<li><a class="reference external" href="#function-wrapweakref">Function wrapWeakref()</a></li>
+<li><a class="reference external" href="#class-iterator">Class Iterator</a><ul>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-scalar">Class Scalar</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#id1">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-timer">Class Timer</a><ul>
+<li><a class="reference external" href="#id2">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-defhash">Class defHash</a><ul>
+<li><a class="reference external" href="#id3">Attributes</a></li>
+<li><a class="reference external" href="#id4">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-deflist">Class defList</a><ul>
+<li><a class="reference external" href="#id5">Attributes</a></li>
+<li><a class="reference external" href="#id6">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleBase.html"
+                                  title="previous chapter">music21.base</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleConverter.html"
+                                  title="next chapter">music21.converter</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleCommon.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -417,94 +505,6 @@ Explicit start method; will clear previous values. Start always happens on initi
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-            <h3><a href="contents.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">music21.common</a><ul>
-<li><a class="reference external" href="#function-euclidgcd">Function EuclidGCD()</a></li>
-<li><a class="reference external" href="#function-almostequals">Function almostEquals()</a></li>
-<li><a class="reference external" href="#function-basicallyequal">Function basicallyEqual()</a></li>
-<li><a class="reference external" href="#function-decimaltotuplet">Function decimalToTuplet()</a></li>
-<li><a class="reference external" href="#function-dirpartitioned">Function dirPartitioned()</a></li>
-<li><a class="reference external" href="#function-dotmultiplier">Function dotMultiplier()</a></li>
-<li><a class="reference external" href="#function-findformat">Function findFormat()</a></li>
-<li><a class="reference external" href="#function-findformatfile">Function findFormatFile()</a></li>
-<li><a class="reference external" href="#function-findinputextension">Function findInputExtension()</a></li>
-<li><a class="reference external" href="#function-findsimplefraction">Function findSimpleFraction()</a></li>
-<li><a class="reference external" href="#function-formatstr">Function formatStr()</a></li>
-<li><a class="reference external" href="#function-fromroman">Function fromRoman()</a></li>
-<li><a class="reference external" href="#function-getmd5">Function getMd5()</a></li>
-<li><a class="reference external" href="#function-getplatform">Function getPlatform()</a></li>
-<li><a class="reference external" href="#function-greaterthan">Function greaterThan()</a></li>
-<li><a class="reference external" href="#function-greaterthanorequal">Function greaterThanOrEqual()</a></li>
-<li><a class="reference external" href="#function-isiterable">Function isIterable()</a></li>
-<li><a class="reference external" href="#function-islistlike">Function isListLike()</a></li>
-<li><a class="reference external" href="#function-isnum">Function isNum()</a></li>
-<li><a class="reference external" href="#function-ispoweroftwo">Function isPowerOfTwo()</a></li>
-<li><a class="reference external" href="#function-isstr">Function isStr()</a></li>
-<li><a class="reference external" href="#function-isweakref">Function isWeakref()</a></li>
-<li><a class="reference external" href="#function-lcm">Function lcm()</a></li>
-<li><a class="reference external" href="#function-lessthan">Function lessThan()</a></li>
-<li><a class="reference external" href="#function-sortfilesrecent">Function sortFilesRecent()</a></li>
-<li><a class="reference external" href="#function-sortmodules">Function sortModules()</a></li>
-<li><a class="reference external" href="#function-stripaddresses">Function stripAddresses()</a></li>
-<li><a class="reference external" href="#function-toroman">Function toRoman()</a></li>
-<li><a class="reference external" href="#function-unwrapweakref">Function unwrapWeakref()</a></li>
-<li><a class="reference external" href="#function-wrapweakref">Function wrapWeakref()</a></li>
-<li><a class="reference external" href="#class-iterator">Class Iterator</a><ul>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-scalar">Class Scalar</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#id1">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-timer">Class Timer</a><ul>
-<li><a class="reference external" href="#id2">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-defhash">Class defHash</a><ul>
-<li><a class="reference external" href="#id3">Attributes</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-deflist">Class defList</a><ul>
-<li><a class="reference external" href="#id5">Attributes</a></li>
-<li><a class="reference external" href="#id6">Methods</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="moduleBase.html"
-                                  title="previous chapter">music21.base</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="moduleConverter.html"
-                                  title="next chapter">music21.converter</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/moduleCommon.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -523,7 +523,7 @@ Explicit start method; will clear previous values. Start always happens on initi
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright music21 project.
+      &copy; Copyright 2009-2010 The music21 Project.
       Last updated on Feb 24, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>

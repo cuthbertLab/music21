@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>music21.note &mdash; music21 v0.2.4a1 documentation</title>
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -39,7 +39,138 @@
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.note</a><ul>
+<li><a class="reference external" href="#function-notefromdiatonicnumber">Function noteFromDiatonicNumber()</a></li>
+<li><a class="reference external" href="#function-sendnoteinfo">Function sendNoteInfo()</a></li>
+<li><a class="reference external" href="#class-accidental">Class Accidental</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-beam">Class Beam</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-beams">Class Beams</a><ul>
+<li><a class="reference external" href="#id3">Attributes</a></li>
+<li><a class="reference external" href="#id4">Properties</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-eighthnote">Class EighthNote</a><ul>
+<li><a class="reference external" href="#id6">Attributes</a></li>
+<li><a class="reference external" href="#id7">Properties</a></li>
+<li><a class="reference external" href="#id8">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-generalnote">Class GeneralNote</a><ul>
+<li><a class="reference external" href="#id9">Attributes</a></li>
+<li><a class="reference external" href="#id10">Properties</a></li>
+<li><a class="reference external" href="#id11">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-halfnote">Class HalfNote</a><ul>
+<li><a class="reference external" href="#id12">Attributes</a></li>
+<li><a class="reference external" href="#id13">Properties</a></li>
+<li><a class="reference external" href="#id14">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-lilystring">Class LilyString</a><ul>
+<li><a class="reference external" href="#id15">Attributes</a></li>
+<li><a class="reference external" href="#id16">Properties</a></li>
+<li><a class="reference external" href="#id17">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-lyric">Class Lyric</a><ul>
+<li><a class="reference external" href="#id18">Attributes</a></li>
+<li><a class="reference external" href="#id19">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-notrest">Class NotRest</a><ul>
+<li><a class="reference external" href="#id20">Attributes</a></li>
+<li><a class="reference external" href="#id21">Properties</a></li>
+<li><a class="reference external" href="#id22">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-note">Class Note</a><ul>
+<li><a class="reference external" href="#id23">Attributes</a></li>
+<li><a class="reference external" href="#id24">Properties</a></li>
+<li><a class="reference external" href="#id25">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-pitch">Class Pitch</a><ul>
+<li><a class="reference external" href="#id26">Attributes</a></li>
+<li><a class="reference external" href="#id27">Properties</a></li>
+<li><a class="reference external" href="#id28">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-quarternote">Class QuarterNote</a><ul>
+<li><a class="reference external" href="#id29">Attributes</a></li>
+<li><a class="reference external" href="#id30">Properties</a></li>
+<li><a class="reference external" href="#id31">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-rest">Class Rest</a><ul>
+<li><a class="reference external" href="#id32">Attributes</a></li>
+<li><a class="reference external" href="#id33">Properties</a></li>
+<li><a class="reference external" href="#id34">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tie">Class Tie</a><ul>
+<li><a class="reference external" href="#id35">Attributes</a></li>
+<li><a class="reference external" href="#id36">Properties</a></li>
+<li><a class="reference external" href="#id37">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-unpitched">Class Unpitched</a><ul>
+<li><a class="reference external" href="#id38">Attributes</a></li>
+<li><a class="reference external" href="#id39">Properties</a></li>
+<li><a class="reference external" href="#id40">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-wholenote">Class WholeNote</a><ul>
+<li><a class="reference external" href="#id41">Attributes</a></li>
+<li><a class="reference external" href="#id42">Properties</a></li>
+<li><a class="reference external" href="#id43">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleMeter.html"
+                                  title="previous chapter">music21.meter</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleNode.html"
+                                  title="next chapter">music21.node</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleNote.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -973,137 +1104,6 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-            <h3><a href="contents.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">music21.note</a><ul>
-<li><a class="reference external" href="#function-notefromdiatonicnumber">Function noteFromDiatonicNumber()</a></li>
-<li><a class="reference external" href="#function-sendnoteinfo">Function sendNoteInfo()</a></li>
-<li><a class="reference external" href="#class-accidental">Class Accidental</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-beam">Class Beam</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-beams">Class Beams</a><ul>
-<li><a class="reference external" href="#id3">Attributes</a></li>
-<li><a class="reference external" href="#id4">Properties</a></li>
-<li><a class="reference external" href="#id5">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-eighthnote">Class EighthNote</a><ul>
-<li><a class="reference external" href="#id6">Attributes</a></li>
-<li><a class="reference external" href="#id7">Properties</a></li>
-<li><a class="reference external" href="#id8">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-generalnote">Class GeneralNote</a><ul>
-<li><a class="reference external" href="#id9">Attributes</a></li>
-<li><a class="reference external" href="#id10">Properties</a></li>
-<li><a class="reference external" href="#id11">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-halfnote">Class HalfNote</a><ul>
-<li><a class="reference external" href="#id12">Attributes</a></li>
-<li><a class="reference external" href="#id13">Properties</a></li>
-<li><a class="reference external" href="#id14">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-lilystring">Class LilyString</a><ul>
-<li><a class="reference external" href="#id15">Attributes</a></li>
-<li><a class="reference external" href="#id16">Properties</a></li>
-<li><a class="reference external" href="#id17">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-lyric">Class Lyric</a><ul>
-<li><a class="reference external" href="#id18">Attributes</a></li>
-<li><a class="reference external" href="#id19">Properties</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-notrest">Class NotRest</a><ul>
-<li><a class="reference external" href="#id20">Attributes</a></li>
-<li><a class="reference external" href="#id21">Properties</a></li>
-<li><a class="reference external" href="#id22">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-note">Class Note</a><ul>
-<li><a class="reference external" href="#id23">Attributes</a></li>
-<li><a class="reference external" href="#id24">Properties</a></li>
-<li><a class="reference external" href="#id25">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-pitch">Class Pitch</a><ul>
-<li><a class="reference external" href="#id26">Attributes</a></li>
-<li><a class="reference external" href="#id27">Properties</a></li>
-<li><a class="reference external" href="#id28">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-quarternote">Class QuarterNote</a><ul>
-<li><a class="reference external" href="#id29">Attributes</a></li>
-<li><a class="reference external" href="#id30">Properties</a></li>
-<li><a class="reference external" href="#id31">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-rest">Class Rest</a><ul>
-<li><a class="reference external" href="#id32">Attributes</a></li>
-<li><a class="reference external" href="#id33">Properties</a></li>
-<li><a class="reference external" href="#id34">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-tie">Class Tie</a><ul>
-<li><a class="reference external" href="#id35">Attributes</a></li>
-<li><a class="reference external" href="#id36">Properties</a></li>
-<li><a class="reference external" href="#id37">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-unpitched">Class Unpitched</a><ul>
-<li><a class="reference external" href="#id38">Attributes</a></li>
-<li><a class="reference external" href="#id39">Properties</a></li>
-<li><a class="reference external" href="#id40">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-wholenote">Class WholeNote</a><ul>
-<li><a class="reference external" href="#id41">Attributes</a></li>
-<li><a class="reference external" href="#id42">Properties</a></li>
-<li><a class="reference external" href="#id43">Methods</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="moduleMeter.html"
-                                  title="previous chapter">music21.meter</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="moduleNode.html"
-                                  title="next chapter">music21.node</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/moduleNote.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -1122,7 +1122,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright music21 project.
+      &copy; Copyright 2009-2010 The music21 Project.
       Last updated on Feb 24, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>

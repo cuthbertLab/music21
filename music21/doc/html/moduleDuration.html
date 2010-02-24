@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>music21.duration &mdash; music21 v0.2.4a1 documentation</title>
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -39,7 +39,108 @@
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.duration</a><ul>
+<li><a class="reference external" href="#function-convertquarterlengthtotype">Function convertQuarterLengthToType()</a></li>
+<li><a class="reference external" href="#function-converttypetonumber">Function convertTypeToNumber()</a></li>
+<li><a class="reference external" href="#function-converttypetoquarterlength">Function convertTypeToQuarterLength()</a></li>
+<li><a class="reference external" href="#function-dottedmatch">Function dottedMatch()</a></li>
+<li><a class="reference external" href="#function-musicxmltypetotype">Function musicXMLTypeToType()</a></li>
+<li><a class="reference external" href="#function-nextlargertype">Function nextLargerType()</a></li>
+<li><a class="reference external" href="#function-partitionquarterlength">Function partitionQuarterLength()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtoclosesttype">Function quarterLengthToClosestType()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtodurations">Function quarterLengthToDurations()</a></li>
+<li><a class="reference external" href="#function-quarterlengthtotuplet">Function quarterLengthToTuplet()</a></li>
+<li><a class="reference external" href="#function-roundduration">Function roundDuration()</a></li>
+<li><a class="reference external" href="#function-typetomusicxmltype">Function typeToMusicXMLType()</a></li>
+<li><a class="reference external" href="#function-unitspec">Function unitSpec()</a></li>
+<li><a class="reference external" href="#function-updatetuplettype">Function updateTupletType()</a></li>
+<li><a class="reference external" href="#class-appogiaturastartduration">Class AppogiaturaStartDuration</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-appogiaturastopduration">Class AppogiaturaStopDuration</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Properties</a></li>
+<li><a class="reference external" href="#id3">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-duration">Class Duration</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Properties</a></li>
+<li><a class="reference external" href="#id6">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-durationcommon">Class DurationCommon</a><ul>
+<li><a class="reference external" href="#id7">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-durationunit">Class DurationUnit</a><ul>
+<li><a class="reference external" href="#id8">Attributes</a></li>
+<li><a class="reference external" href="#id9">Properties</a></li>
+<li><a class="reference external" href="#id10">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-graceduration">Class GraceDuration</a><ul>
+<li><a class="reference external" href="#id11">Attributes</a></li>
+<li><a class="reference external" href="#id12">Properties</a></li>
+<li><a class="reference external" href="#id13">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-longgraceduration">Class LongGraceDuration</a><ul>
+<li><a class="reference external" href="#id14">Attributes</a></li>
+<li><a class="reference external" href="#id15">Properties</a></li>
+<li><a class="reference external" href="#id16">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tuplet">Class Tuplet</a><ul>
+<li><a class="reference external" href="#id17">Attributes</a></li>
+<li><a class="reference external" href="#id18">Properties</a></li>
+<li><a class="reference external" href="#id19">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-zeroduration">Class ZeroDuration</a><ul>
+<li><a class="reference external" href="#id20">Attributes</a></li>
+<li><a class="reference external" href="#id21">Properties</a></li>
+<li><a class="reference external" href="#id22">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleChord.html"
+                                  title="previous chapter">music21.chord</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleDynamics.html"
+                                  title="next chapter">music21.dynamics</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleDuration.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -803,107 +904,6 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-            <h3><a href="contents.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">music21.duration</a><ul>
-<li><a class="reference external" href="#function-convertquarterlengthtotype">Function convertQuarterLengthToType()</a></li>
-<li><a class="reference external" href="#function-converttypetonumber">Function convertTypeToNumber()</a></li>
-<li><a class="reference external" href="#function-converttypetoquarterlength">Function convertTypeToQuarterLength()</a></li>
-<li><a class="reference external" href="#function-dottedmatch">Function dottedMatch()</a></li>
-<li><a class="reference external" href="#function-musicxmltypetotype">Function musicXMLTypeToType()</a></li>
-<li><a class="reference external" href="#function-nextlargertype">Function nextLargerType()</a></li>
-<li><a class="reference external" href="#function-partitionquarterlength">Function partitionQuarterLength()</a></li>
-<li><a class="reference external" href="#function-quarterlengthtoclosesttype">Function quarterLengthToClosestType()</a></li>
-<li><a class="reference external" href="#function-quarterlengthtodurations">Function quarterLengthToDurations()</a></li>
-<li><a class="reference external" href="#function-quarterlengthtotuplet">Function quarterLengthToTuplet()</a></li>
-<li><a class="reference external" href="#function-roundduration">Function roundDuration()</a></li>
-<li><a class="reference external" href="#function-typetomusicxmltype">Function typeToMusicXMLType()</a></li>
-<li><a class="reference external" href="#function-unitspec">Function unitSpec()</a></li>
-<li><a class="reference external" href="#function-updatetuplettype">Function updateTupletType()</a></li>
-<li><a class="reference external" href="#class-appogiaturastartduration">Class AppogiaturaStartDuration</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-appogiaturastopduration">Class AppogiaturaStopDuration</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties</a></li>
-<li><a class="reference external" href="#id3">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-duration">Class Duration</a><ul>
-<li><a class="reference external" href="#id4">Attributes</a></li>
-<li><a class="reference external" href="#id5">Properties</a></li>
-<li><a class="reference external" href="#id6">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-durationcommon">Class DurationCommon</a><ul>
-<li><a class="reference external" href="#id7">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-durationunit">Class DurationUnit</a><ul>
-<li><a class="reference external" href="#id8">Attributes</a></li>
-<li><a class="reference external" href="#id9">Properties</a></li>
-<li><a class="reference external" href="#id10">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-graceduration">Class GraceDuration</a><ul>
-<li><a class="reference external" href="#id11">Attributes</a></li>
-<li><a class="reference external" href="#id12">Properties</a></li>
-<li><a class="reference external" href="#id13">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-longgraceduration">Class LongGraceDuration</a><ul>
-<li><a class="reference external" href="#id14">Attributes</a></li>
-<li><a class="reference external" href="#id15">Properties</a></li>
-<li><a class="reference external" href="#id16">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-tuplet">Class Tuplet</a><ul>
-<li><a class="reference external" href="#id17">Attributes</a></li>
-<li><a class="reference external" href="#id18">Properties</a></li>
-<li><a class="reference external" href="#id19">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-zeroduration">Class ZeroDuration</a><ul>
-<li><a class="reference external" href="#id20">Attributes</a></li>
-<li><a class="reference external" href="#id21">Properties</a></li>
-<li><a class="reference external" href="#id22">Methods</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="moduleChord.html"
-                                  title="previous chapter">music21.chord</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="moduleDynamics.html"
-                                  title="next chapter">music21.dynamics</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/moduleDuration.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -922,7 +922,7 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright music21 project.
+      &copy; Copyright 2009-2010 The music21 Project.
       Last updated on Feb 24, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
