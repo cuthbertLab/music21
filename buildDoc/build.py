@@ -211,11 +211,11 @@ class RestrtucturedWriter(object):
                 else:
                     space = '\n'
                 msg.append(space + indent + line)
-            else: # continueing an existing line
+            else: # continuing an existing line
                 if inExamples == False:
                     msg.append(line + ' ')
                 else: # assume we are in examples; 
-                # need to get lines python lines tt do not start with delim
+                # need to get lines python lines that do not start with delim
                     msg.append('\n' + indent + line + ' ')
         msg.append('\n')
 
@@ -238,7 +238,7 @@ class ModuleDoc(RestrtucturedWriter):
         # file name for this module; leave off music21 part
         fn = mod.__name__.split('.')
         self.fileName = 'module' + fn[1][0].upper() + fn[1][1:] + '.rst'
-        # refernces used in rst table of contestns
+        # references used in rst table of contents
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
 
 
@@ -348,7 +348,7 @@ class ModuleDoc(RestrtucturedWriter):
                 continue
             elif 'Test' in component: # ignore test classes
                 continue
-            elif 'Exception' in component: # ignore test classes
+            elif 'Exception' in component: # ignore exceptions
                 continue
 
             objName = '%s.%s' % (self.modName, component)

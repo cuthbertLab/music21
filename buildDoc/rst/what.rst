@@ -4,7 +4,10 @@
 What Is Music21?
 ======================================
 
-Music21 is a tool kit for computer-aided musicology. Additional applications include computational musicology, musical example extraction and generation, music notation editing and scripting, and a wide variety of approaches to compositiong, both algorithmic and directly specified. 
+Music21 is a toolkit for computer-aided musicology. Additional applications include 
+computational musicology, musical example extraction and generation, music notation 
+editing and scripting, and a wide variety of approaches to composition, both algorithmic 
+and directly specified. 
 
 
 Getting Musical Data
