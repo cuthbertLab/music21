@@ -164,6 +164,7 @@ class RestrtucturedWriter(object):
         sub = []
         for i in range(len(mro)):
             if i == 0: continue # first is always the class itself
+            if i == len(mro): continue # last is object
             sub.append(self.formatParent(mro[i]))        
         msg.append(', '.join(sub))
         return ' '.join(msg)
