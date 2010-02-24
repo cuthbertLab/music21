@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.serial &mdash; music21 v0.2.4a1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="music21.tempo" href="moduleTempo.html" />
+    <link rel="prev" title="music21.stream" href="moduleStream.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="moduleTempo.html" title="music21.tempo"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleStream.html" title="music21.stream"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="music21-serial">
+<span id="moduleserial"></span><h1>music21.serial<a class="headerlink" href="#music21-serial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="function-pctotonerow">
+<h2>Function pcToToneRow()<a class="headerlink" href="#function-pctotonerow" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pcToToneRow</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">12</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-rowtomatrix">
+<h2>Function rowToMatrix()<a class="headerlink" href="#function-rowtomatrix" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="class-tonerow">
+<h2>Class ToneRow<a class="headerlink" href="#class-tonerow" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>id</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>sorted</strong>, <strong>semiFlat</strong>, <strong>pitches</strong>, <strong>notes</strong>, <strong>mx</strong>, <strong>musicxml</strong>, <strong>measures</strong>, <strong>lowestOffset</strong>, <strong>lily</strong>, <strong>isGapless</strong>, <strong>highestTime</strong>, <strong>highestOffset</strong>, <strong>flat</strong>, <strong>elements</strong></p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>trimPlayingWhileSounding()</strong>, <strong>transferOffsetToElements()</strong>, <strong>stripTies()</strong>, <strong>splitByClass()</strong>, <strong>simultaneousAttacks()</strong>, <strong>shiftElements()</strong>, <strong>repeatInsert()</strong>, <strong>repeatAppend()</strong>, <strong>pop()</strong>, <strong>playingWhenAttacked()</strong>, <strong>melodicIntervals()</strong>, <strong>makeTies()</strong>, <strong>makeRests()</strong>, <strong>makeMeasures()</strong>, <strong>makeBeams()</strong>, <strong>makeAccidentals()</strong>, <strong>isSequence()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>insertAtIndex()</strong>, <strong>insert()</strong>, <strong>index()</strong>, <strong>groupElementsByOffset()</strong>, <strong>getTimeSignatures()</strong>, <strong>getSimultaneous()</strong>, <strong>getPitches()</strong>, <strong>getOverlaps()</strong>, <strong>getNotes()</strong>, <strong>getMeasures()</strong>, <strong>getInstrument()</strong>, <strong>getGroups()</strong>, <strong>getElementsByOffset()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementById()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAfterElement()</strong>, <strong>findGaps()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>extractContext()</strong>, <strong>extendDuration()</strong>, <strong>bestClef()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>append()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>addGroupForElements()</strong></p>
+</div>
+</div>
+<div class="section" id="class-twelvetonematrix">
+<h2>Class TwelveToneMatrix<a class="headerlink" href="#class-twelvetonematrix" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>id</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id2">
+<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>sorted</strong>, <strong>semiFlat</strong>, <strong>pitches</strong>, <strong>notes</strong>, <strong>mx</strong>, <strong>musicxml</strong>, <strong>measures</strong>, <strong>lowestOffset</strong>, <strong>lily</strong>, <strong>isGapless</strong>, <strong>highestTime</strong>, <strong>highestOffset</strong>, <strong>flat</strong>, <strong>elements</strong></p>
+</div>
+<div class="section" id="id3">
+<h3>Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>trimPlayingWhileSounding()</strong>, <strong>transferOffsetToElements()</strong>, <strong>stripTies()</strong>, <strong>splitByClass()</strong>, <strong>simultaneousAttacks()</strong>, <strong>shiftElements()</strong>, <strong>repeatInsert()</strong>, <strong>repeatAppend()</strong>, <strong>pop()</strong>, <strong>playingWhenAttacked()</strong>, <strong>melodicIntervals()</strong>, <strong>makeTies()</strong>, <strong>makeRests()</strong>, <strong>makeMeasures()</strong>, <strong>makeBeams()</strong>, <strong>makeAccidentals()</strong>, <strong>isSequence()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>insertAtIndex()</strong>, <strong>insert()</strong>, <strong>index()</strong>, <strong>groupElementsByOffset()</strong>, <strong>getTimeSignatures()</strong>, <strong>getSimultaneous()</strong>, <strong>getPitches()</strong>, <strong>getOverlaps()</strong>, <strong>getNotes()</strong>, <strong>getMeasures()</strong>, <strong>getInstrument()</strong>, <strong>getGroups()</strong>, <strong>getElementsByOffset()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementById()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAfterElement()</strong>, <strong>findGaps()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>extractContext()</strong>, <strong>extendDuration()</strong>, <strong>bestClef()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>append()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>addGroupForElements()</strong></p>
+</div>
+</div>
+<div class="section" id="class-twelvetonerow">
+<h2>Class TwelveToneRow<a class="headerlink" href="#class-twelvetonerow" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: serial.ToneRow (of module <a class="reference internal" href="#moduleserial"><em>music21.serial</em></a>), stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>contexts</strong></p>
+<p><strong>flattenedRepresentationOf</strong></p>
+<p><strong>groups</strong></p>
+<p><strong>id</strong></p>
+<p><strong>isFlat</strong></p>
+<p><strong>isSorted</strong></p>
+<p><strong>locations</strong></p>
+</div>
+<div class="section" id="id5">
+<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>sorted</strong>, <strong>semiFlat</strong>, <strong>pitches</strong>, <strong>notes</strong>, <strong>mx</strong>, <strong>musicxml</strong>, <strong>measures</strong>, <strong>lowestOffset</strong>, <strong>lily</strong>, <strong>isGapless</strong>, <strong>highestTime</strong>, <strong>highestOffset</strong>, <strong>flat</strong>, <strong>elements</strong></p>
+</div>
+<div class="section" id="id6">
+<h3>Methods<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <strong>trimPlayingWhileSounding()</strong>, <strong>transferOffsetToElements()</strong>, <strong>stripTies()</strong>, <strong>splitByClass()</strong>, <strong>simultaneousAttacks()</strong>, <strong>shiftElements()</strong>, <strong>repeatInsert()</strong>, <strong>repeatAppend()</strong>, <strong>pop()</strong>, <strong>playingWhenAttacked()</strong>, <strong>melodicIntervals()</strong>, <strong>makeTies()</strong>, <strong>makeRests()</strong>, <strong>makeMeasures()</strong>, <strong>makeBeams()</strong>, <strong>makeAccidentals()</strong>, <strong>isSequence()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>insertAtIndex()</strong>, <strong>insert()</strong>, <strong>index()</strong>, <strong>groupElementsByOffset()</strong>, <strong>getTimeSignatures()</strong>, <strong>getSimultaneous()</strong>, <strong>getPitches()</strong>, <strong>getOverlaps()</strong>, <strong>getNotes()</strong>, <strong>getMeasures()</strong>, <strong>getInstrument()</strong>, <strong>getGroups()</strong>, <strong>getElementsByOffset()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementById()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAfterElement()</strong>, <strong>findGaps()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>extractContext()</strong>, <strong>extendDuration()</strong>, <strong>bestClef()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>append()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>addGroupForElements()</strong></p>
+<p>Locally Defined:</p>
+<p><strong>matrix()</strong></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.serial</a><ul>
+<li><a class="reference external" href="#function-pctotonerow">Function pcToToneRow()</a></li>
+<li><a class="reference external" href="#function-rowtomatrix">Function rowToMatrix()</a></li>
+<li><a class="reference external" href="#class-tonerow">Class ToneRow</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-twelvetonematrix">Class TwelveToneMatrix</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#id2">Properties</a></li>
+<li><a class="reference external" href="#id3">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-twelvetonerow">Class TwelveToneRow</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+<li><a class="reference external" href="#id5">Properties</a></li>
+<li><a class="reference external" href="#id6">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleStream.html"
+                                  title="previous chapter">music21.stream</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleTempo.html"
+                                  title="next chapter">music21.tempo</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleSerial.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="moduleTempo.html" title="music21.tempo"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleStream.html" title="music21.stream"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright music21 project.
+      Last updated on Feb 24, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

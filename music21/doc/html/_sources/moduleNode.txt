@@ -1,0 +1,105 @@
+.. _moduleNode:
+
+music21.node
+============
+
+Function fixed_writexml()
+-------------------------
+
+
+Class Node
+----------
+
+Inherits from: object
+
+
+Attributes
+~~~~~~~~~~
+
+**charData**
+
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**tag**
+
+
+Methods
+~~~~~~~
+
+
+Locally Defined:
+
+**xmlStr()**
+
+    Shortcut method to provide quick xml out. 
+
+**toxml()**
+
+    Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls. 
+
+**setDefaults()**
+
+    provide defaults for all necessary attributes at this level 
+
+**set()**
+
+
+**merge()**
+
+    Given another similar or commonly used Node object, combine all attributes and return a new object. 
+
+    >>> a = Node()
+    >>> a.set('charData', 'green')
+    >>> b = Node()
+    >>> c = b.merge(a)
+    >>> c.get('charData')
+    'green' 
+
+**loadAttrs()**
+
+    Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
+
+**getNewDoc()**
+
+
+**get()**
+
+
+
+Class NodeList
+--------------
+
+Inherits from: node.Node (of module :ref:`moduleNode`), object
+
+Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
+
+Attributes
+~~~~~~~~~~
+
+**charData**
+
+**componentList**
+
+Properties
+~~~~~~~~~~
+
+
+Inherited from node.Node (of module :ref:`moduleNode`): **tag**
+
+Methods
+~~~~~~~
+
+
+Inherited from node.Node (of module :ref:`moduleNode`): **xmlStr()**, **toxml()**, **setDefaults()**, **set()**, **merge()**, **loadAttrs()**, **getNewDoc()**, **get()**
+
+
+Locally Defined:
+
+**append()**
+
+
+
