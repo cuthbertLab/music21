@@ -16,34 +16,26 @@ so everything in this file can be accessed as music21.XXXX
 Class ElementWrapper
 --------------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the ElementWrapper will call Object is now mandatory -- calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object. 
 
 
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **id**, **duration**
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **setId()**
 
@@ -78,22 +70,6 @@ Locally Defined
 **getId()**
 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**id**
-
-**duration**
-
 
 Class Groups
 ------------
@@ -114,25 +90,7 @@ Methods
 ~~~~~~~
 
 
-Inherited from list
-
-**sort()**
-
-**reverse()**
-
-**remove()**
-
-**pop()**
-
-**insert()**
-
-**index()**
-
-**extend()**
-
-**count()**
-
-**append()**
+Inherited from list: **sort()**, **reverse()**, **remove()**, **pop()**, **insert()**, **index()**, **extend()**, **count()**, **append()**
 
 
 Class Locations
@@ -151,7 +109,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **setOffsetBySite()**
 
@@ -304,11 +262,37 @@ Attributes
 
 **locations**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**priority**
+
+
+**parent**
+
+
+**offset**
+
+    
+
+    
+
+    
+
+**duration**
+
+    Gets the DurationObject of the object or None 
+
+    
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **write()**
 
@@ -357,32 +341,6 @@ Locally Defined
     >>> o1.getOffsetBySite(st1)
     20.0 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**priority**
-
-
-**parent**
-
-
-**offset**
-
-    
-
-    
-
-    
-
-**duration**
-
-    Gets the DurationObject of the object or None 
-
-    
-
 
 Class Relations
 ---------------
@@ -395,7 +353,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **setOffsetBySite()**
 

@@ -93,6 +93,8 @@ class Stream(music21.Music21Object):
 
     Streams may be embedded within other Streams.
     
+
+    OMIT_FROM_DOCS
     TODO: Get Stream Duration working -- should be the total length of the 
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
@@ -802,9 +804,7 @@ class Stream(music21.Music21Object):
 
 
     def getElementsByGroup(self, groupFilterList):
-        '''
-        # TODO: group comparisons are not YET case insensitive.  
-        
+        '''        
         >>> from music21 import note
         >>> n1 = note.Note("C")
         >>> n1.groups.append('trombone')
@@ -827,6 +827,9 @@ class Stream(music21.Music21Object):
         ...     print thisNote.name
         D
         E
+
+        OMIT_FROM_DOCS
+        # TODO: group comparisons are not YET case insensitive.  
         '''
         
         if not hasattr(groupFilterList, "__iter__"):
@@ -1023,8 +1026,6 @@ class Stream(music21.Music21Object):
         Return one element or None if no elements are at or preceded by this 
         offset. 
 
-        TODO: include sort order for concurrent matches?
-
         >>> a = Stream()
 
         >>> x = music21.Music21Object()
@@ -1053,6 +1054,8 @@ class Stream(music21.Music21Object):
         >>> b.offset, b.id
         (0.0, 'z')
 
+        OMIT_FROM_DOCS
+        TODO: include sort order for concurrent matches?
         '''
         candidates = []
         nearestTrailSpan = offset # start with max time
@@ -1081,18 +1084,24 @@ class Stream(music21.Music21Object):
     def getElementAtOrAfter(self, offset, classList=None):
         '''Given an offset, find the element at this offset, or with the offset
         greater than and nearest to.
+
+        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
     def getElementBeforeOffset(self, offset, classList=None):
         '''Get element before a provided offset
+
+        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
 
     def getElementAfterOffset(self, offset, classList = None):
         '''Get element after a provided offset
+
+        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -1100,6 +1109,8 @@ class Stream(music21.Music21Object):
 
     def getElementBeforeElement(self, element, classList = None):
         '''given an element, get the element before
+
+        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -1437,9 +1448,7 @@ class Stream(music21.Music21Object):
         r'''
         extracts elements around the given element within (before) quarter notes and (after) quarter notes
         (default 4)
-        
-        TODO: maxBefore -- maximum number of elements to return before; etc.
-        
+                
         >>> from music21 import note
         >>> qn = note.QuarterNote()
         >>> qtrStream = Stream()
@@ -1451,8 +1460,12 @@ class Stream(music21.Music21Object):
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
         >>> hnStream._reprText()
         '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>'
+
+
+        OMIT_FROM_DOCS
+        TODO: maxBefore -- maximum number of elements to return before; etc.
         '''
-        
+       
         display = Stream()
         found = None
         foundOffset = 0
@@ -1532,14 +1545,15 @@ class Stream(music21.Music21Object):
         >>> c = meter.TimeSignature('3/4')
         >>> a.insert(0.0, c)
         >>> x = a.makeMeasures()
-        
-        TODO: Test something here...
-    
+            
         >>> d = Stream()
         >>> n = note.Note()
         >>> d.repeatAppend(n, 10)
         >>> d.repeatInsert(n, [x+.5 for x in range(10)])
         >>> x = d.makeMeasures()
+
+        OMIT_FROM_DOCS
+        TODO: Test something here...
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
@@ -1655,11 +1669,9 @@ class Stream(music21.Music21Object):
         '''Given a streamObj with an  with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
     
-        If refStream is provided, use this to get min and max offsets. Rests 
+        If refStream is provided, this is used to get min and max offsets. Rests 
         will be added to fill all time defined within refStream.
-    
-        TODO: rename fillRests() or something else.  CHRIS: I Don't Understand what refStream does for this method!
-    
+        
         >>> a = Stream()
         >>> a.insert(20, note.Note())
         >>> len(a)
@@ -1671,6 +1683,10 @@ class Stream(music21.Music21Object):
         2
         >>> b.lowestOffset
         0.0
+
+
+        OMIT_FROM_DOCS
+        TODO: rename fillRests() or something else.
         '''
         #environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
@@ -1710,9 +1726,7 @@ class Stream(music21.Music21Object):
         if the elements duration extends beyond the measures bound, create a tied  entity.
     
         Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false
-        
-        TODO: take a list of clases to act as filter on what elements are tied.
-    
+            
         configure ".previous" and ".next" attributes
     
         >>> d = Stream()
@@ -1723,6 +1737,8 @@ class Stream(music21.Music21Object):
         >>> x = d.makeMeasures()
         >>> x = x.makeTies()
     
+        OMIT_FROM_DOCS
+        TODO: take a list of clases to act as filter on what elements are tied.
         '''
 
         #environLocal.printDebug(['calling Stream.makeTies()'])
@@ -1843,14 +1859,16 @@ class Stream(music21.Music21Object):
 
         In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.
 
-        TODO: inPlace=False does not work in many cases
-
         >>> aMeasure = Measure()
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
         >>> aNote = note.Note()
         >>> aNote.quarterLength = .25
         >>> aMeasure.repeatAppend(aNote,16)
         >>> bMeasure = aMeasure.makeBeams()
+
+        OMIT_FROM_DOCS
+        TODO: inPlace=False does not work in many cases
+
         '''
 
         #environLocal.printDebug(['calling Stream.makeBeams()'])
@@ -1937,6 +1955,7 @@ class Stream(music21.Music21Object):
         >>> stream2[-1].offset
         40.0
 
+        OMIT_FROM_DOCS
         TODO: Chris; what file is testFiles.ALL[2]?? 
         
 #        >>> from music21.musicxml import testFiles
@@ -2088,9 +2107,7 @@ class Stream(music21.Music21Object):
         
         if this stream is not flat, then only the highest elements are sorted.  To sort all,
         run myStream.flat.sorted
-        
-        ## TODO: CLEF ORDER RULES, etc.
-        
+                
         >>> s = Stream()
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
         >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
@@ -2126,6 +2143,10 @@ class Stream(music21.Music21Object):
         '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> z[2].name, z[3].name
         ('C#', 'E')
+
+
+        OMIT_FROM_DOCS
+        ## TODO: CLEF ORDER RULES, etc.
         '''
         post = self.elements ## already a copy
         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority))
@@ -2795,11 +2816,14 @@ class Stream(music21.Music21Object):
         also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because
         of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
         will give you the number of P1s in the piece, because there could be d2's in there as well.
-        
-        N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX
-        
+                
         See Test.testFindConsecutiveNotes() for usage details.
         
+
+        OMIT_FROM_DOCS
+
+        N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX
+
         (**keywords is there so that other methods that pass along dicts to findConsecutiveNotes don't have to remove 
         their own args; this method is used in melodicIntervals.)
         '''
@@ -3218,7 +3242,6 @@ class Stream(music21.Music21Object):
                         includeEndBoundary=False):
         '''A stream is a sequence if it has no overlaps.
 
-        TODO: check that co-incident boundaries are properly handled
         >>> a = Stream()
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
@@ -3228,6 +3251,10 @@ class Stream(music21.Music21Object):
         ...
         >>> a.isSequence()
         False
+
+        OMIT_FROM_DOCS
+        TODO: check that co-incident boundaries are properly handled
+
         '''
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
@@ -3363,9 +3390,9 @@ class Stream(music21.Music21Object):
                     return thisEl
             return otherElements[0]
 
-    def allPlayingWhileSounding(self, el, elStream = None, requireClass = False):
-        '''
-        returns a new Stream of elements in this stream that sound at the same time as "el", an element
+    def allPlayingWhileSounding(self, el, elStream = None, 
+                                requireClass = False):
+        '''Returns a new Stream of elements in this stream that sound at the same time as "el", an element
         presumably in another Stream.
         
         The offset of this new Stream is set to el's offset, while the offset of elements within the 
@@ -3376,6 +3403,8 @@ class Stream(music21.Music21Object):
     
         as above, elStream is an optional Stream to look up el's offset in.
         
+
+        OMIT_FROM_DOCS
         TODO: write: requireClass:
         Takes as an optional parameter "requireClass".  If this parameter is boolean True then only elements 
         of the same class as el are added to the new Stream.  If requireClass is list, it is used like 
@@ -3400,7 +3429,8 @@ class Stream(music21.Music21Object):
         
         return otherElements
 
-    def trimPlayingWhileSounding(self, el, elStream = None, requireClass = False, padStream = False):
+    def trimPlayingWhileSounding(self, el, elStream = None, 
+                               requireClass = False, padStream = False):
         '''
         returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but
         with any element that was sounding when el. begins trimmed to begin with el. and any element 
@@ -3415,6 +3445,8 @@ class Stream(music21.Music21Object):
         Note that you can make el an empty stream of offset X and duration Y to extract exactly
         that much information from otherStream.  
     
+
+        OMIT_FROM_DOCS
         TODO: write: ALL. requireClass, padStream
     
         always returns a Stream, but might be an empty Stream
@@ -4091,6 +4123,7 @@ class TestExternal(unittest.TestCase):
         '''This demonstrates obtaining slices from a stream and layering
         them into individual parts.
 
+        OMIT_FROM_DOCS
         TODO: this should show instruments
         this is presently not showing instruments 
         probably b/c when appending to s Stream parent is set to that stream

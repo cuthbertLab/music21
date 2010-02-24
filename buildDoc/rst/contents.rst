@@ -18,6 +18,7 @@ Music21 Documentation
    environment
    graphing
    faq
+   glossary
    moduleBase
    moduleCommon
    moduleConverter
@@ -30,6 +31,7 @@ Music21 Documentation
    moduleInterval
    moduleMeter
    moduleNote
+   moduleNode
    modulePitch
    moduleStream
    moduleSerial

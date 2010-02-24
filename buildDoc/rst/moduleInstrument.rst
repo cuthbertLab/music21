@@ -6,7 +6,7 @@ music21.instrument
 Class Instrument
 ----------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -34,30 +34,29 @@ Attributes
 
 **partName**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**mx**
+
+    
+
+    
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **partIdRandomize()**
 
@@ -66,28 +65,5 @@ Locally Defined
 **bestName()**
 
     Find a viable name, looking first at instrument, then part, then abbreviations. 
-
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**mx**
-
-    
-
-    
 
 

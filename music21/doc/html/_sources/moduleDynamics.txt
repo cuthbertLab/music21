@@ -11,7 +11,7 @@ Given a unit interfal value, map to a dynamic name
 Class Dynamic
 -------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Object representation of Dyanmics. 
 
@@ -42,44 +42,14 @@ Attributes
 
 **value**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
@@ -97,11 +67,17 @@ Locally Defined
 
     Provide a complete MusicXM: representation. 
 
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
+
 
 Class Wedge
 -----------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Object model of crescendeo/decrescendo wedges. 
 
@@ -122,44 +98,14 @@ Attributes
 
 **type**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
@@ -171,5 +117,11 @@ Locally Defined
     >>> mxWedge = mxDirection.getWedge()
     >>> mxWedge.get('type')
     'crescendo' 
+
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -16,7 +16,8 @@ import unittest, doctest
 import music21
 import music21.note
 from music21 import stream
-from music21.stream import Stream
+# this import will falsely insert the Stream docs in here
+#from music21.stream import Stream
 
 
 
@@ -24,7 +25,7 @@ from music21.stream import Stream
 class SerialException(Exception):
     pass
 
-class ToneRow(Stream):
+class ToneRow(stream.Stream):
     pass
 
 class TwelveToneRow(ToneRow):
@@ -52,10 +53,13 @@ class TwelveToneRow(ToneRow):
         return matrixObj
         
             
-class TwelveToneMatrix(Stream):
+class TwelveToneMatrix(stream.Stream):
     
     def __init__(self, *arguments, **keywords):
-        Stream.__init__(self, *arguments, **keywords)
+        '''
+        >>> aMatrix = TwelveToneMatrix()
+        '''
+        stream.Stream.__init__(self, *arguments, **keywords)
 
 
 

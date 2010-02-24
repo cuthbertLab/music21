@@ -6,7 +6,7 @@ music21.chord
 Class Chord
 -----------
 
-Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = 'C' E = note.Note(), E.name = 'E' G = note.Note(), G.name = 'G' And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples 
 
@@ -37,52 +37,236 @@ Attributes
 
 **tie**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**
+
+
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
+
+
+Locally Defined:
+
+**primeFormString**
+
+    Return a representation of the Chord as a prime-form set class string. 
+
+**primeForm**
+
+    Return a representation of the Chord as a prime-form list of pitch class integers. 
+
+**pitches**
+
+    TODO: presently, whenever pitches are accessed, it sets the _chordTablesAddressNeedsUpdating value to false this is b/c the pitches list can be accessed and appended to a better way to do this needs to be found 
+
+**pitchedCommonName**
+
+    Get the common name of the TN set class. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.pitchedCommonName
+    'C-minor triad' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.pitchedCommonName
+    'C-major triad' 
+
+**pitchClasses**
+
+    Return a pitch class representation ordered as the original chord. 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.pitchClasses
+    [2, 9, 6, 2] 
+
+**pitchClassCardinality**
+
+    Return the number of unique pitch classes 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.pitchClassCardinality
+    3 
+
+**orderedPitchClasses**
+
+    Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.orderedPitchClasses
+    [2, 6, 9] 
+
+**normalFormString**
+
+    
+
+    >>> c1 = Chord(['f#', 'e-', 'g'])
+    >>> c1.normalFormString
+    '<034>' 
+
+**normalForm**
+
+    
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.normalForm
+    [0, 3, 7] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.normalForm
+    [0, 4, 7] 
+
+**mx**
+
+    Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
+
+    >>> a = Chord()
+    >>> a.quarterLength = 2
+    >>> b = pitch.Pitch('A-')
+    >>> c = pitch.Pitch('D-')
+    >>> d = pitch.Pitch('E-')
+    >>> e = a.pitches = [b, c, d]
+    >>> len(e)
+    3 
+    >>> mxNoteList = a.mx
+    >>> len(mxNoteList) # get three mxNotes
+    3 
+    >>> mxNoteList[0].get('chord')
+    False 
+    >>> mxNoteList[1].get('chord')
+    True 
+    >>> mxNoteList[2].get('chord')
+    True 
+
+**multisetCardinality**
+
+    Return the number of pitch classes, regardless of redundancy. 
+
+    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+    >>> c1.multisetCardinality
+    4 
+
+**lily**
+
+    The name of the note as it would appear in Lilypond format. 
+
+**isPrimeFormInversion**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.isPrimeFormInversion
+    False 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.isPrimeFormInversion
+    True 
+
+**intervalVectorString**
+
+    
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.intervalVectorString
+    '<001110>' 
+
+**intervalVector**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.intervalVector
+    [0, 0, 1, 1, 1, 0] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.intervalVector
+    [0, 0, 1, 1, 1, 0] 
+
+**hasZRelation**
+
+    Get the Z-relation status 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.hasZRelation
+    False 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.hasZRelation
+    False 
+
+**forteClassTnI**
+
+    Return a forte class name under TnI classification 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClassTnI
+    '3-11' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClassTnI
+    '3-11' 
+
+**forteClassTn**
+
+    Return a forte class name 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClass
+    '3-11A' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClass
+    '3-11B' 
+
+**forteClassNumber**
+
+    Get the Forte class index number. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClassNumber
+    11 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClassNumber
+    11 
+
+**forteClass**
+
+    Return a forte class name 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.forteClass
+    '3-11A' 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.forteClass
+    '3-11B' 
+
+**commonName**
+
+    Get the common name of the TN set class. Possible rename forteIndex 
+
+    >>> c1 = Chord(['c', 'e-', 'g'])
+    >>> c1.commonName
+    ['minor triad'] 
+    >>> c2 = Chord(['c', 'e', 'g'])
+    >>> c2.commonName
+    ['major triad'] 
+
+**chordTablesAddress**
+
+    
+
+    >>> c = Chord(["C4", "E4", "G#4"])
+    >>> c.chordTablesAddress
+    (3, 12, 0) 
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**duration()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **duration()**, **contexts()**, **addLocationAndParent()**
 
 
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
 
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
 
-Locally Defined
+Locally Defined:
 
 **sortFrequencyAscending()**
 
@@ -443,241 +627,11 @@ Locally Defined
     >>> c1.areZRelations(c3)
     False 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
-
-
-Locally Defined
-
-**primeFormString**
-
-    Return a representation of the Chord as a prime-form set class string. 
-
-**primeForm**
-
-    Return a representation of the Chord as a prime-form list of pitch class integers. 
-
-**pitches**
-
-    TODO: presently, whenever pitches are accessed, it sets the _chordTablesAddressNeedsUpdating value to false this is b/c the pitches list can be accessed and appended to a better way to do this needs to be found 
-
-**pitchedCommonName**
-
-    Get the common name of the TN set class. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.pitchedCommonName
-    'C-minor triad' 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.pitchedCommonName
-    'C-major triad' 
-
-**pitchClasses**
-
-    Return a pitch class representation ordered as the original chord. 
-
-    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-    >>> c1.pitchClasses
-    [2, 9, 6, 2] 
-
-**pitchClassCardinality**
-
-    Return the number of unique pitch classes 
-
-    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-    >>> c1.pitchClassCardinality
-    3 
-
-**orderedPitchClasses**
-
-    Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
-
-    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-    >>> c1.orderedPitchClasses
-    [2, 6, 9] 
-
-**normalFormString**
-
-    
-
-    >>> c1 = Chord(['f#', 'e-', 'g'])
-    >>> c1.normalFormString
-    '<034>' 
-
-**normalForm**
-
-    
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.normalForm
-    [0, 3, 7] 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.normalForm
-    [0, 4, 7] 
-
-**mx**
-
-    Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
-
-    >>> a = Chord()
-    >>> a.quarterLength = 2
-    >>> b = pitch.Pitch('A-')
-    >>> c = pitch.Pitch('D-')
-    >>> d = pitch.Pitch('E-')
-    >>> e = a.pitches = [b, c, d]
-    >>> len(e)
-    3 
-    >>> mxNoteList = a.mx
-    >>> len(mxNoteList) # get three mxNotes
-    3 
-    >>> mxNoteList[0].get('chord')
-    False 
-    >>> mxNoteList[1].get('chord')
-    True 
-    >>> mxNoteList[2].get('chord')
-    True 
-
-**multisetCardinality**
-
-    Return the number of pitch classes, regardless of redundancy. 
-
-    >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-    >>> c1.multisetCardinality
-    4 
-
-**lily**
-
-    The name of the note as it would appear in Lilypond format. 
-
-**isPrimeFormInversion**
-
-    Get the Forte class index number. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.isPrimeFormInversion
-    False 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.isPrimeFormInversion
-    True 
-
-**intervalVectorString**
-
-    
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.intervalVectorString
-    '<001110>' 
-
-**intervalVector**
-
-    Get the Forte class index number. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.intervalVector
-    [0, 0, 1, 1, 1, 0] 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.intervalVector
-    [0, 0, 1, 1, 1, 0] 
-
-**hasZRelation**
-
-    Get the Z-relation status 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.hasZRelation
-    False 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.hasZRelation
-    False 
-
-**forteClassTnI**
-
-    Return a forte class name under TnI classification 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.forteClassTnI
-    '3-11' 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.forteClassTnI
-    '3-11' 
-
-**forteClassTn**
-
-    Return a forte class name 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.forteClass
-    '3-11A' 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.forteClass
-    '3-11B' 
-
-**forteClassNumber**
-
-    Get the Forte class index number. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.forteClassNumber
-    11 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.forteClassNumber
-    11 
-
-**forteClass**
-
-    Return a forte class name 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.forteClass
-    '3-11A' 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.forteClass
-    '3-11B' 
-
-**commonName**
-
-    Get the common name of the TN set class. Possible rename forteIndex 
-
-    >>> c1 = Chord(['c', 'e-', 'g'])
-    >>> c1.commonName
-    ['minor triad'] 
-    >>> c2 = Chord(['c', 'e', 'g'])
-    >>> c2.commonName
-    ['major triad'] 
-
-**chordTablesAddress**
-
-    
-
-    >>> c = Chord(["C4", "E4", "G#4"])
-    >>> c.chordTablesAddress
-    (3, 12, 0) 
-
 
 Class Duration
 --------------
 
-Inherits from: duration.DurationCommon, object
+Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note" 
 
@@ -688,16 +642,70 @@ Attributes
 
 **linkages**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**type**
+
+    Get the duration type. 
+
+**tuplets**
+
+
+**quarterLength**
+
+    Can be the same as the base class. 
+
+**mx**
+
+    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
+
+    >>> a = Duration()
+    >>> a.quarterLength = 3
+    >>> b = a.mx
+    >>> len(b) == 1
+    True 
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True 
+    >>> a = Duration()
+    >>> a.quarterLength = .33333333
+    >>> b = a.mx
+    >>> len(b) == 1
+    True 
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True 
+
+**musicxml**
+
+    Return a complete MusicXML string with defaults. 
+
+**lily**
+
+    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+
+    
+
+**isComplex**
+
+
+**dots**
+
+    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+
+**components**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
 
-Locally Defined
+Locally Defined:
 
 **write()**
 
@@ -837,62 +845,6 @@ Locally Defined
     >>> a.type
     'complex' 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**type**
-
-    Get the duration type. 
-
-**tuplets**
-
-
-**quarterLength**
-
-    Can be the same as the base class. 
-
-**mx**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-    >>> a = Duration()
-    >>> a.quarterLength = .33333333
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**musicxml**
-
-    Return a complete MusicXML string with defaults. 
-
-**lily**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**isComplex**
-
-
-**dots**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**components**
-
-
 
 Class LilyString
 ----------------
@@ -905,11 +857,21 @@ Attributes
 
 **value**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**wrappedValue**
+
+    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **writeTemp()**
 
@@ -961,15 +923,5 @@ Locally Defined
 **addMidi()**
 
     override this in subclasses, such as LilyScore 
-
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**wrappedValue**
-
-    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
 
 

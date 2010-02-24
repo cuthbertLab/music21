@@ -74,7 +74,7 @@ TODO: it seems like this should return only integers; not sure why these origina
 Class CompoundTimeSignature
 ---------------------------
 
-Inherits from: meter.TimeSignature, base.Music21Object, object
+Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -104,95 +104,29 @@ Attributes
 
 **symbolizeDenominator**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from meter.TimeSignature
-
-**setDisplay()**
-
-**setAccentWeight()**
-
-**ratioEqual()**
-
-**quarterPositionToBeat()**
-
-**loadRatio()**
-
-**load()**
-
-**getBeatProgress()**
-
-**getBeatDepth()**
-
-**getBeat()**
-
-**getBeams()**
-
-**getAccentWeight()**
-
-**getAccent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from meter.TimeSignature
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **totalLength**, **quarterLengthToBeatLengthRatio**, **numerator**, **mx**, **musicxml**, **lily**, **denominator**, **beatLengthToQuarterLengthRatio**, **barDuration**
 
-**totalLength**
+Methods
+~~~~~~~
 
-**quarterLengthToBeatLengthRatio**
 
-**numerator**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**denominator**
-
-**beatLengthToQuarterLengthRatio**
-
-**barDuration**
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **setDisplay()**, **setAccentWeight()**, **ratioEqual()**, **quarterPositionToBeat()**, **loadRatio()**, **load()**, **getBeatProgress()**, **getBeatDepth()**, **getBeat()**, **getBeams()**, **getAccentWeight()**, **getAccent()**
 
 
 Class DurationDenominatorTimeSignature
 --------------------------------------
 
-Inherits from: meter.TimeSignature, base.Music21Object, object
+Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`), object
 
 If you have played Hindemith you know these, 3/(dot-quarter) etc. 
 
@@ -223,95 +157,29 @@ Attributes
 
 **symbolizeDenominator**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from meter.TimeSignature
-
-**setDisplay()**
-
-**setAccentWeight()**
-
-**ratioEqual()**
-
-**quarterPositionToBeat()**
-
-**loadRatio()**
-
-**load()**
-
-**getBeatProgress()**
-
-**getBeatDepth()**
-
-**getBeat()**
-
-**getBeams()**
-
-**getAccentWeight()**
-
-**getAccent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from meter.TimeSignature
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **totalLength**, **quarterLengthToBeatLengthRatio**, **numerator**, **mx**, **musicxml**, **lily**, **denominator**, **beatLengthToQuarterLengthRatio**, **barDuration**
 
-**totalLength**
+Methods
+~~~~~~~
 
-**quarterLengthToBeatLengthRatio**
 
-**numerator**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**denominator**
-
-**beatLengthToQuarterLengthRatio**
-
-**barDuration**
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **setDisplay()**, **setAccentWeight()**, **ratioEqual()**, **quarterPositionToBeat()**, **loadRatio()**, **load()**, **getBeatProgress()**, **getBeatDepth()**, **getBeat()**, **getBeams()**, **getAccentWeight()**, **getAccent()**
 
 
 Class MeterSequence
 -------------------
 
-Inherits from: meter.MeterTerminal, object
+Inherits from: meter.MeterTerminal (of module :ref:`moduleMeter`), object
 
 A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
@@ -322,22 +190,50 @@ Attributes
 
 **summedNumerator**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): **weight**, **numerator**, **duration**, **depth**, **denominator**
+
+
+Locally Defined:
+
+**flatWeight**
+
+    Retrun a list of flat weight valuess 
+
+    
+
+**flat**
+
+    Retrun a new MeterSequence composed of the flattend representation. 
+
+    >>> a = MeterSequence('3/4', 3)
+    >>> b = a.flat
+    >>> len(b)
+    3 
+    >>> a[1] = a[1].subdivide(4)
+    >>> b = a.flat
+    >>> len(b)
+    6 
+    >>> a[1][2] = a[1][2].subdivide(4)
+    >>> a
+    <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}> 
+    >>> b = a.flat
+    >>> len(b)
+    9 
+
+    
+
 Methods
 ~~~~~~~
 
 
-Inherited from meter.MeterTerminal
-
-**subdivideByList()**
-
-**subdivideByCount()**
-
-**subdivide()**
-
-**ratioEqual()**
+Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): **subdivideByList()**, **subdivideByCount()**, **subdivide()**, **ratioEqual()**
 
 
-Locally Defined
+Locally Defined:
 
 **positionToSpan()**
 
@@ -556,52 +452,6 @@ Locally Defined
     >>> b.getLevel(2)
     <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}> 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from meter.MeterTerminal
-
-**weight**
-
-**numerator**
-
-**duration**
-
-**depth**
-
-**denominator**
-
-
-Locally Defined
-
-**flatWeight**
-
-    Retrun a list of flat weight valuess 
-
-    
-
-**flat**
-
-    Retrun a new MeterSequence composed of the flattend representation. 
-
-    >>> a = MeterSequence('3/4', 3)
-    >>> b = a.flat
-    >>> len(b)
-    3 
-    >>> a[1] = a[1].subdivide(4)
-    >>> b = a.flat
-    >>> len(b)
-    6 
-    >>> a[1][2] = a[1][2].subdivide(4)
-    >>> a
-    <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}> 
-    >>> b = a.flat
-    >>> len(b)
-    9 
-
-    
-
 
 Class MeterTerminal
 -------------------
@@ -622,45 +472,11 @@ A MeterTerminal is a nestable primitive of rhythmic division
 
 
 
-Methods
-~~~~~~~
-
-
-Locally Defined
-
-**subdivideByList()**
-
-    Return a MeterSequence countRequest is within the context of the beatIndex 
-
-    >>> a = MeterTerminal('3/4')
-    >>> b = a.subdivideByList([1,1,1])
-    >>> len(b)
-    3 
-
-**subdivideByCount()**
-
-    retrun a MeterSequence 
-
-    >>> a = MeterTerminal('3/4')
-    >>> b = a.subdivideByCount(3)
-    >>> isinstance(b, MeterSequence)
-    True 
-    >>> len(b)
-    3 
-
-**subdivide()**
-
-    Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count 
-
-**ratioEqual()**
-
-    Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8 
-
 Properties
 ~~~~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **weight**
 
@@ -690,11 +506,45 @@ Locally Defined
 **denominator**
 
 
+Methods
+~~~~~~~
+
+
+Locally Defined:
+
+**subdivideByList()**
+
+    Return a MeterSequence countRequest is within the context of the beatIndex 
+
+    >>> a = MeterTerminal('3/4')
+    >>> b = a.subdivideByList([1,1,1])
+    >>> len(b)
+    3 
+
+**subdivideByCount()**
+
+    retrun a MeterSequence 
+
+    >>> a = MeterTerminal('3/4')
+    >>> b = a.subdivideByCount(3)
+    >>> isinstance(b, MeterSequence)
+    True 
+    >>> len(b)
+    3 
+
+**subdivide()**
+
+    Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count 
+
+**ratioEqual()**
+
+    Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8 
+
 
 Class NonPowerOfTwoTimeSignature
 --------------------------------
 
-Inherits from: meter.TimeSignature, base.Music21Object, object
+Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -723,96 +573,30 @@ Attributes
 **symbol**
 
 **symbolizeDenominator**
-
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from meter.TimeSignature
-
-**setDisplay()**
-
-**setAccentWeight()**
-
-**ratioEqual()**
-
-**quarterPositionToBeat()**
-
-**loadRatio()**
-
-**load()**
-
-**getBeatProgress()**
-
-**getBeatDepth()**
-
-**getBeat()**
-
-**getBeams()**
-
-**getAccentWeight()**
-
-**getAccent()**
 
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from meter.TimeSignature
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **totalLength**, **quarterLengthToBeatLengthRatio**, **numerator**, **mx**, **musicxml**, **lily**, **denominator**, **beatLengthToQuarterLengthRatio**, **barDuration**
 
-**totalLength**
+Methods
+~~~~~~~
 
-**quarterLengthToBeatLengthRatio**
 
-**numerator**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**denominator**
-
-**beatLengthToQuarterLengthRatio**
-
-**barDuration**
+Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **setDisplay()**, **setAccentWeight()**, **ratioEqual()**, **quarterPositionToBeat()**, **loadRatio()**, **load()**, **getBeatProgress()**, **getBeatDepth()**, **getBeat()**, **getBeams()**, **getAccentWeight()**, **getAccent()**
 
 
 Class TimeSignature
 -------------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -842,30 +626,79 @@ Attributes
 
 **symbolizeDenominator**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**totalLength**
+
+
+**quarterLengthToBeatLengthRatio**
+
+
+**numerator**
+
+
+**mx**
+
+    Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements 
+
+    >>> a = TimeSignature('3/4')
+    >>> b = a.mx
+    >>> a = TimeSignature('3/4+2/4')
+    >>> b = a.mx
+
+    
+
+**musicxml**
+
+    Return a complete MusicXML string 
+
+**lily**
+
+    returns the lilypond representation of the timeSignature 
+
+    >>> a = TimeSignature('3/16')
+    >>> a.lily
+    \time 3/16 
+
+**denominator**
+
+
+**beatLengthToQuarterLengthRatio**
+
+    
+
+    >>> a = TimeSignature('3/2')
+    >>> a.beatLengthToQuarterLengthRatio
+    2.0 
+
+**barDuration**
+
+    barDuration gets or sets a duration value that is equal in length to the totalLength 
+
+    >>> a = TimeSignature('3/8')
+    >>> d = a.barDuration
+    >>> d.type
+    'quarter' 
+    >>> d.dots
+    1 
+    >>> d.quarterLength
+    1.5 
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **setDisplay()**
 
@@ -1009,78 +842,5 @@ Locally Defined
     False 
     >>> a.getAccent(2)
     True 
-
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**totalLength**
-
-
-**quarterLengthToBeatLengthRatio**
-
-
-**numerator**
-
-
-**mx**
-
-    Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements 
-
-    >>> a = TimeSignature('3/4')
-    >>> b = a.mx
-    >>> a = TimeSignature('3/4+2/4')
-    >>> b = a.mx
-
-    
-
-**musicxml**
-
-    Return a complete MusicXML string 
-
-**lily**
-
-    returns the lilypond representation of the timeSignature 
-
-    >>> a = TimeSignature('3/16')
-    >>> a.lily
-    \time 3/16 
-
-**denominator**
-
-
-**beatLengthToQuarterLengthRatio**
-
-    
-
-    >>> a = TimeSignature('3/2')
-    >>> a.beatLengthToQuarterLengthRatio
-    2.0 
-
-**barDuration**
-
-    barDuration gets or sets a duration value that is equal in length to the totalLength 
-
-    >>> a = TimeSignature('3/8')
-    >>> d = a.barDuration
-    >>> d.type
-    'quarter' 
-    >>> d.dots
-    1 
-    >>> d.quarterLength
-    1.5 
 
 

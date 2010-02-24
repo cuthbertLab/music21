@@ -28,6 +28,7 @@ from music21 import environment
 from music21 import instrument
 from music21 import interval
 from music21 import note
+from music21 import node
 from music21 import pitch
 from music21 import meter
 from music21 import musicxml
@@ -60,6 +61,7 @@ MODULES = [
     interval, 
     meter, 
     note, 
+    node, 
     pitch, 
     stream,     
     serial,     
@@ -133,10 +135,15 @@ class RestrtucturedWriter(object):
         modName = mroEntry.__module__
         modName = modName.replace('music21.', '') # remove leading music21
         className = mroEntry.__name__
+        modNameCapital = modName[0].upper() + modName[1:]
         if modName == '__builtin__':
             return className
         else:
-            return '%s.%s' % (modName, className)
+            return '%s.%s (of module :ref:`module%s`)' % (modName, className,
+                                                    modNameCapital)
+
+        # return in this form to get a cross reference
+        # :ref:`moduleSerial`
 
     def formatClassInheritance(self, mro):
         '''Given a lost of classes from inspect.getmro, return a formatted
@@ -408,9 +415,9 @@ class ModuleDoc(RestrtucturedWriter):
                 for nameFound in attrPublic:
                     msg.append('**%s**\n\n' % nameFound)
 
-        for groupName, groupKey, postfix in [
-                                    ('Methods', 'methods', '()'), 
-                                    ('Properties', 'properties', '')]:
+        for groupName, groupKey, postfix in [('Properties', 'properties', ''),
+                                    ('Methods', 'methods', '()')
+                                    ]:
             methodNames = self.classes[className][groupKey].keys()
             methodPublic = []
             for methodName in methodNames:
@@ -419,29 +426,55 @@ class ModuleDoc(RestrtucturedWriter):
             if len(methodPublic) == 0: 
                 continue    
 
-            msg += self._heading(groupName, '~')
-    
-            iLast = None
+            msg += self._heading(groupName, '~') # will be Properties, Methods
+
+            # first, we need to count the number of names for each mro index
+            # group
+            derivationsCount = {}
             for i, nameFound in self.classes[className]['derivations']:
                 if nameFound not in methodPublic:
                     continue
                 if i == len(self.classes[className]['mro']) - 1:
                     continue # skip names dervied from object
-    
-                parentSrc = self.formatParent(
-                            self.classes[className]['mro'][i])
-    
-                if i != iLast:
-                    msg += '\n'
-                    iLast = i
-                    if i != 0:
-                        titleStr = 'Inherited from %s' % parentSrc
-                    else:
-                        titleStr = 'Locally Defined' 
-                    msg.append('%s\n\n' % titleStr)
+                if i not in derivationsCount.keys():
+                    derivationsCount[i] = 1 # count first
+                else:
+                    derivationsCount[i] += 1
 
-                msg.append('**%s%s**\n\n' % (nameFound, postfix))    
-                if i == 0: # only provide full doc
+            iCurrent = None
+            iCount = None
+            for i, nameFound in self.classes[className]['derivations']:
+                if nameFound not in methodPublic:
+                    continue
+                if i == len(self.classes[className]['mro']) - 1:
+                    continue # skip names dervied from object
+        
+                if i != iCurrent:
+                    msg += '\n'
+                    iCurrent = i # store last value
+                    iCount = 0 # reset to 0, increment below
+                    if i != 0:
+                        parentSrc = self.formatParent(
+                            self.classes[className]['mro'][i])
+                        titleStr = 'Inherited from %s:' % parentSrc
+                        msg.append('%s ' % titleStr)
+                    else: # when i is zero these are the local methods
+                        titleStr = 'Locally Defined:' 
+                        msg.append('%s\n\n' % titleStr)
+
+                # increment count for this derivation index
+                iCount += 1
+
+                if i != 0: # if not locally defined
+                    if iCount < derivationsCount[i]: # last in this group
+                        msg.append('**%s%s**, ' % (nameFound, postfix))   
+                    else: # last of list, no comma
+                        msg.append('**%s%s**\n\n' % (nameFound, postfix))   
+
+                # i is the count within the list of inheritance; if i is 0
+                # that means that these features are locally defined
+                elif i == 0: # only provide full doc
+                    msg.append('**%s%s**\n\n' % (nameFound, postfix))   
                     msg.append('%s\n' % 
                         self.classes[className][groupKey][nameFound]['doc'])
 
@@ -518,6 +551,7 @@ class Documentation(RestrtucturedWriter):
                              'environment', 
                              'graphing', 
                              'faq',
+                             'glossary',
                              ]
         self.chaptersGenerated = [] # to be populated
 

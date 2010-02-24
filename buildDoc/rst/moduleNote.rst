@@ -20,7 +20,7 @@ Debugging method to print information about a music21 note called by trecento.tr
 Class Accidental
 ----------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Accidental class. 
 
@@ -33,30 +33,38 @@ Attributes
 
 **name**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**mx**
+
+    From music21 to MusicXML 
+
+    >>> a = Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True 
+    >>> mxAccidental = a.mx
+    >>> mxAccidental.get('content')
+    'quarter-sharp' 
+
+**lily**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **set()**
 
@@ -77,38 +85,6 @@ Locally Defined
     >>> a = Accidental('--')
     >>> a.alter
     -2.0 
-
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**mx**
-
-    From music21 to MusicXML 
-
-    >>> a = Accidental()
-    >>> a.set('half-sharp')
-    >>> a.alter == .5
-    True 
-    >>> mxAccidental = a.mx
-    >>> mxAccidental.get('content')
-    'quarter-sharp' 
-
-**lily**
-
 
 
 Class Beam
@@ -133,7 +109,7 @@ Properties
 ~~~~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
@@ -168,11 +144,21 @@ Attributes
 
 **feathered**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**mx**
+
+    Returns a list of mxBeam objects 
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **setByNumber()**
 
@@ -262,21 +248,11 @@ Locally Defined
 **append()**
 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**mx**
-
-    Returns a list of mxBeam objects 
-
 
 Class EighthNote
 ----------------
 
-Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -304,118 +280,38 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
-
-
-Inherited from note.Note
-
-**setAccidental()**
-
-**isUnpitched()**
-
-**isRest()**
-
-**isNote()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Inherited from note.Note
+Inherited from note.Note (of module :ref:`moduleNote`): **step**, **ps**, **pitchClass**, **octave**, **nameWithOctave**, **name**, **mx**, **midi**, **lily**, **frequency**, **freq440**, **diatonicNoteNum**, **accidental**
 
-**step**
+Methods
+~~~~~~~
 
-**ps**
 
-**pitchClass**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**octave**
 
-**nameWithOctave**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
-**name**
 
-**mx**
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
-**midi**
 
-**lily**
-
-**frequency**
-
-**freq440**
-
-**diatonicNoteNum**
-
-**accidental**
+Inherited from note.Note (of module :ref:`moduleNote`): **setAccidental()**, **isUnpitched()**, **isRest()**, **isNote()**
 
 
 Class GeneralNote
 -----------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields. 
 
@@ -440,30 +336,43 @@ Attributes
 
 **tie**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**quarterLength**
+
+    Return quarter length 
+
+    >>> n = Note()
+    >>> n.quarterLength = 2.0
+    >>> n.quarterLength
+    2.0 
+
+**musicxml**
+
+    This must call _getMX to get basic mxNote objects 
+
+**lyric**
+
+    returns the first Lyric's text todo: should return a \n separated string of lyrics 
+
+**color**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **splitAtDurations()**
 
@@ -535,48 +444,11 @@ Locally Defined
     >>> n1.lyrics[1].number
     3 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**quarterLength**
-
-    Return quarter length 
-
-    >>> n = Note()
-    >>> n.quarterLength = 2.0
-    >>> n.quarterLength
-    2.0 
-
-**musicxml**
-
-    This must call _getMX to get basic mxNote objects 
-
-**lyric**
-
-    returns the first Lyric's text todo: should return a \n separated string of lyrics 
-
-**color**
-
-
 
 Class HalfNote
 --------------
 
-Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -604,112 +476,32 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
-
-
-Inherited from note.Note
-
-**setAccidental()**
-
-**isUnpitched()**
-
-**isRest()**
-
-**isNote()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Inherited from note.Note
+Inherited from note.Note (of module :ref:`moduleNote`): **step**, **ps**, **pitchClass**, **octave**, **nameWithOctave**, **name**, **mx**, **midi**, **lily**, **frequency**, **freq440**, **diatonicNoteNum**, **accidental**
 
-**step**
+Methods
+~~~~~~~
 
-**ps**
 
-**pitchClass**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**octave**
 
-**nameWithOctave**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
-**name**
 
-**mx**
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
-**midi**
 
-**lily**
-
-**frequency**
-
-**freq440**
-
-**diatonicNoteNum**
-
-**accidental**
+Inherited from note.Note (of module :ref:`moduleNote`): **setAccidental()**, **isUnpitched()**, **isRest()**, **isNote()**
 
 
 Class LilyString
@@ -723,11 +515,21 @@ Attributes
 
 **value**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**wrappedValue**
+
+    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **writeTemp()**
 
@@ -780,16 +582,6 @@ Locally Defined
 
     override this in subclasses, such as LilyScore 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**wrappedValue**
-
-    returns a value that is wrapped with { } if it doesn't contain a score element so that it can run through lilypond 
-
 
 Class Lyric
 -----------
@@ -810,7 +602,7 @@ Properties
 ~~~~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
@@ -826,7 +618,7 @@ Locally Defined
 Class NotRest
 -------------
 
-Inherits from: note.GeneralNote, base.Music21Object, object
+Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 Parent class for objects that are not rests; or, object that can be tied. 
 
@@ -851,45 +643,26 @@ Attributes
 
 **tie**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
 
-Locally Defined
+Locally Defined:
 
 **splitNoteAtPoint()**
 
@@ -911,36 +684,11 @@ Locally Defined
     >>> c.duration.quarterLength
     1.0 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
-
 
 Class Note
 ----------
 
-Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
@@ -969,93 +717,17 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
-
-
-Locally Defined
-
-**setAccidental()**
-
-
-**isUnpitched()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-**isRest()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-**isNote()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Locally Defined
+Locally Defined:
 
 **step**
 
@@ -1120,11 +792,41 @@ Locally Defined
 **accidental**
 
 
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
+
+
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
+
+
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+
+
+Locally Defined:
+
+**setAccidental()**
+
+
+**isUnpitched()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**isRest()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**isNote()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
 
 Class Pitch
 -----------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -1140,44 +842,14 @@ Attributes
 
 **locations**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Locally Defined
+Locally Defined:
 
 **step**
 
@@ -1312,11 +984,17 @@ Locally Defined
     >>> a.accidental.alter
     -1.0 
 
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
+
 
 Class QuarterNote
 -----------------
 
-Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -1344,118 +1022,38 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
-
-
-Inherited from note.Note
-
-**setAccidental()**
-
-**isUnpitched()**
-
-**isRest()**
-
-**isNote()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Inherited from note.Note
+Inherited from note.Note (of module :ref:`moduleNote`): **step**, **ps**, **pitchClass**, **octave**, **nameWithOctave**, **name**, **mx**, **midi**, **lily**, **frequency**, **freq440**, **diatonicNoteNum**, **accidental**
 
-**step**
+Methods
+~~~~~~~
 
-**ps**
 
-**pitchClass**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**octave**
 
-**nameWithOctave**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
-**name**
 
-**mx**
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
-**midi**
 
-**lily**
-
-**frequency**
-
-**freq440**
-
-**diatonicNoteNum**
-
-**accidental**
+Inherited from note.Note (of module :ref:`moduleNote`): **setAccidental()**, **isUnpitched()**, **isRest()**, **isNote()**
 
 
 Class Rest
 ----------
 
-Inherits from: note.GeneralNote, base.Music21Object, object
+Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 General rest class 
 
@@ -1480,85 +1078,17 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Locally Defined
-
-**isUnpitched()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-**isRest()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-**isNote()**
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
@@ -1573,11 +1103,35 @@ Locally Defined
     >>> r1.lily
     'r2' 
 
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
+
+
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
+
+
+Locally Defined:
+
+**isUnpitched()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**isRest()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+**isNote()**
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
 
 Class Tie
 ---------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Object added to notes that are tied to other notes note1.tie = Tie("start") note1.tieStyle = "normal" # could be dotted or dashed print note1.tie.type # prints start Differences from MusicXML: notes do not need to know if they are tied from a previous note.  i.e., you can tie n1 to n2 just with a tie start on n1.  However, if you want proper musicXML output you need a tie stop on n2 one tie with "continue" implies tied from and tied to optional (to know what notes are next:) .to = note()   # not implimented yet, b/c of garbage coll. .from = note() (question: should notes be able to be tied to multiple notes for the case where a single note is tied both voices of a two-note-head unison?) 
 
@@ -1594,53 +1148,29 @@ Attributes
 
 **type**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Locally Defined
+Locally Defined:
 
 **mx**
 
+
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
 Class Unpitched
 ---------------
 
-Inherits from: note.GeneralNote, base.Music21Object, object
+Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
 
@@ -1665,45 +1195,26 @@ Attributes
 
 **tie**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
 
-Locally Defined
+Locally Defined:
 
 **isUnpitched()**
 
@@ -1721,36 +1232,11 @@ Locally Defined
 
     int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
-
 
 Class WholeNote
 ---------------
 
-Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object
+Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -1778,111 +1264,31 @@ Attributes
 
 **tie**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Inherited from note.GeneralNote
-
-**splitAtDurations()**
-
-**isChord()**
-
-**compactNoteInfo()**
-
-**clearDurations()**
-
-**appendDuration()**
-
-**addLyric()**
-
-
-Inherited from note.NotRest
-
-**splitNoteAtPoint()**
-
-
-Inherited from note.Note
-
-**setAccidental()**
-
-**isUnpitched()**
-
-**isRest()**
-
-**isNote()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Inherited from note.GeneralNote
-
-**quarterLength**
-
-**musicxml**
-
-**lyric**
-
-**color**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **quarterLength**, **musicxml**, **lyric**, **color**
 
 
-Inherited from note.Note
+Inherited from note.Note (of module :ref:`moduleNote`): **step**, **ps**, **pitchClass**, **octave**, **nameWithOctave**, **name**, **mx**, **midi**, **lily**, **frequency**, **freq440**, **diatonicNoteNum**, **accidental**
 
-**step**
+Methods
+~~~~~~~
 
-**ps**
 
-**pitchClass**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**octave**
 
-**nameWithOctave**
+Inherited from note.GeneralNote (of module :ref:`moduleNote`): **splitAtDurations()**, **isChord()**, **compactNoteInfo()**, **clearDurations()**, **appendDuration()**, **addLyric()**
 
-**name**
 
-**mx**
+Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
-**midi**
 
-**lily**
-
-**frequency**
-
-**freq440**
-
-**diatonicNoteNum**
-
-**accidental**
+Inherited from note.Note (of module :ref:`moduleNote`): **setAccidental()**, **isUnpitched()**, **isRest()**, **isNote()**
 
 

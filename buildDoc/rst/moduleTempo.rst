@@ -6,7 +6,7 @@ music21.tempo
 Class MetronomeMark
 -------------------
 
-Inherits from: tempo.TempoMark, base.Music21Object, object
+Inherits from: tempo.TempoMark (of module :ref:`moduleTempo`), base.Music21Object (of module :ref:`moduleBase`), object
 
 
 
@@ -31,47 +31,23 @@ Attributes
 
 **value**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
-**priority**
+Methods
+~~~~~~~
 
-**parent**
 
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
 Class TempoMark
 ---------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 
@@ -92,40 +68,16 @@ Attributes
 
 **value**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
-**priority**
+Methods
+~~~~~~~
 
-**parent**
 
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 

@@ -21,7 +21,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **write()**
 
@@ -58,7 +58,7 @@ Locally Defined
 Class Preference
 ----------------
 
-Inherits from: node.Node, object
+Inherits from: node.Node (of module :ref:`moduleNode`), object
 
 
 
@@ -69,41 +69,23 @@ Attributes
 
 **charData**
 
-Methods
-~~~~~~~
-
-
-Inherited from node.Node
-
-**xmlStr()**
-
-**toxml()**
-
-**setDefaults()**
-
-**set()**
-
-**merge()**
-
-**loadAttrs()**
-
-**getNewDoc()**
-
-**get()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from node.Node
+Inherited from node.Node (of module :ref:`moduleNode`): **tag**
 
-**tag**
+Methods
+~~~~~~~
+
+
+Inherited from node.Node (of module :ref:`moduleNode`): **xmlStr()**, **toxml()**, **setDefaults()**, **set()**, **merge()**, **loadAttrs()**, **getNewDoc()**, **get()**
 
 
 Class Settings
 --------------
 
-Inherits from: node.NodeList, node.Node, object
+Inherits from: node.NodeList (of module :ref:`moduleNode`), node.Node (of module :ref:`moduleNode`), object
 
 
 
@@ -116,39 +98,19 @@ Attributes
 
 **componentList**
 
-Methods
-~~~~~~~
-
-
-Inherited from node.Node
-
-**xmlStr()**
-
-**toxml()**
-
-**setDefaults()**
-
-**set()**
-
-**merge()**
-
-**loadAttrs()**
-
-**getNewDoc()**
-
-**get()**
-
-
-Inherited from node.NodeList
-
-**append()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from node.Node
+Inherited from node.Node (of module :ref:`moduleNode`): **tag**
 
-**tag**
+Methods
+~~~~~~~
+
+
+Inherited from node.Node (of module :ref:`moduleNode`): **xmlStr()**, **toxml()**, **setDefaults()**, **set()**, **merge()**, **loadAttrs()**, **getNewDoc()**, **get()**
+
+
+Inherited from node.NodeList (of module :ref:`moduleNode`): **append()**
 
 

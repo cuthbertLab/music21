@@ -27,11 +27,20 @@ Inherits from: object
 
 Not a subclass, but a wrapper for different converter objects based on format. 
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**stream**
+
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **parseFile()**
 
@@ -39,15 +48,6 @@ Locally Defined
 **parseData()**
 
     need to look at data and determine if it is xml or humdrum 
-
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**stream**
-
 
 
 Class ConverterHumdrum
@@ -65,7 +65,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **parseFile()**
 
@@ -82,11 +82,20 @@ Class ConverterMusicXML
 Inherits from: object
 
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**stream**
+
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **parseFile()**
 
@@ -103,15 +112,6 @@ Locally Defined
 **getPartNames()**
 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**stream**
-
-
 
 Class PickleFilter
 ------------------
@@ -124,7 +124,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **status()**
 

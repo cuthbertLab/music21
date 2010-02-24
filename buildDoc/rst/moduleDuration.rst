@@ -263,7 +263,7 @@ True
 Class AppogiaturaStartDuration
 ------------------------------
 
-Inherits from: duration.Duration, duration.DurationCommon, object
+Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 
 Attributes
@@ -271,70 +271,26 @@ Attributes
 
 **linkages**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Inherited from duration.Duration
-
-**write()**
-
-**updateQuarterLength()**
-
-**sliceComponentAtPosition()**
-
-**show()**
-
-**fill()**
-
-**expand()**
-
-**consolidate()**
-
-**componentStartTime()**
-
-**componentIndexAtQtrPosition()**
-
-**clear()**
-
-**appendTuplet()**
-
-**addDuration()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from duration.Duration
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **type**, **tuplets**, **quarterLength**, **mx**, **musicxml**, **lily**, **isComplex**, **dots**, **components**
 
-**type**
+Methods
+~~~~~~~
 
-**tuplets**
 
-**quarterLength**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**isComplex**
-
-**dots**
-
-**components**
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **write()**, **updateQuarterLength()**, **sliceComponentAtPosition()**, **show()**, **fill()**, **expand()**, **consolidate()**, **componentStartTime()**, **componentIndexAtQtrPosition()**, **clear()**, **appendTuplet()**, **addDuration()**
 
 
 Class AppogiaturaStopDuration
 -----------------------------
 
-Inherits from: duration.Duration, duration.DurationCommon, object
+Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 
 Attributes
@@ -342,70 +298,26 @@ Attributes
 
 **linkages**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Inherited from duration.Duration
-
-**write()**
-
-**updateQuarterLength()**
-
-**sliceComponentAtPosition()**
-
-**show()**
-
-**fill()**
-
-**expand()**
-
-**consolidate()**
-
-**componentStartTime()**
-
-**componentIndexAtQtrPosition()**
-
-**clear()**
-
-**appendTuplet()**
-
-**addDuration()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from duration.Duration
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **type**, **tuplets**, **quarterLength**, **mx**, **musicxml**, **lily**, **isComplex**, **dots**, **components**
 
-**type**
+Methods
+~~~~~~~
 
-**tuplets**
 
-**quarterLength**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**isComplex**
-
-**dots**
-
-**components**
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **write()**, **updateQuarterLength()**, **sliceComponentAtPosition()**, **show()**, **fill()**, **expand()**, **consolidate()**, **componentStartTime()**, **componentIndexAtQtrPosition()**, **clear()**, **appendTuplet()**, **addDuration()**
 
 
 Class Duration
 --------------
 
-Inherits from: duration.DurationCommon, object
+Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note" 
 
@@ -416,16 +328,70 @@ Attributes
 
 **linkages**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**type**
+
+    Get the duration type. 
+
+**tuplets**
+
+
+**quarterLength**
+
+    Can be the same as the base class. 
+
+**mx**
+
+    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
+
+    >>> a = Duration()
+    >>> a.quarterLength = 3
+    >>> b = a.mx
+    >>> len(b) == 1
+    True 
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True 
+    >>> a = Duration()
+    >>> a.quarterLength = .33333333
+    >>> b = a.mx
+    >>> len(b) == 1
+    True 
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True 
+
+**musicxml**
+
+    Return a complete MusicXML string with defaults. 
+
+**lily**
+
+    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+
+    
+
+**isComplex**
+
+
+**dots**
+
+    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+
+**components**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
 
-Locally Defined
+Locally Defined:
 
 **write()**
 
@@ -565,62 +531,6 @@ Locally Defined
     >>> a.type
     'complex' 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**type**
-
-    Get the duration type. 
-
-**tuplets**
-
-
-**quarterLength**
-
-    Can be the same as the base class. 
-
-**mx**
-
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
-
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-    >>> a = Duration()
-    >>> a.quarterLength = .33333333
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-
-**musicxml**
-
-    Return a complete MusicXML string with defaults. 
-
-**lily**
-
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
-
-    
-
-**isComplex**
-
-
-**dots**
-
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
-
-**components**
-
-
 
 Class DurationCommon
 --------------------
@@ -633,7 +543,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **aggregateTupletRatio()**
 
@@ -653,7 +563,7 @@ Locally Defined
 Class DurationUnit
 ------------------
 
-Inherits from: duration.DurationCommon, object
+Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
@@ -662,41 +572,11 @@ Attributes
 
 **linkStatus**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Locally Defined
-
-**updateType()**
-
-
-**updateQuarterLength()**
-
-    Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
-
-**unlink()**
-
-
-**setTypeFromNum()**
-
-
-**link()**
-
-
-**appendTuplet()**
-
-
 Properties
 ~~~~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **type**
 
@@ -732,11 +612,39 @@ Locally Defined
 
     _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
 
+Methods
+~~~~~~~
+
+
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+
+
+Locally Defined:
+
+**updateType()**
+
+
+**updateQuarterLength()**
+
+    Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
+
+**unlink()**
+
+
+**setTypeFromNum()**
+
+
+**link()**
+
+
+**appendTuplet()**
+
+
 
 Class GraceDuration
 -------------------
 
-Inherits from: duration.Duration, duration.DurationCommon, object
+Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 
 Attributes
@@ -744,70 +652,26 @@ Attributes
 
 **linkages**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Inherited from duration.Duration
-
-**write()**
-
-**updateQuarterLength()**
-
-**sliceComponentAtPosition()**
-
-**show()**
-
-**fill()**
-
-**expand()**
-
-**consolidate()**
-
-**componentStartTime()**
-
-**componentIndexAtQtrPosition()**
-
-**clear()**
-
-**appendTuplet()**
-
-**addDuration()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from duration.Duration
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **type**, **tuplets**, **quarterLength**, **mx**, **musicxml**, **lily**, **isComplex**, **dots**, **components**
 
-**type**
+Methods
+~~~~~~~
 
-**tuplets**
 
-**quarterLength**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**isComplex**
-
-**dots**
-
-**components**
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **write()**, **updateQuarterLength()**, **sliceComponentAtPosition()**, **show()**, **fill()**, **expand()**, **consolidate()**, **componentStartTime()**, **componentIndexAtQtrPosition()**, **clear()**, **appendTuplet()**, **addDuration()**
 
 
 Class LongGraceDuration
 -----------------------
 
-Inherits from: duration.Duration, duration.DurationCommon, object
+Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 
 Attributes
@@ -815,64 +679,20 @@ Attributes
 
 **linkages**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Inherited from duration.Duration
-
-**write()**
-
-**updateQuarterLength()**
-
-**sliceComponentAtPosition()**
-
-**show()**
-
-**fill()**
-
-**expand()**
-
-**consolidate()**
-
-**componentStartTime()**
-
-**componentIndexAtQtrPosition()**
-
-**clear()**
-
-**appendTuplet()**
-
-**addDuration()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from duration.Duration
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **type**, **tuplets**, **quarterLength**, **mx**, **musicxml**, **lily**, **isComplex**, **dots**, **components**
 
-**type**
+Methods
+~~~~~~~
 
-**tuplets**
 
-**quarterLength**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
-**mx**
 
-**musicxml**
-
-**lily**
-
-**isComplex**
-
-**dots**
-
-**components**
+Inherited from duration.Duration (of module :ref:`moduleDuration`): **write()**, **updateQuarterLength()**, **sliceComponentAtPosition()**, **show()**, **fill()**, **expand()**, **consolidate()**, **componentStartTime()**, **componentIndexAtQtrPosition()**, **clear()**, **appendTuplet()**, **addDuration()**
 
 
 Class Tuplet
@@ -936,11 +756,31 @@ Attributes
 
 **type**
 
+Properties
+~~~~~~~~~~
+
+
+Locally Defined:
+
+**tupletNormal**
+
+
+**tupletActual**
+
+
+**mx**
+
+    From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
+
+    >>> a = Tuplet()
+    >>> a.bracket = True
+    >>> b, c = a.mx
+
 Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **tupletMultiplier()**
 
@@ -1016,31 +856,11 @@ Locally Defined
 
     bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
-Properties
-~~~~~~~~~~
-
-
-Locally Defined
-
-**tupletNormal**
-
-
-**tupletActual**
-
-
-**mx**
-
-    From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
-
-    >>> a = Tuplet()
-    >>> a.bracket = True
-    >>> b, c = a.mx
-
 
 Class ZeroDuration
 ------------------
 
-Inherits from: duration.DurationUnit, duration.DurationCommon, object
+Inherits from: duration.DurationUnit (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`), object
 
 
 Attributes
@@ -1048,45 +868,19 @@ Attributes
 
 **linkStatus**
 
-Methods
-~~~~~~~
-
-
-Inherited from duration.DurationCommon
-
-**aggregateTupletRatio()**
-
-
-Inherited from duration.DurationUnit
-
-**updateType()**
-
-**updateQuarterLength()**
-
-**unlink()**
-
-**setTypeFromNum()**
-
-**link()**
-
-**appendTuplet()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from duration.DurationUnit
+Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **type**, **tuplets**, **quarterLength**, **ordinal**, **lily**, **dots**
 
-**type**
+Methods
+~~~~~~~
 
-**tuplets**
 
-**quarterLength**
+Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 
-**ordinal**
 
-**lily**
-
-**dots**
+Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **updateType()**, **updateQuarterLength()**, **unlink()**, **setTypeFromNum()**, **link()**, **appendTuplet()**
 
 

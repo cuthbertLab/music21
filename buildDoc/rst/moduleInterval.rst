@@ -133,51 +133,27 @@ Given two notes, returns the lower note based on diatonic note number. Returns t
 Class ChromaticInterval
 -----------------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Chromatic interval class -- thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400 
-
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
 
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
-**priority**
+Methods
+~~~~~~~
 
-**parent**
 
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
 Class DiatonicInterval
 ----------------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -195,98 +171,50 @@ Attributes
 
 **specifier**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
-**priority**
+Methods
+~~~~~~~
 
-**parent**
 
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
 Class GenericInterval
 ---------------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1 
-
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
-
-Locally Defined
-
-**complement()**
-
-    generates a new GenericInterval object where descending 3rds are 6ths, etc. 
 
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
-**priority**
+Methods
+~~~~~~~
 
-**parent**
 
-**offset**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
-**duration**
+
+Locally Defined:
+
+**complement()**
+
+    generates a new GenericInterval object where descending 3rds are 6ths, etc. 
 
 
 Class Interval
 --------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 requires either (1) a string ("P5" etc.) or (2) named arguments: (2a) either both of diatonic  = DiatonicInterval object chromatic = ChromaticInterval object (2b) or both of note1     = Pitch (or Note) object note2     = Pitch (or Note) object in which case it figures out the diatonic and chromatic intervals itself 
 
@@ -308,30 +236,26 @@ Attributes
 
 **locations**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**complement**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **reinit()**
 
@@ -360,26 +284,6 @@ Locally Defined
 
 
 **chromatic()**
-
-
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**complement**
 
 
 

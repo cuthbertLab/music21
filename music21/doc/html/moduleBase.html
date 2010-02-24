@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.common" href="moduleCommon.html" />
-    <link rel="prev" title="Frequently Asked Questions" href="faq.html" /> 
+    <link rel="prev" title="Glossary" href="glossary.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
           <a href="moduleCommon.html" title="music21.common"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="faq.html" title="Frequently Asked Questions"
+          <a href="glossary.html" title="Glossary"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
@@ -55,19 +55,16 @@ from base import *</blockquote>
 <p>so everything in this file can be accessed as music21.XXXX</p>
 <div class="section" id="class-elementwrapper">
 <h2>Class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object, object</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>), object</p>
 <p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>id</strong>, <strong>duration</strong></p>
+</div>
 <div class="section" id="methods">
 <h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Locally Defined</p>
+<p>Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Locally Defined:</p>
 <p><strong>setId()</strong></p>
 <p><strong>obj()</strong></p>
 <p><strong>isTwin()</strong></p>
@@ -97,15 +94,6 @@ from base import *</blockquote>
 </blockquote>
 <p><strong>getId()</strong></p>
 </div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>id</strong></p>
-<p><strong>duration</strong></p>
-</div>
 </div>
 <div class="section" id="class-groups">
 <h2>Class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
@@ -122,16 +110,7 @@ from base import *</blockquote>
 </div>
 <div class="section" id="id1">
 <h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from list</p>
-<p><strong>sort()</strong></p>
-<p><strong>reverse()</strong></p>
-<p><strong>remove()</strong></p>
-<p><strong>pop()</strong></p>
-<p><strong>insert()</strong></p>
-<p><strong>index()</strong></p>
-<p><strong>extend()</strong></p>
-<p><strong>count()</strong></p>
-<p><strong>append()</strong></p>
+<p>Inherited from list: <strong>sort()</strong>, <strong>reverse()</strong>, <strong>remove()</strong>, <strong>pop()</strong>, <strong>insert()</strong>, <strong>index()</strong>, <strong>extend()</strong>, <strong>count()</strong>, <strong>append()</strong></p>
 </div>
 </div>
 <div class="section" id="class-locations">
@@ -144,7 +123,7 @@ from base import *</blockquote>
 </div>
 <div class="section" id="id2">
 <h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<p>Locally Defined:</p>
 <p><strong>setOffsetBySite()</strong></p>
 <blockquote>
 <p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception.</p>
@@ -291,8 +270,18 @@ Clear all data.</blockquote>
 <p><strong>locations</strong></p>
 </div>
 <div class="section" id="id4">
-<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
+<p><strong>priority</strong></p>
+<p><strong>parent</strong></p>
+<p><strong>offset</strong></p>
+<p><strong>duration</strong></p>
+<blockquote>
+Gets the DurationObject of the object or None</blockquote>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
 <p><strong>write()</strong></p>
 <blockquote>
 Write a file. A None file path will result in temporary file</blockquote>
@@ -332,16 +321,6 @@ returns bool depending on if the object is a particular class or not here, it ju
 </div>
 </blockquote>
 </div>
-<div class="section" id="id5">
-<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<blockquote>
-Gets the DurationObject of the object or None</blockquote>
-</div>
 </div>
 <div class="section" id="class-relations">
 <h2>Class Relations<a class="headerlink" href="#class-relations" title="Permalink to this headline">¶</a></h2>
@@ -349,7 +328,7 @@ Gets the DurationObject of the object or None</blockquote>
 <p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.</p>
 <div class="section" id="id6">
 <h3>Methods<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<p>Locally Defined:</p>
 <p><strong>setOffsetBySite()</strong></p>
 <blockquote>
 <p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Relations, it will raise an exception.</p>
@@ -517,8 +496,8 @@ Add a reference if offset is None, it is interpreted as a context if offset is a
             <ul>
 <li><a class="reference external" href="">music21.base</a><ul>
 <li><a class="reference external" href="#class-elementwrapper">Class ElementWrapper</a><ul>
-<li><a class="reference external" href="#methods">Methods</a></li>
 <li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-groups">Class Groups</a><ul>
@@ -532,8 +511,8 @@ Add a reference if offset is None, it is interpreted as a context if offset is a
 </li>
 <li><a class="reference external" href="#class-music21object">Class Music21Object</a><ul>
 <li><a class="reference external" href="#id3">Attributes</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
-<li><a class="reference external" href="#id5">Properties</a></li>
+<li><a class="reference external" href="#id4">Properties</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-relations">Class Relations</a><ul>
@@ -545,8 +524,8 @@ Add a reference if offset is None, it is interpreted as a context if offset is a
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="faq.html"
-                                  title="previous chapter">Frequently Asked Questions</a></p>
+            <p class="topless"><a href="glossary.html"
+                                  title="previous chapter">Glossary</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="moduleCommon.html"
                                   title="next chapter">music21.common</a></p>
@@ -582,7 +561,7 @@ Add a reference if offset is None, it is interpreted as a context if offset is a
           <a href="moduleCommon.html" title="music21.common"
              >next</a> |</li>
         <li class="right" >
-          <a href="faq.html" title="Frequently Asked Questions"
+          <a href="glossary.html" title="Glossary"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>

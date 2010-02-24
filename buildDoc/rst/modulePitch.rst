@@ -85,7 +85,7 @@ Utility conversion; does not process internals.
 Class Accidental
 ----------------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 Accidental class. 
 
@@ -98,30 +98,38 @@ Attributes
 
 **name**
 
+Properties
+~~~~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
+
+
+Locally Defined:
+
+**mx**
+
+    From music21 to MusicXML 
+
+    >>> a = Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True 
+    >>> mxAccidental = a.mx
+    >>> mxAccidental.get('content')
+    'quarter-sharp' 
+
+**lily**
+
+
 Methods
 ~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 
-Locally Defined
+Locally Defined:
 
 **set()**
 
@@ -143,43 +151,11 @@ Locally Defined
     >>> a.alter
     -2.0 
 
-Properties
-~~~~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
-
-
-Locally Defined
-
-**mx**
-
-    From music21 to MusicXML 
-
-    >>> a = Accidental()
-    >>> a.set('half-sharp')
-    >>> a.alter == .5
-    True 
-    >>> mxAccidental = a.mx
-    >>> mxAccidental.get('content')
-    'quarter-sharp' 
-
-**lily**
-
-
 
 Class Pitch
 -----------
 
-Inherits from: base.Music21Object, object
+Inherits from: base.Music21Object (of module :ref:`moduleBase`), object
 
 
 Attributes
@@ -195,44 +171,14 @@ Attributes
 
 **locations**
 
-Methods
-~~~~~~~
-
-
-Inherited from base.Music21Object
-
-**write()**
-
-**show()**
-
-**searchParent()**
-
-**isClass()**
-
-**id()**
-
-**getOffsetBySite()**
-
-**contexts()**
-
-**addLocationAndParent()**
-
 Properties
 ~~~~~~~~~~
 
 
-Inherited from base.Music21Object
-
-**priority**
-
-**parent**
-
-**offset**
-
-**duration**
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **priority**, **parent**, **offset**, **duration**
 
 
-Locally Defined
+Locally Defined:
 
 **step**
 
@@ -366,5 +312,11 @@ Locally Defined
     >>> a = Pitch('D-2')
     >>> a.accidental.alter
     -1.0 
+
+Methods
+~~~~~~~
+
+
+Inherited from base.Music21Object (of module :ref:`moduleBase`): **write()**, **show()**, **searchParent()**, **isClass()**, **id()**, **getOffsetBySite()**, **contexts()**, **addLocationAndParent()**
 
 

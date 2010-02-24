@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
-    <link rel="next" title="music21.pitch" href="modulePitch.html" />
+    <link rel="next" title="music21.node" href="moduleNode.html" />
     <link rel="prev" title="music21.meter" href="moduleMeter.html" /> 
   </head>
   <body>
@@ -32,7 +32,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modulePitch.html" title="music21.pitch"
+          <a href="moduleNode.html" title="music21.node"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"
@@ -59,7 +59,7 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 </div>
 <div class="section" id="class-accidental">
 <h2>Class Accidental<a class="headerlink" href="#class-accidental" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object, object</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>Accidental class.</p>
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
@@ -67,18 +67,29 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 <p><strong>modifier</strong></p>
 <p><strong>name</strong></p>
 </div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Locally Defined:</p>
+<p><strong>mx</strong></p>
+<blockquote>
+<p>From music21 to MusicXML</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;content&#39;</span><span class="p">)</span>
+<span class="go">&#39;quarter-sharp&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>lily</strong></p>
+</div>
 <div class="section" id="methods">
 <h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Locally Defined</p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Locally Defined:</p>
 <p><strong>set()</strong></p>
 <blockquote>
 <p>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</p>
@@ -101,29 +112,6 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 </div>
 </blockquote>
 </div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Locally Defined</p>
-<p><strong>mx</strong></p>
-<blockquote>
-<p>From music21 to MusicXML</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;content&#39;</span><span class="p">)</span>
-<span class="go">&#39;quarter-sharp&#39;</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>lily</strong></p>
-</div>
 </div>
 <div class="section" id="class-beam">
 <h2>Class Beam<a class="headerlink" href="#class-beam" title="Permalink to this headline">¶</a></h2>
@@ -138,7 +126,7 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 </div>
 <div class="section" id="id2">
 <h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<p>Locally Defined:</p>
 <p><strong>mx</strong></p>
 <blockquote>
 <p>Returns a Beams object</p>
@@ -170,8 +158,15 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 <p><strong>feathered</strong></p>
 </div>
 <div class="section" id="id4">
-<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
+<p><strong>mx</strong></p>
+<blockquote>
+Returns a list of mxBeam objects</blockquote>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
 <p><strong>setByNumber()</strong></p>
 <blockquote>
 <p>Set an internal beam object by number, or rhythmic symbol level</p>
@@ -264,17 +259,10 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 </blockquote>
 <p><strong>append()</strong></p>
 </div>
-<div class="section" id="id5">
-<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
-<p><strong>mx</strong></p>
-<blockquote>
-Returns a list of mxBeam objects</blockquote>
-</div>
 </div>
 <div class="section" id="class-eighthnote">
 <h2>Class EighthNote<a class="headerlink" href="#class-eighthnote" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <div class="section" id="id6">
 <h3>Attributes<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p><strong>articulations</strong></p>
@@ -290,62 +278,22 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id7">
-<h3>Methods<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Inherited from note.NotRest</p>
-<p><strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>setAccidental()</strong></p>
-<p><strong>isUnpitched()</strong></p>
-<p><strong>isRest()</strong></p>
-<p><strong>isNote()</strong></p>
+<h3>Properties<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>step</strong>, <strong>ps</strong>, <strong>pitchClass</strong>, <strong>octave</strong>, <strong>nameWithOctave</strong>, <strong>name</strong>, <strong>mx</strong>, <strong>midi</strong>, <strong>lily</strong>, <strong>frequency</strong>, <strong>freq440</strong>, <strong>diatonicNoteNum</strong>, <strong>accidental</strong></p>
 </div>
 <div class="section" id="id8">
-<h3>Properties<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>step</strong></p>
-<p><strong>ps</strong></p>
-<p><strong>pitchClass</strong></p>
-<p><strong>octave</strong></p>
-<p><strong>nameWithOctave</strong></p>
-<p><strong>name</strong></p>
-<p><strong>mx</strong></p>
-<p><strong>midi</strong></p>
-<p><strong>lily</strong></p>
-<p><strong>frequency</strong></p>
-<p><strong>freq440</strong></p>
-<p><strong>diatonicNoteNum</strong></p>
-<p><strong>accidental</strong></p>
+<h3>Methods<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>setAccidental()</strong>, <strong>isUnpitched()</strong>, <strong>isRest()</strong>, <strong>isNote()</strong></p>
 </div>
 </div>
 <div class="section" id="class-generalnote">
 <h2>Class GeneralNote<a class="headerlink" href="#class-generalnote" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object, object</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields.</p>
 <div class="section" id="id9">
 <h3>Attributes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
@@ -360,17 +308,31 @@ Returns a list of mxBeam objects</blockquote>
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id10">
-<h3>Methods<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Locally Defined:</p>
+<p><strong>quarterLength</strong></p>
+<blockquote>
+<p>Return quarter length</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+</blockquote>
+<p><strong>musicxml</strong></p>
+<blockquote>
+This must call _getMX to get basic mxNote objects</blockquote>
+<p><strong>lyric</strong></p>
+<blockquote>
+returns the first Lyric&#8217;s text todo: should return a n separated string of lyrics</blockquote>
+<p><strong>color</strong></p>
+</div>
+<div class="section" id="id11">
+<h3>Methods<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Locally Defined:</p>
 <p><strong>splitAtDurations()</strong></p>
 <blockquote>
 <p>Takes a Note and returns a list of notes with only a single duration.Duration each.</p>
@@ -440,36 +402,10 @@ clears all the durations stored in the note. After performing this, it&#8217;s p
 </div>
 </blockquote>
 </div>
-<div class="section" id="id11">
-<h3>Properties<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Locally Defined</p>
-<p><strong>quarterLength</strong></p>
-<blockquote>
-<p>Return quarter length</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span>
-<span class="go">2.0</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>musicxml</strong></p>
-<blockquote>
-This must call _getMX to get basic mxNote objects</blockquote>
-<p><strong>lyric</strong></p>
-<blockquote>
-returns the first Lyric&#8217;s text todo: should return a n separated string of lyrics</blockquote>
-<p><strong>color</strong></p>
-</div>
 </div>
 <div class="section" id="class-halfnote">
 <h2>Class HalfNote<a class="headerlink" href="#class-halfnote" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <div class="section" id="id12">
 <h3>Attributes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <p><strong>articulations</strong></p>
@@ -485,57 +421,17 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id13">
-<h3>Methods<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Inherited from note.NotRest</p>
-<p><strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>setAccidental()</strong></p>
-<p><strong>isUnpitched()</strong></p>
-<p><strong>isRest()</strong></p>
-<p><strong>isNote()</strong></p>
+<h3>Properties<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>step</strong>, <strong>ps</strong>, <strong>pitchClass</strong>, <strong>octave</strong>, <strong>nameWithOctave</strong>, <strong>name</strong>, <strong>mx</strong>, <strong>midi</strong>, <strong>lily</strong>, <strong>frequency</strong>, <strong>freq440</strong>, <strong>diatonicNoteNum</strong>, <strong>accidental</strong></p>
 </div>
 <div class="section" id="id14">
-<h3>Properties<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>step</strong></p>
-<p><strong>ps</strong></p>
-<p><strong>pitchClass</strong></p>
-<p><strong>octave</strong></p>
-<p><strong>nameWithOctave</strong></p>
-<p><strong>name</strong></p>
-<p><strong>mx</strong></p>
-<p><strong>midi</strong></p>
-<p><strong>lily</strong></p>
-<p><strong>frequency</strong></p>
-<p><strong>freq440</strong></p>
-<p><strong>diatonicNoteNum</strong></p>
-<p><strong>accidental</strong></p>
+<h3>Methods<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>setAccidental()</strong>, <strong>isUnpitched()</strong>, <strong>isRest()</strong>, <strong>isNote()</strong></p>
 </div>
 </div>
 <div class="section" id="class-lilystring">
@@ -546,8 +442,15 @@ returns the first Lyric&#8217;s text todo: should return a n separated string of
 <p><strong>value</strong></p>
 </div>
 <div class="section" id="id16">
-<h3>Methods<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
+<p><strong>wrappedValue</strong></p>
+<blockquote>
+returns a value that is wrapped with { } if it doesn&#8217;t contain a score element so that it can run through lilypond</blockquote>
+</div>
+<div class="section" id="id17">
+<h3>Methods<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>Locally Defined:</p>
 <p><strong>writeTemp()</strong></p>
 <p><strong>wrapForMidi()</strong></p>
 <p><strong>showPNGandPlayMIDI()</strong></p>
@@ -576,13 +479,6 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
 <blockquote>
 override this in subclasses, such as LilyScore</blockquote>
 </div>
-<div class="section" id="id17">
-<h3>Properties<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
-<p><strong>wrappedValue</strong></p>
-<blockquote>
-returns a value that is wrapped with { } if it doesn&#8217;t contain a score element so that it can run through lilypond</blockquote>
-</div>
 </div>
 <div class="section" id="class-lyric">
 <h2>Class Lyric<a class="headerlink" href="#class-lyric" title="Permalink to this headline">¶</a></h2>
@@ -595,7 +491,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 </div>
 <div class="section" id="id19">
 <h3>Properties<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined</p>
+<p>Locally Defined:</p>
 <p><strong>mx</strong></p>
 <blockquote>
 <p>Returns an mxLyric</p>
@@ -611,7 +507,7 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 </div>
 <div class="section" id="class-notrest">
 <h2>Class NotRest<a class="headerlink" href="#class-notrest" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>Parent class for objects that are not rests; or, object that can be tied.</p>
 <div class="section" id="id20">
 <h3>Attributes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
@@ -626,24 +522,15 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id21">
-<h3>Methods<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+</div>
+<div class="section" id="id22">
+<h3>Methods<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Locally Defined:</p>
 <p><strong>splitNoteAtPoint()</strong></p>
 <blockquote>
 <p>Split a Note into two Notes.</p>
@@ -666,23 +553,10 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 </div>
 </blockquote>
 </div>
-<div class="section" id="id22">
-<h3>Properties<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-</div>
 </div>
 <div class="section" id="class-note">
 <h2>Class Note<a class="headerlink" href="#class-note" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now.</p>
 <div class="section" id="id23">
 <h3>Attributes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
@@ -699,50 +573,10 @@ returns a value that is wrapped with { } if it doesn&#8217;t contain a score ele
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id24">
-<h3>Methods<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Inherited from note.NotRest</p>
-<p><strong>splitNoteAtPoint()</strong></p>
-<p>Locally Defined</p>
-<p><strong>setAccidental()</strong></p>
-<p><strong>isUnpitched()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-<p><strong>isRest()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-<p><strong>isNote()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-</div>
-<div class="section" id="id25">
-<h3>Properties<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Locally Defined:</p>
 <p><strong>step</strong></p>
 <p><strong>ps</strong></p>
 <blockquote>
@@ -793,10 +627,27 @@ The name of the note as it would appear in Lilypond format.</blockquote>
 see Pitch.diatonicNoteNum</blockquote>
 <p><strong>accidental</strong></p>
 </div>
+<div class="section" id="id25">
+<h3>Methods<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
+<p>Locally Defined:</p>
+<p><strong>setAccidental()</strong></p>
+<p><strong>isUnpitched()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isRest()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isNote()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+</div>
 </div>
 <div class="section" id="class-pitch">
 <h2>Class Pitch<a class="headerlink" href="#class-pitch" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object, object</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <div class="section" id="id26">
 <h3>Attributes<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
 <p><strong>contexts</strong></p>
@@ -806,25 +657,9 @@ see Pitch.diatonicNoteNum</blockquote>
 <p><strong>locations</strong></p>
 </div>
 <div class="section" id="id27">
-<h3>Methods<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-</div>
-<div class="section" id="id28">
-<h3>Properties<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Locally Defined:</p>
 <p><strong>step</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C#3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_getStep</span><span class="p">()</span>
@@ -951,10 +786,14 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 </pre></div>
 </div>
 </div>
+<div class="section" id="id28">
+<h3>Methods<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+</div>
 </div>
 <div class="section" id="class-quarternote">
 <h2>Class QuarterNote<a class="headerlink" href="#class-quarternote" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <div class="section" id="id29">
 <h3>Attributes<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <p><strong>articulations</strong></p>
@@ -970,62 +809,22 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id30">
-<h3>Methods<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Inherited from note.NotRest</p>
-<p><strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>setAccidental()</strong></p>
-<p><strong>isUnpitched()</strong></p>
-<p><strong>isRest()</strong></p>
-<p><strong>isNote()</strong></p>
+<h3>Properties<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>step</strong>, <strong>ps</strong>, <strong>pitchClass</strong>, <strong>octave</strong>, <strong>nameWithOctave</strong>, <strong>name</strong>, <strong>mx</strong>, <strong>midi</strong>, <strong>lily</strong>, <strong>frequency</strong>, <strong>freq440</strong>, <strong>diatonicNoteNum</strong>, <strong>accidental</strong></p>
 </div>
 <div class="section" id="id31">
-<h3>Properties<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>step</strong></p>
-<p><strong>ps</strong></p>
-<p><strong>pitchClass</strong></p>
-<p><strong>octave</strong></p>
-<p><strong>nameWithOctave</strong></p>
-<p><strong>name</strong></p>
-<p><strong>mx</strong></p>
-<p><strong>midi</strong></p>
-<p><strong>lily</strong></p>
-<p><strong>frequency</strong></p>
-<p><strong>freq440</strong></p>
-<p><strong>diatonicNoteNum</strong></p>
-<p><strong>accidental</strong></p>
+<h3>Methods<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>setAccidental()</strong>, <strong>isUnpitched()</strong>, <strong>isRest()</strong>, <strong>isNote()</strong></p>
 </div>
 </div>
 <div class="section" id="class-rest">
 <h2>Class Rest<a class="headerlink" href="#class-rest" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>General rest class</p>
 <div class="section" id="id32">
 <h3>Attributes<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
@@ -1040,47 +839,10 @@ The frequency property gets or sets the frequency of the pitch in hertz. If the 
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id33">
-<h3>Methods<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Locally Defined</p>
-<p><strong>isUnpitched()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-<p><strong>isRest()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-<p><strong>isNote()</strong></p>
-<blockquote>
-bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
-</div>
-<div class="section" id="id34">
-<h3>Properties<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Locally Defined:</p>
 <p><strong>mx</strong></p>
 <blockquote>
 Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added</blockquote>
@@ -1095,10 +857,25 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 </div>
 </blockquote>
 </div>
+<div class="section" id="id34">
+<h3>Methods<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Locally Defined:</p>
+<p><strong>isUnpitched()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isRest()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+<p><strong>isNote()</strong></p>
+<blockquote>
+bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
+</div>
 </div>
 <div class="section" id="class-tie">
 <h2>Class Tie<a class="headerlink" href="#class-tie" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object, object</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>Object added to notes that are tied to other notes note1.tie = Tie(&#8220;start&#8221;) note1.tieStyle = &#8220;normal&#8221; # could be dotted or dashed print note1.tie.type # prints start Differences from MusicXML: notes do not need to know if they are tied from a previous note.  i.e., you can tie n1 to n2 just with a tie start on n1.  However, if you want proper musicXML output you need a tie stop on n2 one tie with &#8220;continue&#8221; implies tied from and tied to optional (to know what notes are next:) .to = note()   # not implimented yet, b/c of garbage coll. .from = note() (question: should notes be able to be tied to multiple notes for the case where a single note is tied both voices of a two-note-head unison?)</p>
 <div class="section" id="id35">
 <h3>Attributes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
@@ -1109,31 +886,19 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <p><strong>type</strong></p>
 </div>
 <div class="section" id="id36">
-<h3>Methods<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
+<h3>Properties<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Locally Defined:</p>
+<p><strong>mx</strong></p>
 </div>
 <div class="section" id="id37">
-<h3>Properties<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Locally Defined</p>
-<p><strong>mx</strong></p>
+<h3>Methods<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
 </div>
 </div>
 <div class="section" id="class-unpitched">
 <h2>Class Unpitched<a class="headerlink" href="#class-unpitched" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <p>General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation</p>
 <div class="section" id="id38">
 <h3>Attributes<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
@@ -1148,24 +913,15 @@ Returns a List of mxNotes Attributes of notes are merged from different location
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id39">
-<h3>Methods<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Locally Defined</p>
+<h3>Properties<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+</div>
+<div class="section" id="id40">
+<h3>Methods<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Locally Defined:</p>
 <p><strong>isUnpitched()</strong></p>
 <blockquote>
 bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</blockquote>
@@ -1179,23 +935,10 @@ bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. Th
 <blockquote>
 int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
 </div>
-<div class="section" id="id40">
-<h3>Properties<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-</div>
 </div>
 <div class="section" id="class-wholenote">
 <h2>Class WholeNote<a class="headerlink" href="#class-wholenote" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: note.Note, note.NotRest, note.GeneralNote, base.Music21Object, object</p>
+<p>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
 <div class="section" id="id41">
 <h3>Attributes<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h3>
 <p><strong>articulations</strong></p>
@@ -1211,57 +954,17 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <p><strong>tie</strong></p>
 </div>
 <div class="section" id="id42">
-<h3>Methods<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>write()</strong></p>
-<p><strong>show()</strong></p>
-<p><strong>searchParent()</strong></p>
-<p><strong>isClass()</strong></p>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>splitAtDurations()</strong></p>
-<p><strong>isChord()</strong></p>
-<p><strong>compactNoteInfo()</strong></p>
-<p><strong>clearDurations()</strong></p>
-<p><strong>appendDuration()</strong></p>
-<p><strong>addLyric()</strong></p>
-<p>Inherited from note.NotRest</p>
-<p><strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>setAccidental()</strong></p>
-<p><strong>isUnpitched()</strong></p>
-<p><strong>isRest()</strong></p>
-<p><strong>isNote()</strong></p>
+<h3>Properties<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>quarterLength</strong>, <strong>musicxml</strong>, <strong>lyric</strong>, <strong>color</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>step</strong>, <strong>ps</strong>, <strong>pitchClass</strong>, <strong>octave</strong>, <strong>nameWithOctave</strong>, <strong>name</strong>, <strong>mx</strong>, <strong>midi</strong>, <strong>lily</strong>, <strong>frequency</strong>, <strong>freq440</strong>, <strong>diatonicNoteNum</strong>, <strong>accidental</strong></p>
 </div>
 <div class="section" id="id43">
-<h3>Properties<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<p>Inherited from note.GeneralNote</p>
-<p><strong>quarterLength</strong></p>
-<p><strong>musicxml</strong></p>
-<p><strong>lyric</strong></p>
-<p><strong>color</strong></p>
-<p>Inherited from note.Note</p>
-<p><strong>step</strong></p>
-<p><strong>ps</strong></p>
-<p><strong>pitchClass</strong></p>
-<p><strong>octave</strong></p>
-<p><strong>nameWithOctave</strong></p>
-<p><strong>name</strong></p>
-<p><strong>mx</strong></p>
-<p><strong>midi</strong></p>
-<p><strong>lily</strong></p>
-<p><strong>frequency</strong></p>
-<p><strong>freq440</strong></p>
-<p><strong>diatonicNoteNum</strong></p>
-<p><strong>accidental</strong></p>
+<h3>Methods<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitAtDurations()</strong>, <strong>isChord()</strong>, <strong>compactNoteInfo()</strong>, <strong>clearDurations()</strong>, <strong>appendDuration()</strong>, <strong>addLyric()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>setAccidental()</strong>, <strong>isUnpitched()</strong>, <strong>isRest()</strong>, <strong>isNote()</strong></p>
 </div>
 </div>
 </div>
@@ -1279,8 +982,8 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 <li><a class="reference external" href="#function-sendnoteinfo">Function sendNoteInfo()</a></li>
 <li><a class="reference external" href="#class-accidental">Class Accidental</a><ul>
 <li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
 <li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-beam">Class Beam</a><ul>
@@ -1290,32 +993,32 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 </li>
 <li><a class="reference external" href="#class-beams">Class Beams</a><ul>
 <li><a class="reference external" href="#id3">Attributes</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
-<li><a class="reference external" href="#id5">Properties</a></li>
+<li><a class="reference external" href="#id4">Properties</a></li>
+<li><a class="reference external" href="#id5">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-eighthnote">Class EighthNote</a><ul>
 <li><a class="reference external" href="#id6">Attributes</a></li>
-<li><a class="reference external" href="#id7">Methods</a></li>
-<li><a class="reference external" href="#id8">Properties</a></li>
+<li><a class="reference external" href="#id7">Properties</a></li>
+<li><a class="reference external" href="#id8">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-generalnote">Class GeneralNote</a><ul>
 <li><a class="reference external" href="#id9">Attributes</a></li>
-<li><a class="reference external" href="#id10">Methods</a></li>
-<li><a class="reference external" href="#id11">Properties</a></li>
+<li><a class="reference external" href="#id10">Properties</a></li>
+<li><a class="reference external" href="#id11">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-halfnote">Class HalfNote</a><ul>
 <li><a class="reference external" href="#id12">Attributes</a></li>
-<li><a class="reference external" href="#id13">Methods</a></li>
-<li><a class="reference external" href="#id14">Properties</a></li>
+<li><a class="reference external" href="#id13">Properties</a></li>
+<li><a class="reference external" href="#id14">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-lilystring">Class LilyString</a><ul>
 <li><a class="reference external" href="#id15">Attributes</a></li>
-<li><a class="reference external" href="#id16">Methods</a></li>
-<li><a class="reference external" href="#id17">Properties</a></li>
+<li><a class="reference external" href="#id16">Properties</a></li>
+<li><a class="reference external" href="#id17">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-lyric">Class Lyric</a><ul>
@@ -1325,50 +1028,50 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
 </li>
 <li><a class="reference external" href="#class-notrest">Class NotRest</a><ul>
 <li><a class="reference external" href="#id20">Attributes</a></li>
-<li><a class="reference external" href="#id21">Methods</a></li>
-<li><a class="reference external" href="#id22">Properties</a></li>
+<li><a class="reference external" href="#id21">Properties</a></li>
+<li><a class="reference external" href="#id22">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-note">Class Note</a><ul>
 <li><a class="reference external" href="#id23">Attributes</a></li>
-<li><a class="reference external" href="#id24">Methods</a></li>
-<li><a class="reference external" href="#id25">Properties</a></li>
+<li><a class="reference external" href="#id24">Properties</a></li>
+<li><a class="reference external" href="#id25">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-pitch">Class Pitch</a><ul>
 <li><a class="reference external" href="#id26">Attributes</a></li>
-<li><a class="reference external" href="#id27">Methods</a></li>
-<li><a class="reference external" href="#id28">Properties</a></li>
+<li><a class="reference external" href="#id27">Properties</a></li>
+<li><a class="reference external" href="#id28">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-quarternote">Class QuarterNote</a><ul>
 <li><a class="reference external" href="#id29">Attributes</a></li>
-<li><a class="reference external" href="#id30">Methods</a></li>
-<li><a class="reference external" href="#id31">Properties</a></li>
+<li><a class="reference external" href="#id30">Properties</a></li>
+<li><a class="reference external" href="#id31">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-rest">Class Rest</a><ul>
 <li><a class="reference external" href="#id32">Attributes</a></li>
-<li><a class="reference external" href="#id33">Methods</a></li>
-<li><a class="reference external" href="#id34">Properties</a></li>
+<li><a class="reference external" href="#id33">Properties</a></li>
+<li><a class="reference external" href="#id34">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-tie">Class Tie</a><ul>
 <li><a class="reference external" href="#id35">Attributes</a></li>
-<li><a class="reference external" href="#id36">Methods</a></li>
-<li><a class="reference external" href="#id37">Properties</a></li>
+<li><a class="reference external" href="#id36">Properties</a></li>
+<li><a class="reference external" href="#id37">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-unpitched">Class Unpitched</a><ul>
 <li><a class="reference external" href="#id38">Attributes</a></li>
-<li><a class="reference external" href="#id39">Methods</a></li>
-<li><a class="reference external" href="#id40">Properties</a></li>
+<li><a class="reference external" href="#id39">Properties</a></li>
+<li><a class="reference external" href="#id40">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-wholenote">Class WholeNote</a><ul>
 <li><a class="reference external" href="#id41">Attributes</a></li>
-<li><a class="reference external" href="#id42">Methods</a></li>
-<li><a class="reference external" href="#id43">Properties</a></li>
+<li><a class="reference external" href="#id42">Properties</a></li>
+<li><a class="reference external" href="#id43">Methods</a></li>
 </ul>
 </li>
 </ul>
@@ -1379,8 +1082,8 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
             <p class="topless"><a href="moduleMeter.html"
                                   title="previous chapter">music21.meter</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="modulePitch.html"
-                                  title="next chapter">music21.pitch</a></p>
+            <p class="topless"><a href="moduleNode.html"
+                                  title="next chapter">music21.node</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/moduleNote.txt"
@@ -1410,7 +1113,7 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modulePitch.html" title="music21.pitch"
+          <a href="moduleNode.html" title="music21.node"
              >next</a> |</li>
         <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"

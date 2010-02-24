@@ -327,7 +327,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **next()**
 
@@ -351,7 +351,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **toUnicode()**
 
@@ -374,7 +374,7 @@ Methods
 ~~~~~~~
 
 
-Locally Defined
+Locally Defined:
 
 **stop()**
 
@@ -405,37 +405,7 @@ Methods
 ~~~~~~~
 
 
-Inherited from dict
-
-**values()**
-
-**update()**
-
-**setdefault()**
-
-**popitem()**
-
-**pop()**
-
-**keys()**
-
-**itervalues()**
-
-**iterkeys()**
-
-**iteritems()**
-
-**items()**
-
-**has_key()**
-
-**get()**
-
-**fromkeys()**
-
-**copy()**
-
-**clear()**
+Inherited from dict: **values()**, **update()**, **setdefault()**, **popitem()**, **pop()**, **keys()**, **itervalues()**, **iterkeys()**, **iteritems()**, **items()**, **has_key()**, **get()**, **fromkeys()**, **copy()**, **clear()**
 
 
 Class defList
@@ -456,24 +426,6 @@ Methods
 ~~~~~~~
 
 
-Inherited from list
-
-**sort()**
-
-**reverse()**
-
-**remove()**
-
-**pop()**
-
-**insert()**
-
-**index()**
-
-**extend()**
-
-**count()**
-
-**append()**
+Inherited from list: **sort()**, **reverse()**, **remove()**, **pop()**, **insert()**, **index()**, **extend()**, **count()**, **append()**
 
 
