@@ -33,6 +33,7 @@ Music21 Documentation
    modulePitch
    moduleStream
    moduleSerial
+   moduleTempo
 
 Indices and Tables
 ==================

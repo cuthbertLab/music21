@@ -63,6 +63,7 @@ MODULES = [
     pitch, 
     stream,     
     serial,     
+    tempo,     
 
 
 #   musicxml, 
