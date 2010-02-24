@@ -103,6 +103,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -342,6 +344,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -540,6 +544,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -730,6 +736,8 @@ Inherited from stream.Stream
 **makeMeasures()**
 
 **makeBeams()**
+
+**makeAccidentals()**
 
 **isSequence()**
 
@@ -922,6 +930,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -1112,6 +1122,8 @@ Inherited from stream.Stream
 **makeMeasures()**
 
 **makeBeams()**
+
+**makeAccidentals()**
 
 **isSequence()**
 
@@ -1495,6 +1507,9 @@ Locally Defined
     >>> aNote.quarterLength = .25
     >>> aMeasure.repeatAppend(aNote,16)
     >>> bMeasure = aMeasure.makeBeams()
+
+**makeAccidentals()**
+
 
 **isSequence()**
 
@@ -2346,6 +2361,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -2543,6 +2560,8 @@ Inherited from stream.Stream
 **makeMeasures()**
 
 **makeBeams()**
+
+**makeAccidentals()**
 
 **isSequence()**
 

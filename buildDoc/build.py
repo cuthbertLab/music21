@@ -529,7 +529,11 @@ class Documentation(RestrtucturedWriter):
 
     def updateDirs(self):
         self.dir = os.getcwd()
-        if not self.dir.endswith("music21%sbuildDoc" % os.sep):
+        self.parentDir = os.path.dirname(self.dir)
+        parentContents = os.listdir(self.parentDir)
+        # make sure we are in the the proper directory
+        if (not self.dir.endswith("buildDoc") or 
+            'music21' not in parentContents):
             raise Exception("not in the music21%sbuildDoc directory: %s" % (os.sep, self.dir))
     
         parentDir = os.path.dirname(self.dir)

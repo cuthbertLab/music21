@@ -280,6 +280,9 @@ Locally Defined
     >>> aMeasure.repeatAppend(aNote,16)
     >>> bMeasure = aMeasure.makeBeams()
 
+**makeAccidentals()**
+
+
 **isSequence()**
 
     A stream is a sequence if it has no overlaps. TODO: check that co-incident boundaries are properly handled 
@@ -1129,6 +1132,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -1319,6 +1324,8 @@ Inherited from stream.Stream
 
 **makeBeams()**
 
+**makeAccidentals()**
+
 **isSequence()**
 
 **insertAtNativeOffset()**
@@ -1508,6 +1515,8 @@ Inherited from stream.Stream
 **makeMeasures()**
 
 **makeBeams()**
+
+**makeAccidentals()**
 
 **isSequence()**
 

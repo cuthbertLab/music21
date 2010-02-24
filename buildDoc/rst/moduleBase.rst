@@ -13,121 +13,6 @@ base -- the convention within music21 is that __init__ files contain:
    
 so everything in this file can be accessed as music21.XXXX
 
-Class Contexts
---------------
-
-Inherits from: object
-
-An object, stored within a Music21Object, that provides an ordered collection of objects that may be contextually relevant. 
-
-Methods
-~~~~~~~
-
-
-Locally Defined
-
-**setAttrByName()**
-
-    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> bObj.attr1 = 98
-    >>> aContexts = Contexts()
-    >>> aContexts.addReference(aObj)
-    >>> aContexts.addReference(bObj)
-    >>> aContexts.setAttrByName('attr1', 'test')
-    >>> aContexts.getAttrByName('attr1') == 'test'
-    True 
-
-**scrub()**
-
-    Remove all weak ref objects that point to objects that no longer exist. 
-
-**remove()**
-
-    Remove the entry specified by sites 
-
-    
-
-**getReferences()**
-
-
-**getLocations()**
-
-
-**getById()**
-
-
-**getByGroup()**
-
-
-**getByClass()**
-
-    Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Contexts of all members 
-
-    >>> class Mock(Music21Object): pass
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> aContexts = Contexts()
-    >>> aContexts.addReference(aObj)
-    >>> aContexts.addReference(bObj)
-    >>> aContexts.getByClass('mock') == bObj
-    True 
-    >>> aContexts.getByClass(Mock) == bObj
-    True 
-
-    
-
-**getAttrByName()**
-
-    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> bObj.attr1 = 98
-    >>> aContexts = Contexts()
-    >>> aContexts.addReference(aObj)
-    >>> aContexts.addReference(bObj)
-    >>> aContexts.getAttrByName('attr1') == 98
-    True 
-    >>> del bObj
-    >>> aContexts.getAttrByName('attr1') == 234
-    True 
-
-**get()**
-
-    Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
-
-    >>> class Mock(Music21Object): pass
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> aContexts = Contexts()
-    >>> aContexts.addReference(aObj)
-    >>> aContexts.addReference(bObj)
-    >>> aContexts.getReferences() == [bObj, aObj]
-    True 
-
-**find()**
-
-
-**countRef()**
-
-
-**countLoc()**
-
-
-**clear()**
-
-    Clear all data. 
-
-**addReference()**
-
-    Add a reference 
-
-
 Class ElementWrapper
 --------------------
 
@@ -318,8 +203,6 @@ Locally Defined
     >>> len(aLocations)
     0 
 
-    
-
 **getTimes()**
 
 
@@ -329,7 +212,7 @@ Locally Defined
 
 **getSiteByOffset()**
 
-    For a given offset return the parent ####More than one parent may have the same offset; ####this will return the last site added. No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
+    For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -499,5 +382,171 @@ Locally Defined
     Gets the DurationObject of the object or None 
 
     
+
+
+Class Relations
+---------------
+
+Inherits from: object
+
+An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. 
+
+Methods
+~~~~~~~
+
+
+Locally Defined
+
+**setOffsetBySite()**
+
+    Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Relations, it will raise an exception. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> aLocations = Relations()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.setOffsetBySite(aSite, 20)
+    >>> aLocations.getOffsetBySite(aSite)
+    20 
+    >>> aLocations.setOffsetBySite(cSite, 30)
+    Traceback (most recent call last): 
+    RelationsException: ... 
+
+**setAttrByName()**
+
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aRelations = Relations()
+    >>> aRelations.add(aObj)
+    >>> aRelations.add(bObj)
+    >>> aRelations.setAttrByName('attr1', 'test')
+    >>> aRelations.getAttrByName('attr1') == 'test'
+    True 
+
+**scrub()**
+
+    Remove all weak ref objects that point to objects that no longer exist. 
+
+**removeById()**
+
+
+**getSiteByOffset()**
+
+    For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> aLocations = Relations()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 23121.5)
+    >>> aSite == aLocations.getSiteByOffset(23)
+    True 
+    #### no longer works 
+    #Adding another site at offset 23 will change getSiteByOffset 
+    #>>> aLocations.add(cSite, 23) 
+    #>>> aSite == aLocations.getSiteByOffset(23) 
+    #False 
+    #>>> cSite == aLocations.getSiteByOffset(23) 
+    #True 
+
+**getOffsets()**
+
+    Return a list of all offsets. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> dSite = Mock()
+    >>> aLocations = Relations()
+    >>> aLocations.add(aSite, 0)
+    >>> aLocations.add(cSite) # a context
+    >>> aLocations.add(bSite, 234) # can add at same offset or another
+    >>> aLocations.add(dSite) # a context
+    >>> aLocations.getOffsets()
+    [0, 234] 
+
+**getOffsetBySite()**
+
+    For a given site return its offset. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cParent = Mock()
+    >>> aLocations = Relations()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.getOffsetBySite(aSite)
+    23 
+    >>> aLocations.getOffsetBySite(bSite)
+    121.5 
+    >>> aLocations.getOffsetBySite(cParent)
+    Traceback (most recent call last): 
+    RelationsException: ... 
+
+**getByClass()**
+
+    Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Relations of all members 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aRelations = Relations()
+    >>> aRelations.add(aObj)
+    >>> aRelations.add(bObj)
+    >>> aRelations.getByClass('mock') == aObj
+    True 
+    >>> aRelations.getByClass(Mock) == aObj
+    True 
+
+    
+
+**getAttrByName()**
+
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aRelations = Relations()
+    >>> aRelations.add(aObj)
+    >>> aRelations.getAttrByName('attr1') == 234
+    True 
+    >>> aRelations.removeById(id(aObj))
+    >>> aRelations.add(bObj)
+    >>> aRelations.getAttrByName('attr1') == 98
+    True 
+
+**get()**
+
+    Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aRelations = Relations()
+    >>> aRelations.add(aObj)
+    >>> aRelations.add(bObj)
+    >>> aRelations.get('contexts') == [aObj, bObj]
+    True 
+
+**clear()**
+
+    Clear all data. 
+
+**add()**
+
+    Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old Locations 
 
 
