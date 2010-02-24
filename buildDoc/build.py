@@ -70,7 +70,6 @@ MODULES = [
 
 #   musicxml, 
 #   #  scale,
-#     tempo,  
 
 # trecento
 #    trecentoCadencebook
@@ -141,7 +140,6 @@ class RestrtucturedWriter(object):
         else:
             return '%s.%s (of module :ref:`module%s`)' % (modName, className,
                                                     modNameCapital)
-
         # return in this form to get a cross reference
         # :ref:`moduleSerial`
 
@@ -241,7 +239,6 @@ class ModuleDoc(RestrtucturedWriter):
         # references used in rst table of contents
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
 
-
     def findDerivationClass(self, mro, partName):
         '''Given an mro (method resolution order) and a part of an object, find from where the part is derived.
         '''
@@ -281,7 +278,6 @@ class ModuleDoc(RestrtucturedWriter):
         info['reference'] = obj
         info['name'] = obj.__name__
         info['doc']  = self.formatDocString(obj.__doc__)
-
         # skip private functions
         if not obj.__name__.startswith('_'): 
             self.functions[obj.__name__] = info
@@ -379,6 +375,8 @@ class ModuleDoc(RestrtucturedWriter):
 
     #---------------------------------------------------------------------------
     def getRestructuredClass(self, className):
+        '''Return a string of a complete RST specification for a class.
+        '''
         msg = []
         titleStr = 'Class %s' % self.classes[className]['name']
         msg += self._heading(titleStr, '-')
@@ -503,7 +501,6 @@ class ModuleDoc(RestrtucturedWriter):
         # can optionally list imports
         #msg += self._heading('Imports' , '-')
         #msg += self._list(self.imports)
-
 
         funcNames = self.functions.keys()
         funcNames.sort()
