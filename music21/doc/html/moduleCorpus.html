@@ -32,6 +32,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
           <a href="moduleChord.html" title="music21.chord"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -42,20 +45,6 @@
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="contents.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">music21.corpus</a><ul>
-<li><a class="reference external" href="#function-getbachchorales">Function getBachChorales()</a></li>
-<li><a class="reference external" href="#function-getbeethovenstringquartets">Function getBeethovenStringQuartets()</a></li>
-<li><a class="reference external" href="#function-getcomposer">Function getComposer()</a></li>
-<li><a class="reference external" href="#function-getcomposerdir">Function getComposerDir()</a></li>
-<li><a class="reference external" href="#function-getpaths">Function getPaths()</a></li>
-<li><a class="reference external" href="#function-getwork">Function getWork()</a></li>
-<li><a class="reference external" href="#function-parsework">Function parseWork()</a></li>
-</ul>
-</li>
-</ul>
-
             <h4>Previous topic</h4>
             <p class="topless"><a href="moduleConverter.html"
                                   title="previous chapter">music21.converter</a></p>
@@ -88,16 +77,54 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-corpus">
-<span id="modulecorpus"></span><h1>music21.corpus<a class="headerlink" href="#music21-corpus" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="function-getbachchorales">
-<h2>Function getBachChorales()<a class="headerlink" href="#function-getbachchorales" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="module-music21.corpus">
+<span id="modulecorpus"></span><h1>music21.corpus<a class="headerlink" href="#module-music21.corpus" title="Permalink to this headline">¶</a></h1>
+<p>The music21 corpus provides a collection of public-domain music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.</p>
+<dl class="function">
+<dt id="music21.corpus.parseWork">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">parseWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.parseWork" title="Permalink to this definition">¶</a></dt>
+<dd>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="function-getbeethovenstringquartets">
-<h2>Function getBeethovenStringQuartets()<a class="headerlink" href="#function-getbeethovenstringquartets" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="music21.corpus.getWork">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getWork" title="Permalink to this definition">¶</a></dt>
+<dd>Search the corpus and return either a list of file paths or a single file path</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
+<span class="go">True</span>
+</pre></div>
 </div>
-<div class="section" id="function-getcomposer">
-<h2>Function getComposer()<a class="headerlink" href="#function-getcomposer" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="music21.corpus.getPaths">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getPaths</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getPaths" title="Permalink to this definition">¶</a></dt>
+<dd>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">30</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">(</span><span class="s">&#39;krn&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">4</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.corpus.getBeethovenStringQuartets">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getBeethovenStringQuartets</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getBeethovenStringQuartets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="music21.corpus.getComposer">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getComposer</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getComposer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposer</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
 <span class="go">True</span>
@@ -106,10 +133,11 @@
 <span class="go">True</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="function-getcomposerdir">
-<h2>Function getComposerDir()<a class="headerlink" href="#function-getcomposerdir" title="Permalink to this headline">¶</a></h2>
-<p>Given the name of a composer, get the path to the top-level directory of that composer</p>
+<dl class="function">
+<dt id="music21.corpus.getComposerDir">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getComposerDir</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getComposerDir" title="Permalink to this definition">¶</a></dt>
+<dd>Given the name of a composer, get the path to the top-level directory of that composer</dd></dl>
+
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;beethoven&#39;</span><span class="p">))</span>
@@ -125,39 +153,11 @@
 <span class="go">True</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="function-getpaths">
-<h2>Function getPaths()<a class="headerlink" href="#function-getpaths" title="Permalink to this headline">¶</a></h2>
-<p>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">30</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">(</span><span class="s">&#39;krn&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">4</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-getwork">
-<h2>Function getWork()<a class="headerlink" href="#function-getwork" title="Permalink to this headline">¶</a></h2>
-<p>Search the corpus and return either a list of file paths or a single file path</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-parsework">
-<h2>Function parseWork()<a class="headerlink" href="#function-parsework" title="Permalink to this headline">¶</a></h2>
-<p>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
+<dl class="function">
+<dt id="music21.corpus.getBachChorales">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getBachChorales</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getBachChorales" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -172,6 +172,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="moduleChord.html" title="music21.chord"
              >next</a> |</li>

@@ -32,6 +32,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -45,40 +48,30 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.interval</a><ul>
-<li><a class="reference external" href="#function-convertdiatonicnumbertostep">Function convertDiatonicNumberToStep()</a></li>
-<li><a class="reference external" href="#function-convertstaffdistancetointerval">Function convertStaffDistanceToInterval()</a></li>
-<li><a class="reference external" href="#function-generatechromatic">Function generateChromatic()</a></li>
-<li><a class="reference external" href="#function-generatediatonic">Function generateDiatonic()</a></li>
-<li><a class="reference external" href="#function-generategeneric">Function generateGeneric()</a></li>
-<li><a class="reference external" href="#function-generateinterval">Function generateInterval()</a></li>
-<li><a class="reference external" href="#function-generateintervalfromstring">Function generateIntervalFromString()</a></li>
-<li><a class="reference external" href="#function-generatenote">Function generateNote()</a></li>
-<li><a class="reference external" href="#function-generatepitch">Function generatePitch()</a></li>
-<li><a class="reference external" href="#function-getabsolutehighernote">Function getAbsoluteHigherNote()</a></li>
-<li><a class="reference external" href="#function-getabsolutelowernote">Function getAbsoluteLowerNote()</a></li>
-<li><a class="reference external" href="#function-getspecifier">Function getSpecifier()</a></li>
-<li><a class="reference external" href="#function-getwrittenhighernote">Function getWrittenHigherNote()</a></li>
-<li><a class="reference external" href="#function-getwrittenlowernote">Function getWrittenLowerNote()</a></li>
-<li><a class="reference external" href="#class-chromaticinterval">Class ChromaticInterval</a><ul>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
 <li><a class="reference external" href="#class-diatonicinterval">Class DiatonicInterval</a><ul>
 <li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#id1">Properties</a></li>
-<li><a class="reference external" href="#id2">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-genericinterval">Class GenericInterval</a><ul>
-<li><a class="reference external" href="#id3">Properties</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
+<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-interval">Class Interval</a><ul>
-<li><a class="reference external" href="#id5">Attributes</a></li>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#id2">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#id3">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-chromaticinterval">Class ChromaticInterval</a><ul>
+<li><a class="reference external" href="#id4">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id5">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-genericinterval">Class GenericInterval</a><ul>
 <li><a class="reference external" href="#id6">Properties</a></li>
-<li><a class="reference external" href="#id7">Methods</a></li>
+<li><a class="reference external" href="#id7">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id8">Methods</a></li>
+<li><a class="reference external" href="#id9">Methods (Inherited)</a></li>
 </ul>
 </li>
 </ul>
@@ -117,75 +110,26 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-interval">
-<span id="moduleinterval"></span><h1>music21.interval<a class="headerlink" href="#music21-interval" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-music21.interval">
+<span id="moduleinterval"></span><h1>music21.interval<a class="headerlink" href="#module-music21.interval" title="Permalink to this headline">¶</a></h1>
 <p>Interval.py is a module for creating and manipulating interval objects.
 Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
 There are also a number of useful lists included in the module.</p>
-<div class="section" id="function-convertdiatonicnumbertostep">
-<h2>Function convertDiatonicNumberToStep()<a class="headerlink" href="#function-convertdiatonicnumbertostep" title="Permalink to this headline">¶</a></h2>
-<p>Utility conversion; does not process internals returns a tuple of Step and Octave</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">15</span><span class="p">)</span>
-<span class="go">(&#39;C&#39;, 2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
-<span class="go">(&#39;D&#39;, 3)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-convertstaffdistancetointerval">
-<h2>Function convertStaffDistanceToInterval()<a class="headerlink" href="#function-convertstaffdistancetointerval" title="Permalink to this headline">¶</a></h2>
-<p>convertStaffDistanceToInterval(staffDistance) -&gt; intervalDistance Returns the interval number from the given staff distance.</p>
-</div>
-<div class="section" id="function-generatechromatic">
-<h2>Function generateChromatic()<a class="headerlink" href="#function-generatechromatic" title="Permalink to this headline">¶</a></h2>
-<p>generateChromatic(Note, Note) -&gt; ChromaticInterval Generates a ChromaticInterval from the two given notes.</p>
-</div>
-<div class="section" id="function-generatediatonic">
-<h2>Function generateDiatonic()<a class="headerlink" href="#function-generatediatonic" title="Permalink to this headline">¶</a></h2>
-<p>generateDiatonic(GenericInterval, ChromaticInterval) -&gt; DiatonicInterval Generates a DiatonicInterval from the given Generic and Chromatic intervals.</p>
-</div>
-<div class="section" id="function-generategeneric">
-<h2>Function generateGeneric()<a class="headerlink" href="#function-generategeneric" title="Permalink to this headline">¶</a></h2>
-<p>generateGeneric(Note, Note) -&gt; GenericInterval Generates a GenericInterval from the two given notes.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateGeneric</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.GenericInterval 12&gt;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-generateinterval">
-<h2>Function generateInterval()<a class="headerlink" href="#function-generateinterval" title="Permalink to this headline">¶</a></h2>
-<p>generateInterval(Note [,Note]) -&gt; Interval Generates an interval from note1 to a generic note, or from note1 to note2.  The generic, chromatic, and diatonic parts of the interval are also generated.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateInterval</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.Interval P12&gt;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-generateintervalfromstring">
-<h2>Function generateIntervalFromString()<a class="headerlink" href="#function-generateintervalfromstring" title="Permalink to this headline">¶</a></h2>
-<p>generateIntervalFromString(string) -&gt; Interval Generates an interval object based on the given string, such as &#8220;P5&#8221;, &#8220;m3&#8221;, &#8220;A2&#8221;.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.Interval P5&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.Interval m3&gt;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="function-generatenote">
-<h2>Function generateNote()<a class="headerlink" href="#function-generatenote" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="function-generatepitch">
-<h2>Function generatePitch()<a class="headerlink" href="#function-generatepitch" title="Permalink to this headline">¶</a></h2>
-<p>generatePitch(Pitch1 (or Note1), Interval1) -&gt; Pitch Generates a Pitch object at the specified interval from the specified Pitch.</p>
+<dl class="function">
+<dt id="music21.interval.generateDiatonic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateDiatonic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateDiatonic" title="Permalink to this definition">¶</a></dt>
+<dd>generateDiatonic(GenericInterval, ChromaticInterval) -&gt; DiatonicInterval Generates a DiatonicInterval from the given Generic and Chromatic intervals.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.getAbsoluteLowerNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getAbsoluteLowerNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getAbsoluteLowerNote" title="Permalink to this definition">¶</a></dt>
+<dd>Given two notes, returns the lower note based on actual pitch. If both pitches are the same, returns the first note given.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.generatePitch">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generatePitch</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generatePitch" title="Permalink to this definition">¶</a></dt>
+<dd>generatePitch(Pitch1 (or Note1), Interval1) -&gt; Pitch Generates a Pitch object at the specified interval from the specified Pitch.</dd></dl>
+
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
@@ -198,22 +142,62 @@ There are also a number of useful lists included in the module.</p>
 <span class="go">F3</span>
 </pre></div>
 </div>
+<dl class="function">
+<dt id="music21.interval.generateNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateNote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.generateInterval">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateInterval</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateInterval" title="Permalink to this definition">¶</a></dt>
+<dd>generateInterval(Note [,Note]) -&gt; Interval Generates an interval from note1 to a generic note, or from note1 to note2.  The generic, chromatic, and diatonic parts of the interval are also generated.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateInterval</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval P12&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="function-getabsolutehighernote">
-<h2>Function getAbsoluteHigherNote()<a class="headerlink" href="#function-getabsolutehighernote" title="Permalink to this headline">¶</a></h2>
-<p>Given two notes, returns the higher note based on actual pitch. If both pitches are the same, returns the first note given.</p>
+<dl class="function">
+<dt id="music21.interval.generateIntervalFromString">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateIntervalFromString</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateIntervalFromString" title="Permalink to this definition">¶</a></dt>
+<dd>generateIntervalFromString(string) -&gt; Interval Generates an interval object based on the given string, such as &#8220;P5&#8221;, &#8220;m3&#8221;, &#8220;A2&#8221;.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval P5&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval m3&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="function-getabsolutelowernote">
-<h2>Function getAbsoluteLowerNote()<a class="headerlink" href="#function-getabsolutelowernote" title="Permalink to this headline">¶</a></h2>
-<p>Given two notes, returns the lower note based on actual pitch. If both pitches are the same, returns the first note given.</p>
-</div>
-<div class="section" id="function-getspecifier">
-<h2>Function getSpecifier()<a class="headerlink" href="#function-getspecifier" title="Permalink to this headline">¶</a></h2>
-<p>getSpecifier(GenericInterval, ChromaticInterval) -&gt; specifier Returns the specifier (i.e. MAJOR, MINOR, etc...) of the diatonic interval defined by the given Generic and Chromatic intervals.</p>
-</div>
-<div class="section" id="function-getwrittenhighernote">
-<h2>Function getWrittenHigherNote()<a class="headerlink" href="#function-getwrittenhighernote" title="Permalink to this headline">¶</a></h2>
-<p>Given two notes, returns the higher note based on diatonic note numbers. Returns the note higher in pitch if the diatonic number is the same, or the first note if pitch is also the same.</p>
+<dl class="function">
+<dt id="music21.interval.getSpecifier">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getSpecifier</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getSpecifier" title="Permalink to this definition">¶</a></dt>
+<dd>getSpecifier(GenericInterval, ChromaticInterval) -&gt; specifier Returns the specifier (i.e. MAJOR, MINOR, etc...) of the diatonic interval defined by the given Generic and Chromatic intervals.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.getWrittenLowerNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getWrittenLowerNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getWrittenLowerNote" title="Permalink to this definition">¶</a></dt>
+<dd>Given two notes, returns the lower note based on diatonic note number. Returns the note lower in pitch if the diatonic number is the same, or the first note if pitch is also the same.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.generateChromatic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateChromatic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateChromatic" title="Permalink to this definition">¶</a></dt>
+<dd>generateChromatic(Note, Note) -&gt; ChromaticInterval Generates a ChromaticInterval from the two given notes.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.getAbsoluteHigherNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getAbsoluteHigherNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getAbsoluteHigherNote" title="Permalink to this definition">¶</a></dt>
+<dd>Given two notes, returns the higher note based on actual pitch. If both pitches are the same, returns the first note given.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.getWrittenHigherNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getWrittenHigherNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getWrittenHigherNote" title="Permalink to this definition">¶</a></dt>
+<dd>Given two notes, returns the higher note based on diatonic note numbers. Returns the note higher in pitch if the diatonic number is the same, or the first note if pitch is also the same.</dd></dl>
+
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cis</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">deses</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;D--&quot;</span><span class="p">)</span>
@@ -222,66 +206,103 @@ There are also a number of useful lists included in the module.</p>
 <span class="go">True</span>
 </pre></div>
 </div>
+<dl class="function">
+<dt id="music21.interval.convertDiatonicNumberToStep">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">convertDiatonicNumberToStep</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.convertDiatonicNumberToStep" title="Permalink to this definition">¶</a></dt>
+<dd>Utility conversion; does not process internals returns a tuple of Step and Octave</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">15</span><span class="p">)</span>
+<span class="go">(&#39;C&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertDiatonicNumberToStep</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">(&#39;D&#39;, 3)</span>
+</pre></div>
 </div>
-<div class="section" id="function-getwrittenlowernote">
-<h2>Function getWrittenLowerNote()<a class="headerlink" href="#function-getwrittenlowernote" title="Permalink to this headline">¶</a></h2>
-<p>Given two notes, returns the lower note based on diatonic note number. Returns the note lower in pitch if the diatonic number is the same, or the first note if pitch is also the same.</p>
-</div>
-<div class="section" id="class-chromaticinterval">
-<h2>Class ChromaticInterval<a class="headerlink" href="#class-chromaticinterval" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
-<p>Chromatic interval class &#8211; thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400</p>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
-</div>
+<dl class="function">
+<dt id="music21.interval.convertStaffDistanceToInterval">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">convertStaffDistanceToInterval</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.convertStaffDistanceToInterval" title="Permalink to this definition">¶</a></dt>
+<dd>convertStaffDistanceToInterval(staffDistance) -&gt; intervalDistance Returns the interval number from the given staff distance.</dd></dl>
+
+<dl class="function">
+<dt id="music21.interval.generateGeneric">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generateGeneric</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generateGeneric" title="Permalink to this definition">¶</a></dt>
+<dd>generateGeneric(Note, Note) -&gt; GenericInterval Generates a GenericInterval from the two given notes.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateGeneric</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.GenericInterval 12&gt;</span>
+</pre></div>
 </div>
 <div class="section" id="class-diatonicinterval">
 <h2>Class DiatonicInterval<a class="headerlink" href="#class-diatonicinterval" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
+<dl class="class">
+<dt id="music21.interval.DiatonicInterval">
+<em class="property">
+class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">DiatonicInterval</tt><a class="headerlink" href="#music21.interval.DiatonicInterval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<p><strong>contexts</strong></p>
-<p><strong>groups</strong></p>
-<p><strong>id</strong></p>
-<p><strong>locations</strong></p>
-<p><strong>name</strong></p>
-<p><strong>specifier</strong></p>
-</div>
-<div class="section" id="id1">
-<h3>Properties<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
-</div>
-<div class="section" id="id2">
-<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
-</div>
-</div>
-<div class="section" id="class-genericinterval">
-<h2>Class GenericInterval<a class="headerlink" href="#class-genericinterval" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
-<p>A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
-<div class="section" id="id3">
-<h3>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
-</div>
-<div class="section" id="id4">
-<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
-<p>Locally Defined:</p>
-<p><strong>complement()</strong></p>
 <blockquote>
-generates a new GenericInterval object where descending 3rds are 6ths, etc.</blockquote>
+<dl class="attribute">
+<dt id="music21.interval.contexts">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">contexts</tt><a class="headerlink" href="#music21.interval.contexts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.interval.groups">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.interval.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.interval.id">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.interval.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.interval.locations">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">locations</tt><a class="headerlink" href="#music21.interval.locations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.interval.name">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">name</tt><a class="headerlink" href="#music21.interval.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.interval.specifier">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">specifier</tt><a class="headerlink" href="#music21.interval.specifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="properties-inherited">
+<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 <div class="section" id="class-interval">
 <h2>Class Interval<a class="headerlink" href="#class-interval" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>), object</p>
-<p>requires either (1) a string (&#8220;P5&#8221; etc.) or (2) named arguments: (2a) either both of diatonic  = DiatonicInterval object chromatic = ChromaticInterval object (2b) or both of note1     = Pitch (or Note) object note2     = Pitch (or Note) object in which case it figures out the diatonic and chromatic intervals itself</p>
+<dl class="class">
+<dt id="music21.interval.Interval">
+<em class="property">
+class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">Interval</tt><a class="headerlink" href="#music21.interval.Interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+requires either (1) a string (&#8220;P5&#8221; etc.) or (2) named arguments: (2a) either both of diatonic  = DiatonicInterval object chromatic = ChromaticInterval object (2b) or both of note1     = Pitch (or Note) object note2     = Pitch (or Note) object in which case it figures out the diatonic and chromatic intervals itself</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c5&#39;</span><span class="p">)</span>
@@ -290,36 +311,163 @@ generates a new GenericInterval object where descending 3rds are 6ths, etc.</blo
 <span class="go">&lt;music21.interval.Interval P15&gt;</span>
 </pre></div>
 </div>
-<div class="section" id="id5">
-<h3>Attributes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p><strong>contexts</strong></p>
-<p><strong>groups</strong></p>
-<p><strong>id</strong></p>
-<p><strong>locations</strong></p>
+<blockquote>
+Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.interval.</tt><tt class="descname">contexts</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.interval.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.interval.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.interval.</tt><tt class="descname">locations</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
 </div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.interval.complement">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">complement</tt><a class="headerlink" href="#music21.interval.complement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id2">
+<h3>Properties (Inherited)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.interval.chromatic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">chromatic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.chromatic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.diatonic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">diatonic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.diatonic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.diatonicType">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">diatonicType</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.diatonicType" title="Permalink to this definition">¶</a></dt>
+<dd>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.direction">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">direction</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.generic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">generic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.generic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.getComplement">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">getComplement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.getComplement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.note1">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">note1</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.note1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.note2">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">note2</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.note2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.interval.reinit">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">reinit</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.reinit" title="Permalink to this definition">¶</a></dt>
+<dd>Reinitialize the internal interval objects in case something has changed.  Called also during __init__</dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id3">
+<h3>Methods (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-chromaticinterval">
+<h2>Class ChromaticInterval<a class="headerlink" href="#class-chromaticinterval" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.interval.ChromaticInterval">
+<em class="property">
+class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">ChromaticInterval</tt><a class="headerlink" href="#music21.interval.ChromaticInterval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>Chromatic interval class &#8211; thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+</blockquote>
+<div class="section" id="id4">
+<h3>Properties (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="id5">
+<h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-genericinterval">
+<h2>Class GenericInterval<a class="headerlink" href="#class-genericinterval" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.interval.GenericInterval">
+<em class="property">
+class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">GenericInterval</tt><a class="headerlink" href="#music21.interval.GenericInterval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+</blockquote>
 <div class="section" id="id6">
 <h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>duration</strong></p>
-<p>Locally Defined:</p>
-<p><strong>complement</strong></p>
 </div>
 <div class="section" id="id7">
-<h3>Methods<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>id()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
-<p>Locally Defined:</p>
-<p><strong>reinit()</strong></p>
+<h3>Properties (Inherited)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Reinitialize the internal interval objects in case something has changed.  Called also during __init__</blockquote>
-<p><strong>note2()</strong></p>
-<p><strong>note1()</strong></p>
-<p><strong>getComplement()</strong></p>
-<p><strong>generic()</strong></p>
-<p><strong>direction()</strong></p>
-<p><strong>diatonicType()</strong></p>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="id8">
+<h3>Methods<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</blockquote>
-<p><strong>diatonic()</strong></p>
-<p><strong>chromatic()</strong></p>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.interval.</tt><tt class="descname">complement</tt><big>(</big><big>)</big></dt>
+<dd>generates a new GenericInterval object where descending 3rds are 6ths, etc.</dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id9">
+<h3>Methods (Inherited)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 </div>
@@ -336,6 +484,9 @@ int(x[, base]) -&gt; integer Convert a string or number to an integer, if possib
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="moduleMeter.html" title="music21.meter"
              >next</a> |</li>

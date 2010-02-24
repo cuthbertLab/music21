@@ -5109,5 +5109,12 @@ class Test(unittest.TestCase):
 
 
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Stream, Measure]
+
+
+
 if __name__ == "__main__":    
     music21.mainTest(Test)

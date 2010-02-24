@@ -6,10 +6,14 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
 from music21.musicxml.base import *
+
+
+__doc__ = base.__doc__
+
 
 

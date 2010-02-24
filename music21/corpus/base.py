@@ -10,6 +10,11 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''
+The music21 corpus provides a collection of public-domain music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
+'''
+
+
 import re
 import os
 import doctest, unittest
@@ -342,6 +347,14 @@ class Test(unittest.TestCase):
             keyStream = s[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
             environLocal.printDebug([keyObj])
+
+
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [parseWork, getWork, ]
 
 
 if __name__ == "__main__":

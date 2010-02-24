@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -33,13 +33,14 @@ validDenominators = [1,2,4,8,16,32,64,128] # in order
 
 def slashToFraction(value):
     '''
-    TODO: it seems like this should return only integers; not sure
-    why these originally were floats.
-
     >>> slashToFraction('3/8')
     (3, 8)
     >>> slashToFraction('7/32')
     (7, 32)
+
+    OMIT_FROM_DOCS
+    TODO: it seems like this should return only integers; not sure
+    why these originally were floats.
     '''
     value = value.strip() # rem whitespace
     matches = re.match("(\d+)\/(\d+)", value)

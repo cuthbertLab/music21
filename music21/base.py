@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-Music21 base classes and important utilities
+Music21 base classes and important utilities.
 
 base -- the convention within music21 is that __init__ files contain:
 
@@ -125,8 +125,9 @@ class Groups(list):
 #-------------------------------------------------------------------------------
 # DefinedContexts
 # LocationContext
-# some contexts are the results
-# locations are type a defined contexts
+# some contexts are the results of searches
+# locations are type a DefinedContext 
+# store no keys to distinguish locations or contexts
 
 class Relations(object):
     '''An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.

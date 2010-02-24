@@ -32,6 +32,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
           <a href="moduleCommon.html" title="music21.common"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -45,28 +48,30 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.base</a><ul>
-<li><a class="reference external" href="#class-elementwrapper">Class ElementWrapper</a><ul>
+<li><a class="reference external" href="#class-music21object">Class Music21Object</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
 <li><a class="reference external" href="#properties">Properties</a></li>
 <li><a class="reference external" href="#methods">Methods</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#class-groups">Class Groups</a><ul>
+<li><a class="reference external" href="#class-relations">Class Relations</a><ul>
 <li><a class="reference external" href="#id1">Methods</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-locations">Class Locations</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#id2">Attributes</a></li>
+<li><a class="reference external" href="#id3">Methods</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#class-music21object">Class Music21Object</a><ul>
-<li><a class="reference external" href="#id3">Attributes</a></li>
+<li><a class="reference external" href="#class-groups">Class Groups</a><ul>
+<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-elementwrapper">Class ElementWrapper</a><ul>
 <li><a class="reference external" href="#id4">Properties</a></li>
+<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
 <li><a class="reference external" href="#id5">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-relations">Class Relations</a><ul>
-<li><a class="reference external" href="#id6">Methods</a></li>
+<li><a class="reference external" href="#id6">Methods (Inherited)</a></li>
 </ul>
 </li>
 </ul>
@@ -105,30 +110,569 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-base">
-<span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#music21-base" title="Permalink to this headline">¶</a></h1>
-<p>Music21 base classes and important utilities</p>
+  <div class="section" id="module-music21.base">
+<span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#module-music21.base" title="Permalink to this headline">¶</a></h1>
+<p>Music21 base classes and important utilities.</p>
 <p>base &#8211; the convention within music21 is that __init__ files contain:</p>
 <blockquote>
 from base import *</blockquote>
 <p>so everything in this file can be accessed as music21.XXXX</p>
-<div class="section" id="class-elementwrapper">
-<h2>Class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>), object</p>
-<p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
+<div class="section" id="class-music21object">
+<h2>Class Music21Object<a class="headerlink" href="#class-music21object" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.base.Music21Object">
+<em class="property">
+class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a Locations object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</blockquote>
+<p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+<blockquote>
+Inherits from:</blockquote>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.base.contexts">
+<tt class="descclassname">music21.base.</tt><tt class="descname">contexts</tt><a class="headerlink" href="#music21.base.contexts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.groups">
+<tt class="descclassname">music21.base.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.base.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.id">
+<tt class="descclassname">music21.base.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.base.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.locations">
+<tt class="descclassname">music21.base.</tt><tt class="descname">locations</tt><a class="headerlink" href="#music21.base.locations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
 <div class="section" id="properties">
 <h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>priority</strong>, <strong>parent</strong>, <strong>offset</strong>, <strong>id</strong>, <strong>duration</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.base.duration">
+<tt class="descclassname">music21.base.</tt><tt class="descname">duration</tt><a class="headerlink" href="#music21.base.duration" title="Permalink to this definition">¶</a></dt>
+<dd>Gets the DurationObject of the object or None</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.offset">
+<tt class="descclassname">music21.base.</tt><tt class="descname">offset</tt><a class="headerlink" href="#music21.base.offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.parent">
+<tt class="descclassname">music21.base.</tt><tt class="descname">parent</tt><a class="headerlink" href="#music21.base.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.base.priority">
+<tt class="descclassname">music21.base.</tt><tt class="descname">priority</tt><a class="headerlink" href="#music21.base.priority" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
 </div>
 <div class="section" id="methods">
 <h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>write()</strong>, <strong>show()</strong>, <strong>searchParent()</strong>, <strong>isClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>contexts()</strong>, <strong>addLocationAndParent()</strong></p>
-<p>Locally Defined:</p>
-<p><strong>setId()</strong></p>
-<p><strong>obj()</strong></p>
-<p><strong>isTwin()</strong></p>
 <blockquote>
-<p>a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context</p>
+<dl class="method">
+<dt id="music21.base.addLocationAndParent">
+<tt class="descclassname">music21.base.</tt><tt class="descname">addLocationAndParent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.addLocationAndParent" title="Permalink to this definition">¶</a></dt>
+<dd>ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert &#8211; this saves some dual processing.  Does not do safety checks that the siteId doesn&#8217;t already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly &#8211; so not to be emulated)</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">stream</span> <span class="kn">import</span> <span class="n">Stream</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1_wr</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">wrapWeakref</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">o1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">addLocationAndParent</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">st1</span><span class="p">,</span> <span class="n">st1_wr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="n">st1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
+<span class="go">20.0</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">contexts</tt><big>(</big><big>)</big></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.getOffsetBySite">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getOffsetBySite</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">30.0</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">id</tt><big>(</big><big>)</big></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.isClass">
+<tt class="descclassname">music21.base.</tt><tt class="descname">isClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.isClass" title="Permalink to this definition">¶</a></dt>
+<dd>returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.searchParent">
+<tt class="descclassname">music21.base.</tt><tt class="descname">searchParent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.searchParent" title="Permalink to this definition">¶</a></dt>
+<dd>If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.show">
+<tt class="descclassname">music21.base.</tt><tt class="descname">show</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.show" title="Permalink to this definition">¶</a></dt>
+<dd>Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.write">
+<tt class="descclassname">music21.base.</tt><tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.write" title="Permalink to this definition">¶</a></dt>
+<dd>Write a file. A None file path will result in temporary file</dd></dl>
+
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-relations">
+<h2>Class Relations<a class="headerlink" href="#class-relations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.base.Relations">
+<em class="property">
+class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Relations</tt><a class="headerlink" href="#music21.base.Relations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.</p>
+<p>Inherits from:</p>
+</blockquote>
+<div class="section" id="id1">
+<h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.base.add">
+<tt class="descclassname">music21.base.</tt><tt class="descname">add</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.add" title="Permalink to this definition">¶</a></dt>
+<dd>Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old Locations</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.clear">
+<tt class="descclassname">music21.base.</tt><tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.clear" title="Permalink to this definition">¶</a></dt>
+<dd>Clear all data.</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.get">
+<tt class="descclassname">music21.base.</tt><tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.get" title="Permalink to this definition">¶</a></dt>
+<dd>Get references; unwrap from weakrefs; place in order from most recently added to least recently added</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;contexts&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="n">aObj</span><span class="p">,</span> <span class="n">bObj</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.getAttrByName">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getAttrByName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getAttrByName" title="Permalink to this definition">¶</a></dt>
+<dd>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">234</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">removeById</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">aObj</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">98</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.getByClass">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getByClass" title="Permalink to this definition">¶</a></dt>
+<dd>Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Relations of all members</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="s">&#39;mock&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">aObj</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="n">Mock</span><span class="p">)</span> <span class="o">==</span> <span class="n">aObj</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">getOffsetBySite</tt><big>(</big><big>)</big></dt>
+<dd>For a given site return its offset.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cParent</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">121.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">23</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">bSite</span><span class="p">)</span>
+<span class="go">121.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">cParent</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">RelationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.getOffsets">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getOffsets</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getOffsets" title="Permalink to this definition">¶</a></dt>
+<dd>Return a list of all offsets.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cSite</span><span class="p">)</span> <span class="c"># a context</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">234</span><span class="p">)</span> <span class="c"># can add at same offset or another</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dSite</span><span class="p">)</span> <span class="c"># a context</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsets</span><span class="p">()</span>
+<span class="go">[0, 234]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.getSiteByOffset">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getSiteByOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getSiteByOffset" title="Permalink to this definition">¶</a></dt>
+<dd>For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">23121.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="go">#### no longer works</span>
+<span class="go">#Adding another site at offset 23 will change getSiteByOffset</span>
+<span class="go">#&gt;&gt;&gt; aLocations.add(cSite, 23)</span>
+<span class="go">#&gt;&gt;&gt; aSite == aLocations.getSiteByOffset(23)</span>
+<span class="go">#False</span>
+<span class="go">#&gt;&gt;&gt; cSite == aLocations.getSiteByOffset(23)</span>
+<span class="go">#True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.removeById">
+<tt class="descclassname">music21.base.</tt><tt class="descname">removeById</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.removeById" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.scrub">
+<tt class="descclassname">music21.base.</tt><tt class="descname">scrub</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.scrub" title="Permalink to this definition">¶</a></dt>
+<dd>Remove all weak ref objects that point to objects that no longer exist.</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.setAttrByName">
+<tt class="descclassname">music21.base.</tt><tt class="descname">setAttrByName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.setAttrByName" title="Permalink to this definition">¶</a></dt>
+<dd>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">setAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;test&#39;</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.setOffsetBySite">
+<tt class="descclassname">music21.base.</tt><tt class="descname">setOffsetBySite</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.setOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Relations, it will raise an exception.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">121.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">cSite</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">RelationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-locations">
+<h2>Class Locations<a class="headerlink" href="#class-locations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.base.Locations">
+<em class="property">
+class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Locations</tt><a class="headerlink" href="#music21.base.Locations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site &#8211; this becomes the default offset for any newly added sites that do not have any sites</p>
+<p>Inherits from:</p>
+</blockquote>
+<div class="section" id="id2">
+<h3>Attributes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.base.coordinates">
+<tt class="descclassname">music21.base.</tt><tt class="descname">coordinates</tt><a class="headerlink" href="#music21.base.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id3">
+<h3>Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">add</tt><big>(</big><big>)</big></dt>
+<dd>Add a location to the object. If site already exists, this will update that entry.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span> <span class="c"># will change the offset for aSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">12</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">clear</tt><big>(</big><big>)</big></dt>
+<dd>Clear all data.</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">getOffsetBySite</tt><big>(</big><big>)</big></dt>
+<dd>For a given site return its offset.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cParent</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">23</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">bSite</span><span class="p">)</span>
+<span class="go">121.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">cParent</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">getOffsets</tt><big>(</big><big>)</big></dt>
+<dd>Return a list of all offsets.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset or another</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsets</span><span class="p">()</span>
+<span class="go">[0, 234]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">getSiteByOffset</tt><big>(</big><big>)</big></dt>
+<dd>For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="go">#### no longer works</span>
+<span class="go">#Adding another site at offset 23 will change getSiteByOffset</span>
+<span class="go">#&gt;&gt;&gt; aLocations.add(23, cSite)</span>
+<span class="go">#&gt;&gt;&gt; aSite == aLocations.getSiteByOffset(23)</span>
+<span class="go">#False</span>
+<span class="go">#&gt;&gt;&gt; cSite == aLocations.getSiteByOffset(23)</span>
+<span class="go">#True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.getSites">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getSites</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getSites" title="Permalink to this definition">¶</a></dt>
+<dd>Get parents; unwrap from weakrefs</dd></dl>
+
+<dl class="method">
+<dt id="music21.base.getTimes">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getTimes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.remove">
+<tt class="descclassname">music21.base.</tt><tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.remove" title="Permalink to this definition">¶</a></dt>
+<dd>Remove the entry specified by sites</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.scrubEmptySites">
+<tt class="descclassname">music21.base.</tt><tt class="descname">scrubEmptySites</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.scrubEmptySites" title="Permalink to this definition">¶</a></dt>
+<dd>If a parent has been deleted, we will still have an empty ref in coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">aSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#aLocations.scrubEmptySites()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#len(aLocations)</span>
+<span class="go">#1</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.base.</tt><tt class="descname">setOffsetBySite</tt><big>(</big><big>)</big></dt>
+<dd>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">cSite</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-groups">
+<h2>Class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.base.Groups">
+<em class="property">
+class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Groups</tt><a class="headerlink" href="#music21.base.Groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
+</pre></div>
+</div>
+<blockquote>
+Inherits from: list</blockquote>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <strong>extend()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>pop()</strong>, <strong>remove()</strong>, <strong>reverse()</strong>, <strong>sort()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-elementwrapper">
+<h2>Class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.base.ElementWrapper">
+<em class="property">
+class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>)</p>
+</blockquote>
+<div class="section" id="id4">
+<h3>Properties<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="properties-inherited">
+<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>id</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.base.getId">
+<tt class="descclassname">music21.base.</tt><tt class="descname">getId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.getId" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.isTwin">
+<tt class="descclassname">music21.base.</tt><tt class="descname">isTwin</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.isTwin" title="Permalink to this definition">¶</a></dt>
+<dd>a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context</dd></dl>
+
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A-&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&quot;aflat-Note&quot;</span>
@@ -150,397 +694,22 @@ from base import *</blockquote>
 <span class="go">True</span>
 </pre></div>
 </div>
-</blockquote>
-<p><strong>getId()</strong></p>
-</div>
-</div>
-<div class="section" id="class-groups">
-<h2>Class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: list, object</p>
-<p>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
-<span class="go">&#39;hello&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
-</pre></div>
-</div>
-<div class="section" id="id1">
-<h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Inherited from list: <strong>sort()</strong>, <strong>reverse()</strong>, <strong>remove()</strong>, <strong>pop()</strong>, <strong>insert()</strong>, <strong>index()</strong>, <strong>extend()</strong>, <strong>count()</strong>, <strong>append()</strong></p>
-</div>
-</div>
-<div class="section" id="class-locations">
-<h2>Class Locations<a class="headerlink" href="#class-locations" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: object</p>
-<p>An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site &#8211; this becomes the default offset for any newly added sites that do not have any sites</p>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<p><strong>coordinates</strong></p>
-</div>
-<div class="section" id="id2">
-<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined:</p>
-<p><strong>setOffsetBySite()</strong></p>
-<blockquote>
-<p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">20</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
-<span class="go">20</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">cSite</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>scrubEmptySites()</strong></p>
-<blockquote>
-<p>If a parent has been deleted, we will still have an empty ref in coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">aSite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
-<span class="go">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c">#aLocations.scrubEmptySites()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c">#len(aLocations)</span>
-<span class="go">#1</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>remove()</strong></p>
-<blockquote>
-<p>Remove the entry specified by sites</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
-<span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aLocations</span><span class="p">)</span>
-<span class="go">0</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getTimes()</strong></p>
-<p><strong>getSites()</strong></p>
-<blockquote>
-Get parents; unwrap from weakrefs</blockquote>
-<p><strong>getSiteByOffset()</strong></p>
-<blockquote>
-<p>For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="go">#### no longer works</span>
-<span class="go">#Adding another site at offset 23 will change getSiteByOffset</span>
-<span class="go">#&gt;&gt;&gt; aLocations.add(23, cSite)</span>
-<span class="go">#&gt;&gt;&gt; aSite == aLocations.getSiteByOffset(23)</span>
-<span class="go">#False</span>
-<span class="go">#&gt;&gt;&gt; cSite == aLocations.getSiteByOffset(23)</span>
-<span class="go">#True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getOffsets()</strong></p>
-<blockquote>
-<p>Return a list of all offsets.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">234</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset or another</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsets</span><span class="p">()</span>
-<span class="go">[0, 234]</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getOffsetBySite()</strong></p>
-<blockquote>
-<p>For a given site return its offset.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cParent</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">121.5</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
-<span class="go">23</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">bSite</span><span class="p">)</span>
-<span class="go">121.5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">cParent</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">LocationsException</span>: <span class="n-Identifier">...</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>clear()</strong></p>
-<blockquote>
-Clear all data.</blockquote>
-<p><strong>add()</strong></p>
-<blockquote>
-<p>Add a location to the object. If site already exists, this will update that entry.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Locations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">23</span><span class="p">,</span> <span class="n">bSite</span><span class="p">)</span> <span class="c"># can add at same offset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span> <span class="n">aSite</span><span class="p">)</span> <span class="c"># will change the offset for aSite</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">12</span><span class="p">)</span>
-<span class="go">True</span>
-</pre></div>
-</div>
+<dl class="method">
+<dt id="music21.base.obj">
+<tt class="descclassname">music21.base.</tt><tt class="descname">obj</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.obj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.base.setId">
+<tt class="descclassname">music21.base.</tt><tt class="descname">setId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.setId" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </blockquote>
 </div>
-</div>
-<div class="section" id="class-music21object">
-<h2>Class Music21Object<a class="headerlink" href="#class-music21object" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: object</p>
-<p>Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a Locations object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
-<p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
-<div class="section" id="id3">
-<h3>Attributes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p><strong>contexts</strong></p>
-<p><strong>groups</strong></p>
-<p><strong>id</strong></p>
-<p><strong>locations</strong></p>
-</div>
-<div class="section" id="id4">
-<h3>Properties<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined:</p>
-<p><strong>priority</strong></p>
-<p><strong>parent</strong></p>
-<p><strong>offset</strong></p>
-<p><strong>duration</strong></p>
-<blockquote>
-Gets the DurationObject of the object or None</blockquote>
-</div>
-<div class="section" id="id5">
-<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined:</p>
-<p><strong>write()</strong></p>
-<blockquote>
-Write a file. A None file path will result in temporary file</blockquote>
-<p><strong>show()</strong></p>
-<blockquote>
-Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</blockquote>
-<p><strong>searchParent()</strong></p>
-<blockquote>
-If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</blockquote>
-<p><strong>isClass()</strong></p>
-<blockquote>
-returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</blockquote>
-<p><strong>id()</strong></p>
-<p><strong>getOffsetBySite()</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
-<span class="go">30.0</span>
-</pre></div>
-</div>
-<p><strong>contexts()</strong></p>
-<p><strong>addLocationAndParent()</strong></p>
-<blockquote>
-<p>ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert &#8211; this saves some dual processing.  Does not do safety checks that the siteId doesn&#8217;t already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly &#8211; so not to be emulated)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">stream</span> <span class="kn">import</span> <span class="n">Stream</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1_wr</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">wrapWeakref</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">o1</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">addLocationAndParent</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">st1</span><span class="p">,</span> <span class="n">st1_wr</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="n">st1</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
-<span class="go">20.0</span>
-</pre></div>
-</div>
-</blockquote>
-</div>
-</div>
-<div class="section" id="class-relations">
-<h2>Class Relations<a class="headerlink" href="#class-relations" title="Permalink to this headline">¶</a></h2>
-<p>Inherits from: object</p>
-<p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.</p>
 <div class="section" id="id6">
-<h3>Methods<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>Locally Defined:</p>
-<p><strong>setOffsetBySite()</strong></p>
+<h3>Methods (Inherited)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Relations, it will raise an exception.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">121.5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">20</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
-<span class="go">20</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">cSite</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">RelationsException</span>: <span class="n-Identifier">...</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>setAttrByName()</strong></p>
-<blockquote>
-<p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">setAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;test&#39;</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>scrub()</strong></p>
-<blockquote>
-Remove all weak ref objects that point to objects that no longer exist.</blockquote>
-<p><strong>removeById()</strong></p>
-<p><strong>getSiteByOffset()</strong></p>
-<blockquote>
-<p>For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">23121.5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">==</span> <span class="n">aLocations</span><span class="o">.</span><span class="n">getSiteByOffset</span><span class="p">(</span><span class="mf">23</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="go">#### no longer works</span>
-<span class="go">#Adding another site at offset 23 will change getSiteByOffset</span>
-<span class="go">#&gt;&gt;&gt; aLocations.add(cSite, 23)</span>
-<span class="go">#&gt;&gt;&gt; aSite == aLocations.getSiteByOffset(23)</span>
-<span class="go">#False</span>
-<span class="go">#&gt;&gt;&gt; cSite == aLocations.getSiteByOffset(23)</span>
-<span class="go">#True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getOffsets()</strong></p>
-<blockquote>
-<p>Return a list of all offsets.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cSite</span><span class="p">)</span> <span class="c"># a context</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">234</span><span class="p">)</span> <span class="c"># can add at same offset or another</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dSite</span><span class="p">)</span> <span class="c"># a context</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsets</span><span class="p">()</span>
-<span class="go">[0, 234]</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getOffsetBySite()</strong></p>
-<blockquote>
-<p>For a given site return its offset.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cParent</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aSite</span><span class="p">,</span> <span class="mf">23</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bSite</span><span class="p">,</span> <span class="mf">121.5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">aSite</span><span class="p">)</span>
-<span class="go">23</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">bSite</span><span class="p">)</span>
-<span class="go">121.5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aLocations</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">cParent</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">RelationsException</span>: <span class="n-Identifier">...</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getByClass()</strong></p>
-<blockquote>
-<p>Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Relations of all members</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="s">&#39;mock&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">aObj</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getByClass</span><span class="p">(</span><span class="n">Mock</span><span class="p">)</span> <span class="o">==</span> <span class="n">aObj</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>getAttrByName()</strong></p>
-<blockquote>
-<p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">98</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">234</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">removeById</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">aObj</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">getAttrByName</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">98</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>get()</strong></p>
-<blockquote>
-<p>Get references; unwrap from weakrefs; place in order from most recently added to least recently added</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span> <span class="o">=</span> <span class="n">Relations</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aRelations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;contexts&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="n">aObj</span><span class="p">,</span> <span class="n">bObj</span><span class="p">]</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</blockquote>
-<p><strong>clear()</strong></p>
-<blockquote>
-Clear all data.</blockquote>
-<p><strong>add()</strong></p>
-<blockquote>
-Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old Locations</blockquote>
+Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 </div>
@@ -557,6 +726,9 @@ Add a reference if offset is None, it is interpreted as a context if offset is a
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="moduleCommon.html" title="music21.common"
              >next</a> |</li>
