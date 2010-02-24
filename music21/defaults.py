@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ _MOD = 'defaults.py'
 
 
 
-# TODO: defaults should check the envrionment object to see 
+# TODO: defaults should check the environment object to see 
 # if there are any preferences set for values used here
 
 

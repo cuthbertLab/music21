@@ -81,7 +81,7 @@ MODULES = [
 # experimenting with auto documentation of modules
 # incomplete
 
-class RestrtucturedWriter(object):
+class RestructuredWriter(object):
 
     def __init__(self):
         self.INDENT = ' ' * 4
@@ -124,7 +124,7 @@ class RestrtucturedWriter(object):
         '''Return a class name as a parent, showing module when necessary
 
         >>> from music21 import note
-        >>> rw = RestrtucturedWriter()
+        >>> rw = RestructuredWriter()
         >>> post = rw.formatParent(inspect.getmro(note.Note)[1])
         >>> 'note.NotRest' in post      
         True
@@ -149,7 +149,7 @@ class RestrtucturedWriter(object):
         String
 
         >>> from music21 import note
-        >>> rw = RestrtucturedWriter()
+        >>> rw = RestructuredWriter()
         >>> post = rw.formatClassInheritance(inspect.getmro(note.Note))
         >>> 'note.GeneralNote' in post
         True
@@ -222,9 +222,9 @@ class RestrtucturedWriter(object):
 
 
 #-------------------------------------------------------------------------------
-class ModuleDoc(RestrtucturedWriter):
+class ModuleDoc(RestructuredWriter):
     def __init__(self, mod):
-        RestrtucturedWriter.__init__(self)
+        RestructuredWriter.__init__(self)
 
         self.mod = mod
         self.modName = mod.__name__
@@ -610,10 +610,10 @@ class ModuleDoc(RestrtucturedWriter):
 
 
 #-------------------------------------------------------------------------------
-class Documentation(RestrtucturedWriter):
+class Documentation(RestructuredWriter):
 
     def __init__(self):
-        RestrtucturedWriter.__init__(self)
+        RestructuredWriter.__init__(self)
 
         self.titleMain = 'Music21 Documentation'
 

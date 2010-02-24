@@ -138,7 +138,7 @@ class Relations(object):
     def __init__(self):
         # a dictionary of dictionaries
         self._relations = {} 
-        # store idKeys in lists for easy accesss
+        # store idKeys in lists for easy access
         # the same key may be both in locationKeys and contextKeys
         self._locationKeys = []
         self._contextKeys = []
