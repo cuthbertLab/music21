@@ -1,10 +1,10 @@
 .. _overviewPostTonal:
 
 
-Overview: Post Tonal Tools
+Overview: Post-Tonal Tools
 =============================================
 
-The music21 system features many tools for post-tonal analaysis.
+The music21 system features many tools for post-tonal analysis.
 
 For complete documentation on post-tonal tools, see :ref:`moduleChord` and :ref:`moduleSerial`.
 

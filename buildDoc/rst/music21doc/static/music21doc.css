@@ -1,4 +1,5 @@
 /**
+ * music21 stylesheet -- music21doc theme, based on
  * Sphinx stylesheet -- sphinxdoc theme
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -149,7 +150,7 @@ div.body a {
 h1 {
     margin: 0;
     padding: 0.7em 0 0.3em 0;
-    font-size: 1.5em;
+    font-size: 2.0em;
     color: #11557C;
 }
 

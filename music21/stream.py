@@ -5108,5 +5108,6 @@ class Test(unittest.TestCase):
     #    assert trimPlayingWhileSounding[1].duration.quarterLength == 3.5
 
 
+
 if __name__ == "__main__":    
     music21.mainTest(Test)

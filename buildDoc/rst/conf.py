@@ -35,7 +35,8 @@ html_last_updated_fmt = '%b %d, %Y'
 # Content template for the index page.
 html_index = 'index.html'
 
-html_theme = 'sphinxdoc'
+html_theme = 'music21doc'
+html_theme_path = ["."] # search for theme in this dirs
 
 def _shell():
     '''

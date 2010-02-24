@@ -123,6 +123,11 @@ class Groups(list):
 
 
 #-------------------------------------------------------------------------------
+# DefinedContexts
+# LocationContext
+# some contexts are the results
+# locations are type a defined contexts
+
 class Relations(object):
     '''An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.
     '''
@@ -345,7 +350,11 @@ class Relations(object):
         siteId = None
         if site is not None:
             siteId = id(site)
-        if not siteId in self._getKeys('locations'): 
+        # this is going to be slow
+#         if not siteId in self._getKeys('locations'): 
+#             raise RelationsException('an entry for this object (%s) is not stored in Relations' % siteId)
+        post = self._relations[siteId]['offset']
+        if post == None: # 
             raise RelationsException('an entry for this object (%s) is not stored in Relations' % siteId)
         return self._relations[siteId]['offset']
 
