@@ -340,7 +340,7 @@ def januaryThankYou():
 #                if (notes[i].name == 'E-' or notes[i].name == "D#") and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                 if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                         measureNumber = 0
-                        for site in notes[i].locations.getSites():
+                        for site in notes[i]._definedContexts.getSites():
                             if isinstance(site, stream.Measure):
                                 measureNumber = site.measureNumber
                                 display.append(site)

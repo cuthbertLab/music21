@@ -490,7 +490,7 @@ class Stream(music21.Music21Object):
             raise StreamException("offset %s must be a number", offset)
         
         offset = float(offset)
-        element.locations.add(offset, self)
+        element._definedContexts.add(self, offset)
         # need to explicitly set the parent of the element
         element.parent = self 
 #        element.addLocationAndParent(offset, self)
@@ -570,7 +570,7 @@ class Stream(music21.Music21Object):
             else:
                 element = item
 
-            element.locations.add(highestTime, self)
+            element._definedContexts.add(self, highestTime)
             # need to explicitly set the parent of the element
             element.parent = self 
             self._elements.append(element)  
@@ -599,15 +599,17 @@ class Stream(music21.Music21Object):
         >>> a[0].name == 'B'
         True
         '''
-
-        if not hasattr(item, "locations"):
-            raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
+# locations attribute no longer exists
+# probably a better way to determine if object is a 
+# Music21Object
+#         if not hasattr(item, "locations"):
+#             raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
 
         # NOTE: this may have unexpected side effects, as the None location
         # may have been set much later in this objects life.
         # optionally, could use last assigned site to get the offset        
         # or, use zero
-        item.locations.add(item.getOffsetBySite(None), self)
+        item._definedContexts.add(self, item.getOffsetBySite(None))
         # need to explicitly set the parent of the element
         item.parent = self 
 
@@ -1053,6 +1055,10 @@ class Stream(music21.Music21Object):
         >>> b = a.getElementAtOrBefore(0.1)
         >>> b.offset, b.id
         (0.0, 'z')
+        >>> c = a.getElementAtOrBefore(0.1, [music21.Music21Object])
+        >>> c.offset, c.id
+        (0.0, 'z')
+
 
         OMIT_FROM_DOCS
         TODO: include sort order for concurrent matches?
@@ -1060,6 +1066,14 @@ class Stream(music21.Music21Object):
         candidates = []
         nearestTrailSpan = offset # start with max time
         for element in self:
+            if classList != None:
+                match = False
+                for cl in classList:
+                    if isinstance(element, cl):
+                        match = True
+                        break
+                if not match:
+                    continue
             span = offset - element.offset
             #environLocal.printDebug(['element span check', span])
             if span < 0: # the element is after this offset
@@ -1362,8 +1376,8 @@ class Stream(music21.Music21Object):
         20.0
         '''
         for e in self:
-            e.locations.setOffsetBySite(self, 
-                e.locations.getOffsetBySite(self) + offset)
+            e._definedContexts.setOffsetBySite(self, 
+                e._definedContexts.getOffsetBySite(self) + offset)
         self._elementsChanged() 
         
     def transferOffsetToElements(self):
@@ -2153,8 +2167,8 @@ class Stream(music21.Music21Object):
         newStream = copy.copy(self)
         newStream.elements = post
         for thisElement in post:
-            thisElement.locations.add(thisElement.getOffsetBySite(self),
-                                       newStream)
+            thisElement._definedContexts.add(newStream,
+                                     thisElement.getOffsetBySite(self))
             # need to explicitly set parent
             thisElement.parent = newStream 
 
@@ -2239,7 +2253,7 @@ class Stream(music21.Music21Object):
         for myEl in self.elements:
             # check for stream instance instead
             if hasattr(myEl, "elements"): # recurse time:
-                recurseStreamOffset = myEl.locations.getOffsetBySite(self)
+                recurseStreamOffset = myEl._definedContexts.getOffsetBySite(self)
                 if retainContainers is True: ## semiFlat
                     newStream.insert(recurseStreamOffset, myEl)
                     recurseStream = myEl.semiFlat
@@ -2249,14 +2263,14 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
                 
                 for subEl in recurseStream:
-                    oldOffset = subEl.locations.getOffsetBySite(recurseStream)
+                    oldOffset = subEl._definedContexts.getOffsetBySite(recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
                     #environLocal.printDebug("newOffset: " + str(subEl.id) + " " + str(newOffset))
                     newStream.insert(newOffset, subEl)
             
             else:
                 newStream.insert(
-                    myEl.locations.getOffsetBySite(self), myEl)
+                    myEl._definedContexts.getOffsetBySite(self), myEl)
 
         newStream.isFlat = True
         newStream.flattenedRepresentationOf = self #common.wrapWeakref(self)
@@ -3355,17 +3369,17 @@ class Stream(music21.Music21Object):
         
         >>> s1.playingWhenAttacked(n3).name
         'G#'
-        >>> n3.locations.setOffsetBySite(s2, 20.5)
+        >>> n3._definedContexts.setOffsetBySite(s2, 20.5)
         >>> s1.playingWhenAttacked(n3).name
         'G#'
-        >>> n3.locations.setOffsetBySite(s2, 21.0)
+        >>> n3._definedContexts.setOffsetBySite(s2, 21.0)
         >>> n3.offset
         21.0
         >>> s1.playingWhenAttacked(n3).name
         'D#'
 
         ## optionally, specify the site to get the offset from
-        >>> n3.locations.setOffsetBySite(None, 100)
+        >>> n3._definedContexts.setOffsetBySite(None, 100)
         >>> n3.parent = None
         >>> s1.playingWhenAttacked(n3)
         <BLANKLINE>
@@ -4311,9 +4325,9 @@ class Test(unittest.TestCase):
         sf1 = s1.flat
         sf1.id = "flat s1"
         
-#        for site in n4.locations.getSites():
+#        for site in n4._definedContexts.getSites():
 #            print site.id,
-#            print n4.locations.getOffsetBySite(site)
+#            print n4._definedContexts.getOffsetBySite(site)
         
         self.assertEqual(len(sf1), 4)
         assert(sf1[1] is n2)
@@ -4353,7 +4367,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)        
 
         # one location in midstream
-        self.assertEqual(len(midStream.locations), 1)
+        self.assertEqual(len(midStream._definedContexts), 1)
         
         #environLocal.printDebug(['srcStream', srcStream])
         #environLocal.printDebug(['midStream', midStream])
@@ -4393,7 +4407,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flat.sorted
-        self.assertEqual(mfs[7].locations.getOffsetBySite(mfs), 11.0)
+        self.assertEqual(mfs[7]._definedContexts.getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
         for x in range(7):
@@ -4831,7 +4845,7 @@ class Test(unittest.TestCase):
         # copying while looping: this gets increasingly slow
         for aElement in s:
             environLocal.printDebug(['copying and inserting an element',
-                                     aElement, len(aElement.locations)])
+                                     aElement, len(aElement._definedContexts)])
             bElement = deepcopy(aElement)
             post.insert(aElement.offset, bElement)
             
@@ -4908,11 +4922,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a), 1)
 
         # there are two locations, default and the one just added
-        self.assertEqual(len(a[0].locations), 2)
+        self.assertEqual(len(a[0]._definedContexts), 2)
         # this works
-#        self.assertEqual(a[0].locations.getOffsetByIndex(-1), 50.0)
+#        self.assertEqual(a[0]._definedContexts.getOffsetByIndex(-1), 50.0)
 
-#        self.assertEqual(a[0].locations.getSiteByIndex(-1), a)
+#        self.assertEqual(a[0]._definedContexts.getSiteByIndex(-1), a)
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 

@@ -30,7 +30,7 @@ def richardBreedGetWell():
                         measureNumber = 0
                         thisSite = None
                         for j in range(4):
-                            for site in notes[i+j].locations.getSites():
+                            for site in notes[i+j]._definedContexts.getSites():
                                 if isinstance(site, stream.Measure) and site is not thisSite:
                                     thisSite = site
                                     measureNumber = site.measureNumber
