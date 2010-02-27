@@ -1,4 +1,4 @@
-from music21 import corpus, stream, note
+from music21 import converter, corpus, stream, note
 
 def richardBreedGetWell():
     '''
@@ -6,12 +6,13 @@ def richardBreedGetWell():
     I used this code as part of a get well card for him, it finds the name BREED in the Beethoven
     quartets.  (well something close, B-rest-E-E-D returned nothing, so I instead did b-r-E-d, where
     the e has to be long...)
-    '''
-    names = ['opus132', 'opus133', 'opus18no3', 'opus18no4', 'opus18no5', 'opus74']
-    names += ['opus59no1', 'opus59no2', 'opus59no3']
 
-    for workName in names:
-        beethovenScore = corpus.parseWork('beethoven/' + workName, 1)
+    finds a few places in opus132 and nothing else
+    '''
+    for workName in corpus.beethovenStringQuartets:
+        if 'opus132' not in workName:
+            continue
+        beethovenScore = converter.parse(workName)
         for partNum in range(len(beethovenScore)):
             print workName, str(partNum)
             thisPart = beethovenScore[partNum]
@@ -28,21 +29,15 @@ def richardBreedGetWell():
                    (notes[i+2].duration.quarterLength > notes[i+3].duration.quarterLength):
                         
                         measureNumber = 0
-                        thisSite = None
+                        lastMeasure = None
                         for j in range(4):
-                            for site in notes[i+j]._definedContexts.getSites():
-                                if isinstance(site, stream.Measure) and site is not thisSite:
-                                    thisSite = site
-                                    measureNumber = site.measureNumber
-                                    display.append(site)
+                            thisMeasure = notes[i+j].getContextByClass(stream.Measure)
+                            if thisMeasure is not None and thisMeasure is not lastMeasure:
+                                lastMeasure = thisMeasure
+                                measureNumber = thisMeasure.measureNumber
+                                thisMeasure.insert(0, thisMeasure.bestClef())
+                                display.append(thisMeasure)
                         notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
-                        m = stream.Measure()
-                        m.append(notes[i])
-                        m.append(notes[i+1])
-                        m.append(notes[i+2])
-                        m.append(notes[i+3])
-                        m.insert(0, m.bestClef())
-                        display.append(m)
 
             if len(display) > 0:
                 display.show()
