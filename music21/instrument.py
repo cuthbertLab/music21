@@ -22,7 +22,17 @@ from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
 
+#def fromName(name):
+#    '''
+#    returns a new Instrument object of the proper class given
+#    a name as a string.  Currently must be uppercase first letter,
+#    lower for rest.
+#    '''
+#    eval(name + "()")
 
+
+class InstrumentException(Exception):
+    pass
 
 class Instrument(music21.Music21Object):
 
@@ -104,17 +114,61 @@ class Instrument(music21.Music21Object):
 
 
 class StringInstrument(Instrument):
-    pass
-
+    
+    def _getStringPitches(self):    
+        if hasattr(self, "_cachedPitches") and self._cachedPitches is not None:
+            return self._cachedPitches
+        elif not hasattr(self, "_stringPitches"):
+            raise InstrumentException("cannot get stringPitches for these instruments")
+        else:
+            self._cachedPitches = [pitch.Pitch(x) for x in self._stringPitches]
+            return self._cachedPitches
+    
+    def _setStringPitches(self, newPitches):
+        if len(newPitches) > 0 and (hasattr(newPitches[0], "step") or newPitches[0] is None):
+            # newPitches is pitchObjects or something 
+            self._stringPitches = newPitches
+            self._cachedPitches = newPitches
+        else:
+            self._cachedPitches = None
+            self._stringPitches = newPitches
+    
+    stringPitches = property(_getStringPitches, _setStringPitches, doc = '''
+            stringPitches is a property that stores a list of Pitches (or pitch names, 
+            such as "C4") that represent the pitch of the open strings from lowest to
+            highest[#reentrant]_
+            
+            >>> vln1 = Violin()
+            >>> vln1.stringPitches
+            [G3, D4, A4, E5]
+            
+            instrument.stringPitches are full pitch objects, not just names
+            >>> [x.octave for x in vln1.stringPitches]
+            [3, 4, 4, 5]
+            
+            scordatura for Scelsi's *Anahit*. N.B. string to pitch conversion
+            >>> vln1.stringPitches = ["G3","G4","B4","D4"]
+            >>> vln1.stringPitches
+            [G3, G4, B4, D4]
+            
+            ..[#reentrant] In some tuning methods such as reentrant tuning on the ukulele,
+            lute, or five-string banjo the order might not strictly be from lowest to
+            highest.  The same would hold true for certain violin scordatura pieces, such
+            as some of Biber's *Mystery Sonatas*
+            ''')
+            
+            
 class Violin(StringInstrument):   
     def __init__(self):
         StringInstrument.__init__(self)
         self.lowestNote = pitch.Pitch("G3")
+        self._stringPitches = ["G3","D4","A4","E5"]
 
 class Viola(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
         self.lowestNote = pitch.Pitch("C3")
+        
 
 class Violoncello(StringInstrument):
     def __init__(self):
@@ -171,8 +225,6 @@ class Test(unittest.TestCase):
 #                 a = Instrument()    
 #                 a.mx = mxObj
 #                 post.append(a)
-
-
 
 
 if __name__ == "__main__":
