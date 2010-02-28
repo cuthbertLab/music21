@@ -16,7 +16,7 @@ import unittest, doctest
 import music21
 from music21 import musicxml
 from music21 import common
-
+from music21 import pitch
 
 from music21 import environment
 _MOD = "instrument.py"
@@ -37,6 +37,8 @@ class Instrument(music21.Music21Object):
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
+
+        self.transposition = None
 
     def __str__(self):
         return '%s: %s: %s' % (self.partId, self.partName, self.instrumentName)
@@ -101,7 +103,23 @@ class Instrument(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
+class StringInstrument(Instrument):
+    pass
 
+class Violin(StringInstrument):   
+    def __init__(self):
+        StringInstrument.__init__(self)
+        self.lowestNote = pitch.Pitch("G3")
+
+class Viola(StringInstrument):
+    def __init__(self):
+        StringInstrument.__init__(self)
+        self.lowestNote = pitch.Pitch("C3")
+
+class Violoncello(StringInstrument):
+    def __init__(self):
+        StringInstrument.__init__(self)
+        self.lowestNote = pitch.Pitch("C2")
 
 
 
