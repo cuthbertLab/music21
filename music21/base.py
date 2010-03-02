@@ -785,7 +785,7 @@ class Music21Object(object):
 #             site = None # shortcut
         return self._definedContexts.getOffsetBySite(site)
 
-    def getAttrByName(self, attr):
+    def getContextAttr(self, attr):
         '''Given the name of an attribute, search Conctexts and return 
         the best match.
 
@@ -794,12 +794,12 @@ class Music21Object(object):
         >>> aObj.attr1 = 'test'
         >>> a = Music21Object()
         >>> a.addContext(aObj)
-        >>> a.getAttrByName('attr1')
+        >>> a.getContextAttr('attr1')
         'test'
         '''
         return self._definedContexts.getAttrByName(attr)
 
-    def setAttrByName(self, attrName, value):
+    def setContextAttr(self, attrName, value):
         '''Given the name of an attribute, search Conctexts and return 
         the best match.
 
@@ -808,10 +808,10 @@ class Music21Object(object):
         >>> aObj.attr1 = 'test'
         >>> a = Music21Object()
         >>> a.addContext(aObj)
-        >>> a.getAttrByName('attr1')
+        >>> a.getContextAttr('attr1')
         'test'
-        >>> a.setAttrByName('attr1', 3000)
-        >>> a.getAttrByName('attr1')
+        >>> a.setContextAttr('attr1', 3000)
+        >>> a.getContextAttr('attr1')
         3000
         '''
         return self._definedContexts.setAttrByName(attrName, value)
@@ -824,7 +824,7 @@ class Music21Object(object):
         >>> aObj.attr1 = 'test'
         >>> a = Music21Object()
         >>> a.addContext(aObj)
-        >>> a.getAttrByName('attr1')
+        >>> a.getContextAttr('attr1')
         'test'
         '''
         return self._definedContexts.add(obj)
@@ -1660,9 +1660,9 @@ class Test(unittest.TestCase):
         
         n.pitch.addContext(m)
         n.pitch.addContext(n) # its its own context; not sure if this  
-        self.assertEqual(n.pitch.getAttrByName('measureNumber'), 34)
-        n.pitch.setAttrByName('lyric',  
-        n.pitch.getAttrByName('measureNumber'))
+        self.assertEqual(n.pitch.getContextAttr('measureNumber'), 34)
+        n.pitch.setContextAttr('lyric',  
+                               n.pitch.getContextAttr('measureNumber'))
         self.assertEqual(n.lyric, 34)
 
 
