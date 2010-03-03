@@ -284,8 +284,8 @@ class Converter(object):
         '''Given a url, downloadn and parse
             
         >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-        >>> urlB = http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern
-        >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml
+        >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+        >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
         '''
         # TODO: this needs to check if the file is already stored in the
         # users scrawtch directory before downloading
@@ -303,7 +303,10 @@ class Converter(object):
             ext = ''    
         environLocal.printDebug(['using extension:', ext])
         dst = environLocal.getTempFile(ext)
-        fp, headers = urllib.urlretrieve(url, filename=dst)
+        try:
+            fp, headers = urllib.urlretrieve(url, filename=dst)
+        except IOError:
+            raise ConverterException('cannot access file: %s' % url)
 
         format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=False)
@@ -348,7 +351,8 @@ def parse(value, forceSource=False):
     '''
     if os.path.exists(value):
         return parseFile(value, forceSource)
-    elif 'http://' in value: # its a url; may need to broaden these criteria
+    elif value.startswith('http://'): 
+        # its a url; may need to broaden these criteria
         return parseURL(value, forceSource)
     else:
         return parseData(value)
