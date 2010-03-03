@@ -292,21 +292,34 @@ class DefinedContexts(object):
             self._locationKeys.pop(self._locationKeys.index(idKey))
 
 
-    def get(self):
+    def get(self, locationsTrail=False):
         '''Get references; unwrap from weakrefs; place in order from 
         most recently added to least recently added
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
+        >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
+        >>> aContexts.add(cObj, 345)
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
-        >>> aContexts.get() == [aObj, bObj]
+        >>> aContexts.get() == [cObj, aObj, bObj]
+        True
+        >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
         True
         '''
         post = []
-        for key in self._definedContexts.keys():
+        if locationsTrail:
+            keys = []
+            for key in self._definedContexts.keys():
+                if key not in self._locationKeys: # skip these
+                    keys.append(key) # others first
+            keys += self._locationKeys # now locations are at end
+        else:
+            keys = self._definedContexts.keys()
+            
+        for key in keys:
             dict = self._definedContexts[key]
             # need to check if these is weakref
             if common.isWeakref(dict['obj']):
@@ -488,10 +501,19 @@ class DefinedContexts(object):
     #---------------------------------------------------------------------------
     # for dealing with contexts or getting other information
 
-    def getByClass(self, className):
+    def getByClass(self, className, callerFirst=None, memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the real class name.
 
         This will recursively search the defined contexts of existing defined context.
+
+        Caller here can be the object that is hosting this DefinedContexts
+        object (such as a Stream). This is necessary when, later on, we need
+        a flat representation. If no caller is provided, the a reference to
+        this DefinedContexts instances is based (from where locations can be 
+        looked up if necessary).
+
+        callerFirst is simply used to pass a reference of the first caller; this
+        is necessary if we are looking within a Stream for a flat offset position.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -505,11 +527,26 @@ class DefinedContexts(object):
         True
 
         OMIT_FROM_DOCS
-        TODO: do this recursively, searching the DefinedContexts of all members
+        TODO: not sure if memo is properly working: need a test case
         '''
+        # in general, this should not be the first caller, as this method
+        # is called from a Music21Object, not directly on the DefinedContexts
+        # isntance. Nontheless, if this is the first caller, it is the first
+        # caller. 
+        if callerFirst == None: # this is the first caller
+            callerFirst = self
+        if memo == None:
+            memo = {} # intialize
+
+        environLocal.printDebug(['call getByClass from:', self, 
+                                 'callerFirst:', callerFirst])
         #environLocal.printDebug(['call getByClass from', self])
         post = None
-        for obj in self.get():
+
+        # search any defined contexts first
+        # TODO: get here should return non-locations first
+        for obj in self.get(locationsTrail=True):
+            #environLocal.printDebug(['memo', memo])
             if obj is None: continue # in case the reference is dead
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
@@ -518,11 +555,24 @@ class DefinedContexts(object):
             elif isinstance(obj, className):
                     post = obj       
                     break
-            # access public method to recurse
-            elif hasattr(obj, 'getContextByClass'):
-                post = obj.getContextByClass(className, caller=self)
-                if post != None:
-                    break
+            # if after trying to match name, look in the defined contexts' 
+            # defined contexts [sic!]
+            # note that this does not complete searching at the first level
+            # before recursing: might want to change this
+            if post == None: # no match yet
+                # access public method to recurse
+                if id(obj) not in memo.keys():
+                    if hasattr(obj, 'getContextByClass'):
+                        post = obj.getContextByClass(className,
+                               callerFirst=callerFirst, memo=memo)
+                        # after searching, store this obj in memo
+                        memo[id(obj)] = obj
+                        if post != None:
+                            break
+                    else: # this is not a music21 object
+                        environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
+                else: # objec has already been searched
+                    environLocal.printDebug['skipping searching of object already searched:', obj]
             else: 
                 return None
         return post
@@ -775,7 +825,13 @@ class Music21Object(object):
         
 
     def getOffsetBySite(self, site):
-        '''
+        '''If this class has been registered in a container such as a Stream, 
+        that container can be provided here, and the offset in that object
+        can be returned. 
+
+        Note that this is different than the getOffsetByElement() method on 
+        Stream in that this can never access the flat representation of a Stream.
+
         >>> a = Music21Object()
         >>> a.offset = 30
         >>> a.getOffsetBySite(None)
@@ -831,33 +887,66 @@ class Music21Object(object):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          caller=None):
-        '''Search both DefinedContexts as well as associated object to find a matching class.
+                          callerFirst=None, memo=None):
+        '''Search both DefinedContexts as well as associated objects to find a matching class.
 
-        The offsetOfCaller argument should be provided by the caller of this 
-        method when doing the serialReverseSearch.
+        The a reference to the caller is required to find the offset of the 
+        object of the caller. This is needed for serialReverseSearch.
+
+        The caller may be a DefinedContexts reference from a lower-level object.
+        If so, we can access the location of that lower-level object. However, 
+        if we need a flat representation, the caller needs to be the source 
+        Stream, not its DefinedContexts reference.
+
+        The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
         '''
-        environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent])
+        environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst])
     
         # this method will be called recursively on all object levels, ascending
-        # thus, to do seriual reverse search we need to 
+        # thus, to do serial reverse search we need to 
         # look at parent flat and track back to first encountered class match
+
+        if callerFirst == None: # this is the first caller
+            callerFirst = self
+        if memo == None:
+            memo = {} # intialize
+
         post = None
+        # first, if this obj is a Stream, we see if the class exists at or
+        # before where the offsetOfCaller
         if serialReverseSearch:
-            # if this is a stream
-            if hasattr(self, "elements") and caller != None: 
-                # find the offset of the caller by using this object
-                # as the site
-                offsetOfCaller = caller.getOffsetBySite(self)
-                # hopefully, this offset is relative to the flat
-                # presentation of the containing stream.
-                post = self.flat.getElementAtOrBefore(offsetOfCaller, [className])
+            # if this is a Stream and we have a caller
+            # callerFirst must also be not None; this is assured if caller      
+            # is not None
+            if hasattr(self, "elements") and callerFirst != None: 
+                # find the offset of the callerFirst
+                # if this is a Stream, we need to find the offset relative
+                # to this Stream; it may only be available within a flat
+                # representaiton
+
+                #note: cannt use self.flat.getOffsetBySite() here 
+                # alternative method:
+                #offsetOfCaller = callerFirst.getOffsetBySite(self.flat)
+                # most error tolerant: returns None
+                offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
+
+                # in some cases it migth be necessary and/or faster 
+                # to search the 
+                # offsetOfCaller = caller.flat.getOffsetBySite(self)
+                # offsetOfCaller = caller.getOffsetBySite(self)
+
+                if offsetOfCaller != None:
+                    post = self.flat.getElementAtOrBefore(offsetOfCaller, 
+                               [className])
 
                 environLocal.printDebug(['results of serialReverseSearch:', post, 'searching for:', className, 'starting from offset', offsetOfCaller])
 
-        if post == None:
-            # this will call this method at the next level up, recursing
-            post = self._definedContexts.getByClass(className)
+        if post == None: # still no match
+            # this will call this method on all defined contexts;
+            # if this is a stream, this will be the next level up, recursing
+            # a reference to the callerFirst is continuall passed
+            post = self._definedContexts.getByClass(className,
+                                   callerFirst=callerFirst, memo=memo)
         return post
 
 
@@ -1659,7 +1748,7 @@ class Test(unittest.TestCase):
         m.append(n)
         
         n.pitch.addContext(m)
-        n.pitch.addContext(n) # its its own context; not sure if this  
+        n.pitch.addContext(n) 
         self.assertEqual(n.pitch.getContextAttr('measureNumber'), 34)
         n.pitch.setContextAttr('lyric',  
                                n.pitch.getContextAttr('measureNumber'))
@@ -1671,6 +1760,69 @@ class Test(unittest.TestCase):
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
+
+
+
+    def testDefinedContextsSearch(self):
+        from music21 import note, stream, clef
+
+        n1 = note.Note('A')
+        n2 = note.Note('B')
+        c1 = clef.TrebleClef()
+        c2 = clef.BassClef()
+        
+        s1 = stream.Stream()
+        s1.insert(10, n1)
+        s1.insert(100, n2)
+        
+        s2 = stream.Stream()
+        s2.insert(0, c1)
+        s2.insert(100, c2)
+        s2.insert(10, s1) # placing s1 here should result in c2 being before n2
+        
+        self.assertEqual(s1.getOffsetBySite(s2), 10)
+        # make sure in the context of s1 things are as we expect
+        self.assertEqual(s2.flat.getElementAtOrBefore(0), c1)
+        self.assertEqual(s2.flat.getElementAtOrBefore(100), c2)
+        self.assertEqual(s2.flat.getElementAtOrBefore(20), n1)
+        self.assertEqual(s2.flat.getElementAtOrBefore(110), n2)
+        
+        # note: we cannot do this
+        #self.assertEqual(s2.flat.getOffsetBySite(n2), 110)
+        # we can do this:
+        self.assertEqual(n2.getOffsetBySite(s2.flat), 110)
+        
+        # this seems more idiomatic
+        self.assertEqual(s2.flat.getOffsetByElement(n2), 110)
+        
+        # both notes can find the treble clef in the parent stream
+        post = n1.getContextByClass(clef.TrebleClef)
+        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        
+        post = n2.getContextByClass(clef.TrebleClef)
+        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        
+        # n1 cannot find a bass clef
+        post = n1.getContextByClass(clef.BassClef)
+        self.assertEqual(post, None)
+        
+        # n2 can find a bass clef, due to its shifted position in s2
+        post = n2.getContextByClass(clef.BassClef)
+        self.assertEqual(isinstance(post, clef.BassClef), True)
+
+
+    def testDefinedContextsPitch(self):
+        # TODO: this form does not yet work
+        from music21 import base, note, stream, clef
+        m = stream.Measure()
+        m.measureNumber = 34
+        n = note.Note()
+        m.append(n)
+        
+        #pitchMeasure = n.pitch.getContextAttr('measureNumber')
+        #n.pitch.setContextAttr('lyric', pitchMeasure)
+        #self.assertEqual(n.lyric, 34)
+
 
 
 def mainTest(*testClasses):

@@ -877,6 +877,36 @@ class Stream(music21.Music21Object):
         return post
 
 
+    def getOffsetByElement(self, obj):
+        '''Given an object, return the offset of that object in the context of
+        this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
+
+        >>> n1 = note.Note('A')
+        >>> n2 = note.Note('B')
+
+        >>> s1 = Stream()
+        >>> s1.insert(10, n1)
+        >>> s1.insert(100, n2)
+
+        >>> s2 = Stream()
+        >>> s2.insert(10, s1)
+
+        >>> s2.flat.getOffsetBySite(n1) # this will not work
+        Traceback (most recent call last):
+        KeyError: ...
+
+        >>> s2.flat.getOffsetByElement(n1)
+        20.0
+        >>> s2.flat.getOffsetByElement(n2)
+        110.0
+        '''
+        post = None
+        for element in self:
+            if element == obj:
+                post = obj.getOffsetBySite(self)
+                break
+        return post
+
     def getElementById(self, id, classFilter=None):
         '''Returns the first encountered element for a given id. Return None
         if no match
