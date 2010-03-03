@@ -21,8 +21,6 @@ Class Instrument
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: groups
 
     .. attribute:: id
@@ -30,8 +28,6 @@ Attributes
     .. attribute:: instrumentAbbreviation
 
     .. attribute:: instrumentName
-
-    .. attribute:: locations
 
     .. attribute:: midiChannel
 
@@ -42,6 +38,8 @@ Attributes
     .. attribute:: partId
 
     .. attribute:: partName
+
+    .. attribute:: transposition
 
 Properties
 ~~~~~~~~~~
@@ -71,6 +69,239 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Violoncello
+-----------------
+
+.. class:: Violoncello
+
+
+========================
+
+    
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: instrumentAbbreviation
+
+    .. attribute:: instrumentName
+
+    .. attribute:: lowestNote
+
+    .. attribute:: midiChannel
+
+    .. attribute:: midiProgram
+
+    .. attribute:: partAbbreviation
+
+    .. attribute:: partId
+
+    .. attribute:: partName
+
+    .. attribute:: transposition
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): **stringPitches**
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **mx**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **bestName()**, **partIdRandomize()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class StringInstrument
+----------------------
+
+.. class:: StringInstrument
+
+
+=============================
+
+    
+    Inherits from: instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: instrumentAbbreviation
+
+    .. attribute:: instrumentName
+
+    .. attribute:: midiChannel
+
+    .. attribute:: midiProgram
+
+    .. attribute:: partAbbreviation
+
+    .. attribute:: partId
+
+    .. attribute:: partName
+
+    .. attribute:: transposition
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: stringPitches
+
+        stringPitches is a property that stores a list of Pitches (or pitch names, such as "C4") that represent the pitch of the open strings from lowest to highest[#reentrant]_ 
+
+    >>> vln1 = Violin()
+    >>> vln1.stringPitches
+    [G3, D4, A4, E5] 
+    instrument.stringPitches are full pitch objects, not just names 
+    >>> [x.octave for x in vln1.stringPitches]
+    [3, 4, 4, 5] 
+    scordatura for Scelsi's *Anahit*. N.B. string to pitch conversion 
+    >>> vln1.stringPitches = ["G3","G4","B4","D4"]
+    >>> vln1.stringPitches
+    [G3, G4, B4, D4] 
+    ..[#reentrant] In some tuning methods such as reentrant tuning on the ukulele, 
+    lute, or five-string banjo the order might not strictly be from lowest to 
+    highest.  The same would hold true for certain violin scordatura pieces, such 
+    as some of Biber's *Mystery Sonatas* 
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **mx**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods
+~~~~~~~
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **bestName()**, **partIdRandomize()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Viola
+-----------
+
+.. class:: Viola
+
+
+==================
+
+    
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: instrumentAbbreviation
+
+    .. attribute:: instrumentName
+
+    .. attribute:: lowestNote
+
+    .. attribute:: midiChannel
+
+    .. attribute:: midiProgram
+
+    .. attribute:: partAbbreviation
+
+    .. attribute:: partId
+
+    .. attribute:: partName
+
+    .. attribute:: transposition
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): **stringPitches**
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **mx**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **bestName()**, **partIdRandomize()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Violin
+------------
+
+.. class:: Violin
+
+
+===================
+
+    
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: instrumentAbbreviation
+
+    .. attribute:: instrumentName
+
+    .. attribute:: lowestNote
+
+    .. attribute:: midiChannel
+
+    .. attribute:: midiProgram
+
+    .. attribute:: partAbbreviation
+
+    .. attribute:: partId
+
+    .. attribute:: partName
+
+    .. attribute:: transposition
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): **stringPitches**
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **mx**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): **bestName()**, **partIdRandomize()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

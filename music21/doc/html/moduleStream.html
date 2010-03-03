@@ -167,11 +167,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.stream.contexts">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt><a class="headerlink" href="#music21.stream.contexts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="music21.stream.flattenedRepresentationOf">
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -194,11 +189,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt id="music21.stream.isSorted">
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.isSorted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.stream.locations">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt><a class="headerlink" href="#music21.stream.locations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </blockquote>
@@ -646,6 +636,9 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span>
 <span class="go">(0.0, &#39;z&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getElementAtOrBefore</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="p">[</span><span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+<span class="go">(0.0, &#39;z&#39;)</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -831,6 +824,27 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNotes</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
 <span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.stream.getOffsetByElement">
+<tt class="descclassname">music21.stream.</tt><tt class="descname">getOffsetByElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getOffsetByElement" title="Permalink to this definition">¶</a></dt>
+<dd>Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span> <span class="c"># this will not work</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">KeyError</span>: <span class="n-Identifier">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getOffsetByElement</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="go">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getOffsetByElement</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+<span class="go">110.0</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -1115,16 +1129,16 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">n3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;G#&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">20.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">20.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;G#&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">offset</span>
 <span class="go">21.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;D#&#39;</span>
 <span class="go">## optionally, specify the site to get the offset from</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">locations</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mf">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">setOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mf">100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">playingWhenAttacked</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span>
 <span class="go">&lt;BLANKLINE&gt;</span>
@@ -1273,7 +1287,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 <div class="section" id="class-measure">
@@ -1295,11 +1309,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="attribute">
 <dt id="music21.stream.clefIsNew">
 <tt class="descclassname">music21.stream.</tt><tt class="descname">clefIsNew</tt><a class="headerlink" href="#music21.stream.clefIsNew" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1340,11 +1349,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="attribute">
 <dt id="music21.stream.leftbarline">
 <tt class="descclassname">music21.stream.</tt><tt class="descname">leftbarline</tt><a class="headerlink" href="#music21.stream.leftbarline" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1447,8 +1451,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <div class="section" id="id5">
 <h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1470,11 +1474,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pe
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1498,11 +1497,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pe
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
-<dd></dd></dl>
-
 </blockquote>
 </div>
 <div class="section" id="id7">
@@ -1515,8 +1509,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pe
 <div class="section" id="id8">
 <h3>Methods (Inherited)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1538,11 +1532,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sc
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1566,11 +1555,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sc
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
-<dd></dd></dl>
-
 </blockquote>
 </div>
 <div class="section" id="id10">
@@ -1583,8 +1567,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sc
 <div class="section" id="id11">
 <h3>Methods (Inherited)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1606,11 +1590,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1632,11 +1611,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 <dl class="attribute">
 <dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
 <dd></dd></dl>
 
 </blockquote>
@@ -1664,8 +1638,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 <div class="section" id="id16">
 <h3>Methods (Inherited)<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1687,11 +1661,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1715,11 +1684,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
-<dd></dd></dl>
-
 </blockquote>
 </div>
 <div class="section" id="id18">
@@ -1732,8 +1696,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <div class="section" id="id19">
 <h3>Methods (Inherited)<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1755,11 +1719,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1783,11 +1742,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
-<dd></dd></dl>
-
 </blockquote>
 </div>
 <div class="section" id="id21">
@@ -1800,8 +1754,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
 <div class="section" id="id22">
 <h3>Methods (Inherited)<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1823,11 +1777,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
 <dd></dd></dl>
 
@@ -1849,11 +1798,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <dl class="attribute">
 <dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
 <dd></dd></dl>
 
 </blockquote>
@@ -1881,8 +1825,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <div class="section" id="id27">
 <h3>Methods (Inherited)<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1902,11 +1846,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <div class="section" id="id28">
 <h3>Attributes<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
@@ -1930,11 +1869,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt>
 <tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">locations</tt></dt>
 <dd></dd></dl>
 
 </blockquote>
@@ -1962,8 +1896,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <div class="section" id="id32">
 <h3>Methods (Inherited)<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <strong>addGroupForElements()</strong>, <strong>allPlayingWhileSounding()</strong>, <strong>append()</strong>, <strong>attachIntervalsBetweenStreams()</strong>, <strong>bestClef()</strong>, <strong>extendDuration()</strong>, <strong>extractContext()</strong>, <strong>findConsecutiveNotes()</strong>, <strong>findGaps()</strong>, <strong>getElementAfterElement()</strong>, <strong>getElementAfterOffset()</strong>, <strong>getElementAtOrAfter()</strong>, <strong>getElementAtOrBefore()</strong>, <strong>getElementBeforeElement()</strong>, <strong>getElementBeforeOffset()</strong>, <strong>getElementById()</strong>, <strong>getElementsByClass()</strong>, <strong>getElementsByGroup()</strong>, <strong>getElementsByOffset()</strong>, <strong>getGroups()</strong>, <strong>getInstrument()</strong>, <strong>getMeasures()</strong>, <strong>getNotes()</strong>, <strong>getOffsetByElement()</strong>, <strong>getOverlaps()</strong>, <strong>getPitches()</strong>, <strong>getSimultaneous()</strong>, <strong>getTimeSignatures()</strong>, <strong>groupElementsByOffset()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>insertAtIndex()</strong>, <strong>insertAtNativeOffset()</strong>, <strong>isSequence()</strong>, <strong>makeAccidentals()</strong>, <strong>makeBeams()</strong>, <strong>makeMeasures()</strong>, <strong>makeRests()</strong>, <strong>makeTies()</strong>, <strong>melodicIntervals()</strong>, <strong>playingWhenAttacked()</strong>, <strong>pop()</strong>, <strong>repeatAppend()</strong>, <strong>repeatInsert()</strong>, <strong>shiftElements()</strong>, <strong>simultaneousAttacks()</strong>, <strong>splitByClass()</strong>, <strong>stripTies()</strong>, <strong>transferOffsetToElements()</strong>, <strong>trimPlayingWhileSounding()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -1995,7 +1929,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Feb 25, 2010.
+      Last updated on Mar 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

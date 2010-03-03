@@ -90,8 +90,6 @@ Attributes
 
     .. attribute:: beat
 
-    .. attribute:: contexts
-
     .. attribute:: display
 
     .. attribute:: groups
@@ -99,8 +97,6 @@ Attributes
     .. attribute:: id
 
     .. attribute:: inherited
-
-    .. attribute:: locations
 
     .. attribute:: summedNumerator
 
@@ -120,7 +116,7 @@ Methods (Inherited)
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class CompoundTimeSignature
@@ -143,8 +139,6 @@ Attributes
 
     .. attribute:: beat
 
-    .. attribute:: contexts
-
     .. attribute:: display
 
     .. attribute:: groups
@@ -152,8 +146,6 @@ Attributes
     .. attribute:: id
 
     .. attribute:: inherited
-
-    .. attribute:: locations
 
     .. attribute:: summedNumerator
 
@@ -173,7 +165,7 @@ Methods (Inherited)
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class MeterTerminal
@@ -284,8 +276,6 @@ Attributes
 
     .. attribute:: beat
 
-    .. attribute:: contexts
-
     .. attribute:: display
 
     .. attribute:: groups
@@ -293,8 +283,6 @@ Attributes
     .. attribute:: id
 
     .. attribute:: inherited
-
-    .. attribute:: locations
 
     .. attribute:: summedNumerator
 
@@ -314,7 +302,7 @@ Methods (Inherited)
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class TimeSignature
@@ -337,8 +325,6 @@ Attributes
 
     .. attribute:: beat
 
-    .. attribute:: contexts
-
     .. attribute:: display
 
     .. attribute:: groups
@@ -346,8 +332,6 @@ Attributes
     .. attribute:: id
 
     .. attribute:: inherited
-
-    .. attribute:: locations
 
     .. attribute:: summedNumerator
 
@@ -568,7 +552,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class MeterSequence

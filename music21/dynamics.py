@@ -363,5 +363,13 @@ class Test(unittest.TestCase):
         b = a[0].flat.getElementsByClass(music21.dynamics.Wedge)
         self.assertEquals(len(b), 4)
 
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Dynamic, Wedge]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)

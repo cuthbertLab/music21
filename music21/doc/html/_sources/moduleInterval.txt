@@ -134,13 +134,9 @@ Class DiatonicInterval
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: name
 
@@ -154,7 +150,7 @@ Properties (Inherited)
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Interval
@@ -179,13 +175,9 @@ Class Interval
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
 Properties
 ~~~~~~~~~~
@@ -233,7 +225,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class ChromaticInterval
@@ -256,7 +248,7 @@ Properties (Inherited)
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class GenericInterval
@@ -289,6 +281,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

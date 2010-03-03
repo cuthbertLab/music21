@@ -37,15 +37,11 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -73,7 +69,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Unpitched
@@ -93,15 +89,11 @@ Attributes
 
     .. attribute:: articulations
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -143,7 +135,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class EighthNote
@@ -164,15 +156,11 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -200,7 +188,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class QuarterNote
@@ -221,15 +209,11 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -257,7 +241,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Rest
@@ -277,15 +261,11 @@ Attributes
 
     .. attribute:: articulations
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -336,7 +316,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Note
@@ -358,15 +338,11 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -474,7 +450,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Beam
@@ -540,15 +516,11 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -576,7 +548,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Lyric
@@ -748,15 +720,11 @@ Attributes
 
     .. attribute:: articulations
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -802,7 +770,7 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class GeneralNote
@@ -822,15 +790,11 @@ Attributes
 
     .. attribute:: articulations
 
-    .. attribute:: contexts
-
     .. attribute:: editorial
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -942,7 +906,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Tie
@@ -960,13 +924,9 @@ Class Tie
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: type
 
@@ -987,6 +947,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

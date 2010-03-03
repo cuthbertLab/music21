@@ -7,6 +7,15 @@ music21.duration
 
 .. module:: music21.duration
 
+.. function:: convertQuarterLengthToType()
+
+    similar to quarterLengthToClosestType but only returns exact matches 
+
+>>> convertQuarterLengthToType(2)
+'half' 
+>>> convertQuarterLengthToType(0.125)
+'32nd' 
+
 .. function:: partitionQuarterLength()
 
     Given a quarterLength and a base quarterLength to divide it into (default 4 = whole notes), return a list of Durations that partition the given quarterLength after each division. (Little demonstration method) 
@@ -162,15 +171,6 @@ and recurse, adding as my units as necessary.
 
 
 
-.. function:: convertQuarterLengthToType()
-
-    similar to quarterLengthToClosestType but only returns exact matches 
-
->>> convertQuarterLengthToType(2)
-'half' 
->>> convertQuarterLengthToType(0.125)
-'32nd' 
-
 .. function:: dottedMatch()
 
     given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default. 
@@ -249,369 +249,6 @@ DurationException...
 'eighth' 
 >>> nextLargerType("whole")
 'breve' 
-
-Class AppogiaturaStopDuration
------------------------------
-
-.. class:: AppogiaturaStopDuration
-
-
-====================================
-
-    
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: linkages
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
-
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
-
-
-Class DurationUnit
-------------------
-
-.. class:: DurationUnit
-
-
-=========================
-
-    A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
-
-    Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: linkStatus
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: dots
-
-        _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
-
-    .. attribute:: lily
-
-        Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
-
-    .. attribute:: ordinal
-
-        Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
-
-    >>> a = DurationUnit('whole')
-    >>> a.ordinal
-    4 
-    >>> b = DurationUnit('maxima')
-    >>> b.ordinal
-    1 
-    >>> c = DurationUnit('1024th')
-    >>> c.ordinal
-    14 
-
-    .. attribute:: quarterLength
-
-        determine the length in quarter notes from current information 
-
-    .. attribute:: tuplets
-
-        Return a tuple of Tuplet objects 
-
-    .. attribute:: type
-
-        Get the duration type. 
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-Methods
-~~~~~~~
-
-    .. method:: appendTuplet()
-
-    
-    .. method:: link()
-
-    
-    .. method:: setTypeFromNum()
-
-    
-    .. method:: unlink()
-
-    
-    .. method:: updateQuarterLength()
-
-        Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
-
-    .. method:: updateType()
-
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
-
-
-Class DurationCommon
---------------------
-
-.. class:: DurationCommon
-
-
-===========================
-
-    base class for Duration and DurationUnit to borrow from 
-
-    Inherits from: 
-
-Methods
-~~~~~~~
-
-    .. method:: aggregateTupletRatio()
-
-        say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
-
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.appendTuplet(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.appendTuplet(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
-
-
-Class Tuplet
-------------
-
-.. class:: Tuplet
-
-
-===================
-
-    tuplet class: creates tuplet objects which modify duration objects note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
-
->>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
->>> print myTup.tupletMultiplier()
-0.8 
->>> myTup2 = Tuplet(8, 5)
->>> print myTup2.tupletMultiplier()
-0.625 
->>> myTup2 = Tuplet(6, 4, "16th")
->>> print myTup2.durationActual.type
-16th 
->>> print myTup2.tupletMultiplier()
-0.666... 
-
-
-Tuplets may be frozen, in which case they become immutable.  Tuplets 
-which are attached to Durations are automatically frozen 
-# TODO: use __setattr__ to freeze all properties, and make a metaclass 
-# exceptions: tuplet type, tuplet id: things that don't affect length 
->>> myTup.frozen = True
->>> myTup.tupletActual = [3, 2]
-Traceback (most recent call last): 
-... 
-TupletException: A frozen tuplet (or one attached to a duration) is immutable 
->>> myHalf = Duration("half")
->>> myHalf.appendTuplet(myTup2)
->>> myTup2.tupletActual = [5, 4]
-Traceback (most recent call last): 
-... 
-TupletException: A frozen tuplet (or one attached to a duration) is immutable 
-
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: bracket
-
-    .. attribute:: durationActual
-
-    .. attribute:: durationNormal
-
-    .. attribute:: nestedLevel
-
-    .. attribute:: numberNotesActual
-
-    .. attribute:: numberNotesNormal
-
-    .. attribute:: placement
-
-    .. attribute:: tupletActualShow
-
-    .. attribute:: tupletId
-
-    .. attribute:: tupletNormalShow
-
-    .. attribute:: type
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: mx
-
-        From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
-
-    >>> a = Tuplet()
-    >>> a.bracket = True
-    >>> b, c = a.mx
-
-    .. attribute:: tupletActual
-
-    
-    .. attribute:: tupletNormal
-
-    
-Methods
-~~~~~~~
-
-    .. method:: frozen()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: setDurationType()
-
-        Set the Duration for both actual and normal. 
-
-    >>> a = Tuplet()
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.totalTupletLength()
-    1.0 
-    >>> a.setDurationType('half')
-    >>> a.tupletMultiplier()
-    0.6666... 
-    >>> a.totalTupletLength()
-    4.0 
-
-    .. method:: setRatio()
-
-        Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
-
-    >>> a = Tuplet()
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.setRatio(6,2)
-    >>> a.tupletMultiplier()
-    0.333... 
-    One way of expressing 6/4-ish triplets without numbers: 
-    >>> a = Tuplet()
-    >>> a.setRatio(3,1)
-    >>> a.durationActual = DurationUnit('quarter')
-    >>> a.durationNormal = DurationUnit('half')
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.totalTupletLength()
-    2.0 
-
-    .. method:: totalTupletLength()
-
-        The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
-
-    >>> a = Tuplet()
-    >>> a.totalTupletLength()
-    1.0 
-    >>> a.numberNotesActual = 3
-    >>> a.durationActual = Duration('half')
-    >>> a.numberNotesNormal = 2
-    >>> a.durationNormal = Duration('half')
-    >>> a.totalTupletLength()
-    4.0 
-    >>> a.setRatio(5,4)
-    >>> a.totalTupletLength()
-    8.0 
-    >>> a.setRatio(5,2)
-    >>> a.totalTupletLength()
-    4.0 
-
-    .. method:: tupletMultiplier()
-
-        Get a floating point value by which to scale the duration that this Tuplet is associated with. 
-
-    >>> myTuplet = Tuplet()
-    >>> print round(myTuplet.tupletMultiplier(), 3)
-    0.667 
-    >>> myTuplet.tupletActual = [5, Duration('eighth')]
-    >>> myTuplet.numberNotesActual
-    5 
-    >>> myTuplet.durationActual.type
-    'eighth' 
-    >>> print myTuplet.tupletMultiplier()
-    0.4 
-
-
-Class GraceDuration
--------------------
-
-.. class:: GraceDuration
-
-
-==========================
-
-    
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: linkages
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
-
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
-
-
-Class ZeroDuration
-------------------
-
-.. class:: ZeroDuration
-
-
-=========================
-
-    
-    Inherits from: duration.DurationUnit (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: linkStatus
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **dots**, **lily**, **ordinal**, **quarterLength**, **tuplets**, **type**
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **appendTuplet()**, **link()**, **setTypeFromNum()**, **unlink()**, **updateQuarterLength()**, **updateType()**
-
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
-
 
 Class Duration
 --------------
@@ -831,6 +468,369 @@ Methods
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+
+
+Class Tuplet
+------------
+
+.. class:: Tuplet
+
+
+===================
+
+    tuplet class: creates tuplet objects which modify duration objects note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
+
+>>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+>>> print myTup.tupletMultiplier()
+0.8 
+>>> myTup2 = Tuplet(8, 5)
+>>> print myTup2.tupletMultiplier()
+0.625 
+>>> myTup2 = Tuplet(6, 4, "16th")
+>>> print myTup2.durationActual.type
+16th 
+>>> print myTup2.tupletMultiplier()
+0.666... 
+
+
+Tuplets may be frozen, in which case they become immutable.  Tuplets 
+which are attached to Durations are automatically frozen 
+# TODO: use __setattr__ to freeze all properties, and make a metaclass 
+# exceptions: tuplet type, tuplet id: things that don't affect length 
+>>> myTup.frozen = True
+>>> myTup.tupletActual = [3, 2]
+Traceback (most recent call last): 
+... 
+TupletException: A frozen tuplet (or one attached to a duration) is immutable 
+>>> myHalf = Duration("half")
+>>> myHalf.appendTuplet(myTup2)
+>>> myTup2.tupletActual = [5, 4]
+Traceback (most recent call last): 
+... 
+TupletException: A frozen tuplet (or one attached to a duration) is immutable 
+
+    Inherits from: 
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: bracket
+
+    .. attribute:: durationActual
+
+    .. attribute:: durationNormal
+
+    .. attribute:: nestedLevel
+
+    .. attribute:: numberNotesActual
+
+    .. attribute:: numberNotesNormal
+
+    .. attribute:: placement
+
+    .. attribute:: tupletActualShow
+
+    .. attribute:: tupletId
+
+    .. attribute:: tupletNormalShow
+
+    .. attribute:: type
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: mx
+
+        From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
+
+    >>> a = Tuplet()
+    >>> a.bracket = True
+    >>> b, c = a.mx
+
+    .. attribute:: tupletActual
+
+    
+    .. attribute:: tupletNormal
+
+    
+Methods
+~~~~~~~
+
+    .. method:: frozen()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: setDurationType()
+
+        Set the Duration for both actual and normal. 
+
+    >>> a = Tuplet()
+    >>> a.tupletMultiplier()
+    0.666... 
+    >>> a.totalTupletLength()
+    1.0 
+    >>> a.setDurationType('half')
+    >>> a.tupletMultiplier()
+    0.6666... 
+    >>> a.totalTupletLength()
+    4.0 
+
+    .. method:: setRatio()
+
+        Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
+
+    >>> a = Tuplet()
+    >>> a.tupletMultiplier()
+    0.666... 
+    >>> a.setRatio(6,2)
+    >>> a.tupletMultiplier()
+    0.333... 
+    One way of expressing 6/4-ish triplets without numbers: 
+    >>> a = Tuplet()
+    >>> a.setRatio(3,1)
+    >>> a.durationActual = DurationUnit('quarter')
+    >>> a.durationNormal = DurationUnit('half')
+    >>> a.tupletMultiplier()
+    0.666... 
+    >>> a.totalTupletLength()
+    2.0 
+
+    .. method:: totalTupletLength()
+
+        The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
+
+    >>> a = Tuplet()
+    >>> a.totalTupletLength()
+    1.0 
+    >>> a.numberNotesActual = 3
+    >>> a.durationActual = Duration('half')
+    >>> a.numberNotesNormal = 2
+    >>> a.durationNormal = Duration('half')
+    >>> a.totalTupletLength()
+    4.0 
+    >>> a.setRatio(5,4)
+    >>> a.totalTupletLength()
+    8.0 
+    >>> a.setRatio(5,2)
+    >>> a.totalTupletLength()
+    4.0 
+
+    .. method:: tupletMultiplier()
+
+        Get a floating point value by which to scale the duration that this Tuplet is associated with. 
+
+    >>> myTuplet = Tuplet()
+    >>> print round(myTuplet.tupletMultiplier(), 3)
+    0.667 
+    >>> myTuplet.tupletActual = [5, Duration('eighth')]
+    >>> myTuplet.numberNotesActual
+    5 
+    >>> myTuplet.durationActual.type
+    'eighth' 
+    >>> print myTuplet.tupletMultiplier()
+    0.4 
+
+
+Class AppogiaturaStopDuration
+-----------------------------
+
+.. class:: AppogiaturaStopDuration
+
+
+====================================
+
+    
+    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: linkages
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+
+
+Class DurationUnit
+------------------
+
+.. class:: DurationUnit
+
+
+=========================
+
+    A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
+
+    Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: linkStatus
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: dots
+
+        _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
+
+    .. attribute:: lily
+
+        Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
+
+    .. attribute:: ordinal
+
+        Converts type to an ordinal number where maxima = 1 and 1024th = 14; whole = 4 and quarter = 6 based on duration.ordinalTypeFromNum 
+
+    >>> a = DurationUnit('whole')
+    >>> a.ordinal
+    4 
+    >>> b = DurationUnit('maxima')
+    >>> b.ordinal
+    1 
+    >>> c = DurationUnit('1024th')
+    >>> c.ordinal
+    14 
+
+    .. attribute:: quarterLength
+
+        determine the length in quarter notes from current information 
+
+    .. attribute:: tuplets
+
+        Return a tuple of Tuplet objects 
+
+    .. attribute:: type
+
+        Get the duration type. 
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+Methods
+~~~~~~~
+
+    .. method:: appendTuplet()
+
+    
+    .. method:: link()
+
+    
+    .. method:: setTypeFromNum()
+
+    
+    .. method:: unlink()
+
+    
+    .. method:: updateQuarterLength()
+
+        Updates the quarterLength if linkStatus is True Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. (use self.quarterLength = X to set) 
+
+    .. method:: updateType()
+
+    
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+
+
+Class DurationCommon
+--------------------
+
+.. class:: DurationCommon
+
+
+===========================
+
+    base class for Duration and DurationUnit to borrow from 
+
+    Inherits from: 
+
+Methods
+~~~~~~~
+
+    .. method:: aggregateTupletRatio()
+
+        say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
+
+    >>> complexDur = Duration('eighth')
+    >>> complexDur.appendTuplet(Tuplet())
+    >>> complexDur.aggregateTupletRatio()
+    (3, 2) 
+    >>> tup2 = Tuplet()
+    >>> tup2.setRatio(5, 4)
+    >>> complexDur.appendTuplet(tup2)
+    >>> complexDur.aggregateTupletRatio()
+    (15, 8) 
+
+
+Class GraceDuration
+-------------------
+
+.. class:: GraceDuration
+
+
+==========================
+
+    
+    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: linkages
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+
+
+Class ZeroDuration
+------------------
+
+.. class:: ZeroDuration
+
+
+=========================
+
+    
+    Inherits from: duration.DurationUnit (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: linkStatus
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **dots**, **lily**, **ordinal**, **quarterLength**, **tuplets**, **type**
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **appendTuplet()**, **link()**, **setTypeFromNum()**, **unlink()**, **updateQuarterLength()**, **updateType()**
 
     Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
 

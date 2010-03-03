@@ -1980,5 +1980,11 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.commonName[0], 'combinatorial RI (RI9)')
         self.assertEqual(c1.pitchedCommonName, 'D#-combinatorial RI (RI9)')
 
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Chord]
+
 if __name__ == '__main__':
     music21.mainTest(Test)

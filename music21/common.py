@@ -1043,7 +1043,13 @@ class Test(unittest.TestCase):
         
 
 
+
+
 #-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [fromRoman, toRoman, Scalar]
+
+
 if __name__ == "__main__":
     ## do this the old way to avoid music21 import
     s1 = doctest.DocTestSuite(__name__)

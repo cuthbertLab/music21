@@ -21,53 +21,6 @@ Public interface for importing file formats into music21.
 .. function:: parseData()
 
     
-Class ConverterHumdrum
-----------------------
-
-.. class:: ConverterHumdrum
-
-
-=============================
-
-    
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: stream
-
-Methods
-~~~~~~~
-
-    .. method:: parseData()
-
-        Open from a string 
-
-    .. method:: parseFile()
-
-        Open from file path 
-
-
-Class PickleFilter
-------------------
-
-.. class:: PickleFilter
-
-
-=========================
-
-    Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
-
-    Inherits from: 
-
-Methods
-~~~~~~~
-
-    .. method:: status()
-
-    
-
 Class Converter
 ---------------
 
@@ -132,4 +85,51 @@ Methods
 
         Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
+
+Class ConverterHumdrum
+----------------------
+
+.. class:: ConverterHumdrum
+
+
+=============================
+
+    
+    Inherits from: 
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: stream
+
+Methods
+~~~~~~~
+
+    .. method:: parseData()
+
+        Open from a string 
+
+    .. method:: parseFile()
+
+        Open from file path 
+
+
+Class PickleFilter
+------------------
+
+.. class:: PickleFilter
+
+
+=========================
+
+    Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
+
+    Inherits from: 
+
+Methods
+~~~~~~~
+
+    .. method:: status()
+
+    
 

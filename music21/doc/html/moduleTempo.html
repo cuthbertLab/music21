@@ -109,11 +109,6 @@ Inherits from: tempo.TempoMark (of module <a class="reference internal" href="#m
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.tempo.contexts">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">contexts</tt><a class="headerlink" href="#music21.tempo.contexts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="music21.tempo.groups">
 <tt class="descclassname">music21.tempo.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.tempo.groups" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -121,11 +116,6 @@ Inherits from: tempo.TempoMark (of module <a class="reference internal" href="#m
 <dl class="attribute">
 <dt id="music21.tempo.id">
 <tt class="descclassname">music21.tempo.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.tempo.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.tempo.locations">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">locations</tt><a class="headerlink" href="#music21.tempo.locations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -144,7 +134,7 @@ Inherits from: tempo.TempoMark (of module <a class="reference internal" href="#m
 <dd></dd></dl>
 
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
 </div>
 </div>
@@ -169,22 +159,12 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 <blockquote>
 <dl class="attribute">
 <dt>
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">contexts</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
 <tt class="descclassname">music21.tempo.</tt><tt class="descname">groups</tt></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt>
 <tt class="descclassname">music21.tempo.</tt><tt class="descname">id</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">locations</tt></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -202,7 +182,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addLocationAndParent()</strong>, <strong>contexts()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 </div>
@@ -230,7 +210,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Feb 25, 2010.
+      Last updated on Mar 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

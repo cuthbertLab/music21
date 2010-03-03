@@ -151,7 +151,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Pitch
@@ -168,15 +168,11 @@ Class Pitch
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: defaultOctave
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
 Properties
 ~~~~~~~~~~
@@ -325,6 +321,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

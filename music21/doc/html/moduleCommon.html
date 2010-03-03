@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.converter" href="moduleConverter.html" />
-    <link rel="prev" title="music21.base" href="moduleBase.html" /> 
+    <link rel="prev" title="music21.clef" href="moduleClef.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="moduleConverter.html" title="music21.converter"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="moduleBase.html" title="music21.base"
+          <a href="moduleClef.html" title="music21.clef"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
@@ -48,14 +48,14 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.common</a><ul>
-<li><a class="reference external" href="#class-deflist">Class defList</a><ul>
+<li><a class="reference external" href="#class-scalar">Class Scalar</a><ul>
 <li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#class-scalar">Class Scalar</a><ul>
+<li><a class="reference external" href="#class-deflist">Class defList</a><ul>
 <li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#class-defhash">Class defHash</a><ul>
@@ -76,8 +76,8 @@
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="moduleBase.html"
-                                  title="previous chapter">music21.base</a></p>
+            <p class="topless"><a href="moduleClef.html"
+                                  title="previous chapter">music21.clef</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="moduleConverter.html"
                                   title="next chapter">music21.converter</a></p>
@@ -110,6 +110,28 @@
   <div class="section" id="module-music21.common">
 <span id="modulecommon"></span><h1>music21.common<a class="headerlink" href="#module-music21.common" title="Permalink to this headline">¶</a></h1>
 <p>Utility constants, dictionaries, functions, and objects used throughout music21.</p>
+<dl class="function">
+<dt id="music21.common.fromRoman">
+<tt class="descclassname">music21.common.</tt><tt class="descname">fromRoman</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.fromRoman" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fromRoman</span><span class="p">(</span><span class="s">&#39;ii&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fromRoman</span><span class="p">(</span><span class="s">&#39;vii&#39;</span><span class="p">)</span>
+<span class="go">7</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.common.toRoman">
+<tt class="descclassname">music21.common.</tt><tt class="descname">toRoman</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.toRoman" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">toRoman</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">&#39;II&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">toRoman</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
+<span class="go">&#39;VII&#39;</span>
+</pre></div>
+</div>
 <dl class="function">
 <dt id="music21.common.EuclidGCD">
 <tt class="descclassname">music21.common.</tt><tt class="descname">EuclidGCD</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.EuclidGCD" title="Permalink to this definition">¶</a></dt>
@@ -214,17 +236,6 @@
 </pre></div>
 </div>
 <dl class="function">
-<dt id="music21.common.toRoman">
-<tt class="descclassname">music21.common.</tt><tt class="descname">toRoman</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.toRoman" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">toRoman</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
-<span class="go">&#39;II&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">toRoman</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
-<span class="go">&#39;VII&#39;</span>
-</pre></div>
-</div>
-<dl class="function">
 <dt id="music21.common.isPowerOfTwo">
 <tt class="descclassname">music21.common.</tt><tt class="descname">isPowerOfTwo</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.isPowerOfTwo" title="Permalink to this definition">¶</a></dt>
 <dd>returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True</dd></dl>
@@ -251,17 +262,6 @@
 <span class="go">while this is left alone:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stripAddresses</span><span class="p">(</span><span class="s">&quot;{0.0} &lt;music21.humdrum.MiscTandam *&gt;I humdrum control&gt;&quot;</span><span class="p">)</span>
 <span class="go">&#39;{0.0} &lt;music21.humdrum.MiscTandam *&gt;I humdrum control&gt;&#39;</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.common.fromRoman">
-<tt class="descclassname">music21.common.</tt><tt class="descname">fromRoman</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.fromRoman" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fromRoman</span><span class="p">(</span><span class="s">&#39;ii&#39;</span><span class="p">)</span>
-<span class="go">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fromRoman</span><span class="p">(</span><span class="s">&#39;vii&#39;</span><span class="p">)</span>
-<span class="go">7</span>
 </pre></div>
 </div>
 <dl class="function">
@@ -437,40 +437,6 @@
 <tt class="descclassname">music21.common.</tt><tt class="descname">findSimpleFraction</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.findSimpleFraction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<div class="section" id="class-deflist">
-<h2>Class defList<a class="headerlink" href="#class-deflist" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="music21.common.defList">
-<em class="property">
-class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
-<p>Inherits from: list</p>
-</blockquote>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.common.callDefault">
-<tt class="descclassname">music21.common.</tt><tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.callDefault" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.common.default">
-<tt class="descclassname">music21.common.</tt><tt class="descname">default</tt><a class="headerlink" href="#music21.common.default" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <strong>extend()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>pop()</strong>, <strong>remove()</strong>, <strong>reverse()</strong>, <strong>sort()</strong></blockquote>
-</div>
-</div>
 <div class="section" id="class-scalar">
 <h2>Class Scalar<a class="headerlink" href="#class-scalar" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -484,8 +450,8 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <p>for those of us who miss perl scalars....</p>
 <p>Inherits from:</p>
 </blockquote>
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.common.valType">
@@ -518,6 +484,40 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <dd></dd></dl>
 
 </blockquote>
+</div>
+</div>
+<div class="section" id="class-deflist">
+<h2>Class defList<a class="headerlink" href="#class-deflist" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.common.defList">
+<em class="property">
+class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
+<p>Inherits from: list</p>
+</blockquote>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.common.callDefault">
+<tt class="descclassname">music21.common.</tt><tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.callDefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.common.default">
+<tt class="descclassname">music21.common.</tt><tt class="descname">default</tt><a class="headerlink" href="#music21.common.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <strong>extend()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>pop()</strong>, <strong>remove()</strong>, <strong>reverse()</strong>, <strong>sort()</strong></blockquote>
 </div>
 </div>
 <div class="section" id="class-defhash">
@@ -633,14 +633,14 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
           <a href="moduleConverter.html" title="music21.converter"
              >next</a> |</li>
         <li class="right" >
-          <a href="moduleBase.html" title="music21.base"
+          <a href="moduleClef.html" title="music21.clef"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Feb 25, 2010.
+      Last updated on Mar 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

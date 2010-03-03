@@ -11,6 +11,24 @@ music21.common
 
 Utility constants, dictionaries, functions, and objects used throughout music21.
 
+.. function:: fromRoman()
+
+    
+
+>>> fromRoman('ii')
+2 
+>>> fromRoman('vii')
+7 
+
+.. function:: toRoman()
+
+    
+
+>>> toRoman(2)
+'II' 
+>>> toRoman(7)
+'VII' 
+
 .. function:: EuclidGCD()
 
     use Euclid's algorithm to find the GCD of a and b 
@@ -102,15 +120,6 @@ True
 >>> isIterable(music21.stream.Stream())
 True 
 
-.. function:: toRoman()
-
-    
-
->>> toRoman(2)
-'II' 
->>> toRoman(7)
-'VII' 
-
 .. function:: isPowerOfTwo()
 
     returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
@@ -135,15 +144,6 @@ True
 while this is left alone: 
 >>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
 '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>' 
-
-.. function:: fromRoman()
-
-    
-
->>> fromRoman('ii')
-2 
->>> fromRoman('vii')
-7 
 
 .. function:: isWeakref()
 
@@ -290,31 +290,6 @@ test 1 2 3
 .. function:: findSimpleFraction()
 
     
-Class defList
--------------
-
-.. class:: defList
-
-
-====================
-
-    A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
-
-    Inherits from: list
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: callDefault
-
-    .. attribute:: default
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
-
-
 Class Scalar
 ------------
 
@@ -346,6 +321,31 @@ Methods
     .. method:: toUnicode()
 
     
+
+Class defList
+-------------
+
+.. class:: defList
+
+
+====================
+
+    A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
+
+    Inherits from: list
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: callDefault
+
+    .. attribute:: default
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
+
 
 Class defHash
 -------------

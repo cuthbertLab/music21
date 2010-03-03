@@ -28,8 +28,6 @@ Attributes
 
     .. attribute:: beams
 
-    .. attribute:: contexts
-
     .. attribute:: duration
 
     .. attribute:: editorial
@@ -37,8 +35,6 @@ Attributes
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: lyrics
 
@@ -629,6 +625,6 @@ Methods (Inherited)
 
     Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **duration()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **duration()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

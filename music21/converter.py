@@ -589,6 +589,11 @@ class Test(unittest.TestCase):
 
 
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [parse, parseFile, parseData, Converter, ConverterMusicXML, ConverterHumdrum]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)

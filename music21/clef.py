@@ -549,6 +549,12 @@ class Test(unittest.TestCase):
         self.assertTrue(n6.getContextByClass(Clef) is tc1)
 
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Clef, TrebleClef, BassClef]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

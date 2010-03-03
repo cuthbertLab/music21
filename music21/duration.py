@@ -2354,6 +2354,12 @@ class Test(unittest.TestCase):
         self.assertEqual(output, match)
 
 
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
+
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test, TestExternal)

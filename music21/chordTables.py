@@ -2728,8 +2728,10 @@ class Test(unittest.TestCase):
             self.assertEqual(len(FORTE[setSize])-1, setCount)
         
 
-#-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
 
 
 if __name__ == "__main__":

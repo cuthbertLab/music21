@@ -25,7 +25,7 @@ Class Music21Object
 
 ==========================
 
-    Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a Locations object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
+    Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
 
 Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
 
@@ -36,13 +36,9 @@ Each of these may be passed in as a named keyword to any music21 object. Some of
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
 Properties
 ~~~~~~~~~~
@@ -70,6 +66,18 @@ Properties
 Methods
 ~~~~~~~
 
+    .. method:: addContext()
+
+        Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.getContextAttr('attr1')
+    'test' 
+
     .. method:: addLocationAndParent()
 
         ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
@@ -86,12 +94,25 @@ Methods
     >>> o1.getOffsetBySite(st1)
     20.0 
 
-    .. method:: contexts()
+    .. method:: getContextAttr()
 
-    
+        Given the name of an attribute, search Conctexts and return the best match. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.getContextAttr('attr1')
+    'test' 
+
+    .. method:: getContextByClass()
+
+        Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+
     .. method:: getOffsetBySite()
 
-        
+        If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
 
     >>> a = Music21Object()
     >>> a.offset = 30
@@ -109,6 +130,21 @@ Methods
 
         If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
 
+    .. method:: setContextAttr()
+
+        Given the name of an attribute, search Conctexts and return the best match. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.getContextAttr('attr1')
+    'test' 
+    >>> a.setContextAttr('attr1', 3000)
+    >>> a.getContextAttr('attr1')
+    3000 
+
     .. method:: show()
 
         Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
@@ -116,349 +152,6 @@ Methods
     .. method:: write()
 
         Write a file. A None file path will result in temporary file 
-
-
-Class Relations
----------------
-
-.. class:: Relations
-
-
-======================
-
-    An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. 
-
-    Inherits from: 
-
-Methods
-~~~~~~~
-
-    .. method:: add()
-
-        Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old Locations 
-
-    .. method:: clear()
-
-        Clear all data. 
-
-    .. method:: get()
-
-        Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
-
-    >>> class Mock(Music21Object): pass
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> aRelations = Relations()
-    >>> aRelations.add(aObj)
-    >>> aRelations.add(bObj)
-    >>> aRelations.get('contexts') == [aObj, bObj]
-    True 
-
-    .. method:: getAttrByName()
-
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> bObj.attr1 = 98
-    >>> aRelations = Relations()
-    >>> aRelations.add(aObj)
-    >>> aRelations.getAttrByName('attr1') == 234
-    True 
-    >>> aRelations.removeById(id(aObj))
-    >>> aRelations.add(bObj)
-    >>> aRelations.getAttrByName('attr1') == 98
-    True 
-
-    .. method:: getByClass()
-
-        Return the most recently added reference based on className. Class name can be a string or the real class name. TODO: do this recursively, searching the Relations of all members 
-
-    >>> class Mock(Music21Object): pass
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> aRelations = Relations()
-    >>> aRelations.add(aObj)
-    >>> aRelations.add(bObj)
-    >>> aRelations.getByClass('mock') == aObj
-    True 
-    >>> aRelations.getByClass(Mock) == aObj
-    True 
-
-    
-
-    .. method:: getOffsetBySite()
-
-        For a given site return its offset. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cParent = Mock()
-    >>> aLocations = Relations()
-    >>> aLocations.add(aSite, 23)
-    >>> aLocations.add(bSite, 121.5)
-    >>> aLocations.getOffsetBySite(aSite)
-    23 
-    >>> aLocations.getOffsetBySite(bSite)
-    121.5 
-    >>> aLocations.getOffsetBySite(cParent)
-    Traceback (most recent call last): 
-    RelationsException: ... 
-
-    .. method:: getOffsets()
-
-        Return a list of all offsets. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cSite = Mock()
-    >>> dSite = Mock()
-    >>> aLocations = Relations()
-    >>> aLocations.add(aSite, 0)
-    >>> aLocations.add(cSite) # a context
-    >>> aLocations.add(bSite, 234) # can add at same offset or another
-    >>> aLocations.add(dSite) # a context
-    >>> aLocations.getOffsets()
-    [0, 234] 
-
-    .. method:: getSiteByOffset()
-
-        For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cSite = Mock()
-    >>> aLocations = Relations()
-    >>> aLocations.add(aSite, 23)
-    >>> aLocations.add(bSite, 23121.5)
-    >>> aSite == aLocations.getSiteByOffset(23)
-    True 
-    #### no longer works 
-    #Adding another site at offset 23 will change getSiteByOffset 
-    #>>> aLocations.add(cSite, 23) 
-    #>>> aSite == aLocations.getSiteByOffset(23) 
-    #False 
-    #>>> cSite == aLocations.getSiteByOffset(23) 
-    #True 
-
-    .. method:: removeById()
-
-    
-    .. method:: scrub()
-
-        Remove all weak ref objects that point to objects that no longer exist. 
-
-    .. method:: setAttrByName()
-
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> bObj = Mock()
-    >>> bObj.attr1 = 98
-    >>> aRelations = Relations()
-    >>> aRelations.add(aObj)
-    >>> aRelations.add(bObj)
-    >>> aRelations.setAttrByName('attr1', 'test')
-    >>> aRelations.getAttrByName('attr1') == 'test'
-    True 
-
-    .. method:: setOffsetBySite()
-
-        Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Relations, it will raise an exception. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cSite = Mock()
-    >>> aLocations = Relations()
-    >>> aLocations.add(aSite, 23)
-    >>> aLocations.add(bSite, 121.5)
-    >>> aLocations.setOffsetBySite(aSite, 20)
-    >>> aLocations.getOffsetBySite(aSite)
-    20 
-    >>> aLocations.setOffsetBySite(cSite, 30)
-    Traceback (most recent call last): 
-    RelationsException: ... 
-
-
-Class Locations
----------------
-
-.. class:: Locations
-
-
-======================
-
-    An object, stored within a Music21Object, that manages site/offset pairs. Site is an object that contains an object; site may be a parent. Sites are always stored as weak refs. An object may store None as a site -- this becomes the default offset for any newly added sites that do not have any sites 
-
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: coordinates
-
-Methods
-~~~~~~~
-
-    .. method:: add()
-
-        Add a location to the object. If site already exists, this will update that entry. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(23, bSite) # can add at same offset
-    >>> aLocations.add(12, aSite) # will change the offset for aSite
-    >>> aSite == aLocations.getSiteByOffset(12)
-    True 
-
-    .. method:: clear()
-
-        Clear all data. 
-
-    .. method:: getOffsetBySite()
-
-        For a given site return its offset. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cParent = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(121.5, bSite)
-    >>> aLocations.getOffsetBySite(aSite)
-    23 
-    >>> aLocations.getOffsetBySite(bSite)
-    121.5 
-    >>> aLocations.getOffsetBySite(cParent)
-    Traceback (most recent call last): 
-    LocationsException: ... 
-
-    .. method:: getOffsets()
-
-        Return a list of all offsets. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(0, aSite)
-    >>> aLocations.add(234, bSite) # can add at same offset or another
-    >>> aLocations.getOffsets()
-    [0, 234] 
-
-    .. method:: getSiteByOffset()
-
-        For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(121.5, bSite)
-    >>> aSite == aLocations.getSiteByOffset(23)
-    True 
-    #### no longer works 
-    #Adding another site at offset 23 will change getSiteByOffset 
-    #>>> aLocations.add(23, cSite) 
-    #>>> aSite == aLocations.getSiteByOffset(23) 
-    #False 
-    #>>> cSite == aLocations.getSiteByOffset(23) 
-    #True 
-
-    .. method:: getSites()
-
-        Get parents; unwrap from weakrefs 
-
-    .. method:: getTimes()
-
-    
-    .. method:: remove()
-
-        Remove the entry specified by sites 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> len(aLocations)
-    1 
-    >>> aLocations.remove(aSite)
-    >>> len(aLocations)
-    0 
-
-    .. method:: scrubEmptySites()
-
-        If a parent has been deleted, we will still have an empty ref in coordinates; when called, this empty ref will return None. This method will remove all parents that deref to None DOES NOT WORK IF A FULLREF, NOT WEAKREF IS STORED 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(0, aSite)
-    >>> aLocations.add(234, bSite)
-    >>> del aSite
-    >>> len(aLocations)
-    2 
-    >>> #aLocations.scrubEmptySites()
-    >>> #len(aLocations)
-    #1 
-
-    .. method:: setOffsetBySite()
-
-        Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in Locations, it will raise an exception. 
-
-    >>> class Mock(Music21Object): pass
-    >>> aSite = Mock()
-    >>> bSite = Mock()
-    >>> cSite = Mock()
-    >>> aLocations = Locations()
-    >>> aLocations.add(23, aSite)
-    >>> aLocations.add(121.5, bSite)
-    >>> aLocations.setOffsetBySite(aSite, 20)
-    >>> aLocations.getOffsetBySite(aSite)
-    20 
-    >>> aLocations.setOffsetBySite(cSite, 30)
-    Traceback (most recent call last): 
-    LocationsException: ... 
-
-
-Class Groups
-------------
-
-.. class:: Groups
-
-
-===================
-
-    A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
-
->>> g = Groups()
->>> g.append("hello")
->>> g[0]
-'hello' 
->>> g.append(5)
-Traceback (most recent call last): 
-GroupException: Only strings can be used as list names 
-
-    Inherits from: list
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
 
 
 Class ElementWrapper
@@ -522,6 +215,250 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class DefinedContexts
+---------------------
+
+.. class:: DefinedContexts
+
+
+============================
+
+    An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
+
+
+
+    Inherits from: 
+
+Methods
+~~~~~~~
+
+    .. method:: add()
+
+        Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
+
+    .. method:: clear()
+
+        Clear all data. 
+
+    .. method:: get()
+
+        Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> cObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(cObj, 345)
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> aContexts.get() == [cObj, aObj, bObj]
+    True 
+    >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
+    True 
+
+    .. method:: getAttrByName()
+
+        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 234
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> len(aContexts)
+    1 
+    >>> aContexts.getAttrByName('attr1') == 234
+    True 
+    >>> aContexts.removeById(id(aObj))
+    >>> aContexts.add(bObj)
+    >>> aContexts.getAttrByName('attr1') == 98
+    True 
+
+    .. method:: getByClass()
+
+        Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> aContexts.getByClass('mock') == aObj
+    True 
+    >>> aContexts.getByClass(Mock) == aObj
+    True 
+
+    .. method:: getOffsetBySite()
+
+        For a given site return its offset. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cParent = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.getOffsetBySite(aSite)
+    23 
+    >>> aLocations.getOffsetBySite(bSite)
+    121.5 
+
+    .. method:: getOffsetBySiteId()
+
+        For a given site id, return its offset. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cParent = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.getOffsetBySiteId(id(aSite))
+    23 
+    >>> aLocations.getOffsetBySiteId(id(bSite))
+    121.5 
+
+    .. method:: getOffsets()
+
+        Return a list of all offsets. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> dSite = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 0)
+    >>> aLocations.add(cSite) # a context
+    >>> aLocations.add(bSite, 234) # can add at same offset or another
+    >>> aLocations.add(dSite) # a context
+    >>> aLocations.getOffsets()
+    [0, 234] 
+
+    .. method:: getSiteByOffset()
+
+        For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 23121.5)
+    >>> aSite == aLocations.getSiteByOffset(23)
+    True 
+
+    .. method:: getSites()
+
+        Get parents for locations; unwrap from weakrefs 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj, 234)
+    >>> aContexts.add(bObj, 3000)
+    >>> len(aContexts._locationKeys) == 2
+    True 
+    >>> len(aContexts.getSites()) == 2
+    True 
+
+    .. method:: hasSiteId()
+
+        Return True or False if this DefinedContexts object already has this site defined as a location 
+
+    .. method:: remove()
+
+        Remove the entry specified by sites 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aSite, 23)
+    >>> len(aContexts)
+    1 
+    >>> aContexts.add(bSite, 233)
+    >>> len(aContexts)
+    2 
+    >>> aContexts.add(cSite, 232223)
+    >>> len(aContexts)
+    3 
+    >>> aContexts.remove(aSite)
+    >>> len(aContexts)
+    2 
+
+    .. method:: removeById()
+
+    
+    .. method:: setAttrByName()
+
+        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> bObj.attr1 = 98
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> aContexts.setAttrByName('attr1', 'test')
+    >>> aContexts.getAttrByName('attr1') == 'test'
+    True 
+
+    .. method:: setOffsetBySite()
+
+        Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cSite = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.setOffsetBySite(aSite, 20)
+    >>> aLocations.getOffsetBySite(aSite)
+    20 
+    >>> aLocations.setOffsetBySite(cSite, 30)
+    Traceback (most recent call last): 
+    RelationsException: ... 
+
+
+Class Groups
+------------
+
+.. class:: Groups
+
+
+===================
+
+    A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
+
+>>> g = Groups()
+>>> g.append("hello")
+>>> g[0]
+'hello' 
+>>> g.append(5)
+Traceback (most recent call last): 
+GroupException: Only strings can be used as list names 
+
+    Inherits from: list
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
 
 

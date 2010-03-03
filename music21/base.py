@@ -638,11 +638,6 @@ class DefinedContexts(object):
 
 
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
 class Music21Object(object):
     '''
@@ -1539,12 +1534,9 @@ class ElementWrapper(Music21Object):
 
 
 #-------------------------------------------------------------------------------
-
-
 class TestMock(Music21Object):
     def __init__(self):
         Music21Object.__init__(self)
-
 
 class Test(unittest.TestCase):
 
@@ -1823,6 +1815,12 @@ class Test(unittest.TestCase):
         #n.pitch.setContextAttr('lyric', pitchMeasure)
         #self.assertEqual(n.lyric, 34)
 
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
 
 
 def mainTest(*testClasses):

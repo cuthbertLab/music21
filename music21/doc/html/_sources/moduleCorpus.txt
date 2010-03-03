@@ -19,7 +19,7 @@ The music21 corpus provides a collection of public-domain music in MusicXML, Hum
 
 .. function:: getWork()
 
-    Search the corpus and return either a list of file paths or a single file path 
+    Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
 >>> import os
 >>> a = getWork('opus74no2', 4)
@@ -45,9 +45,20 @@ True
 .. function:: getBeethovenStringQuartets()
 
     
+
+>>> a = getBeethovenStringQuartets()
+>>> len(a) > 10
+True 
+>>> a = getBeethovenStringQuartets('krn')
+>>> len(a) < 10 and len(a) > 0
+True 
+>>> a = getBeethovenStringQuartets('xml')
+>>> len(a) > 400
+False 
+
 .. function:: getComposer()
 
-    
+    Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
 
 >>> a = getComposer('beethoven')
 >>> len(a) > 10
@@ -55,6 +66,16 @@ True
 >>> a = getComposer('mozart')
 >>> len(a) > 10
 True 
+>>> a = getComposer('bach', 'krn')
+>>> len(a) < 10
+True 
+>>> a = getComposer('bach', 'xml')
+>>> len(a) > 10
+True 
+
+.. function:: getWorkList()
+
+    Search the corpus and return a list of works, alway in a list. If no matches are found, an empty list is returned. 
 
 .. function:: getComposerDir()
 
@@ -77,3 +98,14 @@ True
 .. function:: getBachChorales()
 
     
+
+>>> a = getBachChorales()
+>>> len(a) > 10
+True 
+>>> a = getBachChorales('krn')
+>>> len(a) > 10
+False 
+>>> a = getBachChorales('xml')
+>>> len(a) > 400
+True 
+

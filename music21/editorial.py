@@ -115,6 +115,14 @@ class Test(unittest.TestCase):
         self.assertEqual(a.position, 'below')
 
 
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [NoteEditorial]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

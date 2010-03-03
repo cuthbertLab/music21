@@ -11,63 +11,6 @@ music21.dynamics
 
     Given a unit interfal value, map to a dynamic name 
 
-Class Wedge
------------
-
-.. class:: Wedge
-
-
-==================
-
-    Object model of crescendeo/decrescendo wedges. 
-
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: contexts
-
-    .. attribute:: groups
-
-    .. attribute:: id
-
-    .. attribute:: locations
-
-    .. attribute:: posPlacement
-
-    .. attribute:: spread
-
-    .. attribute:: type
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: mx
-
-        returns a musicxml.Direction object 
-
-    >>> a = Wedge()
-    >>> a.type = 'crescendo'
-    >>> mxDirection = a.mx
-    >>> mxWedge = mxDirection.getWedge()
-    >>> mxWedge.get('type')
-    'crescendo' 
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-Methods
-~~~~~~~
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
-
-
 Class Dynamic
 -------------
 
@@ -83,15 +26,11 @@ Class Dynamic
 Attributes
 ~~~~~~~~~~
 
-    .. attribute:: contexts
-
     .. attribute:: englishName
 
     .. attribute:: groups
 
     .. attribute:: id
-
-    .. attribute:: locations
 
     .. attribute:: longName
 
@@ -137,6 +76,59 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addLocationAndParent()**, **contexts()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Wedge
+-----------
+
+.. class:: Wedge
+
+
+==================
+
+    Object model of crescendeo/decrescendo wedges. 
+
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: posPlacement
+
+    .. attribute:: spread
+
+    .. attribute:: type
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: mx
+
+        returns a musicxml.Direction object 
+
+    >>> a = Wedge()
+    >>> a.type = 'crescendo'
+    >>> mxDirection = a.mx
+    >>> mxWedge = mxDirection.getWedge()
+    >>> mxWedge.get('type')
+    'crescendo' 
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods
+~~~~~~~
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 

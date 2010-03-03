@@ -30,12 +30,14 @@ Module Reference
    :maxdepth: 1
 
    moduleBase
+   moduleClef
    moduleCommon
    moduleConverter
    moduleCorpus
    moduleChord
    moduleDuration
    moduleDynamics
+   moduleEditorial
    moduleEnvironment
    moduleInstrument
    moduleInterval
