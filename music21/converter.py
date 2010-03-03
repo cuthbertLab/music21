@@ -18,6 +18,7 @@ import doctest
 import unittest
 import os
 import pickle
+import urllib
 
 import music21
 
@@ -279,6 +280,36 @@ class Converter(object):
         self._converter.parseData(dataStr)
 
 
+    def parseURL(self, url):
+        '''Given a url, downloadn and parse
+            
+        >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+        >>> urlB = http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern
+        >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+        '''
+        # TODO: this needs to check if the file is already stored in the
+        # users scrawtch directory before downloading
+
+        #url = urllib.quote(url) may need?
+        if '=xml' in url:
+            ext = '.xml'
+        elif '=kern' in url:
+            ext = '.krn'
+        elif 'xml' in url: # less restrictive
+            ext = '.xml'
+        elif 'krn' in url:
+            ext = '.krn'
+        else:
+            ext = ''    
+        environLocal.printDebug(['using extension:', ext])
+        dst = environLocal.getTempFile(ext)
+        fp, headers = urllib.urlretrieve(url, filename=dst)
+
+        format = common.findFormatFile(fp) 
+        self._setConverter(format, forceSource=False)
+        self._converter.parseFile(fp)
+
+
     #---------------------------------------------------------------------------
     # properties
 
@@ -306,12 +337,19 @@ def parseData(dataStr):
     v.parseData(dataStr)
     return v.stream
 
+def parseURL(url, forceSource=False):
+    v = Converter()
+    v.parseURL(url)
+    return v.stream
+
 def parse(value, forceSource=False):
     '''
     Determine if the file is a file path or a string 
     '''
     if os.path.exists(value):
         return parseFile(value, forceSource)
+    elif 'http://' in value: # its a url; may need to broaden these criteria
+        return parseURL(value, forceSource)
     else:
         return parseData(value)
 
