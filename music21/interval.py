@@ -817,5 +817,13 @@ class Test(unittest.TestCase):
         assert perfectFifth.diatonic.mod7 == "P5"
         self.assertEqual(perfectFifth.complement.niceName, "Perfect Fourth")
 
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [generateChromatic, generateDiatonic, generateInterval, Interval]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)

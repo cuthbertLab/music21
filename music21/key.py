@@ -292,6 +292,14 @@ class Test(unittest.TestCase):
         self.assertEqual(a.sharps, None)
 
 
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [KeySignature, Key]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

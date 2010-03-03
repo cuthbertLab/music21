@@ -7,40 +7,6 @@ music21.tempo
 
 .. module:: music21.tempo
 
-Class MetronomeMark
--------------------
-
-.. class:: MetronomeMark
-
-
-==========================
-
-    
-
->>> a = MetronomeMark(40)
->>> a.number
-40 
-
-    Inherits from: tempo.TempoMark (of module :ref:`moduleTempo`), base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: groups
-
-    .. attribute:: id
-
-    .. attribute:: number
-
-    .. attribute:: referent
-
-    .. attribute:: value
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
-
-
 Class TempoMark
 ---------------
 
@@ -73,6 +39,40 @@ Properties (Inherited)
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class MetronomeMark
+-------------------
+
+.. class:: MetronomeMark
+
+
+==========================
+
+    
+
+>>> a = MetronomeMark(40)
+>>> a.number
+40 
+
+    Inherits from: tempo.TempoMark (of module :ref:`moduleTempo`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: number
+
+    .. attribute:: referent
+
+    .. attribute:: value
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 

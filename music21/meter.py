@@ -2343,7 +2343,13 @@ class Test(unittest.TestCase):
             test = a.positionToDepth(pos, align='quantize')
             self.assertEqual(test, match[x])
 
-#-----------------------------------------------------------------||||||||||||--
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [TimeSignature, CompoundTimeSignature]
+
+
 if __name__ == "__main__":
     #music21.mainTest(Test, TestExternal)
     music21.mainTest(Test)

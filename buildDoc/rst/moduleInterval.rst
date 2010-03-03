@@ -13,9 +13,26 @@ Interval.py is a module for creating and manipulating interval objects.
 Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
 There are also a number of useful lists included in the module.
 
+.. function:: generateChromatic()
+
+    generateChromatic(Note, Note) -> ChromaticInterval Generates a ChromaticInterval from the two given notes. 
+
 .. function:: generateDiatonic()
 
     generateDiatonic(GenericInterval, ChromaticInterval) -> DiatonicInterval Generates a DiatonicInterval from the given Generic and Chromatic intervals. 
+
+.. function:: generateInterval()
+
+    generateInterval(Note [,Note]) -> Interval Generates an interval from note1 to a generic note, or from note1 to note2.  The generic, chromatic, and diatonic parts of the interval are also generated. 
+
+>>> from music21 import note
+>>> aNote = note.Note('c4')
+>>> bNote = note.Note('g5')
+>>> aInterval = generateInterval(aNote, bNote)
+>>> aInterval
+<music21.interval.Interval P12> 
+
+
 
 .. function:: getAbsoluteLowerNote()
 
@@ -39,19 +56,6 @@ F3
 .. function:: generateNote()
 
     
-.. function:: generateInterval()
-
-    generateInterval(Note [,Note]) -> Interval Generates an interval from note1 to a generic note, or from note1 to note2.  The generic, chromatic, and diatonic parts of the interval are also generated. 
-
->>> from music21 import note
->>> aNote = note.Note('c4')
->>> bNote = note.Note('g5')
->>> aInterval = generateInterval(aNote, bNote)
->>> aInterval
-<music21.interval.Interval P12> 
-
-
-
 .. function:: generateIntervalFromString()
 
     generateIntervalFromString(string) -> Interval Generates an interval object based on the given string, such as "P5", "m3", "A2". 
@@ -74,10 +78,6 @@ F3
 .. function:: getWrittenLowerNote()
 
     Given two notes, returns the lower note based on diatonic note number. Returns the note lower in pitch if the diatonic number is the same, or the first note if pitch is also the same. 
-
-.. function:: generateChromatic()
-
-    generateChromatic(Note, Note) -> ChromaticInterval Generates a ChromaticInterval from the two given notes. 
 
 .. function:: getAbsoluteHigherNote()
 
@@ -118,39 +118,6 @@ True
 >>> aInterval
 <music21.interval.GenericInterval 12> 
 
-
-
-Class DiatonicInterval
-----------------------
-
-.. class:: DiatonicInterval
-
-
-=============================
-
-    
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: groups
-
-    .. attribute:: id
-
-    .. attribute:: name
-
-    .. attribute:: specifier
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
 
 
 Class Interval
@@ -221,6 +188,39 @@ Methods
     .. method:: reinit()
 
         Reinitialize the internal interval objects in case something has changed.  Called also during __init__ 
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class DiatonicInterval
+----------------------
+
+.. class:: DiatonicInterval
+
+
+=============================
+
+    
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: name
+
+    .. attribute:: specifier
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~

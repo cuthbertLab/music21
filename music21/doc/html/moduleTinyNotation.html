@@ -1,0 +1,417 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.tinyNotation &mdash; music21 v0.2.4a1 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="prev" title="music21.tempo" href="moduleTempo.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="moduleTempo.html" title="music21.tempo"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.tinyNotation</a><ul>
+<li><a class="reference external" href="#class-tinynotationnote">Class TinyNotationNote</a><ul>
+<li><a class="reference external" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tinynotationline">Class TinyNotationLine</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#id1">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-harmonynote">Class HarmonyNote</a><ul>
+<li><a class="reference external" href="#id2">Methods</a></li>
+<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-harmonyline">Class HarmonyLine</a><ul>
+<li><a class="reference external" href="#id3">Attributes</a></li>
+<li><a class="reference external" href="#id4">Methods (Inherited)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleTempo.html"
+                                  title="previous chapter">music21.tempo</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleTinyNotation.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-music21.tinyNotation">
+<span id="moduletinynotation"></span><h1>music21.tinyNotation<a class="headerlink" href="#module-music21.tinyNotation" title="Permalink to this headline">¶</a></h1>
+<p>tinyNotation &#8211; a simple way of specifying single line melodies
+that uses a notation somewhat similar to Lilypond but with WAY fewer
+examples.  Originally developed to notate trecento (medieval Italian)
+music, but it&#8217;s pretty useful for a lot of short examples.</p>
+<p>tinyNotation is not meant to expand to cover every single case.  Instead
+it is meant to be subclassible to extend to the cases <em>your</em> project needs.
+See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
+or the Trecento specific examples in trecento/cadencebook.py</p>
+<dl class="function">
+<dt id="music21.tinyNotation.lineToStream">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">lineToStream</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.lineToStream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="class-tinynotationnote">
+<h2>Class TinyNotationNote<a class="headerlink" href="#class-tinynotationnote" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.tinyNotation.TinyNotationNote">
+<em class="property">
+class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationNote</tt><a class="headerlink" href="#music21.tinyNotation.TinyNotationNote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tcN</span> <span class="o">=</span> <span class="n">TinyNotationNote</span><span class="p">(</span><span class="s">&quot;AA-4.~=aflat_hel-&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span> <span class="o">=</span> <span class="n">tcN</span><span class="o">.</span><span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;A-&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">octave</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">lyric</span>
+<span class="go">&#39;hel-&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;aflat&#39;</span>
+</pre></div>
+</div>
+<blockquote>
+Inherits from:</blockquote>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.tinyNotation.DBLDOT">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">DBLDOT</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.DBLDOT" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.DOT">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">DOT</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.DOT" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.EDFLAT">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">EDFLAT</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.EDFLAT" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.EDNAT">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">EDNAT</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.EDNAT" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.EDSHARP">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">EDSHARP</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.EDSHARP" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.FLAT">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">FLAT</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.FLAT" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.ID_EL">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">ID_EL</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.ID_EL" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.LYRIC">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">LYRIC</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.LYRIC" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.OCTAVE2">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">OCTAVE2</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.OCTAVE2" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.OCTAVE3">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">OCTAVE3</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.OCTAVE3" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.OCTAVE4">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">OCTAVE4</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.OCTAVE4" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.OCTAVE5">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">OCTAVE5</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.OCTAVE5" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.PRECTIE">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">PRECTIE</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.PRECTIE" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.REST">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">REST</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.REST" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.SHARP">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">SHARP</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.SHARP" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.TIE">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TIE</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.TIE" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.TYPE">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TYPE</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.TYPE" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.customNotationMatch">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">customNotationMatch</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.customNotationMatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.customPitchMatch">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">customPitchMatch</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.customPitchMatch" title="Permalink to this definition">¶</a></dt>
+<dd>method to create a note object in sub classes of tiny notation. Should return a Note-like object or None</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.debug">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">debug</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.debug" title="Permalink to this definition">¶</a></dt>
+<dd>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.getDots">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">getDots</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.getDots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-tinynotationline">
+<h2>Class TinyNotationLine<a class="headerlink" href="#class-tinynotationline" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.tinyNotation.TinyNotationLine">
+<em class="property">
+class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationLine</tt><a class="headerlink" href="#music21.tinyNotation.TinyNotationLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4:</blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">TinyNotationLine</span><span class="p">(</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">stream</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&quot;lastG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;G&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">isRest</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">octave</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<blockquote>
+Inherits from:</blockquote>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.tinyNotation.stream">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">stream</tt><a class="headerlink" href="#music21.tinyNotation.stream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.tinyNotation.stringRep">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">stringRep</tt><a class="headerlink" href="#music21.tinyNotation.stringRep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id1">
+<h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.tinyNotation.ENDBRAC">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">ENDBRAC</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.ENDBRAC" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.QUAD">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">QUAD</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.QUAD" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.TRIP">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TRIP</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.TRIP" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+<dl class="method">
+<dt id="music21.tinyNotation.getNote">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">getNote</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.getNote" title="Permalink to this definition">¶</a></dt>
+<dd>called out so as to be subclassable</dd></dl>
+
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-harmonynote">
+<h2>Class HarmonyNote<a class="headerlink" href="#class-harmonynote" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.tinyNotation.HarmonyNote">
+<em class="property">
+class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyNote</tt><a class="headerlink" href="#music21.tinyNotation.HarmonyNote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>)</blockquote>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.tinyNotation.HARMONY">
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HARMONY</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.tinyNotation.HARMONY" title="Permalink to this definition">¶</a></dt>
+<dd>Compiled regular expression objects</dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <strong>DBLDOT()</strong>, <strong>DOT()</strong>, <strong>EDFLAT()</strong>, <strong>EDNAT()</strong>, <strong>EDSHARP()</strong>, <strong>FLAT()</strong>, <strong>ID_EL()</strong>, <strong>LYRIC()</strong>, <strong>OCTAVE2()</strong>, <strong>OCTAVE3()</strong>, <strong>OCTAVE4()</strong>, <strong>OCTAVE5()</strong>, <strong>PRECTIE()</strong>, <strong>REST()</strong>, <strong>SHARP()</strong>, <strong>TIE()</strong>, <strong>TYPE()</strong>, <strong>customNotationMatch()</strong>, <strong>customPitchMatch()</strong>, <strong>debug()</strong>, <strong>getDots()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-harmonyline">
+<h2>Class HarmonyLine<a class="headerlink" href="#class-harmonyline" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.tinyNotation.HarmonyLine">
+<em class="property">
+class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyLine</tt><a class="headerlink" href="#music21.tinyNotation.HarmonyLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+example of subclassing TinyNotationLine to include a possible harmonic representation of the note</blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">hnl</span> <span class="o">=</span> <span class="n">HarmonyLine</span><span class="p">(</span><span class="s">&quot;c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle &quot;</span> <span class="o">+</span>                           <span class="s">&quot;G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er&quot;</span><span class="p">,</span> <span class="s">&quot;4/4&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span> <span class="o">=</span> <span class="n">hnl</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">notes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;C&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">misc</span><span class="p">[</span><span class="s">&#39;harmony&#39;</span><span class="p">]</span>
+<span class="go">&#39;F&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">lyric</span>
+<span class="go">&#39;Mi-&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">isRest</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">5</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;G&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">7</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;A-&#39;</span>
+</pre></div>
+</div>
+<blockquote>
+Inherits from: tinyNotation.TinyNotationLine (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>)</blockquote>
+<div class="section" id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">stream</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">stringRep</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id4">
+<h3>Methods (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from tinyNotation.TinyNotationLine (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <strong>ENDBRAC()</strong>, <strong>QUAD()</strong>, <strong>TRIP()</strong>, <strong>getNote()</strong></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleTempo.html" title="music21.tempo"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Mar 03, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

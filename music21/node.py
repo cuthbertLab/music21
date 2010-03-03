@@ -476,7 +476,11 @@ class Test(unittest.TestCase):
 
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Node, NodeList]
+
+
 if __name__ == "__main__":
     s1 = doctest.DocTestSuite(__name__)
     s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)

@@ -48,6 +48,7 @@ Module Reference
    moduleStream
    moduleSerial
    moduleTempo
+   moduleTinyNotation
 
 Indices and Tables
 ==================

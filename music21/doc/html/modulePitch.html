@@ -48,7 +48,7 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.pitch</a><ul>
-<li><a class="reference external" href="#class-accidental">Class Accidental</a><ul>
+<li><a class="reference external" href="#class-pitch">Class Pitch</a><ul>
 <li><a class="reference external" href="#attributes">Attributes</a></li>
 <li><a class="reference external" href="#properties">Properties</a></li>
 <li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
@@ -56,7 +56,7 @@
 <li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#class-pitch">Class Pitch</a><ul>
+<li><a class="reference external" href="#class-accidental">Class Accidental</a><ul>
 <li><a class="reference external" href="#id1">Attributes</a></li>
 <li><a class="reference external" href="#id2">Properties</a></li>
 <li><a class="reference external" href="#id3">Properties (Inherited)</a></li>
@@ -183,101 +183,6 @@ Used extensively by note.py</p>
 <span class="go">60.0</span>
 </pre></div>
 </div>
-<div class="section" id="class-accidental">
-<h2>Class Accidental<a class="headerlink" href="#class-accidental" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="music21.pitch.Accidental">
-<em class="property">
-class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Accidental class.</p>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.pitch.alter">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.alter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.pitch.modifier">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">modifier</tt><a class="headerlink" href="#music21.pitch.modifier" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.pitch.name">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.pitch.lily">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">lily</tt><a class="headerlink" href="#music21.pitch.lily" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.pitch.mx">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.mx" title="Permalink to this definition">¶</a></dt>
-<dd>From music21 to MusicXML</dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;content&#39;</span><span class="p">)</span>
-<span class="go">&#39;quarter-sharp&#39;</span>
-</pre></div>
-</div>
-</blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="method">
-<dt id="music21.pitch.set">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.set" title="Permalink to this definition">¶</a></dt>
-<dd>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="mf">1</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;--&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span>
-<span class="go">-2.0</span>
-</pre></div>
-</div>
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
-</div>
-</div>
 <div class="section" id="class-pitch">
 <h2>Class Pitch<a class="headerlink" href="#class-pitch" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -289,8 +194,8 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <hr class="docutils" />
 <blockquote>
 Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.pitch.defaultOctave">
@@ -309,8 +214,8 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 
 </blockquote>
 </div>
-<div class="section" id="id2">
-<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.pitch.accidental">
@@ -379,8 +284,8 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 <dd>Provide a complete MusicXM: representation. Presently, this is based on</dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">mx</tt></dt>
+<dt id="music21.pitch.mx">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.mx" title="Permalink to this definition">¶</a></dt>
 <dd>returns a musicxml.Note() object</dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g#4&#39;</span><span class="p">)</span>
@@ -390,8 +295,8 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">name</tt></dt>
+<dt id="music21.pitch.name">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.name" title="Permalink to this definition">¶</a></dt>
 <dd>Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass</dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -470,6 +375,77 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 </div>
 </blockquote>
 </div>
+<div class="section" id="properties-inherited">
+<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-accidental">
+<h2>Class Accidental<a class="headerlink" href="#class-accidental" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.pitch.Accidental">
+<em class="property">
+class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+<p>Accidental class.</p>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+</blockquote>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.pitch.alter">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.alter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.pitch.modifier">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">modifier</tt><a class="headerlink" href="#music21.pitch.modifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">name</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id2">
+<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.pitch.lily">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">lily</tt><a class="headerlink" href="#music21.pitch.lily" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">mx</tt></dt>
+<dd>From music21 to MusicXML</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxAccidental</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;content&#39;</span><span class="p">)</span>
+<span class="go">&#39;quarter-sharp&#39;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
 <div class="section" id="id3">
 <h3>Properties (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -477,6 +453,30 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </div>
 <div class="section" id="id4">
 <h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="method">
+<dt id="music21.pitch.set">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.set" title="Permalink to this definition">¶</a></dt>
+<dd>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="mf">1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;--&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span>
+<span class="go">-2.0</span>
+</pre></div>
+</div>
+</blockquote>
 </div>
 <div class="section" id="id5">
 <h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>

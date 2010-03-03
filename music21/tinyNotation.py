@@ -312,7 +312,9 @@ class HarmonyNote(TinyNotationNote):
 class TinyNotationException(Exception):
     pass
 
-###### test routines
+
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -386,6 +388,12 @@ class TestExternal(unittest.TestCase):
 #        cadB.append(n1)
 #        cadB.lily.showPDF()
         cadB.show()
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [TinyNotationNote, TinyNotationLine]
 
 
 if __name__ == "__main__":

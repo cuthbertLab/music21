@@ -21,6 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="music21.tinyNotation" href="moduleTinyNotation.html" />
     <link rel="prev" title="music21.serial" href="moduleSerial.html" /> 
   </head>
   <body>
@@ -34,6 +35,9 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
+          <a href="moduleTinyNotation.html" title="music21.tinyNotation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="moduleSerial.html" title="music21.serial"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
@@ -44,14 +48,14 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.tempo</a><ul>
-<li><a class="reference external" href="#class-metronomemark">Class MetronomeMark</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-</ul>
-</li>
 <li><a class="reference external" href="#class-tempomark">Class TempoMark</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
 <li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
 <li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-metronomemark">Class MetronomeMark</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
 </ul>
 </li>
 </ul>
@@ -61,6 +65,9 @@
             <h4>Previous topic</h4>
             <p class="topless"><a href="moduleSerial.html"
                                   title="previous chapter">music21.serial</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleTinyNotation.html"
+                                  title="next chapter">music21.tinyNotation</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/moduleTempo.txt"
@@ -89,55 +96,6 @@
             
   <div class="section" id="module-music21.tempo">
 <span id="moduletempo"></span><h1>music21.tempo<a class="headerlink" href="#module-music21.tempo" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="class-metronomemark">
-<h2>Class MetronomeMark<a class="headerlink" href="#class-metronomemark" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="music21.tempo.MetronomeMark">
-<em class="property">
-class </em><tt class="descclassname">music21.tempo.</tt><tt class="descname">MetronomeMark</tt><a class="headerlink" href="#music21.tempo.MetronomeMark" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MetronomeMark</span><span class="p">(</span><span class="mf">40</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">number</span>
-<span class="go">40</span>
-</pre></div>
-</div>
-<blockquote>
-Inherits from: tempo.TempoMark (of module <a class="reference internal" href="#moduletempo"><em>music21.tempo</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.tempo.groups">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.tempo.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.tempo.id">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.tempo.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.tempo.number">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">number</tt><a class="headerlink" href="#music21.tempo.number" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.tempo.referent">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">referent</tt><a class="headerlink" href="#music21.tempo.referent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.tempo.value">
-<tt class="descclassname">music21.tempo.</tt><tt class="descname">value</tt><a class="headerlink" href="#music21.tempo.value" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
-</blockquote>
-</div>
-</div>
 <div class="section" id="class-tempomark">
 <h2>Class TempoMark<a class="headerlink" href="#class-tempomark" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -154,6 +112,53 @@ class </em><tt class="descclassname">music21.tempo.</tt><tt class="descname">Tem
 </div>
 <blockquote>
 Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.tempo.groups">
+<tt class="descclassname">music21.tempo.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.tempo.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.tempo.id">
+<tt class="descclassname">music21.tempo.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.tempo.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.tempo.value">
+<tt class="descclassname">music21.tempo.</tt><tt class="descname">value</tt><a class="headerlink" href="#music21.tempo.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="properties-inherited">
+<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-metronomemark">
+<h2>Class MetronomeMark<a class="headerlink" href="#class-metronomemark" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.tempo.MetronomeMark">
+<em class="property">
+class </em><tt class="descclassname">music21.tempo.</tt><tt class="descname">MetronomeMark</tt><a class="headerlink" href="#music21.tempo.MetronomeMark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MetronomeMark</span><span class="p">(</span><span class="mf">40</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">number</span>
+<span class="go">40</span>
+</pre></div>
+</div>
+<blockquote>
+Inherits from: tempo.TempoMark (of module <a class="reference internal" href="#moduletempo"><em>music21.tempo</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id1">
 <h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -168,21 +173,23 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="music21.tempo.number">
+<tt class="descclassname">music21.tempo.</tt><tt class="descname">number</tt><a class="headerlink" href="#music21.tempo.number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.tempo.referent">
+<tt class="descclassname">music21.tempo.</tt><tt class="descname">referent</tt><a class="headerlink" href="#music21.tempo.referent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt>
 <tt class="descclassname">music21.tempo.</tt><tt class="descname">value</tt></dt>
 <dd></dd></dl>
 
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
 </blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
 </div>
 </div>
 </div>
@@ -202,6 +209,9 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleTinyNotation.html" title="music21.tinyNotation"
+             >next</a> |</li>
         <li class="right" >
           <a href="moduleSerial.html" title="music21.serial"
              >previous</a> |</li>

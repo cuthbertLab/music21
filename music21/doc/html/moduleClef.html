@@ -1,0 +1,1571 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.clef &mdash; music21 v0.2.4a1 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="music21.common" href="moduleCommon.html" />
+    <link rel="prev" title="music21.base" href="moduleBase.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="moduleCommon.html" title="music21.common"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleBase.html" title="music21.base"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.clef</a><ul>
+<li><a class="reference external" href="#class-clef">Class Clef</a><ul>
+<li><a class="reference external" href="#attributes">Attributes</a></li>
+<li><a class="reference external" href="#properties">Properties</a></li>
+<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-trebleclef">Class TrebleClef</a><ul>
+<li><a class="reference external" href="#id1">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-bassclef">Class BassClef</a><ul>
+<li><a class="reference external" href="#id2">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-treble8vaclef">Class Treble8vaClef</a><ul>
+<li><a class="reference external" href="#id3">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-gsopranoclef">Class GSopranoClef</a><ul>
+<li><a class="reference external" href="#id4">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tabclef">Class TabClef</a><ul>
+<li><a class="reference external" href="#id5">Attributes</a></li>
+<li><a class="reference external" href="#id6">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id7">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-fclef">Class FClef</a><ul>
+<li><a class="reference external" href="#id8">Attributes</a></li>
+<li><a class="reference external" href="#id9">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id10">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-noclef">Class NoClef</a><ul>
+<li><a class="reference external" href="#id11">Attributes</a></li>
+<li><a class="reference external" href="#id12">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id13">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-altoclef">Class AltoClef</a><ul>
+<li><a class="reference external" href="#id14">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-fbaritoneclef">Class FBaritoneClef</a><ul>
+<li><a class="reference external" href="#id15">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-treble8vbclef">Class Treble8vbClef</a><ul>
+<li><a class="reference external" href="#id16">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-percussionclef">Class PercussionClef</a><ul>
+<li><a class="reference external" href="#id17">Attributes</a></li>
+<li><a class="reference external" href="#id18">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id19">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-frenchviolinclef">Class FrenchViolinClef</a><ul>
+<li><a class="reference external" href="#id20">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-gclef">Class GClef</a><ul>
+<li><a class="reference external" href="#id21">Attributes</a></li>
+<li><a class="reference external" href="#id22">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id23">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-bass8vbclef">Class Bass8vbClef</a><ul>
+<li><a class="reference external" href="#id24">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-tenorclef">Class TenorClef</a><ul>
+<li><a class="reference external" href="#id25">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-sopranoclef">Class SopranoClef</a><ul>
+<li><a class="reference external" href="#id26">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-cbaritoneclef">Class CBaritoneClef</a><ul>
+<li><a class="reference external" href="#id27">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-pitchclef">Class PitchClef</a><ul>
+<li><a class="reference external" href="#id28">Attributes</a></li>
+<li><a class="reference external" href="#id29">Properties</a></li>
+<li><a class="reference external" href="#id30">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id31">Methods</a></li>
+<li><a class="reference external" href="#id32">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-subbassclef">Class SubBassClef</a><ul>
+<li><a class="reference external" href="#id33">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-bass8vaclef">Class Bass8vaClef</a><ul>
+<li><a class="reference external" href="#id34">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-cclef">Class CClef</a><ul>
+<li><a class="reference external" href="#id35">Attributes</a></li>
+<li><a class="reference external" href="#id36">Properties (Inherited)</a></li>
+<li><a class="reference external" href="#id37">Methods (Inherited)</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-mezzosopranoclef">Class MezzoSopranoClef</a><ul>
+<li><a class="reference external" href="#id38">Attributes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleBase.html"
+                                  title="previous chapter">music21.base</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleCommon.html"
+                                  title="next chapter">music21.common</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleClef.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-music21.clef">
+<span id="moduleclef"></span><h1>music21.clef<a class="headerlink" href="#module-music21.clef" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="music21.clef.standardClefFromXN">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">standardClefFromXN</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.clef.standardClefFromXN" title="Permalink to this definition">¶</a></dt>
+<dd>Returns a Clef object given a string like &#8220;G2&#8221; or &#8220;F4&#8221; etc.</dd></dl>
+
+<div class="section" id="class-clef">
+<h2>Class Clef<a class="headerlink" href="#class-clef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.Clef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Clef</tt><a class="headerlink" href="#music21.clef.Clef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.clef.groups">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.clef.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.id">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.clef.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.line">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt><a class="headerlink" href="#music21.clef.line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.octaveChange">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt><a class="headerlink" href="#music21.clef.octaveChange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.sign">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt><a class="headerlink" href="#music21.clef.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.clef.mx">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.clef.mx" title="Permalink to this definition">¶</a></dt>
+<dd>Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef.</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">GClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;sign&#39;</span><span class="p">)</span>
+<span class="go">&#39;G&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Treble8vbClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">octaveChange</span>
+<span class="go">-1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;sign&#39;</span><span class="p">)</span>
+<span class="go">&#39;G&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;clefOctaveChange&#39;</span><span class="p">)</span>
+<span class="go">-1</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="properties-inherited">
+<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="methods-inherited">
+<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-trebleclef">
+<h2>Class TrebleClef<a class="headerlink" href="#class-trebleclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.TrebleClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">TrebleClef</tt><a class="headerlink" href="#music21.clef.TrebleClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.GClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.lilyName">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt><a class="headerlink" href="#music21.clef.lilyName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.clef.lowestLine">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt><a class="headerlink" href="#music21.clef.lowestLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-bassclef">
+<h2>Class BassClef<a class="headerlink" href="#class-bassclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.BassClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">BassClef</tt><a class="headerlink" href="#music21.clef.BassClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.FClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id2">
+<h3>Attributes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-treble8vaclef">
+<h2>Class Treble8vaClef<a class="headerlink" href="#class-treble8vaclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.Treble8vaClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Treble8vaClef</tt><a class="headerlink" href="#music21.clef.Treble8vaClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.TrebleClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.GClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-gsopranoclef">
+<h2>Class GSopranoClef<a class="headerlink" href="#class-gsopranoclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.GSopranoClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">GSopranoClef</tt><a class="headerlink" href="#music21.clef.GSopranoClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.GClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-tabclef">
+<h2>Class TabClef<a class="headerlink" href="#class-tabclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.TabClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">TabClef</tt><a class="headerlink" href="#music21.clef.TabClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id5">
+<h3>Attributes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id6">
+<h3>Properties (Inherited)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id7">
+<h3>Methods (Inherited)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-fclef">
+<h2>Class FClef<a class="headerlink" href="#class-fclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.FClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FClef</tt><a class="headerlink" href="#music21.clef.FClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id8">
+<h3>Attributes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id9">
+<h3>Properties (Inherited)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id10">
+<h3>Methods (Inherited)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-noclef">
+<h2>Class NoClef<a class="headerlink" href="#class-noclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.NoClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">NoClef</tt><a class="headerlink" href="#music21.clef.NoClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id11">
+<h3>Attributes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id12">
+<h3>Properties (Inherited)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id13">
+<h3>Methods (Inherited)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-altoclef">
+<h2>Class AltoClef<a class="headerlink" href="#class-altoclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.AltoClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">AltoClef</tt><a class="headerlink" href="#music21.clef.AltoClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.CClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id14">
+<h3>Attributes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-fbaritoneclef">
+<h2>Class FBaritoneClef<a class="headerlink" href="#class-fbaritoneclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.FBaritoneClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FBaritoneClef</tt><a class="headerlink" href="#music21.clef.FBaritoneClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.FClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id15">
+<h3>Attributes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-treble8vbclef">
+<h2>Class Treble8vbClef<a class="headerlink" href="#class-treble8vbclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.Treble8vbClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Treble8vbClef</tt><a class="headerlink" href="#music21.clef.Treble8vbClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.TrebleClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.GClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id16">
+<h3>Attributes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-percussionclef">
+<h2>Class PercussionClef<a class="headerlink" href="#class-percussionclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.PercussionClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">PercussionClef</tt><a class="headerlink" href="#music21.clef.PercussionClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id17">
+<h3>Attributes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id18">
+<h3>Properties (Inherited)<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id19">
+<h3>Methods (Inherited)<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-frenchviolinclef">
+<h2>Class FrenchViolinClef<a class="headerlink" href="#class-frenchviolinclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.FrenchViolinClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FrenchViolinClef</tt><a class="headerlink" href="#music21.clef.FrenchViolinClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.GClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id20">
+<h3>Attributes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-gclef">
+<h2>Class GClef<a class="headerlink" href="#class-gclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.GClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">GClef</tt><a class="headerlink" href="#music21.clef.GClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id21">
+<h3>Attributes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id22">
+<h3>Properties (Inherited)<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id23">
+<h3>Methods (Inherited)<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-bass8vbclef">
+<h2>Class Bass8vbClef<a class="headerlink" href="#class-bass8vbclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.Bass8vbClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass8vbClef</tt><a class="headerlink" href="#music21.clef.Bass8vbClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.FClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id24">
+<h3>Attributes<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-tenorclef">
+<h2>Class TenorClef<a class="headerlink" href="#class-tenorclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.TenorClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">TenorClef</tt><a class="headerlink" href="#music21.clef.TenorClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.CClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id25">
+<h3>Attributes<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-sopranoclef">
+<h2>Class SopranoClef<a class="headerlink" href="#class-sopranoclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.SopranoClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">SopranoClef</tt><a class="headerlink" href="#music21.clef.SopranoClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.CClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id26">
+<h3>Attributes<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-cbaritoneclef">
+<h2>Class CBaritoneClef<a class="headerlink" href="#class-cbaritoneclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.CBaritoneClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">CBaritoneClef</tt><a class="headerlink" href="#music21.clef.CBaritoneClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.CClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id27">
+<h3>Attributes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-pitchclef">
+<h2>Class PitchClef<a class="headerlink" href="#class-pitchclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.PitchClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">PitchClef</tt><a class="headerlink" href="#music21.clef.PitchClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id28">
+<h3>Attributes<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id29">
+<h3>Properties<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.clef.lily">
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lily</tt><a class="headerlink" href="#music21.clef.lily" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id30">
+<h3>Properties (Inherited)<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id31">
+<h3>Methods<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id32">
+<h3>Methods (Inherited)<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-subbassclef">
+<h2>Class SubBassClef<a class="headerlink" href="#class-subbassclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.SubBassClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">SubBassClef</tt><a class="headerlink" href="#music21.clef.SubBassClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.FClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id33">
+<h3>Attributes<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-bass8vaclef">
+<h2>Class Bass8vaClef<a class="headerlink" href="#class-bass8vaclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.Bass8vaClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass8vaClef</tt><a class="headerlink" href="#music21.clef.Bass8vaClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.FClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id34">
+<h3>Attributes<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="class-cclef">
+<h2>Class CClef<a class="headerlink" href="#class-cclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.CClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">CClef</tt><a class="headerlink" href="#music21.clef.CClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id35">
+<h3>Attributes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+</blockquote>
+</div>
+<div class="section" id="id36">
+<h3>Properties (Inherited)<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+</blockquote>
+</div>
+<div class="section" id="id37">
+<h3>Methods (Inherited)<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+</div>
+</div>
+<div class="section" id="class-mezzosopranoclef">
+<h2>Class MezzoSopranoClef<a class="headerlink" href="#class-mezzosopranoclef" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.clef.MezzoSopranoClef">
+<em class="property">
+class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">MezzoSopranoClef</tt><a class="headerlink" href="#music21.clef.MezzoSopranoClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<blockquote>
+Inherits from: clef.CClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
+<div class="section" id="id38">
+<h3>Attributes<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">groups</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">id</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lilyName</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">line</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">lowestLine</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">octaveChange</tt></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descclassname">music21.clef.</tt><tt class="descname">sign</tt></dt>
+<dd></dd></dl>
+
+<p>Inherited from clef.PitchClef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>lily</strong></p>
+<p>Inherited from clef.Clef (of module <a class="reference internal" href="#moduleclef"><em>music21.clef</em></a>): <strong>mx</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleCommon.html" title="music21.common"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleBase.html" title="music21.base"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Mar 03, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

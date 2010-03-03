@@ -227,5 +227,12 @@ class Test(unittest.TestCase):
 #                 post.append(a)
 
 
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Instrument]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)

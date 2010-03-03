@@ -37,6 +37,7 @@ from music21 import scale
 from music21 import serial
 from music21 import stream
 from music21 import tempo
+from music21 import tinyNotation
 
 from music21.trecento import cadencebook as trecentoCadencebook
 
@@ -71,7 +72,7 @@ MODULES = [
     stream,     
     serial,     
     tempo,     
-
+    tinyNotation,
 
 #   musicxml, 
 #   #  scale,

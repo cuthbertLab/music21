@@ -1461,5 +1461,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)
 
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Note, Rest]
+
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)

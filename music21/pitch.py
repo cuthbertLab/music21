@@ -1043,6 +1043,12 @@ class Test(unittest.TestCase):
         self.assertEqual(pAltered.accidental.displayEvaluated, 'yes')
 
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [Pitch, Accidental]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

@@ -78,5 +78,12 @@ class Test(unittest.TestCase):
         TM1 = TempoMark("Lebhaft")
         self.assertEqual(TM1.value, "Lebhaft")
         
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+DOC_ORDER = [TempoMark, MetronomeMark]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)

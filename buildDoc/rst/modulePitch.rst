@@ -81,79 +81,6 @@ Used extensively by note.py
 >>> convertFqToPs(261.62556530059862)
 60.0 
 
-Class Accidental
-----------------
-
-.. class:: Accidental
-
-
-=======================
-
-    Accidental class. 
-
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: alter
-
-    .. attribute:: modifier
-
-    .. attribute:: name
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: lily
-
-    
-    .. attribute:: mx
-
-        From music21 to MusicXML 
-
-    >>> a = Accidental()
-    >>> a.set('half-sharp')
-    >>> a.alter == .5
-    True 
-    >>> mxAccidental = a.mx
-    >>> mxAccidental.get('content')
-    'quarter-sharp' 
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-Methods
-~~~~~~~
-
-    .. method:: set()
-
-        Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
-
-    >>> a = Accidental()
-    >>> a.set('sharp')
-    >>> a.alter == 1
-    True 
-    >>> a = Accidental()
-    >>> a.set(2)
-    >>> a.modifier == "##"
-    True 
-    >>> a = Accidental()
-    >>> a.set(2.0)
-    >>> a.modifier == "##"
-    True 
-    >>> a = Accidental('--')
-    >>> a.alter
-    -2.0 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
-
-
 Class Pitch
 -----------
 
@@ -317,6 +244,79 @@ Properties (Inherited)
 
 Methods
 ~~~~~~~
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Accidental
+----------------
+
+.. class:: Accidental
+
+
+=======================
+
+    Accidental class. 
+
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: alter
+
+    .. attribute:: modifier
+
+    .. attribute:: name
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: lily
+
+    
+    .. attribute:: mx
+
+        From music21 to MusicXML 
+
+    >>> a = Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True 
+    >>> mxAccidental = a.mx
+    >>> mxAccidental.get('content')
+    'quarter-sharp' 
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods
+~~~~~~~
+
+    .. method:: set()
+
+        Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
+
+    >>> a = Accidental()
+    >>> a.set('sharp')
+    >>> a.alter == 1
+    True 
+    >>> a = Accidental()
+    >>> a.set(2)
+    >>> a.modifier == "##"
+    True 
+    >>> a = Accidental()
+    >>> a.set(2.0)
+    >>> a.modifier == "##"
+    True 
+    >>> a = Accidental('--')
+    >>> a.alter
+    -2.0 
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~

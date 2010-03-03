@@ -19,6 +19,215 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 
     Debugging method to print information about a music21 note called by trecento.trecentoCadence, among other places 
 
+Class Note
+----------
+
+.. class:: Note
+
+
+=================
+
+    Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
+
+    Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: articulations
+
+    .. attribute:: beams
+
+    .. attribute:: editorial
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: lyrics
+
+    .. attribute:: notations
+
+    .. attribute:: pitch
+
+    .. attribute:: tie
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: accidental
+
+    
+    .. attribute:: diatonicNoteNum
+
+        see Pitch.diatonicNoteNum 
+
+    .. attribute:: freq440
+
+    
+    .. attribute:: frequency
+
+    
+    .. attribute:: lily
+
+        The name of the note as it would appear in Lilypond format. 
+
+    .. attribute:: midi
+
+        Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
+
+    >>> a = Note()
+    >>> a.pitch = Pitch('d-4')
+    >>> a.midi
+    61 
+
+    .. attribute:: mx
+
+        Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
+
+    .. attribute:: name
+
+    
+    .. attribute:: nameWithOctave
+
+    
+    .. attribute:: octave
+
+    
+    .. attribute:: pitchClass
+
+        Return pitch class 
+
+    >>> d = Note()
+    >>> d.pitch = Pitch('d-4')
+    >>> d.pitchClass
+    1 
+    >>>
+
+    .. attribute:: ps
+
+        Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
+
+    >>> a = Note()
+    >>> a.ps = 60.5
+    >>> a.midi
+    61 
+    >>> a.ps
+    60.5 
+
+    .. attribute:: step
+
+    
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods
+~~~~~~~
+
+    .. method:: isNote()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: isRest()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: isUnpitched()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: setAccidental()
+
+    
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
+Class Rest
+----------
+
+.. class:: Rest
+
+
+=================
+
+    General rest class 
+
+    Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
+
+Attributes
+~~~~~~~~~~
+
+    .. attribute:: articulations
+
+    .. attribute:: editorial
+
+    .. attribute:: groups
+
+    .. attribute:: id
+
+    .. attribute:: lyrics
+
+    .. attribute:: notations
+
+    .. attribute:: tie
+
+Properties
+~~~~~~~~~~
+
+    .. attribute:: lily
+
+        The name of the rest as it would appear in Lilypond format. 
+
+    >>> r1 = Rest()
+    >>> r1.duration.type = "half"
+    >>> r1.lily
+    'r2' 
+
+    .. attribute:: mx
+
+        Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
+
+Properties (Inherited)
+~~~~~~~~~~~~~~~~~~~~~~
+
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+
+Methods
+~~~~~~~
+
+    .. method:: isNote()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: isRest()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. method:: isUnpitched()
+
+        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+Methods (Inherited)
+~~~~~~~~~~~~~~~~~~~
+
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+
+
 Class WholeNote
 ---------------
 
@@ -236,215 +445,6 @@ Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
     Inherited from note.Note (of module :ref:`moduleNote`): **isNote()**, **isRest()**, **isUnpitched()**, **setAccidental()**
-
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
-
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
-
-
-Class Rest
-----------
-
-.. class:: Rest
-
-
-=================
-
-    General rest class 
-
-    Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: articulations
-
-    .. attribute:: editorial
-
-    .. attribute:: groups
-
-    .. attribute:: id
-
-    .. attribute:: lyrics
-
-    .. attribute:: notations
-
-    .. attribute:: tie
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: lily
-
-        The name of the rest as it would appear in Lilypond format. 
-
-    >>> r1 = Rest()
-    >>> r1.duration.type = "half"
-    >>> r1.lily
-    'r2' 
-
-    .. attribute:: mx
-
-        Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-Methods
-~~~~~~~
-
-    .. method:: isNote()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: isRest()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: isUnpitched()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
-
-
-Class Note
-----------
-
-.. class:: Note
-
-
-=================
-
-    Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
-
-    Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
-
-    .. attribute:: articulations
-
-    .. attribute:: beams
-
-    .. attribute:: editorial
-
-    .. attribute:: groups
-
-    .. attribute:: id
-
-    .. attribute:: lyrics
-
-    .. attribute:: notations
-
-    .. attribute:: pitch
-
-    .. attribute:: tie
-
-Properties
-~~~~~~~~~~
-
-    .. attribute:: accidental
-
-    
-    .. attribute:: diatonicNoteNum
-
-        see Pitch.diatonicNoteNum 
-
-    .. attribute:: freq440
-
-    
-    .. attribute:: frequency
-
-    
-    .. attribute:: lily
-
-        The name of the note as it would appear in Lilypond format. 
-
-    .. attribute:: midi
-
-        Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
-
-    >>> a = Note()
-    >>> a.pitch = Pitch('d-4')
-    >>> a.midi
-    61 
-
-    .. attribute:: mx
-
-        Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
-
-    .. attribute:: name
-
-    
-    .. attribute:: nameWithOctave
-
-    
-    .. attribute:: octave
-
-    
-    .. attribute:: pitchClass
-
-        Return pitch class 
-
-    >>> d = Note()
-    >>> d.pitch = Pitch('d-4')
-    >>> d.pitchClass
-    1 
-    >>>
-
-    .. attribute:: ps
-
-        Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
-
-    >>> a = Note()
-    >>> a.ps = 60.5
-    >>> a.midi
-    61 
-    >>> a.ps
-    60.5 
-
-    .. attribute:: step
-
-    
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
-
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
-
-Methods
-~~~~~~~
-
-    .. method:: isNote()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: isRest()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: isUnpitched()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: setAccidental()
-
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
 
