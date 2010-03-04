@@ -29,7 +29,7 @@ def rhythmLine(baseDuration = QuarterNote(), minLength = 8.0, maxProbability = 0
 
         x = random.random()
         while x < currentProbability:
-            print x, currentProbability
+            print(x, currentProbability)
             newNote.duration = alterRhythm(newNote.duration)
             x = random.random()
         newStream.append(newNote)
@@ -76,9 +76,9 @@ def test():
     s1 = rhythmLine(minLength = 30, maxProbability = 0.7)
     ts1 = meter.TimeSignature("4/4")
     s1.applyTimeSignature(ts1)
-    print s1.lily
+    print(s1.lily)
     s1.sliceDurationsForMeasures(ts1)
-    print s1.lily
+    print(s1.lily)
     
 if (__name__ == "__main__"):
     test()

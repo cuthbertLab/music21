@@ -66,18 +66,18 @@ for i in range(0, minRows):
         minCells = totalCells1 # doesnt matter which
     for j in range(0, minCells):
         if (rowvalues1[j] != rowvalues2[j]):
-            print "%3d,%2s--%34s : %34s" % (i+1,xlrd.colname(j),
+            print("%3d,%2s--%34s : %34s" % (i+1,xlrd.colname(j),
                                                unicode(rowvalues1[j]).encode('utf-8')[:34],
-                                               unicode(rowvalues2[j]).encode('utf-8')[:34])
+                                               unicode(rowvalues2[j]).encode('utf-8')[:34]))
     if (extraCells > 0):
-        print "%3d extra cells in row %3d in" % (extraCells, i+1),
-        if (longrow == 1): print book1name + ":" + sheetname1
-        elif (longrow == 2): print book2name + ":" + sheetname2
+        print("%3d extra cells in row %3d in" % (extraCells, i+1),)
+        if (longrow == 1): print(book1name + ":" + sheetname1)
+        elif (longrow == 2): print(book2name + ":" + sheetname2)
         else: raise Exception("What?  longrow was not set!")
 
 if (extraRows > 0):
-    print "%3d extra rows in" % extraRows,
-    if (longsheet == 1): print book1name + ":" + sheetname1
-    elif (longsheet == 2): print book2name + ":" + sheetname2
+    print("%3d extra rows in" % extraRows,)
+    if (longsheet == 1): print(book1name + ":" + sheetname1)
+    elif (longsheet == 2): print(book2name + ":" + sheetname2)
     else: raise Exception("What?  longsheet was not set!")
 

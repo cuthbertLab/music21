@@ -556,15 +556,15 @@ def compareOnesrcStream(srcStream1, srcStream2, fictaType = "editor"):
 
         iType = getIntervalType(interval1)
         if hasFicta and fictaType == "editor":
-            if debug: print "found ficta of Editor type"
+            if debug: print ("found ficta of Editor type")
             note1.editorial.misc["editorFictaHarmony"] = iType
             note1.editorial.misc["editorFictaInterval"] = interval1 
         elif hasFicta and fictaType == "capua1srcStream":
-            if debug: print "found ficta of capua1srcStream type"
+            if debug: print ("found ficta of capua1srcStream type")
             note1.editorial.misc["capua1FictaHarmony"] = iType
             note1.editorial.misc["capua1FictaInterval"] = interval1
         elif hasFicta and fictaType == "capua2srcStream":
-            if debug: print "found ficta of capua2srcStream type"
+            if debug: print ("found ficta of capua2srcStream type")
             note1.editorial.misc["capua2FictaHarmony"] = iType
             note1.editorial.misc["capua2FictaInterval"] = interval1
         else:
@@ -612,9 +612,9 @@ def colorCapuaFicta(srcStream1, srcStream2, oneOrBoth = "both"):
     twoStreams1 = TwoStreamComparer(srcStream1, srcStream2)
     twoStreams1.intervalToOtherStreamWhenAttacked()
     capuaCount = evaluateRules(srcStream1, srcStream2)
-    print capuaCount
+    print(capuaCount)
     noFictaCount = evaluateWithoutFicta(srcStream1, srcStream2)
-    print noFictaCount
+    print(noFictaCount)
     for note1 in srcStream1:
         colorNote(note1, oneOrBoth)
     for note2 in srcStream2:
@@ -659,7 +659,7 @@ def testCompare1():
         pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipit_c == "":
             continue
-        print pieceObj.title
+        print(pieceObj.title)
         cadenceA   = pieceObj.cadenceAClass()
         if len(cadenceA.srcStreams) >= 2:
             srcStream1    = cadenceA.srcStreams[0]
@@ -671,7 +671,7 @@ def testCompare1():
             for thisKey in thisDict.keys():
                 totalDict[thisKey] += thisDict[thisKey]
 
-    print totalDict
+    print(totalDict)
 
 def correctedMaj3():
     '''Find all cases where a Major 3rd moves inward to unison (within the next two or three notes, excluding rests)
@@ -727,7 +727,7 @@ def correctedMaj3():
                         lilyAll += cadenceA.lily()
                     totalDict[thisKey] += newResults[thisKey]
                 
-    print totalDict
+    print(totalDict)
     lilyAll.showPDF()
 
 def correctedMin6():
@@ -750,7 +750,7 @@ def correctedMin6():
 
     for i in range(2, 459):  # all ballate   
 #    for i in range(232, 373):  # all of Landini ballate
-        print i
+        print(i)
         pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipitClass is None:
             continue
@@ -785,7 +785,7 @@ def correctedMin6():
                         lilyAll += cadenceA.lily()
                     totalDict[thisKey] += newResults[thisKey]
                 
-    print totalDict
+    print(totalDict)
     lilyAll.showPDF()
 
 def improvedHarmony():
@@ -802,7 +802,7 @@ def improvedHarmony():
 
     for i in range(2, 459):  # all ballate   
 #    for i in range(232, 373):  # all of Landini ballate
-        print i
+        print(i)
         pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipitClass is None:
             continue
@@ -815,7 +815,7 @@ def improvedHarmony():
                 try:
                     twoStreams1.intervalToOtherStreamWhenAttacked()
                 except:
-                    print "UGGGH ERROR!"
+                    print("UGGGH ERROR!")
                     continue
                 capuaRulesOnsrcStream(srcStream1)
     
@@ -856,7 +856,7 @@ def improvedHarmony():
                         else:
                             checkDict["imperfIgnored"] +=1 ## hrumph, Capua left it alone                                
 
-    print checkDict
+    print(checkDict)
 
 def runPiece(pieceNum = 331):  # random default piece...
     ballataObj = cadencebook.BallataSheet()
@@ -870,8 +870,8 @@ def runPiece(pieceNum = 331):  # random default piece...
 
     for note in srcStream.notes:
         if note.editorial.harmonicInterval is not None:
-            print note.name
-            print note.editorial.harmonicInterval.simpleName
+            print(note.name)
+            print(note.editorial.harmonicInterval.simpleName)
             if "capua-ficta" in note.editorial.misc:
                 print note.editorial.misc['capua-ficta']
 
@@ -1049,7 +1049,8 @@ class Test(unittest.TestCase):
     
 
 if (__name__ == "__main__"):
-    music21.mainTest(Test) #, TestExternal)
+    runPiece(388)
+    #music21.mainTest(Test) #, TestExternal)
     
 #    test()
 #    correctedMin6()

@@ -38,7 +38,7 @@ def showDots(show=True):
     for m in partBass.measures:
         for n in m.notes:
             for i in range(ts.getBeatDepth(n.offset)):
-                n.addLyric('.')
+                n.addLyric('*')
     if show:
         partBass.measures[0:7].show() 
 
@@ -117,6 +117,18 @@ class Test(unittest.TestCase):
         '''
         for func in [showDots, findRaisedSevenths, newAccent]:
             func(show=False)
+
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        '''Test showing functions
+        '''
+        for func in [showDots, findRaisedSevenths, newAccent]:
+            func(show=True)
+
 
 if __name__ == "__main__":
     import music21

@@ -41,7 +41,7 @@ def runKeyFinder(windowSize):
         pcGroup = [n.pitchClass for n in v2Part[(0+i):((len(v2Part)/windowSize)+i)].pitches]
         for j in pcGroup:
             pitchClassDist[j] = pitchClassDist[j] + 1
-        print "pass", i
+        print("pass", i)
         keyDetect(pitchClassDist)
 
 
@@ -59,7 +59,7 @@ def keyDetect(pcDistribution):
     #print "Key probabilities ordered by pitch class:", keyResults
     #print keySorted
     #print "Possible keys, from most likely to least likely", likelyKeys
-    print "Key of analyzed segment:", likelyKeys[0], "(runners up", likelyKeys[1], "and", likelyKeys[2], ")"
+    print("Key of analyzed segment:", likelyKeys[0], "(runners up", likelyKeys[1], "and", likelyKeys[2], ")")
 
 
 def convoluteKey(pcDistribution):

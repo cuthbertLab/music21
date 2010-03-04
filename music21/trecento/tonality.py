@@ -39,7 +39,7 @@ def landiniTonality():
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
             cadB = thisWork.cadenceB1Class()
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
-            print thisWork.title.encode('utf-8')
+            print(thisWork.title.encode('utf-8'))
             continue
         try:           
             firstTenorNote = incip.streams[1].getNotes()[0]
@@ -56,8 +56,8 @@ def landiniTonality():
             
         if firstTenorNote.isNote is True and cadATenorNote.isNote is True:
             myDict[firstTenorNote.step][cadATenorNote.step] += 1
-        print "%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
-                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8'))
+        print("%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
+                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8')))
         
     bigTotalSame = 0
     bigTotalDiff = 0
@@ -65,16 +65,16 @@ def landiniTonality():
         outKeyDiffTotal = 0
         for inKey in sorted(myDict[outKey].keys()):
             if outKey == inKey:
-                print "**** ",
+                print ("**** ",)
                 bigTotalSame += myDict[outKey][inKey]
             else:
-                print "     ",
+                print ("     ",)
                 outKeyDiffTotal += myDict[outKey][inKey]
                 bigTotalDiff    += myDict[outKey][inKey] 
-            print "%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey])
-        print "      %4s diff %4d" % (outKey, outKeyDiffTotal)
-    print "Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-    print "Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+            print("%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey]))
+        print("      %4s diff %4d" % (outKey, outKeyDiffTotal))
+    print("Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff)))
+    print("Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff)))
 
 
 def nonLandiniBallataTonality():
@@ -95,7 +95,7 @@ def nonLandiniBallataTonality():
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
             cadB = thisWork.cadenceB1Class()
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
-            print thisWork.title.encode('utf-8')
+            print(thisWork.title.encode('utf-8'))
             continue            
         firstTenorNote = incip.streams[1].getNotes()[0]
         cadATenorNote  = cadA.streams[1].getNotes()[-1]
@@ -108,8 +108,8 @@ def nonLandiniBallataTonality():
             
         if firstTenorNote.isNote is True and cadATenorNote.isNote is True:
             myDict[firstTenorNote.step][cadATenorNote.step] += 1
-        print "%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
-                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8'))
+        print("%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
+                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8')))
         
     bigTotalSame = 0
     bigTotalDiff = 0
@@ -117,16 +117,16 @@ def nonLandiniBallataTonality():
         outKeyDiffTotal = 0
         for inKey in sorted(myDict[outKey].keys()):
             if outKey == inKey:
-                print "**** ",
+                print("**** ",)
                 bigTotalSame += myDict[outKey][inKey]
             else:
-                print "     ",
+                print("     ",)
                 outKeyDiffTotal += myDict[outKey][inKey]
                 bigTotalDiff    += myDict[outKey][inKey] 
-            print "%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey])
-        print "      %4s diff %4d" % (outKey, outKeyDiffTotal)
-    print "Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-    print "Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+            print("%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey]))
+        print("      %4s diff %4d" % (outKey, outKeyDiffTotal))
+    print("Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff)))
+    print("Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff)))
 
 def anonBallataTonality():
     '''
@@ -154,7 +154,7 @@ def anonBallataTonality():
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
             cadB = thisWork.cadenceB1Class()
         if (cadB is None or cadB.streams is None or len(cadB.streams) < 2):
-            print thisWork.title.encode('utf-8')
+            print(thisWork.title.encode('utf-8'))
             continue            
         firstTenorNote = incip.streams[1].getNotes()[0]
         cadATenorNote  = cadA.streams[1].getNotes()[-1]
@@ -171,8 +171,8 @@ def anonBallataTonality():
                 allLily += incip.lily
                 allLily += cadA.lily
                 
-        print "%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
-                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8'))
+        print("%30s %4s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
+                                    cadATenorNote.name.encode('utf-8'), cadBTenorNote.name.encode('utf-8')))
         
     bigTotalSame = 0
     bigTotalDiff = 0
@@ -180,19 +180,19 @@ def anonBallataTonality():
         outKeyDiffTotal = 0
         for inKey in sorted(myDict[outKey].keys()):
             if outKey == inKey:
-                print "**** ",
+                print("**** ",)
                 bigTotalSame += myDict[outKey][inKey]
             else:
-                print "     ",
+                print("     ",)
                 outKeyDiffTotal += myDict[outKey][inKey]
                 bigTotalDiff    += myDict[outKey][inKey] 
-            print "%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey])
-        print "      %4s diff %4d" % (outKey, outKeyDiffTotal)
-    print "Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-    print "Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+            print("%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey]))
+        print("      %4s diff %4d" % (outKey, outKeyDiffTotal))
+    print("Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff)))
+    print("Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff)))
 
-    print "Generating Lilypond PNG of all pieces where the first note of the tenor is the same pitchclass as the last note of Cadence A"
-    print "It might take a while, esp. on the first Lilypond run..."
+    print("Generating Lilypond PNG of all pieces where the first note of the tenor is the same pitchclass as the last note of Cadence A")
+    print("It might take a while, esp. on the first Lilypond run...")
     allLily.showPNG()
 
 def sacredTonality():
@@ -234,8 +234,8 @@ def sacredTonality():
             
         if firstTenorNote.isNote is True and cadATenorNote.isNote is True:
             myDict[firstTenorNote.step][cadATenorNote.step] += 1
-        print "%30s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
-                                    cadATenorNote.name.encode('utf-8'))
+        print("%30s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
+                                    cadATenorNote.name.encode('utf-8')))
         
     bigTotalSame = 0
     bigTotalDiff = 0
@@ -243,16 +243,16 @@ def sacredTonality():
         outKeyDiffTotal = 0
         for inKey in sorted(myDict[outKey].keys()):
             if outKey == inKey:
-                print "**** ",
+                print("**** ",)
                 bigTotalSame += myDict[outKey][inKey]
             else:
-                print "     ",
+                print("     ",)
                 outKeyDiffTotal += myDict[outKey][inKey]
                 bigTotalDiff    += myDict[outKey][inKey] 
-            print "%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey])
-        print "      %4s diff %4d" % (outKey, outKeyDiffTotal)
-    print "Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-    print "Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+            print("%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey]))
+        print("      %4s diff %4d" % (outKey, outKeyDiffTotal))
+    print("Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff)))
+    print("Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff)))
 
     allLily.showPNG()
 
@@ -300,8 +300,8 @@ def sacredAllCadencesTonality():
             
             if firstTenorNote.isNote is True and thisCadenceTenorNote.isNote is True:
                 myDict[firstTenorNote.step][thisCadenceTenorNote.step] += 1
-                print "%30s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
-                                        thisCadenceTenorNote.name.encode('utf-8'))
+                print("%30s %4s %4s" % (thisWork.title.encode('utf-8')[0:30], firstTenorNote.name.encode('utf-8'),
+                                        thisCadenceTenorNote.name.encode('utf-8')))
         
     bigTotalSame = 0
     bigTotalDiff = 0
@@ -309,16 +309,16 @@ def sacredAllCadencesTonality():
         outKeyDiffTotal = 0
         for inKey in sorted(myDict[outKey].keys()):
             if outKey == inKey:
-                print "**** ",
+                print("**** ",)
                 bigTotalSame += myDict[outKey][inKey]
             else:
-                print "     ",
+                print("     ",)
                 outKeyDiffTotal += myDict[outKey][inKey]
                 bigTotalDiff    += myDict[outKey][inKey] 
-            print "%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey])
-        print "      %4s diff %4d" % (outKey, outKeyDiffTotal)
-    print "Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-    print "Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+            print("%4s %4s %4d" % (outKey, inKey, myDict[outKey][inKey]))
+        print("      %4s diff %4d" % (outKey, outKeyDiffTotal))
+    print("Total Same %4d %3.1f" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff)))
+    print("Total Diff %4d %3.1f" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff)))
 
 class TestExternal(unittest.TestCase):
     pass

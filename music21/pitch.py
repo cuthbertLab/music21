@@ -869,7 +869,7 @@ class Pitch(music21.Music21Object):
         >>> c.set('pitch', b)
         >>> a = Pitch('g#4')
         >>> a.mx = c
-        >>> print a
+        >>> print(a)
         E-3
         '''
         # assume this is an object

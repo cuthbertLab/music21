@@ -453,7 +453,7 @@ class MusicXMLElement(node.Node):
         >>> a = MusicXMLElement()
         >>> len(a._publicAttributes())
         3
-        >>> print a._publicAttributes()
+        >>> print(a._publicAttributes())
         ['charData', 'external', 'tag']
 
 
@@ -2822,22 +2822,22 @@ class Document(object):
         else:
             title = ''
 
-        print '+'*20 + ' ' + title
-        print self.score
-        print
-        print self.score.toxml(None, None, 1)
+        print('+'*20 + ' ' + title)
+        print(self.score)
+        print()
+        print(self.score.toxml(None, None, 1))
 
     def reprPolyphony(self):
         # create an event list by measure
         for part in self.score.componentList:
-            print '+'*20 + ' ' + 'part-id', part.get('id')
+            print('+'*20 + ' ' + 'part-id', part.get('id'))
             for measure in part.componentList:
-                print ' '*10 + '+'*10 + ' ' + 'measure-no', measure.get('number')
+                print(' '*10 + '+'*10 + ' ' + 'measure-no', measure.get('number'))
                 for note in measure.componentList:
                     # skip forward and backward objects
                     if note.tag != 'note': continue
                     startStr = str(note.external['start']).ljust(5)
-                    print ' '*20 + ' ' + 'note', startStr, note
+                    print(' '*20 + ' ' + 'note', startStr, note)
 
     #---------------------------------------------------------------------------
     def write(self, fp):

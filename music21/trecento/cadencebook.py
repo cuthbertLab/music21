@@ -83,7 +83,7 @@ class TrecentoSheet(object):
         
         >>> a = BallataSheet()
         >>> b = a.makeWork(3)
-        >>> print b.title
+        >>> print(b.title)
         Ad(d)io, amore mio
         '''
         rowvalues = self.sheet.row_values(rownumber - 1)
@@ -198,7 +198,7 @@ class TrecentoCadenceWork(object):
         >>> bs = BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
-        >>> print accurIncipit
+        >>> print(accurIncipit)
         <music21.trecento.polyphonicSnippet.Incipit object at 0x...>
         '''
         rowBlock = self.rowvalues[8:12]
@@ -220,7 +220,7 @@ class TrecentoCadenceWork(object):
         >>> accur = bs.makeWork(2)
         >>> accurSnippets = accur.getOtherSnippets()
         >>> for thisSnip in accurSnippets:
-        ...     print thisSnip
+        ...     print(thisSnip)
         <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
         <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
          
@@ -243,7 +243,7 @@ class TrecentoCadenceWork(object):
 
         >>> bs = BallataSheet()
         >>> accur = bs.makeWork(2)
-        >>> print accur.getSnippetAtPosition(12)
+        >>> print(accur.getSnippetAtPosition(12))
         <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
         '''
         
@@ -268,7 +268,7 @@ class TrecentoCadenceWork(object):
         >>> dummyPiece = bs.makeWork(2)
         >>> dummyPiece.convertBlockToStreams(block1)
         >>> for x in block1:
-        ...     print x
+        ...     print(x)
         <music21.stream.Stream object at 0x...>
         <music21.stream.Stream object at 0x...>
         <BLANKLINE>

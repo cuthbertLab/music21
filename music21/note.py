@@ -42,9 +42,11 @@ environLocal = environment.Environment(_MOD)
 class Tie(music21.Music21Object):
     '''Object added to notes that are tied to other notes
 
-    note1.tie = Tie("start")
-    note1.tieStyle = "normal" # could be dotted or dashed
-    print note1.tie.type # prints start
+    >>> note1 = Note()
+    >>> note1.tie = Tie("start")
+    >>> note1.tieStyle = "normal" # or could be dotted or dashed
+    >>> note1.tie.type
+    'start'
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -1135,7 +1137,7 @@ class Note(NotRest):
     def _setMX(self, mxNote):
         '''Given an mxNote, fill the necessary parameters
         '''
-        # print ojbect == 'no' and grace notes may have a type but not
+        # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream 
         # processing
         if mxNote.get('printObject') == 'no':

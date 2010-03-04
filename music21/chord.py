@@ -1168,7 +1168,7 @@ class Chord(note.NotRest):
 
         >>> chord1 = Chord(["C#4", "G5", "E6"])
         >>> chord2 = chord1.closedPosition()
-        >>> print chord2.lily.value
+        >>> print(chord2.lily.value)
         <cis' e' g'>4
         '''
         newChord = copy.copy(self)

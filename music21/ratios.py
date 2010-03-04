@@ -95,14 +95,14 @@ def testOld():
     P5 = IntervalRatio(3,2)
     P4 = IntervalRatio(4,3)
     WT = P5.sub(P4)
-    print "Whole tone in ratio " + WT.ratio
-    print "Whole tone in decimal " + str(WT.decimal)
+    print("Whole tone in ratio " + WT.ratio)
+    print("Whole tone in decimal " + str(WT.decimal))
     
     P5_12times = P5.times(12)
-    print "12 Perfect fifths exceeds an octave by " + P5_12times.ratio_octaveless
+    print("12 Perfect fifths exceeds an octave by " + P5_12times.ratio_octaveless)
     
     P8_7times = P8.times(7)
-    print "your Wolf fifth will be too small by " + centsCompare(P5_12times, P8_7times) + " cents"
+    print("your Wolf fifth will be too small by " + centsCompare(P5_12times, P8_7times) + " cents")
     
     #P11 = Interval(8,3)
     #P11.show()
@@ -114,24 +114,24 @@ def testOld():
     ET = ETIntervalRatio
     
     P5et = ET(7)
-    print "A pythagorean Perfect 5 is  " + centsCompare(P5,P5et) + " cents above an ET P5"
+    print("A pythagorean Perfect 5 is  " + centsCompare(P5,P5et) + " cents above an ET P5")
     
     WTet = ET(2)
-    print "A pythagorean Whole tone is " + centsCompare(WT,WTet) + " cents above an ET WT"
+    print("A pythagorean Whole tone is " + centsCompare(WT,WTet) + " cents above an ET WT")
     
     ditone = WT.add(WT)
     M3et = ET(4)
     M3ji = IntervalRatio(5,4)
-    print ""
-    print "Ditone to M3 in ET        : " + centsCompare(ditone, M3et) + " cents higher;"
-    print "M3 in ET to 5:4 major 3rd : " + centsCompare(M3et, M3ji) + " cents higher;"
-    print "Ditone to 5:4 major 3rd   : " + centsCompare(ditone, M3ji) + " cents higher;"
+    print("")
+    print("Ditone to M3 in ET        : " + centsCompare(ditone, M3et) + " cents higher;")
+    print("M3 in ET to 5:4 major 3rd : " + centsCompare(M3et, M3ji) + " cents higher;")
+    print("Ditone to 5:4 major 3rd   : " + centsCompare(ditone, M3ji) + " cents higher;")
     
-    print ""
+    print("")
     
     Diminished4 = P4.times(8).reduce()
-    print "A diminished fourth is " + str(Diminished4.octaveless_decimal)
-    print "The difference in cents between a Just Major 3rd and a Pythagorean d4 is " + centsCompare(M3ji, Diminished4)
+    print("A diminished fourth is " + str(Diminished4.octaveless_decimal))
+    print("The difference in cents between a Just Major 3rd and a Pythagorean d4 is " + centsCompare(M3ji, Diminished4))
     
     majorST = IntervalRatio(17,16)
     minorST = IntervalRatio(18,17)

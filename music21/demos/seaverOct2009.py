@@ -153,10 +153,10 @@ def simple4b():
             elif wedge.type == 'diminuendo': 
                 countDiminuendo += 1
                 map.append(('<', wedge.offset))
-        print map
+        print(map)
 
-    print 'total crescendi: %s' % countCrescendo    
-    print 'total diminuendi: %s' % countDiminuendo    
+    print('total crescendi: %s' % countCrescendo) 
+    print('total diminuendi: %s' % countDiminuendo)
 
 def simple4c():
     # question 178 Generate a set matrix for a given tone row. (python only)
@@ -170,7 +170,7 @@ def simple4c():
         msg = []
         for pitch in row:
             msg.append(str(pitch).ljust(3))
-        print ''.join(msg)
+        print (''.join(msg))
 
 
 def simple4c_b():
@@ -178,7 +178,7 @@ def simple4c_b():
     from music21 import serial
 
     p = [8,1,7,9,0,2,3,5,4,11,6,10]
-    print serial.rowToMatrix(p)
+    print(serial.rowToMatrix(p))
 
 
 def simple4d():
@@ -191,7 +191,7 @@ def simple4d():
     for part in converter.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
         lyrics = text.assembleLyrics(part)
         if 'exultavit' in lyrics:
-            print lyrics
+            print(lyrics)
             webbrowser.open('http://www.google.com/search?&q=' + lyrics)
 
     # open a web browswer to google, searching for the string
@@ -216,7 +216,7 @@ def simple4e():
         maxNote.color = 'red'
         display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
                
-    print 'longest duration was: %s quarters long' % (qLenMax)
+    print('longest duration was: %s quarters long' % (qLenMax))
 
 
     lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
@@ -248,7 +248,7 @@ def simple4f():
                 if e.pitchClass not in candidateSet:
                     candidateSet.append(e.pitchClass)
     foundSets.sort()
-    print foundSets
+    print(foundSets)
 
 
 def simple4g():
@@ -264,8 +264,8 @@ def simple4g():
             # assuming spelling does not count
             if noteStream[i].midi == noteStream[i+1].midi:
                 count += 1
-    print 'repeated pitches for %s, movement %s: %s counts' % (work,
-                     movementNumber, count)
+    print('repeated pitches for %s, movement %s: %s counts' % (work,
+                     movementNumber, count))
 
 
 def simple4h():
@@ -331,7 +331,7 @@ def januaryThankYou():
     for workName in names:
         beethovenScore = corpus.parseWork('beethoven/' + workName, 1)
         for partNum in range(4):
-            print workName, str(partNum)
+            print(workName, str(partNum))
             thisPart = beethovenScore[partNum]
             display = stream.Stream()
             notes = thisPart.flat.findConsecutiveNotes(skipUnisons = True, skipChords = True,

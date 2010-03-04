@@ -30,7 +30,7 @@ def countTimeSig():
                 timeSigCounter[thisTime] = 1
                 
     for thisKey in sorted(timeSigCounter.keys()):
-        print thisKey, ":", timeSigCounter[thisKey], str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%"
+        print(thisKey, ":", timeSigCounter[thisKey], str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
 
 def sortByPMFC(work1, work2):
     if work1.pmfcVol > work2.pmfcVol:
@@ -60,7 +60,7 @@ def makePDFfromPieces(start = 1, finish = 2):
     lilyString = ""
     retrievedPieces.sort(sortByPMFC)
     for randomPiece in retrievedPieces:
-        print randomPiece.title.encode('utf-8')
+        print(randomPiece.title.encode('utf-8'))
 # skip skipping skip incipits
         randomIncipit = randomPiece.incipitClass()
         lilyString += randomIncipit.lily()
@@ -97,7 +97,7 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
     lilyString = ""
     retrievedPieces.sort(sortByPMFC)
     for randomPiece in retrievedPieces:
-        print randomPiece.title.encode('utf-8')
+        print(randomPiece.title.encode('utf-8'))
 # skip skipping skip incipits
         randomIncipit = randomPiece.incipitClass()
         for thisStream in randomIncipit.streams:

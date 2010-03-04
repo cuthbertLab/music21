@@ -20,7 +20,7 @@ def sortMelodicFifths():
     for pieceObj in ballataObj:
         if pieceObj.incipitClass() is None:
             continue
-        print pieceObj.title
+        print(pieceObj.title)
         for polyphonicSnippet in pieceObj.snippets:
             if polyphonicSnippet is None:
                 continue
@@ -33,7 +33,7 @@ def sortMelodicFifths():
                         continue
                     elif thisNote.editorial.melodicIntervalOverRests.simpleName == "P4" or \
                         thisNote.editorial.melodicIntervalOverRests.simpleName == "P5":
-                        print thisNote.name
+                        print(thisNote.name)
 
 if (__name__ == "__main__"):
     sortMelodicFifths()

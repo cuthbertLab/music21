@@ -429,7 +429,7 @@ def partitionQuarterLength(qLen, qLenDiv = 4):
     >>> def pql(qLen, qLenDiv):
     ...    partitionList = partitionQuarterLength(qLen, qLenDiv)
     ...    for dur in partitionList: 
-    ...        print unitSpec(dur)
+    ...        print(unitSpec(dur))
     
     
     >>> pql(2.5,.5)
@@ -990,15 +990,15 @@ class Tuplet(object):
     object that groups note objects into larger groups.
 
     >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
-    >>> print myTup.tupletMultiplier()
+    >>> print(myTup.tupletMultiplier())
     0.8
     >>> myTup2 = Tuplet(8, 5)
-    >>> print myTup2.tupletMultiplier()
+    >>> print(myTup2.tupletMultiplier())
     0.625
     >>> myTup2 = Tuplet(6, 4, "16th")
-    >>> print myTup2.durationActual.type
+    >>> print(myTup2.durationActual.type)
     16th
-    >>> print myTup2.tupletMultiplier()
+    >>> print(myTup2.tupletMultiplier())
     0.666...
     
     
@@ -1126,14 +1126,14 @@ class Tuplet(object):
         this Tuplet is associated with.
 
         >>> myTuplet = Tuplet()
-        >>> print round(myTuplet.tupletMultiplier(), 3)
+        >>> print(round(myTuplet.tupletMultiplier(), 3))
         0.667
         >>> myTuplet.tupletActual = [5, Duration('eighth')]
         >>> myTuplet.numberNotesActual
         5
         >>> myTuplet.durationActual.type
         'eighth'
-        >>> print myTuplet.tupletMultiplier()
+        >>> print(myTuplet.tupletMultiplier())
         0.4
         '''
         lengthActual = self.durationActual.quarterLength
@@ -1426,14 +1426,14 @@ class Duration(DurationCommon):
         >>> a.quarterLength 
         3.5
         >>> for thisUnit in a.components:
-        ...    print unitSpec(thisUnit)
+        ...    print(unitSpec(thisUnit))
         (3.5, 'half', 2, None, None, None)
         
         >>> a.quarterLength = 2.5
         >>> a.quarterLength
         2.5
         >>> for thisUnit in a.components:
-        ...    print unitSpec(thisUnit)
+        ...    print(unitSpec(thisUnit))
         (2.0, 'half', 0, None, None, None)
         (0.5, 'eighth', 0, None, None, None)
         '''

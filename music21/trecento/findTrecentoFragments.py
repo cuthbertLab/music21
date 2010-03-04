@@ -94,7 +94,7 @@ def searchForNotes(notesStr):
                             "<< \\time " + str(thisCadence.timeSig) + \
                             "\n \\new Staff {" + str(thisCadence.streams[i].lily) + "} >>" + \
                             thisCadence.header() + "\n}\n"
-                    print "In piece %r found in stream %d: %s" % (thisWork.title, i, notesList)
+                    print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
     if streamLily:
         lS = LilyString(streamLily)
         lS.showPNG()
@@ -134,10 +134,10 @@ def searchForIntervals(notesStr):
                             "<< \\time " + str(thisCadence.timeSig) + \
                             "\n \\new Staff {" + thisCadence.streams[i].lily + "} >>" + \
                             thisCadence.header() + "\n}\n"
-                    print "In piece %r found in stream %d: %s" % (thisWork.title, i, notesList)
+                    print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
 
     if streamLily:
-        print streamLily
+        print(streamLily)
         LilyString(streamLily).showPDF()
 
 def findRandomVerona():
@@ -168,9 +168,9 @@ def searchForVat1969():
             break
             if findUpDown(strB1.notes[-3], strB1.notes[-2], strB1.notes[-1]):
                 if findUpDown(strB2.notes[-3], strB2.notes[-2], strB2.notes[-1]):
-                    print thisWork.title.encode('utf-8') + "   ",
+                    print(thisWork.title.encode('utf-8') + "   ",)
                     b1b2int = interval.Interval(note1 = strB1.notes[-1], note2 = strB2.notes[-1])
-                    print b1b2int.diatonic.generic.niceName
+                    print(b1b2int.diatonic.generic.niceName)
                   
 def findUpDown(n1, n2, n3):
     if n1.isRest or n2.isRest or n3.isRest: return False

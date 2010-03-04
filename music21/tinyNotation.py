@@ -156,7 +156,7 @@ class TinyNotationNote(object):
         storedtie = None
         
         if self.PRECTIE.match(stringRep):
-            if self.debug is True: print "FOUND FRONT TIE"
+            if self.debug is True: print("FOUND FRONT TIE")
             stringRep = self.PRECTIE.sub("", stringRep)
             storedtie = music21.note.Tie("stop")
 
@@ -202,7 +202,7 @@ class TinyNotationNote(object):
         
         ## get ties
         if self.TIE.search(stringRep):
-            if self.debug is True: print "FOUND TIE"
+            if self.debug is True: print("FOUND TIE")
             noteObj.tie = music21.note.Tie("start")
         
         ## use dict to set tuplets

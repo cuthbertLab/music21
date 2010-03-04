@@ -245,12 +245,12 @@ class Test(unittest.TestCase):
         monoScore = score1.chordsToNotes()    # returns a new Stream
         notePairs = monoScore.getAllSimultaneousNotes()  # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
         intervals2 = common.defHash(default = 0) 
-        for thisInt in intervals:
+        for thisInt in intervals2:
             if thisInt.name != "P1":
                 intervals2[thisInt.name] += 1
 
         for key in intervals2.sort(key = simpleName):
-            print key, intervals2[key]
+            print(key, intervals2[key])
 
 
 

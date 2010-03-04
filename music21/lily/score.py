@@ -172,10 +172,10 @@ def test():
     isStaff2 = lf1.firstContents("staff")
     assert isStaff2 is staff2, "first staff in File should be staff2"
 
-    print lf1
+    print(lf1)
     if lf1:
         lf1.showPNGandPlayMIDI()
-    print lf1.midiFilename
+    print(lf1.midiFilename)
 
 if (__name__ == "__main__"):
     test()

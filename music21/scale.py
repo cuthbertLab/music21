@@ -64,7 +64,7 @@ class DiatonicScale(Scale):
     def getDominant(self):
         interval1to5 = interval.generateInterval(self.tonic, self.pitchFromScaleDegree(5))
         if interval1to5.specificName != "Perfect":
-            print interval1to5.diatonicType
+            print(interval1to5.diatonicType)
             raise ScaleException("This scale has no Dominant (Locrian perhaps?)")
         else:
             return self.pitchFromScaleDegree(5)

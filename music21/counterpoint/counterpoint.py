@@ -225,7 +225,7 @@ class ModalCounterpoint(object):
             if note2.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
                 return False
         if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
-            print stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!"
+            print(stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!")
             return False
         return True
 

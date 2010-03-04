@@ -821,12 +821,12 @@ class Stream(music21.Music21Object):
         >>> s1.append(n3)
         >>> tboneSubStream = s1.getElementsByGroup("trombone")
         >>> for thisNote in tboneSubStream:
-        ...     print thisNote.name
+        ...     print(thisNote.name)
         C
         D
         >>> tubaSubStream = s1.getElementsByGroup("tuba")
         >>> for thisNote in tubaSubStream:
-        ...     print thisNote.name
+        ...     print(thisNote.name)
         D
         E
 

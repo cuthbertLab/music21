@@ -23,7 +23,7 @@ def createScalePart():
     
     s1 = Stream()
     s1.append([c, d, b])
-    print s1.lily
+    print(s1.lily)
     lS1 = LilyString("{" + s1.lily + "}")
     lS1.showPNG()
 
@@ -35,7 +35,7 @@ def createEasyScale():
     s1.insertAtOffset(0, time1)
 #    s1.timeSignature = time1
 #    s1.showTimeSignature = True
-    print s1.lily
+    print(s1.lily)
     lS1 = LilyString("{" + s1.lily.value + "}")
     lS1.showPDF()
     
@@ -75,7 +75,7 @@ def badMeter():
     s1.insertAtOffset(0, time1)    
 #    s1.timeSignature = time1
 #    s1.showTimeSignature = True
-    print s1.lily
+    print(s1.lily)
     s1.lily.showPNG()
     
 def capuaReg1():
@@ -84,7 +84,7 @@ def capuaReg1():
     s1 = tinyNotation.stream
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
-    print lS1.midiFilename
+    print(lS1.midiFilename)
 
 def capuaReg2():
     myScale = "d4 e f g r r r r d e f# g2"
@@ -92,7 +92,7 @@ def capuaReg2():
     s1 = tinyNotation.stream
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
-    print lS1.midiFilename
+    print(lS1.midiFilename)
 
 def capuaReg3():
     myScale = "a4 f g r r r r a f# g2"
@@ -100,7 +100,7 @@ def capuaReg3():
     s1 = tinyNotation.stream
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
-    print lS1.midiFilename
+    print(lS1.midiFilename)
     
 def major3rd():
     myScale = "a-2 c'2"

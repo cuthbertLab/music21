@@ -163,7 +163,7 @@ class Node(object):
         >>> a = Node()
         >>> len(a._publicAttributes())
         2
-        >>> print a._publicAttributes()
+        >>> print(a._publicAttributes())
         ['charData', 'tag']
     
         '''

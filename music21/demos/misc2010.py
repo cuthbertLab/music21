@@ -14,7 +14,7 @@ def richardBreedGetWell():
             continue
         beethovenScore = converter.parse(workName)
         for partNum in range(len(beethovenScore)):
-            print workName, str(partNum)
+            print(workName, str(partNum))
             thisPart = beethovenScore[partNum]
             thisPart.title = workName + str(partNum)
             display = stream.Stream()

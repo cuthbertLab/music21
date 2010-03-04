@@ -389,7 +389,7 @@ class HumdrumSpine(object):
     spine1.spineCollection = weakref.ref(SpineCollection1)
            ## we keep weak references to the spineCollection so that we don't have circular references
 
-    print spine1.spineType  ## searches the EventList or upstreamSpines to figure out the spineType
+    print(spine1.spineType)  ## searches the EventList or upstreamSpines to figure out the spineType
 
     '''
     def __init__(self, id, eventList = None):

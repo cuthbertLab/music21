@@ -1670,13 +1670,13 @@ class TimeSignature(music21.Music21Object):
         >>> c = a.getBeams(b)
         >>> len(c) == len(b)
         True
-        >>> print c
+        >>> print(c)
         [<music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>]
 
         >>> a = TimeSignature('6/8')
         >>> b = [duration.Duration('eighth')] * 6
         >>> c = a.getBeams(b)
-        >>> print c
+        >>> print(c)
         [<music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>]
         '''
 

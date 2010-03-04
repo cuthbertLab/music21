@@ -38,7 +38,7 @@ excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
 gf = pycallgraph.GlobbingFilter(exclude=excludeList)
 
-print time.ctime()
+print(time.ctime())
 
 pycallgraph.start_trace(filter_func = gf)
 
@@ -46,4 +46,4 @@ timeCapua2()
 
 pycallgraph.make_dot_graph('d:\\desktop\\test1.png')
 
-print time.ctime()
+print(time.ctime())

@@ -15,7 +15,7 @@ def find():
 #        try:
             if findinwork(ballata):
                 alllily = alllily + ballata.getAllLily()
-                print ballata.title + ' has a seventh somewhere'
+                print(ballata.title + ' has a seventh somewhere')
 #        except:
 #            pass
     lS = lily.LilyString("{" + alllily + "}")
@@ -38,7 +38,7 @@ def findinwork(work):
                     streamLily = astream.lily
                     lS = lily.Lilystring("{" + streamLily + "}")
                     lS.showPNG()
-                    print interval.note1.lilyName + ' -- ' + interval.note2.lilyName
+                    print(interval.note1.lilyName + ' -- ' + interval.note2.lilyName)
                     #interval.note1.editorial.color = "blue" #this doesn't actually work yet....
                     #interval.note2.editorial.color = "blue"
     return containssev
@@ -59,7 +59,7 @@ def findinwork2(work):
                                 "<< \\time " + str(thisCadence.timeSig) + \
                                 "\n \\new Staff {" + astream.lily + "} >>" + \
                                 thisCadence.header() + "\n}\n"
-                            print "found sev"
+                            print("found sev")
     #lily.showPDF(streamLily)
     return streamLily
 
@@ -79,7 +79,7 @@ def findsixinwork(work):
                                 "<< \\time " + str(thisCadence.timeSig) + \
                                 "\n \\new Staff {" + astream.lily + "} >>" + \
                                 thisCadence.header() + "\n}\n"
-                            print "found six"
+                            print("found six")
     #lily.showPDF(streamLily)
     return streamLily    
 
@@ -99,7 +99,7 @@ def findintervalinwork(work, intervalnum):
                                 "<< \\time " + str(thisCadence.timeSig) + \
                                 "\n \\new Staff {" + astream.lily + "} >>" + \
                                 thisCadence.header() + "\n}\n"
-                            print "found " + str(intervalnum)
+                            print("found " + str(intervalnum))
     #lily.showPDF(streamLily)
     return streamLily    
 
@@ -112,51 +112,51 @@ def test1(row):
         sevlily = work.getAllLily()
         lS = lily.LilyString(sevlily)
         lS.showPNG()
-        print 'done'
+        print('done')
         
         
 def findsevinrange(startrow, endrow):
     ballatas = cadencebook.BallataSheet()
     streamLily = ''
     for row in range(startrow, endrow):
-        print row
+        print(row)
         work = ballatas.makeWork(row)
         streamLily += findinwork2(work)
     if streamLily != '':
         lS = lily.LilyString(streamLily)
         lS.showPDF()
-    print 'done'
+    print('done')
 
 def test3(row):
     ballatas = cadencebook.BallataSheet()
     work = ballatas.makeWork(row)
     findinwork2(work)
-    print 'done'
+    print('done')
     
 def findsixinrange(startrow, endrow):
     ballatas = cadencebook.BallataSheet()
     streamLily = ''
     for row in range(startrow, endrow):
-        print row
+        print(row)
         work = ballatas.makeWork(row)
         streamLily += findsixinwork(work)
     if streamLily != '':
         lS = lily.LilyString(streamLily)
         lS.showPDF()
-    print 'done'
+    print('done')
     
 def findintervalinrange(startrow, endrow, intervalnum, makePDF=True):
     ballatas = cadencebook.BallataSheet()
     streamLily = ''
     for row in range(startrow, endrow):
-        print row
+        print(row)
         work = ballatas.makeWork(row)
         streamLily += findintervalinwork(work, intervalnum)
     if streamLily != '':
         if makePDF:
             lS = lily.LilyString(streamLily)
             lS.showPDF()
-    print 'done' 
+    print('done')
 
 if __name__ == "__main__":
     find()

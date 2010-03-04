@@ -72,21 +72,20 @@ def countCadencePercentages():
         firstNote = firstNotes[0]
         lastNote = lastNotes[-1]
                     
-        print thisWork.title, firstNote.name, lastNote.name
+        print(thisWork.title, firstNote.name, lastNote.name)
         totalPieces += 1.0  # for float division later
         firstNoteTotal[firstNote.name] += 1
         lastNoteTotal[lastNote.name] += 1
     
-    print "First note distribution:"
+    print ("First note distribution:")
     
     for thisName in firstNoteTotal:
-        print thisName, firstNoteTotal[thisName]/totalPieces
+        print (thisName, firstNoteTotal[thisName]/totalPieces)
 
-    print "Last note distribution:"
+    print ("Last note distribution:")
     
     for thisName in lastNoteTotal:
-        print thisName, lastNoteTotal[thisName]/totalPieces
-    
+        print (thisName, lastNoteTotal[thisName]/totalPieces) 
         
 if __name__ == "__main__":
     countCadencePercentages()

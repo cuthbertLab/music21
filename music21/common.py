@@ -584,7 +584,7 @@ class defHash(dict):
     
         falsehash = lambda h = None: defHash(h, default = False)
         a = falsehash({"A": falsehash(), "B": falsehash()})
-        print a["A"]["hi"] # returns False
+        print(a["A"]["hi"]) # returns False
     
     there's probably a way to use this to create a data structure
     of arbitrary dimensionality, though it escapes this author.
