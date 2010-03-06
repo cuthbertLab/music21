@@ -42,24 +42,26 @@ Properties
 
     .. attribute:: duration
 
-        Gets the DurationObject of the object or None 
-
-    
+        Get and set the duration of this object as a Duration object. 
 
     .. attribute:: offset
 
-        
-
-    
-
-    
+        The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths. 
 
     .. attribute:: parent
 
-    
+        A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
+
     .. attribute:: priority
 
-    
+        Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
+
+    >>> a = Music21Object()
+    >>> a.priority = 3
+    >>> a.priority = 'high'
+    Traceback (most recent call last): 
+    ElementException: priority values must be integers. 
+
 Methods
 ~~~~~~~
 

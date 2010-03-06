@@ -672,6 +672,12 @@ class Music21Object(object):
     _currentParentId = None # cached id in case the weakref has gone away...
 
     def __init__(self, *arguments, **keywords):
+
+        # define order to present names in documentation; use strings:
+        # deepcopy does not like actual method names
+        self._DOC_ORDER = ['searchParent', 'getContextAttr', 'setContextAttr']
+        self._DOC_ATTR = {}
+
         # an offset keyword arg should set the offset in location
         # not in a local parameter
 #         if "offset" in keywords and not self.offset:
@@ -712,6 +718,7 @@ class Music21Object(object):
 #         elif self._definedContexts is None:
 #             self._definedContexts = []
     
+
 
     def __deepcopy__(self, memo=None):
         '''
@@ -954,19 +961,8 @@ class Music21Object(object):
                 return common.unwrapWeakref(self._currentParent)
         else:
             return self._currentParent
-
-#         if self._currentParent is not None:
-#             return self._currentParent
-#         elif len(self._definedContexts) == 0:
-#             return None # return None if no sites set
-#         else: 
-#             return self._definedContexts.getSiteByIndex(-1) 
-
     
     def _setParent(self, site):
-#         if site == self:
-#             site = None # shortcut translation
-
         siteId = None
         if site is not None: 
             siteId = id(site)
@@ -986,7 +982,9 @@ class Music21Object(object):
             self._currentParentId = siteId
 
 
-    parent = property(_getParent, _setParent)
+    parent = property(_getParent, _setParent, 
+        doc='''A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
+        ''')
 
     def addLocationAndParent(self, offset, parent, parentWeakRef = None):
         '''
@@ -1054,8 +1052,7 @@ class Music21Object(object):
 
             offset = float(value)
         elif hasattr(value, "quarterLength"):
-            ## probably a Duration object, but could be something else -- in any case, 
-            ## we'll take it.
+            # probably a Duration object, but could be something else -- in any case, we'll take it.
             offset = value.quarterLength
         else:
             raise Exception('We cannot set  %s as an offset' % value)
@@ -1068,7 +1065,9 @@ class Music21Object(object):
 #        else:
 #            self._definedContexts.setOffsetBySite(self.parent, offset)
     
-    offset = property(_getOffset, _setOffset)
+    offset = property(_getOffset, _setOffset, 
+        doc = '''The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths.
+        ''')
 
 
     def _getDuration(self):
@@ -1091,7 +1090,9 @@ class Music21Object(object):
             # need to permit Duration object assignment here
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
-    duration = property(_getDuration, _setDuration)
+    duration = property(_getDuration, _setDuration, 
+        doc = '''Get and set the duration of this object as a Duration object.
+        ''')
 
     def _getPriority(self):
         return self._priority
@@ -1099,39 +1100,26 @@ class Music21Object(object):
     def _setPriority(self, value):
         '''
         value is an int.
-        
-        Priority specifies the order of processing from 
-        left (LOWEST #) to right (HIGHEST #) of objects at the
-        same offset.  For instance, if you want a key change and a clef change
-        to happen at the same time but the key change to appear
-        first, then set: keySigElement.priority = 1; clefElement.priority = 2
-        this might be a slightly counterintuitive numbering of priority, but
-        it does mean, for instance, if you had two elements at the same 
-        offset, an allegro tempo change and an andante tempo change, 
-        then the tempo change with the higher priority number would 
-        apply to the following notes (by being processed
-        second).
-        
-        Default priority is 0; thus negative priorities are encouraged
-        to have Elements that appear non-priority set elements.
-        
-        In case of tie, there are defined class sort orders defined in
-        music21.stream.CLASS_SORT_ORDER.  For instance, a key signature
-        change appears before a time signature change before a note at the
-        same offset.  This produces the familiar order of materials at the
-        start of a musical score.
+        '''
+        if not isinstance(value, int):
+            raise ElementException('priority values must be integers.')
+        self._priority = value
+
+    priority = property(_getPriority, _setPriority,
+        doc = '''Get and set the priority integer value. 
+
+        Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second).
+
+        Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements.
+
+        In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.
         
         >>> a = Music21Object()
         >>> a.priority = 3
         >>> a.priority = 'high'
         Traceback (most recent call last):
         ElementException: priority values must be integers.
-        '''
-        if not isinstance(value, int):
-            raise ElementException('priority values must be integers.')
-        self._priority = value
-
-    priority = property(_getPriority, _setPriority)
+        ''')
 
 
     #---------------------------------------------------------------------------

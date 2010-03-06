@@ -160,8 +160,6 @@ class RestructuredWriter(object):
         True
         >>> 'base.Music21Object' in post
         True
-        >>> 'object' in post
-        True
         '''
         msg = []
         msg.append('Inherits from:')
@@ -227,23 +225,18 @@ class RestructuredWriter(object):
 
 
 #-------------------------------------------------------------------------------
-class ModuleDoc(RestructuredWriter):
-    def __init__(self, mod):
+class ClassDoc(RestructuredWriter):
+
+# use
+# inspect.classify_class_attrs to get information on all class attriutes
+
+    def __init__(self, className):
         RestructuredWriter.__init__(self)
 
-        self.mod = mod
-        self.modName = mod.__name__
-        self.modDoc = mod.__doc__
-        self.classes = {}
-        self.functions = {}
-        self.imports = []
-        self.globals = []
-
-        # file name for this module; leave off music21 part
-        fn = mod.__name__.split('.')
-        self.fileName = 'module' + fn[1][0].upper() + fn[1][1:] + '.rst'
-        # references used in rst table of contents
-        self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
+        self.className = className
+        self.classObj = eval(className)
+        self.info = {}
+        self.scanClass() # will fill self.info using self.classObj
 
     def findDerivationClass(self, mro, partName):
         '''Given an mro (method resolution order) and a part of an object, find from where the part is derived.
@@ -260,18 +253,6 @@ class ModuleDoc(RestructuredWriter):
             raise Exception('cannot find %s in %s' % (partName, mro))
         return lastIndex
 
-    #---------------------------------------------------------------------------
-    # for methods and functions can use
-    # inspect.getargspec(func)
-    # to get argument information
-    # can use this to format: inspect.formatargspec(inspect.getargspec(a.show))
-
-#             args, varargs, varkw, defaults = inspect.getargspec(object)
-#             argspec = inspect.formatargspec(
-#                 args, varargs, varkw, defaults, formatvalue=self.formatvalue)
-
-# might be abel to use
-# inspect.classify_class_attrs
 
     def scanMethod(self, obj):
         methodInfo = {}
@@ -279,19 +260,12 @@ class ModuleDoc(RestructuredWriter):
         methodInfo['doc'] = self.formatDocString(obj.__doc__, self.INDENT)
         return methodInfo
 
-    def scanFunction(self, obj):
-        info = {}
-        info['reference'] = obj
-        info['name'] = obj.__name__
-        info['doc']  = self.formatDocString(obj.__doc__)
-        # skip private functions
-        if not obj.__name__.startswith('_'): 
-            self.functions[obj.__name__] = info
 
-    def scanClass(self, obj):
+    def scanClass(self):
         '''For an object provided as an argument, collect all relevant
         information in a dictionary. 
         '''
+        obj = self.classObj
         info = {}
         info['reference'] = obj
         info['name'] = obj.__name__
@@ -337,7 +311,202 @@ class ModuleDoc(RestructuredWriter):
 
         # will sort by index, which is proximity to this class
         #environLocal.printDebug(info['derivations'])
-        self.classes[obj.__name__] = info
+        self.info = info
+        #self.classes[obj.__name__] = info
+
+
+    #---------------------------------------------------------------------------
+    def _fmtRstAttribute(self, groupKey, name):
+        msg = []
+        msg.append('    .. attribute:: %s\n\n' %  name)   
+        #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
+        if  groupKey == 'properties':
+            msg.append('    %s\n' %  
+                self.info[groupKey][name]['doc'])
+        elif groupKey == 'attributes':
+            pass
+        else:
+            raise Exceptioin('bad groupKey %s' % groupKey)
+        return ''.join(msg)
+
+    def _fmtRstMethod(self, groupKey, name):
+        msg = []
+        msg.append('    .. method:: %s()\n\n' %  name)   
+        #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
+        msg.append('    %s\n' %  
+                self.info[groupKey][name]['doc'])
+        return ''.join(msg)
+
+
+    def getRestructuredClass(self):
+        '''Return a string of a complete RST specification for a class.
+        '''
+        msg = []
+        titleStr = 'Class %s' % self.info['name']
+        msg += self._heading(titleStr, '-')
+
+        titleStr = '.. class:: %s\n\n' % self.info['name']
+        msg += titleStr
+        #msg += self._heading(titleStr)
+
+        msg.append('    %s\n' % self.info['doc'])
+        msg.append('    %s\n\n' % self.formatClassInheritance(
+            self.info['mro']))
+
+        obj = None
+        try: # create a dummy object and list its attributes
+            obj = self.info['reference']()
+        except TypeError:
+            pass
+            #print _MOD, 'cannot create instance of %s' % className
+
+        if obj != None:
+            attrList = obj.__dict__.keys()
+            attrList.sort()
+            attrPublic = []
+            attrPrivate = []
+            for attr in attrList:
+                if not attr.startswith('_'):
+                    attrPublic.append(attr)
+            if len(attrPublic) > 0:
+                msg += self._heading('Attributes', '~')
+                # not working:
+#                 for i, nameFound in self.info['derivations']:
+#                     if nameFound not in attrPublic:
+#                         continue
+#                     #msg += self._list(attrPublic)
+                for nameFound in attrPublic:
+                    # TODO: names are not presenting properly, not showing
+                    # class name, only module name          
+                    # need to hide inherited attributes
+                    msg.append(self._fmtRstAttribute('attributes', nameFound))
+                    #msg.append('**%s**\n\n' % nameFound)
+
+        for groupName, groupKey, postfix in [('Properties', 'properties', ''),
+                                    ('Methods', 'methods', '()')
+                                    ]:
+            methodNames = self.info[groupKey].keys()
+
+            # segragating methods names is still necessary
+            methodPublic = []
+            for methodName in methodNames:
+                if not methodName.startswith('_'):
+                    methodPublic.append(methodName)
+            if len(methodPublic) == 0: 
+                continue    
+
+            # first, we need to count the number of names for each mro index
+            # group
+            derivationsCount = {}
+            for i in self.info['derivations'].keys():
+                for nameFound in self.info['derivations'][i]:
+                    if nameFound not in methodPublic:
+                        continue
+                    if i not in derivationsCount.keys():
+                        derivationsCount[i] = 1 # count first
+                    else:
+                        derivationsCount[i] += 1
+
+            iCurrent = None
+            iCount = None
+            for i in self.info['derivations'].keys():
+                if i == len(self.info['mro']) - 1:
+                    continue # skip names dervied from object
+                if len(self.info['derivations'][i]) == 0:
+                    continue
+
+                # will be Properties, Methods
+                if i == 0:
+                    groupTitle = '%s' % groupName 
+                    msg += self._heading(groupTitle, '~') 
+                if i == 1: # only do first one
+                    groupTitle = '%s (Inherited)' % (groupName)
+                    msg += self._heading(groupTitle, '~') 
+
+                for nameFound in self.info['derivations'][i]:
+                    if nameFound not in methodPublic:
+                        continue
+            
+                    if i != iCurrent:
+                        iCurrent = i # store last value
+                        iCount = 0 # reset to 0, increment below
+                        if i != 0:
+                            # TODO: link directly to the Class, not to the    
+                            # the module page
+                            # inherited from music21.base.Music21Object
+                            parentSrc = self.formatParent(
+                                self.info['mro'][i])
+                            titleStr = 'Inherited from %s:' % parentSrc
+                            msg.append('    %s ' % titleStr)
+#                         else: # when i is zero these are the local methods
+#                             titleStr = 'Locally Defined:' 
+#                             msg.append('    %s\n\n' % titleStr)
+    
+                    # increment count for this derivation index
+                    iCount += 1
+    
+                    if i != 0: # if not locally defined
+                        if iCount < derivationsCount[i]: # last in this group
+                            msg.append('``%s%s``, ' % (nameFound, postfix))   
+                        else: # last of list, no comma
+                            msg.append('``%s%s``\n\n' % (nameFound, postfix))   
+    
+                    # i is the count within the list of inheritance; if i is 0
+                    # that means that these features are locally defined
+                    elif i == 0: # only provide full doc
+                        if groupKey == 'properties':
+                            msg.append(self._fmtRstAttribute(groupKey,
+                                       nameFound))
+                        elif groupKey == 'methods':
+                            msg.append(self._fmtRstMethod(groupKey, nameFound))
+        msg.append('\n'*1)
+        return msg
+
+
+
+
+#-------------------------------------------------------------------------------
+class ModuleDoc(RestructuredWriter):
+    def __init__(self, mod):
+        RestructuredWriter.__init__(self)
+
+        self.mod = mod
+        self.modName = mod.__name__
+        self.modDoc = mod.__doc__
+        self.classes = {} # a dictionary of ClassDoc objects
+        self.functions = {}
+        self.imports = []
+        self.globals = []
+
+        # file name for this module; leave off music21 part
+        fn = mod.__name__.split('.')
+        self.fileName = 'module' + fn[1][0].upper() + fn[1][1:] + '.rst'
+        # references used in rst table of contents
+        self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
+
+
+
+    #---------------------------------------------------------------------------
+    # for methods and functions can use
+    # inspect.getargspec(func)
+    # to get argument information
+    # can use this to format: inspect.formatargspec(inspect.getargspec(a.show))
+    
+    # args, varargs, varkw, defaults = inspect.getargspec(object)
+    # argspec = inspect.formatargspec(
+    # args, varargs, varkw, defaults, formatvalue=self.formatvalue)
+    
+
+
+    def scanFunction(self, obj):
+        info = {}
+        info['reference'] = obj
+        info['name'] = obj.__name__
+        info['doc']  = self.formatDocString(obj.__doc__)
+        # skip private functions
+        if not obj.__name__.startswith('_'): 
+            self.functions[obj.__name__] = info
+
 
     #---------------------------------------------------------------------------
     # note: can use inspect to get properties:
@@ -364,7 +533,6 @@ class ModuleDoc(RestructuredWriter):
             # that is, that this is not an object imported from another mod
             if hasattr(obj, '__module__'):
                 if self.modName not in obj.__module__:
-                    #environLocal.printDebug(['skipping %s from %s' % (obj, self.modName)])
                     continue
 
             objType = type(obj)
@@ -375,12 +543,14 @@ class ModuleDoc(RestructuredWriter):
 
             elif (isinstance(obj, types.StringTypes) or 
                 isinstance(obj, types.DictionaryType) or 
-                isinstance(obj, types.ListType) 
-                ):
+                isinstance(obj, types.ListType)):
                 self.globals.append(objName)
             # assume that these are classes
             elif isinstance(obj, types.TypeType):
-                self.scanClass(obj)
+                #self.classes[obj.__name__] = info
+                self.classes[obj.__name__] = ClassDoc(objName)
+                #self.scanClass(obj)
+
             elif isinstance(obj, types.FunctionType):
                 self.scanFunction(obj)
             elif isinstance(obj, environment.Environment):
@@ -389,157 +559,6 @@ class ModuleDoc(RestructuredWriter):
                 if common.isNum(obj) or common.isListLike(obj): 
                     continue
                 environLocal.printDebug(['cannot process: %s' % repr(obj)])
-
-
-    #---------------------------------------------------------------------------
-    def _fmtRstAttribute(self, className, groupKey, name):
-        msg = []
-        msg.append('    .. attribute:: %s\n\n' %  name)   
-        #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-        if  groupKey == 'properties':
-            msg.append('    %s\n' %  
-                self.classes[className][groupKey][name]['doc'])
-        elif groupKey == 'attributes':
-            pass
-        else:
-            raise Exceptioin('bad groupKey %s' % groupKey)
-        return ''.join(msg)
-
-    def _fmtRstMethod(self, className, groupKey, name):
-        msg = []
-        msg.append('    .. method:: %s()\n\n' %  name)   
-        #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-        msg.append('    %s\n' %  
-            self.classes[className][groupKey][name]['doc'])
-        return ''.join(msg)
-
-
-    def getRestructuredClass(self, className):
-        '''Return a string of a complete RST specification for a class.
-        '''
-        msg = []
-        titleStr = 'Class %s' % self.classes[className]['name']
-        msg += self._heading(titleStr, '-')
-
-        titleStr = '.. class:: %s\n\n' % self.classes[className]['name']
-        msg += titleStr
-        #msg += self._heading(titleStr)
-
-        msg.append('    %s\n' % self.classes[className]['doc'])
-        msg.append('    %s\n\n' % self.formatClassInheritance(
-            self.classes[className]['mro']))
-
-        obj = None
-        try: # create a dummy object and list its attributes
-            obj = self.classes[className]['reference']()
-        except TypeError:
-            pass
-            #print _MOD, 'cannot create instance of %s' % className
-
-        if obj != None:
-            attrList = obj.__dict__.keys()
-            attrList.sort()
-            attrPublic = []
-            attrPrivate = []
-            for attr in attrList:
-                if not attr.startswith('_'):
-                    attrPublic.append(attr)
-            if len(attrPublic) > 0:
-                msg += self._heading('Attributes', '~')
-                # not working:
-#                 for i, nameFound in self.classes[className]['derivations']:
-#                     if nameFound not in attrPublic:
-#                         continue
-#                     #msg += self._list(attrPublic)
-                for nameFound in attrPublic:
-                    # TODO: names are not presenting properly, not showing
-                    # class name, only module name          
-                    # need to hide inherited attributes
-                    msg.append(self._fmtRstAttribute(className, 
-                              'attributes', nameFound))
-                    #msg.append('**%s**\n\n' % nameFound)
-
-        for groupName, groupKey, postfix in [('Properties', 'properties', ''),
-                                    ('Methods', 'methods', '()')
-                                    ]:
-            methodNames = self.classes[className][groupKey].keys()
-
-            # segragating methods names is still necessary
-            methodPublic = []
-            for methodName in methodNames:
-                if not methodName.startswith('_'):
-                    methodPublic.append(methodName)
-            if len(methodPublic) == 0: 
-                continue    
-
-            # first, we need to count the number of names for each mro index
-            # group
-            derivationsCount = {}
-            for i in self.classes[className]['derivations'].keys():
-                for nameFound in self.classes[className]['derivations'][i]:
-                    if nameFound not in methodPublic:
-                        continue
-                    if i not in derivationsCount.keys():
-                        derivationsCount[i] = 1 # count first
-                    else:
-                        derivationsCount[i] += 1
-
-            iCurrent = None
-            iCount = None
-            for i in self.classes[className]['derivations'].keys():
-                if i == len(self.classes[className]['mro']) - 1:
-                    continue # skip names dervied from object
-                if len(self.classes[className]['derivations'][i]) == 0:
-                    continue
-
-                # will be Properties, Methods
-                if i == 0:
-                    groupTitle = '%s' % groupName 
-                    msg += self._heading(groupTitle, '~') 
-                if i == 1: # only do first one
-                    groupTitle = '%s (Inherited)' % (groupName)
-                    msg += self._heading(groupTitle, '~') 
-
-                for nameFound in self.classes[className]['derivations'][i]:
-                    if nameFound not in methodPublic:
-                        continue
-            
-                    if i != iCurrent:
-                        iCurrent = i # store last value
-                        iCount = 0 # reset to 0, increment below
-                        if i != 0:
-                            # TODO: link directly to the Class, not to the    
-                            # the module page
-                            # inherited from music21.base.Music21Object
-                            parentSrc = self.formatParent(
-                                self.classes[className]['mro'][i])
-                            titleStr = 'Inherited from %s:' % parentSrc
-                            msg.append('    %s ' % titleStr)
-#                         else: # when i is zero these are the local methods
-#                             titleStr = 'Locally Defined:' 
-#                             msg.append('    %s\n\n' % titleStr)
-    
-                    # increment count for this derivation index
-                    iCount += 1
-    
-                    if i != 0: # if not locally defined
-                        if iCount < derivationsCount[i]: # last in this group
-                            msg.append('``%s%s``, ' % (nameFound, postfix))   
-                        else: # last of list, no comma
-                            msg.append('``%s%s``\n\n' % (nameFound, postfix))   
-    
-                    # i is the count within the list of inheritance; if i is 0
-                    # that means that these features are locally defined
-                    elif i == 0: # only provide full doc
-                        if groupKey == 'properties':
-                            msg.append(self._fmtRstAttribute(className, 
-                                      groupKey, nameFound))
-                        elif groupKey == 'methods':
-                            msg.append(self._fmtRstMethod(className, 
-                                groupKey, nameFound))
-        msg.append('\n'*1)
-        return msg
-
 
 
     def _sortModuleNames(self, src='classes'):
@@ -603,10 +622,8 @@ class ModuleDoc(RestructuredWriter):
             msg += '.. function:: %s()\n\n' % self.functions[funcName]['name']
             msg.append('    %s\n' % self.functions[funcName]['doc'])
 
-#         classNames = self.classes.keys()
-#         classNames.sort()
         for className in self._sortModuleNames('classes'):
-            msg += self.getRestructuredClass(className)
+            msg += self.classes[className].getRestructuredClass()
         return ''.join(msg)
 
 
