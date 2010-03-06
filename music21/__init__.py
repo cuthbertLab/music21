@@ -34,7 +34,7 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 
 '''
 
-### put these in alphabetical order FIRST dirs then modules
+# put these in alphabetical order FIRST dirs then modules
 __all__ = ["analysis", "composition", "counterpoint", "corpus", \
            "demos", "doc", "humdrum", \
            "lily", "musicxml", "test", "trecento", \
@@ -53,7 +53,14 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus", \
 
 # skipped purposely, "base", "node"
 
-#--------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
 import base
 from base import *
+
+#-------------------------------------------------------------------------------
+# place the parse function directly in the music21 namespace
+# this cannot go in music21/base.py
+
+import converter
+parse = converter.parse

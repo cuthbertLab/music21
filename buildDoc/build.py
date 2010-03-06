@@ -448,13 +448,15 @@ class ModuleDoc(RestructuredWriter):
                     attrPublic.append(attr)
             if len(attrPublic) > 0:
                 msg += self._heading('Attributes', '~')
-
                 # not working:
 #                 for i, nameFound in self.classes[className]['derivations']:
 #                     if nameFound not in attrPublic:
 #                         continue
 #                     #msg += self._list(attrPublic)
                 for nameFound in attrPublic:
+                    # TODO: names are not presenting properly, not showing
+                    # class name, only module name          
+                    # need to hide inherited attributes
                     msg.append(self._fmtRstAttribute(className, 
                               'attributes', nameFound))
                     #msg.append('**%s**\n\n' % nameFound)
@@ -508,6 +510,9 @@ class ModuleDoc(RestructuredWriter):
                         iCurrent = i # store last value
                         iCount = 0 # reset to 0, increment below
                         if i != 0:
+                            # TODO: link directly to the Class, not to the    
+                            # the module page
+                            # inherited from music21.base.Music21Object
                             parentSrc = self.formatParent(
                                 self.classes[className]['mro'][i])
                             titleStr = 'Inherited from %s:' % parentSrc
@@ -520,10 +525,11 @@ class ModuleDoc(RestructuredWriter):
                     iCount += 1
     
                     if i != 0: # if not locally defined
+                        # TODO: format these as monospace!
                         if iCount < derivationsCount[i]: # last in this group
-                            msg.append('**%s%s**, ' % (nameFound, postfix))   
+                            msg.append('%s%s, ' % (nameFound, postfix))   
                         else: # last of list, no comma
-                            msg.append('**%s%s**\n\n' % (nameFound, postfix))   
+                            msg.append('%s%s\n\n' % (nameFound, postfix))   
     
                     # i is the count within the list of inheritance; if i is 0
                     # that means that these features are locally defined
@@ -593,8 +599,6 @@ class ModuleDoc(RestructuredWriter):
         #msg += self._heading('Imports' , '-')
         #msg += self._list(self.imports)
 
-        #funcNames = self.functions.keys()
-        #funcNames.sort()
         for funcName in self._sortModuleNames('functions'):
         #for funcName in funcNames:
             #titleStr = 'Function %s()' % self.functions[funcName]['name']

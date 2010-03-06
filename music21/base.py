@@ -47,9 +47,6 @@ class Music21Exception(Exception):
 class RelationsException(Exception):
     pass
 
-class LocationsException(Exception):
-    pass
-
 class Music21ObjectException(Exception):
     pass
 
