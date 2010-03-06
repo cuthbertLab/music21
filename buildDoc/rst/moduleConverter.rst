@@ -21,13 +21,13 @@ Public interface for importing file formats into music21.
 .. function:: parseData()
 
     
+.. function:: parseURL()
+
+    
 Class Converter
 ---------------
 
 .. class:: Converter
-
-
-======================
 
     Not a subclass, but a wrapper for different converter objects based on format. 
 
@@ -49,14 +49,19 @@ Methods
     .. method:: parseFile()
 
     
+    .. method:: parseURL()
+
+        Given a url, downloadn and parse 
+
+    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+
 
 Class ConverterMusicXML
 -----------------------
 
 .. class:: ConverterMusicXML
-
-
-==============================
 
     
     Inherits from: 
@@ -91,9 +96,6 @@ Class ConverterHumdrum
 
 .. class:: ConverterHumdrum
 
-
-=============================
-
     
     Inherits from: 
 
@@ -118,9 +120,6 @@ Class PickleFilter
 ------------------
 
 .. class:: PickleFilter
-
-
-=========================
 
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
 

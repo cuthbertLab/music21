@@ -23,7 +23,7 @@ music21.duration
 >>> def pql(qLen, qLenDiv):
 ...    partitionList = partitionQuarterLength(qLen, qLenDiv) 
 ...    for dur in partitionList: 
-...        print unitSpec(dur) 
+...        print(unitSpec(dur)) 
 
 
 >>> pql(2.5,.5)
@@ -255,9 +255,6 @@ Class Duration
 
 .. class:: Duration
 
-
-=====================
-
     Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note" 
 
 A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit. 
@@ -469,7 +466,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class Tuplet
@@ -477,21 +474,18 @@ Class Tuplet
 
 .. class:: Tuplet
 
-
-===================
-
     tuplet class: creates tuplet objects which modify duration objects note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
 
 >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
->>> print myTup.tupletMultiplier()
+>>> print(myTup.tupletMultiplier())
 0.8 
 >>> myTup2 = Tuplet(8, 5)
->>> print myTup2.tupletMultiplier()
+>>> print(myTup2.tupletMultiplier())
 0.625 
 >>> myTup2 = Tuplet(6, 4, "16th")
->>> print myTup2.durationActual.type
+>>> print(myTup2.durationActual.type)
 16th 
->>> print myTup2.tupletMultiplier()
+>>> print(myTup2.tupletMultiplier())
 0.666... 
 
 
@@ -622,14 +616,14 @@ Methods
         Get a floating point value by which to scale the duration that this Tuplet is associated with. 
 
     >>> myTuplet = Tuplet()
-    >>> print round(myTuplet.tupletMultiplier(), 3)
+    >>> print(round(myTuplet.tupletMultiplier(), 3))
     0.667 
     >>> myTuplet.tupletActual = [5, Duration('eighth')]
     >>> myTuplet.numberNotesActual
     5 
     >>> myTuplet.durationActual.type
     'eighth' 
-    >>> print myTuplet.tupletMultiplier()
+    >>> print(myTuplet.tupletMultiplier())
     0.4 
 
 
@@ -637,9 +631,6 @@ Class AppogiaturaStopDuration
 -----------------------------
 
 .. class:: AppogiaturaStopDuration
-
-
-====================================
 
     
     Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
@@ -652,23 +643,20 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class DurationUnit
 ------------------
 
 .. class:: DurationUnit
-
-
-=========================
 
     A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
@@ -744,16 +732,13 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class DurationCommon
 --------------------
 
 .. class:: DurationCommon
-
-
-===========================
 
     base class for Duration and DurationUnit to borrow from 
 
@@ -782,9 +767,6 @@ Class GraceDuration
 
 .. class:: GraceDuration
 
-
-==========================
-
     
     Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
 
@@ -796,23 +778,20 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class ZeroDuration
 ------------------
 
 .. class:: ZeroDuration
-
-
-=========================
 
     
     Inherits from: duration.DurationUnit (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
@@ -825,14 +804,14 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **dots**, **lily**, **ordinal**, **quarterLength**, **tuplets**, **type**
+    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): ``dots``, ``lily``, ``ordinal``, ``quarterLength``, ``tuplets``, ``type``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): **appendTuplet()**, **link()**, **setTypeFromNum()**, **unlink()**, **updateQuarterLength()**, **updateType()**
+    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): ``appendTuplet()``, ``link()``, ``setTypeFromNum()``, ``unlink()``, ``updateQuarterLength()``, ``updateType()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class AppogiaturaStartDuration
@@ -840,9 +819,6 @@ Class AppogiaturaStartDuration
 
 .. class:: AppogiaturaStartDuration
 
-
-=====================================
-
     
     Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
 
@@ -854,14 +830,14 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 
 Class LongGraceDuration
@@ -869,9 +845,6 @@ Class LongGraceDuration
 
 .. class:: LongGraceDuration
 
-
-==============================
-
     
     Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
 
@@ -883,13 +856,13 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **components**, **dots**, **isComplex**, **lily**, **musicxml**, **mx**, **quarterLength**, **tuplets**, **type**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): **addDuration()**, **appendTuplet()**, **clear()**, **componentIndexAtQtrPosition()**, **componentStartTime()**, **consolidate()**, **expand()**, **fill()**, **show()**, **sliceComponentAtPosition()**, **updateQuarterLength()**, **write()**
+    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): **aggregateTupletRatio()**
+    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
 
 

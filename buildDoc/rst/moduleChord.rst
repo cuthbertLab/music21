@@ -12,9 +12,6 @@ Class Chord
 
 .. class:: Chord
 
-
-==================
-
     Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = 'C' E = note.Note(), E.name = 'E' G = note.Note(), G.name = 'G' And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples 
 
 
@@ -252,9 +249,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -312,7 +309,7 @@ Methods
 
     >>> chord1 = Chord(["C#4", "G5", "E6"])
     >>> chord2 = chord1.closedPosition()
-    >>> print chord2.lily.value
+    >>> print(chord2.lily.value)
     <cis' e' g'>4 
 
     .. method:: containsSeventh()
@@ -621,10 +618,10 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **duration()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``duration()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

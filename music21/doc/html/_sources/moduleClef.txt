@@ -16,9 +16,6 @@ Class Clef
 
 .. class:: Clef
 
-
-=================
-
     
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
@@ -58,7 +55,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -66,7 +63,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TrebleClef
@@ -74,9 +71,6 @@ Class TrebleClef
 
 .. class:: TrebleClef
 
-
-=======================
-
     
     Inherits from: clef.GClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -97,13 +91,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class BassClef
@@ -111,9 +105,6 @@ Class BassClef
 
 .. class:: BassClef
 
-
-=====================
-
     
     Inherits from: clef.FClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -134,13 +125,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Treble8vaClef
@@ -148,9 +139,6 @@ Class Treble8vaClef
 
 .. class:: Treble8vaClef
 
-
-==========================
-
     
     Inherits from: clef.TrebleClef (of module :ref:`moduleClef`), clef.GClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -171,13 +159,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GSopranoClef
@@ -185,9 +173,6 @@ Class GSopranoClef
 
 .. class:: GSopranoClef
 
-
-=========================
-
     
     Inherits from: clef.GClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -208,22 +193,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TabClef
 -------------
 
 .. class:: TabClef
-
-
-====================
 
     
     Inherits from: clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -244,23 +226,20 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FClef
 -----------
 
 .. class:: FClef
-
-
-==================
 
     
     Inherits from: clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -283,25 +262,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class NoClef
 ------------
 
 .. class:: NoClef
-
-
-===================
 
     
     Inherits from: clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -322,23 +298,20 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class AltoClef
 --------------
 
 .. class:: AltoClef
-
-
-=====================
 
     
     Inherits from: clef.CClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -360,22 +333,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FBaritoneClef
 -------------------
 
 .. class:: FBaritoneClef
-
-
-==========================
 
     
     Inherits from: clef.FClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -397,22 +367,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Treble8vbClef
 -------------------
 
 .. class:: Treble8vbClef
-
-
-==========================
 
     
     Inherits from: clef.TrebleClef (of module :ref:`moduleClef`), clef.GClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -434,22 +401,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class PercussionClef
 --------------------
 
 .. class:: PercussionClef
-
-
-===========================
 
     
     Inherits from: clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -470,23 +434,20 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FrenchViolinClef
 ----------------------
 
 .. class:: FrenchViolinClef
-
-
-=============================
 
     
     Inherits from: clef.GClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -508,22 +469,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GClef
 -----------
 
 .. class:: GClef
-
-
-==================
 
     
     Inherits from: clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -546,25 +504,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Bass8vbClef
 -----------------
 
 .. class:: Bass8vbClef
-
-
-========================
 
     
     Inherits from: clef.FClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -586,13 +541,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TenorClef
@@ -600,9 +555,6 @@ Class TenorClef
 
 .. class:: TenorClef
 
-
-======================
-
     
     Inherits from: clef.CClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -623,13 +575,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class SopranoClef
@@ -637,9 +589,6 @@ Class SopranoClef
 
 .. class:: SopranoClef
 
-
-========================
-
     
     Inherits from: clef.CClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -660,13 +609,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CBaritoneClef
@@ -674,9 +623,6 @@ Class CBaritoneClef
 
 .. class:: CBaritoneClef
 
-
-==========================
-
     
     Inherits from: clef.CClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -697,22 +643,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class PitchClef
 ---------------
 
 .. class:: PitchClef
-
-
-======================
 
     
     Inherits from: clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -741,9 +684,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -751,7 +694,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class SubBassClef
@@ -759,9 +702,6 @@ Class SubBassClef
 
 .. class:: SubBassClef
 
-
-========================
-
     
     Inherits from: clef.FClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -782,13 +722,13 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Bass8vaClef
@@ -796,9 +736,6 @@ Class Bass8vaClef
 
 .. class:: Bass8vaClef
 
-
-========================
-
     
     Inherits from: clef.FClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -819,22 +756,19 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CClef
 -----------
 
 .. class:: CClef
-
-
-==================
 
     
     Inherits from: clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -857,25 +791,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MezzoSopranoClef
 ----------------------
 
 .. class:: MezzoSopranoClef
-
-
-=============================
 
     
     Inherits from: clef.CClef (of module :ref:`moduleClef`), clef.PitchClef (of module :ref:`moduleClef`), clef.Clef (of module :ref:`moduleClef`), base.Music21Object (of module :ref:`moduleBase`)
@@ -897,12 +828,12 @@ Attributes
 
     .. attribute:: sign
 
-    Inherited from clef.PitchClef (of module :ref:`moduleClef`): **lily**
+    Inherited from clef.PitchClef (of module :ref:`moduleClef`): ``lily``
 
-    Inherited from clef.Clef (of module :ref:`moduleClef`): **mx**
+    Inherited from clef.Clef (of module :ref:`moduleClef`): ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

@@ -75,9 +75,6 @@ Class TimeSignature
 
 .. class:: TimeSignature
 
-
-==========================
-
     
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
@@ -166,7 +163,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -203,12 +200,12 @@ Methods
     >>> c = a.getBeams(b)
     >>> len(c) == len(b)
     True 
-    >>> print c
+    >>> print(c)
     [<music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/start>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/stop>>, <music21.note.Beams <music21.note.Beam 1/continue>/<music21.note.Beam 2/start>>, <music21.note.Beams <music21.note.Beam 1/stop>/<music21.note.Beam 2/stop>>] 
     >>> a = TimeSignature('6/8')
     >>> b = [duration.Duration('eighth')] * 6
     >>> c = a.getBeams(b)
-    >>> print c
+    >>> print(c)
     [<music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>, <music21.note.Beams <music21.note.Beam 1/start>>, <music21.note.Beams <music21.note.Beam 1/continue>>, <music21.note.Beams <music21.note.Beam 1/stop>>] 
 
     .. method:: getBeat()
@@ -317,7 +314,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CompoundTimeSignature
@@ -325,9 +322,6 @@ Class CompoundTimeSignature
 
 .. class:: CompoundTimeSignature
 
-
-==================================
-
     
     Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -357,16 +351,16 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **barDuration**, **beatLengthToQuarterLengthRatio**, **denominator**, **lily**, **musicxml**, **mx**, **numerator**, **quarterLengthToBeatLengthRatio**, **totalLength**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class NonPowerOfTwoTimeSignature
@@ -374,9 +368,6 @@ Class NonPowerOfTwoTimeSignature
 
 .. class:: NonPowerOfTwoTimeSignature
 
-
-=======================================
-
     
     Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -406,25 +397,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **barDuration**, **beatLengthToQuarterLengthRatio**, **denominator**, **lily**, **musicxml**, **mx**, **numerator**, **quarterLengthToBeatLengthRatio**, **totalLength**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterTerminal
 -------------------
 
 .. class:: MeterTerminal
-
-
-==========================
 
     A MeterTerminal is a nestable primitive of rhythmic division 
 
@@ -510,9 +498,6 @@ Class DurationDenominatorTimeSignature
 
 .. class:: DurationDenominatorTimeSignature
 
-
-=============================================
-
     If you have played Hindemith you know these, 3/(dot-quarter) etc. 
 
     Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
@@ -543,25 +528,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **barDuration**, **beatLengthToQuarterLengthRatio**, **denominator**, **lily**, **musicxml**, **mx**, **numerator**, **quarterLengthToBeatLengthRatio**, **totalLength**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): **getAccent()**, **getAccentWeight()**, **getBeams()**, **getBeat()**, **getBeatDepth()**, **getBeatProgress()**, **load()**, **loadRatio()**, **quarterPositionToBeat()**, **ratioEqual()**, **setAccentWeight()**, **setDisplay()**
+    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterSequence
 -------------------
 
 .. class:: MeterSequence
-
-
-==========================
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
@@ -607,7 +589,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): **denominator**, **depth**, **duration**, **numerator**, **weight**
+    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``denominator``, ``depth``, ``duration``, ``numerator``, ``weight``
 
 Methods
 ~~~~~~~
@@ -832,6 +814,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): **ratioEqual()**, **subdivide()**, **subdivideByCount()**, **subdivideByList()**
+    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
 
 

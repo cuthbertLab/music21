@@ -12,9 +12,6 @@ Class Stream
 
 .. class:: Stream
 
-
-===================
-
     This is basic container for Music21Objects that occur at certain times. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams. 
 
 
@@ -215,7 +212,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -523,12 +520,12 @@ Methods
     >>> s1.append(n3)
     >>> tboneSubStream = s1.getElementsByGroup("trombone")
     >>> for thisNote in tboneSubStream:
-    ...     print thisNote.name 
+    ...     print(thisNote.name) 
     C 
     D 
     >>> tubaSubStream = s1.getElementsByGroup("tuba")
     >>> for thisNote in tubaSubStream:
-    ...     print thisNote.name 
+    ...     print(thisNote.name) 
     D 
     E 
 
@@ -1044,16 +1041,13 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Measure
 -------------
 
 .. class:: Measure
-
-
-====================
 
     A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream's elements. 
 
@@ -1121,9 +1115,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -1146,18 +1140,15 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Performer
 ---------------
 
 .. class:: Performer
-
-
-======================
 
     A Stream subclass for designating music to be performed by a single Performer.  Should only be used when a single performer performs on multiple parts.  E.g. Bass Drum and Triangle on separate staves performed by one player. a Part + changes of Instrument is fine for designating most cases where a player changes instrument in a piece.  A part plus staves with individual instrument changes could also be a way of designating music that is performed by a single performer (see, for instance the Piano doubling Celesta part in Lukas Foss's Time Cycle).  The Performer Stream-subclass could be useful for analyses of, for instance, how 5 percussionists chose to play a piece originally designated for 4 (or 6) percussionists in the score. 
 
@@ -1179,25 +1170,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Score
 -----------
 
 .. class:: Score
-
-
-==================
 
     A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard. 
 
@@ -1219,25 +1207,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class System
 ------------
 
 .. class:: System
-
-
-===================
 
     Totally optional: designation that all the music in this Stream belongs in a single system. 
 
@@ -1262,9 +1247,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -1276,18 +1261,15 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Part
 ----------
 
 .. class:: Part
-
-
-=================
 
     A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part 
 
@@ -1309,25 +1291,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Voice
 -----------
 
 .. class:: Voice
-
-
-==================
 
     A Stream subclass for declaring that all the music in the stream belongs to a certain "voice" for analysis or display purposes. Note that both Finale's Layers and Voices as concepts are considered Voices here. 
 
@@ -1349,25 +1328,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Page
 ----------
 
 .. class:: Page
-
-
-=================
 
     Totally optional: designation that all the music in this Stream belongs on a single notated page 
 
@@ -1392,9 +1368,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -1406,18 +1382,15 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Staff
 -----------
 
 .. class:: Staff
-
-
-==================
 
     A Stream subclass for designating music on a single staff 
 
@@ -1442,9 +1415,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **elements**, **flat**, **highestOffset**, **highestTime**, **isGapless**, **lily**, **lowestOffset**, **measures**, **musicxml**, **mx**, **notes**, **pitches**, **semiFlat**, **sorted**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -1456,8 +1429,8 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): **addGroupForElements()**, **allPlayingWhileSounding()**, **append()**, **attachIntervalsBetweenStreams()**, **bestClef()**, **extendDuration()**, **extractContext()**, **findConsecutiveNotes()**, **findGaps()**, **getElementAfterElement()**, **getElementAfterOffset()**, **getElementAtOrAfter()**, **getElementAtOrBefore()**, **getElementBeforeElement()**, **getElementBeforeOffset()**, **getElementById()**, **getElementsByClass()**, **getElementsByGroup()**, **getElementsByOffset()**, **getGroups()**, **getInstrument()**, **getMeasures()**, **getNotes()**, **getOffsetByElement()**, **getOverlaps()**, **getPitches()**, **getSimultaneous()**, **getTimeSignatures()**, **groupElementsByOffset()**, **index()**, **insert()**, **insertAtIndex()**, **insertAtNativeOffset()**, **isSequence()**, **makeAccidentals()**, **makeBeams()**, **makeMeasures()**, **makeRests()**, **makeTies()**, **melodicIntervals()**, **playingWhenAttacked()**, **pop()**, **repeatAppend()**, **repeatInsert()**, **shiftElements()**, **simultaneousAttacks()**, **splitByClass()**, **stripTies()**, **transferOffsetToElements()**, **trimPlayingWhileSounding()**
+    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

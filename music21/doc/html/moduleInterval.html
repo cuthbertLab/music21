@@ -241,11 +241,8 @@ There are also a number of useful lists included in the module.</p>
 <dt id="music21.interval.Interval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">Interval</tt><a class="headerlink" href="#music21.interval.Interval" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>requires either (1) a string (&#8220;P5&#8221; etc.) or (2) named arguments: (2a) either both of diatonic  = DiatonicInterval object chromatic = ChromaticInterval object (2b) or both of note1     = Pitch (or Note) object note2     = Pitch (or Note) object in which case it figures out the diatonic and chromatic intervals itself</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-requires either (1) a string (&#8220;P5&#8221; etc.) or (2) named arguments: (2a) either both of diatonic  = DiatonicInterval object chromatic = ChromaticInterval object (2b) or both of note1     = Pitch (or Note) object note2     = Pitch (or Note) object in which case it figures out the diatonic and chromatic intervals itself</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c5&#39;</span><span class="p">)</span>
@@ -284,7 +281,7 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="properties-inherited">
 <h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="methods">
 <h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
@@ -339,7 +336,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-diatonicinterval">
@@ -348,11 +345,8 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.interval.DiatonicInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">DiatonicInterval</tt><a class="headerlink" href="#music21.interval.DiatonicInterval" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id1">
 <h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -381,12 +375,12 @@ Inherits from: base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="id2">
 <h3>Properties (Inherited)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id3">
 <h3>Methods (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-chromaticinterval">
@@ -395,22 +389,19 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.interval.ChromaticInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">ChromaticInterval</tt><a class="headerlink" href="#music21.interval.ChromaticInterval" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Chromatic interval class &#8211; thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400</p>
+<dd><p>Chromatic interval class &#8211; thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id4">
 <h3>Properties (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id5">
 <h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-genericinterval">
@@ -419,20 +410,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.interval.GenericInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">GenericInterval</tt><a class="headerlink" href="#music21.interval.GenericInterval" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
+<dd><p>A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id6">
 <h3>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="id7">
 <h3>Properties (Inherited)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id8">
 <h3>Methods<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
@@ -447,7 +435,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="id9">
 <h3>Methods (Inherited)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 </div>
@@ -478,7 +466,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

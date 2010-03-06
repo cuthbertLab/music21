@@ -295,9 +295,6 @@ Class Scalar
 
 .. class:: Scalar
 
-
-===================
-
     for those of us who miss perl scalars.... 
 
     Inherits from: 
@@ -327,9 +324,6 @@ Class defList
 
 .. class:: defList
 
-
-====================
-
     A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
 
     Inherits from: list
@@ -344,7 +338,7 @@ Attributes
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
+    Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 
 
 Class defHash
@@ -352,10 +346,7 @@ Class defHash
 
 .. class:: defHash
 
-
-====================
-
-    A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print a["A"]["hi"] # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
+    A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
 
     Inherits from: dict
 
@@ -369,16 +360,13 @@ Attributes
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from dict: **clear()**, **copy()**, **fromkeys()**, **get()**, **has_key()**, **items()**, **iteritems()**, **iterkeys()**, **itervalues()**, **keys()**, **pop()**, **popitem()**, **setdefault()**, **update()**, **values()**
+    Inherited from dict: ``clear()``, ``copy()``, ``fromkeys()``, ``get()``, ``has_key()``, ``items()``, ``iteritems()``, ``iterkeys()``, ``itervalues()``, ``keys()``, ``pop()``, ``popitem()``, ``setdefault()``, ``update()``, ``values()``
 
 
 Class Timer
 -----------
 
 .. class:: Timer
-
-
-==================
 
     An object for timing. 
 
@@ -402,9 +390,6 @@ Class Iterator
 --------------
 
 .. class:: Iterator
-
-
-=====================
 
     A simple Iterator object used to handle iteration of Streams and other list-like objects. 
 

@@ -121,19 +121,21 @@
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parseData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="function">
+<dt id="music21.converter.parseURL">
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parseURL</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parseURL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <div class="section" id="class-converter">
 <h2>Class Converter<a class="headerlink" href="#class-converter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.Converter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">Converter</tt><a class="headerlink" href="#music21.converter.Converter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Not a subclass, but a wrapper for different converter objects based on format.</p>
+<dd><p>Not a subclass, but a wrapper for different converter objects based on format.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="properties">
 <h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -157,6 +159,16 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parseFile</tt><big>(</big><big>)</big></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parseURL</tt><big>(</big><big>)</big></dt>
+<dd>Given a url, downloadn and parse</dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
+</pre></div>
+</div>
 </blockquote>
 </div>
 </div>
@@ -166,11 +178,8 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dt id="music21.converter.ConverterMusicXML">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMusicXML</tt><a class="headerlink" href="#music21.converter.ConverterMusicXML" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from:</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from:</blockquote>
 <div class="section" id="id1">
 <h3>Properties<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -213,11 +222,8 @@ Inherits from:</blockquote>
 <dt id="music21.converter.ConverterHumdrum">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterHumdrum</tt><a class="headerlink" href="#music21.converter.ConverterHumdrum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from:</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from:</blockquote>
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -250,13 +256,10 @@ Inherits from:</blockquote>
 <dt id="music21.converter.PickleFilter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
+<dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id4">
 <h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -296,7 +299,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

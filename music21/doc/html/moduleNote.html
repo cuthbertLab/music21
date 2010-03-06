@@ -192,13 +192,10 @@ Pitch-specific functions are in music21.pitch, but obviously are of great import
 <dt id="music21.note.Note">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note</tt><a class="headerlink" href="#music21.note.Note" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now.</p>
+<dd><p>Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now.</p>
 <p>Inherits from: note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -343,8 +340,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <div class="section" id="properties-inherited">
 <h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="methods">
@@ -375,9 +372,9 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -387,13 +384,10 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dt id="music21.note.Rest">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest</tt><a class="headerlink" href="#music21.note.Rest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>General rest class</p>
+<dd><p>General rest class</p>
 <p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id1">
 <h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -458,8 +452,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest
 <div class="section" id="id3">
 <h3>Properties (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id4">
@@ -485,8 +479,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest
 <div class="section" id="id5">
 <h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -496,11 +490,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest
 <dt id="music21.note.WholeNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">WholeNote</tt><a class="headerlink" href="#music21.note.WholeNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id6">
 <h3>Attributes<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -554,18 +545,18 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <div class="section" id="id7">
 <h3>Properties (Inherited)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>accidental</strong>, <strong>diatonicNoteNum</strong>, <strong>freq440</strong>, <strong>frequency</strong>, <strong>lily</strong>, <strong>midi</strong>, <strong>mx</strong>, <strong>name</strong>, <strong>nameWithOctave</strong>, <strong>octave</strong>, <strong>pitchClass</strong>, <strong>ps</strong>, <strong>step</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">accidental</span></tt>, <tt class="docutils literal"><span class="pre">diatonicNoteNum</span></tt>, <tt class="docutils literal"><span class="pre">freq440</span></tt>, <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">midi</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">nameWithOctave</span></tt>, <tt class="docutils literal"><span class="pre">octave</span></tt>, <tt class="docutils literal"><span class="pre">pitchClass</span></tt>, <tt class="docutils literal"><span class="pre">ps</span></tt>, <tt class="docutils literal"><span class="pre">step</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id8">
 <h3>Methods (Inherited)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>isNote()</strong>, <strong>isRest()</strong>, <strong>isUnpitched()</strong>, <strong>setAccidental()</strong></p>
-<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">isNote()</span></tt>, <tt class="docutils literal"><span class="pre">isRest()</span></tt>, <tt class="docutils literal"><span class="pre">isUnpitched()</span></tt>, <tt class="docutils literal"><span class="pre">setAccidental()</span></tt></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -575,13 +566,10 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <dt id="music21.note.Unpitched">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpitched</tt><a class="headerlink" href="#music21.note.Unpitched" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation</p>
+<dd><p>General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation</p>
 <p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id9">
 <h3>Attributes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -628,8 +616,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpi
 <div class="section" id="id11">
 <h3>Properties (Inherited)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id12">
@@ -660,8 +648,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpi
 <div class="section" id="id13">
 <h3>Methods (Inherited)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -671,11 +659,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpi
 <dt id="music21.note.EighthNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">EighthNote</tt><a class="headerlink" href="#music21.note.EighthNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id14">
 <h3>Attributes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -729,18 +714,18 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <div class="section" id="id15">
 <h3>Properties (Inherited)<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>accidental</strong>, <strong>diatonicNoteNum</strong>, <strong>freq440</strong>, <strong>frequency</strong>, <strong>lily</strong>, <strong>midi</strong>, <strong>mx</strong>, <strong>name</strong>, <strong>nameWithOctave</strong>, <strong>octave</strong>, <strong>pitchClass</strong>, <strong>ps</strong>, <strong>step</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">accidental</span></tt>, <tt class="docutils literal"><span class="pre">diatonicNoteNum</span></tt>, <tt class="docutils literal"><span class="pre">freq440</span></tt>, <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">midi</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">nameWithOctave</span></tt>, <tt class="docutils literal"><span class="pre">octave</span></tt>, <tt class="docutils literal"><span class="pre">pitchClass</span></tt>, <tt class="docutils literal"><span class="pre">ps</span></tt>, <tt class="docutils literal"><span class="pre">step</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id16">
 <h3>Methods (Inherited)<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>isNote()</strong>, <strong>isRest()</strong>, <strong>isUnpitched()</strong>, <strong>setAccidental()</strong></p>
-<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">isNote()</span></tt>, <tt class="docutils literal"><span class="pre">isRest()</span></tt>, <tt class="docutils literal"><span class="pre">isUnpitched()</span></tt>, <tt class="docutils literal"><span class="pre">setAccidental()</span></tt></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -750,11 +735,8 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <dt id="music21.note.QuarterNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">QuarterNote</tt><a class="headerlink" href="#music21.note.QuarterNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id17">
 <h3>Attributes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -808,18 +790,18 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <div class="section" id="id18">
 <h3>Properties (Inherited)<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>accidental</strong>, <strong>diatonicNoteNum</strong>, <strong>freq440</strong>, <strong>frequency</strong>, <strong>lily</strong>, <strong>midi</strong>, <strong>mx</strong>, <strong>name</strong>, <strong>nameWithOctave</strong>, <strong>octave</strong>, <strong>pitchClass</strong>, <strong>ps</strong>, <strong>step</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">accidental</span></tt>, <tt class="docutils literal"><span class="pre">diatonicNoteNum</span></tt>, <tt class="docutils literal"><span class="pre">freq440</span></tt>, <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">midi</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">nameWithOctave</span></tt>, <tt class="docutils literal"><span class="pre">octave</span></tt>, <tt class="docutils literal"><span class="pre">pitchClass</span></tt>, <tt class="docutils literal"><span class="pre">ps</span></tt>, <tt class="docutils literal"><span class="pre">step</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id19">
 <h3>Methods (Inherited)<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>isNote()</strong>, <strong>isRest()</strong>, <strong>isUnpitched()</strong>, <strong>setAccidental()</strong></p>
-<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">isNote()</span></tt>, <tt class="docutils literal"><span class="pre">isRest()</span></tt>, <tt class="docutils literal"><span class="pre">isUnpitched()</span></tt>, <tt class="docutils literal"><span class="pre">setAccidental()</span></tt></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -829,13 +811,10 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <dt id="music21.note.Beam">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Beam</tt><a class="headerlink" href="#music21.note.Beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>An object representation of a beam, where each beam objects exists for each horizontal line in a total beam structure for one note.</p>
+<dd><p>An object representation of a beam, where each beam objects exists for each horizontal line in a total beam structure for one note.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id20">
 <h3>Attributes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -893,11 +872,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Beam
 <dt id="music21.note.HalfNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">HalfNote</tt><a class="headerlink" href="#music21.note.HalfNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id22">
 <h3>Attributes<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -951,18 +927,18 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <div class="section" id="id23">
 <h3>Properties (Inherited)<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>accidental</strong>, <strong>diatonicNoteNum</strong>, <strong>freq440</strong>, <strong>frequency</strong>, <strong>lily</strong>, <strong>midi</strong>, <strong>mx</strong>, <strong>name</strong>, <strong>nameWithOctave</strong>, <strong>octave</strong>, <strong>pitchClass</strong>, <strong>ps</strong>, <strong>step</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">accidental</span></tt>, <tt class="docutils literal"><span class="pre">diatonicNoteNum</span></tt>, <tt class="docutils literal"><span class="pre">freq440</span></tt>, <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">midi</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">nameWithOctave</span></tt>, <tt class="docutils literal"><span class="pre">octave</span></tt>, <tt class="docutils literal"><span class="pre">pitchClass</span></tt>, <tt class="docutils literal"><span class="pre">ps</span></tt>, <tt class="docutils literal"><span class="pre">step</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id24">
 <h3>Methods (Inherited)<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>isNote()</strong>, <strong>isRest()</strong>, <strong>isUnpitched()</strong>, <strong>setAccidental()</strong></p>
-<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>splitNoteAtPoint()</strong></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.Note (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">isNote()</span></tt>, <tt class="docutils literal"><span class="pre">isRest()</span></tt>, <tt class="docutils literal"><span class="pre">isUnpitched()</span></tt>, <tt class="docutils literal"><span class="pre">setAccidental()</span></tt></p>
+<p>Inherited from note.NotRest (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -972,11 +948,8 @@ Inherits from: note.Note (of module <a class="reference internal" href="#modulen
 <dt id="music21.note.Lyric">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Lyric</tt><a class="headerlink" href="#music21.note.Lyric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from:</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from:</blockquote>
 <div class="section" id="id25">
 <h3>Attributes<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -1021,13 +994,10 @@ Inherits from:</blockquote>
 <dt id="music21.note.Beams">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Beams</tt><a class="headerlink" href="#music21.note.Beams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A group of beams applied to a single note that represents the partial beam structure of many notes beamed together.</p>
+<dd><p>A group of beams applied to a single note that represents the partial beam structure of many notes beamed together.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id27">
 <h3>Attributes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -1167,13 +1137,10 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Beam
 <dt id="music21.note.NotRest">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotRest</tt><a class="headerlink" href="#music21.note.NotRest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>Parent class for objects that are not rests; or, object that can be tied.</p>
+<dd><p>Parent class for objects that are not rests; or, object that can be tied.</p>
 <p>Inherits from: note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id30">
 <h3>Attributes<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -1220,8 +1187,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotR
 <div class="section" id="id32">
 <h3>Properties (Inherited)<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>color</strong>, <strong>lyric</strong>, <strong>musicxml</strong>, <strong>quarterLength</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 </div>
 <div class="section" id="id33">
@@ -1254,8 +1221,8 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotR
 <div class="section" id="id34">
 <h3>Methods (Inherited)<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <strong>addLyric()</strong>, <strong>appendDuration()</strong>, <strong>clearDurations()</strong>, <strong>compactNoteInfo()</strong>, <strong>isChord()</strong>, <strong>splitAtDurations()</strong></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></p>
+<p>Inherited from note.GeneralNote (of module <a class="reference internal" href="#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </div>
 </div>
@@ -1265,13 +1232,10 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotR
 <dt id="music21.note.GeneralNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">GeneralNote</tt><a class="headerlink" href="#music21.note.GeneralNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields.</p>
+<dd><p>A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields.</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id35">
 <h3>Attributes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -1346,7 +1310,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <div class="section" id="id37">
 <h3>Properties (Inherited)<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id38">
 <h3>Methods<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
@@ -1433,7 +1397,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="id39">
 <h3>Methods (Inherited)<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-tie">
@@ -1442,13 +1406,29 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.note.Tie">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie</tt><a class="headerlink" href="#music21.note.Tie" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Object added to notes that are tied to other notes</dd></dl>
 
-<hr class="docutils" />
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">tie</span> <span class="o">=</span> <span class="n">Tie</span><span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">tieStyle</span> <span class="o">=</span> <span class="s">&quot;normal&quot;</span> <span class="c"># or could be dotted or dashed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">tie</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;start&#39;</span>
+<span class="go">Differences from MusicXML:</span>
+<span class="go">notes do not need to know if they are tied from a</span>
+<span class="go">previous note.  i.e., you can tie n1 to n2 just with</span>
+<span class="go">a tie start on n1.  However, if you want proper musicXML output</span>
+<span class="go">you need a tie stop on n2</span>
+<span class="go">one tie with &quot;continue&quot; implies tied from and tied to</span>
+<span class="go">optional (to know what notes are next:)</span>
+<span class="go">.to = note()   # not implimented yet, b/c of garbage coll.</span>
+<span class="go">.from = note()</span>
+<span class="go">(question: should notes be able to be tied to multiple notes</span>
+<span class="go">for the case where a single note is tied both voices of a</span>
+<span class="go">two-note-head unison?)</span>
+</pre></div>
+</div>
 <blockquote>
-<p>Object added to notes that are tied to other notes note1.tie = Tie(&#8220;start&#8221;) note1.tieStyle = &#8220;normal&#8221; # could be dotted or dashed print note1.tie.type # prints start Differences from MusicXML: notes do not need to know if they are tied from a previous note.  i.e., you can tie n1 to n2 just with a tie start on n1.  However, if you want proper musicXML output you need a tie stop on n2 one tie with &#8220;continue&#8221; implies tied from and tied to optional (to know what notes are next:) .to = note()   # not implimented yet, b/c of garbage coll. .from = note() (question: should notes be able to be tied to multiple notes for the case where a single note is tied both voices of a two-note-head unison?)</p>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
 <div class="section" id="id40">
 <h3>Attributes<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -1482,7 +1462,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie<
 <div class="section" id="id42">
 <h3>Properties (Inherited)<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id43">
 <h3>Methods<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
@@ -1490,7 +1470,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <div class="section" id="id44">
 <h3>Methods (Inherited)<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>id()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 </div>
@@ -1521,7 +1501,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

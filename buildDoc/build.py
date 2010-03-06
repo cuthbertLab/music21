@@ -422,14 +422,12 @@ class ModuleDoc(RestructuredWriter):
         msg += self._heading(titleStr, '-')
 
         titleStr = '.. class:: %s\n\n' % self.classes[className]['name']
-        msg += self._heading(titleStr)
+        msg += titleStr
+        #msg += self._heading(titleStr)
 
         msg.append('    %s\n' % self.classes[className]['doc'])
         msg.append('    %s\n\n' % self.formatClassInheritance(
             self.classes[className]['mro']))
-
-        #msg.append('*Attributes*\n\n')
-        #msg.append('*Methods*\n\n')
 
         obj = None
         try: # create a dummy object and list its attributes
@@ -525,11 +523,10 @@ class ModuleDoc(RestructuredWriter):
                     iCount += 1
     
                     if i != 0: # if not locally defined
-                        # TODO: format these as monospace!
                         if iCount < derivationsCount[i]: # last in this group
-                            msg.append('%s%s, ' % (nameFound, postfix))   
+                            msg.append('``%s%s``, ' % (nameFound, postfix))   
                         else: # last of list, no comma
-                            msg.append('%s%s\n\n' % (nameFound, postfix))   
+                            msg.append('``%s%s``\n\n' % (nameFound, postfix))   
     
                     # i is the count within the list of inheritance; if i is 0
                     # that means that these features are locally defined
@@ -567,7 +564,7 @@ class ModuleDoc(RestructuredWriter):
                 if orderedName not in srcNames: 
                     # possible if mixing functions and classes
                     continue
-                environLocal.printDebug(['orderedName', orderedName, srcNames])
+                #environLocal.printDebug(['orderedName', orderedName, srcNames])
                 post = srcNames.pop(srcNames.index(orderedName))
                 names.append(post)
         for n in srcNames:

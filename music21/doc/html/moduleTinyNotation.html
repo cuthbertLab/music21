@@ -119,7 +119,6 @@ or the Trecento specific examples in trecento/cadencebook.py</p>
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationNote</tt><a class="headerlink" href="#music21.tinyNotation.TinyNotationNote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<hr class="docutils" />
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tcN</span> <span class="o">=</span> <span class="n">TinyNotationNote</span><span class="p">(</span><span class="s">&quot;AA-4.~=aflat_hel-&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span> <span class="o">=</span> <span class="n">tcN</span><span class="o">.</span><span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">name</span>
@@ -251,11 +250,8 @@ Inherits from:</blockquote>
 <dt id="music21.tinyNotation.TinyNotationLine">
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationLine</tt><a class="headerlink" href="#music21.tinyNotation.TinyNotationLine" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4:</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4:</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">TinyNotationLine</span><span class="p">(</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&quot;lastG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
 <span class="go">&#39;G&#39;</span>
@@ -314,11 +310,8 @@ Inherits from:</blockquote>
 <dt id="music21.tinyNotation.HarmonyNote">
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyNote</tt><a class="headerlink" href="#music21.tinyNotation.HarmonyNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Inherits from: tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>)</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Inherits from: tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>)</blockquote>
 <div class="section" id="id2">
 <h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -332,7 +325,7 @@ Inherits from: tinyNotation.TinyNotationNote (of module <a class="reference inte
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <strong>DBLDOT()</strong>, <strong>DOT()</strong>, <strong>EDFLAT()</strong>, <strong>EDNAT()</strong>, <strong>EDSHARP()</strong>, <strong>FLAT()</strong>, <strong>ID_EL()</strong>, <strong>LYRIC()</strong>, <strong>OCTAVE2()</strong>, <strong>OCTAVE3()</strong>, <strong>OCTAVE4()</strong>, <strong>OCTAVE5()</strong>, <strong>PRECTIE()</strong>, <strong>REST()</strong>, <strong>SHARP()</strong>, <strong>TIE()</strong>, <strong>TYPE()</strong>, <strong>customNotationMatch()</strong>, <strong>customPitchMatch()</strong>, <strong>debug()</strong>, <strong>getDots()</strong></blockquote>
+Inherited from tinyNotation.TinyNotationNote (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <tt class="docutils literal"><span class="pre">DBLDOT()</span></tt>, <tt class="docutils literal"><span class="pre">DOT()</span></tt>, <tt class="docutils literal"><span class="pre">EDFLAT()</span></tt>, <tt class="docutils literal"><span class="pre">EDNAT()</span></tt>, <tt class="docutils literal"><span class="pre">EDSHARP()</span></tt>, <tt class="docutils literal"><span class="pre">FLAT()</span></tt>, <tt class="docutils literal"><span class="pre">ID_EL()</span></tt>, <tt class="docutils literal"><span class="pre">LYRIC()</span></tt>, <tt class="docutils literal"><span class="pre">OCTAVE2()</span></tt>, <tt class="docutils literal"><span class="pre">OCTAVE3()</span></tt>, <tt class="docutils literal"><span class="pre">OCTAVE4()</span></tt>, <tt class="docutils literal"><span class="pre">OCTAVE5()</span></tt>, <tt class="docutils literal"><span class="pre">PRECTIE()</span></tt>, <tt class="docutils literal"><span class="pre">REST()</span></tt>, <tt class="docutils literal"><span class="pre">SHARP()</span></tt>, <tt class="docutils literal"><span class="pre">TIE()</span></tt>, <tt class="docutils literal"><span class="pre">TYPE()</span></tt>, <tt class="docutils literal"><span class="pre">customNotationMatch()</span></tt>, <tt class="docutils literal"><span class="pre">customPitchMatch()</span></tt>, <tt class="docutils literal"><span class="pre">debug()</span></tt>, <tt class="docutils literal"><span class="pre">getDots()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-harmonyline">
@@ -341,11 +334,8 @@ Inherited from tinyNotation.TinyNotationNote (of module <a class="reference inte
 <dt id="music21.tinyNotation.HarmonyLine">
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyLine</tt><a class="headerlink" href="#music21.tinyNotation.HarmonyLine" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>example of subclassing TinyNotationLine to include a possible harmonic representation of the note</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-example of subclassing TinyNotationLine to include a possible harmonic representation of the note</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">hnl</span> <span class="o">=</span> <span class="n">HarmonyLine</span><span class="p">(</span><span class="s">&quot;c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle &quot;</span> <span class="o">+</span>                           <span class="s">&quot;G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er&quot;</span><span class="p">,</span> <span class="s">&quot;4/4&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span> <span class="o">=</span> <span class="n">hnl</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">notes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span>
@@ -382,7 +372,7 @@ Inherits from: tinyNotation.TinyNotationLine (of module <a class="reference inte
 <div class="section" id="id4">
 <h3>Methods (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from tinyNotation.TinyNotationLine (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <strong>ENDBRAC()</strong>, <strong>QUAD()</strong>, <strong>TRIP()</strong>, <strong>getNote()</strong></blockquote>
+Inherited from tinyNotation.TinyNotationLine (of module <a class="reference internal" href="#moduletinynotation"><em>music21.tinyNotation</em></a>): <tt class="docutils literal"><span class="pre">ENDBRAC()</span></tt>, <tt class="docutils literal"><span class="pre">QUAD()</span></tt>, <tt class="docutils literal"><span class="pre">TRIP()</span></tt>, <tt class="docutils literal"><span class="pre">getNote()</span></tt></blockquote>
 </div>
 </div>
 </div>
@@ -410,7 +400,7 @@ Inherited from tinyNotation.TinyNotationLine (of module <a class="reference inte
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

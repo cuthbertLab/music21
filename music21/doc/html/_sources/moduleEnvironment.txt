@@ -12,9 +12,6 @@ Class Environment
 
 .. class:: Environment
 
-
-========================
-
     Environment stores platform-specific, user preferences 
 
     Inherits from: 
@@ -66,9 +63,6 @@ Class Preference
 
 .. class:: Preference
 
-
-=======================
-
     
 
 
@@ -83,21 +77,18 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **tag**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **get()**, **getNewDoc()**, **loadAttrs()**, **merge()**, **set()**, **setDefaults()**, **toxml()**, **xmlStr()**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 
 Class Settings
 --------------
 
 .. class:: Settings
-
-
-=====================
 
     
 
@@ -115,13 +106,13 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **tag**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.NodeList (of module :ref:`moduleNode`): **append()**
+    Inherited from node.NodeList (of module :ref:`moduleNode`): ``append()``
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **get()**, **getNewDoc()**, **loadAttrs()**, **merge()**, **set()**, **setDefaults()**, **toxml()**, **xmlStr()**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 

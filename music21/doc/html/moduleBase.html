@@ -118,11 +118,8 @@ from base import *</blockquote>
 <dt id="music21.base.Music21Object">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</blockquote>
 <p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
 <blockquote>
 Inherits from:</blockquote>
@@ -282,20 +279,17 @@ Inherits from:</blockquote>
 <dt id="music21.base.ElementWrapper">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
+<dd><p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>)</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id1">
 <h3>Properties<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="properties-inherited">
 <h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>duration</strong>, <strong>id</strong>, <strong>offset</strong>, <strong>parent</strong>, <strong>priority</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
 </div>
 <div class="section" id="id2">
 <h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
@@ -346,7 +340,7 @@ Inherited from base.Music21Object (of module <a class="reference internal" href=
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <strong>addContext()</strong>, <strong>addLocationAndParent()</strong>, <strong>getContextAttr()</strong>, <strong>getContextByClass()</strong>, <strong>getOffsetBySite()</strong>, <strong>isClass()</strong>, <strong>searchParent()</strong>, <strong>setContextAttr()</strong>, <strong>show()</strong>, <strong>write()</strong></blockquote>
+Inherited from base.Music21Object (of module <a class="reference internal" href="#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-definedcontexts">
@@ -355,13 +349,10 @@ Inherited from base.Music21Object (of module <a class="reference internal" href=
 <dt id="music21.base.DefinedContexts">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">DefinedContexts</tt><a class="headerlink" href="#music21.base.DefinedContexts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts).</p>
+<dd><p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts).</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id3">
 <h3>Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -601,11 +592,8 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 <dt id="music21.base.Groups">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Groups</tt><a class="headerlink" href="#music21.base.Groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</dd></dl>
 
-<hr class="docutils" />
-<blockquote>
-A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
@@ -620,7 +608,7 @@ Inherits from: list</blockquote>
 <div class="section" id="id4">
 <h3>Methods (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <strong>extend()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>pop()</strong>, <strong>remove()</strong>, <strong>reverse()</strong>, <strong>sort()</strong></blockquote>
+Inherited from list: <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></blockquote>
 </div>
 </div>
 </div>
@@ -651,7 +639,7 @@ Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <stron
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

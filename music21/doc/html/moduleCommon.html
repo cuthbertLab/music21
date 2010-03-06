@@ -443,13 +443,10 @@
 <dt id="music21.common.Scalar">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Scalar</tt><a class="headerlink" href="#music21.common.Scalar" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>for those of us who miss perl scalars....</p>
+<dd><p>for those of us who miss perl scalars....</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -492,13 +489,10 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <dt id="music21.common.defList">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
+<dd><p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
 <p>Inherits from: list</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id1">
 <h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -517,7 +511,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 <div class="section" id="methods-inherited">
 <h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <strong>extend()</strong>, <strong>index()</strong>, <strong>insert()</strong>, <strong>pop()</strong>, <strong>remove()</strong>, <strong>reverse()</strong>, <strong>sort()</strong></blockquote>
+Inherited from list: <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-defhash">
@@ -526,13 +520,10 @@ Inherited from list: <strong>append()</strong>, <strong>count()</strong>, <stron
 <dt id="music21.common.defHash">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print a[&#8220;A&#8221;][&#8220;hi&#8221;] # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
+<dd><p>A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
 <p>Inherits from: dict</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id2">
 <h3>Attributes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -551,7 +542,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 <div class="section" id="id3">
 <h3>Methods (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-Inherited from dict: <strong>clear()</strong>, <strong>copy()</strong>, <strong>fromkeys()</strong>, <strong>get()</strong>, <strong>has_key()</strong>, <strong>items()</strong>, <strong>iteritems()</strong>, <strong>iterkeys()</strong>, <strong>itervalues()</strong>, <strong>keys()</strong>, <strong>pop()</strong>, <strong>popitem()</strong>, <strong>setdefault()</strong>, <strong>update()</strong>, <strong>values()</strong></blockquote>
+Inherited from dict: <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">copy()</span></tt>, <tt class="docutils literal"><span class="pre">fromkeys()</span></tt>, <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">has_key()</span></tt>, <tt class="docutils literal"><span class="pre">items()</span></tt>, <tt class="docutils literal"><span class="pre">iteritems()</span></tt>, <tt class="docutils literal"><span class="pre">iterkeys()</span></tt>, <tt class="docutils literal"><span class="pre">itervalues()</span></tt>, <tt class="docutils literal"><span class="pre">keys()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">popitem()</span></tt>, <tt class="docutils literal"><span class="pre">setdefault()</span></tt>, <tt class="docutils literal"><span class="pre">update()</span></tt>, <tt class="docutils literal"><span class="pre">values()</span></tt></blockquote>
 </div>
 </div>
 <div class="section" id="class-timer">
@@ -560,13 +551,10 @@ Inherited from dict: <strong>clear()</strong>, <strong>copy()</strong>, <strong>
 <dt id="music21.common.Timer">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Timer</tt><a class="headerlink" href="#music21.common.Timer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>An object for timing.</p>
+<dd><p>An object for timing.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id4">
 <h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -594,13 +582,10 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 <dt id="music21.common.Iterator">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Iterator</tt><a class="headerlink" href="#music21.common.Iterator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<hr class="docutils" />
-<blockquote>
-<p>A simple Iterator object used to handle iteration of Streams and other list-like objects.</p>
+<dd><p>A simple Iterator object used to handle iteration of Streams and other list-like objects.</p>
 <p>Inherits from:</p>
-</blockquote>
+</dd></dl>
+
 <div class="section" id="id5">
 <h3>Methods<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -640,7 +625,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 03, 2010.
+      Last updated on Mar 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

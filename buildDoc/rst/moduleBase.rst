@@ -22,9 +22,6 @@ Class Music21Object
 
 .. class:: Music21Object
 
-
-==========================
-
     Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
 
 Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
@@ -159,9 +156,6 @@ Class ElementWrapper
 
 .. class:: ElementWrapper
 
-
-===========================
-
     An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the ElementWrapper will call Object is now mandatory -- calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object. 
 
 
@@ -174,7 +168,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **id**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``id``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -215,16 +209,13 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class DefinedContexts
 ---------------------
 
 .. class:: DefinedContexts
-
-
-============================
 
     An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
 
@@ -441,9 +432,6 @@ Class Groups
 
 .. class:: Groups
 
-
-===================
-
     A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
 
 >>> g = Groups()
@@ -459,6 +447,6 @@ GroupException: Only strings can be used as list names
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from list: **append()**, **count()**, **extend()**, **index()**, **insert()**, **pop()**, **remove()**, **reverse()**, **sort()**
+    Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 
 

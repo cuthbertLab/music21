@@ -24,9 +24,6 @@ Class Note
 
 .. class:: Note
 
-
-=================
-
     Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
     Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
@@ -121,9 +118,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -146,20 +143,17 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Rest
 ----------
 
 .. class:: Rest
-
-
-=================
 
     General rest class 
 
@@ -201,9 +195,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -223,18 +217,15 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class WholeNote
 ---------------
 
 .. class:: WholeNote
-
-
-======================
 
     
     Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
@@ -263,31 +254,28 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **accidental**, **diatonicNoteNum**, **freq440**, **frequency**, **lily**, **midi**, **mx**, **name**, **nameWithOctave**, **octave**, **pitchClass**, **ps**, **step**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``accidental``, ``diatonicNoteNum``, ``freq440``, ``frequency``, ``lily``, ``midi``, ``mx``, ``name``, ``nameWithOctave``, ``octave``, ``pitchClass``, ``ps``, ``step``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **isNote()**, **isRest()**, **isUnpitched()**, **setAccidental()**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``isNote()``, ``isRest()``, ``isUnpitched()``, ``setAccidental()``
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Unpitched
 ---------------
 
 .. class:: Unpitched
-
-
-======================
 
     General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
 
@@ -316,9 +304,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -342,9 +330,9 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class EighthNote
@@ -352,9 +340,6 @@ Class EighthNote
 
 .. class:: EighthNote
 
-
-=======================
-
     
     Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -382,22 +367,22 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **accidental**, **diatonicNoteNum**, **freq440**, **frequency**, **lily**, **midi**, **mx**, **name**, **nameWithOctave**, **octave**, **pitchClass**, **ps**, **step**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``accidental``, ``diatonicNoteNum``, ``freq440``, ``frequency``, ``lily``, ``midi``, ``mx``, ``name``, ``nameWithOctave``, ``octave``, ``pitchClass``, ``ps``, ``step``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **isNote()**, **isRest()**, **isUnpitched()**, **setAccidental()**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``isNote()``, ``isRest()``, ``isUnpitched()``, ``setAccidental()``
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class QuarterNote
@@ -405,9 +390,6 @@ Class QuarterNote
 
 .. class:: QuarterNote
 
-
-========================
-
     
     Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -435,31 +417,28 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **accidental**, **diatonicNoteNum**, **freq440**, **frequency**, **lily**, **midi**, **mx**, **name**, **nameWithOctave**, **octave**, **pitchClass**, **ps**, **step**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``accidental``, ``diatonicNoteNum``, ``freq440``, ``frequency``, ``lily``, ``midi``, ``mx``, ``name``, ``nameWithOctave``, ``octave``, ``pitchClass``, ``ps``, ``step``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **isNote()**, **isRest()**, **isUnpitched()**, **setAccidental()**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``isNote()``, ``isRest()``, ``isUnpitched()``, ``setAccidental()``
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Beam
 ----------
 
 .. class:: Beam
-
-
-=================
 
     An object representation of a beam, where each beam objects exists for each horizontal line in a total beam structure for one note. 
 
@@ -503,9 +482,6 @@ Class HalfNote
 
 .. class:: HalfNote
 
-
-=====================
-
     
     Inherits from: note.Note (of module :ref:`moduleNote`), note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
 
@@ -533,31 +509,28 @@ Attributes
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **accidental**, **diatonicNoteNum**, **freq440**, **frequency**, **lily**, **midi**, **mx**, **name**, **nameWithOctave**, **octave**, **pitchClass**, **ps**, **step**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``accidental``, ``diatonicNoteNum``, ``freq440``, ``frequency``, ``lily``, ``midi``, ``mx``, ``name``, ``nameWithOctave``, ``octave``, ``pitchClass``, ``ps``, ``step``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.Note (of module :ref:`moduleNote`): **isNote()**, **isRest()**, **isUnpitched()**, **setAccidental()**
+    Inherited from note.Note (of module :ref:`moduleNote`): ``isNote()``, ``isRest()``, ``isUnpitched()``, ``setAccidental()``
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): **splitNoteAtPoint()**
+    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Lyric
 -----------
 
 .. class:: Lyric
-
-
-==================
 
     
     Inherits from: 
@@ -589,9 +562,6 @@ Class Beams
 -----------
 
 .. class:: Beams
-
-
-==================
 
     A group of beams applied to a single note that represents the partial beam structure of many notes beamed together. 
 
@@ -708,9 +678,6 @@ Class NotRest
 
 .. class:: NotRest
 
-
-====================
-
     Parent class for objects that are not rests; or, object that can be tied. 
 
     Inherits from: note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
@@ -738,9 +705,9 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **color**, **lyric**, **musicxml**, **quarterLength**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -768,18 +735,15 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): **addLyric()**, **appendDuration()**, **clearDurations()**, **compactNoteInfo()**, **isChord()**, **splitAtDurations()**
+    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GeneralNote
 -----------------
 
 .. class:: GeneralNote
-
-
-========================
 
     A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects It contains duration, notations, editorial, and tie fields. 
 
@@ -828,7 +792,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -906,7 +870,7 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Tie
@@ -914,10 +878,25 @@ Class Tie
 
 .. class:: Tie
 
+    Object added to notes that are tied to other notes 
 
-================
-
-    Object added to notes that are tied to other notes note1.tie = Tie("start") note1.tieStyle = "normal" # could be dotted or dashed print note1.tie.type # prints start Differences from MusicXML: notes do not need to know if they are tied from a previous note.  i.e., you can tie n1 to n2 just with a tie start on n1.  However, if you want proper musicXML output you need a tie stop on n2 one tie with "continue" implies tied from and tied to optional (to know what notes are next:) .to = note()   # not implimented yet, b/c of garbage coll. .from = note() (question: should notes be able to be tied to multiple notes for the case where a single note is tied both voices of a two-note-head unison?) 
+>>> note1 = Note()
+>>> note1.tie = Tie("start")
+>>> note1.tieStyle = "normal" # or could be dotted or dashed
+>>> note1.tie.type
+'start' 
+Differences from MusicXML: 
+notes do not need to know if they are tied from a 
+previous note.  i.e., you can tie n1 to n2 just with 
+a tie start on n1.  However, if you want proper musicXML output 
+you need a tie stop on n2 
+one tie with "continue" implies tied from and tied to 
+optional (to know what notes are next:) 
+.to = note()   # not implimented yet, b/c of garbage coll. 
+.from = note() 
+(question: should notes be able to be tied to multiple notes 
+for the case where a single note is tied both voices of a 
+two-note-head unison?) 
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
@@ -939,7 +918,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **duration**, **offset**, **parent**, **priority**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
 Methods
 ~~~~~~~
@@ -947,6 +926,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): **addContext()**, **addLocationAndParent()**, **getContextAttr()**, **getContextByClass()**, **getOffsetBySite()**, **id()**, **isClass()**, **searchParent()**, **setContextAttr()**, **show()**, **write()**
+    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

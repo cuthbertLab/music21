@@ -720,5 +720,6 @@ music21.dynamics.posRelativeX attribute moduleDynamics.html
 music21.meter.load method moduleMeter.html
 music21.base.setOffsetBySite method moduleBase.html
 music21.pitch.ps attribute modulePitch.html
+music21.converter.parseURL function moduleConverter.html
 music21.tinyNotation.REST method moduleTinyNotation.html
 music21.clef.TenorClef class moduleClef.html

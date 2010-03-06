@@ -27,9 +27,6 @@ Class TinyNotationNote
 
 .. class:: TinyNotationNote
 
-
-=============================
-
     
 
 >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
@@ -136,9 +133,6 @@ Class TinyNotationLine
 
 .. class:: TinyNotationLine
 
-
-=============================
-
     A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4: 
 
 >>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
@@ -185,9 +179,6 @@ Class HarmonyNote
 
 .. class:: HarmonyNote
 
-
-========================
-
     
     Inherits from: tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`)
 
@@ -201,16 +192,13 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`): **DBLDOT()**, **DOT()**, **EDFLAT()**, **EDNAT()**, **EDSHARP()**, **FLAT()**, **ID_EL()**, **LYRIC()**, **OCTAVE2()**, **OCTAVE3()**, **OCTAVE4()**, **OCTAVE5()**, **PRECTIE()**, **REST()**, **SHARP()**, **TIE()**, **TYPE()**, **customNotationMatch()**, **customPitchMatch()**, **debug()**, **getDots()**
+    Inherited from tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`): ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``debug()``, ``getDots()``
 
 
 Class HarmonyLine
 -----------------
 
 .. class:: HarmonyLine
-
-
-========================
 
     example of subclassing TinyNotationLine to include a possible harmonic representation of the note 
 
@@ -243,6 +231,6 @@ Attributes
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`): **ENDBRAC()**, **QUAD()**, **TRIP()**, **getNote()**
+    Inherited from tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`): ``ENDBRAC()``, ``QUAD()``, ``TRIP()``, ``getNote()``
 
 

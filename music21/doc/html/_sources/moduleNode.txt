@@ -15,9 +15,6 @@ Class Node
 
 .. class:: Node
 
-
-=================
-
     
     Inherits from: 
 
@@ -77,9 +74,6 @@ Class NodeList
 
 .. class:: NodeList
 
-
-=====================
-
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
     Inherits from: node.Node (of module :ref:`moduleNode`)
@@ -97,7 +91,7 @@ Properties
 Properties (Inherited)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **tag**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
 
 Methods
 ~~~~~~~
@@ -108,6 +102,6 @@ Methods
 Methods (Inherited)
 ~~~~~~~~~~~~~~~~~~~
 
-    Inherited from node.Node (of module :ref:`moduleNode`): **get()**, **getNewDoc()**, **loadAttrs()**, **merge()**, **set()**, **setDefaults()**, **toxml()**, **xmlStr()**
+    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 
