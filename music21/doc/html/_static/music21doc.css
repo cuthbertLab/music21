@@ -217,6 +217,15 @@ tt.descname, tt.descclassname, tt.xref {
     border: 0;
 }
 
+.class { 
+    margin-top: -5px;
+    margin-left: 10px;
+    font-size: .9em;
+}
+.class EM.property { display: none }
+.class .descname { font-size: 1.0em }
+
+
 hr {
     border: 1px solid #abc;
     margin: 2em;

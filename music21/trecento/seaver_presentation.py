@@ -32,7 +32,7 @@ def createEasyScale():
     time1 = TimeSignature("3/4")
     tinyNotation = TinyNotationLine(myScale, time1)
     s1 = tinyNotation.stream
-    s1.insertAtOffset(0, time1)
+    s1.insert(0, time1)
 #    s1.timeSignature = time1
 #    s1.showTimeSignature = True
     print(s1.lily)
@@ -72,7 +72,7 @@ def badMeter():
     time1 = TimeSignature("3/4")
     tinyNotation = TinyNotationLine(myScale, time1)
     s1 = tinyNotation.stream
-    s1.insertAtOffset(0, time1)    
+    s1.insert(0, time1)    
 #    s1.timeSignature = time1
 #    s1.showTimeSignature = True
     print(s1.lily)

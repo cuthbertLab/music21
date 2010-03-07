@@ -280,8 +280,11 @@ class HarmonyLine(TinyNotationLine):
     '''
     example of subclassing TinyNotationLine to include a possible harmonic representation of the note
 
-    >>> hnl = HarmonyLine("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle " + \
-                          "G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
+    >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
+    >>> michelle += "G4*E-*_these c_are A-_words G_that "
+    >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
+    
+    >>> hnl = HarmonyLine(michelle, "4/4")
     >>> ns = hnl.stream.notes
     >>> ns[0].step
     'C'

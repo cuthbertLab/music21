@@ -34,6 +34,8 @@ from music21.corpus.beethoven import opus59no1
 from music21.corpus.beethoven import opus59no2
 from music21.corpus.beethoven import opus59no3
 
+from music21.corpus import ciconia
+
 from music21.corpus import haydn
 from music21.corpus.haydn import opus74no1  
 from music21.corpus.haydn import opus74no2  
@@ -57,6 +59,8 @@ MODULES = [
             opus59no1,
             opus59no2,
             opus59no3,
+
+            ciconia,
 
             haydn,
             opus74no1,
@@ -203,7 +207,7 @@ def getComposerDir(composerName):
     return match
 
 def getWorkList(workName, movementNumber=None, extList=None):
-    '''Search the corpus and return a list of works, alway in a list. If no matches are found, an empty list is returned.
+    '''Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.
     '''
     paths = getPaths(extList)
     post = []
@@ -407,6 +411,7 @@ DOC_ORDER = [parseWork, getWork, ]
 
 
 if __name__ == "__main__":
+    qj = parseWork('ciconia/quodJactatur')
     music21.mainTest(Test)
 
 
