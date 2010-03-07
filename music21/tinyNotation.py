@@ -6,7 +6,7 @@ examples.  Originally developed to notate trecento (medieval Italian)
 music, but it's pretty useful for a lot of short examples.  
 
 tinyNotation is not meant to expand to cover every single case.  Instead
-it is meant to be subclassible to extend to the cases *your* project needs.
+it is meant to be subclassable to extend to the cases *your* project needs.
 See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
 or the Trecento specific examples in trecento/cadencebook.py
 '''
@@ -149,11 +149,11 @@ class TinyNotationNote(object):
     ID_EL   = compile('\=([A-Za-z0-9]*)')
     LYRIC   = compile('\_(.*)')
 
-    debug = False
 
     def __init__(self, stringRep, storedDict = common.defHash(default = False)):
         noteObj = None
         storedtie = None
+        self.debug = False
         
         if self.PRECTIE.match(stringRep):
             if self.debug is True: print("FOUND FRONT TIE")
@@ -255,6 +255,15 @@ class TinyNotationNote(object):
         self.note = noteObj
 
     def getDots(self, stringRep, noteObj):
+        '''
+        subclassable method to set the dots attributes of 
+        the duration object.
+        
+        It is subclassed in music21.trecento.cadencebook.TrecentoNote
+        where double dots are redefined as referring to multiply by
+        2.25 (according to a practice used by some Medieval musicologists).
+        '''
+        
         if (self.DBLDOT.search(stringRep)):
             noteObj.duration.dots = 2
         elif (self.DOT.search(stringRep)):
@@ -307,6 +316,12 @@ class HarmonyNote(TinyNotationNote):
     HARMONY   = compile('\*(.*)\*')
     
     def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
+        '''
+        checks to see if a note has markup in the form *TEXT* and if
+        so, stores TEXT in the notes editorial.misc[] dictionary object
+        
+        See the demonstration in the docs for class HarmonyLine.
+        '''
         if self.HARMONY.search(stringRep):
             harmony = self.HARMONY.search(stringRep).group(1)
             m21NoteObject.editorial.misc['harmony'] = harmony
