@@ -1263,6 +1263,19 @@ class Chord(note.NotRest):
         
     orderedPitchClasses = property(_getOrderedPitchClasses)    
 
+
+    def _getOrderedPitchClassesString(self):        
+        '''
+        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> c1.orderedPitchClassesString
+        '<367>'
+        '''
+        return self._formatVectorString(self._getOrderedPitchClasses())
+
+    orderedPitchClassesString = property(_getOrderedPitchClassesString)    
+
+
+
     def _getPitchClassCardinality(self):
         '''Return the number of unique pitch classes
 

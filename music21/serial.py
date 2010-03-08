@@ -76,12 +76,12 @@ class RowSchoenbergOp23No5(TwelveToneRow):
     opus = 'Op. 23, No. 5'
     title = 'Five Piano Pieces'
     row = [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]
-class RowSchoenbergOp24(TwelveToneRow):
+class RowSchoenbergOp24Movement4(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 24'
     title = 'Serenade, Mvt. 4, "Sonett"'
     row = [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]
-class RowSchoenbergOp24(TwelveToneRow):
+class RowSchoenbergOp24Movement5(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 24'
     title = 'Serenade, Mvt. 5, "Tanzscene"'
@@ -96,34 +96,34 @@ class RowSchoenbergOp26(TwelveToneRow):
     opus = 'Op. 26'
     title = 'Wind Quintet'
     row = [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
-class RowSchoenbergOp27(TwelveToneRow):
+class RowSchoenbergOp27No1(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 27'
+    opus = 'Op. 27 No. 1'
     title = 'Four Pieces For Mixed Chorus, No. 1'
     row = [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]
-class RowSchoenbergOp27(TwelveToneRow):
+class RowSchoenbergOp27No2(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 27'
+    opus = 'Op. 27 No. 2'
     title = 'Four Pieces For Mixed Chorus, No. 2'
     row = [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]
-class RowSchoenbergOp27(TwelveToneRow):
+class RowSchoenbergOp27No3(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 27'
+    opus = 'Op. 27 No. 3'
     title = 'Four Pieces For Mixed Chorus, No. 3'
     row = [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]
-class RowSchoenbergOp27(TwelveToneRow):
+class RowSchoenbergOp27No4(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 27'
+    opus = 'Op. 27 No. 4'
     title = 'Four Pieces For Mixed Chorus, No. 4'
     row = [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]
-class RowSchoenbergOp28(TwelveToneRow):
+class RowSchoenbergOp28No1(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 28'
+    opus = 'Op. 28 No. 1'
     title = 'Three Satires For Mixed Chorus, No. 1'
     row = [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]
-class RowSchoenbergOp28(TwelveToneRow):
+class RowSchoenbergOp28No3(TwelveToneRow):
     composer = 'Schoenberg'
-    opus = 'Op. 28'
+    opus = 'Op. 28 No. 3'
     title = 'Three Satires For Mixed Chorus, No. 3'
     row = [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]
 class RowSchoenbergOp29(TwelveToneRow):
@@ -161,22 +161,22 @@ class RowSchoenbergOp34(TwelveToneRow):
     opus = 'Op. 34'
     title = 'Accompaniment To A Film Scene'
     row = [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]
-class RowSchoenbergOp35(TwelveToneRow):
+class RowSchoenbergOp35No1(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 35'
     title = 'Six Pieces For Male Chorus, No. 1'
     row = [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]
-class RowSchoenbergOp35(TwelveToneRow):
+class RowSchoenbergOp35No2(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 35'
     title = 'Six Pieces For Male Chorus, No. 2'
     row = [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]
-class RowSchoenbergOp35(TwelveToneRow):
+class RowSchoenbergOp35No3(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 35'
     title = 'Six Pieces For Male Chorus, No. 3'
     row = [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]
-class RowSchoenbergOp35(TwelveToneRow):
+class RowSchoenbergOp35No5(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 35'
     title = 'Six Pieces For Male Chorus, No. 5'
@@ -241,17 +241,17 @@ class RowSchoenbergOp47(TwelveToneRow):
     opus = 'Op. 47'
     title = 'Fantasy For Violin And Piano'
     row = [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]
-class RowSchoenbergOp48(TwelveToneRow):
+class RowSchoenbergOp48No1(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 48'
     title = 'Three Songs, No. 1, "Sommermud"'
     row = [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]
-class RowSchoenbergOp48(TwelveToneRow):
+class RowSchoenbergOp48No2(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 48'
     title = 'Three Songs, No. 2, "Tot"'
     row = [2, 3, 9, 1, 10, 11, 8, 7, 0, 11, 5, 6]
-class RowSchoenbergOp48(TwelveToneRow):
+class RowSchoenbergOp48No3(TwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 48'
     title = 'Three Songs, No, 3, "Madchenlied"'
@@ -429,7 +429,7 @@ class RowWebernOp31(TwelveToneRow):
 
 
 
-vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24, RowSchoenbergOp24, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27, RowSchoenbergOp27, RowSchoenbergOp27, RowSchoenbergOp27, RowSchoenbergOp28, RowSchoenbergOp28, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35, RowSchoenbergOp35, RowSchoenbergOp35, RowSchoenbergOp35, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragmentOfPhantasiaForPiano, RowSchoenbergFragmentOfSonataForOrgan, RowSchoenbergFragmentForPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergDieJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48, RowSchoenbergOp48, RowSchoenbergOp48, RowSchoenbergIsraelExistsAgain, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAndAron, RowBergChamberConcerto, RowBergWozzeckActIScene4Passacaglia, RowBergLyricSuitePrimaryRow, RowBergLyricSuiteLastMvtPermutation, RowBergDerWein, RowBergLuluPrimaryRow, RowBergLuluActISceneXx, RowBergLuluActIiScene1, RowBergConcertoForViolinAndOrchestra, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
+vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Movement4, RowSchoenbergOp24Movement5, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27No1, RowSchoenbergOp27No2, RowSchoenbergOp27No3, RowSchoenbergOp27No4, RowSchoenbergOp28No1, RowSchoenbergOp28No3, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35No1, RowSchoenbergOp35No2, RowSchoenbergOp35No3, RowSchoenbergOp35No5, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragmentOfPhantasiaForPiano, RowSchoenbergFragmentOfSonataForOrgan, RowSchoenbergFragmentForPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergDieJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48No1, RowSchoenbergOp48No2, RowSchoenbergOp48No3, RowSchoenbergIsraelExistsAgain, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAndAron, RowBergChamberConcerto, RowBergWozzeckActIScene4Passacaglia, RowBergLyricSuitePrimaryRow, RowBergLyricSuiteLastMvtPermutation, RowBergDerWein, RowBergLuluPrimaryRow, RowBergLuluActISceneXx, RowBergLuluActIiScene1, RowBergConcertoForViolinAndOrchestra, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
 
 
 
@@ -480,11 +480,13 @@ class Test(unittest.TestCase):
     def testRows(self):
         from music21 import interval
 
+        self.assertEqual(len(vienneseRows), 71)
+
         totalRows = 0
         cRows = 0
         for thisRow in vienneseRows:
             thisRow = thisRow() 
-            assert(isinstance(thisRow, TwelveToneRow))
+            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
             
             if thisRow.composer == "Berg":
                 continue

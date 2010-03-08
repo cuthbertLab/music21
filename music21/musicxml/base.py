@@ -1789,7 +1789,12 @@ class Lyric(MusicXMLElement):
         '''
         Remove and fix character strings that cause problems in MusicXML
         '''
-        text = xml.sax.saxutils.escape(text)
+        # this results in incorrect encoding of </>
+        #text = xml.sax.saxutils.escape(text)
+        text = text.replace('>', unichr(62))
+        text = text.replace('<', unichr(60))
+        text = text.replace('&', unichr(38))
+
         # need to remove hyphens; but &mdash; and similar do not work
         text = text.replace('-', unichr(8211))
         return text

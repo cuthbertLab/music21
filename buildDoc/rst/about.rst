@@ -23,7 +23,10 @@ The music21 project was made possible by generous support from the following sou
 
 Additionally, the following individuals have contributed to this project.
 
-Margaret Greentree has given permission for distribution of her edited collection of the Bach chorales in MusicXML format as part of the music21 corpus. Here site contains all these chorales in additional formats: http://www.jsbchorales.net
+Margaret Greentree has given permission for distribution of her edited collection of the Bach chorales in MusicXML format as part of the music21 corpus. Her site contains all these chorales in additional formats: http://www.jsbchorales.net
+
+
+Justin London compiled and maintained the list of row forms available in serial.py.
 
 
 Contributing

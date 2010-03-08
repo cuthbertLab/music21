@@ -76,6 +76,81 @@ def bergEx01(show=True):
 
 
 
+
+def melodicChordExpression(show=True):
+    #from music21 import *
+    from music21 import corpus, stream, chord
+    beethovenScore = corpus.parseWork(
+                  'beethoven/opus133.xml') 
+    # parts are given IDs by the MusicXML part name 
+    violin2 = beethovenScore.getElementById(
+                            '2nd Violin')
+    # create an empty container for storing found notes
+    display = stream.Stream() 
+    
+    for measure in violin2.measures:
+        notes = measure.findConsecutiveNotes(
+            skipUnisons=True, skipChords=True, 
+            skipOctaves=True, skipRests=True, 
+            noNone=True)
+        pitches = [n.pitch for n in notes]
+        # examine four-note gruops 
+        for i in range(len(pitches) - 3):
+            testChord = chord.Chord(pitches[i:i+4])           
+            # modify duration for final presentation
+            testChord.duration.type = "whole" 
+            if testChord.isDominantSeventh():
+                # append the found pitches as chord
+                testChord.lyric = "m. " + str(
+                    measure.measureNumber)
+                # store the chord in a measure
+                emptyMeasure = stream.Measure()
+                emptyMeasure.append(
+                   testChord.closedPosition())
+                display.append(emptyMeasure)
+                # append the source measure, tagging 
+                # the first note of the measure with a list
+                # of all pitch classes used in the measure.
+                measure.notes[0].lyric = chord.Chord(
+                    measure.pitches).orderedPitchClassesString
+                display.append(measure)
+    # showing the complete Stream will produce output
+    if show:
+        display.show('musicxml')
+    
+    
+    
+def  pitchDensity(show=True):
+
+    from music21 import corpus
+    from music21.analysis import correlate
+    
+    beethovenScore = corpus.parseWork('opus133.xml')
+    celloPart = beethovenScore.getElementById('Cello')
+    
+    # given a "flat" view of the stream, with nested information removed and all information at the same hierarchical level, combine tied notes into single notes with summed durations
+    notes = celloPart.flat.stripTies()
+    
+    # NoteAnalysis objects permit graphing attributes of a Stream of notes
+    na = correlate.NoteAnalysis(notes) 
+    # calling noteAttributeScatter() with x and y values as named attributes returns a graph 
+    na.noteAttributeScatter('offset', 'pitchClass')
+    
+    
+
+# Two graph improvements: I'd really like Figure 6 (the 3d graphs) to use the
+# log(base2) of the quarter-length, because it's really hard to see the
+# differences between eighth notes and dotted sixteenths, etc. I think it will
+# make the graphs clearer.  Similarly, it'd be really great if Figure 4 at least
+# used flats instead of sharps (it is the Grosse Fuge in B-flat, not A#!), but
+# maybe it'd be good to plot Name against Offset that way we separate A#s from
+# Bbs -- it would probably make the results even more convincing (though the
+# graph would be bigger). 
+
+
+
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -84,7 +159,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         '''Test non-showing functions
         '''
-        for func in [bergEx01]:
+        for func in [bergEx01, melodicChordExpression, pitchDensity]:
             func(show=False)
 
 if __name__ == "__main__":
