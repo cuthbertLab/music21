@@ -7,7 +7,7 @@ from music21 import lily
 from music21 import tinyNotation
 from music21.tinyNotation import *
 
-class TrecentoCadenceLine(TinyNotationLine):
+class TrecentoCadenceStream(TinyNotationStream):
     '''
     Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote
     '''
@@ -73,8 +73,7 @@ class TestExternal(unittest.TestCase):
         '''
         should display a 6 beat long line with some triplets
         '''
-        tl = TrecentoCadenceLine('e2 f8 e f trip{g16 f e} d8 c B trip{d16 c B}')
-        st = tl.stream
+        st = TrecentoCadenceStream('e2 f8 e f trip{g16 f e} d8 c B trip{d16 c B}')
         #for thisNote in st:
         #    print note.sendNoteInfo(thisNote)
         #    print "--------"

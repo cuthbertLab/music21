@@ -159,8 +159,6 @@ def convertFqToPs(fq):
     60.0
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
-    
-
 
 #-------------------------------------------------------------------------------
 class AccidentalException(Exception):
@@ -778,7 +776,58 @@ class Pitch(music21.Music21Object):
         else: return self.octave
         
     implicitOctave = property(_getImplicitOctave, doc='''
-    returns the octave of the note, or defaultOctave if octave was never set
+    returns the octave of the Pitch, or defaultOctave if octave was never set
+    ''')
+
+
+    def _getGerman(self):
+        if self.accidental is not None:
+            tempAlter = self.accidental.alter
+        else:
+            tempAlter = 0
+        tempStep = self.step
+        if tempAlter != int(tempAlter):
+            raise PitchException('Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!')
+        else:
+            tempAlter = int(tempAlter)
+        if tempStep == 'B':
+            if tempAlter >= 0:
+                tempStep = 'H'
+            else:
+                tempAlter += 1
+        if tempAlter == 0:
+            return tempStep
+        elif tempAlter > 0:
+            tempName = tempStep + (tempAlter * 'is')
+            return tempName
+        else: # flats
+            if self.name in ['C','D','F','G']:
+                firstFlatName = 'es'
+            else: # A, E.  Hb should never occur...
+                firstFlatName = 's'
+            multipleFlats = abs(tempAlter) - 1
+            tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
+            return tempName
+    
+    german = property(_getGerman, doc ='''
+    returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.)
+    (Microtones raise an error).
+    
+    >>> print Pitch('B-').german
+    B
+    >>> print Pitch('B').german
+    H
+    >>> print Pitch('E-').german
+    Es
+    >>> print Pitch('C#').german
+    Cis
+    >>> print Pitch('A--').german
+    Ases
+    >>> p1 = Pitch('C')
+    >>> p1.accidental = Accidental('half-sharp')
+    >>> p1.german
+    Traceback (most recent call last):
+    PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
     ''')
 
 

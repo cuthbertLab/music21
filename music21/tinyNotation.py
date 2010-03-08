@@ -25,24 +25,18 @@ from music21 import stream
 from music21 import notationMod
 from music21 import meter
 
-def lineToStream(line, timeSignature = None):
-    tnl = TinyNotationLine(line, timeSignature)
-    return tnl.stream
-
-class TinyNotationLine(object):
-    '''A TinyNotationLine begins as a string representation similar to Lilypond format
-    but simplified somewhat.  This object holds the string representation and stores a
-    Stream representation at .stream.
+class TinyNotationStream(stream.Stream):
+    '''A TinyNotationStream takes in a string representation similar to Lilypond format
+    but simplified somewhat and an optional time signature string (or TimeSignature object).
     
     example in 3/4:
-    >>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
+    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
     >>> stream1.getElementById("lastG").step
     'G'
     >>> stream1.notes[1].isRest
     True
     >>> stream1.notes[0].octave
-    3
-    
+    3    
     '''
 
     TRIP    = compile('trip\{')
@@ -50,6 +44,7 @@ class TinyNotationLine(object):
     ENDBRAC = compile('\}')
     
     def __init__(self, stringRep = "", timeSignature = None):
+        stream.Stream.__init__(self)
         self.stringRep = stringRep
         noteStrs = self.stringRep.split()
 
@@ -101,15 +96,15 @@ class TinyNotationLine(object):
                 elif dict1['inQuad'] == True:
                     dict1['inQuad'] = False
                 else:
-                    raise TinyNotationException("unexpected end bracket in TinyNotationLine")
+                    raise TinyNotationException("unexpected end bracket in TinyNotationStream")
 
             dict1['beginTuplet'] = False
 
-        self.stream = stream.Stream()
+        
         if timeSignature is not None and hasattr(timeSignature, "barDuration"):
-            self.stream.append(timeSignature)
+            self.append(timeSignature)
         for thisNote in noteList:
-            self.stream.append(thisNote)
+            self.append(thisNote)
         
     def getNote(self, stringRep, storedDict = {}):
         '''
@@ -285,16 +280,16 @@ class TinyNotationNote(object):
     def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
         return None
 
-class HarmonyLine(TinyNotationLine):
+class HarmonyStream(TinyNotationStream):
     '''
-    example of subclassing TinyNotationLine to include a possible harmonic representation of the note
+    example of subclassing TinyNotationStream to include a possible harmonic representation of the note
 
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
     
-    >>> hnl = HarmonyLine(michelle, "4/4")
-    >>> ns = hnl.stream.notes
+    >>> hns = HarmonyStream(michelle, "4/4")
+    >>> ns = hns.notes
     >>> ns[0].step
     'C'
     >>> ns[0].editorial.misc['harmony']
@@ -343,9 +338,8 @@ class Test(unittest.TestCase):
         a = cn.note
         self.assertEqual(a.compactNoteInfo(), "A- A 2 flat (Tie: start) quarter 1.5")
     
-    def testTinyNotationLine(self):
-        tl = TinyNotationLine('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
-        st = tl.stream
+    def testTinyNotationStream(self):
+        st = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
         ret = ""
         for thisNote in st:
             ret += thisNote.compactNoteInfo() + "\n"
@@ -374,13 +368,13 @@ Total duration of Stream: 6.0
         self.assertTrue(common.basicallyEqual(canonical, ret))
     
     def testConvert(self):
-        st1 = lineToStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
+        st1 = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
         self.assertEqual(st1[1].offset, 2.0) 
         self.assertTrue(isinstance(st1[2], music21.note.Rest))     
 
     def testHarmonyNotation(self):
-        hnl = HarmonyLine("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
-        nst1 = hnl.stream.notes
+        hns = HarmonyStream("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
+        nst1 = hns.notes
         self.assertEqual(nst1[0].step, "C")
         self.assertEqual(nst1[0].editorial.misc['harmony'], "F")
         self.assertEqual(nst1[0].lyric, "Mi-")
@@ -393,12 +387,11 @@ class TestExternal(unittest.TestCase):
     def xtestCreateEasyScale(self):
         myScale = "d8 e f g a b"
         time1 = meter.TimeSignature("3/4")
-        tinyNotation = TinyNotationLine(myScale, time1)
-        s1 = tinyNotation.stream
-        s1.lily.showPDF()
+        tinyNotation = TinyNotationStream(myScale, time1)
+        tinyNotation.lily.showPDF()
     
     def testMusicXMLExt(self):
-        cadB = lineToStream("c8 B- B- A c trip{d16 c B-} A8 B- A0", "2/4")
+        cadB = TinyNotationStream("c8 B- B- A c trip{d16 c B-} A8 B- A0", "2/4")
 #        last = cadB[10]
 #        cadB = stream.Stream()
 #        n1 = music21.note.Note()
@@ -411,8 +404,7 @@ class TestExternal(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [TinyNotationNote, TinyNotationLine]
-
+DOC_ORDER = [TinyNotationNote, TinyNotationStream, HarmonyStream, HarmonyNote]
 
 if __name__ == "__main__":
     music21.mainTest(TestExternal, Test)

@@ -42,6 +42,18 @@ def richardBreedGetWell():
             if len(display) > 0:
                 display.show()
 
+def annotateWithGerman():
+    '''
+    annotates a score with the German notes for each note
+    '''
+    bwv295 = corpus.parseWork('bach/bwv295')
+    for thisNote in bwv295.flat.notes:
+        thisNote.addLyric(thisNote.pitch.german)
+    bwv295.show()
+
+
+
 #-------------------------------------------------------------------------------
 if (__name__ == "__main__"):
-    richardBreedGetWell()
+#    richardBreedGetWell()
+    annotateWithGerman()

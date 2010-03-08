@@ -400,13 +400,13 @@ class NoteAnalysis(object):
         yLabel = None
 
         if fy == None:
-            fy = lambda n: n.midi
-            yLabel = 'MIDI Note Number'
+            fy = lambda n: n.pitchSpace
+            yLabel = 'Pitch Space (middle C = 60)'
         elif common.isStr(fy):
             fy, yLabel = self._autoLambda(fy)
 
         if fx == None:
-            fx = lambda n:n.quarterLength
+            fx = lambda n: n.quarterLength
             xLabel = 'Quarter Length'
         elif common.isStr(fx):
             fx, xLabel = self._autoLambda(fx)

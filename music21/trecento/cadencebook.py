@@ -15,7 +15,6 @@ import os
 
 import music21
 import music21.duration
-from music21 import tinyNotation
 from music21.duration import DurationException
 
 from music21 import lily
@@ -269,8 +268,8 @@ class TrecentoCadenceWork(object):
         >>> dummyPiece.convertBlockToStreams(block1)
         >>> for x in block1:
         ...     print(x)
-        <music21.stream.Stream object at 0x...>
-        <music21.stream.Stream object at 0x...>
+        <music21.trecento.trecentoCadence.TrecentoCadenceStream object at 0x...>
+        <music21.trecento.trecentoCadence.TrecentoCadenceStream object at 0x...>
         <BLANKLINE>
         no-cadence
         2/4
@@ -289,8 +288,7 @@ class TrecentoCadenceWork(object):
             thisVoice = thisVoice.strip()
             if (thisVoice):
                 try:
-                    tc1 = music21.tinyNotation.TinyNotationLine(thisVoice, currentTimeSig)
-                    thisBlock[i] = tc1.stream
+                    thisBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
                 except DurationException, (value):
                     raise DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
 #                except Exception, (value):

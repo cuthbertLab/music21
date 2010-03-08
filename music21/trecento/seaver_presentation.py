@@ -8,7 +8,7 @@ from music21 import stream
 from music21.stream import Stream
 from music21.lily import LilyString
 from music21 import tinyNotation
-from music21.tinyNotation import TinyNotationLine
+from music21.tinyNotation import TinyNotationStream
 from music21.meter import TimeSignature
 from music21 import clef
 from music21 import trecento
@@ -30,8 +30,7 @@ def createScalePart():
 def createEasyScale():
     myScale = "d8 e f g a b"
     time1 = TimeSignature("3/4")
-    tinyNotation = TinyNotationLine(myScale, time1)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(myScale, time1)
     s1.insert(0, time1)
 #    s1.timeSignature = time1
 #    s1.showTimeSignature = True
@@ -41,8 +40,7 @@ def createEasyScale():
     
 def createSleep():
     section = "A1 r4 G G G8 F G2 G c2 c8 c c B c2 c"
-    tinyNotation = TinyNotationLine(section)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(section)
     
     s1.clef = music21.clef.Treble8vbClef()
 #    lS1 = LilyString("\\score { {" + s1.lily + "} \\layout {} \\midi {} }")
@@ -62,50 +60,42 @@ def createOrphee():
     
     section = "g4 g2 c'4 c'2 b4 b8 c' c'2. g4 a-2 g4 "
     section += random3
-    tinyNotation = TinyNotationLine(section)
-    s1 = tinyNotation.stream
+
+    s1 = TinyNotationStream(section)
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
     
 def badMeter():
     myScale = "a2 a2"
     time1 = TimeSignature("3/4")
-    tinyNotation = TinyNotationLine(myScale, time1)
-    s1 = tinyNotation.stream
-    s1.insert(0, time1)    
-#    s1.timeSignature = time1
-#    s1.showTimeSignature = True
+    s1 = TinyNotationStream(myScale, time1)
     print(s1.lily)
     s1.lily.showPNG()
     
 def capuaReg1():
     myScale = "g4 f4 g4 r4 r2 g4 f#4 g2"
-    tinyNotation = TinyNotationLine(myScale)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(myScale)
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
     print(lS1.midiFilename)
 
 def capuaReg2():
     myScale = "d4 e f g r r r r d e f# g2"
-    tinyNotation = TinyNotationLine(myScale)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(myScale)
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
     print(lS1.midiFilename)
 
 def capuaReg3():
     myScale = "a4 f g r r r r a f# g2"
-    tinyNotation = TinyNotationLine(myScale)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(myScale)
     lS1 = LilyString(s1.lily)
     lS1.showPNGandPlayMIDI()
     print(lS1.midiFilename)
     
 def major3rd():
     myScale = "a-2 c'2"
-    tinyNotation = TinyNotationLine(myScale)
-    s1 = tinyNotation.stream
+    s1 = TinyNotationStream(myScale)
     lS1 = LilyString(s1.lily)
     lS1.showPDF()
 
