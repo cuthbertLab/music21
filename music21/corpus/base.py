@@ -255,7 +255,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
 
     post.sort()
     postMvt = []
-    if movementNumber is not None:
+    if movementNumber is not None and len(post) > 0:
         movementStrList = ['movement%s' % movementNumber]
         for fp in post:
             for movementStr in movementStrList:
@@ -280,12 +280,14 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
     >>> getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml']
 
+    >>> getVirtualWorkList('junk')
+    []
     '''
     if not common.isListLike(extList):
         extList = [extList]
 
     for obj in VIRTUAL:
-        if workName.lower() in obj.corpusPath.lower():
+        if obj.corpusPath != None and workName.lower() in obj.corpusPath.lower():
             return obj.getUrlByExt(extList)
     return []
 
