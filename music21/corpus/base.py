@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-The music21 corpus provides a collection of public-domain music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
+The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
 '''
 
 
@@ -22,6 +22,8 @@ import doctest, unittest
 import music21
 from music21 import common
 from music21 import converter
+from music21.corpus import virtual
+
 from music21 import environment
 _MOD = "corpus/base.py"
 environLocal = environment.Environment(_MOD)
@@ -80,6 +82,18 @@ MODULES = [
     ]
 
 
+# instantiate an instance of each virtual work object in a module
+# level constant
+VIRTUAL = []
+for name in dir(virtual): # look over virtual module
+    className = getattr(virtual, name)
+    if callable(className):
+        obj = className()
+        if isinstance(obj, virtual.VirtualWork):
+            VIRTUAL.append(obj)
+
+
+
 #-------------------------------------------------------------------------------
 class CorpusException(Exception):
     pass
@@ -98,13 +112,13 @@ def getPaths(extList=None):
     >>> len(a) >= 4
     True
     '''
-    if extList == None:
+    if not common.isListLike(extList):
+        extList = [extList]
+
+    if extList == [None]:
         extList = (common.findInputExtension('lily') +
                    common.findInputExtension('mx') +
                    common.findInputExtension('humdrum'))
-    else:
-        if not common.isListLike(extList):
-            extList = [extList]
 
     #environLocal.printDebug(['getting paths with extensions:', extList])
 
@@ -206,9 +220,24 @@ def getComposerDir(composerName):
             break
     return match
 
+#-------------------------------------------------------------------------------
 def getWorkList(workName, movementNumber=None, extList=None):
     '''Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.
+
+    >>> len(getWorkList('beethoven/opus18no1'))
+    8
+    >>> len(getWorkList('beethoven/opus18no1', 1))
+    2 
+    >>> len(getWorkList('beethoven/opus18no1', 1, '.krn'))
+    1
+    >>> len(getWorkList('beethoven/opus18no1', 1, '.xml'))
+    1
+    >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
+    0
     '''
+    if not common.isListLike(extList):
+        extList = [extList]
+
     paths = getPaths(extList)
     post = []
 
@@ -223,21 +252,45 @@ def getWorkList(workName, movementNumber=None, extList=None):
             post.append(path)
         elif workSlashes.lower() in path.lower():
             post.append(path)
+
     post.sort()
+    postMvt = []
     if movementNumber is not None:
-        try:
-            return post[movementNumber - 1]
-        except IndexError:
-            raise CorpusException(
-                "Cannot get movement number " + str(movementNumber) + 
-                " either because " + workName + " does not have that many movements or because the corpus is not organized by movement")
-    if len(post) == 0:
+        movementStrList = ['movement%s' % movementNumber]
+        for fp in post:
+            for movementStr in movementStrList:
+                if movementStr.lower() in fp.lower():
+                    postMvt.append(fp)
+        if len(postMvt) == 0:
+            pass # return an empty list
+#             raise CorpusException(
+#                 "Cannot get movement number " + str(movementNumber) + 
+#                 " either because " + workName + " does not have that many movements or because the corpus is not organized by movement")
+    else:
+        postMvt = post
+
+    if len(postMvt) == 0:
         return []
     else:
-        return post
+        return postMvt
+
+def getVirtualWorkList(workName, movementNumber=None, extList=None):
+    '''Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs.
+
+    >>> getVirtualWorkList('bach/bwv1007/prelude')
+    ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml']
+
+    '''
+    if not common.isListLike(extList):
+        extList = [extList]
+
+    for obj in VIRTUAL:
+        if workName.lower() in obj.corpusPath.lower():
+            return obj.getUrlByExt(extList)
+    return []
 
 
-
+#-------------------------------------------------------------------------------
 def getWork(workName, movementNumber=None, extList=None):
     '''Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
@@ -251,18 +304,20 @@ def getWork(workName, movementNumber=None, extList=None):
     True
 
     '''
+    if not common.isListLike(extList):
+        extList = [extList]
+
     post = getWorkList(workName, movementNumber, extList)
+    if len(post) == 0:
+        post = getVirtualWorkList(workName, movementNumber, extList)
+
     if len(post) == 1:
         return post[0]
     elif len(post) == 0:
-        # better if this returns an empty list or None, as we need 
-        # to programmatically use call this and not catch each exception 
-        # when filtering by extension
-        raise CorpusException("Could not find a single file that met this criteria")
-    else:
+        raise CorpusException("Could not find a file/url that met this criteria")
+    else: # return a list
         return post
 
-    
 
 def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
     '''Return a parsed stream from a converter by providing only a work name.
@@ -272,8 +327,22 @@ def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
 
     >>> aStream = parseWork('opus74no1/movement3')
     '''
-    work = getWork(workName, movementNumber, extList)
-    return converter.parse(work, forceSource)
+    if not common.isListLike(extList):
+        extList = [extList]
+
+    post = getWorkList(workName, movementNumber, extList)
+    environLocal.printDebug(['result of getWorkList()', post])
+    if len(post) == 0:
+        post = getVirtualWorkList(workName, movementNumber, extList)    
+
+    if len(post) == 1:
+        fp = post[0]
+    elif len(post) == 0:
+        raise CorpusException("Could not find a work that met this criteria")
+    else: # greater than zero:
+        fp = post[0] # get first
+      
+    return converter.parse(fp, forceSource)
 
 
 
@@ -411,7 +480,7 @@ DOC_ORDER = [parseWork, getWork, ]
 
 
 if __name__ == "__main__":
-    qj = parseWork('ciconia/quodJactatur')
+    #qj = parseWork('ciconia/quod_jactatur')
     music21.mainTest(Test)
 
 

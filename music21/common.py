@@ -128,11 +128,53 @@ def findFormatFile(fp):
     On a windows networked filesystem
     >>> findFormatFile('\\\\long\\file\\path\\test.krn')
     'humdrum'
-
     '''
     format, ext = findFormat(fp.split('.')[-1])
     return format # may be None if no match
 
+
+def findFormatExtURL(url):
+    '''Given a URL, attempt to find the extension
+
+    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+    >>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
+    >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
+    >>> urlF = 'http://junk'
+
+    >>> findFormatExtURL(urlA)
+    ('musicxml', '.xml')
+    >>> findFormatExtURL(urlB)
+    ('humdrum', '.krn')
+    >>> findFormatExtURL(urlC)
+    ('musicxml', '.xml')
+    >>> findFormatExtURL(urlD)
+    ('musicxml', '.mxl')
+    >>> findFormatExtURL(urlE)
+    ('musicxml', '.mxl')
+    >>> findFormatExtURL(urlF)
+    (None, None)
+    '''
+    ext = None
+    # first, look for cgi arguments
+    if '=xml' in url:
+        ext = '.xml'
+    elif '=kern' in url:
+        ext = '.krn'
+    else: # check for file that ends in all known input extensions
+        for key in fileExtensions.keys():
+            for extSample in fileExtensions[key]['input']:
+                if url.endswith('.' + extSample):
+                    ext = '.' + extSample
+                    break
+    # presently, not keeping the extension returned from this function
+    # reason: mxl is converted to xml; need to handle mxl files first
+    if ext != None:
+        format, junk = findFormat(ext)
+        return format, ext
+    else:
+        return None, None    
 
 def basicallyEqual(a, b):
     '''

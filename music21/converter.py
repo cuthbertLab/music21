@@ -77,7 +77,7 @@ class PickleFilter(object):
     def status(self):
         # look for an up to date pickled version
         # if it exists, return its fp, other wise return fp
-        fpScratch = environLocal['directoryScratch']
+        fpScratch = environLocal.getTempDir()
         format = common.findFormatFile(self.fp)
 
         if format == 'pickle': # do not pickle a pickle
@@ -258,7 +258,13 @@ class Converter(object):
         else:
             raise ConverterException('no such format: %s' % format)
 
+    def _getDownloadFp(self, dir, ext, url):
+        if dir == None:
+            raise ValueError
+        return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
+
     def parseFile(self, fp, forceSource=False):
+        #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
         format = common.findFormatFile(fp) 
@@ -281,33 +287,29 @@ class Converter(object):
 
 
     def parseURL(self, url):
-        '''Given a url, downloadn and parse
+        '''Given a url, download and parse
             
-        >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-        >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
         '''
-        # TODO: this needs to check if the file is already stored in the
-        # users scrawtch directory before downloading
-
         #url = urllib.quote(url) may need?
-        if '=xml' in url:
-            ext = '.xml'
-        elif '=kern' in url:
-            ext = '.krn'
-        elif 'xml' in url: # less restrictive
-            ext = '.xml'
-        elif 'krn' in url:
-            ext = '.krn'
-        else:
-            ext = ''    
-        environLocal.printDebug(['using extension:', ext])
-        dst = environLocal.getTempFile(ext)
-        try:
-            fp, headers = urllib.urlretrieve(url, filename=dst)
-        except IOError:
-            raise ConverterException('cannot access file: %s' % url)
+        format, ext = common.findFormatExtURL(url)
+        if format == None: # cannot figure out what it is
+            raise ConverterException('cannot determine file format of url: %s' % url)
+        dir = environLocal.getTempDir()
+        #dst = environLocal.getTempFile(ext)
 
+        dst = self._getDownloadFp(dir, ext, url)
+
+        if not os.path.exists(dst):
+            try:
+                environLocal.printDebug(['downloading to:', dst])
+                fp, headers = urllib.urlretrieve(url, filename=dst)
+            except IOError:
+                raise ConverterException('cannot access file: %s' % url)
+        else:
+            environLocal.printDebug(['using already downloaded file:', dst])
+            fp = dst
+
+        # update format based on downloaded fp
         format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=False)
         self._converter.parseFile(fp)
@@ -349,6 +351,8 @@ def parse(value, forceSource=False):
     '''
     Determine if the file is a file path or a string 
     '''
+    #environLocal.printDebug(['attempting to parse()', value])
+
     if os.path.exists(value):
         return parseFile(value, forceSource)
     elif value.startswith('http://'): 
@@ -388,6 +392,13 @@ class TestExternal(unittest.TestCase):
         c.show()
         # TODO: this is only showing the minimum number of measures
 
+
+    def testParseURL(self):
+        urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+        urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+        urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+        for url in [urlA, urlB, urlC]:
+            post = parseURL(url)
 
 class Test(unittest.TestCase):
 

@@ -332,6 +332,18 @@ class Environment(object):
         return fp
 
 
+    def getTempDir(self):
+        '''Get a temporary directory. Return the user preference if set.
+        '''
+        if self.ref['directoryScratch'] == None:
+            # get a system specified scratch dir
+            pass
+        elif not os.path.exists(self.ref['directoryScratch']):    
+            raise EnvironmentException('user-specified scratch directory (%s) does not exists.' % self.ref['directoryScratch'])
+        else:
+            return self.ref['directoryScratch']
+
+
     
     def launch(self, fmt, fp, options=''):
         '''Open a file with an application specified by a preference (?)
