@@ -14,7 +14,7 @@ Used extensively by note.py
 
 .. function:: convertPsToStep()
 
-    Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
+Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
 
 >>> convertPsToStep(60)
 ('C', <accidental natural>) 
@@ -39,7 +39,7 @@ Used extensively by note.py
 
 .. function:: convertPsToOct()
 
-    Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
+Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
 
 >>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
 [3, 4, 4] 
@@ -50,7 +50,7 @@ Used extensively by note.py
 
 .. function:: convertStepToPs()
 
-    Utility conversion; does not process internals. 
+Utility conversion; does not process internals. 
 
 >>> convertStepToPs('c', 4, 1)
 61 
@@ -61,7 +61,7 @@ Used extensively by note.py
 
 .. function:: convertPsToFq()
 
-    Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
+Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
 
 >>> convertPsToFq(69)
 440.0 
@@ -74,7 +74,7 @@ Used extensively by note.py
 
 .. function:: convertFqToPs()
 
-    Utility conversion; does not process internals. Assumes A4 = 440 Hz 
+Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
 >>> convertFqToPs(440)
 69.0 
@@ -86,24 +86,22 @@ Class Pitch
 
 .. class:: Pitch
 
-    
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: defaultOctave
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
 
-Properties
-~~~~~~~~~~
+    Unique identification string. 
 
     .. attribute:: accidental
 
-        
+    
 
     >>> a = Pitch('D-2')
     >>> a.accidental.alter
@@ -111,7 +109,7 @@ Properties
 
     .. attribute:: diatonicNoteNum
 
-        Read-only property. Returns an int that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
+    Read-only property. Returns an int that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
 
     >>> c = Pitch('c4')
     >>> c.diatonicNoteNum
@@ -135,7 +133,7 @@ Properties
 
     .. attribute:: freq440
 
-        
+    
 
     >>> a = Pitch('A4')
     >>> a.freq440
@@ -143,23 +141,23 @@ Properties
 
     .. attribute:: frequency
 
-        The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
+    The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
 
     .. attribute:: implicitOctave
 
-        returns the octave of the note, or defaultOctave if octave was never set 
+    returns the octave of the note, or defaultOctave if octave was never set 
 
     .. attribute:: midi
 
-        midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
+    midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
 
     .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. Presently, this is based on 
+    Provide a complete MusicXM: representation. Presently, this is based on 
 
     .. attribute:: mx
 
-        returns a musicxml.Note() object 
+    returns a musicxml.Note() object 
 
     >>> a = Pitch('g#4')
     >>> c = a.mx
@@ -168,7 +166,7 @@ Properties
 
     .. attribute:: name
 
-        Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
+    Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
 
     >>> a = Pitch('G#')
     >>> a.name
@@ -176,7 +174,7 @@ Properties
 
     .. attribute:: nameWithOctave
 
-        Returns pitch name with octave Perhaps better default action for getName 
+    Returns pitch name with octave Perhaps better default action for getName 
 
     >>> a = Pitch('G#4')
     >>> a.nameWithOctave
@@ -184,7 +182,7 @@ Properties
 
     .. attribute:: octave
 
-        returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
+    returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
 
     >>> a = Pitch('g')
     >>> a.octave is None
@@ -205,7 +203,7 @@ Properties
 
     .. attribute:: pitchClass
 
-        
+    
 
     >>> a = Pitch('a3')
     >>> a._getPitchClass()
@@ -224,26 +222,17 @@ Properties
 
     .. attribute:: ps
 
-        pitchSpace attribute 
+    pitchSpace attribute 
 
     .. attribute:: step
 
-        
+    
 
     >>> a = Pitch('C#3')
     >>> a._getStep()
     'C' 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -257,24 +246,18 @@ Class Accidental
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: alter
 
     .. attribute:: modifier
 
     .. attribute:: name
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: lily
 
-    
+
     .. attribute:: mx
 
-        From music21 to MusicXML 
+    From music21 to MusicXML 
 
     >>> a = Accidental()
     >>> a.set('half-sharp')
@@ -284,17 +267,11 @@ Properties
     >>> mxAccidental.get('content')
     'quarter-sharp' 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
 
     .. method:: set()
 
-        Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
+    Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
 
     >>> a = Accidental()
     >>> a.set('sharp')
@@ -311,9 +288,6 @@ Methods
     >>> a = Accidental('--')
     >>> a.alter
     -2.0 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 

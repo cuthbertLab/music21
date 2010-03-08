@@ -14,28 +14,23 @@ Class TempoMark
 
     
 
->>> tm = TempoMark("adagio")
->>> tm.value
-'adagio' 
+    >>> tm = TempoMark("adagio")
+    >>> tm.value
+    'adagio' 
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: groups
+
+    An instance of a Group object. 
 
     .. attribute:: id
 
+    Unique identification string. 
+
     .. attribute:: value
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -47,18 +42,19 @@ Class MetronomeMark
 
     
 
->>> a = MetronomeMark(40)
->>> a.number
-40 
+    >>> a = MetronomeMark(40)
+    >>> a.number
+    40 
 
     Inherits from: tempo.TempoMark (of module :ref:`moduleTempo`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: number
 

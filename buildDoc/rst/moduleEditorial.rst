@@ -14,14 +14,11 @@ Class NoteEditorial
 
     EditorialComments that can be applied to notes 
 
->>> a = NoteEditorial()
->>> a.misc
-{} 
+    >>> a = NoteEditorial()
+    >>> a.misc
+    {} 
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
 
     .. attribute:: color
 
@@ -41,34 +38,22 @@ Attributes
 
     .. attribute:: misc
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
 
     .. method:: colorLilyStart()
 
-    
+
     .. method:: fictaLilyStart()
 
-    
+
     .. method:: lilyAttached()
 
-    
+
     .. method:: lilyEnd()
 
-    
+
     .. method:: lilyStart()
 
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -78,19 +63,13 @@ Class Comment
 
 .. class:: Comment
 
-    
-    Inherits from: 
 
-Properties
-~~~~~~~~~~
+    
 
     .. attribute:: lily
 
-    
-Methods
-~~~~~~~
 
     .. method:: text()
 
-    
+
 

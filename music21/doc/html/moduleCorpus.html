@@ -83,16 +83,18 @@
 <dl class="function">
 <dt id="music21.corpus.parseWork">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">parseWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.parseWork" title="Permalink to this definition">¶</a></dt>
-<dd>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</dd></dl>
+<dd></dd></dl>
 
+<p>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="function">
 <dt id="music21.corpus.getWork">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getWork" title="Permalink to this definition">¶</a></dt>
-<dd>Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised.</dd></dl>
+<dd></dd></dl>
 
+<p>Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
@@ -105,8 +107,9 @@
 <dl class="function">
 <dt id="music21.corpus.getPaths">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getPaths</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getPaths" title="Permalink to this definition">¶</a></dt>
-<dd>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</dd></dl>
+<dd></dd></dl>
 
+<p>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">30</span>
 <span class="go">True</span>
@@ -134,8 +137,9 @@
 <dl class="function">
 <dt id="music21.corpus.getComposer">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getComposer</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getComposer" title="Permalink to this definition">¶</a></dt>
-<dd>Return all components of the corpus that match a composer&#8217;s name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions.</dd></dl>
+<dd></dd></dl>
 
+<p>Return all components of the corpus that match a composer&#8217;s name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposer</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
 <span class="go">True</span>
@@ -153,13 +157,15 @@
 <dl class="function">
 <dt id="music21.corpus.getWorkList">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getWorkList</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getWorkList" title="Permalink to this definition">¶</a></dt>
-<dd>Search the corpus and return a list of works, alway in a list. If no matches are found, an empty list is returned.</dd></dl>
+<dd></dd></dl>
 
+<p>Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.</p>
 <dl class="function">
 <dt id="music21.corpus.getComposerDir">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getComposerDir</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getComposerDir" title="Permalink to this definition">¶</a></dt>
-<dd>Given the name of a composer, get the path to the top-level directory of that composer</dd></dl>
+<dd></dd></dl>
 
+<p>Given the name of a composer, get the path to the top-level directory of that composer</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;beethoven&#39;</span><span class="p">))</span>
@@ -219,7 +225,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

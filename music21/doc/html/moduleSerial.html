@@ -48,24 +48,9 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.serial</a><ul>
-<li><a class="reference external" href="#class-twelvetonematrix">Class TwelveToneMatrix</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-twelvetonerow">Class TwelveToneRow</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-tonerow">Class ToneRow</a><ul>
-<li><a class="reference external" href="#id2">Attributes</a></li>
-<li><a class="reference external" href="#id3">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id4">Methods (Inherited)</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-twelvetonematrix">Class TwelveToneMatrix</a></li>
+<li><a class="reference external" href="#class-twelvetonerow">Class TwelveToneRow</a></li>
+<li><a class="reference external" href="#class-tonerow">Class ToneRow</a></li>
 </ul>
 </li>
 </ul>
@@ -123,52 +108,40 @@
 <dt id="music21.serial.TwelveToneMatrix">
 <em class="property">
 class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">TwelveToneMatrix</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt id="music21.serial.flattenedRepresentationOf">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.serial.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.serial.TwelveToneMatrix.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.serial.groups">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.serial.groups" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.serial.TwelveToneMatrix.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.serial.TwelveToneMatrix.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.serial.TwelveToneMatrix.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.serial.id">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.serial.id" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.serial.TwelveToneMatrix.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="music21.serial.isFlat">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isFlat</tt><a class="headerlink" href="#music21.serial.isFlat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.serial.isSorted">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isSorted</tt><a class="headerlink" href="#music21.serial.isSorted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-twelvetonerow">
 <h2>Class TwelveToneRow<a class="headerlink" href="#class-twelvetonerow" title="Permalink to this headline">¶</a></h2>
@@ -176,57 +149,45 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <dt id="music21.serial.TwelveToneRow">
 <em class="property">
 class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">TwelveToneRow</tt><a class="headerlink" href="#music21.serial.TwelveToneRow" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: serial.ToneRow (of module <a class="reference internal" href="#moduleserial"><em>music21.serial</em></a>), stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: serial.ToneRow (of module <a class="reference internal" href="#moduleserial"><em>music21.serial</em></a>), stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.serial.TwelveToneRow.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.serial.TwelveToneRow.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.serial.TwelveToneRow.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.serial.TwelveToneRow.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.serial.TwelveToneRow.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.serial.matrix">
-<tt class="descclassname">music21.serial.</tt><tt class="descname">matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.serial.matrix" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.serial.TwelveToneRow.matrix">
+<tt class="descname">matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.serial.TwelveToneRow.matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-tonerow">
 <h2>Class ToneRow<a class="headerlink" href="#class-tonerow" title="Permalink to this headline">¶</a></h2>
@@ -234,52 +195,40 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <dt id="music21.serial.ToneRow">
 <em class="property">
 class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">ToneRow</tt><a class="headerlink" href="#music21.serial.ToneRow" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id2">
-<h3>Attributes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.serial.ToneRow.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.serial.ToneRow.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.serial.ToneRow.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.serial.ToneRow.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.serial.ToneRow.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.serial.ToneRow.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.serial.ToneRow.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.serial.ToneRow.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.serial.ToneRow.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.serial.ToneRow.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.serial.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id3">
-<h3>Properties (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id4">
-<h3>Methods (Inherited)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -309,7 +258,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">To
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

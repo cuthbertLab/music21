@@ -15,13 +15,13 @@ examples.  Originally developed to notate trecento (medieval Italian)
 music, but it's pretty useful for a lot of short examples.  
 
 tinyNotation is not meant to expand to cover every single case.  Instead
-it is meant to be subclassible to extend to the cases *your* project needs.
+it is meant to be subclassable to extend to the cases *your* project needs.
 See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
 or the Trecento specific examples in trecento/cadencebook.py
 
 .. function:: lineToStream()
 
-    
+
 Class TinyNotationNote
 ----------------------
 
@@ -29,104 +29,98 @@ Class TinyNotationNote
 
     
 
->>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
->>> note1 = tcN.note
->>> note1.name
-'A-' 
->>> note1.octave
-2 
->>> note1.lyric
-'hel-' 
->>> note1.id
-'aflat' 
+    >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
+    >>> note1 = tcN.note
+    >>> note1.name
+    'A-' 
+    >>> note1.octave
+    2 
+    >>> note1.lyric
+    'hel-' 
+    >>> note1.id
+    'aflat' 
 
-    Inherits from: 
-
-Methods
-~~~~~~~
+    
 
     .. method:: DBLDOT()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: DOT()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: EDFLAT()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: EDNAT()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: EDSHARP()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: FLAT()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: ID_EL()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: LYRIC()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: OCTAVE2()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: OCTAVE3()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: OCTAVE4()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: OCTAVE5()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: PRECTIE()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: REST()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: SHARP()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: TIE()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: TYPE()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: customNotationMatch()
 
-    
+
     .. method:: customPitchMatch()
 
-        method to create a note object in sub classes of tiny notation. Should return a Note-like object or None 
-
-    .. method:: debug()
-
-        bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    method to create a note object in sub classes of tiny notation. Should return a Note-like object or None 
 
     .. method:: getDots()
 
-    
+    subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
+
 
 Class TinyNotationLine
 ----------------------
@@ -135,43 +129,37 @@ Class TinyNotationLine
 
     A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4: 
 
->>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
->>> stream1.getElementById("lastG").step
-'G' 
->>> stream1.notes[1].isRest
-True 
->>> stream1.notes[0].octave
-3 
+    >>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
+    >>> stream1.getElementById("lastG").step
+    'G' 
+    >>> stream1.notes[1].isRest
+    True 
+    >>> stream1.notes[0].octave
+    3 
 
+    
 
-
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: stream
 
     .. attribute:: stringRep
 
-Methods
-~~~~~~~
-
     .. method:: ENDBRAC()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: QUAD()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: TRIP()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
     .. method:: getNote()
 
-        called out so as to be subclassable 
+    called out so as to be subclassable 
 
 
 Class HarmonyNote
@@ -179,20 +167,14 @@ Class HarmonyNote
 
 .. class:: HarmonyNote
 
-    
-    Inherits from: tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`)
 
-Methods
-~~~~~~~
+    Inherits from: tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`)
 
     .. method:: HARMONY()
 
-        Compiled regular expression objects 
+    Compiled regular expression objects 
 
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
-    Inherited from tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`): ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``debug()``, ``getDots()``
+    Inherited from tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`): ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``getDots()``
 
 
 Class HarmonyLine
@@ -202,34 +184,31 @@ Class HarmonyLine
 
     example of subclassing TinyNotationLine to include a possible harmonic representation of the note 
 
->>> hnl = HarmonyLine("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle " +                           "G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
->>> ns = hnl.stream.notes
->>> ns[0].step
-'C' 
->>> ns[0].editorial.misc['harmony']
-'F' 
->>> ns[0].lyric
-'Mi-' 
->>> ns[2].isRest
-True 
->>> ns[5].name
-'G' 
->>> ns[7].name
-'A-' 
+    >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
+    >>> michelle += "G4*E-*_these c_are A-_words G_that "
+    >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
+    >>> hnl = HarmonyLine(michelle, "4/4")
+    >>> ns = hnl.stream.notes
+    >>> ns[0].step
+    'C' 
+    >>> ns[0].editorial.misc['harmony']
+    'F' 
+    >>> ns[0].lyric
+    'Mi-' 
+    >>> ns[2].isRest
+    True 
+    >>> ns[5].name
+    'G' 
+    >>> ns[7].name
+    'A-' 
 
-
+    
 
     Inherits from: tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`)
-
-Attributes
-~~~~~~~~~~
 
     .. attribute:: stream
 
     .. attribute:: stringRep
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`): ``ENDBRAC()``, ``QUAD()``, ``TRIP()``, ``getNote()``
 

@@ -13,17 +13,17 @@ Public interface for importing file formats into music21.
 
 .. function:: parse()
 
-    Determine if the file is a file path or a string 
+Determine if the file is a file path or a string 
 
 .. function:: parseFile()
 
-    
+
 .. function:: parseData()
 
-    
+
 .. function:: parseURL()
 
-    
+
 Class Converter
 ---------------
 
@@ -31,27 +31,21 @@ Class Converter
 
     Not a subclass, but a wrapper for different converter objects based on format. 
 
-    Inherits from: 
-
-Properties
-~~~~~~~~~~
+    
 
     .. attribute:: stream
 
-    
-Methods
-~~~~~~~
 
     .. method:: parseData()
 
-        need to look at data and determine if it is xml or humdrum 
+    need to look at data and determine if it is xml or humdrum 
 
     .. method:: parseFile()
 
-    
+
     .. method:: parseURL()
 
-        Given a url, downloadn and parse 
+    Given a url, downloadn and parse 
 
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
@@ -63,32 +57,26 @@ Class ConverterMusicXML
 
 .. class:: ConverterMusicXML
 
-    
-    Inherits from: 
 
-Properties
-~~~~~~~~~~
+    
 
     .. attribute:: stream
 
-    
-Methods
-~~~~~~~
 
     .. method:: getPartNames()
 
-    
+
     .. method:: load()
 
-        Load all parts. This determines the order parts are found in the stream 
+    Load all parts. This determines the order parts are found in the stream 
 
     .. method:: parseData()
 
-        Open from a string 
+    Open from a string 
 
     .. method:: parseFile()
 
-        Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
+    Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
 Class ConverterHumdrum
@@ -96,24 +84,18 @@ Class ConverterHumdrum
 
 .. class:: ConverterHumdrum
 
-    
-    Inherits from: 
 
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: stream
 
-Methods
-~~~~~~~
-
     .. method:: parseData()
 
-        Open from a string 
+    Open from a string 
 
     .. method:: parseFile()
 
-        Open from file path 
+    Open from file path 
 
 
 Class PickleFilter
@@ -123,12 +105,9 @@ Class PickleFilter
 
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
 
-    Inherits from: 
-
-Methods
-~~~~~~~
+    
 
     .. method:: status()
 
-    
+
 

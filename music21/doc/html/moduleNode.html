@@ -48,20 +48,8 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.node</a><ul>
-<li><a class="reference external" href="#class-node">Class Node</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-nodelist">Class NodeList</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id3">Methods</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-node">Class Node</a></li>
+<li><a class="reference external" href="#class-nodelist">Class NodeList</a></li>
 </ul>
 </li>
 </ul>
@@ -111,51 +99,38 @@
 <dt id="music21.node.Node">
 <em class="property">
 class </em><tt class="descclassname">music21.node.</tt><tt class="descname">Node</tt><a class="headerlink" href="#music21.node.Node" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from:</dd></dl>
+<dd><dl class="attribute">
+<dt id="music21.node.Node.charData">
+<tt class="descname">charData</tt><a class="headerlink" href="#music21.node.Node.charData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt id="music21.node.charData">
-<tt class="descclassname">music21.node.</tt><tt class="descname">charData</tt><a class="headerlink" href="#music21.node.charData" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.node.tag">
-<tt class="descclassname">music21.node.</tt><tt class="descname">tag</tt><a class="headerlink" href="#music21.node.tag" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="method">
-<dt id="music21.node.get">
-<tt class="descclassname">music21.node.</tt><tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.get" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.node.Node.tag">
+<tt class="descname">tag</tt><a class="headerlink" href="#music21.node.Node.tag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.node.getNewDoc">
-<tt class="descclassname">music21.node.</tt><tt class="descname">getNewDoc</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.getNewDoc" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.node.Node.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.node.loadAttrs">
-<tt class="descclassname">music21.node.</tt><tt class="descname">loadAttrs</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.loadAttrs" title="Permalink to this definition">¶</a></dt>
-<dd>Given a SAX attrs object, load all atributes that are named within this object&#8217;s _attr dictionary.</dd></dl>
+<dt id="music21.node.Node.getNewDoc">
+<tt class="descname">getNewDoc</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.getNewDoc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.node.merge">
-<tt class="descclassname">music21.node.</tt><tt class="descname">merge</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.merge" title="Permalink to this definition">¶</a></dt>
-<dd>Given another similar or commonly used Node object, combine all attributes and return a new object.</dd></dl>
+<dt id="music21.node.Node.loadAttrs">
+<tt class="descname">loadAttrs</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.loadAttrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given a SAX attrs object, load all atributes that are named within this object&#8217;s _attr dictionary.</p>
+<dl class="method">
+<dt id="music21.node.Node.merge">
+<tt class="descname">merge</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.merge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given another similar or commonly used Node object, combine all attributes and return a new object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;charData&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
@@ -165,27 +140,30 @@ class </em><tt class="descclassname">music21.node.</tt><tt class="descname">Node
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.node.set">
-<tt class="descclassname">music21.node.</tt><tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.set" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.node.Node.set">
+<tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.set" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.node.setDefaults">
-<tt class="descclassname">music21.node.</tt><tt class="descname">setDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.setDefaults" title="Permalink to this definition">¶</a></dt>
-<dd>provide defaults for all necessary attributes at this level</dd></dl>
+<dt id="music21.node.Node.setDefaults">
+<tt class="descname">setDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.setDefaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>provide defaults for all necessary attributes at this level</p>
 <dl class="method">
-<dt id="music21.node.toxml">
-<tt class="descclassname">music21.node.</tt><tt class="descname">toxml</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.toxml" title="Permalink to this definition">¶</a></dt>
-<dd>Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls.</dd></dl>
+<dt id="music21.node.Node.toxml">
+<tt class="descname">toxml</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.toxml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls.</p>
 <dl class="method">
-<dt id="music21.node.xmlStr">
-<tt class="descclassname">music21.node.</tt><tt class="descname">xmlStr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.xmlStr" title="Permalink to this definition">¶</a></dt>
-<dd>Shortcut method to provide quick xml out.</dd></dl>
+<dt id="music21.node.Node.xmlStr">
+<tt class="descname">xmlStr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.Node.xmlStr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
+<p>Shortcut method to provide quick xml out.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="class-nodelist">
 <h2>Class NodeList<a class="headerlink" href="#class-nodelist" title="Permalink to this headline">¶</a></h2>
@@ -195,46 +173,25 @@ class </em><tt class="descclassname">music21.node.</tt><tt class="descname">Node
 class </em><tt class="descclassname">music21.node.</tt><tt class="descname">NodeList</tt><a class="headerlink" href="#music21.node.NodeList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi</p>
 <p>Inherits from: node.Node (of module <a class="reference internal" href="#modulenode"><em>music21.node</em></a>)</p>
+<dl class="attribute">
+<dt id="music21.node.NodeList.charData">
+<tt class="descname">charData</tt><a class="headerlink" href="#music21.node.NodeList.charData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="music21.node.NodeList.componentList">
+<tt class="descname">componentList</tt><a class="headerlink" href="#music21.node.NodeList.componentList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Inherited from node.Node (of module <a class="reference internal" href="#modulenode"><em>music21.node</em></a>): <tt class="docutils literal"><span class="pre">tag</span></tt></p>
+<dl class="method">
+<dt id="music21.node.NodeList.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.NodeList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Inherited from node.Node (of module <a class="reference internal" href="#modulenode"><em>music21.node</em></a>): <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">getNewDoc()</span></tt>, <tt class="docutils literal"><span class="pre">loadAttrs()</span></tt>, <tt class="docutils literal"><span class="pre">merge()</span></tt>, <tt class="docutils literal"><span class="pre">set()</span></tt>, <tt class="docutils literal"><span class="pre">setDefaults()</span></tt>, <tt class="docutils literal"><span class="pre">toxml()</span></tt>, <tt class="docutils literal"><span class="pre">xmlStr()</span></tt></p>
 </dd></dl>
 
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.node.</tt><tt class="descname">charData</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.node.componentList">
-<tt class="descclassname">music21.node.</tt><tt class="descname">componentList</tt><a class="headerlink" href="#music21.node.componentList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id2">
-<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from node.Node (of module <a class="reference internal" href="#modulenode"><em>music21.node</em></a>): <tt class="docutils literal"><span class="pre">tag</span></tt></blockquote>
-</div>
-<div class="section" id="id3">
-<h3>Methods<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="method">
-<dt id="music21.node.append">
-<tt class="descclassname">music21.node.</tt><tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.node.append" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from node.Node (of module <a class="reference internal" href="#modulenode"><em>music21.node</em></a>): <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">getNewDoc()</span></tt>, <tt class="docutils literal"><span class="pre">loadAttrs()</span></tt>, <tt class="docutils literal"><span class="pre">merge()</span></tt>, <tt class="docutils literal"><span class="pre">set()</span></tt>, <tt class="docutils literal"><span class="pre">setDefaults()</span></tt>, <tt class="docutils literal"><span class="pre">toxml()</span></tt>, <tt class="docutils literal"><span class="pre">xmlStr()</span></tt></blockquote>
-</div>
 </div>
 </div>
 
@@ -264,7 +221,7 @@ Inherited from node.Node (of module <a class="reference internal" href="#modulen
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

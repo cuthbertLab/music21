@@ -424,6 +424,9 @@ class Chord(note.NotRest):
 
     def _getPitches(self):
         '''
+
+        OMIT_FROM_DOCS
+
         TODO: presently, whenever pitches are accessed, it sets
         the _chordTablesAddressNeedsUpdating value to false
         this is b/c the pitches list can be accessed and appended to
@@ -1038,9 +1041,6 @@ class Chord(note.NotRest):
         '''returns an abbreviation for the type of chord it is.
         Add option to add inversion name to abbreviation?
 
-        TODO: determine permanent designation abbreviation for every 
-        type of chord and inversion
-
         >>> a = Chord(['a', 'c#', 'e'])
         >>> a.determineType()
         'Major Triad'
@@ -1048,6 +1048,10 @@ class Chord(note.NotRest):
         >>> a = Chord(['g', 'b', 'd', 'f'])
         >>> a.determineType()
         'Dominant Seventh'
+
+        OMIT_FROM_DOCS
+        TODO: determine permanent designation abbreviation for every 
+        type of chord and inversion
         '''
         if (self.isTriad()):
             if (self.isMajorTriad()):

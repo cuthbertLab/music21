@@ -48,70 +48,15 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.stream</a><ul>
-<li><a class="reference external" href="#class-stream">Class Stream</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-measure">Class Measure</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties</a></li>
-<li><a class="reference external" href="#id3">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
-<li><a class="reference external" href="#id5">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-performer">Class Performer</a><ul>
-<li><a class="reference external" href="#id6">Attributes</a></li>
-<li><a class="reference external" href="#id7">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id8">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-score">Class Score</a><ul>
-<li><a class="reference external" href="#id9">Attributes</a></li>
-<li><a class="reference external" href="#id10">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id11">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-system">Class System</a><ul>
-<li><a class="reference external" href="#id12">Attributes</a></li>
-<li><a class="reference external" href="#id13">Properties</a></li>
-<li><a class="reference external" href="#id14">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id15">Methods</a></li>
-<li><a class="reference external" href="#id16">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-part">Class Part</a><ul>
-<li><a class="reference external" href="#id17">Attributes</a></li>
-<li><a class="reference external" href="#id18">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id19">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-voice">Class Voice</a><ul>
-<li><a class="reference external" href="#id20">Attributes</a></li>
-<li><a class="reference external" href="#id21">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id22">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-page">Class Page</a><ul>
-<li><a class="reference external" href="#id23">Attributes</a></li>
-<li><a class="reference external" href="#id24">Properties</a></li>
-<li><a class="reference external" href="#id25">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id26">Methods</a></li>
-<li><a class="reference external" href="#id27">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-staff">Class Staff</a><ul>
-<li><a class="reference external" href="#id28">Attributes</a></li>
-<li><a class="reference external" href="#id29">Properties</a></li>
-<li><a class="reference external" href="#id30">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id31">Methods</a></li>
-<li><a class="reference external" href="#id32">Methods (Inherited)</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-stream">Class Stream</a></li>
+<li><a class="reference external" href="#class-measure">Class Measure</a></li>
+<li><a class="reference external" href="#class-performer">Class Performer</a></li>
+<li><a class="reference external" href="#class-score">Class Score</a></li>
+<li><a class="reference external" href="#class-system">Class System</a></li>
+<li><a class="reference external" href="#class-part">Class Part</a></li>
+<li><a class="reference external" href="#class-voice">Class Voice</a></li>
+<li><a class="reference external" href="#class-page">Class Page</a></li>
+<li><a class="reference external" href="#class-staff">Class Staff</a></li>
 </ul>
 </li>
 </ul>
@@ -158,51 +103,44 @@
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Stream</tt><a class="headerlink" href="#music21.stream.Stream" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is basic container for Music21Objects that occur at certain times. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams.</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt id="music21.stream.flattenedRepresentationOf">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Stream.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.groups">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.groups" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Stream.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Stream.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Stream.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Stream.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Stream.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.id">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.stream.id" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Stream.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.isFlat">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.isFlat" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.elements">
+<tt class="descname">elements</tt><a class="headerlink" href="#music21.stream.Stream.elements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.isSorted">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.isSorted" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.flat">
+<tt class="descname">flat</tt><a class="headerlink" href="#music21.stream.Stream.flat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.stream.elements">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">elements</tt><a class="headerlink" href="#music21.stream.elements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.stream.flat">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flat</tt><a class="headerlink" href="#music21.stream.flat" title="Permalink to this definition">¶</a></dt>
-<dd>returns a new Stream where no elements nest within other elements</dd></dl>
-
+<p>returns a new Stream where no elements nest within other elements</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
@@ -252,10 +190,11 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.highestOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">highestOffset</tt><a class="headerlink" href="#music21.stream.highestOffset" title="Permalink to this definition">¶</a></dt>
-<dd>Get start time of element with the highest offset in the Stream</dd></dl>
+<dt id="music21.stream.Stream.highestOffset">
+<tt class="descname">highestOffset</tt><a class="headerlink" href="#music21.stream.Stream.highestOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Get start time of element with the highest offset in the Stream</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -266,25 +205,28 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.highestTime">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">highestTime</tt><a class="headerlink" href="#music21.stream.highestTime" title="Permalink to this definition">¶</a></dt>
-<dd>returns the max(el.offset + el.duration.quarterLength) over all elements, usually representing the last &#8220;release&#8221; in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.  See below.</dd></dl>
+<dt id="music21.stream.Stream.highestTime">
+<tt class="descname">highestTime</tt><a class="headerlink" href="#music21.stream.Stream.highestTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns the max(el.offset + el.duration.quarterLength) over all elements, usually representing the last &#8220;release&#8221; in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.  See below.</p>
 <dl class="attribute">
-<dt id="music21.stream.isGapless">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isGapless</tt><a class="headerlink" href="#music21.stream.isGapless" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.isGapless">
+<tt class="descname">isGapless</tt><a class="headerlink" href="#music21.stream.Stream.isGapless" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.lily">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">lily</tt><a class="headerlink" href="#music21.stream.lily" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the stream translated into Lilypond format.</dd></dl>
+<dt id="music21.stream.Stream.lily">
+<tt class="descname">lily</tt><a class="headerlink" href="#music21.stream.Stream.lily" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Returns the stream translated into Lilypond format.</p>
 <dl class="attribute">
-<dt id="music21.stream.lowestOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">lowestOffset</tt><a class="headerlink" href="#music21.stream.lowestOffset" title="Permalink to this definition">¶</a></dt>
-<dd>Get start time of element with the lowest offset in the Stream</dd></dl>
+<dt id="music21.stream.Stream.lowestOffset">
+<tt class="descname">lowestOffset</tt><a class="headerlink" href="#music21.stream.Stream.lowestOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Get start time of element with the lowest offset in the Stream</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">lowestOffset</span>
 <span class="go">0.0</span>
@@ -298,20 +240,23 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.measures">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">measures</tt><a class="headerlink" href="#music21.stream.measures" title="Permalink to this definition">¶</a></dt>
-<dd>Return all Measure objects in a Stream()</dd></dl>
+<dt id="music21.stream.Stream.measures">
+<tt class="descname">measures</tt><a class="headerlink" href="#music21.stream.Stream.measures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all Measure objects in a Stream()</p>
 <dl class="attribute">
-<dt id="music21.stream.musicxml">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">musicxml</tt><a class="headerlink" href="#music21.stream.musicxml" title="Permalink to this definition">¶</a></dt>
-<dd>Provide a complete MusicXM: representation.</dd></dl>
+<dt id="music21.stream.Stream.musicxml">
+<tt class="descname">musicxml</tt><a class="headerlink" href="#music21.stream.Stream.musicxml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Provide a complete MusicXM: representation.</p>
 <dl class="attribute">
-<dt id="music21.stream.mx">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.stream.mx" title="Permalink to this definition">¶</a></dt>
-<dd>Create and return a musicxml score.</dd></dl>
+<dt id="music21.stream.Stream.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.stream.Stream.mx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Create and return a musicxml score.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
@@ -321,10 +266,11 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.notes">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">notes</tt><a class="headerlink" href="#music21.stream.notes" title="Permalink to this definition">¶</a></dt>
-<dd>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</dd></dl>
+<dt id="music21.stream.Stream.notes">
+<tt class="descname">notes</tt><a class="headerlink" href="#music21.stream.Stream.notes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
@@ -334,20 +280,22 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.pitches">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">pitches</tt><a class="headerlink" href="#music21.stream.pitches" title="Permalink to this definition">¶</a></dt>
-<dd>Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</dd></dl>
+<dt id="music21.stream.Stream.pitches">
+<tt class="descname">pitches</tt><a class="headerlink" href="#music21.stream.Stream.pitches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</p>
 <dl class="attribute">
-<dt id="music21.stream.semiFlat">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">semiFlat</tt><a class="headerlink" href="#music21.stream.semiFlat" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.semiFlat">
+<tt class="descname">semiFlat</tt><a class="headerlink" href="#music21.stream.Stream.semiFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.sorted">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">sorted</tt><a class="headerlink" href="#music21.stream.sorted" title="Permalink to this definition">¶</a></dt>
-<dd>returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted</dd></dl>
+<dt id="music21.stream.Stream.sorted">
+<tt class="descname">sorted</tt><a class="headerlink" href="#music21.stream.Stream.sorted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
@@ -385,21 +333,13 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <span class="go">(&#39;C#&#39;, &#39;E&#39;)</span>
 </pre></div>
 </div>
-</blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
-<dt id="music21.stream.addGroupForElements">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">addGroupForElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.addGroupForElements" title="Permalink to this definition">¶</a></dt>
-<dd>Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set.</dd></dl>
+<dt id="music21.stream.Stream.addGroupForElements">
+<tt class="descname">addGroupForElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.addGroupForElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">),</span> <span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">30</span><span class="p">)</span>
@@ -424,15 +364,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.allPlayingWhileSounding">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">allPlayingWhileSounding</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.allPlayingWhileSounding" title="Permalink to this definition">¶</a></dt>
-<dd>Returns a new Stream of elements in this stream that sound at the same time as &#8220;el&#8221;, an element presumably in another Stream. The offset of this new Stream is set to el&#8217;s offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el &#8211; thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el&#8217;s offset in.</dd></dl>
+<dt id="music21.stream.Stream.allPlayingWhileSounding">
+<tt class="descname">allPlayingWhileSounding</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.allPlayingWhileSounding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Returns a new Stream of elements in this stream that sound at the same time as &#8220;el&#8221;, an element presumably in another Stream. The offset of this new Stream is set to el&#8217;s offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el &#8211; thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el&#8217;s offset in.</p>
 <dl class="method">
-<dt id="music21.stream.append">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.append" title="Permalink to this definition">¶</a></dt>
-<dd>Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest &#8220;release&#8221; of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True</dd></dl>
+<dt id="music21.stream.Stream.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest &#8220;release&#8221; of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">notes</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">):</span>
@@ -471,15 +413,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.attachIntervalsBetweenStreams">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">attachIntervalsBetweenStreams</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.attachIntervalsBetweenStreams" title="Permalink to this definition">¶</a></dt>
-<dd>For each element in self, creates an interval object in the element&#8217;s editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked.</dd></dl>
+<dt id="music21.stream.Stream.attachIntervalsBetweenStreams">
+<tt class="descname">attachIntervalsBetweenStreams</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.attachIntervalsBetweenStreams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>For each element in self, creates an interval object in the element&#8217;s editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked.</p>
 <dl class="method">
-<dt id="music21.stream.bestClef">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">bestClef</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.bestClef" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename &#8216;getClef&#8217;; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets</dd></dl>
+<dt id="music21.stream.Stream.bestClef">
+<tt class="descname">bestClef</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.bestClef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename &#8216;getClef&#8217;; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -503,10 +447,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.extendDuration">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">extendDuration</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.extendDuration" title="Permalink to this definition">¶</a></dt>
-<dd>Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream.</dd></dl>
+<dt id="music21.stream.Stream.extendDuration">
+<tt class="descname">extendDuration</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.extendDuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.dynamics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
@@ -538,10 +483,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.extractContext">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">extractContext</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.extractContext" title="Permalink to this definition">¶</a></dt>
-<dd>extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4)</dd></dl>
+<dt id="music21.stream.Stream.extractContext">
+<tt class="descname">extractContext</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.extractContext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qn</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -556,20 +502,23 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.findConsecutiveNotes">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">findConsecutiveNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.findConsecutiveNotes" title="Permalink to this definition">¶</a></dt>
-<dd>Returns a list of consecutive <em>pitched</em> Notes in a Stream.  A single &#8220;None&#8221; is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -&gt; Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2&#8217;s in there as well. See Test.testFindConsecutiveNotes() for usage details.</dd></dl>
+<dt id="music21.stream.Stream.findConsecutiveNotes">
+<tt class="descname">findConsecutiveNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.findConsecutiveNotes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Returns a list of consecutive <em>pitched</em> Notes in a Stream.  A single &#8220;None&#8221; is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -&gt; Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2&#8217;s in there as well. See Test.testFindConsecutiveNotes() for usage details.</p>
 <dl class="method">
-<dt id="music21.stream.findGaps">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">findGaps</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.findGaps" title="Permalink to this definition">¶</a></dt>
-<dd>returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why &#8220;isSequence&#8221; calls self.flat.isGapless</dd></dl>
+<dt id="music21.stream.Stream.findGaps">
+<tt class="descname">findGaps</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.findGaps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why &#8220;isSequence&#8221; calls self.flat.isGapless</p>
 <dl class="method">
-<dt id="music21.stream.getElementAfterElement">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementAfterElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementAfterElement" title="Permalink to this definition">¶</a></dt>
-<dd>given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list</dd></dl>
+<dt id="music21.stream.Stream.getElementAfterElement">
+<tt class="descname">getElementAfterElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAfterElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -597,20 +546,23 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getElementAfterOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementAfterOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementAfterOffset" title="Permalink to this definition">¶</a></dt>
-<dd>Get element after a provided offset</dd></dl>
+<dt id="music21.stream.Stream.getElementAfterOffset">
+<tt class="descname">getElementAfterOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAfterOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Get element after a provided offset</p>
 <dl class="method">
-<dt id="music21.stream.getElementAtOrAfter">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementAtOrAfter</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementAtOrAfter" title="Permalink to this definition">¶</a></dt>
-<dd>Given an offset, find the element at this offset, or with the offset greater than and nearest to.</dd></dl>
+<dt id="music21.stream.Stream.getElementAtOrAfter">
+<tt class="descname">getElementAtOrAfter</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAtOrAfter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an offset, find the element at this offset, or with the offset greater than and nearest to.</p>
 <dl class="method">
-<dt id="music21.stream.getElementAtOrBefore">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementAtOrBefore</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementAtOrBefore" title="Permalink to this definition">¶</a></dt>
-<dd>Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset.</dd></dl>
+<dt id="music21.stream.Stream.getElementAtOrBefore">
+<tt class="descname">getElementAtOrBefore</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAtOrBefore" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;x&#39;</span>
@@ -639,20 +591,23 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getElementBeforeElement">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementBeforeElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementBeforeElement" title="Permalink to this definition">¶</a></dt>
-<dd>given an element, get the element before</dd></dl>
+<dt id="music21.stream.Stream.getElementBeforeElement">
+<tt class="descname">getElementBeforeElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementBeforeElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>given an element, get the element before</p>
 <dl class="method">
-<dt id="music21.stream.getElementBeforeOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementBeforeOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementBeforeOffset" title="Permalink to this definition">¶</a></dt>
-<dd>Get element before a provided offset</dd></dl>
+<dt id="music21.stream.Stream.getElementBeforeOffset">
+<tt class="descname">getElementBeforeOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementBeforeOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Get element before a provided offset</p>
 <dl class="method">
-<dt id="music21.stream.getElementById">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementById</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementById" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the first encountered element for a given id. Return None if no match</dd></dl>
+<dt id="music21.stream.Stream.getElementById">
+<tt class="descname">getElementById</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementById" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Returns the first encountered element for a given id. Return None if no match</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
@@ -664,10 +619,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getElementsByClass">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementsByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementsByClass" title="Permalink to this definition">¶</a></dt>
-<dd>Return a list of all Elements that match the className.</dd></dl>
+<dt id="music21.stream.Stream.getElementsByClass">
+<tt class="descname">getElementsByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return a list of all Elements that match the className.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
@@ -693,8 +649,8 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getElementsByGroup">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementsByGroup</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementsByGroup" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.getElementsByGroup">
+<tt class="descname">getElementsByGroup</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByGroup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
@@ -722,10 +678,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getElementsByOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getElementsByOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getElementsByOffset" title="Permalink to this definition">¶</a></dt>
-<dd>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</dd></dl>
+<dt id="music21.stream.Stream.getElementsByOffset">
+<tt class="descname">getElementsByOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;half&quot;</span>
@@ -781,10 +738,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getGroups">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getGroups</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getGroups" title="Permalink to this definition">¶</a></dt>
-<dd>Get a dictionary for each groupId and the count of instances.</dd></dl>
+<dt id="music21.stream.Stream.getGroups">
+<tt class="descname">getGroups</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getGroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Get a dictionary for each groupId and the count of instances.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
@@ -797,24 +755,27 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getInstrument">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getInstrument</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getInstrument" title="Permalink to this definition">¶</a></dt>
-<dd>Search this stream or parent streams for instruments, otherwise return a default</dd></dl>
+<dt id="music21.stream.Stream.getInstrument">
+<tt class="descname">getInstrument</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getInstrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Search this stream or parent streams for instruments, otherwise return a default</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getInstrument</span><span class="p">()</span>
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getMeasures">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getMeasures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getMeasures" title="Permalink to this definition">¶</a></dt>
-<dd>Return all Measure objects in a Stream()</dd></dl>
+<dt id="music21.stream.Stream.getMeasures">
+<tt class="descname">getMeasures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getMeasures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all Measure objects in a Stream()</p>
 <dl class="method">
-<dt id="music21.stream.getNotes">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getNotes" title="Permalink to this definition">¶</a></dt>
-<dd>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</dd></dl>
+<dt id="music21.stream.Stream.getNotes">
+<tt class="descname">getNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getNotes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
@@ -824,10 +785,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getOffsetByElement">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getOffsetByElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getOffsetByElement" title="Permalink to this definition">¶</a></dt>
-<dd>Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.</dd></dl>
+<dt id="music21.stream.Stream.getOffsetByElement">
+<tt class="descname">getOffsetByElement</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getOffsetByElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -845,10 +807,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getOverlaps">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getOverlaps</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getOverlaps" title="Permalink to this definition">¶</a></dt>
-<dd>Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter.</dd></dl>
+<dt id="music21.stream.Stream.getOverlaps">
+<tt class="descname">getOverlaps</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getOverlaps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -890,15 +853,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getPitches">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getPitches</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getPitches" title="Permalink to this definition">¶</a></dt>
-<dd>Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</dd></dl>
+<dt id="music21.stream.Stream.getPitches">
+<tt class="descname">getPitches</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getPitches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return all pitches found in any element in the stream as a List (since Pitches have no duration, it&#8217;s a list not a stream)</p>
 <dl class="method">
-<dt id="music21.stream.getSimultaneous">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getSimultaneous</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getSimultaneous" title="Permalink to this definition">¶</a></dt>
-<dd>Find and return any elements that start at the same time.</dd></dl>
+<dt id="music21.stream.Stream.getSimultaneous">
+<tt class="descname">getSimultaneous</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getSimultaneous" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Find and return any elements that start at the same time.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -920,10 +885,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.getTimeSignatures">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">getTimeSignatures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.getTimeSignatures" title="Permalink to this definition">¶</a></dt>
-<dd>Collect all time signatures in this stream. If no TimeSignature objects are defined, get a default Note: this could be a method of Stream.</dd></dl>
+<dt id="music21.stream.Stream.getTimeSignatures">
+<tt class="descname">getTimeSignatures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.getTimeSignatures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Collect all time signatures in this stream. If no TimeSignature objects are defined, get a default Note: this could be a method of Stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
@@ -934,15 +900,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.groupElementsByOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groupElementsByOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.groupElementsByOffset" title="Permalink to this definition">¶</a></dt>
-<dd>returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can&#8217;t hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first.</dd></dl>
+<dt id="music21.stream.Stream.groupElementsByOffset">
+<tt class="descname">groupElementsByOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.groupElementsByOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can&#8217;t hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first.</p>
 <dl class="method">
-<dt id="music21.stream.index">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">index</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.index" title="Permalink to this definition">¶</a></dt>
-<dd>return the index for the specified object</dd></dl>
+<dt id="music21.stream.Stream.index">
+<tt class="descname">index</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>return the index for the specified object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fSharp</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A#&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
@@ -952,10 +920,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.insert">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.insert" title="Permalink to this definition">¶</a></dt>
-<dd>Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you&#8217;re going to be inserting dozens of items that don&#8217;t change the sort status) Has three forms: in the two argument form, inserts an element at the given offset:</dd></dl>
+<dt id="music21.stream.Stream.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you&#8217;re going to be inserting dozens of items that don&#8217;t change the sort status) Has three forms: in the two argument form, inserts an element at the given offset:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">32</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_getHighestOffset</span><span class="p">()</span>
@@ -988,10 +957,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.insertAtIndex">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">insertAtIndex</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.insertAtIndex" title="Permalink to this definition">¶</a></dt>
-<dd>Insert in elements by index position.</dd></dl>
+<dt id="music21.stream.Stream.insertAtIndex">
+<tt class="descname">insertAtIndex</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.insertAtIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Insert in elements by index position.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">),</span> <span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;A-&#39;</span>
@@ -1002,10 +972,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.insertAtNativeOffset">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">insertAtNativeOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.insertAtNativeOffset" title="Permalink to this definition">¶</a></dt>
-<dd>inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)</dd></dl>
+<dt id="music21.stream.Stream.insertAtNativeOffset">
+<tt class="descname">insertAtNativeOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.insertAtNativeOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F-&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -1023,10 +994,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.isSequence">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSequence</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.isSequence" title="Permalink to this definition">¶</a></dt>
-<dd>A stream is a sequence if it has no overlaps.</dd></dl>
+<dt id="music21.stream.Stream.isSequence">
+<tt class="descname">isSequence</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.isSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>A stream is a sequence if it has no overlaps.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -1039,15 +1011,16 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.makeAccidentals">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">makeAccidentals</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.makeAccidentals" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Stream.makeAccidentals">
+<tt class="descname">makeAccidentals</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeAccidentals" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.stream.makeBeams">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">makeBeams</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.makeBeams" title="Permalink to this definition">¶</a></dt>
-<dd>Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.</dd></dl>
+<dt id="music21.stream.Stream.makeBeams">
+<tt class="descname">makeBeams</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeBeams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -1057,10 +1030,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.makeMeasures">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">makeMeasures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.makeMeasures" title="Permalink to this definition">¶</a></dt>
-<dd>Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.</dd></dl>
+<dt id="music21.stream.Stream.makeMeasures">
+<tt class="descname">makeMeasures</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeMeasures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
@@ -1075,10 +1049,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.makeRests">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">makeRests</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.makeRests" title="Permalink to this definition">¶</a></dt>
-<dd>Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream.</dd></dl>
+<dt id="music21.stream.Stream.makeRests">
+<tt class="descname">makeRests</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeRests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1093,10 +1068,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.makeTies">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">makeTies</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.makeTies" title="Permalink to this definition">¶</a></dt>
-<dd>Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false configure &#8220;.previous&#8221; and &#8220;.next&#8221; attributes</dd></dl>
+<dt id="music21.stream.Stream.makeTies">
+<tt class="descname">makeTies</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeTies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false configure &#8220;.previous&#8221; and &#8220;.next&#8221; attributes</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">12</span>
@@ -1107,15 +1083,17 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.melodicIntervals">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">melodicIntervals</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.melodicIntervals" title="Permalink to this definition">¶</a></dt>
-<dd>returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream. the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, then it is equal to the offset of the second note) see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed. The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval returns None of there are not at least two elements found by findConsecutiveNotes See Test.testMelodicIntervals() for usage details.</dd></dl>
+<dt id="music21.stream.Stream.melodicIntervals">
+<tt class="descname">melodicIntervals</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.melodicIntervals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream. the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, then it is equal to the offset of the second note) see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed. The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval returns None of there are not at least two elements found by findConsecutiveNotes See Test.testMelodicIntervals() for usage details.</p>
 <dl class="method">
-<dt id="music21.stream.playingWhenAttacked">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">playingWhenAttacked</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.playingWhenAttacked" title="Permalink to this definition">¶</a></dt>
-<dd>Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el&#8217;s offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want.</dd></dl>
+<dt id="music21.stream.Stream.playingWhenAttacked">
+<tt class="descname">playingWhenAttacked</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.playingWhenAttacked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el&#8217;s offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -1144,10 +1122,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.pop">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">pop</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.pop" title="Permalink to this definition">¶</a></dt>
-<dd>return the matched object from the list.</dd></dl>
+<dt id="music21.stream.Stream.pop">
+<tt class="descname">pop</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>return the matched object from the list.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">junk</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
@@ -1156,10 +1135,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.repeatAppend">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">repeatAppend</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.repeatAppend" title="Permalink to this definition">¶</a></dt>
-<dd>Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer.</dd></dl>
+<dt id="music21.stream.Stream.repeatAppend">
+<tt class="descname">repeatAppend</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.repeatAppend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
@@ -1171,10 +1151,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.repeatInsert">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">repeatInsert</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.repeatInsert" title="Permalink to this definition">¶</a></dt>
-<dd>Given an object, create many DEEPcopies at the positions specified by the offset list:</dd></dl>
+<dt id="music21.stream.Stream.repeatInsert">
+<tt class="descname">repeatInsert</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.repeatInsert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given an object, create many DEEPcopies at the positions specified by the offset list:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G-&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1</span>
@@ -1186,10 +1167,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.shiftElements">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">shiftElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.shiftElements" title="Permalink to this definition">¶</a></dt>
-<dd>Add offset value to every offset of contained Elements.</dd></dl>
+<dt id="music21.stream.Stream.shiftElements">
+<tt class="descname">shiftElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.shiftElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Add offset value to every offset of contained Elements.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">shiftElements</span><span class="p">(</span><span class="mf">30</span><span class="p">)</span>
@@ -1201,10 +1183,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.simultaneousAttacks">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">simultaneousAttacks</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.simultaneousAttacks" title="Permalink to this definition">¶</a></dt>
-<dd>returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2.</dd></dl>
+<dt id="music21.stream.Stream.simultaneousAttacks">
+<tt class="descname">simultaneousAttacks</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.simultaneousAttacks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n11</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -1221,10 +1204,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.splitByClass">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">splitByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.splitByClass" title="Permalink to this definition">¶</a></dt>
-<dd>Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream.</dd></dl>
+<dt id="music21.stream.Stream.splitByClass">
+<tt class="descname">splitByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.splitByClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">,</span><span class="mf">81</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -1240,10 +1224,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.stripTies">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">stripTies</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.stripTies" title="Permalink to this definition">¶</a></dt>
-<dd>Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique.</dd></dl>
+<dt id="music21.stream.Stream.stripTies">
+<tt class="descname">stripTies</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.stripTies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">6</span>
@@ -1256,10 +1241,11 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.transferOffsetToElements">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">transferOffsetToElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.transferOffsetToElements" title="Permalink to this definition">¶</a></dt>
-<dd>Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero.</dd></dl>
+<dt id="music21.stream.Stream.transferOffsetToElements">
+<tt class="descname">transferOffsetToElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.transferOffsetToElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
@@ -1275,17 +1261,14 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.stream.trimPlayingWhileSounding">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">trimPlayingWhileSounding</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.trimPlayingWhileSounding" title="Permalink to this definition">¶</a></dt>
-<dd>returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding &#8211; but because these elements are deepcopies, the difference might bite you if you&#8217;re not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream.</dd></dl>
+<dt id="music21.stream.Stream.trimPlayingWhileSounding">
+<tt class="descname">trimPlayingWhileSounding</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.trimPlayingWhileSounding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
-</div>
+<p>returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding &#8211; but because these elements are deepcopies, the difference might bite you if you&#8217;re not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream.</p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+</dd></dl>
+
 </div>
 <div class="section" id="class-measure">
 <h2>Class Measure<a class="headerlink" href="#class-measure" title="Permalink to this headline">¶</a></h2>
@@ -1295,84 +1278,76 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Measure</tt><a class="headerlink" href="#music21.stream.Measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream&#8217;s elements.</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt id="music21.stream.clefIsNew">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">clefIsNew</tt><a class="headerlink" href="#music21.stream.clefIsNew" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.clefIsNew">
+<tt class="descname">clefIsNew</tt><a class="headerlink" href="#music21.stream.Measure.clefIsNew" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.filled">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">filled</tt><a class="headerlink" href="#music21.stream.filled" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.filled">
+<tt class="descname">filled</tt><a class="headerlink" href="#music21.stream.Measure.filled" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Measure.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Measure.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Measure.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Measure.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Measure.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Measure.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Measure.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Measure.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Measure.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Measure.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
+<dt id="music21.stream.Measure.keyIsNew">
+<tt class="descname">keyIsNew</tt><a class="headerlink" href="#music21.stream.Measure.keyIsNew" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
+<dt id="music21.stream.Measure.leftbarline">
+<tt class="descname">leftbarline</tt><a class="headerlink" href="#music21.stream.Measure.leftbarline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.keyIsNew">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">keyIsNew</tt><a class="headerlink" href="#music21.stream.keyIsNew" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.measureNumber">
+<tt class="descname">measureNumber</tt><a class="headerlink" href="#music21.stream.Measure.measureNumber" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.leftbarline">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">leftbarline</tt><a class="headerlink" href="#music21.stream.leftbarline" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.measureNumberSuffix">
+<tt class="descname">measureNumberSuffix</tt><a class="headerlink" href="#music21.stream.Measure.measureNumberSuffix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.measureNumber">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">measureNumber</tt><a class="headerlink" href="#music21.stream.measureNumber" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.rightbarline">
+<tt class="descname">rightbarline</tt><a class="headerlink" href="#music21.stream.Measure.rightbarline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.measureNumberSuffix">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">measureNumberSuffix</tt><a class="headerlink" href="#music21.stream.measureNumberSuffix" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.timeSignatureIsNew">
+<tt class="descname">timeSignatureIsNew</tt><a class="headerlink" href="#music21.stream.Measure.timeSignatureIsNew" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.stream.rightbarline">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">rightbarline</tt><a class="headerlink" href="#music21.stream.rightbarline" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.stream.timeSignatureIsNew">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">timeSignatureIsNew</tt><a class="headerlink" href="#music21.stream.timeSignatureIsNew" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id2">
-<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.stream.clef">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">clef</tt><a class="headerlink" href="#music21.stream.clef" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.clef">
+<tt class="descname">clef</tt><a class="headerlink" href="#music21.stream.Measure.clef" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
@@ -1382,8 +1357,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.key">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">key</tt><a class="headerlink" href="#music21.stream.key" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.key">
+<tt class="descname">key</tt><a class="headerlink" href="#music21.stream.Measure.key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
@@ -1393,8 +1368,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.timeSignature">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">timeSignature</tt><a class="headerlink" href="#music21.stream.timeSignature" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.timeSignature">
+<tt class="descname">timeSignature</tt><a class="headerlink" href="#music21.stream.Measure.timeSignature" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
@@ -1403,52 +1378,37 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <span class="go">(2, 4)</span>
 </pre></div>
 </div>
-</blockquote>
-</div>
-<div class="section" id="id3">
-<h3>Properties (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id4">
-<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.stream.addRepeat">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">addRepeat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.addRepeat" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.addRepeat">
+<tt class="descname">addRepeat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.addRepeat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.stream.addTimeDependentDirection">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">addTimeDependentDirection</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.addTimeDependentDirection" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.addTimeDependentDirection">
+<tt class="descname">addTimeDependentDirection</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.addTimeDependentDirection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.stream.measureNumberWithSuffix">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">measureNumberWithSuffix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.measureNumberWithSuffix" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.measureNumberWithSuffix">
+<tt class="descname">measureNumberWithSuffix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.measureNumberWithSuffix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.stream.setLeftBarline">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">setLeftBarline</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.setLeftBarline" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.setLeftBarline">
+<tt class="descname">setLeftBarline</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.setLeftBarline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.stream.setRightBarline">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">setRightBarline</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.setRightBarline" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.setRightBarline">
+<tt class="descname">setRightBarline</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.setRightBarline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="id5">
-<h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-performer">
 <h2>Class Performer<a class="headerlink" href="#class-performer" title="Permalink to this headline">¶</a></h2>
@@ -1458,52 +1418,39 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Performer</tt><a class="headerlink" href="#music21.stream.Performer" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for designating music to be performed by a single Performer.  Should only be used when a single performer performs on multiple parts.  E.g. Bass Drum and Triangle on separate staves performed by one player. a Part + changes of Instrument is fine for designating most cases where a player changes instrument in a piece.  A part plus staves with individual instrument changes could also be a way of designating music that is performed by a single performer (see, for instance the Piano doubling Celesta part in Lukas Foss&#8217;s Time Cycle).  The Performer Stream-subclass could be useful for analyses of, for instance, how 5 percussionists chose to play a piece originally designated for 4 (or 6) percussionists in the score.</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id6">
-<h3>Attributes<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Performer.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Performer.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Performer.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Performer.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Performer.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Performer.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Performer.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Performer.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Performer.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Performer.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id7">
-<h3>Properties (Inherited)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id8">
-<h3>Methods (Inherited)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-score">
 <h2>Class Score<a class="headerlink" href="#class-score" title="Permalink to this headline">¶</a></h2>
@@ -1513,52 +1460,39 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pe
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Score</tt><a class="headerlink" href="#music21.stream.Score" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard.</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id9">
-<h3>Attributes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Score.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Score.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Score.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Score.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Score.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Score.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Score.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Score.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Score.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Score.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id10">
-<h3>Properties (Inherited)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id11">
-<h3>Methods (Inherited)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-system">
 <h2>Class System<a class="headerlink" href="#class-system" title="Permalink to this headline">¶</a></h2>
@@ -1568,65 +1502,45 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sc
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">System</tt><a class="headerlink" href="#music21.stream.System" title="Permalink to this definition">¶</a></dt>
 <dd><p>Totally optional: designation that all the music in this Stream belongs in a single system.</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id12">
-<h3>Attributes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.System.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.System.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.System.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.System.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.System.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.System.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.System.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.System.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.System.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.System.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id13">
-<h3>Properties<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id14">
-<h3>Properties (Inherited)<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id15">
-<h3>Methods<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.stream.systemNumber">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">systemNumber</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.systemNumber" title="Permalink to this definition">¶</a></dt>
-<dd>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</dd></dl>
+<dt id="music21.stream.System.systemNumber">
+<tt class="descname">systemNumber</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.System.systemNumber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="id16">
-<h3>Methods (Inherited)<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-part">
 <h2>Class Part<a class="headerlink" href="#class-part" title="Permalink to this headline">¶</a></h2>
@@ -1636,52 +1550,39 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Part</tt><a class="headerlink" href="#music21.stream.Part" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id17">
-<h3>Attributes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Part.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Part.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Part.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Part.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Part.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Part.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Part.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Part.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Part.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Part.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id18">
-<h3>Properties (Inherited)<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id19">
-<h3>Methods (Inherited)<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-voice">
 <h2>Class Voice<a class="headerlink" href="#class-voice" title="Permalink to this headline">¶</a></h2>
@@ -1691,52 +1592,39 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Voice</tt><a class="headerlink" href="#music21.stream.Voice" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for declaring that all the music in the stream belongs to a certain &#8220;voice&#8221; for analysis or display purposes. Note that both Finale&#8217;s Layers and Voices as concepts are considered Voices here.</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id20">
-<h3>Attributes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Voice.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Voice.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Voice.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Voice.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Voice.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Voice.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Voice.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Voice.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Voice.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Voice.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id21">
-<h3>Properties (Inherited)<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id22">
-<h3>Methods (Inherited)<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-page">
 <h2>Class Page<a class="headerlink" href="#class-page" title="Permalink to this headline">¶</a></h2>
@@ -1746,65 +1634,45 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Page</tt><a class="headerlink" href="#music21.stream.Page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Totally optional: designation that all the music in this Stream belongs on a single notated page</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id23">
-<h3>Attributes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Page.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Page.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Page.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Page.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Page.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Page.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Page.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Page.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Page.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Page.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id24">
-<h3>Properties<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id25">
-<h3>Properties (Inherited)<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id26">
-<h3>Methods<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.stream.pageNumber">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">pageNumber</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.pageNumber" title="Permalink to this definition">¶</a></dt>
-<dd>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</dd></dl>
+<dt id="music21.stream.Page.pageNumber">
+<tt class="descname">pageNumber</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Page.pageNumber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="id27">
-<h3>Methods (Inherited)<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-staff">
 <h2>Class Staff<a class="headerlink" href="#class-staff" title="Permalink to this headline">¶</a></h2>
@@ -1814,65 +1682,45 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Staff</tt><a class="headerlink" href="#music21.stream.Staff" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for designating music on a single staff</p>
 <p>Inherits from: stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id28">
-<h3>Attributes<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">flattenedRepresentationOf</tt></dt>
+<dt id="music21.stream.Staff.flattenedRepresentationOf">
+<tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Staff.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.stream.Staff.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.stream.Staff.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.stream.Staff.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.stream.Staff.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.stream.Staff.isFlat">
+<tt class="descname">isFlat</tt><a class="headerlink" href="#music21.stream.Staff.isFlat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.stream.Staff.isSorted">
+<tt class="descname">isSorted</tt><a class="headerlink" href="#music21.stream.Staff.isSorted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isFlat</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.stream.</tt><tt class="descname">isSorted</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id29">
-<h3>Properties<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id30">
-<h3>Properties (Inherited)<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">elements</span></tt>, <tt class="docutils literal"><span class="pre">flat</span></tt>, <tt class="docutils literal"><span class="pre">highestOffset</span></tt>, <tt class="docutils literal"><span class="pre">highestTime</span></tt>, <tt class="docutils literal"><span class="pre">isGapless</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">lowestOffset</span></tt>, <tt class="docutils literal"><span class="pre">measures</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">notes</span></tt>, <tt class="docutils literal"><span class="pre">pitches</span></tt>, <tt class="docutils literal"><span class="pre">semiFlat</span></tt>, <tt class="docutils literal"><span class="pre">sorted</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id31">
-<h3>Methods<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.stream.staffLines">
-<tt class="descclassname">music21.stream.</tt><tt class="descname">staffLines</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.staffLines" title="Permalink to this definition">¶</a></dt>
-<dd>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</dd></dl>
+<dt id="music21.stream.Staff.staffLines">
+<tt class="descname">staffLines</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Staff.staffLines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="id32">
-<h3>Methods (Inherited)<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
 <p>Inherited from stream.Stream (of module <a class="reference internal" href="#modulestream"><em>music21.stream</em></a>): <tt class="docutils literal"><span class="pre">addGroupForElements()</span></tt>, <tt class="docutils literal"><span class="pre">allPlayingWhileSounding()</span></tt>, <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">attachIntervalsBetweenStreams()</span></tt>, <tt class="docutils literal"><span class="pre">bestClef()</span></tt>, <tt class="docutils literal"><span class="pre">extendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">extractContext()</span></tt>, <tt class="docutils literal"><span class="pre">findConsecutiveNotes()</span></tt>, <tt class="docutils literal"><span class="pre">findGaps()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAfterOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrAfter()</span></tt>, <tt class="docutils literal"><span class="pre">getElementAtOrBefore()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeElement()</span></tt>, <tt class="docutils literal"><span class="pre">getElementBeforeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getElementById()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByGroup()</span></tt>, <tt class="docutils literal"><span class="pre">getElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">getGroups()</span></tt>, <tt class="docutils literal"><span class="pre">getInstrument()</span></tt>, <tt class="docutils literal"><span class="pre">getMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">getNotes()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetByElement()</span></tt>, <tt class="docutils literal"><span class="pre">getOverlaps()</span></tt>, <tt class="docutils literal"><span class="pre">getPitches()</span></tt>, <tt class="docutils literal"><span class="pre">getSimultaneous()</span></tt>, <tt class="docutils literal"><span class="pre">getTimeSignatures()</span></tt>, <tt class="docutils literal"><span class="pre">groupElementsByOffset()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtIndex()</span></tt>, <tt class="docutils literal"><span class="pre">insertAtNativeOffset()</span></tt>, <tt class="docutils literal"><span class="pre">isSequence()</span></tt>, <tt class="docutils literal"><span class="pre">makeAccidentals()</span></tt>, <tt class="docutils literal"><span class="pre">makeBeams()</span></tt>, <tt class="docutils literal"><span class="pre">makeMeasures()</span></tt>, <tt class="docutils literal"><span class="pre">makeRests()</span></tt>, <tt class="docutils literal"><span class="pre">makeTies()</span></tt>, <tt class="docutils literal"><span class="pre">melodicIntervals()</span></tt>, <tt class="docutils literal"><span class="pre">playingWhenAttacked()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">repeatAppend()</span></tt>, <tt class="docutils literal"><span class="pre">repeatInsert()</span></tt>, <tt class="docutils literal"><span class="pre">shiftElements()</span></tt>, <tt class="docutils literal"><span class="pre">simultaneousAttacks()</span></tt>, <tt class="docutils literal"><span class="pre">splitByClass()</span></tt>, <tt class="docutils literal"><span class="pre">stripTies()</span></tt>, <tt class="docutils literal"><span class="pre">transferOffsetToElements()</span></tt>, <tt class="docutils literal"><span class="pre">trimPlayingWhileSounding()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -1902,7 +1750,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

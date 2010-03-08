@@ -14,32 +14,30 @@ Class Stream
 
     This is basic container for Music21Objects that occur at certain times. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams. 
 
-
+    
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
-
-Attributes
-~~~~~~~~~~
 
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: elements
 
-    
+
     .. attribute:: flat
 
-        returns a new Stream where no elements nest within other elements 
+    returns a new Stream where no elements nest within other elements 
 
     >>> s = Stream()
     >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
@@ -90,7 +88,7 @@ Properties
 
     .. attribute:: highestOffset
 
-        Get start time of element with the highest offset in the Stream 
+    Get start time of element with the highest offset in the Stream 
 
     >>> stream1 = Stream()
     >>> for x in [3, 4]:
@@ -104,18 +102,18 @@ Properties
 
     .. attribute:: highestTime
 
-        returns the max(el.offset + el.duration.quarterLength) over all elements, usually representing the last "release" in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.  See below. 
+    returns the max(el.offset + el.duration.quarterLength) over all elements, usually representing the last "release" in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.  See below. 
 
     .. attribute:: isGapless
 
-    
+
     .. attribute:: lily
 
-        Returns the stream translated into Lilypond format. 
+    Returns the stream translated into Lilypond format. 
 
     .. attribute:: lowestOffset
 
-        Get start time of element with the lowest offset in the Stream 
+    Get start time of element with the lowest offset in the Stream 
 
     >>> stream1 = Stream()
     >>> stream1.lowestOffset
@@ -132,15 +130,15 @@ Properties
 
     .. attribute:: measures
 
-        Return all Measure objects in a Stream() 
+    Return all Measure objects in a Stream() 
 
     .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. 
+    Provide a complete MusicXM: representation. 
 
     .. attribute:: mx
 
-        Create and return a musicxml score. 
+    Create and return a musicxml score. 
 
     >>> n1 = note.Note()
     >>> measure1 = Measure()
@@ -151,7 +149,7 @@ Properties
 
     .. attribute:: notes
 
-        Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
+    Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
 
     >>> s1 = Stream()
     >>> c = chord.Chord(['a', 'b'])
@@ -162,14 +160,14 @@ Properties
 
     .. attribute:: pitches
 
-        Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
+    Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
 
     .. attribute:: semiFlat
 
-    
+
     .. attribute:: sorted
 
-        returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted 
+    returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted 
 
     >>> s = Stream()
     >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
@@ -209,17 +207,11 @@ Properties
 
     
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
 
     .. method:: addGroupForElements()
 
-        Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set. 
+    Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set. 
 
     >>> a = Stream()
     >>> a.repeatAppend(note.Note('A-'), 30)
@@ -247,13 +239,13 @@ Methods
 
     .. method:: allPlayingWhileSounding()
 
-        Returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream. The offset of this new Stream is set to el's offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el -- thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el's offset in. 
+    Returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream. The offset of this new Stream is set to el's offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el -- thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el's offset in. 
 
     
 
     .. method:: append()
 
-        Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest "release" of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True 
+    Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest "release" of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True 
 
     >>> a = Stream()
     >>> notes = []
@@ -295,11 +287,11 @@ Methods
 
     .. method:: attachIntervalsBetweenStreams()
 
-        For each element in self, creates an interval object in the element's editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked. 
+    For each element in self, creates an interval object in the element's editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked. 
 
     .. method:: bestClef()
 
-        Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets 
+    Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets 
 
     
 
@@ -326,7 +318,7 @@ Methods
 
     .. method:: extendDuration()
 
-        Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream. 
+    Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream. 
 
     >>> import music21.dynamics
     >>> stream1 = Stream()
@@ -359,7 +351,7 @@ Methods
 
     .. method:: extractContext()
 
-        extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) 
+    extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) 
 
     >>> from music21 import note
     >>> qn = note.QuarterNote()
@@ -377,17 +369,17 @@ Methods
 
     .. method:: findConsecutiveNotes()
 
-        Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2's in there as well. See Test.testFindConsecutiveNotes() for usage details. 
+    Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2's in there as well. See Test.testFindConsecutiveNotes() for usage details. 
 
     
 
     .. method:: findGaps()
 
-        returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless 
+    returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless 
 
     .. method:: getElementAfterElement()
 
-        given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list 
+    given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list 
 
     >>> st1 = Stream()
     >>> n1 = note.Note()
@@ -416,15 +408,15 @@ Methods
 
     .. method:: getElementAfterOffset()
 
-        Get element after a provided offset 
+    Get element after a provided offset 
 
     .. method:: getElementAtOrAfter()
 
-        Given an offset, find the element at this offset, or with the offset greater than and nearest to. 
+    Given an offset, find the element at this offset, or with the offset greater than and nearest to. 
 
     .. method:: getElementAtOrBefore()
 
-        Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset. 
+    Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset. 
 
     >>> a = Stream()
     >>> x = music21.Music21Object()
@@ -456,15 +448,15 @@ Methods
 
     .. method:: getElementBeforeElement()
 
-        given an element, get the element before 
+    given an element, get the element before 
 
     .. method:: getElementBeforeOffset()
 
-        Get element before a provided offset 
+    Get element before a provided offset 
 
     .. method:: getElementById()
 
-        Returns the first encountered element for a given id. Return None if no match 
+    Returns the first encountered element for a given id. Return None if no match 
 
     >>> e = 'test'
     >>> a = Stream()
@@ -477,7 +469,7 @@ Methods
 
     .. method:: getElementsByClass()
 
-        Return a list of all Elements that match the className. 
+    Return a list of all Elements that match the className. 
 
     >>> a = Stream()
     >>> a.repeatInsert(note.Rest(), range(10))
@@ -504,7 +496,7 @@ Methods
 
     .. method:: getElementsByGroup()
 
-        
+    
 
     >>> from music21 import note
     >>> n1 = note.Note("C")
@@ -531,7 +523,7 @@ Methods
 
     .. method:: getElementsByOffset()
 
-        Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding 
+    Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding 
 
     >>> st1 = Stream()
     >>> n0 = note.Note("C")
@@ -588,7 +580,7 @@ Methods
 
     .. method:: getGroups()
 
-        Get a dictionary for each groupId and the count of instances. 
+    Get a dictionary for each groupId and the count of instances. 
 
     >>> a = Stream()
     >>> n = note.Note()
@@ -602,18 +594,18 @@ Methods
 
     .. method:: getInstrument()
 
-        Search this stream or parent streams for instruments, otherwise return a default 
+    Search this stream or parent streams for instruments, otherwise return a default 
 
     >>> a = Stream()
     >>> b = a.getInstrument()
 
     .. method:: getMeasures()
 
-        Return all Measure objects in a Stream() 
+    Return all Measure objects in a Stream() 
 
     .. method:: getNotes()
 
-        Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
+    Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
 
     >>> s1 = Stream()
     >>> c = chord.Chord(['a', 'b'])
@@ -624,7 +616,7 @@ Methods
 
     .. method:: getOffsetByElement()
 
-        Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
+    Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
 
     >>> n1 = note.Note('A')
     >>> n2 = note.Note('B')
@@ -643,7 +635,7 @@ Methods
 
     .. method:: getOverlaps()
 
-        Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter. 
+    Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter. 
 
     >>> a = Stream()
     >>> for x in range(4):
@@ -686,11 +678,11 @@ Methods
 
     .. method:: getPitches()
 
-        Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
+    Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
 
     .. method:: getSimultaneous()
 
-        Find and return any elements that start at the same time. 
+    Find and return any elements that start at the same time. 
 
     >>> stream1 = Stream()
     >>> for x in range(4):
@@ -713,7 +705,7 @@ Methods
 
     .. method:: getTimeSignatures()
 
-        Collect all time signatures in this stream. If no TimeSignature objects are defined, get a default Note: this could be a method of Stream. 
+    Collect all time signatures in this stream. If no TimeSignature objects are defined, get a default Note: this could be a method of Stream. 
 
     >>> a = Stream()
     >>> b = meter.TimeSignature('3/4')
@@ -725,11 +717,11 @@ Methods
 
     .. method:: groupElementsByOffset()
 
-        returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can't hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first. 
+    returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can't hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first. 
 
     .. method:: index()
 
-        return the index for the specified object 
+    return the index for the specified object 
 
     >>> a = Stream()
     >>> fSharp = note.Note("F#")
@@ -740,7 +732,7 @@ Methods
 
     .. method:: insert()
 
-        Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you're going to be inserting dozens of items that don't change the sort status) Has three forms: in the two argument form, inserts an element at the given offset: 
+    Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you're going to be inserting dozens of items that don't change the sort status) Has three forms: in the two argument form, inserts an element at the given offset: 
 
     >>> st1 = Stream()
     >>> st1.insert(32, note.Note("B-"))
@@ -776,7 +768,7 @@ Methods
 
     .. method:: insertAtIndex()
 
-        Insert in elements by index position. 
+    Insert in elements by index position. 
 
     >>> a = Stream()
     >>> a.repeatAppend(note.Note('A-'), 30)
@@ -788,7 +780,7 @@ Methods
 
     .. method:: insertAtNativeOffset()
 
-        inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item) 
+    inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item) 
 
     >>> n1 = note.Note("F-")
     >>> n1.offset = 20.0
@@ -807,7 +799,7 @@ Methods
 
     .. method:: isSequence()
 
-        A stream is a sequence if it has no overlaps. 
+    A stream is a sequence if it has no overlaps. 
 
     >>> a = Stream()
     >>> for x in [0,0,0,0,3,3,3]:
@@ -821,10 +813,10 @@ Methods
 
     .. method:: makeAccidentals()
 
-    
+
     .. method:: makeBeams()
 
-        Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes. 
+    Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes. 
 
     >>> aMeasure = Measure()
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
@@ -835,7 +827,7 @@ Methods
 
     .. method:: makeMeasures()
 
-        Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar. 
+    Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar. 
 
     >>> a = Stream()
     >>> a.repeatAppend(note.Rest(), 3)
@@ -851,7 +843,7 @@ Methods
 
     .. method:: makeRests()
 
-        Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream. 
+    Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream. 
 
     >>> a = Stream()
     >>> a.insert(20, note.Note())
@@ -869,7 +861,7 @@ Methods
 
     .. method:: makeTies()
 
-        Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false configure ".previous" and ".next" attributes 
+    Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false configure ".previous" and ".next" attributes 
 
     >>> d = Stream()
     >>> n = note.Note()
@@ -881,13 +873,13 @@ Methods
 
     .. method:: melodicIntervals()
 
-        returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream. the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, then it is equal to the offset of the second note) see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed. The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval returns None of there are not at least two elements found by findConsecutiveNotes See Test.testMelodicIntervals() for usage details. 
+    returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream. the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, then it is equal to the offset of the second note) see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed. The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval returns None of there are not at least two elements found by findConsecutiveNotes See Test.testMelodicIntervals() for usage details. 
 
     
 
     .. method:: playingWhenAttacked()
 
-        Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el's offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want. 
+    Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el's offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want. 
 
     >>> n1 = note.Note("G#")
     >>> n2 = note.Note("D#")
@@ -919,7 +911,7 @@ Methods
 
     .. method:: pop()
 
-        return the matched object from the list. 
+    return the matched object from the list. 
 
     >>> a = Stream()
     >>> a.repeatInsert(note.Note("C"), range(10))
@@ -929,7 +921,7 @@ Methods
 
     .. method:: repeatAppend()
 
-        Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer. 
+    Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer. 
 
     >>> a = Stream()
     >>> n = note.Note()
@@ -942,7 +934,7 @@ Methods
 
     .. method:: repeatInsert()
 
-        Given an object, create many DEEPcopies at the positions specified by the offset list: 
+    Given an object, create many DEEPcopies at the positions specified by the offset list: 
 
     >>> a = Stream()
     >>> n = note.Note('G-')
@@ -955,7 +947,7 @@ Methods
 
     .. method:: shiftElements()
 
-        Add offset value to every offset of contained Elements. 
+    Add offset value to every offset of contained Elements. 
 
     >>> a = Stream()
     >>> a.repeatInsert(note.Note("C"), range(0,10))
@@ -968,7 +960,7 @@ Methods
 
     .. method:: simultaneousAttacks()
 
-        returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2. 
+    returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2. 
 
     >>> st1 = Stream()
     >>> st2 = Stream()
@@ -986,7 +978,7 @@ Methods
 
     .. method:: splitByClass()
 
-        Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream. 
+    Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream. 
 
     >>> stream1 = Stream()
     >>> for x in range(30,81):
@@ -1003,7 +995,7 @@ Methods
 
     .. method:: stripTies()
 
-        Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique. 
+    Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique. 
 
     >>> a = Stream()
     >>> n = note.Note()
@@ -1017,7 +1009,7 @@ Methods
 
     .. method:: transferOffsetToElements()
 
-        Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero. 
+    Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero. 
 
     >>> a = Stream()
     >>> a.repeatInsert(note.Note("C"), range(0,10))
@@ -1034,12 +1026,9 @@ Methods
 
     .. method:: trimPlayingWhileSounding()
 
-        returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies, the difference might bite you if you're not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream. 
+    returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies, the difference might bite you if you're not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream. 
 
     
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -1053,9 +1042,6 @@ Class Measure
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: clefIsNew
 
     .. attribute:: filled
@@ -1064,7 +1050,11 @@ Attributes
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
@@ -1082,12 +1072,9 @@ Attributes
 
     .. attribute:: timeSignatureIsNew
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: clef
 
-        
+    
 
     >>> a = Measure()
     >>> a.clef = clef.TrebleClef()
@@ -1096,7 +1083,7 @@ Properties
 
     .. attribute:: key
 
-        
+    
 
     >>> a = Measure()
     >>> a.key = key.KeySignature(0)
@@ -1105,40 +1092,31 @@ Properties
 
     .. attribute:: timeSignature
 
-        
+    
 
     >>> a = Measure()
     >>> a.timeSignature = meter.TimeSignature('2/4')
     >>> a.timeSignature.numerator, a.timeSignature.denominator
     (2, 4) 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: addRepeat()
 
-    
+
     .. method:: addTimeDependentDirection()
 
-    
+
     .. method:: measureNumberWithSuffix()
 
-    
+
     .. method:: setLeftBarline()
 
-    
+
     .. method:: setRightBarline()
 
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1154,28 +1132,23 @@ Class Performer
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1191,28 +1164,23 @@ Class Score
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1228,38 +1196,27 @@ Class System
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: systemNumber()
 
-        int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1275,28 +1232,23 @@ Class Part
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1312,28 +1264,23 @@ Class Voice
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1349,38 +1296,27 @@ Class Page
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: pageNumber()
 
-        int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
@@ -1396,38 +1332,27 @@ Class Staff
 
     Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: flattenedRepresentationOf
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: isFlat
 
     .. attribute:: isSorted
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: staffLines()
 
-        int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
     Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 

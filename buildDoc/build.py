@@ -45,7 +45,7 @@ from music21.trecento import cadencebook as trecentoCadencebook
 _MOD = "doc.build.py"
 environLocal = environment.Environment(_MOD)
 
-
+INDENT = ' '*4
 OMIT_STR = 'OMIT_FROM_DOCS'
 FORMATS = ['html', 'latex', 'pdf']
 
@@ -89,16 +89,18 @@ MODULES = [
 class RestructuredWriter(object):
 
     def __init__(self):
-        self.INDENT = ' ' * 4
+        pass
 
-    def _heading(self, line, headingChar='='):
-        '''Format an RST heading.
+    def _heading(self, line, headingChar='=', indent=0):
+        '''Format an RST heading. Indent is in number of spaces.
         '''
+        indent = ' ' * indent
+        #environLocal.printDebug(['got indent', indent])
         msg = []
-        msg.append(line)
-        msg.append('\n')
-        msg.append(headingChar*len(line))
-        msg.append('\n'*2)
+        msg.append(indent + line)
+        msg.append(indent + '\n')
+        msg.append(indent + headingChar*len(line))
+        msg.append(indent + '\n'*2)
         return msg
 
     def _para(self, doc):
@@ -167,7 +169,9 @@ class RestructuredWriter(object):
         for i in range(len(mro)):
             if i == 0: continue # first is always the class itself
             if i == len(mro) - 1: continue # last is object
-            sub.append(self.formatParent(mro[i]))        
+            sub.append(self.formatParent(mro[i]))
+        if len(sub) == 0:
+            return ''
         msg.append(', '.join(sub))
         return ' '.join(msg)
 
@@ -224,6 +228,28 @@ class RestructuredWriter(object):
         return ''.join(msg)
 
 
+#     def _fmtRstDocStr(self, docStr):
+#         '''Some doc strings have double spaces; these need to removed, as they
+#         are interpreted by RST as a section break.
+#         '''
+#         #docStr = docStr.strip()
+#         docLines = docStr.split('\n')
+#         docPost = []
+#         count = 0 # count consec line breaks
+#         for line in docLines:
+#             if line.strip() == '':
+#                 count += 1
+#             else:
+#                 count = 0
+#             # if less than 2 consecutive lines of white space
+#             if line.strip() == '' and count > 1: 
+#                 continue
+# 
+#             docPost.append(line)
+# 
+#         return '\n'.join(docPost) + '\n'
+
+
 #-------------------------------------------------------------------------------
 class ClassDoc(RestructuredWriter):
 
@@ -234,9 +260,13 @@ class ClassDoc(RestructuredWriter):
         RestructuredWriter.__init__(self)
 
         self.className = className
-        self.classObj = eval(className)
+        self.classNameEval = eval(className)
+        # cannot do this in all cases
+        #self.obj = self.classNameEval()
+
         self.info = {}
-        self.scanClass() # will fill self.info using self.classObj
+        self.scanClass() # will fill self.info using self.classNameEval
+        self.name = self.classNameEval.__name__
 
     def findDerivationClass(self, mro, partName):
         '''Given an mro (method resolution order) and a part of an object, find from where the part is derived.
@@ -257,7 +287,7 @@ class ClassDoc(RestructuredWriter):
     def scanMethod(self, obj):
         methodInfo = {}
         #methodInfo['name'] = str(obj)
-        methodInfo['doc'] = self.formatDocString(obj.__doc__, self.INDENT)
+        methodInfo['doc'] = self.formatDocString(obj.__doc__, INDENT)
         return methodInfo
 
 
@@ -265,11 +295,10 @@ class ClassDoc(RestructuredWriter):
         '''For an object provided as an argument, collect all relevant
         information in a dictionary. 
         '''
-        obj = self.classObj
+        obj = self.classNameEval
         info = {}
         info['reference'] = obj
-        info['name'] = obj.__name__
-        info['doc']  = self.formatDocString(obj.__doc__)
+        info['doc']  = self.formatDocString(obj.__doc__, INDENT)
         info['properties'] = {}
         info['methods'] = {}
         info['derivations'] = {} # a dictionary of mro index, name lists
@@ -298,11 +327,11 @@ class ClassDoc(RestructuredWriter):
                 isinstance(partObj, types.DictionaryType) or 
                 isinstance(partObj, types.ListType) 
                 ):
-                pass
-            elif isinstance(partObj, property):
+                continue
+
+            if isinstance(partObj, property):
                 # can use method processing on properties
                 info['properties'][partName] = self.scanMethod(partObj)
-
             elif (callable(partObj) or hasattr(partObj, '__doc__')):
                 info['methods'][partName] = self.scanMethod(partObj)
             else:
@@ -318,13 +347,18 @@ class ClassDoc(RestructuredWriter):
     #---------------------------------------------------------------------------
     def _fmtRstAttribute(self, groupKey, name):
         msg = []
-        msg.append('    .. attribute:: %s\n\n' %  name)   
+        msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         if  groupKey == 'properties':
-            msg.append('    %s\n' %  
-                self.info[groupKey][name]['doc'])
+            msg.append('%s\n' %  ( 
+                self.info[groupKey][name]['doc']))
         elif groupKey == 'attributes':
-            pass
+            if hasattr(self.classNameEval, '_DOC_ATTR'):
+                if name in self.classNameEval._DOC_ATTR.keys():
+                    msg.append('%s\n' %  (self.formatDocString(
+                                self.classNameEval._DOC_ATTR[name], INDENT)))
+            else:
+                environLocal.printDebug(['_DOC_ATTR not found in', self.classNameEval])
         else:
             raise Exceptioin('bad groupKey %s' % groupKey)
         return ''.join(msg)
@@ -333,32 +367,29 @@ class ClassDoc(RestructuredWriter):
         msg = []
         msg.append('    .. method:: %s()\n\n' %  name)   
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-        msg.append('    %s\n' %  
-                self.info[groupKey][name]['doc'])
+        msg.append('%s\n' % (self.info[groupKey][name]['doc']))
         return ''.join(msg)
-
 
     def getRestructuredClass(self):
         '''Return a string of a complete RST specification for a class.
         '''
         msg = []
-        titleStr = 'Class %s' % self.info['name']
+        titleStr = 'Class %s' % self.name
         msg += self._heading(titleStr, '-')
 
-        titleStr = '.. class:: %s\n\n' % self.info['name']
+        titleStr = '.. class:: %s\n\n' % self.name
         msg += titleStr
         #msg += self._heading(titleStr)
 
-        msg.append('    %s\n' % self.info['doc'])
-        msg.append('    %s\n\n' % self.formatClassInheritance(
-            self.info['mro']))
+        msg.append('%s\n' % (self.info['doc']))
+        msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(
+            self.info['mro'])))
 
         obj = None
         try: # create a dummy object and list its attributes
             obj = self.info['reference']()
         except TypeError:
             pass
-            #print _MOD, 'cannot create instance of %s' % className
 
         if obj != None:
             attrList = obj.__dict__.keys()
@@ -369,7 +400,7 @@ class ClassDoc(RestructuredWriter):
                 if not attr.startswith('_'):
                     attrPublic.append(attr)
             if len(attrPublic) > 0:
-                msg += self._heading('Attributes', '~')
+                #msg += self._heading('Attributes', '~')
                 # not working:
 #                 for i, nameFound in self.info['derivations']:
 #                     if nameFound not in attrPublic:
@@ -418,10 +449,10 @@ class ClassDoc(RestructuredWriter):
                 # will be Properties, Methods
                 if i == 0:
                     groupTitle = '%s' % groupName 
-                    msg += self._heading(groupTitle, '~') 
+                    #msg += self._heading(groupTitle, '~') 
                 if i == 1: # only do first one
                     groupTitle = '%s (Inherited)' % (groupName)
-                    msg += self._heading(groupTitle, '~') 
+                    #msg += self._heading(groupTitle, '~') 
 
                 for nameFound in self.info['derivations'][i]:
                     if nameFound not in methodPublic:
@@ -620,7 +651,7 @@ class ModuleDoc(RestructuredWriter):
             #titleStr = 'Function %s()' % self.functions[funcName]['name']
             #msg += self._heading(titleStr, '-')
             msg += '.. function:: %s()\n\n' % self.functions[funcName]['name']
-            msg.append('    %s\n' % self.functions[funcName]['doc'])
+            msg.append('%s\n' % self.functions[funcName]['doc'])
 
         for className in self._sortModuleNames('classes'):
             msg += self.classes[className].getRestructuredClass()

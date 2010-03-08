@@ -48,22 +48,8 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.dynamics</a><ul>
-<li><a class="reference external" href="#class-dynamic">Class Dynamic</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-wedge">Class Wedge</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties</a></li>
-<li><a class="reference external" href="#id3">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id4">Methods</a></li>
-<li><a class="reference external" href="#id5">Methods (Inherited)</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-dynamic">Class Dynamic</a></li>
+<li><a class="reference external" href="#class-wedge">Class Wedge</a></li>
 </ul>
 </li>
 </ul>
@@ -105,8 +91,9 @@
 <dl class="function">
 <dt id="music21.dynamics.unitIntervalToName">
 <tt class="descclassname">music21.dynamics.</tt><tt class="descname">unitIntervalToName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.dynamics.unitIntervalToName" title="Permalink to this definition">¶</a></dt>
-<dd>Given a unit interfal value, map to a dynamic name</dd></dl>
+<dd></dd></dl>
 
+<p>Given a unit interfal value, map to a dynamic name</p>
 <div class="section" id="class-dynamic">
 <h2>Class Dynamic<a class="headerlink" href="#class-dynamic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -115,76 +102,70 @@
 class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">Dynamic</tt><a class="headerlink" href="#music21.dynamics.Dynamic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object representation of Dyanmics.</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt id="music21.dynamics.englishName">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">englishName</tt><a class="headerlink" href="#music21.dynamics.englishName" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.englishName">
+<tt class="descname">englishName</tt><a class="headerlink" href="#music21.dynamics.Dynamic.englishName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.groups">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.dynamics.groups" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.dynamics.Dynamic.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.dynamics.Dynamic.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.dynamics.Dynamic.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.dynamics.Dynamic.longName">
+<tt class="descname">longName</tt><a class="headerlink" href="#music21.dynamics.Dynamic.longName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.id">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.dynamics.id" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.posDefaultX">
+<tt class="descname">posDefaultX</tt><a class="headerlink" href="#music21.dynamics.Dynamic.posDefaultX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.longName">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">longName</tt><a class="headerlink" href="#music21.dynamics.longName" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.posDefaultY">
+<tt class="descname">posDefaultY</tt><a class="headerlink" href="#music21.dynamics.Dynamic.posDefaultY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.posDefaultX">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posDefaultX</tt><a class="headerlink" href="#music21.dynamics.posDefaultX" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.posPlacement">
+<tt class="descname">posPlacement</tt><a class="headerlink" href="#music21.dynamics.Dynamic.posPlacement" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.posDefaultY">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posDefaultY</tt><a class="headerlink" href="#music21.dynamics.posDefaultY" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.posRelativeX">
+<tt class="descname">posRelativeX</tt><a class="headerlink" href="#music21.dynamics.Dynamic.posRelativeX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.posPlacement">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posPlacement</tt><a class="headerlink" href="#music21.dynamics.posPlacement" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.posRelativeY">
+<tt class="descname">posRelativeY</tt><a class="headerlink" href="#music21.dynamics.Dynamic.posRelativeY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.posRelativeX">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posRelativeX</tt><a class="headerlink" href="#music21.dynamics.posRelativeX" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.value">
+<tt class="descname">value</tt><a class="headerlink" href="#music21.dynamics.Dynamic.value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.posRelativeY">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posRelativeY</tt><a class="headerlink" href="#music21.dynamics.posRelativeY" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.musicxml">
+<tt class="descname">musicxml</tt><a class="headerlink" href="#music21.dynamics.Dynamic.musicxml" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Provide a complete MusicXM: representation.</p>
 <dl class="attribute">
-<dt id="music21.dynamics.value">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">value</tt><a class="headerlink" href="#music21.dynamics.value" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Dynamic.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Dynamic.mx" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.dynamics.musicxml">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">musicxml</tt><a class="headerlink" href="#music21.dynamics.musicxml" title="Permalink to this definition">¶</a></dt>
-<dd>Provide a complete MusicXM: representation.</dd></dl>
-
-<dl class="attribute">
-<dt id="music21.dynamics.mx">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.mx" title="Permalink to this definition">¶</a></dt>
-<dd>returns a musicxml.Direction object</dd></dl>
-
+<p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">posRelativeY</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -194,21 +175,10 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="go">&#39;below&#39;</span>
 </pre></div>
 </div>
-</blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
-</div>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+</dd></dl>
+
 </div>
 <div class="section" id="class-wedge">
 <h2>Class Wedge<a class="headerlink" href="#class-wedge" title="Permalink to this headline">¶</a></h2>
@@ -218,46 +188,39 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">Wedge</tt><a class="headerlink" href="#music21.dynamics.Wedge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object model of crescendeo/decrescendo wedges.</p>
 <p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
-</dd></dl>
-
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.dynamics.Wedge.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.dynamics.Wedge.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.dynamics.Wedge.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.dynamics.Wedge.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.dynamics.Wedge.posPlacement">
+<tt class="descname">posPlacement</tt><a class="headerlink" href="#music21.dynamics.Wedge.posPlacement" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.dynamics.Wedge.spread">
+<tt class="descname">spread</tt><a class="headerlink" href="#music21.dynamics.Wedge.spread" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">posPlacement</tt></dt>
+<dt id="music21.dynamics.Wedge.type">
+<tt class="descname">type</tt><a class="headerlink" href="#music21.dynamics.Wedge.type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.spread">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">spread</tt><a class="headerlink" href="#music21.dynamics.spread" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.dynamics.Wedge.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Wedge.mx" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="music21.dynamics.type">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">type</tt><a class="headerlink" href="#music21.dynamics.type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id2">
-<h3>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">mx</tt></dt>
-<dd>returns a musicxml.Direction object</dd></dl>
-
+<p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Wedge</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;crescendo&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mxDirection</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -266,21 +229,10 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="go">&#39;crescendo&#39;</span>
 </pre></div>
 </div>
-</blockquote>
-</div>
-<div class="section" id="id3">
-<h3>Properties (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
-</div>
-<div class="section" id="id4">
-<h3>Methods<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id5">
-<h3>Methods (Inherited)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
-</div>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -310,7 +262,7 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -48,40 +48,11 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.instrument</a><ul>
-<li><a class="reference external" href="#class-instrument">Class Instrument</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-violoncello">Class Violoncello</a><ul>
-<li><a class="reference external" href="#id1">Attributes</a></li>
-<li><a class="reference external" href="#id2">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id3">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-stringinstrument">Class StringInstrument</a><ul>
-<li><a class="reference external" href="#id4">Attributes</a></li>
-<li><a class="reference external" href="#id5">Properties</a></li>
-<li><a class="reference external" href="#id6">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id7">Methods</a></li>
-<li><a class="reference external" href="#id8">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-viola">Class Viola</a><ul>
-<li><a class="reference external" href="#id9">Attributes</a></li>
-<li><a class="reference external" href="#id10">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id11">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-violin">Class Violin</a><ul>
-<li><a class="reference external" href="#id12">Attributes</a></li>
-<li><a class="reference external" href="#id13">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#id14">Methods (Inherited)</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-instrument">Class Instrument</a></li>
+<li><a class="reference external" href="#class-violoncello">Class Violoncello</a></li>
+<li><a class="reference external" href="#class-stringinstrument">Class StringInstrument</a></li>
+<li><a class="reference external" href="#class-viola">Class Viola</a></li>
+<li><a class="reference external" href="#class-violin">Class Violin</a></li>
 </ul>
 </li>
 </ul>
@@ -126,98 +97,80 @@
 <dt id="music21.instrument.Instrument">
 <em class="property">
 class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname">Instrument</tt><a class="headerlink" href="#music21.instrument.Instrument" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt id="music21.instrument.groups">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.groups" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.Instrument.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Instrument.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.Instrument.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Instrument.instrumentAbbreviation">
+<tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.Instrument.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.id">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.id" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.instrumentName">
+<tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.Instrument.instrumentName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.instrumentAbbreviation">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.midiChannel">
+<tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.Instrument.midiChannel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.instrumentName">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.instrumentName" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.midiProgram">
+<tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.Instrument.midiProgram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.midiChannel">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.midiChannel" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.partAbbreviation">
+<tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.Instrument.partAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.midiProgram">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.midiProgram" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.partId">
+<tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.Instrument.partId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.partAbbreviation">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.partAbbreviation" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.partName">
+<tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.Instrument.partName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.partId">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.partId" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.transposition">
+<tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.Instrument.transposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.partName">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.partName" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Instrument.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.instrument.Instrument.mx" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="music21.instrument.transposition">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.transposition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.instrument.mx">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">mx</tt><a class="headerlink" href="#music21.instrument.mx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
-<dt id="music21.instrument.bestName">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">bestName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.instrument.bestName" title="Permalink to this definition">¶</a></dt>
-<dd>Find a viable name, looking first at instrument, then part, then abbreviations.</dd></dl>
+<dt id="music21.instrument.Instrument.bestName">
+<tt class="descname">bestName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.instrument.Instrument.bestName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+<p>Find a viable name, looking first at instrument, then part, then abbreviations.</p>
 <dl class="method">
-<dt id="music21.instrument.partIdRandomize">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partIdRandomize</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.instrument.partIdRandomize" title="Permalink to this definition">¶</a></dt>
-<dd>Force a unique id by using an MD5</dd></dl>
+<dt id="music21.instrument.Instrument.partIdRandomize">
+<tt class="descname">partIdRandomize</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.instrument.Instrument.partIdRandomize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
-</div>
+<p>Force a unique id by using an MD5</p>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+</dd></dl>
+
 </div>
 <div class="section" id="class-violoncello">
 <h2>Class Violoncello<a class="headerlink" href="#class-violoncello" title="Permalink to this headline">¶</a></h2>
@@ -225,83 +178,71 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.instrument.Violoncello">
 <em class="property">
 class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname">Violoncello</tt><a class="headerlink" href="#music21.instrument.Violoncello" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.instrument.Violoncello.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.Violoncello.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Violoncello.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.Violoncello.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Violoncello.instrumentAbbreviation">
+<tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.Violoncello.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.instrument.Violoncello.instrumentName">
+<tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.Violoncello.instrumentName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentAbbreviation</tt></dt>
+<dt id="music21.instrument.Violoncello.lowestNote">
+<tt class="descname">lowestNote</tt><a class="headerlink" href="#music21.instrument.Violoncello.lowestNote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentName</tt></dt>
+<dt id="music21.instrument.Violoncello.midiChannel">
+<tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.Violoncello.midiChannel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.instrument.lowestNote">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">lowestNote</tt><a class="headerlink" href="#music21.instrument.lowestNote" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.instrument.Violoncello.midiProgram">
+<tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.Violoncello.midiProgram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiChannel</tt></dt>
+<dt id="music21.instrument.Violoncello.partAbbreviation">
+<tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.Violoncello.partAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiProgram</tt></dt>
+<dt id="music21.instrument.Violoncello.partId">
+<tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.Violoncello.partId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partAbbreviation</tt></dt>
+<dt id="music21.instrument.Violoncello.partName">
+<tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.Violoncello.partName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partId</tt></dt>
+<dt id="music21.instrument.Violoncello.transposition">
+<tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.Violoncello.transposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partName</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">transposition</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id2">
-<h3>Properties (Inherited)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">stringPitches</span></tt></p>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">mx</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id3">
-<h3>Methods (Inherited)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">bestName()</span></tt>, <tt class="docutils literal"><span class="pre">partIdRandomize()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-stringinstrument">
 <h2>Class StringInstrument<a class="headerlink" href="#class-stringinstrument" title="Permalink to this headline">¶</a></h2>
@@ -309,71 +250,65 @@ class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname
 <dt id="music21.instrument.StringInstrument">
 <em class="property">
 class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname">StringInstrument</tt><a class="headerlink" href="#music21.instrument.StringInstrument" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id4">
-<h3>Attributes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.instrument.StringInstrument.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.StringInstrument.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.instrument.StringInstrument.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.StringInstrument.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.instrument.StringInstrument.instrumentAbbreviation">
+<tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.StringInstrument.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.instrument.StringInstrument.instrumentName">
+<tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.StringInstrument.instrumentName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentAbbreviation</tt></dt>
+<dt id="music21.instrument.StringInstrument.midiChannel">
+<tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.StringInstrument.midiChannel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentName</tt></dt>
+<dt id="music21.instrument.StringInstrument.midiProgram">
+<tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.StringInstrument.midiProgram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiChannel</tt></dt>
+<dt id="music21.instrument.StringInstrument.partAbbreviation">
+<tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.StringInstrument.partAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiProgram</tt></dt>
+<dt id="music21.instrument.StringInstrument.partId">
+<tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.StringInstrument.partId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partAbbreviation</tt></dt>
+<dt id="music21.instrument.StringInstrument.partName">
+<tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.StringInstrument.partName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partId</tt></dt>
+<dt id="music21.instrument.StringInstrument.transposition">
+<tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.StringInstrument.transposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partName</tt></dt>
+<dt id="music21.instrument.StringInstrument.stringPitches">
+<tt class="descname">stringPitches</tt><a class="headerlink" href="#music21.instrument.StringInstrument.stringPitches" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">transposition</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id5">
-<h3>Properties<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.instrument.stringPitches">
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">stringPitches</tt><a class="headerlink" href="#music21.instrument.stringPitches" title="Permalink to this definition">¶</a></dt>
-<dd>stringPitches is a property that stores a list of Pitches (or pitch names, such as &#8220;C4&#8221;) that represent the pitch of the open strings from lowest to highest[#reentrant]_</dd></dl>
-
+<p>stringPitches is a property that stores a list of Pitches (or pitch names, such as &#8220;C4&#8221;) that represent the pitch of the open strings from lowest to highest[#reentrant]_</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vln1</span> <span class="o">=</span> <span class="n">Violin</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vln1</span><span class="o">.</span><span class="n">stringPitches</span>
 <span class="go">[G3, D4, A4, E5]</span>
@@ -390,25 +325,12 @@ class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname
 <span class="go">as some of Biber&#39;s *Mystery Sonatas*</span>
 </pre></div>
 </div>
-</blockquote>
-</div>
-<div class="section" id="id6">
-<h3>Properties (Inherited)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">mx</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id7">
-<h3>Methods<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id8">
-<h3>Methods (Inherited)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">bestName()</span></tt>, <tt class="docutils literal"><span class="pre">partIdRandomize()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-viola">
 <h2>Class Viola<a class="headerlink" href="#class-viola" title="Permalink to this headline">¶</a></h2>
@@ -416,83 +338,71 @@ class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname
 <dt id="music21.instrument.Viola">
 <em class="property">
 class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname">Viola</tt><a class="headerlink" href="#music21.instrument.Viola" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id9">
-<h3>Attributes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.instrument.Viola.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.Viola.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Viola.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.Viola.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Viola.instrumentAbbreviation">
+<tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.Viola.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.instrument.Viola.instrumentName">
+<tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.Viola.instrumentName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentAbbreviation</tt></dt>
+<dt id="music21.instrument.Viola.lowestNote">
+<tt class="descname">lowestNote</tt><a class="headerlink" href="#music21.instrument.Viola.lowestNote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentName</tt></dt>
+<dt id="music21.instrument.Viola.midiChannel">
+<tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.Viola.midiChannel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">lowestNote</tt></dt>
+<dt id="music21.instrument.Viola.midiProgram">
+<tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.Viola.midiProgram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiChannel</tt></dt>
+<dt id="music21.instrument.Viola.partAbbreviation">
+<tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.Viola.partAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiProgram</tt></dt>
+<dt id="music21.instrument.Viola.partId">
+<tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.Viola.partId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partAbbreviation</tt></dt>
+<dt id="music21.instrument.Viola.partName">
+<tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.Viola.partName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partId</tt></dt>
+<dt id="music21.instrument.Viola.transposition">
+<tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.Viola.transposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partName</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">transposition</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id10">
-<h3>Properties (Inherited)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">stringPitches</span></tt></p>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">mx</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id11">
-<h3>Methods (Inherited)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">bestName()</span></tt>, <tt class="docutils literal"><span class="pre">partIdRandomize()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 <div class="section" id="class-violin">
 <h2>Class Violin<a class="headerlink" href="#class-violin" title="Permalink to this headline">¶</a></h2>
@@ -500,83 +410,71 @@ class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname
 <dt id="music21.instrument.Violin">
 <em class="property">
 class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname">Violin</tt><a class="headerlink" href="#music21.instrument.Violin" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</dd></dl>
-
-<div class="section" id="id12">
-<h3>Attributes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<dd><p>Inherits from: instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">groups</tt></dt>
+<dt id="music21.instrument.Violin.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.instrument.Violin.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An instance of a Group object.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Violin.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.instrument.Violin.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.instrument.Violin.instrumentAbbreviation">
+<tt class="descname">instrumentAbbreviation</tt><a class="headerlink" href="#music21.instrument.Violin.instrumentAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">id</tt></dt>
+<dt id="music21.instrument.Violin.instrumentName">
+<tt class="descname">instrumentName</tt><a class="headerlink" href="#music21.instrument.Violin.instrumentName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentAbbreviation</tt></dt>
+<dt id="music21.instrument.Violin.lowestNote">
+<tt class="descname">lowestNote</tt><a class="headerlink" href="#music21.instrument.Violin.lowestNote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">instrumentName</tt></dt>
+<dt id="music21.instrument.Violin.midiChannel">
+<tt class="descname">midiChannel</tt><a class="headerlink" href="#music21.instrument.Violin.midiChannel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">lowestNote</tt></dt>
+<dt id="music21.instrument.Violin.midiProgram">
+<tt class="descname">midiProgram</tt><a class="headerlink" href="#music21.instrument.Violin.midiProgram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiChannel</tt></dt>
+<dt id="music21.instrument.Violin.partAbbreviation">
+<tt class="descname">partAbbreviation</tt><a class="headerlink" href="#music21.instrument.Violin.partAbbreviation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">midiProgram</tt></dt>
+<dt id="music21.instrument.Violin.partId">
+<tt class="descname">partId</tt><a class="headerlink" href="#music21.instrument.Violin.partId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partAbbreviation</tt></dt>
+<dt id="music21.instrument.Violin.partName">
+<tt class="descname">partName</tt><a class="headerlink" href="#music21.instrument.Violin.partName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partId</tt></dt>
+<dt id="music21.instrument.Violin.transposition">
+<tt class="descname">transposition</tt><a class="headerlink" href="#music21.instrument.Violin.transposition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">partName</tt></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<tt class="descclassname">music21.instrument.</tt><tt class="descname">transposition</tt></dt>
-<dd></dd></dl>
-
-</blockquote>
-</div>
-<div class="section" id="id13">
-<h3>Properties (Inherited)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.StringInstrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">stringPitches</span></tt></p>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">mx</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
-</div>
-<div class="section" id="id14">
-<h3>Methods (Inherited)<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <p>Inherited from instrument.Instrument (of module <a class="reference internal" href="#moduleinstrument"><em>music21.instrument</em></a>): <tt class="docutils literal"><span class="pre">bestName()</span></tt>, <tt class="docutils literal"><span class="pre">partIdRandomize()</span></tt></p>
 <p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -606,7 +504,7 @@ class </em><tt class="descclassname">music21.instrument.</tt><tt class="descname
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

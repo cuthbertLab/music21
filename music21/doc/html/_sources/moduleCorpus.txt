@@ -13,13 +13,13 @@ The music21 corpus provides a collection of public-domain music in MusicXML, Hum
 
 .. function:: parseWork()
 
-    Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
+Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
 
 >>> aStream = parseWork('opus74no1/movement3')
 
 .. function:: getWork()
 
-    Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
 >>> import os
 >>> a = getWork('opus74no2', 4)
@@ -33,7 +33,7 @@ True
 
 .. function:: getPaths()
 
-    Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
+Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
 
 >>> a = getPaths()
 >>> len(a) > 30
@@ -44,7 +44,7 @@ True
 
 .. function:: getBeethovenStringQuartets()
 
-    
+
 
 >>> a = getBeethovenStringQuartets()
 >>> len(a) > 10
@@ -58,7 +58,7 @@ False
 
 .. function:: getComposer()
 
-    Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
+Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
 
 >>> a = getComposer('beethoven')
 >>> len(a) > 10
@@ -75,11 +75,11 @@ True
 
 .. function:: getWorkList()
 
-    Search the corpus and return a list of works, alway in a list. If no matches are found, an empty list is returned. 
+Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned. 
 
 .. function:: getComposerDir()
 
-    Given the name of a composer, get the path to the top-level directory of that composer 
+Given the name of a composer, get the path to the top-level directory of that composer 
 
 >>> import os
 >>> a = getComposerDir('beethoven')
@@ -97,7 +97,7 @@ True
 
 .. function:: getBachChorales()
 
-    
+
 
 >>> a = getBachChorales()
 >>> len(a) > 10

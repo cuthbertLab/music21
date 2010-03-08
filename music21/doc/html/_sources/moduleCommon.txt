@@ -13,7 +13,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: fromRoman()
 
-    
+
 
 >>> fromRoman('ii')
 2 
@@ -22,7 +22,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: toRoman()
 
-    
+
 
 >>> toRoman(2)
 'II' 
@@ -31,22 +31,22 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: EuclidGCD()
 
-    use Euclid's algorithm to find the GCD of a and b 
+use Euclid's algorithm to find the GCD of a and b 
 
 .. function:: getMd5()
 
-    Return a string from an md5 haslib 
+Return a string from an md5 haslib 
 
 >>> getMd5('test')
 '098f6bcd4621d373cade4e832627b4f6' 
 
 .. function:: dirPartitioned()
 
-    Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
+Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
 
 .. function:: findFormatFile()
 
-    Given a file path (relative or absolute) return the format 
+Given a file path (relative or absolute) return the format 
 
 >>> findFormatFile('test.xml')
 'musicxml' 
@@ -65,7 +65,7 @@ On a windows networked filesystem
 
 .. function:: findInputExtension()
 
-    Given an input format, find and return all possible input extensions. 
+Given an input format, find and return all possible input extensions. 
 
 >>> a = findInputExtension('musicxml')
 >>> a
@@ -79,7 +79,7 @@ On a windows networked filesystem
 
 .. function:: lcm()
 
-    
+
 
 >>> lcm([3,4,5])
 60 
@@ -92,7 +92,7 @@ On a windows networked filesystem
 
 .. function:: unwrapWeakref()
 
-    utility function that gets an object that might be an object itself or a weak reference to an object. 
+utility function that gets an object that might be an object itself or a weak reference to an object. 
 
 >>> class Mock(object): pass
 >>> a1 = Mock()
@@ -108,7 +108,7 @@ True
 
 .. function:: isIterable()
 
-    Returns True if is the object can be iter'd over 
+Returns True if is the object can be iter'd over 
 
 >>> isIterable([])
 True 
@@ -122,7 +122,7 @@ True
 
 .. function:: isPowerOfTwo()
 
-    returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
+returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
 
 >>> isPowerOfTwo(3)
 False 
@@ -137,7 +137,7 @@ True
 
 .. function:: stripAddresses()
 
-    Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
+Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
 
 >>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
 '{0.0} <music21.clef.TrebleClef object at ADDRESS>' 
@@ -147,7 +147,7 @@ while this is left alone:
 
 .. function:: isWeakref()
 
-    Test if an object is a weakref 
+Test if an object is a weakref 
 
 >>> class Mock(object): pass
 >>> a1 = Mock()
@@ -161,7 +161,7 @@ True
 
 .. function:: isStr()
 
-    Check of usrData is some form of string, including unicode. 
+Check of usrData is some form of string, including unicode. 
 
 >>> isStr(3)
 False 
@@ -172,7 +172,7 @@ True
 
 .. function:: dotMultiplier()
 
-    dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
+dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
 
 >>> dotMultiplier(1)
 1.5 
@@ -183,7 +183,7 @@ True
 
 .. function:: basicallyEqual()
 
-    returns true if a and b are equal except for whitespace differences 
+returns true if a and b are equal except for whitespace differences 
 
 >>> a = " hello there "
 >>> b = "hello there"
@@ -195,7 +195,7 @@ False
 
 .. function:: isNum()
 
-    check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
+check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
 
 >>> isNum(3.0)
 True 
@@ -206,11 +206,11 @@ False
 
 .. function:: getPlatform()
 
-    Shared function to get platform names. 
+Shared function to get platform names. 
 
 .. function:: findFormat()
 
-    Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
+Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
 
 >>> findFormat('mx')
 ('musicxml', '.xml') 
@@ -231,18 +231,18 @@ False
 
 .. function:: greaterThan()
 
-    greaterThan returns True if x is greater than and not almostEquals y 
+greaterThan returns True if x is greater than and not almostEquals y 
 
 .. function:: sortFilesRecent()
 
-    Given two files, sort by most recent. Return only the file paths. 
+Given two files, sort by most recent. Return only the file paths. 
 
 >>> a = os.listdir(os.curdir)
 >>> b = sortFilesRecent(a)
 
 .. function:: isListLike()
 
-    Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
+Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
 
 >>> isListLike([])
 True 
@@ -256,27 +256,27 @@ False
 
 .. function:: almostEquals()
 
-    The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
+The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
 
 .. function:: sortModules()
 
-    Sort a lost of imported module names such that most recently modified is first 
+Sort a lost of imported module names such that most recently modified is first 
 
 .. function:: decimalToTuplet()
 
-    For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
+For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
 
 .. function:: wrapWeakref()
 
-    utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
+utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
 
 .. function:: lessThan()
 
-    lessThan -- returns True if x is less than and not almostEquals y 
+lessThan -- returns True if x is less than and not almostEquals y 
 
 .. function:: formatStr()
 
-    Format one or more data elements into string suitable for printing straight to stderr or other outputs 
+Format one or more data elements into string suitable for printing straight to stderr or other outputs 
 
 >>> a = formatStr('test', '1', 2, 3)
 >>> print a
@@ -285,11 +285,11 @@ test 1 2 3
 
 .. function:: greaterThanOrEqual()
 
-    greaterThan returns True if x is greater than or almostEquals y 
+greaterThan returns True if x is greater than or almostEquals y 
 
 .. function:: findSimpleFraction()
 
-    
+
 Class Scalar
 ------------
 
@@ -297,27 +297,21 @@ Class Scalar
 
     for those of us who miss perl scalars.... 
 
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: valType
 
     .. attribute:: value
 
-Methods
-~~~~~~~
-
     .. method:: toFloat()
 
-    
+
     .. method:: toInt()
 
-    
+
     .. method:: toUnicode()
 
-    
+
 
 Class defList
 -------------
@@ -328,15 +322,9 @@ Class defList
 
     Inherits from: list
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: callDefault
 
     .. attribute:: default
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 
@@ -350,15 +338,9 @@ Class defHash
 
     Inherits from: dict
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: callDefault
 
     .. attribute:: default
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from dict: ``clear()``, ``copy()``, ``fromkeys()``, ``get()``, ``has_key()``, ``items()``, ``iteritems()``, ``iterkeys()``, ``itervalues()``, ``keys()``, ``pop()``, ``popitem()``, ``setdefault()``, ``update()``, ``values()``
 
@@ -370,21 +352,18 @@ Class Timer
 
     An object for timing. 
 
-    Inherits from: 
-
-Methods
-~~~~~~~
+    
 
     .. method:: clear()
 
-    
+
     .. method:: start()
 
-        Explicit start method; will clear previous values. Start always happens on initialization. 
+    Explicit start method; will clear previous values. Start always happens on initialization. 
 
     .. method:: stop()
 
-    
+
 
 Class Iterator
 --------------
@@ -393,12 +372,9 @@ Class Iterator
 
     A simple Iterator object used to handle iteration of Streams and other list-like objects. 
 
-    Inherits from: 
-
-Methods
-~~~~~~~
+    
 
     .. method:: next()
 
-    
+
 

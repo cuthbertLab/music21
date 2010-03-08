@@ -12,15 +12,16 @@ Class Instrument
 
 .. class:: Instrument
 
-    
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: instrumentAbbreviation
 
@@ -38,33 +39,21 @@ Attributes
 
     .. attribute:: transposition
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: mx
-
-        
 
     
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
+    
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: bestName()
 
-        Find a viable name, looking first at instrument, then part, then abbreviations. 
+    Find a viable name, looking first at instrument, then part, then abbreviations. 
 
     .. method:: partIdRandomize()
 
-        Force a unique id by using an MD5 
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
+    Force a unique id by using an MD5 
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -74,15 +63,16 @@ Class Violoncello
 
 .. class:: Violoncello
 
-    
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: instrumentAbbreviation
 
@@ -102,17 +92,11 @@ Attributes
 
     .. attribute:: transposition
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
 
@@ -124,15 +108,16 @@ Class StringInstrument
 
 .. class:: StringInstrument
 
-    
-    Inherits from: instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: instrumentAbbreviation
 
@@ -150,12 +135,9 @@ Attributes
 
     .. attribute:: transposition
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: stringPitches
 
-        stringPitches is a property that stores a list of Pitches (or pitch names, such as "C4") that represent the pitch of the open strings from lowest to highest[#reentrant]_ 
+    stringPitches is a property that stores a list of Pitches (or pitch names, such as "C4") that represent the pitch of the open strings from lowest to highest[#reentrant]_ 
 
     >>> vln1 = Violin()
     >>> vln1.stringPitches
@@ -172,18 +154,9 @@ Properties
     highest.  The same would hold true for certain violin scordatura pieces, such 
     as some of Biber's *Mystery Sonatas* 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
 
@@ -195,15 +168,16 @@ Class Viola
 
 .. class:: Viola
 
-    
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: instrumentAbbreviation
 
@@ -223,17 +197,11 @@ Attributes
 
     .. attribute:: transposition
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
 
@@ -245,15 +213,16 @@ Class Violin
 
 .. class:: Violin
 
-    
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: instrumentAbbreviation
 
@@ -273,17 +242,11 @@ Attributes
 
     .. attribute:: transposition
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
 

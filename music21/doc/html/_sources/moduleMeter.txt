@@ -9,14 +9,14 @@ music21.meter
 
 .. function:: fractionToSlashMixed()
 
-    Given a lost of fraction values, compact numerators by sum if denominators are the same 
+Given a lost of fraction values, compact numerators by sum if denominators are the same 
 
 >>> fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])
 [('3+2+5', 8), ('3', 4), ('2+1+4', 16)] 
 
 .. function:: slashCompoundToFraction()
 
-    
+
 
 >>> slashCompoundToFraction('3/8+2/8')
 [(3, 8), (2, 8)] 
@@ -29,7 +29,7 @@ music21.meter
 
 .. function:: fractionSum()
 
-    Given a list of fractions represented as a list, find the sum 
+Given a list of fractions represented as a list, find the sum 
 
 >>> fractionSum([(3,8), (5,8), (1,8)])
 (9, 8) 
@@ -44,7 +44,7 @@ music21.meter
 
 .. function:: slashMixedToFraction()
 
-    Given a mixture if possible meter fraction representations, return a list of pairs. If originally given as a summed numerator; break into separate fractions. 
+Given a mixture if possible meter fraction representations, return a list of pairs. If originally given as a summed numerator; break into separate fractions. 
 
 >>> slashMixedToFraction('3/8+2/8')
 ([(3, 8), (2, 8)], False) 
@@ -63,7 +63,7 @@ MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
 
 .. function:: slashToFraction()
 
-    
+
 
 >>> slashToFraction('3/8')
 (3, 8) 
@@ -75,11 +75,8 @@ Class TimeSignature
 
 .. class:: TimeSignature
 
-    
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: accent
 
@@ -91,7 +88,11 @@ Attributes
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: inherited
 
@@ -101,12 +102,9 @@ Attributes
 
     .. attribute:: symbolizeDenominator
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: barDuration
 
-        barDuration gets or sets a duration value that is equal in length to the totalLength 
+    barDuration gets or sets a duration value that is equal in length to the totalLength 
 
     >>> a = TimeSignature('3/8')
     >>> d = a.barDuration
@@ -119,7 +117,7 @@ Properties
 
     .. attribute:: beatLengthToQuarterLengthRatio
 
-        
+    
 
     >>> a = TimeSignature('3/2')
     >>> a.beatLengthToQuarterLengthRatio
@@ -127,10 +125,10 @@ Properties
 
     .. attribute:: denominator
 
-    
+
     .. attribute:: lily
 
-        returns the lilypond representation of the timeSignature 
+    returns the lilypond representation of the timeSignature 
 
     >>> a = TimeSignature('3/16')
     >>> a.lily
@@ -138,11 +136,11 @@ Properties
 
     .. attribute:: musicxml
 
-        Return a complete MusicXML string 
+    Return a complete MusicXML string 
 
     .. attribute:: mx
 
-        Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements 
+    Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements 
 
     >>> a = TimeSignature('3/4')
     >>> b = a.mx
@@ -153,24 +151,18 @@ Properties
 
     .. attribute:: numerator
 
-    
+
     .. attribute:: quarterLengthToBeatLengthRatio
 
-    
+
     .. attribute:: totalLength
 
-    
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
 
-Methods
-~~~~~~~
-
     .. method:: getAccent()
 
-        Return true or false if the qLenPos is at the start of an accent division 
+    Return true or false if the qLenPos is at the start of an accent division 
 
     >>> a = TimeSignature('3/4', 3)
     >>> a.accent.partition([2,1])
@@ -185,11 +177,11 @@ Methods
 
     .. method:: getAccentWeight()
 
-        Given a qLenPos,  return an accent level. 
+    Given a qLenPos,  return an accent level. 
 
     .. method:: getBeams()
 
-        Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations. 
+    Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations. 
 
     >>> a = TimeSignature('2/4', 2)
     >>> a.beam[0] = a.beam[0].subdivide(2)
@@ -210,7 +202,7 @@ Methods
 
     .. method:: getBeat()
 
-        Given a quarterLenght position, get the beat, where beats count from 1 
+    Given a quarterLenght position, get the beat, where beats count from 1 
 
     >>> a = TimeSignature('3/4', 3)
     >>> a.getBeat(0)
@@ -223,7 +215,7 @@ Methods
 
     .. method:: getBeatDepth()
 
-        
+    
 
     >>> a = TimeSignature('3/4', 3)
     >>> a.getBeatDepth(0)
@@ -246,7 +238,7 @@ Methods
 
     .. method:: getBeatProgress()
 
-        Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is. 
+    Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is. 
 
     >>> a = TimeSignature('3/4', 3)
     >>> a.getBeatProgress(0)
@@ -261,23 +253,23 @@ Methods
 
     .. method:: load()
 
-        Loading a meter destroys all internal representations 
+    Loading a meter destroys all internal representations 
 
     .. method:: loadRatio()
 
-        Convenience method 
+    Convenience method 
 
     .. method:: quarterPositionToBeat()
 
-        For backward compatibility. Ultimately, remove. 
+    For backward compatibility. Ultimately, remove. 
 
     .. method:: ratioEqual()
 
-        A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio. 
+    A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio. 
 
     .. method:: setAccentWeight()
 
-        Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument. 
+    Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument. 
 
     >>> a = TimeSignature('4/4', 4)
     >>> len(a.accent)
@@ -296,7 +288,7 @@ Methods
 
     .. method:: setDisplay()
 
-        Set an indendent display value 
+    Set an indendent display value 
 
     >>> a = TimeSignature()
     >>> a.load('3/4')
@@ -311,9 +303,6 @@ Methods
     >>> a.display
     <MeterSequence {3/4}> 
 
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
@@ -322,11 +311,8 @@ Class CompoundTimeSignature
 
 .. class:: CompoundTimeSignature
 
-    
-    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: accent
 
@@ -338,7 +324,11 @@ Attributes
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: inherited
 
@@ -348,15 +338,9 @@ Attributes
 
     .. attribute:: symbolizeDenominator
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
@@ -368,11 +352,8 @@ Class NonPowerOfTwoTimeSignature
 
 .. class:: NonPowerOfTwoTimeSignature
 
-    
-    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
+    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
     .. attribute:: accent
 
@@ -384,7 +365,11 @@ Attributes
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: inherited
 
@@ -394,15 +379,9 @@ Attributes
 
     .. attribute:: symbolizeDenominator
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
@@ -416,33 +395,30 @@ Class MeterTerminal
 
     A MeterTerminal is a nestable primitive of rhythmic division 
 
->>> a = MeterTerminal('2/4')
->>> a.duration.quarterLength
-2.0 
->>> a = MeterTerminal('3/8')
->>> a.duration.quarterLength
-1.5 
->>> a = MeterTerminal('5/2')
->>> a.duration.quarterLength
-10.0 
+    >>> a = MeterTerminal('2/4')
+    >>> a.duration.quarterLength
+    2.0 
+    >>> a = MeterTerminal('3/8')
+    >>> a.duration.quarterLength
+    1.5 
+    >>> a = MeterTerminal('5/2')
+    >>> a.duration.quarterLength
+    10.0 
 
+    
 
-
-    Inherits from: 
-
-Properties
-~~~~~~~~~~
+    
 
     .. attribute:: denominator
 
-    
+
     .. attribute:: depth
 
-        Return how many levels deep this part is. Depth of a terminal is always 1 
+    Return how many levels deep this part is. Depth of a terminal is always 1 
 
     .. attribute:: duration
 
-        barDuration gets or sets a duration value that is equal in length to the totalLength 
+    barDuration gets or sets a duration value that is equal in length to the totalLength 
 
     >>> a = MeterTerminal()
     >>> a.numerator = 3
@@ -457,24 +433,21 @@ Properties
 
     .. attribute:: numerator
 
-    
+
     .. attribute:: weight
 
-    
-Methods
-~~~~~~~
 
     .. method:: ratioEqual()
 
-        Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8 
+    Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8 
 
     .. method:: subdivide()
 
-        Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count 
+    Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count 
 
     .. method:: subdivideByCount()
 
-        retrun a MeterSequence 
+    retrun a MeterSequence 
 
     >>> a = MeterTerminal('3/4')
     >>> b = a.subdivideByCount(3)
@@ -485,7 +458,7 @@ Methods
 
     .. method:: subdivideByList()
 
-        Return a MeterSequence countRequest is within the context of the beatIndex 
+    Return a MeterSequence countRequest is within the context of the beatIndex 
 
     >>> a = MeterTerminal('3/4')
     >>> b = a.subdivideByList([1,1,1])
@@ -502,9 +475,6 @@ Class DurationDenominatorTimeSignature
 
     Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: accent
 
     .. attribute:: beam
@@ -515,7 +485,11 @@ Attributes
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: inherited
 
@@ -525,15 +499,9 @@ Attributes
 
     .. attribute:: symbolizeDenominator
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
@@ -549,19 +517,13 @@ Class MeterSequence
 
     Inherits from: meter.MeterTerminal (of module :ref:`moduleMeter`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: parenthesis
 
     .. attribute:: summedNumerator
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: flat
 
-        Retrun a new MeterSequence composed of the flattend representation. 
+    Retrun a new MeterSequence composed of the flattend representation. 
 
     >>> a = MeterSequence('3/4', 3)
     >>> b = a.flat
@@ -582,21 +544,15 @@ Properties
 
     .. attribute:: flatWeight
 
-        Retrun a list of flat weight valuess 
+    Retrun a list of flat weight valuess 
 
     
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``denominator``, ``depth``, ``duration``, ``numerator``, ``weight``
-
-Methods
-~~~~~~~
 
     .. method:: getLevel()
 
-        Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth. 
+    Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth. 
 
     >>> b = MeterSequence('4/4', 4)
     >>> b[1] = b[1].subdivide(2)
@@ -613,7 +569,7 @@ Methods
 
     .. method:: getLevelSpan()
 
-        For a given level, return the time span of each terminal or sequnece 
+    For a given level, return the time span of each terminal or sequnece 
 
     >>> b = MeterSequence('4/4', 4)
     >>> b[1] = b[1].subdivide(2)
@@ -630,7 +586,7 @@ Methods
 
     .. method:: getLevelWeight()
 
-        The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here 
+    The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here 
 
     >>> a = MeterSequence('4/4', 4)
     >>> a.getLevelWeight()
@@ -654,7 +610,7 @@ Methods
 
     .. method:: load()
 
-        This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight 
+    This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight 
 
     >>> a = MeterSequence()
     >>> a.load('4/4', 4)
@@ -674,7 +630,7 @@ Methods
 
     .. method:: partition()
 
-        Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
+    Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
 
     >>> a = MeterSequence('5/4+3/8')
     >>> len(a)
@@ -691,7 +647,7 @@ Methods
 
     .. method:: partitionByCount()
 
-        This will destroy any struct in the _partition 
+    This will destroy any struct in the _partition 
 
     >>> a = MeterSequence('4/4')
     >>> a.partitionByCount(2)
@@ -703,7 +659,7 @@ Methods
 
     .. method:: partitionByList()
 
-        Given a numerator list, partition MeterSequence inot a new list of MeterTerminals 
+    Given a numerator list, partition MeterSequence inot a new list of MeterTerminals 
 
     >>> a = MeterSequence('4/4')
     >>> a.partitionByList([1,1,1,1])
@@ -720,7 +676,7 @@ Methods
 
     .. method:: partitionByOther()
 
-        Set partition to that found in another object 
+    Set partition to that found in another object 
 
     >>> a = MeterSequence('4/4', 4)
     >>> b = MeterSequence('4/4', 2)
@@ -730,7 +686,7 @@ Methods
 
     .. method:: positionToAddress()
 
-        Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen. 
+    Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen. 
 
     >>> a = MeterSequence('3/4', 3)
     >>> a[1] = a[1].subdivide(4)
@@ -757,7 +713,7 @@ Methods
 
     .. method:: positionToDepth()
 
-        Given a qLenPos, return the maximum available depth at this position 
+    Given a qLenPos, return the maximum available depth at this position 
 
     >>> b = MeterSequence('4/4', 4)
     >>> b[1] = b[1].subdivide(2)
@@ -776,7 +732,7 @@ Methods
 
     .. method:: positionToIndex()
 
-        Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence 
+    Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence 
 
     >>> a = MeterSequence('4/4')
     >>> a.positionToIndex(5)
@@ -801,7 +757,7 @@ Methods
 
     .. method:: positionToSpan()
 
-        Given a lenPos, return the span of the active region. Only applies to the top most level of partitions 
+    Given a lenPos, return the span of the active region. Only applies to the top most level of partitions 
 
     >>> a = MeterSequence('3/4', 3)
     >>> a.positionToSpan(.5)
@@ -810,9 +766,6 @@ Methods
     (1.0, 2.0) 
 
     
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
 

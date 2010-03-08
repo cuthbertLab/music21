@@ -48,19 +48,8 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.editorial</a><ul>
-<li><a class="reference external" href="#class-noteeditorial">Class NoteEditorial</a><ul>
-<li><a class="reference external" href="#attributes">Attributes</a></li>
-<li><a class="reference external" href="#properties">Properties</a></li>
-<li><a class="reference external" href="#properties-inherited">Properties (Inherited)</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
-<li><a class="reference external" href="#methods-inherited">Methods (Inherited)</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#class-comment">Class Comment</a><ul>
-<li><a class="reference external" href="#id1">Properties</a></li>
-<li><a class="reference external" href="#id2">Methods</a></li>
-</ul>
-</li>
+<li><a class="reference external" href="#class-noteeditorial">Class NoteEditorial</a></li>
+<li><a class="reference external" href="#class-comment">Class Comment</a></li>
 </ul>
 </li>
 </ul>
@@ -105,108 +94,87 @@
 <dt id="music21.editorial.NoteEditorial">
 <em class="property">
 class </em><tt class="descclassname">music21.editorial.</tt><tt class="descname">NoteEditorial</tt><a class="headerlink" href="#music21.editorial.NoteEditorial" title="Permalink to this definition">¶</a></dt>
-<dd>EditorialComments that can be applied to notes</dd></dl>
-
+<dd><p>EditorialComments that can be applied to notes</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">NoteEditorial</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">misc</span>
 <span class="go">{}</span>
 </pre></div>
 </div>
-<blockquote>
-Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</blockquote>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
 <dl class="attribute">
-<dt id="music21.editorial.color">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">color</tt><a class="headerlink" href="#music21.editorial.color" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.color">
+<tt class="descname">color</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.color" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.comment">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">comment</tt><a class="headerlink" href="#music21.editorial.comment" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.comment">
+<tt class="descname">comment</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.comment" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.ficta">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">ficta</tt><a class="headerlink" href="#music21.editorial.ficta" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.ficta">
+<tt class="descname">ficta</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.ficta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.harmonicInterval">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">harmonicInterval</tt><a class="headerlink" href="#music21.editorial.harmonicInterval" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.harmonicInterval">
+<tt class="descname">harmonicInterval</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.harmonicInterval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.melodicInterval">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">melodicInterval</tt><a class="headerlink" href="#music21.editorial.melodicInterval" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.melodicInterval">
+<tt class="descname">melodicInterval</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicInterval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.melodicIntervalOverRests">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">melodicIntervalOverRests</tt><a class="headerlink" href="#music21.editorial.melodicIntervalOverRests" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.melodicIntervalOverRests">
+<tt class="descname">melodicIntervalOverRests</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervalOverRests" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.melodicIntervals">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">melodicIntervals</tt><a class="headerlink" href="#music21.editorial.melodicIntervals" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.melodicIntervals">
+<tt class="descname">melodicIntervals</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervals" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.melodicIntervalsOverRests">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">melodicIntervalsOverRests</tt><a class="headerlink" href="#music21.editorial.melodicIntervalsOverRests" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.melodicIntervalsOverRests">
+<tt class="descname">melodicIntervalsOverRests</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervalsOverRests" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="music21.editorial.misc">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">misc</tt><a class="headerlink" href="#music21.editorial.misc" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.misc">
+<tt class="descname">misc</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.misc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="properties-inherited">
-<h3>Properties (Inherited)<a class="headerlink" href="#properties-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></blockquote>
-</div>
-<div class="section" id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<blockquote>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
-<dt id="music21.editorial.colorLilyStart">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">colorLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.colorLilyStart" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.colorLilyStart">
+<tt class="descname">colorLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.colorLilyStart" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.editorial.fictaLilyStart">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">fictaLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.fictaLilyStart" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.fictaLilyStart">
+<tt class="descname">fictaLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.fictaLilyStart" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.editorial.lilyAttached">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">lilyAttached</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.lilyAttached" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.lilyAttached">
+<tt class="descname">lilyAttached</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyAttached" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.editorial.lilyEnd">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">lilyEnd</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.lilyEnd" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.lilyEnd">
+<tt class="descname">lilyEnd</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyEnd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="music21.editorial.lilyStart">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">lilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.lilyStart" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.NoteEditorial.lilyStart">
+<tt class="descname">lilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyStart" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="methods-inherited">
-<h3>Methods (Inherited)<a class="headerlink" href="#methods-inherited" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></blockquote>
-</div>
+<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+</dd></dl>
+
 </div>
 <div class="section" id="class-comment">
 <h2>Class Comment<a class="headerlink" href="#class-comment" title="Permalink to this headline">¶</a></h2>
@@ -214,28 +182,18 @@ Inherited from base.Music21Object (of module <a class="reference external" href=
 <dt id="music21.editorial.Comment">
 <em class="property">
 class </em><tt class="descclassname">music21.editorial.</tt><tt class="descname">Comment</tt><a class="headerlink" href="#music21.editorial.Comment" title="Permalink to this definition">¶</a></dt>
-<dd>Inherits from:</dd></dl>
-
-<div class="section" id="id1">
-<h3>Properties<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<dl class="attribute">
-<dt id="music21.editorial.lily">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">lily</tt><a class="headerlink" href="#music21.editorial.lily" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="music21.editorial.Comment.lily">
+<tt class="descname">lily</tt><a class="headerlink" href="#music21.editorial.Comment.lily" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
-<div class="section" id="id2">
-<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<blockquote>
 <dl class="method">
-<dt id="music21.editorial.text">
-<tt class="descclassname">music21.editorial.</tt><tt class="descname">text</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.text" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.editorial.Comment.text">
+<tt class="descname">text</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.Comment.text" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</blockquote>
-</div>
+</dd></dl>
+
 </div>
 </div>
 
@@ -265,7 +223,7 @@ class </em><tt class="descclassname">music21.editorial.</tt><tt class="descname"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 06, 2010.
+      Last updated on Mar 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

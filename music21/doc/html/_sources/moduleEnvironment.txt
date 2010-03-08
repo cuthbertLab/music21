@@ -14,48 +14,42 @@ Class Environment
 
     Environment stores platform-specific, user preferences 
 
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: modNameParent
 
     .. attribute:: ref
 
-Methods
-~~~~~~~
-
     .. method:: getSettingsPath()
 
-        Return the path to the platform specific settings file. 
+    Return the path to the platform specific settings file. 
 
     .. method:: getTempFile()
 
-        Return a file path to a temporary file with the specified suffix 
+    Return a file path to a temporary file with the specified suffix 
 
     .. method:: keys()
 
-    
+
     .. method:: launch()
 
-        Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI 
+    Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI 
 
     .. method:: loadDefaults()
 
-        Keys are derived from these defaults 
+    Keys are derived from these defaults 
 
     .. method:: printDebug()
 
-        Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+    Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
     .. method:: read()
 
-        Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+    Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
 
     .. method:: write()
 
-        Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref 
+    Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref 
 
 
 Class Preference
@@ -65,22 +59,13 @@ Class Preference
 
     
 
-
+    
 
     Inherits from: node.Node (of module :ref:`moduleNode`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: charData
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
@@ -92,24 +77,15 @@ Class Settings
 
     
 
-
+    
 
     Inherits from: node.NodeList (of module :ref:`moduleNode`), node.Node (of module :ref:`moduleNode`)
-
-Attributes
-~~~~~~~~~~
 
     .. attribute:: charData
 
     .. attribute:: componentList
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from node.NodeList (of module :ref:`moduleNode`): ``append()``
 

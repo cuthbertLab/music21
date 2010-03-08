@@ -22,39 +22,35 @@ Class Music21Object
 
 .. class:: Music21Object
 
-    Base class for all music21 objects All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
+    Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
 
-Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
+    Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
 
-
-
-    Inherits from: 
-
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
 
-Properties
-~~~~~~~~~~
+    Unique identification string. 
 
     .. attribute:: duration
 
-        Get and set the duration of this object as a Duration object. 
+    Get and set the duration of this object as a Duration object. 
 
     .. attribute:: offset
 
-        The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths. 
+    The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths. 
 
     .. attribute:: parent
 
-        A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
+    A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
 
     .. attribute:: priority
 
-        Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
+    Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
 
     >>> a = Music21Object()
     >>> a.priority = 3
@@ -62,12 +58,9 @@ Properties
     Traceback (most recent call last): 
     ElementException: priority values must be integers. 
 
-Methods
-~~~~~~~
-
     .. method:: addContext()
 
-        Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
+    Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
 
     >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
@@ -79,7 +72,7 @@ Methods
 
     .. method:: addLocationAndParent()
 
-        ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
+    ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
 
     >>> from stream import Stream
     >>> st1 = Stream()
@@ -95,7 +88,7 @@ Methods
 
     .. method:: getContextAttr()
 
-        Given the name of an attribute, search Conctexts and return the best match. 
+    Given the name of an attribute, search Conctexts and return the best match. 
 
     >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
@@ -107,11 +100,11 @@ Methods
 
     .. method:: getContextByClass()
 
-        Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+    Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
     .. method:: getOffsetBySite()
 
-        If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
+    If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
 
     >>> a = Music21Object()
     >>> a.offset = 30
@@ -120,18 +113,18 @@ Methods
 
     .. method:: id()
 
-    
+
     .. method:: isClass()
 
-        returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
+    returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
     .. method:: searchParent()
 
-        If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
+    If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
 
     .. method:: setContextAttr()
 
-        Given the name of an attribute, search Conctexts and return the best match. 
+    Given the name of an attribute, search Conctexts and return the best match. 
 
     >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
@@ -146,11 +139,11 @@ Methods
 
     .. method:: show()
 
-        Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
+    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
     .. method:: write()
 
-        Write a file. A None file path will result in temporary file 
+    Write a file. A None file path will result in temporary file 
 
 
 Class ElementWrapper
@@ -160,27 +153,18 @@ Class ElementWrapper
 
     An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the ElementWrapper will call Object is now mandatory -- calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object. 
 
-
+    
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``id``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
 
     .. method:: getId()
 
-    
+
     .. method:: isTwin()
 
-        a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
+    a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
 
     >>> import note
     >>> aE = ElementWrapper(obj = note.Note("A-"))
@@ -204,12 +188,9 @@ Methods
 
     .. method:: obj()
 
-    
+
     .. method:: setId()
 
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -221,24 +202,21 @@ Class DefinedContexts
 
     An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
 
+    
 
-
-    Inherits from: 
-
-Methods
-~~~~~~~
+    
 
     .. method:: add()
 
-        Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
+    Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
 
     .. method:: clear()
 
-        Clear all data. 
+    Clear all data. 
 
     .. method:: get()
 
-        Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
+    Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
 
     >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
@@ -255,7 +233,7 @@ Methods
 
     .. method:: getAttrByName()
 
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
     >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
@@ -275,7 +253,7 @@ Methods
 
     .. method:: getByClass()
 
-        Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
+    Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 
     >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
@@ -290,7 +268,7 @@ Methods
 
     .. method:: getOffsetBySite()
 
-        For a given site return its offset. 
+    For a given site return its offset. 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -306,7 +284,7 @@ Methods
 
     .. method:: getOffsetBySiteId()
 
-        For a given site id, return its offset. 
+    For a given site id, return its offset. 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -322,7 +300,7 @@ Methods
 
     .. method:: getOffsets()
 
-        Return a list of all offsets. 
+    Return a list of all offsets. 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -339,7 +317,7 @@ Methods
 
     .. method:: getSiteByOffset()
 
-        For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
+    For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -353,7 +331,7 @@ Methods
 
     .. method:: getSites()
 
-        Get parents for locations; unwrap from weakrefs 
+    Get parents for locations; unwrap from weakrefs 
 
     >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
@@ -368,11 +346,11 @@ Methods
 
     .. method:: hasSiteId()
 
-        Return True or False if this DefinedContexts object already has this site defined as a location 
+    Return True or False if this DefinedContexts object already has this site defined as a location 
 
     .. method:: remove()
 
-        Remove the entry specified by sites 
+    Remove the entry specified by sites 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -394,10 +372,10 @@ Methods
 
     .. method:: removeById()
 
-    
+
     .. method:: setAttrByName()
 
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+    Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
     >>> class Mock(Music21Object): attr1=234
     >>> aObj = Mock()
@@ -412,7 +390,7 @@ Methods
 
     .. method:: setOffsetBySite()
 
-        Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
+    Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
 
     >>> class Mock(Music21Object): pass
     >>> aSite = Mock()
@@ -436,18 +414,15 @@ Class Groups
 
     A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
 
->>> g = Groups()
->>> g.append("hello")
->>> g[0]
-'hello' 
->>> g.append(5)
-Traceback (most recent call last): 
-GroupException: Only strings can be used as list names 
+    >>> g = Groups()
+    >>> g.append("hello")
+    >>> g[0]
+    'hello' 
+    >>> g.append(5)
+    Traceback (most recent call last): 
+    GroupException: Only strings can be used as list names 
 
     Inherits from: list
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 

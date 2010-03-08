@@ -9,7 +9,7 @@ music21.dynamics
 
 .. function:: unitIntervalToName()
 
-    Given a unit interfal value, map to a dynamic name 
+Given a unit interfal value, map to a dynamic name 
 
 Class Dynamic
 -------------
@@ -20,14 +20,15 @@ Class Dynamic
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: englishName
 
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: longName
 
@@ -43,16 +44,13 @@ Attributes
 
     .. attribute:: value
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. 
+    Provide a complete MusicXM: representation. 
 
     .. attribute:: mx
 
-        returns a musicxml.Direction object 
+    returns a musicxml.Direction object 
 
     >>> a = Dynamic('ppp')
     >>> a.posRelativeY = -10
@@ -62,16 +60,7 @@ Properties
     >>> b.get('placement')
     'below' 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
@@ -85,12 +74,13 @@ Class Wedge
 
     Inherits from: base.Music21Object (of module :ref:`moduleBase`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: groups
 
+    An instance of a Group object. 
+
     .. attribute:: id
+
+    Unique identification string. 
 
     .. attribute:: posPlacement
 
@@ -98,12 +88,9 @@ Attributes
 
     .. attribute:: type
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: mx
 
-        returns a musicxml.Direction object 
+    returns a musicxml.Direction object 
 
     >>> a = Wedge()
     >>> a.type = 'crescendo'
@@ -112,16 +99,7 @@ Properties
     >>> mxWedge.get('type')
     'crescendo' 
 
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
-
-Methods
-~~~~~~~
-
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 

@@ -9,42 +9,33 @@ music21.node
 
 .. function:: fixed_writexml()
 
-    
+
 Class Node
 ----------
 
 .. class:: Node
 
-    
-    Inherits from: 
 
-Attributes
-~~~~~~~~~~
+    
 
     .. attribute:: charData
 
-Properties
-~~~~~~~~~~
-
     .. attribute:: tag
 
-    
-Methods
-~~~~~~~
 
     .. method:: get()
 
-    
+
     .. method:: getNewDoc()
 
-    
+
     .. method:: loadAttrs()
 
-        Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
+    Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
 
     .. method:: merge()
 
-        Given another similar or commonly used Node object, combine all attributes and return a new object. 
+    Given another similar or commonly used Node object, combine all attributes and return a new object. 
 
     >>> a = Node()
     >>> a.set('charData', 'green')
@@ -55,18 +46,18 @@ Methods
 
     .. method:: set()
 
-    
+
     .. method:: setDefaults()
 
-        provide defaults for all necessary attributes at this level 
+    provide defaults for all necessary attributes at this level 
 
     .. method:: toxml()
 
-        Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls. 
+    Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls. 
 
     .. method:: xmlStr()
 
-        Shortcut method to provide quick xml out. 
+    Shortcut method to provide quick xml out. 
 
 
 Class NodeList
@@ -78,29 +69,14 @@ Class NodeList
 
     Inherits from: node.Node (of module :ref:`moduleNode`)
 
-Attributes
-~~~~~~~~~~
-
     .. attribute:: charData
 
     .. attribute:: componentList
 
-Properties
-~~~~~~~~~~
-
-Properties (Inherited)
-~~~~~~~~~~~~~~~~~~~~~~
-
     Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
-
-Methods
-~~~~~~~
 
     .. method:: append()
 
-    
-Methods (Inherited)
-~~~~~~~~~~~~~~~~~~~
 
     Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 

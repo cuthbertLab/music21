@@ -638,7 +638,7 @@ class DefinedContexts(object):
 #-------------------------------------------------------------------------------
 class Music21Object(object):
     '''
-    Base class for all music21 objects
+    Base class for all music21 objects.
     
     All music21 objects encode 7 pieces of information:
     
@@ -656,10 +656,9 @@ class Music21Object(object):
     (8) priority  : int representing the position of an object among all
                     objects at the same offset.
 
-    
+
     Each of these may be passed in as a named keyword to any music21 object.
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)
-
     '''
 
     _duration = None
@@ -671,12 +670,14 @@ class Music21Object(object):
     _currentParent = None
     _currentParentId = None # cached id in case the weakref has gone away...
 
-    def __init__(self, *arguments, **keywords):
+    # define order to present names in documentation; use strings:
+    # deepcopy does not like actual method names
+    _DOC_ORDER = ['searchParent', 'getContextAttr', 'setContextAttr']
+    _DOC_ATTR = {'id': 'Unique identification string.',
+                 'groups': 'An instance of a Group object.'
+                     }
 
-        # define order to present names in documentation; use strings:
-        # deepcopy does not like actual method names
-        self._DOC_ORDER = ['searchParent', 'getContextAttr', 'setContextAttr']
-        self._DOC_ATTR = {}
+    def __init__(self, *arguments, **keywords):
 
         # an offset keyword arg should set the offset in location
         # not in a local parameter
