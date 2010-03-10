@@ -83,147 +83,6 @@ MODULES = [
 
 
 #-------------------------------------------------------------------------------
-# experimenting with auto documentation of modules
-# incomplete
-
-class RestructuredWriter(object):
-
-    def __init__(self):
-        pass
-
-    def _heading(self, line, headingChar='=', indent=0):
-        '''Format an RST heading. Indent is in number of spaces.
-        '''
-        indent = ' ' * indent
-        #environLocal.printDebug(['got indent', indent])
-        msg = []
-        msg.append(indent + line)
-        msg.append(indent + '\n')
-        msg.append(indent + headingChar*len(line))
-        msg.append(indent + '\n'*2)
-        return msg
-
-    def _para(self, doc):
-        '''Format an RST paragraph.
-        '''
-        if doc == None:
-            return []
-        doc = doc.strip()
-        msg = []
-        msg.append('\n'*2)
-        msg.append(doc)
-        msg.append('\n'*2)
-        return msg
-
-    def _list(self, elementList, indent=''):
-        '''Format an RST list.
-        '''
-        msg = []
-        for item in elementList:
-            item = item.strip()
-            msg.append('%s+ ' % indent)
-            msg.append(item)
-            msg.append('\n'*1)
-        msg.append('\n'*1)
-        return msg
-
-    def formatParent(self, mroEntry):
-        '''Return a class name as a parent, showing module when necessary
-
-        >>> from music21 import note
-        >>> rw = RestructuredWriter()
-        >>> post = rw.formatParent(inspect.getmro(note.Note)[1])
-        >>> 'note.NotRest' in post      
-        True
-        >>> post = rw.formatParent(inspect.getmro(note.Note)[4])
-        >>> 'object' in post      
-        True
-        '''
-        modName = mroEntry.__module__
-        className = mroEntry.__name__
-        if modName == '__builtin__':
-            return className
-        else:
-            return ':class:`%s.%s`' % (modName, className)
-
-    def formatClassInheritance(self, mro):
-        '''Given a list of classes from inspect.getmro, return a formatted
-        String
-
-        >>> from music21 import note
-        >>> rw = RestructuredWriter()
-        >>> post = rw.formatClassInheritance(inspect.getmro(note.Note))
-        >>> 'note.GeneralNote' in post
-        True
-        >>> 'base.Music21Object' in post
-        True
-        '''
-        msg = []
-        msg.append('Class inherits from:')
-        sub = []
-        for i in range(len(mro)):
-            if i == 0: continue # first is always the class itself
-            if i == len(mro) - 1: continue # last is object
-            sub.append(self.formatParent(mro[i]))
-        if len(sub) == 0:
-            return ''
-        msg.append(', '.join(sub))
-        return ' '.join(msg)
-
-
-    def formatDocString(self, doc, indent=''):
-        '''Given a docstring, clean it up for RST presentation.
-
-        Note: can use inspect.getdoc() or inspect.cleandoc(); though
-        we need customized approach demonstrated here.
-        '''
-        if doc == None:
-            return ''
-            #return '%sNo documentation.\n' % indent
-
-        lines = doc.split('\n')
-        sub = []
-        for line in lines:
-            line = line.strip()
-            if OMIT_STR in line: # permit blocking doctest examples
-                break # do not gather any more lines
-            sub.append(line)
-
-        # find double breaks in text
-        post = []
-        for i in range(len(sub)):
-            line = sub[i]
-            if line == '' and i != 0 and sub[i-1] == '':
-                post.append(None) # will be replaced with line breaks
-            elif line == '':
-                pass
-            else: 
-                post.append(line)
-
-        msg = [indent] # can add indent here
-        inExamples = False
-        for line in post:
-            if line == None: # insert breaks from two spaces
-                msg.append('\n\n' + indent) # can add indent here
-            elif line.startswith('>>>'): # python examples
-                if inExamples == False:
-                    space = '\n\n'
-                    inExamples = True
-                else:
-                    space = '\n'
-                msg.append(space + indent + line)
-            else: # continuing an existing line
-                if inExamples == False:
-                    msg.append(line + ' ')
-                else: # assume we are in examples; 
-                # need to get lines python lines that do not start with delim
-                    msg.append('\n' + indent + line + ' ')
-        msg.append('\n')
-
-        return ''.join(msg)
-
-
-#-------------------------------------------------------------------------------
 class PartitionedNameSpace(object):
     '''Given an evaluated class name as an argument, mange and present
     All data for all attributes, methods, and properties.
@@ -467,10 +326,145 @@ class PartitionedNameSpace(object):
 
 
 #-------------------------------------------------------------------------------
-class ClassDoc(RestructuredWriter):
+class RestructuredWriter(object):
 
-# use
-# inspect.classify_class_attrs to get information on all class attriutes
+    def __init__(self):
+        pass
+
+    def _heading(self, line, headingChar='=', indent=0):
+        '''Format an RST heading. Indent is in number of spaces.
+        '''
+        indent = ' ' * indent
+        #environLocal.printDebug(['got indent', indent])
+        msg = []
+        msg.append(indent + line)
+        msg.append(indent + '\n')
+        msg.append(indent + headingChar*len(line))
+        msg.append(indent + '\n'*2)
+        return msg
+
+    def _para(self, doc):
+        '''Format an RST paragraph.
+        '''
+        if doc == None:
+            return []
+        doc = doc.strip()
+        msg = []
+        msg.append('\n'*2)
+        msg.append(doc)
+        msg.append('\n'*2)
+        return msg
+
+    def _list(self, elementList, indent=''):
+        '''Format an RST list.
+        '''
+        msg = []
+        for item in elementList:
+            item = item.strip()
+            msg.append('%s+ ' % indent)
+            msg.append(item)
+            msg.append('\n'*1)
+        msg.append('\n'*1)
+        return msg
+
+    def formatParent(self, mroEntry):
+        '''Return a class name as a parent, showing module when necessary
+
+        >>> from music21 import note
+        >>> rw = RestructuredWriter()
+        >>> post = rw.formatParent(inspect.getmro(note.Note)[1])
+        >>> 'note.NotRest' in post      
+        True
+        >>> post = rw.formatParent(inspect.getmro(note.Note)[4])
+        >>> 'object' in post      
+        True
+        '''
+        modName = mroEntry.__module__
+        className = mroEntry.__name__
+        if modName == '__builtin__':
+            return className
+        else:
+            return ':class:`%s.%s`' % (modName, className)
+
+    def formatClassInheritance(self, mro):
+        '''Given a list of classes from inspect.getmro, return a formatted
+        String
+
+        >>> from music21 import note
+        >>> rw = RestructuredWriter()
+        >>> post = rw.formatClassInheritance(inspect.getmro(note.Note))
+        >>> 'note.GeneralNote' in post
+        True
+        >>> 'base.Music21Object' in post
+        True
+        '''
+        msg = []
+        msg.append('Class inherits from:')
+        sub = []
+        for i in range(len(mro)):
+            if i == 0: continue # first is always the class itself
+            if i == len(mro) - 1: continue # last is object
+            sub.append(self.formatParent(mro[i]))
+        if len(sub) == 0:
+            return ''
+        msg.append(', '.join(sub))
+        return ' '.join(msg)
+
+
+    def formatDocString(self, doc, indent=''):
+        '''Given a docstring, clean it up for RST presentation.
+
+        Note: can use inspect.getdoc() or inspect.cleandoc(); though
+        we need customized approach demonstrated here.
+        '''
+        if doc == None:
+            return ''
+            #return '%sNo documentation.\n' % indent
+
+        lines = doc.split('\n')
+        sub = []
+        for line in lines:
+            line = line.strip()
+            if OMIT_STR in line: # permit blocking doctest examples
+                break # do not gather any more lines
+            sub.append(line)
+
+        # find double breaks in text
+        post = []
+        for i in range(len(sub)):
+            line = sub[i]
+            if line == '' and i != 0 and sub[i-1] == '':
+                post.append(None) # will be replaced with line breaks
+            elif line == '':
+                pass
+            else: 
+                post.append(line)
+
+        msg = [indent] # can add indent here
+        inExamples = False
+        for line in post:
+            if line == None: # insert breaks from two spaces
+                msg.append('\n\n' + indent) # can add indent here
+            elif line.startswith('>>>'): # python examples
+                if inExamples == False:
+                    space = '\n\n'
+                    inExamples = True
+                else:
+                    space = '\n'
+                msg.append(space + indent + line)
+            else: # continuing an existing line
+                if inExamples == False:
+                    msg.append(line + ' ')
+                else: # assume we are in examples; 
+                # need to get lines python lines that do not start with delim
+                    msg.append('\n' + indent + line + ' ')
+        msg.append('\n')
+
+        return ''.join(msg)
+
+
+#-------------------------------------------------------------------------------
+class ClassDoc(RestructuredWriter):
 
     def __init__(self, className):
         RestructuredWriter.__init__(self)
@@ -482,85 +476,9 @@ class ClassDoc(RestructuredWriter):
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
 
-        # cannot do this in all cases
-        #self.obj = self.classNameEval()
-        #self.derivations = {} # a dictionary of mro index, name lists
-
         self.docCooked = self.formatDocString(self.classNameEval.__doc__, INDENT)
 
         self.name = self.classNameEval.__name__
-
-#     def findDerivationClass(self, mro, partName):
-#         '''Given an mro (method resolution order) and a part of this object, find from where (in the lost of methods) the part is derived. Returns an index number value.
-#         '''
-#         lastIndex = None
-#         for i in range(len(mro)):
-#             classPart = mro[i]
-#             classDir = dir(classPart)
-#             if partName in classDir:
-#                 lastIndex = i
-#             else:
-#                 break # none further should match
-#         if lastIndex == None:
-#             raise Exception('cannot find %s in %s' % (partName, mro))
-#         return lastIndex
-# 
-
-#     def scanMethod(self, obj):
-#         methodInfo = {}
-#         #methodInfo['name'] = str(obj)
-#         methodInfo['doc'] = self.formatDocString(obj.__doc__, INDENT)
-#         return methodInfo
-
-
-#     def scanClass(self):
-#         '''For an object provided as an argument, collect all relevant
-#         information in a dictionary. 
-#         '''
-# 
-#         info = {}
-#         #info['reference'] = self.classNameEval
-#         self.info = info
-
-#         info['properties'] = {}
-#         info['methods'] = {}
-#         info['attributes'] = {}
-        # get a list of parent objects, starting from this one
-        # provide obj, not obj.__class__
-
-#         for partName in dir(self.classNameEval):
-#             # partName is a string
-#             if partName.startswith('__'): 
-#                 continue
-#             if partName.startswith('_'): 
-#                 continue
-
-            # add to a list the index, name of derived obj
-            # derivation from mro
-            # index number is methhod resolution order
-#             mroIndex = self.findDerivationClass(self.mro, partName)
-#             if mroIndex not in self.derivations.keys():
-#                 self.derivations[mroIndex] = []
-#             self.derivations[mroIndex].append(partName)
-
-#             partObj = getattr(self.classNameEval, partName)
-#             if (isinstance(partObj, types.StringTypes) or 
-#                 isinstance(partObj, types.DictionaryType) or 
-#                 isinstance(partObj, types.ListType)):
-#                 continue
-# 
-#             if isinstance(partObj, property):
-#                 # can use method processing on properties
-#                 info['properties'][partName] = self.scanMethod(partObj)
-#             elif (callable(partObj) or hasattr(partObj, '__doc__')):
-#                 info['methods'][partName] = self.scanMethod(partObj)
-#             else:
-#                 environLocal.printDebug(['noncallable', part])
-
-
-        # will sort by index, which is proximity to this class
-        #environLocal.printDebug(info['derivations'])
-        #self.classes[obj.__name__] = info
 
 
     #---------------------------------------------------------------------------
@@ -568,21 +486,8 @@ class ClassDoc(RestructuredWriter):
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-
         docRaw = self.pns.getDoc(name)
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
-
-#         if  groupKey == 'properties':
-#         elif groupKey == 'attributes':
-#             # check for doc attribute documentation
-#             if hasattr(self.classNameEval, '_DOC_ATTR'):
-#                 if name in self.classNameEval._DOC_ATTR.keys():
-#                     msg.append('%s\n' %  (self.formatDocString(
-#                                 self.classNameEval._DOC_ATTR[name], INDENT)))
-#             else:
-#                 environLocal.printDebug(['_DOC_ATTR not found in', self.classNameEval])
-#         else:
-#             raise Exceptioin('bad groupKey %s' % groupKey)
         return ''.join(msg)
 
     def _fmtRstMethod(self, groupKey, name):
@@ -593,38 +498,6 @@ class ClassDoc(RestructuredWriter):
         docRaw = self.pns.getDoc(name)
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
-
-
-#     def _getAttributes(self):
-#         obj = None
-#         try: # create a dummy object and list its attributes
-#             obj = self.info['reference']()
-#         except TypeError:
-#             pass
-#         msg = []
-#         if obj != None:
-#             attrList = obj.__dict__.keys()
-#             attrList.sort()
-#             attrPublic = []
-#             attrPrivate = []
-#             for attr in attrList:
-#                 if not attr.startswith('_'):
-#                     attrPublic.append(attr)
-# #            if len(attrPublic) > 0:
-#                 #msg += self._heading('Attributes', '~')
-#                 # not working:
-# #                 for i, nameFound in self.info['derivations']:
-# #                     if nameFound not in attrPublic:
-# #                         continue
-# #                     #msg += self._list(attrPublic)
-#             for nameFound in attrPublic:
-#                 # TODO: names are not presenting properly, not showing
-#                 # class name, only module name          
-#                 # need to hide inherited attributes
-#                 msg.append(self._fmtRstAttribute('attributes', nameFound))
-#                 #msg.append('**%s**\n\n' % nameFound)
-#         return msg
-
 
     def getRestructuredClass(self):
         '''Return a string of a complete RST specification for a class.
@@ -674,85 +547,6 @@ class ClassDoc(RestructuredWriter):
 
 
 
-
-
-#         for groupKey, postfix in [('properties', ''), ('methods', '()')
-#                                     ]:
-#             methodNames = self.info[groupKey].keys()
-#             if len(methodNames) == 0: 
-#                 continue    
-# 
-#             # first, we need to count the number of names for each mro index
-#             # group
-#             derivationsCount = {}
-#             for i in self.derivations.keys():
-#                 for nameFound in self.derivations[i]:
-#                     if nameFound not in methodNames:
-#                         continue
-#                     if i not in derivationsCount.keys():
-#                         derivationsCount[i] = 1 # count first
-#                     else:
-#                         derivationsCount[i] += 1
-#             #environLocal.printDebug(['derivations', self.info['derivations']])
-# 
-#             iCurrent = None
-#             iCount = None
-# 
-#             for i in self.derivations.keys():
-#                 if i == len(self.mro) - 1:
-#                     continue # skip names dervied from object
-#                 if len(self.derivations[i]) == 0:
-#                     continue
-# 
-#                 # will be Properties, Methods
-#                 if i == 0:
-#                     groupTitle = '%s' % groupKey.title() 
-#                     #msg += self._heading(groupTitle, '~') 
-#                 if i == 1: # only do first one
-#                     groupTitle = '%s (Inherited)' % (groupKey.title())
-#                     #msg += self._heading(groupTitle, '~') 
-# 
-#                 for nameFound in self.derivations[i]:
-#                     if nameFound not in methodNames:
-#                         continue
-#             
-#                     if i != iCurrent:
-#                         iCurrent = i # store last value
-#                         iCount = 0 # reset to 0, increment below
-#                         if i != 0:
-#                             # TODO: link directly to the Class, not to the    
-#                             # the module page
-#                             # inherited from music21.base.Music21Object
-#                             parentSrc = self.formatParent(self.mro[i])
-#                             titleStr = 'Inherited from %s: ' % parentSrc
-#                             msg.append('%s%s' % (INDENT, titleStr))
-# #                         else: # when i is zero these are the local methods
-# #                             titleStr = 'Locally Defined:' 
-# #                             msg.append('    %s\n\n' % titleStr)
-#     
-#                     # increment count for this derivation index
-#                     iCount += 1
-#     
-#                     if i != 0: # if not locally defined
-#                         if iCount < derivationsCount[i]: # last in this group
-#                             msg.append('``%s%s``, ' % (nameFound, postfix))   
-#                         else: # last of list, no comma
-#                             msg.append('``%s%s``\n\n' % (nameFound, postfix))   
-#     
-#                     # i is the count within the list of inheritance; if i is 0
-#                     # that means that these features are locally defined
-#                     elif i == 0: # only provide full doc
-#                         if groupKey == 'properties':
-#                             msg.append(self._fmtRstAttribute(groupKey,
-#                                        nameFound))
-#                         elif groupKey == 'methods':
-#                             msg.append(self._fmtRstMethod(groupKey, nameFound))
-#         msg.append('\n'*1)
-#         return msg
-
-
-
-
 #-------------------------------------------------------------------------------
 class ModuleDoc(RestructuredWriter):
     def __init__(self, mod):
@@ -772,8 +566,6 @@ class ModuleDoc(RestructuredWriter):
         # references used in rst table of contents
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
 
-
-
     #---------------------------------------------------------------------------
     # for methods and functions can use
     # inspect.getargspec(func)
@@ -783,8 +575,6 @@ class ModuleDoc(RestructuredWriter):
     # args, varargs, varkw, defaults = inspect.getargspec(object)
     # argspec = inspect.formatargspec(
     # args, varargs, varkw, defaults, formatvalue=self.formatvalue)
-    
-
 
     def scanFunction(self, obj):
         info = {}
@@ -914,13 +704,6 @@ class ModuleDoc(RestructuredWriter):
         for className in self._sortModuleNames('classes'):
             msg += self.classes[className].getRestructuredClass()
         return ''.join(msg)
-
-
-# def buildModuleReference():
-#     for module in [note]:
-#         a = ModuleDoc(module)
-#         a.scanModule()
-#         a.getRestructured()
 
 
 
