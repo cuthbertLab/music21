@@ -89,14 +89,14 @@
 <p>The music21 documentation is generated with Sphinx. RST files for modules, before being processed by Sphinx, are created by the buildDoc/build.py script. All documentation for public modules, module-level functions, classes, and class-level attributes, properties, and methods are contained in the code fill as close to the relevant names as possible.</p>
 <div class="section" id="prohibiting-docstrings-from-display-documentation">
 <h2>Prohibiting Docstrings from Display Documentation<a class="headerlink" href="#prohibiting-docstrings-from-display-documentation" title="Permalink to this headline">¶</a></h2>
-<p>It may be desirable to hide some docstrings from display in the public documentation. All docstring lines following the constant &#8216;OMIT_FROM_DOCS&#8217; from will be omitted from documentation.</p>
+<p>It may be desirable to hide some docstrings from display in the public documentation. All docstring lines following the constant <cite>OMIT_FROM_DOCS</cite> will be omitted from documentation.</p>
 </div>
 <div class="section" id="ordering-module-level-names">
 <h2>Ordering Module-Level Names<a class="headerlink" href="#ordering-module-level-names" title="Permalink to this headline">¶</a></h2>
 <p>To specify the order in which module-level names are presented in documentation, the module must define <cite>_DOC_ORDER</cite>, a list of the class and/or function names in the module. These values are given as evaluated names, not strings.</p>
 <p>Only the first-most names need be specified; any names not included will be presented in default order</p>
 <p>As this list defines evaluated names, this list must come at the end of the module, after Test classes and before calling <cite>music21.mainTest()</cite></p>
-<p>The following example is from note.py:</p>
+<p>The following example is from the end of note.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="n">Note</span><span class="p">,</span> <span class="n">Rest</span><span class="p">]</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
@@ -144,14 +144,16 @@
     <span class="s">&#39;beams&#39;</span><span class="p">:</span> <span class="s">&#39;A :class:`music21.note.Beams` object.&#39;</span><span class="p">,</span>
     <span class="s">&#39;pitch&#39;</span><span class="p">:</span> <span class="s">&#39;A :class:`music21.pitch.Pitch` object.&#39;</span><span class="p">,</span>
     <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">arguments</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+        <span class="k">pass</span>
 </pre></div>
 </div>
 <p>If a <cite>_DOC_ATTR</cite> attribute is not defined, the most-recently inherited <cite>_DOC_ATTR</cite> attribute will be used. To explicitly merge an inherited <cite>_DOC_ATTR</cite> attribute with a locally defined <cite>_DOC_ATTR</cite>, use the dictionaries <cite>update()</cite> method.</p>
-<p>The following abbreviated example is from chord.py:</p>
+<p>The following abbreviated example, showing the updating of the <cite>_DOC_ATTR</cite> inherited from NotRest, is from chord.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Chord</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-
     <span class="n">isChord</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">isNote</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">isRest</span> <span class="o">=</span> <span class="bp">False</span>
@@ -167,6 +169,9 @@
     <span class="c"># update inherited _DOC_ATTR dictionary</span>
     <span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="o">.</span><span class="n">_DOC_ATTR</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_DOC_ATTR</span><span class="p">)</span>
     <span class="n">_DOC_ATTR</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="o">.</span><span class="n">_DOC_ATTR</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notes</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+        <span class="k">pass</span>
 </pre></div>
 </div>
 </div>

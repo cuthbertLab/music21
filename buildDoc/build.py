@@ -278,7 +278,8 @@ class PartitionedClass(object):
         '''
         element = self.getElement(partName)
         if element.kind == 'method':
-            msg = '()'
+            msg = inspect.formatargspec(inspect.getargspec(element.object))
+
         elif element.kind == 'property':
             msg = ''
         elif element.kind == 'data':
