@@ -18,31 +18,41 @@ Class Dynamic
 
     Object representation of Dyanmics. 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: englishName
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: longName
-
-    .. attribute:: posDefaultX
-
-    .. attribute:: posDefaultY
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: posPlacement
 
-    .. attribute:: posRelativeX
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: value
+
+    No documentation. 
 
     .. attribute:: posRelativeY
 
-    .. attribute:: value
+    No documentation. 
+
+    .. attribute:: posDefaultX
+
+    No documentation. 
+
+    .. attribute:: posDefaultY
+
+    No documentation. 
+
+    .. attribute:: longName
+
+    No documentation. 
+
+    .. attribute:: posRelativeX
+
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+
+    .. attribute:: englishName
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: musicxml
 
@@ -60,9 +70,9 @@ Class Dynamic
     >>> b.get('placement')
     'below' 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Wedge
@@ -72,21 +82,21 @@ Class Wedge
 
     Object model of crescendeo/decrescendo wedges. 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: posPlacement
 
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
     .. attribute:: spread
 
+    No documentation. 
+
     .. attribute:: type
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: mx
 
@@ -99,8 +109,8 @@ Class Wedge
     >>> mxWedge.get('type')
     'crescendo' 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

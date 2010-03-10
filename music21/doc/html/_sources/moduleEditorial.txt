@@ -18,44 +18,69 @@ Class NoteEditorial
     >>> a.misc
     {} 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: color
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: comment
 
+    No documentation. 
+
     .. attribute:: ficta
 
-    .. attribute:: harmonicInterval
+    No documentation. 
 
     .. attribute:: melodicInterval
 
+    No documentation. 
+
+    .. attribute:: color
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
     .. attribute:: melodicIntervalOverRests
 
-    .. attribute:: melodicIntervals
-
-    .. attribute:: melodicIntervalsOverRests
+    No documentation. 
 
     .. attribute:: misc
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
+
+    .. attribute:: harmonicInterval
+
+    No documentation. 
+
+    .. attribute:: melodicIntervals
+
+    list() -> new list list(sequence) -> new list initialized from sequence's items 
+
+    .. attribute:: melodicIntervalsOverRests
+
+    list() -> new list list(sequence) -> new list initialized from sequence's items 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: colorLilyStart()
 
+    No documentation. 
 
     .. method:: fictaLilyStart()
 
+    No documentation. 
 
     .. method:: lilyAttached()
 
+    No documentation. 
 
     .. method:: lilyEnd()
 
+    No documentation. 
 
     .. method:: lilyStart()
 
+    No documentation. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Comment
@@ -66,10 +91,16 @@ Class Comment
 
     
 
+    .. attribute:: position
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: text
+
+    No documentation. 
+
     .. attribute:: lily
 
-
-    .. method:: text()
-
+    No documentation. 
 
 

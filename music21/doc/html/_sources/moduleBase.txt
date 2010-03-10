@@ -28,13 +28,21 @@ Class Music21Object
 
     
 
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
     .. attribute:: id
 
     Unique identification string. 
+
+    .. attribute:: groups
+
+    A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
+
+    >>> g = Groups()
+    >>> g.append("hello")
+    >>> g[0]
+    'hello' 
+    >>> g.append(5)
+    Traceback (most recent call last): 
+    GroupException: Only strings can be used as list names 
 
     .. attribute:: duration
 
@@ -111,9 +119,6 @@ Class Music21Object
     >>> a.getOffsetBySite(None)
     30.0 
 
-    .. method:: id()
-
-
     .. method:: isClass()
 
     returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
@@ -155,12 +160,72 @@ Class ElementWrapper
 
     
 
-    Inherits from: :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.base.Music21Object`
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``id``, ``offset``, ``parent``, ``priority``
+    .. attribute:: obj
+
+    No documentation. 
+
+    .. attribute:: duration
+
+    Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None. 
+
+    >>> import note
+    >>> n = note.Note('F#')
+    >>> n.quarterLength = 2.0
+    >>> n.duration.quarterLength
+    2.0 
+    >>> el1 = ElementWrapper(n)
+    >>> el1.duration.quarterLength
+    2.0 
+    ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY 
+    >>> class KindaStupid(object):
+    ...     pass 
+    >>> ks1 = ElementWrapper(KindaStupid())
+    >>> ks1.obj.duration
+    Traceback (most recent call last): 
+    AttributeError: 'KindaStupid' object has no attribute 'duration' 
+    >>> import duration
+    >>> ks1.duration = duration.Duration("whole")
+    >>> ks1.duration.quarterLength
+    4.0 
+    >>> ks1.obj.duration  # still not defined
+    Traceback (most recent call last): 
+    AttributeError: 'KindaStupid' object has no attribute 'duration' 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: offset
+
+    
+
+    
+
+    
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``parent``, ``priority``
 
     .. method:: getId()
 
+    No documentation. 
+
+    .. method:: isClass()
+
+    Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
+
+    >>> import note
+    >>> a = ElementWrapper(None)
+    >>> a.isClass(note.Note)
+    False 
+    >>> a.isClass(types.NoneType)
+    True 
+    >>> b = ElementWrapper(note.Note('A4'))
+    >>> b.isClass(note.Note)
+    True 
+    >>> b.isClass(types.NoneType)
+    False 
 
     .. method:: isTwin()
 
@@ -186,13 +251,11 @@ Class ElementWrapper
     >>> aE.isTwin(bE)
     True 
 
-    .. method:: obj()
-
-
     .. method:: setId()
 
+    No documentation. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class DefinedContexts
@@ -372,6 +435,7 @@ Class DefinedContexts
 
     .. method:: removeById()
 
+    No documentation. 
 
     .. method:: setAttrByName()
 
@@ -422,8 +486,12 @@ Class Groups
     Traceback (most recent call last): 
     GroupException: Only strings can be used as list names 
 
-    Inherits from: list
+    Class inherits from: list
 
-    Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
+    .. method:: append()
+
+    No documentation. 
+
+    Methods inherited from list: ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 
 

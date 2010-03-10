@@ -134,7 +134,8 @@ def  pitchDensity(show=True):
     # NoteAnalysis objects permit graphing attributes of a Stream of notes
     na = correlate.NoteAnalysis(notes) 
     # calling noteAttributeScatter() with x and y values as named attributes returns a graph 
-    na.noteAttributeScatter('offset', 'pitchClass')
+    if show:
+        na.noteAttributeScatter('offset', 'pitchClass')
     
     
 
@@ -156,8 +157,10 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testBasic(self):
+    def xtestBasic(self):
         '''Test non-showing functions
+
+        removed b/c taking a long time
         '''
         for func in [bergEx01, melodicChordExpression, pitchDensity]:
             func(show=False)

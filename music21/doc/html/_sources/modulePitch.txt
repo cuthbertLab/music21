@@ -87,17 +87,13 @@ Class Pitch
 .. class:: Pitch
 
 
-    Inherits from: :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: defaultOctave
 
-    .. attribute:: groups
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: accidental
 
@@ -252,9 +248,9 @@ Class Pitch
     >>> a._getStep()
     'C' 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Accidental
@@ -264,16 +260,45 @@ Class Accidental
 
     Accidental class. 
 
-    Inherits from: :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.base.Music21Object`
 
-    .. attribute:: alter
+    .. attribute:: displayEvaluated
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: displayLocation
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: displaySize
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: displayStyle
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: displayType
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
 
     .. attribute:: modifier
 
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
     .. attribute:: name
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: alter
+
+    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``
 
     .. attribute:: lily
 
+    No documentation. 
 
     .. attribute:: mx
 
@@ -287,7 +312,7 @@ Class Accidental
     >>> mxAccidental.get('content')
     'quarter-sharp' 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: set()
 
@@ -309,6 +334,6 @@ Class Accidental
     >>> a.alter
     -2.0 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

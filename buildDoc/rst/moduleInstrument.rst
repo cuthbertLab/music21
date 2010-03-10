@@ -13,31 +13,41 @@ Class Instrument
 .. class:: Instrument
 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: instrumentAbbreviation
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: instrumentName
 
+    No documentation. 
+
     .. attribute:: midiChannel
 
-    .. attribute:: midiProgram
-
-    .. attribute:: partAbbreviation
+    No documentation. 
 
     .. attribute:: partId
 
+    No documentation. 
+
     .. attribute:: partName
 
+    No documentation. 
+
+    .. attribute:: midiProgram
+
+    No documentation. 
+
+    .. attribute:: instrumentAbbreviation
+
+    No documentation. 
+
     .. attribute:: transposition
+
+    No documentation. 
+
+    .. attribute:: partAbbreviation
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: mx
 
@@ -45,7 +55,7 @@ Class Instrument
 
     
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: bestName()
 
@@ -55,7 +65,7 @@ Class Instrument
 
     Force a unique id by using an MD5 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Violoncello
@@ -64,43 +74,25 @@ Class Violoncello
 .. class:: Violoncello
 
 
-    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: instrumentAbbreviation
-
-    .. attribute:: instrumentName
+    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestNote
 
-    .. attribute:: midiChannel
+    No documentation. 
 
-    .. attribute:: midiProgram
+    Attributes inherited from :class:`music21.instrument.Instrument`: ``instrumentName``, ``midiChannel``, ``partId``, ``partName``, ``midiProgram``, ``instrumentAbbreviation``, ``transposition``, ``partAbbreviation``
 
-    .. attribute:: partAbbreviation
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: partId
+    Properties inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    .. attribute:: partName
+    Properties inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    .. attribute:: transposition
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
+    Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from :class:`music21.instrument.Instrument`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class StringInstrument
@@ -109,31 +101,11 @@ Class StringInstrument
 .. class:: StringInstrument
 
 
-    Inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.instrument.Instrument`: ``instrumentName``, ``midiChannel``, ``partId``, ``partName``, ``midiProgram``, ``instrumentAbbreviation``, ``transposition``, ``partAbbreviation``
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: instrumentAbbreviation
-
-    .. attribute:: instrumentName
-
-    .. attribute:: midiChannel
-
-    .. attribute:: midiProgram
-
-    .. attribute:: partAbbreviation
-
-    .. attribute:: partId
-
-    .. attribute:: partName
-
-    .. attribute:: transposition
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: stringPitches
 
@@ -154,13 +126,13 @@ Class StringInstrument
     highest.  The same would hold true for certain violin scordatura pieces, such 
     as some of Biber's *Mystery Sonatas* 
 
-    Inherited from :class:`music21.instrument.Instrument`: ``mx``
+    Properties inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
+    Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Viola
@@ -169,43 +141,25 @@ Class Viola
 .. class:: Viola
 
 
-    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: instrumentAbbreviation
-
-    .. attribute:: instrumentName
+    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestNote
 
-    .. attribute:: midiChannel
+    No documentation. 
 
-    .. attribute:: midiProgram
+    Attributes inherited from :class:`music21.instrument.Instrument`: ``instrumentName``, ``midiChannel``, ``partId``, ``partName``, ``midiProgram``, ``instrumentAbbreviation``, ``transposition``, ``partAbbreviation``
 
-    .. attribute:: partAbbreviation
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: partId
+    Properties inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    .. attribute:: partName
+    Properties inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    .. attribute:: transposition
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
+    Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from :class:`music21.instrument.Instrument`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Violin
@@ -214,42 +168,24 @@ Class Violin
 .. class:: Violin
 
 
-    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: instrumentAbbreviation
-
-    .. attribute:: instrumentName
+    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestNote
 
-    .. attribute:: midiChannel
+    No documentation. 
 
-    .. attribute:: midiProgram
+    Attributes inherited from :class:`music21.instrument.Instrument`: ``instrumentName``, ``midiChannel``, ``partId``, ``partName``, ``midiProgram``, ``instrumentAbbreviation``, ``transposition``, ``partAbbreviation``
 
-    .. attribute:: partAbbreviation
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: partId
+    Properties inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    .. attribute:: partName
+    Properties inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    .. attribute:: transposition
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
+    Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from :class:`music21.instrument.Instrument`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

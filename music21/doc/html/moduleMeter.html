@@ -97,7 +97,7 @@
 <tt class="descclassname">music21.meter.</tt><tt class="descname">fractionToSlashMixed</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.meter.fractionToSlashMixed" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Given a lost of fraction values, compact numerators by sum if denominators are the same</p>
+<p>Given a list of fraction values, compact numerators by sum if denominators are the same</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fractionToSlashMixed</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">16</span><span class="p">)])</span>
 <span class="go">[(&#39;3+2+5&#39;, 8), (&#39;3&#39;, 4), (&#39;2+1+4&#39;, 16)]</span>
 </pre></div>
@@ -169,59 +169,56 @@
 <dt id="music21.meter.TimeSignature">
 <em class="property">
 class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">TimeSignature</tt><a class="headerlink" href="#music21.meter.TimeSignature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.accent">
-<tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.TimeSignature.accent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.beam">
-<tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.TimeSignature.beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.beat">
-<tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.TimeSignature.beat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.display">
-<tt class="descname">display</tt><a class="headerlink" href="#music21.meter.TimeSignature.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.meter.TimeSignature.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.meter.TimeSignature.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Unique identification string.</p>
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.inherited">
-<tt class="descname">inherited</tt><a class="headerlink" href="#music21.meter.TimeSignature.inherited" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.summedNumerator">
-<tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.TimeSignature.summedNumerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.TimeSignature.symbol">
-<tt class="descname">symbol</tt><a class="headerlink" href="#music21.meter.TimeSignature.symbol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dd><p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.symbolizeDenominator">
 <tt class="descname">symbolizeDenominator</tt><a class="headerlink" href="#music21.meter.TimeSignature.symbolizeDenominator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.display">
+<tt class="descname">display</tt><a class="headerlink" href="#music21.meter.TimeSignature.display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beat">
+<tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.TimeSignature.beat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.symbol">
+<tt class="descname">symbol</tt><a class="headerlink" href="#music21.meter.TimeSignature.symbol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.accent">
+<tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.TimeSignature.accent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.summedNumerator">
+<tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.TimeSignature.summedNumerator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beam">
+<tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.TimeSignature.beam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.inherited">
+<tt class="descname">inherited</tt><a class="headerlink" href="#music21.meter.TimeSignature.inherited" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">groups</span></tt></p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.barDuration">
 <tt class="descname">barDuration</tt><a class="headerlink" href="#music21.meter.TimeSignature.barDuration" title="Permalink to this definition">¶</a></dt>
@@ -253,6 +250,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.TimeSignature.denominator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.meter.TimeSignature.lily" title="Permalink to this definition">¶</a></dt>
@@ -287,17 +285,20 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.TimeSignature.numerator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.quarterLengthToBeatLengthRatio">
 <tt class="descname">quarterLengthToBeatLengthRatio</tt><a class="headerlink" href="#music21.meter.TimeSignature.quarterLengthToBeatLengthRatio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.totalLength">
 <tt class="descname">totalLength</tt><a class="headerlink" href="#music21.meter.TimeSignature.totalLength" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>No documentation.</p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getAccent">
 <tt class="descname">getAccent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getAccent" title="Permalink to this definition">¶</a></dt>
@@ -471,7 +472,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">&lt;MeterSequence {3/4}&gt;</span>
 </pre></div>
 </div>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -481,63 +482,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dt id="music21.meter.CompoundTimeSignature">
 <em class="property">
 class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">CompoundTimeSignature</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.accent">
-<tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.accent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.beam">
-<tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.beat">
-<tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.beat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.display">
-<tt class="descname">display</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Unique identification string.</p>
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.inherited">
-<tt class="descname">inherited</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.inherited" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.summedNumerator">
-<tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.summedNumerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.symbol">
-<tt class="descname">symbol</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.symbol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.CompoundTimeSignature.symbolizeDenominator">
-<tt class="descname">symbolizeDenominator</tt><a class="headerlink" href="#music21.meter.CompoundTimeSignature.symbolizeDenominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">symbolizeDenominator</span></tt>, <tt class="docutils literal"><span class="pre">display</span></tt>, <tt class="docutils literal"><span class="pre">beat</span></tt>, <tt class="docutils literal"><span class="pre">symbol</span></tt>, <tt class="docutils literal"><span class="pre">accent</span></tt>, <tt class="docutils literal"><span class="pre">summedNumerator</span></tt>, <tt class="docutils literal"><span class="pre">beam</span></tt>, <tt class="docutils literal"><span class="pre">inherited</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">groups</span></tt></p>
+<p>Properties inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Methods inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -547,63 +498,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Com
 <dt id="music21.meter.NonPowerOfTwoTimeSignature">
 <em class="property">
 class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">NonPowerOfTwoTimeSignature</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.accent">
-<tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.accent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.beam">
-<tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.beat">
-<tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.beat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.display">
-<tt class="descname">display</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Unique identification string.</p>
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.inherited">
-<tt class="descname">inherited</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.inherited" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.summedNumerator">
-<tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.summedNumerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.symbol">
-<tt class="descname">symbol</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.symbol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.NonPowerOfTwoTimeSignature.symbolizeDenominator">
-<tt class="descname">symbolizeDenominator</tt><a class="headerlink" href="#music21.meter.NonPowerOfTwoTimeSignature.symbolizeDenominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">symbolizeDenominator</span></tt>, <tt class="docutils literal"><span class="pre">display</span></tt>, <tt class="docutils literal"><span class="pre">beat</span></tt>, <tt class="docutils literal"><span class="pre">symbol</span></tt>, <tt class="docutils literal"><span class="pre">accent</span></tt>, <tt class="docutils literal"><span class="pre">summedNumerator</span></tt>, <tt class="docutils literal"><span class="pre">beam</span></tt>, <tt class="docutils literal"><span class="pre">inherited</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">groups</span></tt></p>
+<p>Properties inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Methods inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -630,6 +531,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.MeterTerminal.denominator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.depth">
 <tt class="descname">depth</tt><a class="headerlink" href="#music21.meter.MeterTerminal.depth" title="Permalink to this definition">¶</a></dt>
@@ -659,11 +561,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.MeterTerminal.numerator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.weight">
 <tt class="descname">weight</tt><a class="headerlink" href="#music21.meter.MeterTerminal.weight" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.meter.MeterTerminal.ratioEqual">
 <tt class="descname">ratioEqual</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.meter.MeterTerminal.ratioEqual" title="Permalink to this definition">¶</a></dt>
@@ -712,63 +616,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <em class="property">
 class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">DurationDenominatorTimeSignature</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature" title="Permalink to this definition">¶</a></dt>
 <dd><p>If you have played Hindemith you know these, 3/(dot-quarter) etc.</p>
-<p>Inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.accent">
-<tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.accent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.beam">
-<tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.beat">
-<tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.beat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.display">
-<tt class="descname">display</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Unique identification string.</p>
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.inherited">
-<tt class="descname">inherited</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.inherited" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.summedNumerator">
-<tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.summedNumerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.symbol">
-<tt class="descname">symbol</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.symbol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.meter.DurationDenominatorTimeSignature.symbolizeDenominator">
-<tt class="descname">symbolizeDenominator</tt><a class="headerlink" href="#music21.meter.DurationDenominatorTimeSignature.symbolizeDenominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-<p>Inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Class inherits from: <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">symbolizeDenominator</span></tt>, <tt class="docutils literal"><span class="pre">display</span></tt>, <tt class="docutils literal"><span class="pre">beat</span></tt>, <tt class="docutils literal"><span class="pre">symbol</span></tt>, <tt class="docutils literal"><span class="pre">accent</span></tt>, <tt class="docutils literal"><span class="pre">summedNumerator</span></tt>, <tt class="docutils literal"><span class="pre">beam</span></tt>, <tt class="docutils literal"><span class="pre">inherited</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">groups</span></tt></p>
+<p>Properties inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">barDuration</span></tt>, <tt class="docutils literal"><span class="pre">beatLengthToQuarterLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">quarterLengthToBeatLengthRatio</span></tt>, <tt class="docutils literal"><span class="pre">totalLength</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Methods inherited from <a title="music21.meter.TimeSignature" class="reference internal" href="#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">music21.meter.TimeSignature</span></tt></a>: <tt class="docutils literal"><span class="pre">getAccent()</span></tt>, <tt class="docutils literal"><span class="pre">getAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">getBeams()</span></tt>, <tt class="docutils literal"><span class="pre">getBeat()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatDepth()</span></tt>, <tt class="docutils literal"><span class="pre">getBeatProgress()</span></tt>, <tt class="docutils literal"><span class="pre">load()</span></tt>, <tt class="docutils literal"><span class="pre">loadRatio()</span></tt>, <tt class="docutils literal"><span class="pre">quarterPositionToBeat()</span></tt>, <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">setAccentWeight()</span></tt>, <tt class="docutils literal"><span class="pre">setDisplay()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -779,17 +633,31 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Dur
 <em class="property">
 class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">MeterSequence</tt><a class="headerlink" href="#music21.meter.MeterSequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
-<p>Inherits from: <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a></p>
+<p>Class inherits from: <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.parenthesis">
 <tt class="descname">parenthesis</tt><a class="headerlink" href="#music21.meter.MeterSequence.parenthesis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.summedNumerator">
 <tt class="descname">summedNumerator</tt><a class="headerlink" href="#music21.meter.MeterSequence.summedNumerator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<dl class="attribute">
+<dt id="music21.meter.MeterSequence.denominator">
+<tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.MeterSequence.denominator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.meter.MeterSequence.depth">
+<tt class="descname">depth</tt><a class="headerlink" href="#music21.meter.MeterSequence.depth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return how many unique levels deep this part is This should be optimized to store values unless the structure has changed.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.flat">
 <tt class="descname">flat</tt><a class="headerlink" href="#music21.meter.MeterSequence.flat" title="Permalink to this definition">¶</a></dt>
@@ -818,7 +686,30 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <dd></dd></dl>
 
 <p>Retrun a list of flat weight valuess</p>
-<p>Inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a>: <tt class="docutils literal"><span class="pre">denominator</span></tt>, <tt class="docutils literal"><span class="pre">depth</span></tt>, <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">numerator</span></tt>, <tt class="docutils literal"><span class="pre">weight</span></tt></p>
+<dl class="attribute">
+<dt id="music21.meter.MeterSequence.numerator">
+<tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.MeterSequence.numerator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.meter.MeterSequence.weight">
+<tt class="descname">weight</tt><a class="headerlink" href="#music21.meter.MeterSequence.weight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span>
+<span class="go">0.333...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;1/4&#39;</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;1/4&#39;</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">([</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">weight</span>
+<span class="go">0.5</span>
+</pre></div>
+</div>
+<p>Properties inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt></p>
 <dl class="method">
 <dt id="music21.meter.MeterSequence.getLevel">
 <tt class="descname">getLevel</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.getLevel" title="Permalink to this definition">¶</a></dt>
@@ -1063,7 +954,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <span class="go">(1.0, 2.0)</span>
 </pre></div>
 </div>
-<p>Inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a>: <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">subdivide()</span></tt>, <tt class="docutils literal"><span class="pre">subdivideByCount()</span></tt>, <tt class="docutils literal"><span class="pre">subdivideByList()</span></tt></p>
+<p>Methods inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">music21.meter.MeterTerminal</span></tt></a>: <tt class="docutils literal"><span class="pre">ratioEqual()</span></tt>, <tt class="docutils literal"><span class="pre">subdivide()</span></tt>, <tt class="docutils literal"><span class="pre">subdivideByCount()</span></tt>, <tt class="docutils literal"><span class="pre">subdivideByList()</span></tt></p>
 </dd></dl>
 
 </div>

@@ -259,12 +259,15 @@ Class Duration
 
     A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit. 
 
-    Inherits from: :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
+    list() -> new list list(sequence) -> new list initialized from sequence's items 
+
     .. attribute:: components
 
+    No documentation. 
 
     .. attribute:: dots
 
@@ -272,6 +275,7 @@ Class Duration
 
     .. attribute:: isComplex
 
+    No documentation. 
 
     .. attribute:: lily
 
@@ -308,6 +312,7 @@ Class Duration
 
     .. attribute:: tuplets
 
+    No documentation. 
 
     .. attribute:: type
 
@@ -327,6 +332,7 @@ Class Duration
 
     .. method:: appendTuplet()
 
+    No documentation. 
 
     .. method:: clear()
 
@@ -451,7 +457,7 @@ Class Duration
 
     Write a file in the given format (default, musicxml) A None file path will result in temporary file 
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class Tuplet
@@ -492,27 +498,53 @@ Class Tuplet
 
     
 
-    .. attribute:: bracket
+    .. attribute:: frozen
 
-    .. attribute:: durationActual
-
-    .. attribute:: durationNormal
-
-    .. attribute:: nestedLevel
-
-    .. attribute:: numberNotesActual
-
-    .. attribute:: numberNotesNormal
-
-    .. attribute:: placement
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     .. attribute:: tupletActualShow
 
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: placement
+
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: numberNotesActual
+
+    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
+
     .. attribute:: tupletId
+
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+
+    .. attribute:: nestedLevel
+
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+
+    .. attribute:: bracket
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     .. attribute:: tupletNormalShow
 
+    No documentation. 
+
     .. attribute:: type
+
+    No documentation. 
+
+    .. attribute:: durationActual
+
+    A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
+
+    .. attribute:: numberNotesNormal
+
+    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
+
+    .. attribute:: durationNormal
+
+    A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
     .. attribute:: mx
 
@@ -524,13 +556,11 @@ Class Tuplet
 
     .. attribute:: tupletActual
 
+    No documentation. 
 
     .. attribute:: tupletNormal
 
-
-    .. method:: frozen()
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
     .. method:: setDurationType()
 
@@ -609,15 +639,15 @@ Class AppogiaturaStopDuration
 .. class:: AppogiaturaStopDuration
 
 
-    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    .. attribute:: linkages
+    Attributes inherited from :class:`music21.duration.Duration`: ``linkages``
 
-    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Properties inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Methods inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class DurationUnit
@@ -627,9 +657,11 @@ Class DurationUnit
 
     A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
-    Inherits from: :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkStatus
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     .. attribute:: dots
 
@@ -667,15 +699,19 @@ Class DurationUnit
 
     .. method:: appendTuplet()
 
+    No documentation. 
 
     .. method:: link()
 
+    No documentation. 
 
     .. method:: setTypeFromNum()
 
+    No documentation. 
 
     .. method:: unlink()
 
+    No documentation. 
 
     .. method:: updateQuarterLength()
 
@@ -683,8 +719,9 @@ Class DurationUnit
 
     .. method:: updateType()
 
+    No documentation. 
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class DurationCommon
@@ -717,15 +754,15 @@ Class GraceDuration
 .. class:: GraceDuration
 
 
-    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    .. attribute:: linkages
+    Attributes inherited from :class:`music21.duration.Duration`: ``linkages``
 
-    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Properties inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Methods inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class ZeroDuration
@@ -734,15 +771,15 @@ Class ZeroDuration
 .. class:: ZeroDuration
 
 
-    Inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
 
-    .. attribute:: linkStatus
+    Attributes inherited from :class:`music21.duration.DurationUnit`: ``linkStatus``
 
-    Inherited from :class:`music21.duration.DurationUnit`: ``dots``, ``lily``, ``ordinal``, ``quarterLength``, ``tuplets``, ``type``
+    Properties inherited from :class:`music21.duration.DurationUnit`: ``dots``, ``lily``, ``ordinal``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from :class:`music21.duration.DurationUnit`: ``appendTuplet()``, ``link()``, ``setTypeFromNum()``, ``unlink()``, ``updateQuarterLength()``, ``updateType()``
+    Methods inherited from :class:`music21.duration.DurationUnit`: ``appendTuplet()``, ``link()``, ``setTypeFromNum()``, ``unlink()``, ``updateQuarterLength()``, ``updateType()``
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class AppogiaturaStartDuration
@@ -751,15 +788,15 @@ Class AppogiaturaStartDuration
 .. class:: AppogiaturaStartDuration
 
 
-    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    .. attribute:: linkages
+    Attributes inherited from :class:`music21.duration.Duration`: ``linkages``
 
-    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Properties inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Methods inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class LongGraceDuration
@@ -768,14 +805,14 @@ Class LongGraceDuration
 .. class:: LongGraceDuration
 
 
-    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    .. attribute:: linkages
+    Attributes inherited from :class:`music21.duration.Duration`: ``linkages``
 
-    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Properties inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Methods inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
+    Methods inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 

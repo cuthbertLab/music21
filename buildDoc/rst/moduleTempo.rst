@@ -18,21 +18,17 @@ Class TempoMark
     >>> tm.value
     'adagio' 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: value
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    No documentation. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MetronomeMark
@@ -46,24 +42,22 @@ Class MetronomeMark
     >>> a.number
     40 
 
-    Inherits from: :class:`music21.tempo.TempoMark`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
+    Class inherits from: :class:`music21.tempo.TempoMark`, :class:`music21.base.Music21Object`
 
     .. attribute:: number
 
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+
     .. attribute:: referent
 
-    .. attribute:: value
+    No documentation. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Attributes inherited from :class:`music21.tempo.TempoMark`: ``value``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

@@ -378,17 +378,19 @@ DurationException...</pre>
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">Duration</tt><a class="headerlink" href="#music21.duration.Duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Durations are one of the most important objects in music21.  A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units).  For instance, &#8220;57 quarter notes&#8221; or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note&#8221;</p>
 <p>A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit.</p>
-<p>Inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Class inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.linkages">
 <tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.Duration.linkages" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>list() -&gt; new list list(sequence) -&gt; new list initialized from sequence&#8217;s items</p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.components">
 <tt class="descname">components</tt><a class="headerlink" href="#music21.duration.Duration.components" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.dots">
 <tt class="descname">dots</tt><a class="headerlink" href="#music21.duration.Duration.dots" title="Permalink to this definition">¶</a></dt>
@@ -400,6 +402,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <tt class="descname">isComplex</tt><a class="headerlink" href="#music21.duration.Duration.isComplex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.duration.Duration.lily" title="Permalink to this definition">¶</a></dt>
@@ -445,6 +448,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <tt class="descname">tuplets</tt><a class="headerlink" href="#music21.duration.Duration.tuplets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.type">
 <tt class="descname">type</tt><a class="headerlink" href="#music21.duration.Duration.type" title="Permalink to this definition">¶</a></dt>
@@ -471,6 +475,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <tt class="descname">appendTuplet</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Duration.appendTuplet" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.Duration.clear">
 <tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Duration.clear" title="Permalink to this definition">¶</a></dt>
@@ -619,7 +624,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dd></dd></dl>
 
 <p>Write a file in the given format (default, musicxml) A None file path will result in temporary file</p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -659,60 +664,77 @@ Traceback (most recent call last):
 ...
 TupletException: A frozen tuplet (or one attached to a duration) is immutable</p>
 <dl class="attribute">
-<dt id="music21.duration.Tuplet.bracket">
-<tt class="descname">bracket</tt><a class="headerlink" href="#music21.duration.Tuplet.bracket" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.duration.Tuplet.frozen">
+<tt class="descname">frozen</tt><a class="headerlink" href="#music21.duration.Tuplet.frozen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.durationActual">
-<tt class="descname">durationActual</tt><a class="headerlink" href="#music21.duration.Tuplet.durationActual" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.durationNormal">
-<tt class="descname">durationNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.durationNormal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.nestedLevel">
-<tt class="descname">nestedLevel</tt><a class="headerlink" href="#music21.duration.Tuplet.nestedLevel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.numberNotesActual">
-<tt class="descname">numberNotesActual</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesActual" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.numberNotesNormal">
-<tt class="descname">numberNotesNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesNormal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.placement">
-<tt class="descname">placement</tt><a class="headerlink" href="#music21.duration.Tuplet.placement" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletActualShow">
 <tt class="descname">tupletActualShow</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletActualShow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.placement">
+<tt class="descname">placement</tt><a class="headerlink" href="#music21.duration.Tuplet.placement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.numberNotesActual">
+<tt class="descname">numberNotesActual</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesActual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>float(x) -&gt; floating point number Convert a string or number to a floating point number, if possible.</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletId">
 <tt class="descname">tupletId</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.nestedLevel">
+<tt class="descname">nestedLevel</tt><a class="headerlink" href="#music21.duration.Tuplet.nestedLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.bracket">
+<tt class="descname">bracket</tt><a class="headerlink" href="#music21.duration.Tuplet.bracket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletNormalShow">
 <tt class="descname">tupletNormalShow</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletNormalShow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.type">
 <tt class="descname">type</tt><a class="headerlink" href="#music21.duration.Tuplet.type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.durationActual">
+<tt class="descname">durationActual</tt><a class="headerlink" href="#music21.duration.Tuplet.durationActual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Additional types are needed: &#8216;zero&#8217; type for zero durations &#8216;unexpressable&#8217; type for anything that needs a Duration (such as 2.5 quarters)</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.numberNotesNormal">
+<tt class="descname">numberNotesNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesNormal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>float(x) -&gt; floating point number Convert a string or number to a floating point number, if possible.</p>
+<dl class="attribute">
+<dt id="music21.duration.Tuplet.durationNormal">
+<tt class="descname">durationNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.durationNormal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Additional types are needed: &#8216;zero&#8217; type for zero durations &#8216;unexpressable&#8217; type for anything that needs a Duration (such as 2.5 quarters)</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.duration.Tuplet.mx" title="Permalink to this definition">¶</a></dt>
@@ -729,17 +751,13 @@ TupletException: A frozen tuplet (or one attached to a duration) is immutable</p
 <tt class="descname">tupletActual</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletActual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletNormal">
 <tt class="descname">tupletNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletNormal" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="music21.duration.Tuplet.frozen">
-<tt class="descname">frozen</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.frozen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.Tuplet.setDurationType">
 <tt class="descname">setDurationType</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.setDurationType" title="Permalink to this definition">¶</a></dt>
@@ -831,15 +849,11 @@ TupletException: A frozen tuplet (or one attached to a duration) is immutable</p
 <dt id="music21.duration.AppogiaturaStopDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStopDuration</tt><a class="headerlink" href="#music21.duration.AppogiaturaStopDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.duration.AppogiaturaStopDuration.linkages">
-<tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.AppogiaturaStopDuration.linkages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">linkages</span></tt></p>
+<p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -850,12 +864,13 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">DurationUnit</tt><a class="headerlink" href="#music21.duration.DurationUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Additional types are needed: &#8216;zero&#8217; type for zero durations &#8216;unexpressable&#8217; type for anything that needs a Duration (such as 2.5 quarters)</p>
-<p>Inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Class inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.linkStatus">
 <tt class="descname">linkStatus</tt><a class="headerlink" href="#music21.duration.DurationUnit.linkStatus" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.dots">
 <tt class="descname">dots</tt><a class="headerlink" href="#music21.duration.DurationUnit.dots" title="Permalink to this definition">¶</a></dt>
@@ -908,21 +923,25 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <tt class="descname">appendTuplet</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.appendTuplet" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.DurationUnit.link">
 <tt class="descname">link</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.link" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.DurationUnit.setTypeFromNum">
 <tt class="descname">setTypeFromNum</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.setTypeFromNum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.DurationUnit.unlink">
 <tt class="descname">unlink</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.unlink" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.duration.DurationUnit.updateQuarterLength">
 <tt class="descname">updateQuarterLength</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.updateQuarterLength" title="Permalink to this definition">¶</a></dt>
@@ -934,7 +953,8 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <tt class="descname">updateType</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.updateType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -971,15 +991,11 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dt id="music21.duration.GraceDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">GraceDuration</tt><a class="headerlink" href="#music21.duration.GraceDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.duration.GraceDuration.linkages">
-<tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.GraceDuration.linkages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">linkages</span></tt></p>
+<p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -989,15 +1005,11 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dt id="music21.duration.ZeroDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">ZeroDuration</tt><a class="headerlink" href="#music21.duration.ZeroDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.duration.ZeroDuration.linkStatus">
-<tt class="descname">linkStatus</tt><a class="headerlink" href="#music21.duration.ZeroDuration.linkStatus" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>: <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">ordinal</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>: <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">link()</span></tt>, <tt class="docutils literal"><span class="pre">setTypeFromNum()</span></tt>, <tt class="docutils literal"><span class="pre">unlink()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">updateType()</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>: <tt class="docutils literal"><span class="pre">linkStatus</span></tt></p>
+<p>Properties inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>: <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">ordinal</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationUnit</span></tt></a>: <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">link()</span></tt>, <tt class="docutils literal"><span class="pre">setTypeFromNum()</span></tt>, <tt class="docutils literal"><span class="pre">unlink()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">updateType()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -1007,15 +1019,11 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dt id="music21.duration.AppogiaturaStartDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStartDuration</tt><a class="headerlink" href="#music21.duration.AppogiaturaStartDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.duration.AppogiaturaStartDuration.linkages">
-<tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.AppogiaturaStartDuration.linkages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">linkages</span></tt></p>
+<p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -1025,15 +1033,11 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dt id="music21.duration.LongGraceDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">LongGraceDuration</tt><a class="headerlink" href="#music21.duration.LongGraceDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
-<dl class="attribute">
-<dt id="music21.duration.LongGraceDuration.linkages">
-<tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.LongGraceDuration.linkages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
-<p>Inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
-<p>Inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
+<dd><p>Class inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">linkages</span></tt></p>
+<p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">components</span></tt>, <tt class="docutils literal"><span class="pre">dots</span></tt>, <tt class="docutils literal"><span class="pre">isComplex</span></tt>, <tt class="docutils literal"><span class="pre">lily</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">mx</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt>, <tt class="docutils literal"><span class="pre">tuplets</span></tt>, <tt class="docutils literal"><span class="pre">type</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">music21.duration.Duration</span></tt></a>: <tt class="docutils literal"><span class="pre">addDuration()</span></tt>, <tt class="docutils literal"><span class="pre">appendTuplet()</span></tt>, <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">componentIndexAtQtrPosition()</span></tt>, <tt class="docutils literal"><span class="pre">componentStartTime()</span></tt>, <tt class="docutils literal"><span class="pre">consolidate()</span></tt>, <tt class="docutils literal"><span class="pre">expand()</span></tt>, <tt class="docutils literal"><span class="pre">fill()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">sliceComponentAtPosition()</span></tt>, <tt class="docutils literal"><span class="pre">updateQuarterLength()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">music21.duration.DurationCommon</span></tt></a>: <tt class="docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></p>
 </dd></dl>
 
 </div>

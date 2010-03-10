@@ -39,76 +39,77 @@ Class TinyNotationNote
 
     
 
-    .. method:: DBLDOT()
+    .. attribute:: DBLDOT
 
     Compiled regular expression objects 
 
-    .. method:: DOT()
+    .. attribute:: DOT
 
     Compiled regular expression objects 
 
-    .. method:: EDFLAT()
+    .. attribute:: EDFLAT
 
     Compiled regular expression objects 
 
-    .. method:: EDNAT()
+    .. attribute:: EDNAT
 
     Compiled regular expression objects 
 
-    .. method:: EDSHARP()
+    .. attribute:: EDSHARP
 
     Compiled regular expression objects 
 
-    .. method:: FLAT()
+    .. attribute:: FLAT
 
     Compiled regular expression objects 
 
-    .. method:: ID_EL()
+    .. attribute:: ID_EL
 
     Compiled regular expression objects 
 
-    .. method:: LYRIC()
+    .. attribute:: LYRIC
 
     Compiled regular expression objects 
 
-    .. method:: OCTAVE2()
+    .. attribute:: OCTAVE2
 
     Compiled regular expression objects 
 
-    .. method:: OCTAVE3()
+    .. attribute:: OCTAVE3
 
     Compiled regular expression objects 
 
-    .. method:: OCTAVE4()
+    .. attribute:: OCTAVE4
 
     Compiled regular expression objects 
 
-    .. method:: OCTAVE5()
+    .. attribute:: OCTAVE5
 
     Compiled regular expression objects 
 
-    .. method:: PRECTIE()
+    .. attribute:: PRECTIE
 
     Compiled regular expression objects 
 
-    .. method:: REST()
+    .. attribute:: REST
 
     Compiled regular expression objects 
 
-    .. method:: SHARP()
+    .. attribute:: SHARP
 
     Compiled regular expression objects 
 
-    .. method:: TIE()
+    .. attribute:: TIE
 
     Compiled regular expression objects 
 
-    .. method:: TYPE()
+    .. attribute:: TYPE
 
     Compiled regular expression objects 
 
     .. method:: customNotationMatch()
 
+    No documentation. 
 
     .. method:: customPitchMatch()
 
@@ -134,47 +135,39 @@ Class TinyNotationStream
     >>> stream1.notes[0].octave
     3 
 
-    Inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    .. attribute:: flattenedRepresentationOf
+    .. attribute:: ENDBRAC
 
-    .. attribute:: groups
+    Compiled regular expression objects 
 
-    An instance of a Group object. 
+    .. attribute:: QUAD
 
-    .. attribute:: id
+    Compiled regular expression objects 
 
-    Unique identification string. 
+    .. attribute:: TRIP
 
-    .. attribute:: isFlat
-
-    .. attribute:: isSorted
+    Compiled regular expression objects 
 
     .. attribute:: stringRep
 
-    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Attributes inherited from :class:`music21.stream.Stream`: ``flattenedRepresentationOf``, ``isFlat``, ``isSorted``
 
-    .. method:: ENDBRAC()
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Compiled regular expression objects 
+    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    .. method:: QUAD()
-
-    Compiled regular expression objects 
-
-    .. method:: TRIP()
-
-    Compiled regular expression objects 
+    Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
     .. method:: getNote()
 
     called out so as to be subclassable 
 
-    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+    Methods inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isClass()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class HarmonyStream
@@ -204,33 +197,25 @@ Class HarmonyStream
 
     
 
-    Inherits from: :class:`music21.tinyNotation.TinyNotationStream`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.tinyNotation.TinyNotationStream`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    .. attribute:: flattenedRepresentationOf
+    Attributes inherited from :class:`music21.tinyNotation.TinyNotationStream`: ``ENDBRAC``, ``QUAD``, ``TRIP``, ``stringRep``
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.stream.Stream`: ``flattenedRepresentationOf``, ``isFlat``, ``isSorted``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: id
+    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
-    .. attribute:: isFlat
+    .. method:: getNote()
 
-    .. attribute:: isSorted
+    No documentation. 
 
-    .. attribute:: stringRep
+    Methods inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isClass()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.tinyNotation.TinyNotationStream`: ``ENDBRAC()``, ``QUAD()``, ``TRIP()``, ``getNote()``
-
-    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class HarmonyNote
@@ -239,12 +224,18 @@ Class HarmonyNote
 .. class:: HarmonyNote
 
 
-    Inherits from: :class:`music21.tinyNotation.TinyNotationNote`
+    Class inherits from: :class:`music21.tinyNotation.TinyNotationNote`
 
-    .. method:: HARMONY()
+    .. attribute:: HARMONY
 
     Compiled regular expression objects 
 
-    Inherited from :class:`music21.tinyNotation.TinyNotationNote`: ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``getDots()``
+    Attributes inherited from :class:`music21.tinyNotation.TinyNotationNote`: ``DBLDOT``, ``DOT``, ``EDFLAT``, ``EDNAT``, ``EDSHARP``, ``FLAT``, ``ID_EL``, ``LYRIC``, ``OCTAVE2``, ``OCTAVE3``, ``OCTAVE4``, ``OCTAVE5``, ``PRECTIE``, ``REST``, ``SHARP``, ``TIE``, ``TYPE``
+
+    .. method:: customNotationMatch()
+
+    checks to see if a note has markup in the form *TEXT* and if so, stores TEXT in the notes editorial.misc[] dictionary object See the demonstration in the docs for class HarmonyLine. 
+
+    Methods inherited from :class:`music21.tinyNotation.TinyNotationNote`: ``customPitchMatch()``, ``getDots()``
 
 

@@ -483,26 +483,31 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <tt class="descname">valType</tt><a class="headerlink" href="#music21.common.Scalar.valType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.common.Scalar.value">
 <tt class="descname">value</tt><a class="headerlink" href="#music21.common.Scalar.value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.common.Scalar.toFloat">
 <tt class="descname">toFloat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toFloat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.common.Scalar.toInt">
 <tt class="descname">toInt</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toInt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.common.Scalar.toUnicode">
 <tt class="descname">toUnicode</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toUnicode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 </dd></dl>
 
 </div>
@@ -513,18 +518,20 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
-<p>Inherits from: list</p>
-<dl class="attribute">
-<dt id="music21.common.defList.callDefault">
-<tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.defList.callDefault" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>Class inherits from: list</p>
 <dl class="attribute">
 <dt id="music21.common.defList.default">
 <tt class="descname">default</tt><a class="headerlink" href="#music21.common.defList.default" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Inherited from list: <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></p>
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.common.defList.callDefault">
+<tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.defList.callDefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<p>Methods inherited from list: <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -535,18 +542,27 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
-<p>Inherits from: dict</p>
-<dl class="attribute">
-<dt id="music21.common.defHash.callDefault">
-<tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.defHash.callDefault" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>Class inherits from: dict</p>
 <dl class="attribute">
 <dt id="music21.common.defHash.default">
 <tt class="descname">default</tt><a class="headerlink" href="#music21.common.defHash.default" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Inherited from dict: <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">copy()</span></tt>, <tt class="docutils literal"><span class="pre">fromkeys()</span></tt>, <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">has_key()</span></tt>, <tt class="docutils literal"><span class="pre">items()</span></tt>, <tt class="docutils literal"><span class="pre">iteritems()</span></tt>, <tt class="docutils literal"><span class="pre">iterkeys()</span></tt>, <tt class="docutils literal"><span class="pre">itervalues()</span></tt>, <tt class="docutils literal"><span class="pre">keys()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">popitem()</span></tt>, <tt class="docutils literal"><span class="pre">setdefault()</span></tt>, <tt class="docutils literal"><span class="pre">update()</span></tt>, <tt class="docutils literal"><span class="pre">values()</span></tt></p>
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.common.defHash.callDefault">
+<tt class="descname">callDefault</tt><a class="headerlink" href="#music21.common.defHash.callDefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>bool(x) -&gt; bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed.</p>
+<p>Attributes inherited from dict: <tt class="docutils literal"><span class="pre">fromkeys</span></tt></p>
+<dl class="method">
+<dt id="music21.common.defHash.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.defHash.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from dict: <tt class="docutils literal"><span class="pre">clear()</span></tt>, <tt class="docutils literal"><span class="pre">copy()</span></tt>, <tt class="docutils literal"><span class="pre">has_key()</span></tt>, <tt class="docutils literal"><span class="pre">items()</span></tt>, <tt class="docutils literal"><span class="pre">iteritems()</span></tt>, <tt class="docutils literal"><span class="pre">iterkeys()</span></tt>, <tt class="docutils literal"><span class="pre">itervalues()</span></tt>, <tt class="docutils literal"><span class="pre">keys()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">popitem()</span></tt>, <tt class="docutils literal"><span class="pre">setdefault()</span></tt>, <tt class="docutils literal"><span class="pre">update()</span></tt>, <tt class="docutils literal"><span class="pre">values()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -562,6 +578,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 <tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Timer.clear" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.common.Timer.start">
 <tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Timer.start" title="Permalink to this definition">¶</a></dt>
@@ -573,6 +590,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 <tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Timer.stop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 </dd></dl>
 
 </div>
@@ -588,6 +606,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
 <tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Iterator.next" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 </dd></dl>
 
 </div>

@@ -131,7 +131,7 @@ def slashMixedToFraction(valueSrc):
 
 
 def fractionToSlashMixed(fList):
-    '''Given a lost of fraction values, compact numerators by sum if
+    '''Given a list of fraction values, compact numerators by sum if
     denominators are the same 
 
     >>> fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])

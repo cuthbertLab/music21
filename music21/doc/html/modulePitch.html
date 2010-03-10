@@ -180,24 +180,14 @@ Used extensively by note.py</p>
 <dt id="music21.pitch.Pitch">
 <em class="property">
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<dd><p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.defaultOctave">
 <tt class="descname">defaultOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.defaultOctave" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="music21.pitch.Pitch.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.pitch.Pitch.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
-<dt id="music21.pitch.Pitch.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.pitch.Pitch.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Unique identification string.</p>
+<p>int(x[, base]) -&gt; integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead.</p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">groups</span></tt></p>
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.accidental">
 <tt class="descname">accidental</tt><a class="headerlink" href="#music21.pitch.Pitch.accidental" title="Permalink to this definition">¶</a></dt>
@@ -387,8 +377,8 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <span class="go">&#39;C&#39;</span>
 </pre></div>
 </div>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -399,27 +389,62 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <em class="property">
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accidental class.</p>
-<p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
-<dt id="music21.pitch.Accidental.alter">
-<tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.Accidental.alter" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Accidental.displayEvaluated">
+<tt class="descname">displayEvaluated</tt><a class="headerlink" href="#music21.pitch.Accidental.displayEvaluated" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displayLocation">
+<tt class="descname">displayLocation</tt><a class="headerlink" href="#music21.pitch.Accidental.displayLocation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displaySize">
+<tt class="descname">displaySize</tt><a class="headerlink" href="#music21.pitch.Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displayStyle">
+<tt class="descname">displayStyle</tt><a class="headerlink" href="#music21.pitch.Accidental.displayStyle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displayType">
+<tt class="descname">displayType</tt><a class="headerlink" href="#music21.pitch.Accidental.displayType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.modifier">
 <tt class="descname">modifier</tt><a class="headerlink" href="#music21.pitch.Accidental.modifier" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.name">
 <tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.Accidental.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>str(object) -&gt; string Return a nice string representation of the object. If the argument is a string, the return value is the same object.</p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.alter">
+<tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.Accidental.alter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>float(x) -&gt; floating point number Convert a string or number to a floating point number, if possible.</p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">id</span></tt></p>
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.pitch.Accidental.lily" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.Accidental.mx" title="Permalink to this definition">¶</a></dt>
@@ -435,7 +460,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <span class="go">&#39;quarter-sharp&#39;</span>
 </pre></div>
 </div>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
 <dt id="music21.pitch.Accidental.set">
 <tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
@@ -459,7 +484,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <span class="go">-2.0</span>
 </pre></div>
 </div>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>

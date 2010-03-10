@@ -17,21 +17,21 @@ Class Clef
 .. class:: Clef
 
 
-    Inherits from: :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: octaveChange
 
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+
     .. attribute:: sign
+
+    No documentation. 
+
+    .. attribute:: line
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: mx
 
@@ -50,9 +50,9 @@ Class Clef
     >>> a.get('clefOctaveChange')
     -1 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TrebleClef
@@ -61,33 +61,25 @@ Class TrebleClef
 .. class:: TrebleClef
 
 
-    Inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class BassClef
@@ -96,33 +88,25 @@ Class BassClef
 .. class:: BassClef
 
 
-    Inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Treble8vaClef
@@ -131,33 +115,23 @@ Class Treble8vaClef
 .. class:: Treble8vaClef
 
 
-    Inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.TrebleClef`: ``lowestLine``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    .. attribute:: id
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Unique identification string. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: lilyName
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    .. attribute:: line
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    .. attribute:: lowestLine
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GSopranoClef
@@ -166,33 +140,25 @@ Class GSopranoClef
 .. class:: GSopranoClef
 
 
-    Inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TabClef
@@ -201,27 +167,17 @@ Class TabClef
 .. class:: TabClef
 
 
-    Inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: id
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: line
-
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FClef
@@ -230,31 +186,21 @@ Class FClef
 .. class:: FClef
 
 
-    Inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    .. attribute:: id
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    .. attribute:: lilyName
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    .. attribute:: line
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class NoClef
@@ -263,27 +209,17 @@ Class NoClef
 .. class:: NoClef
 
 
-    Inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: id
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: line
-
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class AltoClef
@@ -292,33 +228,25 @@ Class AltoClef
 .. class:: AltoClef
 
 
-    Inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FBaritoneClef
@@ -327,33 +255,25 @@ Class FBaritoneClef
 .. class:: FBaritoneClef
 
 
-    Inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Treble8vbClef
@@ -362,33 +282,23 @@ Class Treble8vbClef
 .. class:: Treble8vbClef
 
 
-    Inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.TrebleClef`: ``lowestLine``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    .. attribute:: id
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Unique identification string. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: lilyName
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    .. attribute:: line
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    .. attribute:: lowestLine
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class PercussionClef
@@ -397,27 +307,17 @@ Class PercussionClef
 .. class:: PercussionClef
 
 
-    Inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: id
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: line
-
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class FrenchViolinClef
@@ -426,33 +326,25 @@ Class FrenchViolinClef
 .. class:: FrenchViolinClef
 
 
-    Inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GClef
@@ -461,31 +353,21 @@ Class GClef
 .. class:: GClef
 
 
-    Inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    .. attribute:: id
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    .. attribute:: lilyName
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    .. attribute:: line
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Bass8vbClef
@@ -494,33 +376,25 @@ Class Bass8vbClef
 .. class:: Bass8vbClef
 
 
-    Inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class TenorClef
@@ -529,33 +403,25 @@ Class TenorClef
 .. class:: TenorClef
 
 
-    Inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class SopranoClef
@@ -564,33 +430,25 @@ Class SopranoClef
 .. class:: SopranoClef
 
 
-    Inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CBaritoneClef
@@ -599,33 +457,25 @@ Class CBaritoneClef
 .. class:: CBaritoneClef
 
 
-    Inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class PitchClef
@@ -634,32 +484,25 @@ Class PitchClef
 .. class:: PitchClef
 
 
-    Inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
+    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lilyName
 
-    .. attribute:: line
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
 
-    .. attribute:: octaveChange
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: lily
 
+    No documentation. 
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class SubBassClef
@@ -668,33 +511,25 @@ Class SubBassClef
 .. class:: SubBassClef
 
 
-    Inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Bass8vaClef
@@ -703,33 +538,25 @@ Class Bass8vaClef
 .. class:: Bass8vaClef
 
 
-    Inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CClef
@@ -738,31 +565,21 @@ Class CClef
 .. class:: CClef
 
 
-    Inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    An instance of a Group object. 
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    .. attribute:: id
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Unique identification string. 
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    .. attribute:: lilyName
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
 
-    .. attribute:: line
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: octaveChange
-
-    .. attribute:: sign
-
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
-
-    Inherited from :class:`music21.clef.Clef`: ``mx``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MezzoSopranoClef
@@ -771,32 +588,24 @@ Class MezzoSopranoClef
 .. class:: MezzoSopranoClef
 
 
-    Inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
-
-    .. attribute:: groups
-
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lilyName
-
-    .. attribute:: line
+    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
     .. attribute:: lowestLine
 
-    .. attribute:: octaveChange
+    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
 
-    .. attribute:: sign
+    Attributes inherited from :class:`music21.clef.PitchClef`: ``lilyName``
 
-    Inherited from :class:`music21.clef.PitchClef`: ``lily``
+    Attributes inherited from :class:`music21.clef.Clef`: ``octaveChange``, ``sign``, ``line``
 
-    Inherited from :class:`music21.clef.Clef`: ``mx``
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.clef.PitchClef`: ``lily``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.clef.Clef`: ``mx``
+
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

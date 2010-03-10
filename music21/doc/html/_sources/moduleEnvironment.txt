@@ -18,7 +18,11 @@ Class Environment
 
     .. attribute:: modNameParent
 
+    No documentation. 
+
     .. attribute:: ref
+
+    dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
 
     .. method:: getSettingsPath()
 
@@ -34,6 +38,7 @@ Class Environment
 
     .. method:: keys()
 
+    No documentation. 
 
     .. method:: launch()
 
@@ -65,13 +70,13 @@ Class Preference
 
     
 
-    Inherits from: :class:`music21.node.Node`
+    Class inherits from: :class:`music21.node.Node`
 
-    .. attribute:: charData
+    Attributes inherited from :class:`music21.node.Node`: ``charData``
 
-    Inherited from :class:`music21.node.Node`: ``tag``
+    Properties inherited from :class:`music21.node.Node`: ``tag``
 
-    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Methods inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 
 Class Settings
@@ -83,16 +88,16 @@ Class Settings
 
     
 
-    Inherits from: :class:`music21.node.NodeList`, :class:`music21.node.Node`
+    Class inherits from: :class:`music21.node.NodeList`, :class:`music21.node.Node`
 
-    .. attribute:: charData
+    Attributes inherited from :class:`music21.node.NodeList`: ``componentList``
 
-    .. attribute:: componentList
+    Attributes inherited from :class:`music21.node.Node`: ``charData``
 
-    Inherited from :class:`music21.node.Node`: ``tag``
+    Properties inherited from :class:`music21.node.Node`: ``tag``
 
-    Inherited from :class:`music21.node.NodeList`: ``append()``
+    Methods inherited from :class:`music21.node.NodeList`: ``append()``
 
-    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Methods inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 

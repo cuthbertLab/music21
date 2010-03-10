@@ -104,17 +104,26 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
 <p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
 <dl class="attribute">
-<dt id="music21.base.Music21Object.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.base.Music21Object.groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>An instance of a Group object.</p>
-<dl class="attribute">
 <dt id="music21.base.Music21Object.id">
 <tt class="descname">id</tt><a class="headerlink" href="#music21.base.Music21Object.id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.base.Music21Object.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#music21.base.Music21Object.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
+</pre></div>
+</div>
 <dl class="attribute">
 <dt id="music21.base.Music21Object.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.Music21Object.duration" title="Permalink to this definition">¶</a></dt>
@@ -214,11 +223,6 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </pre></div>
 </div>
 <dl class="method">
-<dt>
-<tt class="descname">id</tt><big>(</big><big>)</big></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="music21.base.Music21Object.isClass">
 <tt class="descname">isClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.isClass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -270,13 +274,80 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
-<p>Inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p>Inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Class inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<dl class="attribute">
+<dt id="music21.base.ElementWrapper.obj">
+<tt class="descname">obj</tt><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.base.ElementWrapper.duration">
+<tt class="descname">duration</tt><a class="headerlink" href="#music21.base.ElementWrapper.duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;F#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el1</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el1</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="go">ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">KindaStupid</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">KindaStupid</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">duration</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">AttributeError</span>: <span class="n-Identifier">&#39;KindaStupid&#39; object has no attribute &#39;duration&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;whole&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">duration</span>  <span class="c"># still not defined</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">AttributeError</span>: <span class="n-Identifier">&#39;KindaStupid&#39; object has no attribute &#39;duration&#39;</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="music21.base.ElementWrapper.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.base.ElementWrapper.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unique identification string.</p>
+<dl class="attribute">
+<dt id="music21.base.ElementWrapper.offset">
+<tt class="descname">offset</tt><a class="headerlink" href="#music21.base.ElementWrapper.offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
 <dt id="music21.base.ElementWrapper.getId">
 <tt class="descname">getId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.getId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.base.ElementWrapper.isClass">
+<tt class="descname">isClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.isClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">NoneType</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A4&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">NoneType</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="music21.base.ElementWrapper.isTwin">
 <tt class="descname">isTwin</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.isTwin" title="Permalink to this definition">¶</a></dt>
@@ -305,16 +376,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.base.ElementWrapper.obj">
-<tt class="descname">obj</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="music21.base.ElementWrapper.setId">
 <tt class="descname">setId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.setId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -527,6 +594,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 <tt class="descname">removeById</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.removeById" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.base.DefinedContexts.setAttrByName">
 <tt class="descname">setAttrByName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.setAttrByName" title="Permalink to this definition">¶</a></dt>
@@ -585,8 +653,14 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
 <span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
 </pre></div>
 </div>
-<p>Inherits from: list</p>
-<p>Inherited from list: <tt class="docutils literal"><span class="pre">append()</span></tt>, <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></p>
+<p>Class inherits from: list</p>
+<dl class="method">
+<dt id="music21.base.Groups.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Groups.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from list: <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></p>
 </dd></dl>
 
 </div>

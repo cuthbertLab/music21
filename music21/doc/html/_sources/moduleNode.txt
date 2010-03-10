@@ -20,14 +20,19 @@ Class Node
 
     .. attribute:: charData
 
+    No documentation. 
+
     .. attribute:: tag
 
+    No documentation. 
 
     .. method:: get()
 
+    No documentation. 
 
     .. method:: getNewDoc()
 
+    No documentation. 
 
     .. method:: loadAttrs()
 
@@ -46,6 +51,7 @@ Class Node
 
     .. method:: set()
 
+    No documentation. 
 
     .. method:: setDefaults()
 
@@ -67,17 +73,20 @@ Class NodeList
 
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
-    Inherits from: :class:`music21.node.Node`
-
-    .. attribute:: charData
+    Class inherits from: :class:`music21.node.Node`
 
     .. attribute:: componentList
 
-    Inherited from :class:`music21.node.Node`: ``tag``
+    list() -> new list list(sequence) -> new list initialized from sequence's items 
+
+    Attributes inherited from :class:`music21.node.Node`: ``charData``
+
+    Properties inherited from :class:`music21.node.Node`: ``tag``
 
     .. method:: append()
 
+    No documentation. 
 
-    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Methods inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 

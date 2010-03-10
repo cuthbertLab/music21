@@ -322,16 +322,23 @@ Class Scalar
 
     .. attribute:: valType
 
+    No documentation. 
+
     .. attribute:: value
+
+    No documentation. 
 
     .. method:: toFloat()
 
+    No documentation. 
 
     .. method:: toInt()
 
+    No documentation. 
 
     .. method:: toUnicode()
 
+    No documentation. 
 
 
 Class defList
@@ -341,13 +348,17 @@ Class defList
 
     A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
 
-    Inherits from: list
-
-    .. attribute:: callDefault
+    Class inherits from: list
 
     .. attribute:: default
 
-    Inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
+    No documentation. 
+
+    .. attribute:: callDefault
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    Methods inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
 
 
 Class defHash
@@ -357,13 +368,23 @@ Class defHash
 
     A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
 
-    Inherits from: dict
-
-    .. attribute:: callDefault
+    Class inherits from: dict
 
     .. attribute:: default
 
-    Inherited from dict: ``clear()``, ``copy()``, ``fromkeys()``, ``get()``, ``has_key()``, ``items()``, ``iteritems()``, ``iterkeys()``, ``itervalues()``, ``keys()``, ``pop()``, ``popitem()``, ``setdefault()``, ``update()``, ``values()``
+    No documentation. 
+
+    .. attribute:: callDefault
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    Attributes inherited from dict: ``fromkeys``
+
+    .. method:: get()
+
+    No documentation. 
+
+    Methods inherited from dict: ``clear()``, ``copy()``, ``has_key()``, ``items()``, ``iteritems()``, ``iterkeys()``, ``itervalues()``, ``keys()``, ``pop()``, ``popitem()``, ``setdefault()``, ``update()``, ``values()``
 
 
 Class Timer
@@ -377,6 +398,7 @@ Class Timer
 
     .. method:: clear()
 
+    No documentation. 
 
     .. method:: start()
 
@@ -384,6 +406,7 @@ Class Timer
 
     .. method:: stop()
 
+    No documentation. 
 
 
 Class Iterator
@@ -397,5 +420,6 @@ Class Iterator
 
     .. method:: next()
 
+    No documentation. 
 
 

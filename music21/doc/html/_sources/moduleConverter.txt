@@ -35,6 +35,7 @@ Class Converter
 
     .. attribute:: stream
 
+    No documentation. 
 
     .. method:: parseData()
 
@@ -42,6 +43,7 @@ Class Converter
 
     .. method:: parseFile()
 
+    No documentation. 
 
     .. method:: parseURL()
 
@@ -60,9 +62,11 @@ Class ConverterMusicXML
 
     .. attribute:: stream
 
+    No documentation. 
 
     .. method:: getPartNames()
 
+    No documentation. 
 
     .. method:: load()
 
@@ -87,6 +91,8 @@ Class ConverterHumdrum
 
     .. attribute:: stream
 
+    No documentation. 
+
     .. method:: parseData()
 
     Open from a string 
@@ -107,5 +113,6 @@ Class PickleFilter
 
     .. method:: status()
 
+    No documentation. 
 
 

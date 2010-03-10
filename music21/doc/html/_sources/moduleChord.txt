@@ -16,29 +16,29 @@ Class Chord
 
     
 
-    Inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
 
-    .. attribute:: articulations
+    .. attribute:: isChord
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. attribute:: isNote
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. attribute:: isRest
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     .. attribute:: beams
 
-    .. attribute:: duration
+    A group of beams applied to a single note that represents the partial beam structure of many notes beamed together. 
 
-    .. attribute:: editorial
+    Attributes inherited from :class:`music21.note.NotRest`: ``stemDirection``
 
-    .. attribute:: groups
+    Attributes inherited from :class:`music21.note.GeneralNote`: ``lyrics``, ``notations``, ``editorial``, ``tie``, ``articulations``
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: lyrics
-
-    .. attribute:: notations
-
-    .. attribute:: tie
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: chordTablesAddress
 
@@ -254,9 +254,9 @@ Class Chord
 
     Return a representation of the Chord as a prime-form set class string. 
 
-    Inherited from :class:`music21.note.GeneralNote`: ``color``, ``lyric``, ``musicxml``, ``quarterLength``
+    Properties inherited from :class:`music21.note.GeneralNote`: ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
     .. method:: areZRelations()
 
@@ -346,6 +346,10 @@ Class Chord
     >>> a = Chord(['g', 'b', 'd', 'f'])
     >>> a.determineType()
     'Dominant Seventh' 
+
+    .. method:: duration()
+
+    Duration of the chord can be defined here OR it should return the duration of the first note of the chord 
 
     .. method:: findBass()
 
@@ -527,14 +531,6 @@ Class Chord
     >>> other.isMinorTriad() # returns False
     False 
 
-    .. method:: isNote()
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
-    .. method:: isRest()
-
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
-
     .. method:: isSeventh()
 
     Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example: 
@@ -596,9 +592,11 @@ Class Chord
 
     .. method:: semiClosedPosition()
 
+    No documentation. 
 
     .. method:: sortAscending()
 
+    No documentation. 
 
     .. method:: sortChromaticAscending()
 
@@ -617,10 +615,10 @@ Class Chord
 
     Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
 
-    Inherited from :class:`music21.note.NotRest`: ``splitNoteAtPoint()``
+    Methods inherited from :class:`music21.note.NotRest`: ``splitNoteAtPoint()``
 
-    Inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
+    Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``duration()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

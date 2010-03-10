@@ -140,20 +140,14 @@ class RestructuredWriter(object):
         True
         '''
         modName = mroEntry.__module__
-        modName = modName.replace('music21.', '') # remove leading music21
         className = mroEntry.__name__
-        modNameCapital = modName[0].upper() + modName[1:]
         if modName == '__builtin__':
             return className
         else:
-            return ':class:`music21.%s.%s`' % (modName, className)
-            #return '%s.%s (of module :ref:`module%s`)' % (modName, className,
-            #                                        modNameCapital)
-        # return in this form to get a cross reference
-        # :ref:`moduleSerial`
+            return ':class:`%s.%s`' % (modName, className)
 
     def formatClassInheritance(self, mro):
-        '''Given a lost of classes from inspect.getmro, return a formatted
+        '''Given a list of classes from inspect.getmro, return a formatted
         String
 
         >>> from music21 import note
@@ -165,7 +159,7 @@ class RestructuredWriter(object):
         True
         '''
         msg = []
-        msg.append('Inherits from:')
+        msg.append('Class inherits from:')
         sub = []
         for i in range(len(mro)):
             if i == 0: continue # first is always the class itself
@@ -229,26 +223,247 @@ class RestructuredWriter(object):
         return ''.join(msg)
 
 
-#     def _fmtRstDocStr(self, docStr):
-#         '''Some doc strings have double spaces; these need to removed, as they
-#         are interpreted by RST as a section break.
-#         '''
-#         #docStr = docStr.strip()
-#         docLines = docStr.split('\n')
-#         docPost = []
-#         count = 0 # count consec line breaks
-#         for line in docLines:
-#             if line.strip() == '':
-#                 count += 1
-#             else:
-#                 count = 0
-#             # if less than 2 consecutive lines of white space
-#             if line.strip() == '' and count > 1: 
-#                 continue
-# 
-#             docPost.append(line)
-# 
-#         return '\n'.join(docPost) + '\n'
+#-------------------------------------------------------------------------------
+class PartitionedNameSpace(object):
+    '''Given an evaluated class name as an argument, mange and present
+    All data for all attributes, methods, and properties.
+
+    Note that this only gets data attributes that are defined outside
+    of the __init__ definition of the Class. 
+    '''
+    def __init__(self, classNameEval):
+        '''
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> len(a.names) > 30
+        True
+        >>> a.mro
+        (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <type 'object'>)
+
+        '''
+        self.classNameEval = classNameEval
+        try:
+            self.classObj = self.classNameEval()
+        except TypeError:
+            self.classObj = None
+        self.mro = inspect.getmro(self.classNameEval)
+        self.mroLive = self._createMroLive()
+
+        # store both a list of names as well as name/mro index pairs
+        self.names = []
+        self.namesMroIndex = []
+
+        # this will get much but not all data
+        self._dataClassify = inspect.classify_class_attrs(self.classNameEval)
+        for element in self._dataClassify:
+            # get mro index number
+            self.names.append(element.name)
+            mroIndexMatch = self.mro.index(element.defining_class)
+            self.namesMroIndex.append((element.name, mroIndexMatch))
+
+        # add dataLive after processing names from classify
+        # this assures that names are not duplicated
+        self._dataLive = self._fillDataLive()
+        for element in self._dataLive:
+            # get mro index number
+            self.names.append(element.name)
+            mroIndexMatch = self.mro.index(element.defining_class)            
+            self.namesMroIndex.append((element.name, mroIndexMatch))
+
+        # create a combined data storage
+        # this will match the order in names, and namesMroIndex
+        self._data = self._dataClassify + self._dataLive
+
+    def _createMroLive(self):
+        '''Try to create the mro order but with live objects.
+
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> len(a._createMroLive()) == 3
+        True
+        '''
+        post = []
+        for entry in self.mro:
+            try:
+                obj = entry()
+            except TypeError:
+                obj = None
+            post.append(obj)
+        return post
+
+    def _fillDataLive(self):
+        post = []
+        # we cannot get this data if the object cannot be instantiated
+        if self.classObj == None: 
+            return post
+        # dir(self.classObj) will get all names
+        # want only writable attributes: 
+        for name in self.classObj.__dict__.keys():
+            if name in self.names:
+                continue # already have all the info we need
+            # using an attribute class to match the form given by 
+            # inspect.classify_class_attrs
+            obj = self.classObj.__dict__[name]
+            kind = 'data' # always from __dict__, it seems
+            # go through live mroLive objects and try to find
+            # this attribute
+            mroIndices = self.mroIndices()
+            mroIndices.reverse()
+            homecls = None
+            for mroIndex in mroIndices:
+                if (hasattr(self.mroLive[mroIndex], '__dict__') and 
+                    name in self.mroLive[mroIndex].__dict__.keys()):
+                    # if found, set class name to heomcls
+                    homecls = self.mro[mroIndex]
+                    break
+            if homecls == None:
+                homecls = self.classNameEval
+
+            post.append(inspect.Attribute(name, kind, homecls, obj))
+        return post
+
+    def findMroIndex(self, partName):
+        '''Given an partName, find from where (in the list of methods) the part is derived. Returns an index number value.
+
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a.findMroIndex('midi')
+        0
+        >>> a.findMroIndex('id')
+        1
+        '''        
+        i = self.names.index(partName)
+        name, mroIndex = self.namesMroIndex[i]
+        return mroIndex
+
+    def mroIndices(self):
+        return range(len(self.mro))
+
+    def lastMroIndex(self):
+        '''
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a.lastMroIndex()
+        2
+        '''
+        return len(self.mro)-1
+
+    def getElement(self, partName):
+        '''
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a.getElement('midi')
+        Attribute(name='midi', kind='property', defining_class=<class 'music21.pitch.Pitch'>, object=<property object...
+        >>> a.getElement('id')
+        Attribute(name='id', kind='data', defining_class=<class 'music21.base.Music21Object'>, object=None)
+        >>> a.getElement('_getDiatonicNoteNum')
+        Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<function...
+
+        '''
+        return self._data[self.names.index(partName)]
+
+    def getSignature(self, partName):
+        '''Expand to include signatures when possible
+
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a.getSignature('midi')
+        ''
+        '''
+        element = self.getElement(partName)
+        if element.kind == 'method':
+            msg = '()'
+        elif element.kind == 'property':
+            msg = ''
+        elif element.kind == 'data':
+            msg = ''
+        return msg
+
+    def getDefiningClass(self, partName):
+        element = getElement(partName)
+        return element.defining_class
+
+    def getClassFromMroIndex(self, mroIndex):
+        return self.mro[mroIndex]
+
+
+    def getDoc(self, partName):
+        element = self.getElement(partName)
+        match = None
+        try:
+            match = element.object.__doc__
+        except AttributeError:
+            match = None
+
+        if match == None:
+            if hasattr(self.classNameEval, '_DOC_ATTR'):
+                if partName in self.classNameEval._DOC_ATTR.keys():
+                    match = self.classNameEval._DOC_ATTR[partName]
+
+        if match == None:
+            return 'No documentation.'
+        else:
+            return match
+
+    def getNames(self, nameKind, mroIndex=None, public=True):
+        '''Name type can be method, data, property
+
+        >>> from music21 import pitch
+        >>> a = PartitionedNameSpace(pitch.Pitch)
+
+        >>> a.getNames('property')
+        ['accidental', 'diatonicNoteNum', 'duration', 'freq440', 'frequency', 'german', 'implicitOctave', 'midi', 'musicxml', 'mx', 'name', 'nameWithOctave', 'octave', 'offset', 'parent', 'pitchClass', 'priority', 'ps', 'step']
+
+        >>> a.getNames('method')
+        ['addContext', 'addLocationAndParent', 'getContextAttr', 'getContextByClass', 'getOffsetBySite', 'isClass', 'searchParent', 'setContextAttr', 'show', 'write']
+
+        >>> a.getNames('method', mroIndex=0)
+        []
+        >>> a.getNames('data', mroIndex=0)
+        ['defaultOctave']
+        >>> a.getNames('data', mroIndex=1)
+        ['id', 'groups']
+        >>> a.getNames('data', mroIndex=a.lastMroIndex())
+        []
+
+        >>> from music21 import converter
+        >>> a = PartitionedNameSpace(converter.Converter)
+        >>> a.getNames('methods')
+        ['parseData', 'parseFile', 'parseURL']
+
+        >>> from music21 import meter
+        >>> a = PartitionedNameSpace(meter.TimeSignature)
+        >>> a.getNames('methods')
+        ['addContext', 'addLocationAndParent', 'getAccent', 'getAccentWeight', 'getBeams', 'getBeat', 'getBeatDepth', 'getBeatProgress', 'getContextAttr', 'getContextByClass', 'getOffsetBySite', 'isClass', 'load', 'loadRatio', 'quarterPositionToBeat', 'ratioEqual', 'searchParent', 'setAccentWeight', 'setContextAttr', 'setDisplay', 'show', 'write']
+        >>> a.getNames('attributes', 1)
+        ['id', 'groups']
+
+        '''
+        post = []
+        if nameKind.lower() in ['properties', 'property']:
+            nameKind = 'property'
+        elif nameKind.lower() in ['methods', 'method']:
+            nameKind = 'method'
+        elif nameKind.lower() in ['data', 'attributes', 'attribute']:
+            nameKind = 'data'
+
+        for name in self.names:
+            element = self.getElement(name)
+            if public:
+                if name.startswith('__') or name.startswith('_'): 
+                    continue
+
+            #environLocal.printDebug(['kinds', name, element.kind])
+
+            if not element.kind == nameKind:
+                continue
+            if mroIndex != None: # select by mro
+                #environLocal.printDebug(['mroindex', self.findMroIndex(name)])
+                if mroIndex == self.findMroIndex(name):
+                    post.append(name)
+            else:
+                post.append(name)
+        return post
 
 
 #-------------------------------------------------------------------------------
@@ -262,90 +477,89 @@ class ClassDoc(RestructuredWriter):
 
         self.className = className
         self.classNameEval = eval(className)
-
+        self.pns = PartitionedNameSpace(self.classNameEval)
         # this is a tuple of class instances that are in the order
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
 
         # cannot do this in all cases
         #self.obj = self.classNameEval()
+        #self.derivations = {} # a dictionary of mro index, name lists
 
-        self.info = {}
-        self.scanClass() # will fill self.info using self.classNameEval
+        self.docCooked = self.formatDocString(self.classNameEval.__doc__, INDENT)
+
         self.name = self.classNameEval.__name__
 
-    def findDerivationClass(self, mro, partName):
-        '''Given an mro (method resolution order) and a part of an object, find from where the part is derived. Returns an index number value.
-        '''
-        lastIndex = None
-        for i in range(len(mro)):
-            classPart = mro[i]
-            classDir = dir(classPart)
-            if partName in classDir:
-                lastIndex = i
-            else:
-                break # none further should match
-        if lastIndex == None:
-            raise Exception('cannot find %s in %s' % (partName, mro))
-        return lastIndex
+#     def findDerivationClass(self, mro, partName):
+#         '''Given an mro (method resolution order) and a part of this object, find from where (in the lost of methods) the part is derived. Returns an index number value.
+#         '''
+#         lastIndex = None
+#         for i in range(len(mro)):
+#             classPart = mro[i]
+#             classDir = dir(classPart)
+#             if partName in classDir:
+#                 lastIndex = i
+#             else:
+#                 break # none further should match
+#         if lastIndex == None:
+#             raise Exception('cannot find %s in %s' % (partName, mro))
+#         return lastIndex
+# 
+
+#     def scanMethod(self, obj):
+#         methodInfo = {}
+#         #methodInfo['name'] = str(obj)
+#         methodInfo['doc'] = self.formatDocString(obj.__doc__, INDENT)
+#         return methodInfo
 
 
-    def scanMethod(self, obj):
-        methodInfo = {}
-        #methodInfo['name'] = str(obj)
-        methodInfo['doc'] = self.formatDocString(obj.__doc__, INDENT)
-        return methodInfo
+#     def scanClass(self):
+#         '''For an object provided as an argument, collect all relevant
+#         information in a dictionary. 
+#         '''
+# 
+#         info = {}
+#         #info['reference'] = self.classNameEval
+#         self.info = info
 
-
-    def scanClass(self):
-        '''For an object provided as an argument, collect all relevant
-        information in a dictionary. 
-        '''
-
-        info = {}
-        info['reference'] = self.classNameEval
-        info['doc']  = self.formatDocString(self.classNameEval.__doc__, INDENT)
-        info['properties'] = {}
-        info['methods'] = {}
-        info['derivations'] = {} # a dictionary of mro index, name lists
-        info['attributes'] = {}
+#         info['properties'] = {}
+#         info['methods'] = {}
+#         info['attributes'] = {}
         # get a list of parent objects, starting from this one
         # provide obj, not obj.__class__
 
-        for partName in dir(self.classNameEval):
-            # partName is a string
-            if partName.startswith('__'): 
-                continue
-            if partName.startswith('_'): 
-                continue
+#         for partName in dir(self.classNameEval):
+#             # partName is a string
+#             if partName.startswith('__'): 
+#                 continue
+#             if partName.startswith('_'): 
+#                 continue
 
             # add to a list the index, name of derived obj
             # derivation from mro
             # index number is methhod resolution order
-            mroIndex = self.findDerivationClass(self.mro, partName)
-            if mroIndex not in info['derivations'].keys():
-                info['derivations'][mroIndex] = []
-            info['derivations'][mroIndex].append(partName)
+#             mroIndex = self.findDerivationClass(self.mro, partName)
+#             if mroIndex not in self.derivations.keys():
+#                 self.derivations[mroIndex] = []
+#             self.derivations[mroIndex].append(partName)
 
-            partObj = getattr(self.classNameEval, partName)
-            if (isinstance(partObj, types.StringTypes) or 
-                isinstance(partObj, types.DictionaryType) or 
-                isinstance(partObj, types.ListType) 
-                ):
-                continue
-
-            if isinstance(partObj, property):
-                # can use method processing on properties
-                info['properties'][partName] = self.scanMethod(partObj)
-            elif (callable(partObj) or hasattr(partObj, '__doc__')):
-                info['methods'][partName] = self.scanMethod(partObj)
-            else:
-                environLocal.printDebug(['noncallable', part])
+#             partObj = getattr(self.classNameEval, partName)
+#             if (isinstance(partObj, types.StringTypes) or 
+#                 isinstance(partObj, types.DictionaryType) or 
+#                 isinstance(partObj, types.ListType)):
+#                 continue
+# 
+#             if isinstance(partObj, property):
+#                 # can use method processing on properties
+#                 info['properties'][partName] = self.scanMethod(partObj)
+#             elif (callable(partObj) or hasattr(partObj, '__doc__')):
+#                 info['methods'][partName] = self.scanMethod(partObj)
+#             else:
+#                 environLocal.printDebug(['noncallable', part])
 
 
         # will sort by index, which is proximity to this class
         #environLocal.printDebug(info['derivations'])
-        self.info = info
         #self.classes[obj.__name__] = info
 
 
@@ -354,19 +568,21 @@ class ClassDoc(RestructuredWriter):
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-        if  groupKey == 'properties':
-            msg.append('%s\n' %  ( 
-                self.info[groupKey][name]['doc']))
-        elif groupKey == 'attributes':
-            # check for doc attribute documentation
-            if hasattr(self.classNameEval, '_DOC_ATTR'):
-                if name in self.classNameEval._DOC_ATTR.keys():
-                    msg.append('%s\n' %  (self.formatDocString(
-                                self.classNameEval._DOC_ATTR[name], INDENT)))
-            else:
-                environLocal.printDebug(['_DOC_ATTR not found in', self.classNameEval])
-        else:
-            raise Exceptioin('bad groupKey %s' % groupKey)
+
+        docRaw = self.pns.getDoc(name)
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
+
+#         if  groupKey == 'properties':
+#         elif groupKey == 'attributes':
+#             # check for doc attribute documentation
+#             if hasattr(self.classNameEval, '_DOC_ATTR'):
+#                 if name in self.classNameEval._DOC_ATTR.keys():
+#                     msg.append('%s\n' %  (self.formatDocString(
+#                                 self.classNameEval._DOC_ATTR[name], INDENT)))
+#             else:
+#                 environLocal.printDebug(['_DOC_ATTR not found in', self.classNameEval])
+#         else:
+#             raise Exceptioin('bad groupKey %s' % groupKey)
         return ''.join(msg)
 
     def _fmtRstMethod(self, groupKey, name):
@@ -374,39 +590,40 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s.. method:: %s()\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         # do not need indent as doc is already formatted with indent
-        msg.append('%s\n' % (self.info[groupKey][name]['doc']))
+        docRaw = self.pns.getDoc(name)
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
 
 
-    def _getAttributes(self):
-        obj = None
-        try: # create a dummy object and list its attributes
-            obj = self.info['reference']()
-        except TypeError:
-            pass
-        msg = []
-        if obj != None:
-            attrList = obj.__dict__.keys()
-            attrList.sort()
-            attrPublic = []
-            attrPrivate = []
-            for attr in attrList:
-                if not attr.startswith('_'):
-                    attrPublic.append(attr)
-#            if len(attrPublic) > 0:
-                #msg += self._heading('Attributes', '~')
-                # not working:
-#                 for i, nameFound in self.info['derivations']:
-#                     if nameFound not in attrPublic:
-#                         continue
-#                     #msg += self._list(attrPublic)
-            for nameFound in attrPublic:
-                # TODO: names are not presenting properly, not showing
-                # class name, only module name          
-                # need to hide inherited attributes
-                msg.append(self._fmtRstAttribute('attributes', nameFound))
-                #msg.append('**%s**\n\n' % nameFound)
-        return msg
+#     def _getAttributes(self):
+#         obj = None
+#         try: # create a dummy object and list its attributes
+#             obj = self.info['reference']()
+#         except TypeError:
+#             pass
+#         msg = []
+#         if obj != None:
+#             attrList = obj.__dict__.keys()
+#             attrList.sort()
+#             attrPublic = []
+#             attrPrivate = []
+#             for attr in attrList:
+#                 if not attr.startswith('_'):
+#                     attrPublic.append(attr)
+# #            if len(attrPublic) > 0:
+#                 #msg += self._heading('Attributes', '~')
+#                 # not working:
+# #                 for i, nameFound in self.info['derivations']:
+# #                     if nameFound not in attrPublic:
+# #                         continue
+# #                     #msg += self._list(attrPublic)
+#             for nameFound in attrPublic:
+#                 # TODO: names are not presenting properly, not showing
+#                 # class name, only module name          
+#                 # need to hide inherited attributes
+#                 msg.append(self._fmtRstAttribute('attributes', nameFound))
+#                 #msg.append('**%s**\n\n' % nameFound)
+#         return msg
 
 
     def getRestructuredClass(self):
@@ -419,90 +636,119 @@ class ClassDoc(RestructuredWriter):
         titleStr = '.. class:: %s\n\n' % self.name
         msg += titleStr
 
-        msg.append('%s\n' % (self.info['doc']))
+        msg.append('%s\n' % self.docCooked)
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
 
-        msg += self._getAttributes()
+        #msg += self._getAttributes()
 
-        for groupKey, postfix in [('properties', ''), ('methods', '()')
-                                    ]:
-            methodNames = self.info[groupKey].keys()
-
-            # segragating methods names is still necessary
-            methodPublic = []
-            for methodName in methodNames:
-                if not methodName.startswith('_'):
-                    methodPublic.append(methodName)
-            if len(methodPublic) == 0: 
-                continue    
-
-            # first, we need to count the number of names for each mro index
-            # group
-            derivationsCount = {}
-            for i in self.info['derivations'].keys():
-                for nameFound in self.info['derivations'][i]:
-                    if nameFound not in methodPublic:
-                        continue
-                    if i not in derivationsCount.keys():
-                        derivationsCount[i] = 1 # count first
-                    else:
-                        derivationsCount[i] += 1
-            #environLocal.printDebug(['derivations', self.info['derivations']])
-
-            iCurrent = None
-            iCount = None
-
-            for i in self.info['derivations'].keys():
-                if i == len(self.mro) - 1:
-                    continue # skip names dervied from object
-                if len(self.info['derivations'][i]) == 0:
+        #for group in ['attributes', 'properties', 'methods']:
+        for group in ['attributes', 'properties', 'methods']:
+            for mroIndex in self.pns.mroIndices():
+                if mroIndex == self.pns.lastMroIndex():
                     continue
+                names = self.pns.getNames(group, mroIndex, public=True)
+                if len(names) == 0: continue
 
-                # will be Properties, Methods
-                if i == 0:
-                    groupTitle = '%s' % groupKey.title() 
-                    #msg += self._heading(groupTitle, '~') 
-                if i == 1: # only do first one
-                    groupTitle = '%s (Inherited)' % (groupKey.title())
-                    #msg += self._heading(groupTitle, '~') 
+                if mroIndex != 0:
+                    parentSrc = self.formatParent(
+                        self.pns.getClassFromMroIndex(mroIndex))
+                    groupStr = group.title()
+                    msg.append('%s%s inherited from %s: ' % (INDENT, groupStr,
+                                                             parentSrc))
 
-                for nameFound in self.info['derivations'][i]:
-                    if nameFound not in methodPublic:
-                        continue
-            
-                    if i != iCurrent:
-                        iCurrent = i # store last value
-                        iCount = 0 # reset to 0, increment below
-                        if i != 0:
-                            # TODO: link directly to the Class, not to the    
-                            # the module page
-                            # inherited from music21.base.Music21Object
-                            parentSrc = self.formatParent(self.mro[i])
-                            titleStr = 'Inherited from %s: ' % parentSrc
-                            msg.append('%s%s' % (INDENT, titleStr))
-#                         else: # when i is zero these are the local methods
-#                             titleStr = 'Locally Defined:' 
-#                             msg.append('    %s\n\n' % titleStr)
-    
-                    # increment count for this derivation index
-                    iCount += 1
-    
-                    if i != 0: # if not locally defined
-                        if iCount < derivationsCount[i]: # last in this group
-                            msg.append('``%s%s``, ' % (nameFound, postfix))   
-                        else: # last of list, no comma
-                            msg.append('``%s%s``\n\n' % (nameFound, postfix))   
-    
-                    # i is the count within the list of inheritance; if i is 0
-                    # that means that these features are locally defined
-                    elif i == 0: # only provide full doc
-                        if groupKey == 'properties':
-                            msg.append(self._fmtRstAttribute(groupKey,
-                                       nameFound))
-                        elif groupKey == 'methods':
-                            msg.append(self._fmtRstMethod(groupKey, nameFound))
+                    msgSub = []
+                    for partName in names:
+                        postfix = self.pns.getSignature(partName)
+                        msgSub.append('``%s%s``' % (partName, postfix))   
+                    msg.append('%s\n\n' % ', '.join(msgSub))
+                else:
+                    for partName in names:
+                        if group in ['properties', 'attributes']:
+                            msg.append(self._fmtRstAttribute(group,
+                                       partName))
+                        elif group == 'methods':
+                            msg.append(self._fmtRstMethod(group, partName))
         msg.append('\n'*1)
         return msg
+
+
+
+
+
+
+#         for groupKey, postfix in [('properties', ''), ('methods', '()')
+#                                     ]:
+#             methodNames = self.info[groupKey].keys()
+#             if len(methodNames) == 0: 
+#                 continue    
+# 
+#             # first, we need to count the number of names for each mro index
+#             # group
+#             derivationsCount = {}
+#             for i in self.derivations.keys():
+#                 for nameFound in self.derivations[i]:
+#                     if nameFound not in methodNames:
+#                         continue
+#                     if i not in derivationsCount.keys():
+#                         derivationsCount[i] = 1 # count first
+#                     else:
+#                         derivationsCount[i] += 1
+#             #environLocal.printDebug(['derivations', self.info['derivations']])
+# 
+#             iCurrent = None
+#             iCount = None
+# 
+#             for i in self.derivations.keys():
+#                 if i == len(self.mro) - 1:
+#                     continue # skip names dervied from object
+#                 if len(self.derivations[i]) == 0:
+#                     continue
+# 
+#                 # will be Properties, Methods
+#                 if i == 0:
+#                     groupTitle = '%s' % groupKey.title() 
+#                     #msg += self._heading(groupTitle, '~') 
+#                 if i == 1: # only do first one
+#                     groupTitle = '%s (Inherited)' % (groupKey.title())
+#                     #msg += self._heading(groupTitle, '~') 
+# 
+#                 for nameFound in self.derivations[i]:
+#                     if nameFound not in methodNames:
+#                         continue
+#             
+#                     if i != iCurrent:
+#                         iCurrent = i # store last value
+#                         iCount = 0 # reset to 0, increment below
+#                         if i != 0:
+#                             # TODO: link directly to the Class, not to the    
+#                             # the module page
+#                             # inherited from music21.base.Music21Object
+#                             parentSrc = self.formatParent(self.mro[i])
+#                             titleStr = 'Inherited from %s: ' % parentSrc
+#                             msg.append('%s%s' % (INDENT, titleStr))
+# #                         else: # when i is zero these are the local methods
+# #                             titleStr = 'Locally Defined:' 
+# #                             msg.append('    %s\n\n' % titleStr)
+#     
+#                     # increment count for this derivation index
+#                     iCount += 1
+#     
+#                     if i != 0: # if not locally defined
+#                         if iCount < derivationsCount[i]: # last in this group
+#                             msg.append('``%s%s``, ' % (nameFound, postfix))   
+#                         else: # last of list, no comma
+#                             msg.append('``%s%s``\n\n' % (nameFound, postfix))   
+#     
+#                     # i is the count within the list of inheritance; if i is 0
+#                     # that means that these features are locally defined
+#                     elif i == 0: # only provide full doc
+#                         if groupKey == 'properties':
+#                             msg.append(self._fmtRstAttribute(groupKey,
+#                                        nameFound))
+#                         elif groupKey == 'methods':
+#                             msg.append(self._fmtRstMethod(groupKey, nameFound))
+#         msg.append('\n'*1)
+#         return msg
 
 
 

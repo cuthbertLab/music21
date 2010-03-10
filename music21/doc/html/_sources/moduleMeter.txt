@@ -9,7 +9,7 @@ music21.meter
 
 .. function:: fractionToSlashMixed()
 
-Given a lost of fraction values, compact numerators by sum if denominators are the same 
+Given a list of fraction values, compact numerators by sum if denominators are the same 
 
 >>> fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])
 [('3+2+5', 8), ('3', 4), ('2+1+4', 16)] 
@@ -76,31 +76,41 @@ Class TimeSignature
 .. class:: TimeSignature
 
 
-    Inherits from: :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.base.Music21Object`
 
-    .. attribute:: accent
+    .. attribute:: symbolizeDenominator
 
-    .. attribute:: beam
-
-    .. attribute:: beat
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     .. attribute:: display
 
-    .. attribute:: groups
+    A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
-    An instance of a Group object. 
+    .. attribute:: beat
 
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: inherited
-
-    .. attribute:: summedNumerator
+    A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
     .. attribute:: symbol
 
-    .. attribute:: symbolizeDenominator
+    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+
+    .. attribute:: accent
+
+    A meter sequence is a list of MeterTerminals, or other MeterSequences 
+
+    .. attribute:: summedNumerator
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. attribute:: beam
+
+    A meter sequence is a list of MeterTerminals, or other MeterSequences 
+
+    .. attribute:: inherited
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
     .. attribute:: barDuration
 
@@ -125,6 +135,7 @@ Class TimeSignature
 
     .. attribute:: denominator
 
+    No documentation. 
 
     .. attribute:: lily
 
@@ -151,14 +162,17 @@ Class TimeSignature
 
     .. attribute:: numerator
 
+    No documentation. 
 
     .. attribute:: quarterLengthToBeatLengthRatio
 
+    No documentation. 
 
     .. attribute:: totalLength
 
+    No documentation. 
 
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: getAccent()
 
@@ -303,7 +317,7 @@ Class TimeSignature
     >>> a.display
     <MeterSequence {3/4}> 
 
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CompoundTimeSignature
@@ -312,39 +326,19 @@ Class CompoundTimeSignature
 .. class:: CompoundTimeSignature
 
 
-    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    .. attribute:: accent
+    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
 
-    .. attribute:: beam
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: beat
+    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    .. attribute:: display
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: groups
+    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: inherited
-
-    .. attribute:: summedNumerator
-
-    .. attribute:: symbol
-
-    .. attribute:: symbolizeDenominator
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class NonPowerOfTwoTimeSignature
@@ -353,39 +347,19 @@ Class NonPowerOfTwoTimeSignature
 .. class:: NonPowerOfTwoTimeSignature
 
 
-    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    .. attribute:: accent
+    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
 
-    .. attribute:: beam
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: beat
+    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    .. attribute:: display
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: groups
+    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: inherited
-
-    .. attribute:: summedNumerator
-
-    .. attribute:: symbol
-
-    .. attribute:: symbolizeDenominator
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterTerminal
@@ -411,6 +385,7 @@ Class MeterTerminal
 
     .. attribute:: denominator
 
+    No documentation. 
 
     .. attribute:: depth
 
@@ -433,9 +408,11 @@ Class MeterTerminal
 
     .. attribute:: numerator
 
+    No documentation. 
 
     .. attribute:: weight
 
+    No documentation. 
 
     .. method:: ratioEqual()
 
@@ -473,39 +450,19 @@ Class DurationDenominatorTimeSignature
 
     If you have played Hindemith you know these, 3/(dot-quarter) etc. 
 
-    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
+    Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    .. attribute:: accent
+    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
 
-    .. attribute:: beam
+    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    .. attribute:: beat
+    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    .. attribute:: display
+    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. attribute:: groups
+    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    An instance of a Group object. 
-
-    .. attribute:: id
-
-    Unique identification string. 
-
-    .. attribute:: inherited
-
-    .. attribute:: summedNumerator
-
-    .. attribute:: symbol
-
-    .. attribute:: symbolizeDenominator
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
-
-    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
-
-    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterSequence
@@ -515,11 +472,23 @@ Class MeterSequence
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
-    Inherits from: :class:`music21.meter.MeterTerminal`
+    Class inherits from: :class:`music21.meter.MeterTerminal`
 
     .. attribute:: parenthesis
 
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
     .. attribute:: summedNumerator
+
+    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+
+    .. attribute:: denominator
+
+    No documentation. 
+
+    .. attribute:: depth
+
+    Return how many unique levels deep this part is This should be optimized to store values unless the structure has changed. 
 
     .. attribute:: flat
 
@@ -548,7 +517,26 @@ Class MeterSequence
 
     
 
-    Inherited from :class:`music21.meter.MeterTerminal`: ``denominator``, ``depth``, ``duration``, ``numerator``, ``weight``
+    .. attribute:: numerator
+
+    No documentation. 
+
+    .. attribute:: weight
+
+    
+
+    >>> a = MeterSequence('3/4')
+    >>> a.partition(3)
+    >>> a.weight = 1
+    >>> a[0].weight
+    0.333... 
+    >>> b = MeterTerminal('1/4', .25)
+    >>> c = MeterTerminal('1/4', .25)
+    >>> d = MeterSequence([b, c])
+    >>> d.weight
+    0.5 
+
+    Properties inherited from :class:`music21.meter.MeterTerminal`: ``duration``
 
     .. method:: getLevel()
 
@@ -767,6 +755,6 @@ Class MeterSequence
 
     
 
-    Inherited from :class:`music21.meter.MeterTerminal`: ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
+    Methods inherited from :class:`music21.meter.MeterTerminal`: ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
 
 
