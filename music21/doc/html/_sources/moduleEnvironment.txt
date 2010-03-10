@@ -14,7 +14,7 @@ Class Environment
 
 .. class:: Environment
 
-    Environment stores platform-specific, user preferences 
+    The Environment object stores user preferences as dictionary-like object. 
 
     
 
@@ -32,9 +32,11 @@ Class Environment
 
     .. method:: __init__(modName=None)
 
-    
+    Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 
     >>> a = Environment()
+    >>> a['writeFormat']
+    u'musicxml' 
 
     .. method:: getSettingsPath()
 
@@ -54,23 +56,23 @@ Class Environment
 
     .. method:: launch(fmt, fp, options=)
 
-    Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI 
+    Open a file with an either default or user-specified applications. 
 
     .. method:: loadDefaults()
 
-    Keys are derived from these defaults 
+    Load defaults. All keys are derived from these defaults. 
 
     .. method:: printDebug(msg, statusLevel=1)
 
-    Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+    Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
     .. method:: read(fp=None)
 
-    Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+    Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
 
     .. method:: write(fp=None)
 
-    Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref 
+    Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
 
 
 Class Preference

@@ -45,15 +45,21 @@ class VirtualWork(object):
         '''Given a request for an extension, find a best match for a URL from 
         the list of known URLs. If ext is None, return the first URL.
         '''
+        if not common.isListLike(extList):
+            extList = [extList]
         if extList == None or extList == [None]:
-            return [self.urlList[0]] # return a list
+            return [self.urlList[0]] # return a list of all 
+
         post = []
         for ext in extList:
             for url in self.urlList:
                 format, extFound = common.findFormatExtURL(url)
+                #environLocal.printDebug([extFound, ext])
                 if extFound == ext:
                     post.append(url)
         return post # no match
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -61,6 +67,13 @@ class VirtualWork(object):
 
 class BachBWV1007Prelude(VirtualWork):
     def __init__(self):
+        '''
+
+        >>> a = BachBWV1007Prelude()
+        >>> a.getUrlByExt('.xml')
+        ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml']
+
+        '''
         VirtualWork.__init__(self)
 
         self.title = 'Prelude from Cello Suite No. 1 in G Major, BWV 1007'
@@ -106,8 +119,6 @@ class SchubertD576(VirtualWork):
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml')        
-
-
 
 
 class PachelbelCanonD(VirtualWork):

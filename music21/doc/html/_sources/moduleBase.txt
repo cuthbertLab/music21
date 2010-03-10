@@ -139,11 +139,11 @@ Class Music21Object
 
     returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
-    .. method:: show(fmt=musicxml)
+    .. method:: show(fmt=None)
 
-    Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
+    Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
 
-    .. method:: write(fmt=musicxml, fp=None)
+    .. method:: write(fmt=None, fp=None)
 
     Write a file. A None file path will result in temporary file 
 

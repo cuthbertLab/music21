@@ -96,22 +96,25 @@
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><em>value</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Determine if the file is a file path or a string</p>
+<p>Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment &#8220;autoDownload&#8221; preference to &#8220;allow&#8221;.</p>
 <dl class="function">
 <dt id="music21.converter.parseFile">
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parseFile</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Given a file path, attempt to parse the file into a Stream.</p>
 <dl class="function">
 <dt id="music21.converter.parseData">
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parseData</tt><big>(</big><em>dataStr</em><big>)</big><a class="headerlink" href="#music21.converter.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Given musical data represented within a Python string, attempt to parse the data into a Stream.</p>
 <dl class="function">
 <dt id="music21.converter.parseURL">
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parseURL</tt><big>(</big><em>url</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parseURL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment &#8220;autoDownload&#8221; preference to &#8220;allow&#8221;.</p>
 <div class="section" id="class-converter">
 <h2>Class Converter<a class="headerlink" href="#class-converter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -150,7 +153,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <tt class="descname">parseURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseURL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Given a url, download and parse</p>
+<p>Given a url, download and parse the file into a Stream.</p>
 </dd></dl>
 
 </div>

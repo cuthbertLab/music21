@@ -250,13 +250,13 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <p>returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
 <dl class="method">
 <dt id="music21.base.Music21Object.show">
-<tt class="descname">show</tt><big>(</big><em>fmt=musicxml</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">show</tt><big>(</big><em>fmt=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path.</p>
+<p>Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user&#8217;s Environment</p>
 <dl class="method">
 <dt id="music21.base.Music21Object.write">
-<tt class="descname">write</tt><big>(</big><em>fmt=musicxml</em>, <em>fp=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.write" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write</tt><big>(</big><em>fmt=None</em>, <em>fp=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Write a file. A None file path will result in temporary file</p>

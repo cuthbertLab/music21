@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,9 +27,6 @@ _MOD = 'environment.py'
 #-------------------------------------------------------------------------------
 class EnvironmentException(Exception):
     pass
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -83,12 +80,15 @@ class SettingsHandler(xml.sax.ContentHandler):
 
 #-------------------------------------------------------------------------------
 class Environment(object):
-    '''Environment stores platform-specific, user preferences
+    '''The Environment object stores user preferences as dictionary-like object. 
     '''
 
     def __init__(self, modName=None):
-        '''
+        '''Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
+
         >>> a = Environment()
+        >>> a['writeFormat']
+        u'musicxml'
         '''
         self.ref = {}
         self.loadDefaults() # defines all valid keys in ref
@@ -100,7 +100,7 @@ class Environment(object):
 
 
     def loadDefaults(self):
-        '''Keys are derived from these defaults
+        '''Load defaults. All keys are derived from these defaults.
         '''
         self.ref['directoryScratch'] = None # will use temp files
         self.ref['lilypondPath'] = None # path to lilypond
@@ -110,8 +110,10 @@ class Environment(object):
         self.ref['musicxmlPath'] = None # path to a musicxml reader
         self.ref['midiPath'] = None # path to a midi reader
         self.ref['graphicsPath'] = None # path to a graphcis viewer
+        self.ref['showFormat'] = 'musicxml' 
+        self.ref['writeFormat'] = 'musicxml' 
+        self.ref['autoDownload'] = 'ask' 
         self.ref['debug'] = 0
-
 
         platform = common.getPlatform()
 
@@ -170,6 +172,13 @@ class Environment(object):
         >>> a['graphicsPath'] = '/test&Encode'
         >>> a['graphicsPath']
         '/test&amp;Encode'
+        >>> a['autoDownload'] = 'adsf'
+        Traceback (most recent call last):
+        EnvironmentException: adsf is not an acceptable value for preference: autoDownload
+        >>> a['showFormat'] = 'adsf'
+        Traceback (most recent call last):
+        EnvironmentException: adsf is not an acceptable value for preference: showFormat
+        >>> a['showFormat'] = 'musicxml'
         '''
         #saxutils.escape # used for escaping strings going to xml
         # with unicode encoding
@@ -180,6 +189,26 @@ class Environment(object):
             raise EnvironmentException('no preference: %s' % key)
         if value == '':
             value = None # always replace '' with None
+
+        valid = False
+        if key == 'showFormat':
+            value = value.lower()
+            if value in common.VALID_SHOW_FORMATS:
+                valid = True
+        elif key == 'writeFormat':
+            value = value.lower()
+            if value in common.VALID_WRITE_FORMATS:
+                valid = True
+        elif key == 'autoDownload':
+            value = value.lower()
+            if value in common.VALID_AUTO_DOWNLOAD:
+                valid = True
+        else: # temporarily not validating other preferences
+            valid = True
+
+        if not valid:
+            raise EnvironmentException('%s is not an acceptable value for preference: %s' % (value, key))
+
         if common.isStr(value):
             value = xml.sax.saxutils.escape(value).encode('UTF-8')
         self.ref[key] = value
@@ -220,9 +249,7 @@ class Environment(object):
 
     #---------------------------------------------------------------------------
     def read(self, fp=None):
-        '''Load from an XML file if and only if available and has been 
-        written in the past. This means that no preference file will ever be 
-        written unless manually done so. 
+        '''Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -246,19 +273,15 @@ class Environment(object):
             name = slot.get('name')
             value = slot.get('value')
             if name not in self.ref.keys():
+                self.printDebug(['a preference is defined that is longer used: %s' % name])
                 continue
                 # do not set, ignore for now
                 #raise EnvironmentException('no such defined preference: %s' % name)
-            else:
+            else: # load up stored values, overwriting defaults
                 self.ref[name] = value
 
     def write(self, fp=None):
-        '''Write an XML file.
-
-        This must be manually called to store preferences. 
-        
-        fp is the file path.
-        preferences are stored in self.ref
+        '''Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -338,6 +361,8 @@ class Environment(object):
         if self.ref['directoryScratch'] == None:
             # get a system specified scratch dir
             pass
+            raise EnvironmentException('cannot get a system specified temporary directory.')
+
         elif not os.path.exists(self.ref['directoryScratch']):    
             raise EnvironmentException('user-specified scratch directory (%s) does not exists.' % self.ref['directoryScratch'])
         else:
@@ -346,11 +371,14 @@ class Environment(object):
 
     
     def launch(self, fmt, fp, options=''):
-        '''Open a file with an application specified by a preference (?)
+        '''Open a file with an either default or user-specified applications.
         
+        OMIT_FROM_DOCS
+
         Optionally, can add additional command to erase files, if necessary 
         Erase could be called from os or command-line arguemtns after opening
         the file and then a short time delay.
+
 
         TODO: Move showImageDirectfrom lilyString.py ; add MIDI
         '''
@@ -380,10 +408,7 @@ class Environment(object):
 
     
     def printDebug(self, msg, statusLevel=common.DEBUG_USER):
-        '''Format one or more data elements into string suitable for printing
-        straight to stderr or other outputs.
-    
-        The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+        '''Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
         '''
         if not common.isNum(statusLevel):
             raise EnvironmentException('bad statusLevel argument given: %s' % statusLevel)

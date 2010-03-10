@@ -12,16 +12,19 @@ Public interface for importing file formats into music21.
 
 .. function:: parse(value, forceSource=False)
 
-Determine if the file is a file path or a string 
+Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
 .. function:: parseFile(fp, forceSource=False)
 
+Given a file path, attempt to parse the file into a Stream. 
 
 .. function:: parseData(dataStr)
 
+Given musical data represented within a Python string, attempt to parse the data into a Stream. 
 
 .. function:: parseURL(url, forceSource=False)
 
+Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
 Class Converter
 ---------------
@@ -54,9 +57,7 @@ Class Converter
 
     .. method:: parseURL(url)
 
-    Given a url, download and parse 
-
-    
+    Given a url, download and parse the file into a Stream. 
 
 
 Class ConverterMusicXML

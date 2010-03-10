@@ -150,13 +150,13 @@ Given an input format, find and return all possible input extensions.
 
 >>> a = findInputExtension('musicxml')
 >>> a
-['xml', 'mxl', 'mx'] 
+['.xml', '.mxl', '.mx'] 
 >>> a = findInputExtension('mx')
 >>> a
-['xml', 'mxl', 'mx'] 
+['.xml', '.mxl', '.mx'] 
 >>> a = findInputExtension('humdrum')
 >>> a
-['krn'] 
+['.krn'] 
 
 .. function:: findSimpleFraction(working)
 

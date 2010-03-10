@@ -104,6 +104,13 @@ True
 >>> len(a) >= 4
 True 
 
+.. function:: getVirtualPaths(extList=None)
+
+Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions. 
+
+>>> len(getVirtualPaths()) > 6
+True 
+
 .. function:: getVirtualWorkList(workName, movementNumber=None, extList=None)
 
 Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs. 

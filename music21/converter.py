@@ -287,9 +287,16 @@ class Converter(object):
 
 
     def parseURL(self, url):
-        '''Given a url, download and parse
-            
+        '''Given a url, download and parse the file into a Stream.
         '''
+        autoDownload = environLocal['autoDownload']
+        if autoDownload == 'allow':
+            pass
+        elif autoDownload == 'deny':
+            raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
+        elif autoDownload == 'ask':
+            raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
+
         #url = urllib.quote(url) may need?
         format, ext = common.findFormatExtURL(url)
         if format == None: # cannot figure out what it is
@@ -333,23 +340,28 @@ class Converter(object):
 
 
 def parseFile(fp, forceSource=False):
+    '''Given a file path, attempt to parse the file into a Stream.
+    '''
     v = Converter()
     v.parseFile(fp, forceSource)
     return v.stream
 
 def parseData(dataStr):
+    '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
+    '''
     v = Converter()
     v.parseData(dataStr)
     return v.stream
 
 def parseURL(url, forceSource=False):
+    '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+    '''
     v = Converter()
     v.parseURL(url)
     return v.stream
 
 def parse(value, forceSource=False):
-    '''
-    Determine if the file is a file path or a string 
+    '''Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
     '''
     #environLocal.printDebug(['attempting to parse()', value])
 

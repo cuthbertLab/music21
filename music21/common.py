@@ -24,7 +24,9 @@ import imp
 import random
 import inspect
 
-# define file extensions for various foramts
+
+# define file extensions for various formats
+# keys are assumed to be formats
 fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
@@ -60,7 +62,10 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 
-
+# used for checking preferences, and for setting environment variables
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text']
+VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
 def findFormat(fmt):
@@ -98,18 +103,23 @@ def findInputExtension(fmt):
 
     >>> a = findInputExtension('musicxml')
     >>> a
-    ['xml', 'mxl', 'mx']
+    ['.xml', '.mxl', '.mx']
     >>> a = findInputExtension('mx')
     >>> a
-    ['xml', 'mxl', 'mx']
+    ['.xml', '.mxl', '.mx']
     >>> a = findInputExtension('humdrum')
     >>> a
-    ['krn']
+    ['.krn']
     '''
     fmt = findFormat(fmt)[0]
     if fmt == None:
         raise Exception('no match to format: %s' % fmt)
-    return fileExtensions[fmt]['input']
+    post = []
+    for ext in fileExtensions[fmt]['input']:
+        if not ext.startswith('.'):
+            ext = '.'+ext # must have a leading dot
+        post.append(ext)
+    return post
 
 def findFormatFile(fp):
     '''Given a file path (relative or absolute) return the format

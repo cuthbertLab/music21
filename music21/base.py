@@ -1125,12 +1125,18 @@ class Music21Object(object):
 
 
     #---------------------------------------------------------------------------
-    def write(self, fmt='musicxml', fp=None):
+    def write(self, fmt=None, fp=None):
         '''Write a file.
         
         A None file path will result in temporary file
         '''
+        if fmt == None: # get setting in environment
+            fmt = environLocal['writeFormat']
+ 
         format, ext = common.findFormat(fmt)
+        if format not in common.VALID_WRITE_FORMATS:
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % format)
+
         if format is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
         elif format == 'text':
@@ -1156,14 +1162,21 @@ class Music21Object(object):
         return self.__repr__()
 
 
-    def show(self, fmt='musicxml'):
+    def show(self, fmt=None):
         '''
-        Displays an object in the given format (default: musicxml) using the default display
-        tools.
-        
+        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
+
+        OMIT_FROM_DOCS        
         This might need to return the file path.
         '''
+
+        if fmt == None: # get setting in environment
+            fmt = environLocal['showFormat']
+
         format, ext = common.findFormat(fmt)
+        if format not in common.VALID_SHOW_FORMATS:
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % format)
+
         if format == 'text':
             print(self._reprText())
         else: # a format that writes a file

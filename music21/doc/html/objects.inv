@@ -406,6 +406,7 @@ music21.serial.RowWebernOp18No3 class moduleSerial.html
 music21.serial.RowWebernOp18No2 class moduleSerial.html
 music21.base.DefinedContexts.clear method moduleBase.html
 music21.duration.DurationUnit.appendTuplet method moduleDuration.html
+music21.serial.RowWebernOp18No1.composer attribute moduleSerial.html
 music21.stream.Stream.makeTies method moduleStream.html
 music21.duration.DurationUnit.__init__ method moduleDuration.html
 music21.chord.Chord.normalFormString attribute moduleChord.html
@@ -512,7 +513,7 @@ music21.base.DefinedContexts.setAttrByName method moduleBase.html
 music21.common.sortModules function moduleCommon.html
 music21.serial.RowBergConcertoForViolinAndOrchestra.composer attribute moduleSerial.html
 music21.meter.TimeSignature.setDisplay method moduleMeter.html
-music21.serial.RowWebernOp18No1.composer attribute moduleSerial.html
+music21.corpus.base.getVirtualPaths function moduleCorpus.html
 music21.note.Note.isNote attribute moduleNote.html
 music21.chord.Chord.orderedPitchClassesString attribute moduleChord.html
 music21.serial.RowWebernOp19No2.opus attribute moduleSerial.html

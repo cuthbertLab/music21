@@ -95,7 +95,7 @@
 <dt id="music21.environment.Environment">
 <em class="property">
 class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Environment</tt><a class="headerlink" href="#music21.environment.Environment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Environment stores platform-specific, user preferences</p>
+<dd><p>The Environment object stores user preferences as dictionary-like object.</p>
 <p><strong>Class Environment</strong> <strong>Attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.environment.Environment.modNameParent">
@@ -115,7 +115,10 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <tt class="descname">__init__</tt><big>(</big><em>modName=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Create an instance of this object. A modName argument can be provided for use in printDebug() calls.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="s">&#39;writeFormat&#39;</span><span class="p">]</span>
+<span class="go">u&#39;musicxml&#39;</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -147,31 +150,31 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI</p>
+<p>Open a file with an either default or user-specified applications.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.loadDefaults">
 <tt class="descname">loadDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.loadDefaults" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Keys are derived from these defaults</p>
+<p>Load defaults. All keys are derived from these defaults.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.printDebug">
 <tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
+<p>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
 <dl class="method">
 <dt id="music21.environment.Environment.read">
 <tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
+<p>Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.write">
 <tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref</p>
+<p>Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.</p>
 </dd></dl>
 
 </div>

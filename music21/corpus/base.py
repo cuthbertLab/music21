@@ -25,7 +25,7 @@ from music21 import converter
 from music21.corpus import virtual
 
 from music21 import environment
-_MOD = "corpus/base.py"
+_MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 
@@ -117,7 +117,7 @@ def getPaths(extList=None):
 
     if extList == [None]:
         extList = (common.findInputExtension('lily') +
-                   common.findInputExtension('mx') +
+                   common.findInputExtension('musicxml') +
                    common.findInputExtension('humdrum'))
 
     #environLocal.printDebug(['getting paths with extensions:', extList])
@@ -145,9 +145,34 @@ def getPaths(extList=None):
                     match = True
                     break 
             if match:
-                paths.append(fp)    
+                if fp not in paths:
+                    paths.append(fp)    
     return paths
 
+def getVirtualPaths(extList=None):
+    '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
+   
+    >>> len(getVirtualPaths()) > 6
+    True
+    '''
+    if not common.isListLike(extList):
+        extList = [extList]
+
+    if extList == [None]:
+        extList = (common.findInputExtension('lily') +
+                   common.findInputExtension('musicxml') +
+                   common.findInputExtension('humdrum'))
+    paths = []
+    for obj in VIRTUAL:
+        if obj.corpusPath != None:
+            for ext in extList:
+                #environLocal.printDebug([obj.corpusPath, ext])
+                post = obj.getUrlByExt(ext)
+                for part in post:
+                    if part not in paths:
+                        paths.append(part)
+
+    return paths
 
 def getComposer(composerName, extList=None):
     '''Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
@@ -333,7 +358,7 @@ def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
         extList = [extList]
 
     post = getWorkList(workName, movementNumber, extList)
-    environLocal.printDebug(['result of getWorkList()', post])
+    #environLocal.printDebug(['result of getWorkList()', post])
     if len(post) == 0:
         post = getVirtualWorkList(workName, movementNumber, extList)    
 
