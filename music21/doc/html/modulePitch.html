@@ -180,7 +180,7 @@ Used extensively by note.py</p>
 <dt id="music21.pitch.Pitch">
 <em class="property">
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+<dd><p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.defaultOctave">
 <tt class="descname">defaultOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.defaultOctave" title="Permalink to this definition">¶</a></dt>
@@ -252,11 +252,34 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 
 <p>The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament</p>
 <dl class="attribute">
+<dt id="music21.pitch.Pitch.german">
+<tt class="descname">german</tt><a class="headerlink" href="#music21.pitch.Pitch.german" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<span class="go">B</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<span class="go">H</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;E-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<span class="go">Es</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C#&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<span class="go">Cis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A--&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<span class="go">Ases</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">accidental</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">german</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">PitchException</span>: <span class="n-Identifier">Es geht nicht &quot;german&quot; zu benutzen mit Microtoenen.  Schade!</span>
+</pre></div>
+</div>
+<dl class="attribute">
 <dt id="music21.pitch.Pitch.implicitOctave">
 <tt class="descname">implicitOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.implicitOctave" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>returns the octave of the note, or defaultOctave if octave was never set</p>
+<p>returns the octave of the Pitch, or defaultOctave if octave was never set</p>
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.midi">
 <tt class="descname">midi</tt><a class="headerlink" href="#music21.pitch.Pitch.midi" title="Permalink to this definition">¶</a></dt>
@@ -364,8 +387,8 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <span class="go">&#39;C&#39;</span>
 </pre></div>
 </div>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -376,7 +399,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <em class="property">
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accidental class.</p>
-<p>Inherits from: base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+<p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.alter">
 <tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.Accidental.alter" title="Permalink to this definition">¶</a></dt>
@@ -412,7 +435,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <span class="go">&#39;quarter-sharp&#39;</span>
 </pre></div>
 </div>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">duration</span></tt>, <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
 <dt id="music21.pitch.Accidental.set">
 <tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
@@ -436,7 +459,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <span class="go">-2.0</span>
 </pre></div>
 </div>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -468,7 +491,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 07, 2010.
+      Last updated on Mar 09, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

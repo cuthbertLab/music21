@@ -24,6 +24,10 @@ Class Environment
 
     Return the path to the platform specific settings file. 
 
+    .. method:: getTempDir()
+
+    Get a temporary directory. Return the user preference if set. 
+
     .. method:: getTempFile()
 
     Return a file path to a temporary file with the specified suffix 
@@ -61,13 +65,13 @@ Class Preference
 
     
 
-    Inherits from: node.Node (of module :ref:`moduleNode`)
+    Inherits from: :class:`music21.node.Node`
 
     .. attribute:: charData
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
+    Inherited from :class:`music21.node.Node`: ``tag``
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 
 Class Settings
@@ -79,16 +83,16 @@ Class Settings
 
     
 
-    Inherits from: node.NodeList (of module :ref:`moduleNode`), node.Node (of module :ref:`moduleNode`)
+    Inherits from: :class:`music21.node.NodeList`, :class:`music21.node.Node`
 
     .. attribute:: charData
 
     .. attribute:: componentList
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
+    Inherited from :class:`music21.node.Node`: ``tag``
 
-    Inherited from node.NodeList (of module :ref:`moduleNode`): ``append()``
+    Inherited from :class:`music21.node.NodeList`: ``append()``
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 

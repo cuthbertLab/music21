@@ -13,7 +13,7 @@ Class Instrument
 .. class:: Instrument
 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -45,7 +45,7 @@ Class Instrument
 
     
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: bestName()
 
@@ -55,7 +55,7 @@ Class Instrument
 
     Force a unique id by using an MD5 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Violoncello
@@ -64,7 +64,7 @@ Class Violoncello
 .. class:: Violoncello
 
 
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -92,15 +92,15 @@ Class Violoncello
 
     .. attribute:: transposition
 
-    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
+    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
+    Inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
+    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class StringInstrument
@@ -109,7 +109,7 @@ Class StringInstrument
 .. class:: StringInstrument
 
 
-    Inherits from: instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -154,13 +154,13 @@ Class StringInstrument
     highest.  The same would hold true for certain violin scordatura pieces, such 
     as some of Biber's *Mystery Sonatas* 
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
+    Inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
+    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Viola
@@ -169,7 +169,7 @@ Class Viola
 .. class:: Viola
 
 
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -197,15 +197,15 @@ Class Viola
 
     .. attribute:: transposition
 
-    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
+    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
+    Inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
+    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Violin
@@ -214,7 +214,7 @@ Class Violin
 .. class:: Violin
 
 
-    Inherits from: instrument.StringInstrument (of module :ref:`moduleInstrument`), instrument.Instrument (of module :ref:`moduleInstrument`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -242,14 +242,14 @@ Class Violin
 
     .. attribute:: transposition
 
-    Inherited from instrument.StringInstrument (of module :ref:`moduleInstrument`): ``stringPitches``
+    Inherited from :class:`music21.instrument.StringInstrument`: ``stringPitches``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``mx``
+    Inherited from :class:`music21.instrument.Instrument`: ``mx``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from instrument.Instrument (of module :ref:`moduleInstrument`): ``bestName()``, ``partIdRandomize()``
+    Inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

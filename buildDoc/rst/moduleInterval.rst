@@ -134,7 +134,7 @@ Class Interval
     >>> a
     <music21.interval.Interval P15> 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -147,7 +147,7 @@ Class Interval
     .. attribute:: complement
 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: chromatic()
 
@@ -178,7 +178,7 @@ Class Interval
 
     Reinitialize the internal interval objects in case something has changed.  Called also during __init__ 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class DiatonicInterval
@@ -187,7 +187,7 @@ Class DiatonicInterval
 .. class:: DiatonicInterval
 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: groups
 
@@ -201,9 +201,9 @@ Class DiatonicInterval
 
     .. attribute:: specifier
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class ChromaticInterval
@@ -213,11 +213,11 @@ Class ChromaticInterval
 
     Chromatic interval class -- thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class GenericInterval
@@ -227,14 +227,14 @@ Class GenericInterval
 
     A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: complement()
 
     generates a new GenericInterval object where descending 3rds are 6ths, etc. 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

@@ -67,17 +67,17 @@ Class NodeList
 
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
-    Inherits from: node.Node (of module :ref:`moduleNode`)
+    Inherits from: :class:`music21.node.Node`
 
     .. attribute:: charData
 
     .. attribute:: componentList
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``tag``
+    Inherited from :class:`music21.node.Node`: ``tag``
 
     .. method:: append()
 
 
-    Inherited from node.Node (of module :ref:`moduleNode`): ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
 
 

@@ -16,7 +16,7 @@ Class Chord
 
     
 
-    Inherits from: note.NotRest (of module :ref:`moduleNote`), note.GeneralNote (of module :ref:`moduleNote`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
 
     .. attribute:: articulations
 
@@ -205,6 +205,14 @@ Class Chord
     >>> c1.orderedPitchClasses
     [2, 6, 9] 
 
+    .. attribute:: orderedPitchClassesString
+
+    
+
+    >>> c1 = Chord(['f#', 'e-', 'g'])
+    >>> c1.orderedPitchClassesString
+    '<367>' 
+
     .. attribute:: pitchClassCardinality
 
     Return the number of unique pitch classes 
@@ -246,9 +254,9 @@ Class Chord
 
     Return a representation of the Chord as a prime-form set class string. 
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``color``, ``lyric``, ``musicxml``, ``quarterLength``
+    Inherited from :class:`music21.note.GeneralNote`: ``color``, ``lyric``, ``musicxml``, ``quarterLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
     .. method:: areZRelations()
 
@@ -609,10 +617,10 @@ Class Chord
 
     Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
 
-    Inherited from note.NotRest (of module :ref:`moduleNote`): ``splitNoteAtPoint()``
+    Inherited from :class:`music21.note.NotRest`: ``splitNoteAtPoint()``
 
-    Inherited from note.GeneralNote (of module :ref:`moduleNote`): ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
+    Inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``isChord()``, ``splitAtDurations()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``duration()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``duration()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

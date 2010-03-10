@@ -87,7 +87,7 @@ Class Pitch
 .. class:: Pitch
 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: defaultOctave
 
@@ -143,9 +143,29 @@ Class Pitch
 
     The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
 
+    .. attribute:: german
+
+    returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
+
+    >>> print Pitch('B-').german
+    B 
+    >>> print Pitch('B').german
+    H 
+    >>> print Pitch('E-').german
+    Es 
+    >>> print Pitch('C#').german
+    Cis 
+    >>> print Pitch('A--').german
+    Ases 
+    >>> p1 = Pitch('C')
+    >>> p1.accidental = Accidental('half-sharp')
+    >>> p1.german
+    Traceback (most recent call last): 
+    PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade! 
+
     .. attribute:: implicitOctave
 
-    returns the octave of the note, or defaultOctave if octave was never set 
+    returns the octave of the Pitch, or defaultOctave if octave was never set 
 
     .. attribute:: midi
 
@@ -232,9 +252,9 @@ Class Pitch
     >>> a._getStep()
     'C' 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class Accidental
@@ -244,7 +264,7 @@ Class Accidental
 
     Accidental class. 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: alter
 
@@ -267,7 +287,7 @@ Class Accidental
     >>> mxAccidental.get('content')
     'quarter-sharp' 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: set()
 
@@ -289,6 +309,6 @@ Class Accidental
     >>> a.alter
     -2.0 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

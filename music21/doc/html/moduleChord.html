@@ -94,7 +94,7 @@
 <em class="property">
 class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Chord</tt><a class="headerlink" href="#music21.chord.Chord" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = &#8216;C&#8217; E = note.Note(), E.name = &#8216;E&#8217; G = note.Note(), G.name = &#8216;G&#8217; And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples</p>
-<p>Inherits from: note.NotRest (of module <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>), note.GeneralNote (of module <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>), base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>)</p>
+<p>Inherits from: <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">music21.note.NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">music21.note.GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <dl class="attribute">
 <dt id="music21.chord.Chord.articulations">
 <tt class="descname">articulations</tt><a class="headerlink" href="#music21.chord.Chord.articulations" title="Permalink to this definition">¶</a></dt>
@@ -351,6 +351,16 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </pre></div>
 </div>
 <dl class="attribute">
+<dt id="music21.chord.Chord.orderedPitchClassesString">
+<tt class="descname">orderedPitchClassesString</tt><a class="headerlink" href="#music21.chord.Chord.orderedPitchClassesString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClassesString</span>
+<span class="go">&#39;&lt;367&gt;&#39;</span>
+</pre></div>
+</div>
+<dl class="attribute">
 <dt id="music21.chord.Chord.pitchClassCardinality">
 <tt class="descname">pitchClassCardinality</tt><a class="headerlink" href="#music21.chord.Chord.pitchClassCardinality" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -403,8 +413,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dd></dd></dl>
 
 <p>Return a representation of the Chord as a prime-form set class string.</p>
-<p>Inherited from note.GeneralNote (of module <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">music21.note.GeneralNote</span></tt></a>: <tt class="docutils literal"><span class="pre">color</span></tt>, <tt class="docutils literal"><span class="pre">lyric</span></tt>, <tt class="docutils literal"><span class="pre">musicxml</span></tt>, <tt class="docutils literal"><span class="pre">quarterLength</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">offset</span></tt>, <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
 <dl class="method">
 <dt id="music21.chord.Chord.areZRelations">
 <tt class="descname">areZRelations</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.areZRelations" title="Permalink to this definition">¶</a></dt>
@@ -866,9 +876,9 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dd></dd></dl>
 
 <p>Same as above, but uses a note&#8217;s frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types.</p>
-<p>Inherited from note.NotRest (of module <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
-<p>Inherited from note.GeneralNote (of module <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>): <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
-<p>Inherited from base.Music21Object (of module <a class="reference external" href="moduleBase.html#modulebase"><em>music21.base</em></a>): <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">duration()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Inherited from <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">music21.note.NotRest</span></tt></a>: <tt class="docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></p>
+<p>Inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">music21.note.GeneralNote</span></tt></a>: <tt class="docutils literal"><span class="pre">addLyric()</span></tt>, <tt class="docutils literal"><span class="pre">appendDuration()</span></tt>, <tt class="docutils literal"><span class="pre">clearDurations()</span></tt>, <tt class="docutils literal"><span class="pre">compactNoteInfo()</span></tt>, <tt class="docutils literal"><span class="pre">isChord()</span></tt>, <tt class="docutils literal"><span class="pre">splitAtDurations()</span></tt></p>
+<p>Inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">duration()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">id()</span></tt>, <tt class="docutils literal"><span class="pre">isClass()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -900,7 +910,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 07, 2010.
+      Last updated on Mar 09, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

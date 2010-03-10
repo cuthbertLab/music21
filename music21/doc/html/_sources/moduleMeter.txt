@@ -76,7 +76,7 @@ Class TimeSignature
 .. class:: TimeSignature
 
 
-    Inherits from: base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.base.Music21Object`
 
     .. attribute:: accent
 
@@ -158,7 +158,7 @@ Class TimeSignature
     .. attribute:: totalLength
 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: getAccent()
 
@@ -303,7 +303,7 @@ Class TimeSignature
     >>> a.display
     <MeterSequence {3/4}> 
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class CompoundTimeSignature
@@ -312,7 +312,7 @@ Class CompoundTimeSignature
 .. class:: CompoundTimeSignature
 
 
-    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
     .. attribute:: accent
 
@@ -338,13 +338,13 @@ Class CompoundTimeSignature
 
     .. attribute:: symbolizeDenominator
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class NonPowerOfTwoTimeSignature
@@ -353,7 +353,7 @@ Class NonPowerOfTwoTimeSignature
 .. class:: NonPowerOfTwoTimeSignature
 
 
-    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
     .. attribute:: accent
 
@@ -379,13 +379,13 @@ Class NonPowerOfTwoTimeSignature
 
     .. attribute:: symbolizeDenominator
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterTerminal
@@ -473,7 +473,7 @@ Class DurationDenominatorTimeSignature
 
     If you have played Hindemith you know these, 3/(dot-quarter) etc. 
 
-    Inherits from: meter.TimeSignature (of module :ref:`moduleMeter`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
     .. attribute:: accent
 
@@ -499,13 +499,13 @@ Class DurationDenominatorTimeSignature
 
     .. attribute:: symbolizeDenominator
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from meter.TimeSignature (of module :ref:`moduleMeter`): ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class MeterSequence
@@ -515,7 +515,7 @@ Class MeterSequence
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
-    Inherits from: meter.MeterTerminal (of module :ref:`moduleMeter`)
+    Inherits from: :class:`music21.meter.MeterTerminal`
 
     .. attribute:: parenthesis
 
@@ -548,7 +548,7 @@ Class MeterSequence
 
     
 
-    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``denominator``, ``depth``, ``duration``, ``numerator``, ``weight``
+    Inherited from :class:`music21.meter.MeterTerminal`: ``denominator``, ``depth``, ``duration``, ``numerator``, ``weight``
 
     .. method:: getLevel()
 
@@ -767,6 +767,6 @@ Class MeterSequence
 
     
 
-    Inherited from meter.MeterTerminal (of module :ref:`moduleMeter`): ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
+    Inherited from :class:`music21.meter.MeterTerminal`: ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
 
 

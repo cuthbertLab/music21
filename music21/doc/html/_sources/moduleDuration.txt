@@ -259,7 +259,7 @@ Class Duration
 
     A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit. 
 
-    Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
@@ -451,7 +451,7 @@ Class Duration
 
     Write a file in the given format (default, musicxml) A None file path will result in temporary file 
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class Tuplet
@@ -609,15 +609,15 @@ Class AppogiaturaStopDuration
 .. class:: AppogiaturaStopDuration
 
 
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class DurationUnit
@@ -627,7 +627,7 @@ Class DurationUnit
 
     A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
-    Inherits from: duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkStatus
 
@@ -684,7 +684,7 @@ Class DurationUnit
     .. method:: updateType()
 
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class DurationCommon
@@ -717,15 +717,15 @@ Class GraceDuration
 .. class:: GraceDuration
 
 
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class ZeroDuration
@@ -734,15 +734,15 @@ Class ZeroDuration
 .. class:: ZeroDuration
 
 
-    Inherits from: duration.DurationUnit (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkStatus
 
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): ``dots``, ``lily``, ``ordinal``, ``quarterLength``, ``tuplets``, ``type``
+    Inherited from :class:`music21.duration.DurationUnit`: ``dots``, ``lily``, ``ordinal``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from duration.DurationUnit (of module :ref:`moduleDuration`): ``appendTuplet()``, ``link()``, ``setTypeFromNum()``, ``unlink()``, ``updateQuarterLength()``, ``updateType()``
+    Inherited from :class:`music21.duration.DurationUnit`: ``appendTuplet()``, ``link()``, ``setTypeFromNum()``, ``unlink()``, ``updateQuarterLength()``, ``updateType()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class AppogiaturaStartDuration
@@ -751,15 +751,15 @@ Class AppogiaturaStartDuration
 .. class:: AppogiaturaStartDuration
 
 
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 
 Class LongGraceDuration
@@ -768,14 +768,14 @@ Class LongGraceDuration
 .. class:: LongGraceDuration
 
 
-    Inherits from: duration.Duration (of module :ref:`moduleDuration`), duration.DurationCommon (of module :ref:`moduleDuration`)
+    Inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
     .. attribute:: linkages
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
+    Inherited from :class:`music21.duration.Duration`: ``components``, ``dots``, ``isComplex``, ``lily``, ``musicxml``, ``mx``, ``quarterLength``, ``tuplets``, ``type``
 
-    Inherited from duration.Duration (of module :ref:`moduleDuration`): ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
+    Inherited from :class:`music21.duration.Duration`: ``addDuration()``, ``appendTuplet()``, ``clear()``, ``componentIndexAtQtrPosition()``, ``componentStartTime()``, ``consolidate()``, ``expand()``, ``fill()``, ``show()``, ``sliceComponentAtPosition()``, ``updateQuarterLength()``, ``write()``
 
-    Inherited from duration.DurationCommon (of module :ref:`moduleDuration`): ``aggregateTupletRatio()``
+    Inherited from :class:`music21.duration.DurationCommon`: ``aggregateTupletRatio()``
 
 

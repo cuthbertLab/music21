@@ -9,7 +9,7 @@ music21.corpus
 
 
 
-The music21 corpus provides a collection of public-domain music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
+The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
 
 .. function:: parseWork()
 
@@ -76,6 +76,26 @@ True
 .. function:: getWorkList()
 
 Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned. 
+
+>>> len(getWorkList('beethoven/opus18no1'))
+8 
+>>> len(getWorkList('beethoven/opus18no1', 1))
+2 
+>>> len(getWorkList('beethoven/opus18no1', 1, '.krn'))
+1 
+>>> len(getWorkList('beethoven/opus18no1', 1, '.xml'))
+1 
+>>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
+0 
+
+.. function:: getVirtualWorkList()
+
+Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs. 
+
+>>> getVirtualWorkList('bach/bwv1007/prelude')
+['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 
+>>> getVirtualWorkList('junk')
+[] 
 
 .. function:: getComposerDir()
 

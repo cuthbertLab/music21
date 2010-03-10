@@ -18,13 +18,13 @@ music21.serial
 
 >>> a = pcToToneRow(range(12))
 
-Class TwelveToneMatrix
-----------------------
+Class RowSchoenbergOp24Movement4
+--------------------------------
 
-.. class:: TwelveToneMatrix
+.. class:: RowSchoenbergOp24Movement4
 
 
-    Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
     .. attribute:: flattenedRepresentationOf
 
@@ -40,22 +40,57 @@ Class TwelveToneMatrix
 
     .. attribute:: isSorted
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
-Class TwelveToneRow
+Class RowSchoenbergOp24Movement5
+--------------------------------
+
+.. class:: RowSchoenbergOp24Movement5
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp26
 -------------------
 
-.. class:: TwelveToneRow
+.. class:: RowWebernOp26
 
 
-    Inherits from: serial.ToneRow (of module :ref:`moduleSerial`), stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
     .. attribute:: flattenedRepresentationOf
 
@@ -71,16 +106,453 @@ Class TwelveToneRow
 
     .. attribute:: isSorted
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    .. method:: matrix()
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+Class RowBergLyricSuitePrimaryRow
+---------------------------------
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+.. class:: RowBergLyricSuitePrimaryRow
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergConcertoForViolinAndOrchestra
+------------------------------------------
+
+.. class:: RowBergConcertoForViolinAndOrchestra
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp21
+-------------------
+
+.. class:: RowWebernOp21
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp27No4
+--------------------------
+
+.. class:: RowSchoenbergOp27No4
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp23
+-------------------
+
+.. class:: RowWebernOp23
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp22
+-------------------
+
+.. class:: RowWebernOp22
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp27No1
+--------------------------
+
+.. class:: RowSchoenbergOp27No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp24
+-------------------
+
+.. class:: RowWebernOp24
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp27No3
+--------------------------
+
+.. class:: RowSchoenbergOp27No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergFragmentForPiano
+-----------------------------------
+
+.. class:: RowSchoenbergFragmentForPiano
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp50B
+------------------------
+
+.. class:: RowSchoenbergOp50B
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp50C
+------------------------
+
+.. class:: RowSchoenbergOp50C
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp50A
+------------------------
+
+.. class:: RowSchoenbergOp50A
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
 Class ToneRow
@@ -89,7 +561,7 @@ Class ToneRow
 .. class:: ToneRow
 
 
-    Inherits from: stream.Stream (of module :ref:`moduleStream`), base.Music21Object (of module :ref:`moduleBase`)
+    Inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
     .. attribute:: flattenedRepresentationOf
 
@@ -105,12 +577,1925 @@ Class ToneRow
 
     .. attribute:: isSorted
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``duration``, ``offset``, ``parent``, ``priority``
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Inherited from stream.Stream (of module :ref:`moduleStream`): ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-    Inherited from base.Music21Object (of module :ref:`moduleBase`): ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp23No5
+--------------------------
+
+.. class:: RowSchoenbergOp23No5
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp28No1
+--------------------------
+
+.. class:: RowSchoenbergOp28No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergChamberConcerto
+----------------------------
+
+.. class:: RowBergChamberConcerto
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergLuluPrimaryRow
+---------------------------
+
+.. class:: RowBergLuluPrimaryRow
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergDieJakobsleiter
+----------------------------------
+
+.. class:: RowSchoenbergDieJakobsleiter
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp35No2
+--------------------------
+
+.. class:: RowSchoenbergOp35No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp35No3
+--------------------------
+
+.. class:: RowSchoenbergOp35No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp35No1
+--------------------------
+
+.. class:: RowSchoenbergOp35No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp48No1
+--------------------------
+
+.. class:: RowSchoenbergOp48No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp35No5
+--------------------------
+
+.. class:: RowSchoenbergOp35No5
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp29
+-----------------------
+
+.. class:: RowSchoenbergOp29
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp29
+-------------------
+
+.. class:: RowWebernOp29
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergLyricSuiteLastMvtPermutation
+-----------------------------------------
+
+.. class:: RowBergLyricSuiteLastMvtPermutation
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergLuluActIiScene1
+----------------------------
+
+.. class:: RowBergLuluActIiScene1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp46
+-----------------------
+
+.. class:: RowSchoenbergOp46
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp47
+-----------------------
+
+.. class:: RowSchoenbergOp47
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp44
+-----------------------
+
+.. class:: RowSchoenbergOp44
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp28No3
+--------------------------
+
+.. class:: RowSchoenbergOp28No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp33A
+------------------------
+
+.. class:: RowSchoenbergOp33A
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp25
+-----------------------
+
+.. class:: RowSchoenbergOp25
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp26
+-----------------------
+
+.. class:: RowSchoenbergOp26
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp33B
+------------------------
+
+.. class:: RowSchoenbergOp33B
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp20
+-------------------
+
+.. class:: RowWebernOp20
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergFragmentOfPhantasiaForPiano
+----------------------------------------------
+
+.. class:: RowSchoenbergFragmentOfPhantasiaForPiano
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp31
+-------------------
+
+.. class:: RowWebernOp31
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp25
+-------------------
+
+.. class:: RowWebernOp25
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp30
+-------------------
+
+.. class:: RowWebernOp30
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergLuluActISceneXx
+----------------------------
+
+.. class:: RowBergLuluActISceneXx
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOpNo17No1
+------------------------
+
+.. class:: RowWebernOpNo17No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp28
+-------------------
+
+.. class:: RowWebernOp28
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp48No2
+--------------------------
+
+.. class:: RowSchoenbergOp48No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp27
+-------------------
+
+.. class:: RowWebernOp27
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergWozzeckActIScene4Passacaglia
+-----------------------------------------
+
+.. class:: RowBergWozzeckActIScene4Passacaglia
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergMosesAndAron
+-------------------------------
+
+.. class:: RowSchoenbergMosesAndAron
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class TwelveToneMatrix
+----------------------
+
+.. class:: TwelveToneMatrix
+
+
+    Inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp19No2
+----------------------
+
+.. class:: RowWebernOp19No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp19No1
+----------------------
+
+.. class:: RowWebernOp19No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp27No2
+--------------------------
+
+.. class:: RowSchoenbergOp27No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergFragmentOfSonataForOrgan
+-------------------------------------------
+
+.. class:: RowSchoenbergFragmentOfSonataForOrgan
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp37
+-----------------------
+
+.. class:: RowSchoenbergOp37
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp45
+-----------------------
+
+.. class:: RowSchoenbergOp45
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp18No1
+----------------------
+
+.. class:: RowWebernOp18No1
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp18No2
+----------------------
+
+.. class:: RowWebernOp18No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp18No3
+----------------------
+
+.. class:: RowWebernOp18No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class TwelveToneRow
+-------------------
+
+.. class:: TwelveToneRow
+
+
+    Inherits from: :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: matrix()
+
+
+    .. method:: row()
+
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp42
+-----------------------
+
+.. class:: RowSchoenbergOp42
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp48No3
+--------------------------
+
+.. class:: RowSchoenbergOp48No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergIsraelExistsAgain
+------------------------------------
+
+.. class:: RowSchoenbergIsraelExistsAgain
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp36
+-----------------------
+
+.. class:: RowSchoenbergOp36
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp34
+-----------------------
+
+.. class:: RowSchoenbergOp34
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowBergDerWein
+--------------------
+
+.. class:: RowBergDerWein
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    .. method:: opus()
+
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp32
+-----------------------
+
+.. class:: RowSchoenbergOp32
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp31
+-----------------------
+
+.. class:: RowSchoenbergOp31
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp30
+-----------------------
+
+.. class:: RowSchoenbergOp30
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowSchoenbergOp41
+-----------------------
+
+.. class:: RowSchoenbergOp41
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp17No3
+----------------------
+
+.. class:: RowWebernOp17No3
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class RowWebernOp17No2
+----------------------
+
+.. class:: RowWebernOp17No2
+
+
+    Inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.serial.TwelveToneRow`: ``matrix()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 

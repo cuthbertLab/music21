@@ -61,8 +61,6 @@ On a windows networked filesystem
 >>> findFormatFile('\\long\file\path\test.krn')
 'humdrum' 
 
-
-
 .. function:: findInputExtension()
 
 Given an input format, find and return all possible input extensions. 
@@ -145,6 +143,27 @@ while this is left alone:
 >>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
 '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>' 
 
+.. function:: findFormat()
+
+Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
+
+>>> findFormat('mx')
+('musicxml', '.xml') 
+>>> findFormat('.mxl')
+('musicxml', '.xml') 
+>>> findFormat('musicxml')
+('musicxml', '.xml') 
+>>> findFormat('jpeg')
+('jpeg', '.jpg') 
+>>> findFormat('lily')
+('lilypond', '.ly') 
+>>> findFormat('jpeg')
+('jpeg', '.jpg') 
+>>> findFormat('humdrum')
+('humdrum', '.krn') 
+>>> findFormat('txt')
+('text', '.txt') 
+
 .. function:: isWeakref()
 
 Test if an object is a weakref 
@@ -208,27 +227,6 @@ False
 
 Shared function to get platform names. 
 
-.. function:: findFormat()
-
-Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
-
->>> findFormat('mx')
-('musicxml', '.xml') 
->>> findFormat('.mxl')
-('musicxml', '.xml') 
->>> findFormat('musicxml')
-('musicxml', '.xml') 
->>> findFormat('jpeg')
-('jpeg', '.jpg') 
->>> findFormat('lily')
-('lilypond', '.ly') 
->>> findFormat('jpeg')
-('jpeg', '.jpg') 
->>> findFormat('humdrum')
-('humdrum', '.krn') 
->>> findFormat('txt')
-('text', '.txt') 
-
 .. function:: greaterThan()
 
 greaterThan returns True if x is greater than and not almostEquals y 
@@ -282,6 +280,29 @@ Format one or more data elements into string suitable for printing straight to s
 >>> print a
 test 1 2 3 
 <BLANKLINE> 
+
+.. function:: findFormatExtURL()
+
+Given a URL, attempt to find the extension 
+
+>>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+>>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+>>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+>>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
+>>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
+>>> urlF = 'http://junk'
+>>> findFormatExtURL(urlA)
+('musicxml', '.xml') 
+>>> findFormatExtURL(urlB)
+('humdrum', '.krn') 
+>>> findFormatExtURL(urlC)
+('musicxml', '.xml') 
+>>> findFormatExtURL(urlD)
+('musicxml', '.mxl') 
+>>> findFormatExtURL(urlE)
+('musicxml', '.mxl') 
+>>> findFormatExtURL(urlF)
+(None, None) 
 
 .. function:: greaterThanOrEqual()
 

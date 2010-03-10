@@ -19,9 +19,6 @@ it is meant to be subclassable to extend to the cases *your* project needs.
 See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
 or the Trecento specific examples in trecento/cadencebook.py
 
-.. function:: lineToStream()
-
-
 Class TinyNotationNote
 ----------------------
 
@@ -122,14 +119,14 @@ Class TinyNotationNote
     subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
 
 
-Class TinyNotationLine
-----------------------
+Class TinyNotationStream
+------------------------
 
-.. class:: TinyNotationLine
+.. class:: TinyNotationStream
 
-    A TinyNotationLine begins as a string representation similar to Lilypond format but simplified somewhat.  This object holds the string representation and stores a Stream representation at .stream. example in 3/4: 
+    A TinyNotationStream takes in a string representation similar to Lilypond format but simplified somewhat and an optional time signature string (or TimeSignature object). example in 3/4: 
 
-    >>> stream1 = TinyNotationLine("E4 r f# g=lastG trip{b-8 a g} c", "3/4").stream
+    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
     >>> stream1.getElementById("lastG").step
     'G' 
     >>> stream1.notes[1].isRest
@@ -137,13 +134,27 @@ Class TinyNotationLine
     >>> stream1.notes[0].octave
     3 
 
-    
+    Inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    
+    .. attribute:: flattenedRepresentationOf
 
-    .. attribute:: stream
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
 
     .. attribute:: stringRep
+
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
     .. method:: ENDBRAC()
 
@@ -161,34 +172,23 @@ Class TinyNotationLine
 
     called out so as to be subclassable 
 
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
 
-Class HarmonyNote
------------------
-
-.. class:: HarmonyNote
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
 
 
-    Inherits from: tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`)
+Class HarmonyStream
+-------------------
 
-    .. method:: HARMONY()
+.. class:: HarmonyStream
 
-    Compiled regular expression objects 
-
-    Inherited from tinyNotation.TinyNotationNote (of module :ref:`moduleTinyNotation`): ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``getDots()``
-
-
-Class HarmonyLine
------------------
-
-.. class:: HarmonyLine
-
-    example of subclassing TinyNotationLine to include a possible harmonic representation of the note 
+    example of subclassing TinyNotationStream to include a possible harmonic representation of the note 
 
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
-    >>> hnl = HarmonyLine(michelle, "4/4")
-    >>> ns = hnl.stream.notes
+    >>> hns = HarmonyStream(michelle, "4/4")
+    >>> ns = hns.notes
     >>> ns[0].step
     'C' 
     >>> ns[0].editorial.misc['harmony']
@@ -204,12 +204,47 @@ Class HarmonyLine
 
     
 
-    Inherits from: tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`)
+    Inherits from: :class:`music21.tinyNotation.TinyNotationStream`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    .. attribute:: stream
+    .. attribute:: flattenedRepresentationOf
+
+    .. attribute:: groups
+
+    An instance of a Group object. 
+
+    .. attribute:: id
+
+    Unique identification string. 
+
+    .. attribute:: isFlat
+
+    .. attribute:: isSorted
 
     .. attribute:: stringRep
 
-    Inherited from tinyNotation.TinyNotationLine (of module :ref:`moduleTinyNotation`): ``ENDBRAC()``, ``QUAD()``, ``TRIP()``, ``getNote()``
+    Inherited from :class:`music21.stream.Stream`: ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+
+    Inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+
+    Inherited from :class:`music21.tinyNotation.TinyNotationStream`: ``ENDBRAC()``, ``QUAD()``, ``TRIP()``, ``getNote()``
+
+    Inherited from :class:`music21.stream.Stream`: ``addGroupForElements()``, ``allPlayingWhileSounding()``, ``append()``, ``attachIntervalsBetweenStreams()``, ``bestClef()``, ``extendDuration()``, ``extractContext()``, ``findConsecutiveNotes()``, ``findGaps()``, ``getElementAfterElement()``, ``getElementAfterOffset()``, ``getElementAtOrAfter()``, ``getElementAtOrBefore()``, ``getElementBeforeElement()``, ``getElementBeforeOffset()``, ``getElementById()``, ``getElementsByClass()``, ``getElementsByGroup()``, ``getElementsByOffset()``, ``getGroups()``, ``getInstrument()``, ``getMeasures()``, ``getNotes()``, ``getOffsetByElement()``, ``getOverlaps()``, ``getPitches()``, ``getSimultaneous()``, ``getTimeSignatures()``, ``groupElementsByOffset()``, ``index()``, ``insert()``, ``insertAtIndex()``, ``insertAtNativeOffset()``, ``isSequence()``, ``makeAccidentals()``, ``makeBeams()``, ``makeMeasures()``, ``makeRests()``, ``makeTies()``, ``melodicIntervals()``, ``playingWhenAttacked()``, ``pop()``, ``repeatAppend()``, ``repeatInsert()``, ``shiftElements()``, ``simultaneousAttacks()``, ``splitByClass()``, ``stripTies()``, ``transferOffsetToElements()``, ``trimPlayingWhileSounding()``
+
+    Inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``id()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+
+
+Class HarmonyNote
+-----------------
+
+.. class:: HarmonyNote
+
+
+    Inherits from: :class:`music21.tinyNotation.TinyNotationNote`
+
+    .. method:: HARMONY()
+
+    Compiled regular expression objects 
+
+    Inherited from :class:`music21.tinyNotation.TinyNotationNote`: ``DBLDOT()``, ``DOT()``, ``EDFLAT()``, ``EDNAT()``, ``EDSHARP()``, ``FLAT()``, ``ID_EL()``, ``LYRIC()``, ``OCTAVE2()``, ``OCTAVE3()``, ``OCTAVE4()``, ``OCTAVE5()``, ``PRECTIE()``, ``REST()``, ``SHARP()``, ``TIE()``, ``TYPE()``, ``customNotationMatch()``, ``customPitchMatch()``, ``getDots()``
 
 

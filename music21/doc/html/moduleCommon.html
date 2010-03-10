@@ -256,6 +256,30 @@
 </pre></div>
 </div>
 <dl class="function">
+<dt id="music21.common.findFormat">
+<tt class="descclassname">music21.common.</tt><tt class="descname">findFormat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.findFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a format defined either by a format name or an extension, return the format name as well as the output exensions</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;mx&#39;</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;.mxl&#39;</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;jpeg&#39;</span><span class="p">)</span>
+<span class="go">(&#39;jpeg&#39;, &#39;.jpg&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;lily&#39;</span><span class="p">)</span>
+<span class="go">(&#39;lilypond&#39;, &#39;.ly&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;jpeg&#39;</span><span class="p">)</span>
+<span class="go">(&#39;jpeg&#39;, &#39;.jpg&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;humdrum&#39;</span><span class="p">)</span>
+<span class="go">(&#39;humdrum&#39;, &#39;.krn&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;txt&#39;</span><span class="p">)</span>
+<span class="go">(&#39;text&#39;, &#39;.txt&#39;)</span>
+</pre></div>
+</div>
+<dl class="function">
 <dt id="music21.common.isWeakref">
 <tt class="descclassname">music21.common.</tt><tt class="descname">isWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.isWeakref" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -336,30 +360,6 @@
 
 <p>Shared function to get platform names.</p>
 <dl class="function">
-<dt id="music21.common.findFormat">
-<tt class="descclassname">music21.common.</tt><tt class="descname">findFormat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.findFormat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a format defined either by a format name or an extension, return the format name as well as the output exensions</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;mx&#39;</span><span class="p">)</span>
-<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;.mxl&#39;</span><span class="p">)</span>
-<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
-<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;jpeg&#39;</span><span class="p">)</span>
-<span class="go">(&#39;jpeg&#39;, &#39;.jpg&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;lily&#39;</span><span class="p">)</span>
-<span class="go">(&#39;lilypond&#39;, &#39;.ly&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;jpeg&#39;</span><span class="p">)</span>
-<span class="go">(&#39;jpeg&#39;, &#39;.jpg&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;humdrum&#39;</span><span class="p">)</span>
-<span class="go">(&#39;humdrum&#39;, &#39;.krn&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;txt&#39;</span><span class="p">)</span>
-<span class="go">(&#39;text&#39;, &#39;.txt&#39;)</span>
-</pre></div>
-</div>
-<dl class="function">
 <dt id="music21.common.greaterThan">
 <tt class="descclassname">music21.common.</tt><tt class="descname">greaterThan</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.greaterThan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -432,6 +432,32 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span>
 <span class="go">test 1 2 3</span>
 <span class="go">&lt;BLANKLINE&gt;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.common.findFormatExtURL">
+<tt class="descclassname">music21.common.</tt><tt class="descname">findFormatExtURL</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.findFormatExtURL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a URL, attempt to find the extension</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlD</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4918/musicxml.mxl&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlE</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4306/musicxml.mxl&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlF</span> <span class="o">=</span> <span class="s">&#39;http://junk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlA</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlB</span><span class="p">)</span>
+<span class="go">(&#39;humdrum&#39;, &#39;.krn&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlC</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlD</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.mxl&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlE</span><span class="p">)</span>
+<span class="go">(&#39;musicxml&#39;, &#39;.mxl&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlF</span><span class="p">)</span>
+<span class="go">(None, None)</span>
 </pre></div>
 </div>
 <dl class="function">
@@ -593,7 +619,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 07, 2010.
+      Last updated on Mar 09, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

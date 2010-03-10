@@ -146,8 +146,9 @@ class RestructuredWriter(object):
         if modName == '__builtin__':
             return className
         else:
-            return '%s.%s (of module :ref:`module%s`)' % (modName, className,
-                                                    modNameCapital)
+            return ':class:`music21.%s.%s`' % (modName, className)
+            #return '%s.%s (of module :ref:`module%s`)' % (modName, className,
+            #                                        modNameCapital)
         # return in this form to get a cross reference
         # :ref:`moduleSerial`
 
@@ -261,6 +262,11 @@ class ClassDoc(RestructuredWriter):
 
         self.className = className
         self.classNameEval = eval(className)
+
+        # this is a tuple of class instances that are in the order
+        # of this class to base class
+        self.mro = inspect.getmro(self.classNameEval)
+
         # cannot do this in all cases
         #self.obj = self.classNameEval()
 
@@ -269,7 +275,7 @@ class ClassDoc(RestructuredWriter):
         self.name = self.classNameEval.__name__
 
     def findDerivationClass(self, mro, partName):
-        '''Given an mro (method resolution order) and a part of an object, find from where the part is derived.
+        '''Given an mro (method resolution order) and a part of an object, find from where the part is derived. Returns an index number value.
         '''
         lastIndex = None
         for i in range(len(mro)):
@@ -295,20 +301,18 @@ class ClassDoc(RestructuredWriter):
         '''For an object provided as an argument, collect all relevant
         information in a dictionary. 
         '''
-        obj = self.classNameEval
+
         info = {}
-        info['reference'] = obj
-        info['doc']  = self.formatDocString(obj.__doc__, INDENT)
+        info['reference'] = self.classNameEval
+        info['doc']  = self.formatDocString(self.classNameEval.__doc__, INDENT)
         info['properties'] = {}
         info['methods'] = {}
         info['derivations'] = {} # a dictionary of mro index, name lists
         info['attributes'] = {}
         # get a list of parent objects, starting from this one
         # provide obj, not obj.__class__
-        info['mro'] = inspect.getmro(obj)
-        #environLocal.printDebug(['mro: %s, %s' % (obj, info['mro'])])
 
-        for partName in dir(obj):
+        for partName in dir(self.classNameEval):
             # partName is a string
             if partName.startswith('__'): 
                 continue
@@ -317,12 +321,13 @@ class ClassDoc(RestructuredWriter):
 
             # add to a list the index, name of derived obj
             # derivation from mro
-            mroIndex = self.findDerivationClass(info['mro'], partName)
+            # index number is methhod resolution order
+            mroIndex = self.findDerivationClass(self.mro, partName)
             if mroIndex not in info['derivations'].keys():
                 info['derivations'][mroIndex] = []
             info['derivations'][mroIndex].append(partName)
 
-            partObj = getattr(obj, partName)
+            partObj = getattr(self.classNameEval, partName)
             if (isinstance(partObj, types.StringTypes) or 
                 isinstance(partObj, types.DictionaryType) or 
                 isinstance(partObj, types.ListType) 
@@ -353,6 +358,7 @@ class ClassDoc(RestructuredWriter):
             msg.append('%s\n' %  ( 
                 self.info[groupKey][name]['doc']))
         elif groupKey == 'attributes':
+            # check for doc attribute documentation
             if hasattr(self.classNameEval, '_DOC_ATTR'):
                 if name in self.classNameEval._DOC_ATTR.keys():
                     msg.append('%s\n' %  (self.formatDocString(
@@ -365,32 +371,20 @@ class ClassDoc(RestructuredWriter):
 
     def _fmtRstMethod(self, groupKey, name):
         msg = []
-        msg.append('    .. method:: %s()\n\n' %  name)   
+        msg.append('%s.. method:: %s()\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
+        # do not need indent as doc is already formatted with indent
         msg.append('%s\n' % (self.info[groupKey][name]['doc']))
         return ''.join(msg)
 
-    def getRestructuredClass(self):
-        '''Return a string of a complete RST specification for a class.
-        '''
-        msg = []
-        titleStr = 'Class %s' % self.name
-        msg += self._heading(titleStr, '-')
 
-        titleStr = '.. class:: %s\n\n' % self.name
-        msg += titleStr
-        #msg += self._heading(titleStr)
-
-        msg.append('%s\n' % (self.info['doc']))
-        msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(
-            self.info['mro'])))
-
+    def _getAttributes(self):
         obj = None
         try: # create a dummy object and list its attributes
             obj = self.info['reference']()
         except TypeError:
             pass
-
+        msg = []
         if obj != None:
             attrList = obj.__dict__.keys()
             attrList.sort()
@@ -399,22 +393,38 @@ class ClassDoc(RestructuredWriter):
             for attr in attrList:
                 if not attr.startswith('_'):
                     attrPublic.append(attr)
-            if len(attrPublic) > 0:
+#            if len(attrPublic) > 0:
                 #msg += self._heading('Attributes', '~')
                 # not working:
 #                 for i, nameFound in self.info['derivations']:
 #                     if nameFound not in attrPublic:
 #                         continue
 #                     #msg += self._list(attrPublic)
-                for nameFound in attrPublic:
-                    # TODO: names are not presenting properly, not showing
-                    # class name, only module name          
-                    # need to hide inherited attributes
-                    msg.append(self._fmtRstAttribute('attributes', nameFound))
-                    #msg.append('**%s**\n\n' % nameFound)
+            for nameFound in attrPublic:
+                # TODO: names are not presenting properly, not showing
+                # class name, only module name          
+                # need to hide inherited attributes
+                msg.append(self._fmtRstAttribute('attributes', nameFound))
+                #msg.append('**%s**\n\n' % nameFound)
+        return msg
 
-        for groupName, groupKey, postfix in [('Properties', 'properties', ''),
-                                    ('Methods', 'methods', '()')
+
+    def getRestructuredClass(self):
+        '''Return a string of a complete RST specification for a class.
+        '''
+        msg = []
+
+        titleStr = 'Class %s' % self.name
+        msg += self._heading(titleStr, '-')
+        titleStr = '.. class:: %s\n\n' % self.name
+        msg += titleStr
+
+        msg.append('%s\n' % (self.info['doc']))
+        msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
+
+        msg += self._getAttributes()
+
+        for groupKey, postfix in [('properties', ''), ('methods', '()')
                                     ]:
             methodNames = self.info[groupKey].keys()
 
@@ -437,21 +447,23 @@ class ClassDoc(RestructuredWriter):
                         derivationsCount[i] = 1 # count first
                     else:
                         derivationsCount[i] += 1
+            #environLocal.printDebug(['derivations', self.info['derivations']])
 
             iCurrent = None
             iCount = None
+
             for i in self.info['derivations'].keys():
-                if i == len(self.info['mro']) - 1:
+                if i == len(self.mro) - 1:
                     continue # skip names dervied from object
                 if len(self.info['derivations'][i]) == 0:
                     continue
 
                 # will be Properties, Methods
                 if i == 0:
-                    groupTitle = '%s' % groupName 
+                    groupTitle = '%s' % groupKey.title() 
                     #msg += self._heading(groupTitle, '~') 
                 if i == 1: # only do first one
-                    groupTitle = '%s (Inherited)' % (groupName)
+                    groupTitle = '%s (Inherited)' % (groupKey.title())
                     #msg += self._heading(groupTitle, '~') 
 
                 for nameFound in self.info['derivations'][i]:
@@ -465,10 +477,9 @@ class ClassDoc(RestructuredWriter):
                             # TODO: link directly to the Class, not to the    
                             # the module page
                             # inherited from music21.base.Music21Object
-                            parentSrc = self.formatParent(
-                                self.info['mro'][i])
-                            titleStr = 'Inherited from %s:' % parentSrc
-                            msg.append('    %s ' % titleStr)
+                            parentSrc = self.formatParent(self.mro[i])
+                            titleStr = 'Inherited from %s: ' % parentSrc
+                            msg.append('%s%s' % (INDENT, titleStr))
 #                         else: # when i is zero these are the local methods
 #                             titleStr = 'Locally Defined:' 
 #                             msg.append('    %s\n\n' % titleStr)
@@ -603,6 +614,7 @@ class ModuleDoc(RestructuredWriter):
             return []
 
         if hasattr(self.mod, 'DOC_ORDER'):
+            # re order names by order specified in doc_order
             for orderedObj in self.mod.DOC_ORDER:
                 if hasattr(orderedObj, 'func_name'):
                     orderedName = orderedObj.func_name
