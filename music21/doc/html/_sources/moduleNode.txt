@@ -7,7 +7,9 @@ music21.node
 
 .. module:: music21.node
 
-.. function:: fixed_writexml()
+
+
+.. function:: fixed_writexml(writer, indent=, addindent=, newl=)
 
 
 Class Node
@@ -32,7 +34,14 @@ Class Node
 
     **Class Node** **Methods**
 
-    .. method:: get()
+    .. method:: __init__()
+
+    
+
+    >>> a = Node()
+    >>> a.set('charData', 'test')
+
+    .. method:: get(name)
 
     No documentation. 
 
@@ -40,11 +49,11 @@ Class Node
 
     No documentation. 
 
-    .. method:: loadAttrs()
+    .. method:: loadAttrs(attrs)
 
     Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
 
-    .. method:: merge()
+    .. method:: merge(other, favorSelf=True)
 
     Given another similar or commonly used Node object, combine all attributes and return a new object. 
 
@@ -55,7 +64,7 @@ Class Node
     >>> c.get('charData')
     'green' 
 
-    .. method:: set()
+    .. method:: set(name, value)
 
     No documentation. 
 
@@ -63,7 +72,7 @@ Class Node
 
     provide defaults for all necessary attributes at this level 
 
-    .. method:: toxml()
+    .. method:: toxml(doc=None, parent=None, stringOut=0)
 
     Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls. 
 
@@ -95,7 +104,11 @@ Class NodeList
 
     **Class NodeList** **Methods**
 
-    .. method:: append()
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: append(item)
 
     No documentation. 
 

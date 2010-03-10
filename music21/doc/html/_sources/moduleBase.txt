@@ -7,15 +7,10 @@ music21.base
 
 .. module:: music21.base
 
+Music21 base classes and important utilities. base -- the convention within music21 is that __init__ files contain: from base import * so everything in this file can be accessed as music21.XXXX 
 
 
-Music21 base classes and important utilities.
 
-base -- the convention within music21 is that __init__ files contain:
-
-   from base import *
-   
-so everything in this file can be accessed as music21.XXXX
 
 Class Music21Object
 -------------------
@@ -64,11 +59,15 @@ Class Music21Object
 
     **Class Music21Object** **Methods**
 
-    .. method:: searchParent()
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: searchParent(attrName)
 
     If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
 
-    .. method:: getContextAttr()
+    .. method:: getContextAttr(attr)
 
     Given the name of an attribute, search Conctexts and return the best match. 
 
@@ -80,7 +79,7 @@ Class Music21Object
     >>> a.getContextAttr('attr1')
     'test' 
 
-    .. method:: setContextAttr()
+    .. method:: setContextAttr(attrName, value)
 
     Given the name of an attribute, search Conctexts and return the best match. 
 
@@ -95,7 +94,7 @@ Class Music21Object
     >>> a.getContextAttr('attr1')
     3000 
 
-    .. method:: addContext()
+    .. method:: addContext(obj)
 
     Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
 
@@ -107,7 +106,7 @@ Class Music21Object
     >>> a.getContextAttr('attr1')
     'test' 
 
-    .. method:: addLocationAndParent()
+    .. method:: addLocationAndParent(offset, parent, parentWeakRef=None)
 
     ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
 
@@ -123,11 +122,11 @@ Class Music21Object
     >>> o1.getOffsetBySite(st1)
     20.0 
 
-    .. method:: getContextByClass()
+    .. method:: getContextByClass(className, serialReverseSearch=True, callerFirst=None, memo=None)
 
     Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
-    .. method:: getOffsetBySite()
+    .. method:: getOffsetBySite(site)
 
     If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
 
@@ -136,15 +135,15 @@ Class Music21Object
     >>> a.getOffsetBySite(None)
     30.0 
 
-    .. method:: isClass()
+    .. method:: isClass(className)
 
     returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
-    .. method:: show()
+    .. method:: show(fmt=musicxml)
 
     Displays an object in the given format (default: musicxml) using the default display tools. This might need to return the file path. 
 
-    .. method:: write()
+    .. method:: write(fmt=musicxml, fp=None)
 
     Write a file. A None file path will result in temporary file 
 
@@ -211,11 +210,15 @@ Class ElementWrapper
 
     **Class ElementWrapper** **Methods**
 
+    .. method:: __init__(obj)
+
+    No documentation. 
+
     .. method:: getId()
 
     No documentation. 
 
-    .. method:: isClass()
+    .. method:: isClass(className)
 
     Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
 
@@ -231,7 +234,7 @@ Class ElementWrapper
     >>> b.isClass(types.NoneType)
     False 
 
-    .. method:: isTwin()
+    .. method:: isTwin(other)
 
     a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
 
@@ -255,7 +258,7 @@ Class ElementWrapper
     >>> aE.isTwin(bE)
     True 
 
-    .. method:: setId()
+    .. method:: setId(newId)
 
     No documentation. 
 
@@ -275,7 +278,11 @@ Class DefinedContexts
 
     **Class DefinedContexts** **Methods**
 
-    .. method:: add()
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: add(obj, offset=None, name=None, timeValue=None, idKey=None)
 
     Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
 
@@ -283,7 +290,7 @@ Class DefinedContexts
 
     Clear all data. 
 
-    .. method:: get()
+    .. method:: get(locationsTrail=False)
 
     Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
 
@@ -300,7 +307,7 @@ Class DefinedContexts
     >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
     True 
 
-    .. method:: getAttrByName()
+    .. method:: getAttrByName(attrName)
 
     Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
@@ -320,7 +327,7 @@ Class DefinedContexts
     >>> aContexts.getAttrByName('attr1') == 98
     True 
 
-    .. method:: getByClass()
+    .. method:: getByClass(className, callerFirst=None, memo=None)
 
     Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 
@@ -335,7 +342,7 @@ Class DefinedContexts
     >>> aContexts.getByClass(Mock) == aObj
     True 
 
-    .. method:: getOffsetBySite()
+    .. method:: getOffsetBySite(site)
 
     For a given site return its offset. 
 
@@ -351,7 +358,7 @@ Class DefinedContexts
     >>> aLocations.getOffsetBySite(bSite)
     121.5 
 
-    .. method:: getOffsetBySiteId()
+    .. method:: getOffsetBySiteId(siteId)
 
     For a given site id, return its offset. 
 
@@ -384,7 +391,7 @@ Class DefinedContexts
     >>> aLocations.getOffsets()
     [0, 234] 
 
-    .. method:: getSiteByOffset()
+    .. method:: getSiteByOffset(offset)
 
     For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
@@ -413,11 +420,11 @@ Class DefinedContexts
     >>> len(aContexts.getSites()) == 2
     True 
 
-    .. method:: hasSiteId()
+    .. method:: hasSiteId(site)
 
     Return True or False if this DefinedContexts object already has this site defined as a location 
 
-    .. method:: remove()
+    .. method:: remove(site)
 
     Remove the entry specified by sites 
 
@@ -439,11 +446,11 @@ Class DefinedContexts
     >>> len(aContexts)
     2 
 
-    .. method:: removeById()
+    .. method:: removeById(idKey)
 
     No documentation. 
 
-    .. method:: setAttrByName()
+    .. method:: setAttrByName(attrName, value)
 
     Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
@@ -458,7 +465,7 @@ Class DefinedContexts
     >>> aContexts.getAttrByName('attr1') == 'test'
     True 
 
-    .. method:: setOffsetBySite()
+    .. method:: setOffsetBySite(site, value)
 
     Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
 
@@ -496,10 +503,10 @@ Class Groups
 
     **Class Groups** **Methods**
 
-    .. method:: append()
+    .. method:: append(value)
 
     No documentation. 
 
-    Methods inherited from list: :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
+    Methods inherited from list: :meth:`__builtin__.list.__init__`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
 
 

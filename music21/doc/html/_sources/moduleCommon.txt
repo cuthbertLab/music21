@@ -7,11 +7,10 @@ music21.common
 
 .. module:: music21.common
 
+Utility constants, dictionaries, functions, and objects used throughout music21. 
 
 
-Utility constants, dictionaries, functions, and objects used throughout music21.
-
-.. function:: fromRoman()
+.. function:: fromRoman(num)
 
 
 
@@ -20,7 +19,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 >>> fromRoman('vii')
 7 
 
-.. function:: toRoman()
+.. function:: toRoman(num)
 
 
 
@@ -29,121 +28,62 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 >>> toRoman(7)
 'VII' 
 
-.. function:: EuclidGCD()
+.. function:: EuclidGCD(a, b)
 
 use Euclid's algorithm to find the GCD of a and b 
 
-.. function:: getMd5()
+.. function:: almostEqual(x, y=0.0, grain=1e-07)
 
-Return a string from an md5 haslib 
+The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
 
->>> getMd5('test')
-'098f6bcd4621d373cade4e832627b4f6' 
+.. function:: almostEquals(x, y=0.0, grain=1e-07)
 
-.. function:: dirPartitioned()
+The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
+
+.. function:: basicallyEqual(a, b)
+
+returns true if a and b are equal except for whitespace differences 
+
+>>> a = " hello there "
+>>> b = "hello there"
+>>> c = " bye there "
+>>> basicallyEqual(a,b)
+True 
+>>> basicallyEqual(a,c)
+False 
+
+.. function:: basicallyEquals(a, b)
+
+returns true if a and b are equal except for whitespace differences 
+
+>>> a = " hello there "
+>>> b = "hello there"
+>>> c = " bye there "
+>>> basicallyEqual(a,b)
+True 
+>>> basicallyEqual(a,c)
+False 
+
+.. function:: decimalToTuplet(decNum)
+
+For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
+
+.. function:: dirPartitioned(obj, skipLeading=['__'])
 
 Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
 
-.. function:: findFormatFile()
+.. function:: dotMultiplier(dots)
 
-Given a file path (relative or absolute) return the format 
+dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
 
->>> findFormatFile('test.xml')
-'musicxml' 
->>> findFormatFile('long/file/path/test-2009.03.02.xml')
-'musicxml' 
->>> findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
-'musicxml' 
-Windows drive + pickle 
->>> findFormatFile('d:/long/file/path/test.p')
-'pickle' 
-On a windows networked filesystem 
->>> findFormatFile('\\long\file\path\test.krn')
-'humdrum' 
+>>> dotMultiplier(1)
+1.5 
+>>> dotMultiplier(2)
+1.75 
+>>> dotMultiplier(3)
+1.875 
 
-.. function:: findInputExtension()
-
-Given an input format, find and return all possible input extensions. 
-
->>> a = findInputExtension('musicxml')
->>> a
-['xml', 'mxl', 'mx'] 
->>> a = findInputExtension('mx')
->>> a
-['xml', 'mxl', 'mx'] 
->>> a = findInputExtension('humdrum')
->>> a
-['krn'] 
-
-.. function:: lcm()
-
-
-
->>> lcm([3,4,5])
-60 
->>> lcm([3,4])
-12 
->>> lcm([1,2])
-2 
->>> lcm([3,6])
-6 
-
-.. function:: unwrapWeakref()
-
-utility function that gets an object that might be an object itself or a weak reference to an object. 
-
->>> class Mock(object): pass
->>> a1 = Mock()
->>> a2 = Mock()
->>> a2.strong = a1
->>> a2.weak = wrapWeakref(a1)
->>> unwrapWeakref(a2.strong) is a1
-True 
->>> unwrapWeakref(a2.weak) is a1
-True 
->>> unwrapWeakref(a2.strong) is unwrapWeakref(a2.weak)
-True 
-
-.. function:: isIterable()
-
-Returns True if is the object can be iter'd over 
-
->>> isIterable([])
-True 
->>> isIterable('sharp')
-False 
->>> isIterable((None, None))
-True 
->>> import music21.stream
->>> isIterable(music21.stream.Stream())
-True 
-
-.. function:: isPowerOfTwo()
-
-returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
-
->>> isPowerOfTwo(3)
-False 
->>> isPowerOfTwo(18)
-False 
->>> isPowerOfTwo(1024)
-True 
->>> isPowerOfTwo(1024.01)
-False 
->>> isPowerOfTwo(1024.00001)
-True 
-
-.. function:: stripAddresses()
-
-Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
-
->>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
-'{0.0} <music21.clef.TrebleClef object at ADDRESS>' 
-while this is left alone: 
->>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
-'{0.0} <music21.humdrum.MiscTandam *>I humdrum control>' 
-
-.. function:: findFormat()
+.. function:: findFormat(fmt)
 
 Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
 
@@ -164,124 +104,7 @@ Given a format defined either by a format name or an extension, return the forma
 >>> findFormat('txt')
 ('text', '.txt') 
 
-.. function:: isWeakref()
-
-Test if an object is a weakref 
-
->>> class Mock(object): pass
->>> a1 = Mock()
->>> a2 = Mock()
->>> isWeakref(a1)
-False 
->>> isWeakref(3)
-False 
->>> isWeakref(wrapWeakref(a1))
-True 
-
-.. function:: isStr()
-
-Check of usrData is some form of string, including unicode. 
-
->>> isStr(3)
-False 
->>> isStr('sharp')
-True 
->>> isStr(u'flat')
-True 
-
-.. function:: dotMultiplier()
-
-dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
-
->>> dotMultiplier(1)
-1.5 
->>> dotMultiplier(2)
-1.75 
->>> dotMultiplier(3)
-1.875 
-
-.. function:: basicallyEqual()
-
-returns true if a and b are equal except for whitespace differences 
-
->>> a = " hello there "
->>> b = "hello there"
->>> c = " bye there "
->>> basicallyEqual(a,b)
-True 
->>> basicallyEqual(a,c)
-False 
-
-.. function:: isNum()
-
-check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
-
->>> isNum(3.0)
-True 
->>> isNum(3)
-True 
->>> isNum('three')
-False 
-
-.. function:: getPlatform()
-
-Shared function to get platform names. 
-
-.. function:: greaterThan()
-
-greaterThan returns True if x is greater than and not almostEquals y 
-
-.. function:: sortFilesRecent()
-
-Given two files, sort by most recent. Return only the file paths. 
-
->>> a = os.listdir(os.curdir)
->>> b = sortFilesRecent(a)
-
-.. function:: isListLike()
-
-Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
-
->>> isListLike([])
-True 
->>> isListLike('sharp')
-False 
->>> isListLike((None, None))
-True 
->>> import music21.stream
->>> isListLike(music21.stream.Stream())
-False 
-
-.. function:: almostEquals()
-
-The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
-
-.. function:: sortModules()
-
-Sort a lost of imported module names such that most recently modified is first 
-
-.. function:: decimalToTuplet()
-
-For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
-
-.. function:: wrapWeakref()
-
-utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
-
-.. function:: lessThan()
-
-lessThan -- returns True if x is less than and not almostEquals y 
-
-.. function:: formatStr()
-
-Format one or more data elements into string suitable for printing straight to stderr or other outputs 
-
->>> a = formatStr('test', '1', 2, 3)
->>> print a
-test 1 2 3 
-<BLANKLINE> 
-
-.. function:: findFormatExtURL()
+.. function:: findFormatExtURL(url)
 
 Given a URL, attempt to find the extension 
 
@@ -304,12 +127,204 @@ Given a URL, attempt to find the extension
 >>> findFormatExtURL(urlF)
 (None, None) 
 
-.. function:: greaterThanOrEqual()
+.. function:: findFormatFile(fp)
+
+Given a file path (relative or absolute) return the format 
+
+>>> findFormatFile('test.xml')
+'musicxml' 
+>>> findFormatFile('long/file/path/test-2009.03.02.xml')
+'musicxml' 
+>>> findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
+'musicxml' 
+Windows drive + pickle 
+>>> findFormatFile('d:/long/file/path/test.p')
+'pickle' 
+On a windows networked filesystem 
+>>> findFormatFile('\\long\file\path\test.krn')
+'humdrum' 
+
+.. function:: findInputExtension(fmt)
+
+Given an input format, find and return all possible input extensions. 
+
+>>> a = findInputExtension('musicxml')
+>>> a
+['xml', 'mxl', 'mx'] 
+>>> a = findInputExtension('mx')
+>>> a
+['xml', 'mxl', 'mx'] 
+>>> a = findInputExtension('humdrum')
+>>> a
+['krn'] 
+
+.. function:: findSimpleFraction(working)
+
+
+.. function:: formatStr(msg)
+
+Format one or more data elements into string suitable for printing straight to stderr or other outputs 
+
+>>> a = formatStr('test', '1', 2, 3)
+>>> print a
+test 1 2 3 
+<BLANKLINE> 
+
+.. function:: getMd5(value=None)
+
+Return a string from an md5 haslib 
+
+>>> getMd5('test')
+'098f6bcd4621d373cade4e832627b4f6' 
+
+.. function:: getPlatform()
+
+Shared function to get platform names. 
+
+.. function:: greaterThan(x, y=0.0)
+
+greaterThan returns True if x is greater than and not almostEquals y 
+
+.. function:: greaterThanOrEqual(x, y=0.0, grain=1e-07)
 
 greaterThan returns True if x is greater than or almostEquals y 
 
-.. function:: findSimpleFraction()
+.. function:: isIterable(usrData)
 
+Returns True if is the object can be iter'd over 
+
+>>> isIterable([])
+True 
+>>> isIterable('sharp')
+False 
+>>> isIterable((None, None))
+True 
+>>> import music21.stream
+>>> isIterable(music21.stream.Stream())
+True 
+
+.. function:: isListLike(usrData)
+
+Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
+
+>>> isListLike([])
+True 
+>>> isListLike('sharp')
+False 
+>>> isListLike((None, None))
+True 
+>>> import music21.stream
+>>> isListLike(music21.stream.Stream())
+False 
+
+.. function:: isNum(usrData)
+
+check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
+
+>>> isNum(3.0)
+True 
+>>> isNum(3)
+True 
+>>> isNum('three')
+False 
+
+.. function:: isPowerOfTwo(n)
+
+returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
+
+>>> isPowerOfTwo(3)
+False 
+>>> isPowerOfTwo(18)
+False 
+>>> isPowerOfTwo(1024)
+True 
+>>> isPowerOfTwo(1024.01)
+False 
+>>> isPowerOfTwo(1024.00001)
+True 
+
+.. function:: isStr(usrData)
+
+Check of usrData is some form of string, including unicode. 
+
+>>> isStr(3)
+False 
+>>> isStr('sharp')
+True 
+>>> isStr(u'flat')
+True 
+
+.. function:: isWeakref(referent)
+
+Test if an object is a weakref 
+
+>>> class Mock(object): pass
+>>> a1 = Mock()
+>>> a2 = Mock()
+>>> isWeakref(a1)
+False 
+>>> isWeakref(3)
+False 
+>>> isWeakref(wrapWeakref(a1))
+True 
+
+.. function:: lcm(filter)
+
+
+
+>>> lcm([3,4,5])
+60 
+>>> lcm([3,4])
+12 
+>>> lcm([1,2])
+2 
+>>> lcm([3,6])
+6 
+
+.. function:: lessThan(x, y=0.0)
+
+lessThan -- returns True if x is less than and not almostEquals y 
+
+.. function:: sortFilesRecent(fileList)
+
+Given two files, sort by most recent. Return only the file paths. 
+
+>>> a = os.listdir(os.curdir)
+>>> b = sortFilesRecent(a)
+
+.. function:: sortModules(moduleList)
+
+Sort a lost of imported module names such that most recently modified is first 
+
+.. function:: stripAddresses(textString, replacement=ADDRESS)
+
+Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
+
+>>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
+'{0.0} <music21.clef.TrebleClef object at ADDRESS>' 
+while this is left alone: 
+>>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
+'{0.0} <music21.humdrum.MiscTandam *>I humdrum control>' 
+
+.. function:: unwrapWeakref(referent)
+
+utility function that gets an object that might be an object itself or a weak reference to an object. 
+
+>>> class Mock(object): pass
+>>> a1 = Mock()
+>>> a2 = Mock()
+>>> a2.strong = a1
+>>> a2.weak = wrapWeakref(a1)
+>>> unwrapWeakref(a2.strong) is a1
+True 
+>>> unwrapWeakref(a2.weak) is a1
+True 
+>>> unwrapWeakref(a2.strong) is unwrapWeakref(a2.weak)
+True 
+
+.. function:: wrapWeakref(referent)
+
+utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
 
 Class Scalar
 ------------
@@ -332,6 +347,10 @@ Class Scalar
 
     **Class Scalar** **Methods**
 
+    .. method:: __init__(value=None)
+
+    No documentation. 
+
     .. method:: toFloat()
 
     No documentation. 
@@ -345,28 +364,52 @@ Class Scalar
     No documentation. 
 
 
-Class defList
--------------
+Class Iterator
+--------------
 
-.. class:: defList
+.. class:: Iterator
 
-    A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
+    A simple Iterator object used to handle iteration of Streams and other list-like objects. 
 
-    Class inherits from: list
+    
 
-    **Class defList** **Attributes**
+    **Class Iterator** **Methods**
 
-    .. attribute:: default
-
-    No documentation. 
-
-    .. attribute:: callDefault
+    .. method:: __init__(data)
 
     No documentation. 
 
-    **Class defList** **Methods**
+    .. method:: next()
 
-    Methods inherited from list: :meth:`__builtin__.list.append`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
+    No documentation. 
+
+
+Class Timer
+-----------
+
+.. class:: Timer
+
+    An object for timing. 
+
+    
+
+    **Class Timer** **Methods**
+
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: clear()
+
+    No documentation. 
+
+    .. method:: start()
+
+    Explicit start method; will clear previous values. Start always happens on initialization. 
+
+    .. method:: stop()
+
+    No documentation. 
 
 
 Class defHash
@@ -392,50 +435,42 @@ Class defHash
 
     **Class defHash** **Methods**
 
-    .. method:: get()
+    .. method:: __init__(hash=None, default=None, callDefault=False)
+
+    No documentation. 
+
+    .. method:: get(key)
 
     No documentation. 
 
     Methods inherited from dict: :meth:`__builtin__.dict.clear`, :meth:`__builtin__.dict.copy`, :meth:`__builtin__.dict.has_key`, :meth:`__builtin__.dict.items`, :meth:`__builtin__.dict.iteritems`, :meth:`__builtin__.dict.iterkeys`, :meth:`__builtin__.dict.itervalues`, :meth:`__builtin__.dict.keys`, :meth:`__builtin__.dict.pop`, :meth:`__builtin__.dict.popitem`, :meth:`__builtin__.dict.setdefault`, :meth:`__builtin__.dict.update`, :meth:`__builtin__.dict.values`
 
 
-Class Timer
------------
+Class defList
+-------------
 
-.. class:: Timer
+.. class:: defList
 
-    An object for timing. 
+    A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
 
-    
+    Class inherits from: list
 
-    **Class Timer** **Methods**
+    **Class defList** **Attributes**
 
-    .. method:: clear()
-
-    No documentation. 
-
-    .. method:: start()
-
-    Explicit start method; will clear previous values. Start always happens on initialization. 
-
-    .. method:: stop()
+    .. attribute:: default
 
     No documentation. 
 
-
-Class Iterator
---------------
-
-.. class:: Iterator
-
-    A simple Iterator object used to handle iteration of Streams and other list-like objects. 
-
-    
-
-    **Class Iterator** **Methods**
-
-    .. method:: next()
+    .. attribute:: callDefault
 
     No documentation. 
+
+    **Class defList** **Methods**
+
+    .. method:: __init__(value=None, default=None, callDefault=False)
+
+    No documentation. 
+
+    Methods inherited from list: :meth:`__builtin__.list.append`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
 
 

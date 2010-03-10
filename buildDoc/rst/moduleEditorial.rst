@@ -7,6 +7,8 @@ music21.editorial
 
 .. module:: music21.editorial
 
+
+
 Class NoteEditorial
 -------------------
 
@@ -65,6 +67,10 @@ Class NoteEditorial
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
     **Class NoteEditorial** **Methods**
+
+    .. method:: __init__()
+
+    No documentation. 
 
     .. method:: colorLilyStart()
 

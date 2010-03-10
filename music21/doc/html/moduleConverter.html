@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
-    <link rel="next" title="music21.corpus" href="moduleCorpus.html" />
+    <link rel="next" title="music21.corpus.base" href="moduleCorpus.html" />
     <link rel="prev" title="music21.common" href="moduleCommon.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="moduleCorpus.html" title="music21.corpus"
+          <a href="moduleCorpus.html" title="music21.corpus.base"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="moduleCommon.html" title="music21.common"
@@ -61,7 +61,7 @@
                                   title="previous chapter">music21.common</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="moduleCorpus.html"
-                                  title="next chapter">music21.corpus</a></p>
+                                  title="next chapter">music21.corpus.base</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/moduleConverter.txt"
@@ -93,23 +93,23 @@
 <p>Public interface for importing file formats into music21.</p>
 <dl class="function">
 <dt id="music21.converter.parse">
-<tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><em>value</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Determine if the file is a file path or a string</p>
 <dl class="function">
 <dt id="music21.converter.parseFile">
-<tt class="descclassname">music21.converter.</tt><tt class="descname">parseFile</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parseFile" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parseFile</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="music21.converter.parseData">
-<tt class="descclassname">music21.converter.</tt><tt class="descname">parseData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parseData" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parseData</tt><big>(</big><em>dataStr</em><big>)</big><a class="headerlink" href="#music21.converter.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="music21.converter.parseURL">
-<tt class="descclassname">music21.converter.</tt><tt class="descname">parseURL</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.parseURL" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parseURL</tt><big>(</big><em>url</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parseURL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="section" id="class-converter">
@@ -128,20 +128,26 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>No documentation.</p>
 <p><strong>Class Converter</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.converter.Converter.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
 <dt id="music21.converter.Converter.parseData">
-<tt class="descname">parseData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseData" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseData</tt><big>(</big><em>dataStr</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>need to look at data and determine if it is xml or humdrum</p>
 <dl class="method">
 <dt id="music21.converter.Converter.parseFile">
-<tt class="descname">parseFile</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseFile" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseFile</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
 <dl class="method">
 <dt id="music21.converter.Converter.parseURL">
-<tt class="descname">parseURL</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseURL" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseURL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given a url, download and parse</p>
@@ -163,6 +169,12 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>No documentation.</p>
 <p><strong>Class ConverterMusicXML</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.converter.ConverterMusicXML.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>forceSource</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
 <dt id="music21.converter.ConverterMusicXML.getPartNames">
 <tt class="descname">getPartNames</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.getPartNames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -176,13 +188,13 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>Load all parts. This determines the order parts are found in the stream</p>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.parseData">
-<tt class="descname">parseData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseData" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseData</tt><big>(</big><em>xmlString</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Open from a string</p>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.parseFile">
-<tt class="descname">parseFile</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseFile" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source.</p>
@@ -204,14 +216,20 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>No documentation.</p>
 <p><strong>Class ConverterHumdrum</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.converter.ConverterHumdrum.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
 <dt id="music21.converter.ConverterHumdrum.parseData">
-<tt class="descname">parseData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseData" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseData</tt><big>(</big><em>humdrumString</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Open from a string</p>
 <dl class="method">
 <dt id="music21.converter.ConverterHumdrum.parseFile">
-<tt class="descname">parseFile</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseFile" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parseFile</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Open from file path</p>
@@ -226,6 +244,12 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
 <p><strong>Class PickleFilter</strong> <strong>Methods</strong></p>
+<dl class="method">
+<dt id="music21.converter.PickleFilter.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned.</p>
 <dl class="method">
 <dt id="music21.converter.PickleFilter.status">
 <tt class="descname">status</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.status" title="Permalink to this definition">¶</a></dt>
@@ -253,7 +277,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="moduleCorpus.html" title="music21.corpus"
+          <a href="moduleCorpus.html" title="music21.corpus.base"
              >next</a> |</li>
         <li class="right" >
           <a href="moduleCommon.html" title="music21.common"

@@ -7,6 +7,8 @@ music21.tempo
 
 .. module:: music21.tempo
 
+
+
 Class TempoMark
 ---------------
 
@@ -33,6 +35,10 @@ Class TempoMark
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
     **Class TempoMark** **Methods**
+
+    .. method:: __init__(value=None)
+
+    No documentation. 
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -69,6 +75,10 @@ Class MetronomeMark
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
     **Class MetronomeMark** **Methods**
+
+    .. method:: __init__(number=60, referent=None)
+
+    No documentation. 
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 

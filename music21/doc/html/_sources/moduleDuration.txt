@@ -7,7 +7,9 @@ music21.duration
 
 .. module:: music21.duration
 
-.. function:: convertQuarterLengthToType()
+
+
+.. function:: convertQuarterLengthToType(qLen)
 
 similar to quarterLengthToClosestType but only returns exact matches 
 
@@ -16,7 +18,70 @@ similar to quarterLengthToClosestType but only returns exact matches
 >>> convertQuarterLengthToType(0.125)
 '32nd' 
 
-.. function:: partitionQuarterLength()
+.. function:: convertTypeToNumber(dType)
+
+
+
+>>> convertTypeToNumber('quarter')
+4 
+>>> convertTypeToNumber('half')
+2 
+
+.. function:: convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[])
+
+Given a rhythm type, number of dots, and list of Tuplet objects, give its quarter length. 
+
+>>> convertTypeToQuarterLength('whole')
+4.0 
+>>> convertTypeToQuarterLength('16th')
+0.25 
+>>> convertTypeToQuarterLength('quarter', 2)
+1.75 
+Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8). 
+>>> convertTypeToQuarterLength('half', dotGroups = [1,1])
+4.5 
+
+.. function:: dottedMatch(qLen, maxDots=4)
+
+given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default. 
+
+>>> dottedMatch(3.0)
+(1, 'half') 
+>>> dottedMatch(1.75)
+(2, 'quarter') 
+This value is not equal to any dotted note length 
+>>> dottedMatch(1.6)
+(False, False) 
+maxDots can be lowered for certain searches 
+>>> dottedMatch(1.875)
+(3, 'quarter') 
+>>> dottedMatch(1.875, 2)
+(False, False) 
+
+
+
+.. function:: musicXMLTypeToType(value)
+
+Convert a MusicXML type to an m21 type. 
+
+>>> musicXMLTypeToType('long')
+'longa' 
+>>> musicXMLTypeToType('quarter')
+'quarter' 
+>>> musicXMLTypeToType(None)
+Traceback (most recent call last): 
+DurationException... 
+
+.. function:: nextLargerType(durType)
+
+given a type return the next larger one: 
+
+>>> nextLargerType("16th")
+'eighth' 
+>>> nextLargerType("whole")
+'breve' 
+
+.. function:: partitionQuarterLength(qLen, qLenDiv=4)
 
 Given a quarterLength and a base quarterLength to divide it into (default 4 = whole notes), return a list of Durations that partition the given quarterLength after each division. (Little demonstration method) 
 
@@ -62,7 +127,7 @@ No problem if the division unit is larger then the source duration.
 
 
 
-.. function:: quarterLengthToClosestType()
+.. function:: quarterLengthToClosestType(qLen)
 
 ## was quarterLengthToTypeCandidate Returns a two-unit tuple consisting of 1. the type string ("quarter") that is smaller than or equal to the qLen 2. bool, True or False whether the conversion was exact. 
 
@@ -73,48 +138,7 @@ No problem if the division unit is larger then the source duration.
 >>> quarterLengthToClosestType(1.8)
 ('quarter', False) 
 
-.. function:: quarterLengthToTuplet()
-
-Returns a list of possible Tuplet objects for a given qLen up to the maxToReturn Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13) does not return dotted tuplets, nor nested tuplets. (was quarterLengthToTupletCandidate) Note that 4:3 tuplets won't be found, but will be found as dotted notes by dottedMatch 
-
->>> quarterLengthToTuplet(.33333333)
-[<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>] 
-By specifying only 1 count, the a single-length list containing the Tuplet with the 
-smallest type will be returned. 
->>> quarterLengthToTuplet(.3333333, 1)
-[<music21.duration.Tuplet 3/2/eighth>] 
->>> quarterLengthToTuplet(.20)
-[<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>] 
->>> c = quarterLengthToTuplet(.3333333, 1)[0]
->>> c.tupletMultiplier()
-0.6666... 
-
-.. function:: updateTupletType()
-
-Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary. 
-
->>> a = Duration(); a.quarterLength = .33333
->>> b = Duration(); b.quarterLength = .33333
->>> c = DurationUnit(); c.quarterLength = .33333
->>> d = Duration(); d.quarterLength = 2
->>> e = Duration(); e.quarterLength = .33333
->>> f = DurationUnit(); f.quarterLength = .33333
->>> g = Duration(); g.quarterLength = .33333
->>> a.tuplets[0].type == None
-True 
->>> updateTupletType([a, b, c, d, e, f, g])
->>> a.tuplets[0].type == 'start'
-True 
->>> b.tuplets[0].type == None
-True 
->>> c.tuplets[0].type == 'stop'
-True 
->>> e.tuplets[0].type == 'start'
-True 
->>> g.tuplets[0].type == 'stop'
-True 
-
-.. function:: quarterLengthToDurations()
+.. function:: quarterLengthToDurations(qLen)
 
 Returns a List of new Durations (each with only a single component) given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (n.b. all quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that). This is mainly a utility function.  Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and then let Duration automatically create Duration Components as necessary. These examples use unitSpec() to get a concise summary of the contents 
 
@@ -171,26 +195,26 @@ and recurse, adding as my units as necessary.
 
 
 
-.. function:: dottedMatch()
+.. function:: quarterLengthToTuplet(qLen, maxToReturn=4)
 
-given a qLen, determine if there is a dotted (or non-dotted) type that exactly matches.  Returns (numDots, type) or (False, False) if non matches exactly. Returns a maximum of four dots by default. 
+Returns a list of possible Tuplet objects for a given qLen up to the maxToReturn Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13) does not return dotted tuplets, nor nested tuplets. (was quarterLengthToTupletCandidate) Note that 4:3 tuplets won't be found, but will be found as dotted notes by dottedMatch 
 
->>> dottedMatch(3.0)
-(1, 'half') 
->>> dottedMatch(1.75)
-(2, 'quarter') 
-This value is not equal to any dotted note length 
->>> dottedMatch(1.6)
-(False, False) 
-maxDots can be lowered for certain searches 
->>> dottedMatch(1.875)
-(3, 'quarter') 
->>> dottedMatch(1.875, 2)
-(False, False) 
+>>> quarterLengthToTuplet(.33333333)
+[<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>] 
+By specifying only 1 count, the a single-length list containing the Tuplet with the 
+smallest type will be returned. 
+>>> quarterLengthToTuplet(.3333333, 1)
+[<music21.duration.Tuplet 3/2/eighth>] 
+>>> quarterLengthToTuplet(.20)
+[<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>] 
+>>> c = quarterLengthToTuplet(.3333333, 1)[0]
+>>> c.tupletMultiplier()
+0.6666... 
+
+.. function:: roundDuration(qLen)
 
 
-
-.. function:: typeToMusicXMLType()
+.. function:: typeToMusicXMLType(value)
 
 Convert a MusicXML type to an m21 type. 
 
@@ -199,56 +223,34 @@ Convert a MusicXML type to an m21 type.
 >>> typeToMusicXMLType('quarter')
 'quarter' 
 
-.. function:: roundDuration()
-
-
-.. function:: convertTypeToNumber()
-
-
-
->>> convertTypeToNumber('quarter')
-4 
->>> convertTypeToNumber('half')
-2 
-
-.. function:: convertTypeToQuarterLength()
-
-Given a rhythm type, number of dots, and list of Tuplet objects, give its quarter length. 
-
->>> convertTypeToQuarterLength('whole')
-4.0 
->>> convertTypeToQuarterLength('16th')
-0.25 
->>> convertTypeToQuarterLength('quarter', 2)
-1.75 
-Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8). 
->>> convertTypeToQuarterLength('half', dotGroups = [1,1])
-4.5 
-
-.. function:: musicXMLTypeToType()
-
-Convert a MusicXML type to an m21 type. 
-
->>> musicXMLTypeToType('long')
-'longa' 
->>> musicXMLTypeToType('quarter')
-'quarter' 
->>> musicXMLTypeToType(None)
-Traceback (most recent call last): 
-DurationException... 
-
-.. function:: unitSpec()
+.. function:: unitSpec(durationObjectOrObjects)
 
 simple representation of most durationObjects. works on a single DurationObject or a List of them, returning a list of unitSpecs if given a list otherwise returns a single one A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, tupletType (assuming top and bottom are the same). Does not deal with nested tuplets, etc. 
 
-.. function:: nextLargerType()
+.. function:: updateTupletType(durationList)
 
-given a type return the next larger one: 
+Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary. 
 
->>> nextLargerType("16th")
-'eighth' 
->>> nextLargerType("whole")
-'breve' 
+>>> a = Duration(); a.quarterLength = .33333
+>>> b = Duration(); b.quarterLength = .33333
+>>> c = DurationUnit(); c.quarterLength = .33333
+>>> d = Duration(); d.quarterLength = 2
+>>> e = Duration(); e.quarterLength = .33333
+>>> f = DurationUnit(); f.quarterLength = .33333
+>>> g = Duration(); g.quarterLength = .33333
+>>> a.tuplets[0].type == None
+True 
+>>> updateTupletType([a, b, c, d, e, f, g])
+>>> a.tuplets[0].type == 'start'
+True 
+>>> b.tuplets[0].type == None
+True 
+>>> c.tuplets[0].type == 'stop'
+True 
+>>> e.tuplets[0].type == 'start'
+True 
+>>> g.tuplets[0].type == 'stop'
+True 
 
 Class Duration
 --------------
@@ -324,7 +326,11 @@ Class Duration
 
     **Class Duration** **Methods**
 
-    .. method:: addDuration()
+    .. method:: __init__()
+
+    First positional argument is assumed to be type string or a quarterLength. 
+
+    .. method:: addDuration(dur)
 
     Add a DurationUnit or a Duration's components to this Duration. 
 
@@ -336,7 +342,7 @@ Class Duration
     >>> a.type
     'complex' 
 
-    .. method:: appendTuplet()
+    .. method:: appendTuplet(newTuplet)
 
     No documentation. 
 
@@ -354,7 +360,7 @@ Class Duration
     >>> a.type
     'zero' 
 
-    .. method:: componentIndexAtQtrPosition()
+    .. method:: componentIndexAtQtrPosition(quarterPosition)
 
     returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
 
@@ -383,7 +389,7 @@ Class Duration
     self.componentIndexAtQtrPosition(2.0) == d3 
     self.componentIndexAtQtrPosition(2.5) == d3 
 
-    .. method:: componentStartTime()
+    .. method:: componentStartTime(componentIndex)
 
     For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
 
@@ -419,19 +425,19 @@ Class Duration
     >>> a.type
     'whole' 
 
-    .. method:: expand()
+    .. method:: expand(qLenDiv=4)
 
     Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
 
-    .. method:: fill()
+    .. method:: fill(quarterLengthList=['quarter', 'half', 'quarter'])
 
     Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
 
-    .. method:: show()
+    .. method:: show(format=musicxml)
 
     This might need to return the file path. 
 
-    .. method:: sliceComponentAtPosition()
+    .. method:: sliceComponentAtPosition(quarterPosition)
 
     Given a quarter position within a component, divide that component into two components. 
 
@@ -459,7 +465,7 @@ Class Duration
 
     Look to components and determine quarter length. 
 
-    .. method:: write()
+    .. method:: write(fmt=musicxml, fp=None)
 
     Write a file in the given format (default, musicxml) A None file path will result in temporary file 
 
@@ -574,7 +580,11 @@ Class Tuplet
 
     **Class Tuplet** **Methods**
 
-    .. method:: setDurationType()
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: setDurationType(type)
 
     Set the Duration for both actual and normal. 
 
@@ -589,7 +599,7 @@ Class Tuplet
     >>> a.totalTupletLength()
     4.0 
 
-    .. method:: setRatio()
+    .. method:: setRatio(actual, normal)
 
     Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
 
@@ -645,6 +655,29 @@ Class Tuplet
     0.4 
 
 
+Class AppogiaturaStartDuration
+------------------------------
+
+.. class:: AppogiaturaStartDuration
+
+
+    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+
+    **Class AppogiaturaStartDuration** **Attributes**
+
+    Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
+
+    **Class AppogiaturaStartDuration** **Properties**
+
+    Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
+
+    **Class AppogiaturaStartDuration** **Methods**
+
+    Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.__init__`, :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
+
+    Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
+
+
 Class AppogiaturaStopDuration
 -----------------------------
 
@@ -663,9 +696,35 @@ Class AppogiaturaStopDuration
 
     **Class AppogiaturaStopDuration** **Methods**
 
-    Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
+    Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.__init__`, :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
+
+
+Class DurationCommon
+--------------------
+
+.. class:: DurationCommon
+
+    base class for Duration and DurationUnit to borrow from 
+
+    
+
+    **Class DurationCommon** **Methods**
+
+    .. method:: aggregateTupletRatio()
+
+    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
+
+    >>> complexDur = Duration('eighth')
+    >>> complexDur.appendTuplet(Tuplet())
+    >>> complexDur.aggregateTupletRatio()
+    (3, 2) 
+    >>> tup2 = Tuplet()
+    >>> tup2.setRatio(5, 4)
+    >>> complexDur.appendTuplet(tup2)
+    >>> complexDur.aggregateTupletRatio()
+    (15, 8) 
 
 
 Class DurationUnit
@@ -721,7 +780,11 @@ Class DurationUnit
 
     **Class DurationUnit** **Methods**
 
-    .. method:: appendTuplet()
+    .. method:: __init__(prototype=quarter)
+
+    No documentation. 
+
+    .. method:: appendTuplet(newTuplet)
 
     No documentation. 
 
@@ -729,7 +792,7 @@ Class DurationUnit
 
     No documentation. 
 
-    .. method:: setTypeFromNum()
+    .. method:: setTypeFromNum(typeNum)
 
     No documentation. 
 
@@ -746,32 +809,6 @@ Class DurationUnit
     No documentation. 
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
-
-
-Class DurationCommon
---------------------
-
-.. class:: DurationCommon
-
-    base class for Duration and DurationUnit to borrow from 
-
-    
-
-    **Class DurationCommon** **Methods**
-
-    .. method:: aggregateTupletRatio()
-
-    say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
-
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.appendTuplet(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.appendTuplet(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
 
 
 Class GraceDuration
@@ -792,51 +829,9 @@ Class GraceDuration
 
     **Class GraceDuration** **Methods**
 
-    Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
+    .. method:: __init__()
 
-    Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
-
-
-Class ZeroDuration
-------------------
-
-.. class:: ZeroDuration
-
-
-    Class inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
-
-    **Class ZeroDuration** **Attributes**
-
-    Attributes inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.linkStatus`
-
-    **Class ZeroDuration** **Properties**
-
-    Properties inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.dots`, :attr:`music21.duration.DurationUnit.lily`, :attr:`music21.duration.DurationUnit.ordinal`, :attr:`music21.duration.DurationUnit.quarterLength`, :attr:`music21.duration.DurationUnit.tuplets`, :attr:`music21.duration.DurationUnit.type`
-
-    **Class ZeroDuration** **Methods**
-
-    Methods inherited from :class:`music21.duration.DurationUnit`: :meth:`music21.duration.DurationUnit.appendTuplet`, :meth:`music21.duration.DurationUnit.link`, :meth:`music21.duration.DurationUnit.setTypeFromNum`, :meth:`music21.duration.DurationUnit.unlink`, :meth:`music21.duration.DurationUnit.updateQuarterLength`, :meth:`music21.duration.DurationUnit.updateType`
-
-    Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
-
-
-Class AppogiaturaStartDuration
-------------------------------
-
-.. class:: AppogiaturaStartDuration
-
-
-    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
-
-    **Class AppogiaturaStartDuration** **Attributes**
-
-    Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
-
-    **Class AppogiaturaStartDuration** **Properties**
-
-    Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
-
-    **Class AppogiaturaStartDuration** **Methods**
+    No documentation. 
 
     Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
 
@@ -861,7 +856,38 @@ Class LongGraceDuration
 
     **Class LongGraceDuration** **Methods**
 
+    .. method:: __init__()
+
+    No documentation. 
+
     Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
+
+    Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
+
+
+Class ZeroDuration
+------------------
+
+.. class:: ZeroDuration
+
+
+    Class inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
+
+    **Class ZeroDuration** **Attributes**
+
+    Attributes inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.linkStatus`
+
+    **Class ZeroDuration** **Properties**
+
+    Properties inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.dots`, :attr:`music21.duration.DurationUnit.lily`, :attr:`music21.duration.DurationUnit.ordinal`, :attr:`music21.duration.DurationUnit.quarterLength`, :attr:`music21.duration.DurationUnit.tuplets`, :attr:`music21.duration.DurationUnit.type`
+
+    **Class ZeroDuration** **Methods**
+
+    .. method:: __init__()
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.duration.DurationUnit`: :meth:`music21.duration.DurationUnit.appendTuplet`, :meth:`music21.duration.DurationUnit.link`, :meth:`music21.duration.DurationUnit.setTypeFromNum`, :meth:`music21.duration.DurationUnit.unlink`, :meth:`music21.duration.DurationUnit.updateQuarterLength`, :meth:`music21.duration.DurationUnit.updateType`
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 

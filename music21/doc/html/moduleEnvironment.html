@@ -111,6 +111,14 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p>dict() -&gt; new empty dictionary. dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s (key, value) pairs. dict(seq) -&gt; new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2)</p>
 <p><strong>Class Environment</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.environment.Environment.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>modName=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
 <dt id="music21.environment.Environment.getSettingsPath">
 <tt class="descname">getSettingsPath</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getSettingsPath" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -124,7 +132,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p>Get a temporary directory. Return the user preference if set.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.getTempFile">
-<tt class="descname">getTempFile</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getTempFile" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getTempFile</tt><big>(</big><em>suffix=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.getTempFile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Return a file path to a temporary file with the specified suffix</p>
@@ -136,7 +144,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p>No documentation.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.launch">
-<tt class="descname">launch</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI</p>
@@ -148,19 +156,19 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p>Keys are derived from these defaults</p>
 <dl class="method">
 <dt id="music21.environment.Environment.printDebug">
-<tt class="descname">printDebug</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
 <dl class="method">
 <dt id="music21.environment.Environment.read">
-<tt class="descname">read</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.write">
-<tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref</p>
@@ -179,6 +187,14 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p><strong>Class Preference</strong> <strong>Properties</strong></p>
 <p>Properties inherited from <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">music21.node.Node</span></tt></a>: <a title="music21.node.Node.tag" class="reference external" href="moduleNode.html#music21.node.Node.tag"><tt class="xref docutils literal"><span class="pre">music21.node.Node.tag</span></tt></a></p>
 <p><strong>Class Preference</strong> <strong>Methods</strong></p>
+<dl class="method">
+<dt id="music21.environment.Preference.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Preference.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Preference</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">music21.node.Node</span></tt></a>: <a title="music21.node.Node.get" class="reference external" href="moduleNode.html#music21.node.Node.get"><tt class="xref docutils literal"><span class="pre">music21.node.Node.get()</span></tt></a>, <a title="music21.node.Node.getNewDoc" class="reference external" href="moduleNode.html#music21.node.Node.getNewDoc"><tt class="xref docutils literal"><span class="pre">music21.node.Node.getNewDoc()</span></tt></a>, <a title="music21.node.Node.loadAttrs" class="reference external" href="moduleNode.html#music21.node.Node.loadAttrs"><tt class="xref docutils literal"><span class="pre">music21.node.Node.loadAttrs()</span></tt></a>, <a title="music21.node.Node.merge" class="reference external" href="moduleNode.html#music21.node.Node.merge"><tt class="xref docutils literal"><span class="pre">music21.node.Node.merge()</span></tt></a>, <a title="music21.node.Node.set" class="reference external" href="moduleNode.html#music21.node.Node.set"><tt class="xref docutils literal"><span class="pre">music21.node.Node.set()</span></tt></a>, <a title="music21.node.Node.setDefaults" class="reference external" href="moduleNode.html#music21.node.Node.setDefaults"><tt class="xref docutils literal"><span class="pre">music21.node.Node.setDefaults()</span></tt></a>, <a title="music21.node.Node.toxml" class="reference external" href="moduleNode.html#music21.node.Node.toxml"><tt class="xref docutils literal"><span class="pre">music21.node.Node.toxml()</span></tt></a>, <a title="music21.node.Node.xmlStr" class="reference external" href="moduleNode.html#music21.node.Node.xmlStr"><tt class="xref docutils literal"><span class="pre">music21.node.Node.xmlStr()</span></tt></a></p>
 </dd></dl>
 
@@ -196,6 +212,14 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <p><strong>Class Settings</strong> <strong>Properties</strong></p>
 <p>Properties inherited from <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">music21.node.Node</span></tt></a>: <a title="music21.node.Node.tag" class="reference external" href="moduleNode.html#music21.node.Node.tag"><tt class="xref docutils literal"><span class="pre">music21.node.Node.tag</span></tt></a></p>
 <p><strong>Class Settings</strong> <strong>Methods</strong></p>
+<dl class="method">
+<dt id="music21.environment.Settings.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Settings.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.node.NodeList" class="reference external" href="moduleNode.html#music21.node.NodeList"><tt class="xref docutils literal"><span class="pre">music21.node.NodeList</span></tt></a>: <a title="music21.node.NodeList.append" class="reference external" href="moduleNode.html#music21.node.NodeList.append"><tt class="xref docutils literal"><span class="pre">music21.node.NodeList.append()</span></tt></a></p>
 <p>Methods inherited from <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">music21.node.Node</span></tt></a>: <a title="music21.node.Node.get" class="reference external" href="moduleNode.html#music21.node.Node.get"><tt class="xref docutils literal"><span class="pre">music21.node.Node.get()</span></tt></a>, <a title="music21.node.Node.getNewDoc" class="reference external" href="moduleNode.html#music21.node.Node.getNewDoc"><tt class="xref docutils literal"><span class="pre">music21.node.Node.getNewDoc()</span></tt></a>, <a title="music21.node.Node.loadAttrs" class="reference external" href="moduleNode.html#music21.node.Node.loadAttrs"><tt class="xref docutils literal"><span class="pre">music21.node.Node.loadAttrs()</span></tt></a>, <a title="music21.node.Node.merge" class="reference external" href="moduleNode.html#music21.node.Node.merge"><tt class="xref docutils literal"><span class="pre">music21.node.Node.merge()</span></tt></a>, <a title="music21.node.Node.set" class="reference external" href="moduleNode.html#music21.node.Node.set"><tt class="xref docutils literal"><span class="pre">music21.node.Node.set()</span></tt></a>, <a title="music21.node.Node.setDefaults" class="reference external" href="moduleNode.html#music21.node.Node.setDefaults"><tt class="xref docutils literal"><span class="pre">music21.node.Node.setDefaults()</span></tt></a>, <a title="music21.node.Node.toxml" class="reference external" href="moduleNode.html#music21.node.Node.toxml"><tt class="xref docutils literal"><span class="pre">music21.node.Node.toxml()</span></tt></a>, <a title="music21.node.Node.xmlStr" class="reference external" href="moduleNode.html#music21.node.Node.xmlStr"><tt class="xref docutils literal"><span class="pre">music21.node.Node.xmlStr()</span></tt></a></p>
 </dd></dl>

@@ -586,7 +586,18 @@ class Pitch(music21.Music21Object):
         self.step, self.accidental = convertPsToStep(self._ps)
         self.octave = convertPsToOct(self._ps)
 
-    ps = property(_getPs, _setPs, doc="pitchSpace attribute")
+    ps = property(_getPs, _setPs, 
+        doc='''The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).
+
+        >>> a = Pitch()
+        >>> a.ps = 45
+        >>> a
+        A2
+        >>> a.ps = 60
+        >>> a
+        C4
+
+        ''')
 
     def _updatePitchSpace(self):
         '''

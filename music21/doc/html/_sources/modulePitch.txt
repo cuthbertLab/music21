@@ -7,12 +7,43 @@ music21.pitch
 
 .. module:: music21.pitch
 
+Classes and functions for creating and manipulating pitches, pitch-space, and accidentals. Used extensively by note.py 
 
 
-Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
-Used extensively by note.py
+.. function:: convertFqToPs(fq)
 
-.. function:: convertPsToStep()
+Utility conversion; does not process internals. Assumes A4 = 440 Hz 
+
+>>> convertFqToPs(440)
+69.0 
+>>> convertFqToPs(261.62556530059862)
+60.0 
+
+.. function:: convertPsToFq(ps)
+
+Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
+
+>>> convertPsToFq(69)
+440.0 
+>>> convertPsToFq(60)
+261.62556530059862 
+>>> convertPsToFq(2)
+9.1770239974189884 
+>>> convertPsToFq(135)
+19912.126958213179 
+
+.. function:: convertPsToOct(ps)
+
+Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
+
+>>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
+[3, 4, 4] 
+>>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
+[0, -1, -2] 
+>>> convertPsToOct(135)
+10 
+
+.. function:: convertPsToStep(ps)
 
 Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
 
@@ -37,18 +68,7 @@ Utility conversion; does not process internals. Takes in a midiNote number (Assu
 >>> convertPsToStep(135)
 ('D', <accidental sharp>) 
 
-.. function:: convertPsToOct()
-
-Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
-
->>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
-[3, 4, 4] 
->>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
-[0, -1, -2] 
->>> convertPsToOct(135)
-10 
-
-.. function:: convertStepToPs()
+.. function:: convertStepToPs(step, oct, acc=None)
 
 Utility conversion; does not process internals. 
 
@@ -58,28 +78,6 @@ Utility conversion; does not process internals.
 36 
 >>> convertStepToPs('b', 3, 3)
 62 
-
-.. function:: convertPsToFq()
-
-Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
-
->>> convertPsToFq(69)
-440.0 
->>> convertPsToFq(60)
-261.62556530059862 
->>> convertPsToFq(2)
-9.1770239974189884 
->>> convertPsToFq(135)
-19912.126958213179 
-
-.. function:: convertFqToPs()
-
-Utility conversion; does not process internals. Assumes A4 = 440 Hz 
-
->>> convertFqToPs(440)
-69.0 
->>> convertFqToPs(261.62556530059862)
-60.0 
 
 Class Pitch
 -----------
@@ -251,11 +249,32 @@ Class Pitch
 
     .. attribute:: ps
 
-    pitchSpace attribute 
+    The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
+
+    >>> a = Pitch()
+    >>> a.ps = 45
+    >>> a
+    A2 
+    >>> a.ps = 60
+    >>> a
+    C4 
+
+    
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
     **Class Pitch** **Methods**
+
+    .. method:: __init__(name=None)
+
+    optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
+
+    >>> p1 = Pitch('a#')
+    >>> p1
+    A# 
+    >>> p2 = Pitch(3)
+    >>> p2
+    D# 
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -327,7 +346,11 @@ Class Accidental
 
     **Class Accidental** **Methods**
 
-    .. method:: set()
+    .. method:: __init__(specifier=natural)
+
+    No documentation. 
+
+    .. method:: set(name)
 
     Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
 

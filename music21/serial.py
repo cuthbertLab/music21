@@ -501,7 +501,9 @@ class Test(unittest.TestCase):
 #              # between element 1 and element 7 is there a TriTone?
 #              rowsWithTTRelations += 1
         
-
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [ToneRow, TwelveToneRow, TwelveToneMatrix]
 
 if __name__ == "__main__":
     music21.mainTest(Test)

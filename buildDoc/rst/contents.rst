@@ -49,6 +49,8 @@ Module Reference
    moduleSerial
    moduleTempo
    moduleTinyNotation
+
+
 Developer Reference
 ===================
 
@@ -56,6 +58,7 @@ Developer Reference
    :maxdepth: 2
 
    documenting
+
 
 Indices and Tables
 ==================

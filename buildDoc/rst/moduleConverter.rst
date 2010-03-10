@@ -7,21 +7,20 @@ music21.converter
 
 .. module:: music21.converter
 
+Public interface for importing file formats into music21. 
 
 
-Public interface for importing file formats into music21.
-
-.. function:: parse()
+.. function:: parse(value, forceSource=False)
 
 Determine if the file is a file path or a string 
 
-.. function:: parseFile()
+.. function:: parseFile(fp, forceSource=False)
 
 
-.. function:: parseData()
+.. function:: parseData(dataStr)
 
 
-.. function:: parseURL()
+.. function:: parseURL(url, forceSource=False)
 
 
 Class Converter
@@ -41,15 +40,19 @@ Class Converter
 
     **Class Converter** **Methods**
 
-    .. method:: parseData()
-
-    need to look at data and determine if it is xml or humdrum 
-
-    .. method:: parseFile()
+    .. method:: __init__()
 
     No documentation. 
 
-    .. method:: parseURL()
+    .. method:: parseData(dataStr)
+
+    need to look at data and determine if it is xml or humdrum 
+
+    .. method:: parseFile(fp, forceSource=False)
+
+    No documentation. 
+
+    .. method:: parseURL(url)
 
     Given a url, download and parse 
 
@@ -72,6 +75,10 @@ Class ConverterMusicXML
 
     **Class ConverterMusicXML** **Methods**
 
+    .. method:: __init__(forceSource)
+
+    No documentation. 
+
     .. method:: getPartNames()
 
     No documentation. 
@@ -80,11 +87,11 @@ Class ConverterMusicXML
 
     Load all parts. This determines the order parts are found in the stream 
 
-    .. method:: parseData()
+    .. method:: parseData(xmlString)
 
     Open from a string 
 
-    .. method:: parseFile()
+    .. method:: parseFile(fp)
 
     Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
@@ -105,11 +112,15 @@ Class ConverterHumdrum
 
     **Class ConverterHumdrum** **Methods**
 
-    .. method:: parseData()
+    .. method:: __init__()
+
+    No documentation. 
+
+    .. method:: parseData(humdrumString)
 
     Open from a string 
 
-    .. method:: parseFile()
+    .. method:: parseFile(filepath)
 
     Open from file path 
 
@@ -124,6 +135,10 @@ Class PickleFilter
     
 
     **Class PickleFilter** **Methods**
+
+    .. method:: __init__(fp, forceSource=False)
+
+    Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
 
     .. method:: status()
 

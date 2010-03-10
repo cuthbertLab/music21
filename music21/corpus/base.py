@@ -478,7 +478,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [parseWork, getWork, ]
+_DOC_ORDER = [parseWork, getWork]
 
 
 if __name__ == "__main__":

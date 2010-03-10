@@ -7,8 +7,8 @@ Documenting music21 Modules and Classes
 The music21 documentation is generated with Sphinx. RST files for modules, before being processed by Sphinx, are created by the buildDoc/build.py script. All documentation for public modules, module-level functions, classes, and class-level attributes, properties, and methods are contained in the code fill as close to the relevant names as possible. 
 
 
-Prohibiting Docstrings from Display Documentation
---------------------------------------------------
+Prohibiting Docstrings from Display in Documentation
+----------------------------------------------------
 
 It may be desirable to hide some docstrings from display in the public documentation. All docstring lines following the constant `OMIT_FROM_DOCS` will be omitted from documentation. 
 

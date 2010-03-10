@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.duration" href="moduleDuration.html" />
-    <link rel="prev" title="music21.corpus" href="moduleCorpus.html" /> 
+    <link rel="prev" title="music21.corpus.base" href="moduleCorpus.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="moduleDuration.html" title="music21.duration"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="moduleCorpus.html" title="music21.corpus"
+          <a href="moduleCorpus.html" title="music21.corpus.base"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
@@ -55,7 +55,7 @@
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="moduleCorpus.html"
-                                  title="previous chapter">music21.corpus</a></p>
+                                  title="previous chapter">music21.corpus.base</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="moduleDuration.html"
                                   title="next chapter">music21.duration</a></p>
@@ -399,8 +399,14 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
 <p><strong>Class Chord</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.chord.Chord.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>notes=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.chord.Chord.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
 <dt id="music21.chord.Chord.areZRelations">
-<tt class="descname">areZRelations</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.areZRelations" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">areZRelations</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.areZRelations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Check of chord other is also a z relations</p>
@@ -415,7 +421,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.bass">
-<tt class="descname">bass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.bass" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bass</tt><big>(</big><em>newbass=0</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.bass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example:</p>
@@ -509,7 +515,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.duration">
-<tt class="descname">duration</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.duration" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">duration</tt><big>(</big><em>newDur=0</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.duration" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Duration of the chord can be defined here OR it should return the duration of the first note of the chord</p>
@@ -537,7 +543,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.hasAnyRepeatedScale">
-<tt class="descname">hasAnyRepeatedScale</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasAnyRepeatedScale" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasAnyRepeatedScale</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasAnyRepeatedScale" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example:</p>
@@ -551,13 +557,13 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.hasFifth">
-<tt class="descname">hasFifth</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasFifth" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasFifth</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasFifth" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Shortcut for hasScaleX(5)</p>
 <dl class="method">
 <dt id="music21.chord.Chord.hasRepeatedScaleX">
-<tt class="descname">hasRepeatedScaleX</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasRepeatedScaleX" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasRepeatedScaleX</tt><big>(</big><em>scaleDeg</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasRepeatedScaleX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example:</p>
@@ -568,7 +574,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.hasScaleX">
-<tt class="descname">hasScaleX</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasScaleX" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasScaleX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasScaleX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., &#8220;c&#8221; =&gt; &#8220;e&#8212;-&#8220;), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we&#8217;re using &#8220;Scale&#8221; to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example:</p>
@@ -583,13 +589,13 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.hasSeventh">
-<tt class="descname">hasSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSeventh" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasSeventh</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSeventh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Shortcut for hasScaleX(7)</p>
 <dl class="method">
 <dt id="music21.chord.Chord.hasSpecificX">
-<tt class="descname">hasSpecificX</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSpecificX" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasSpecificX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSpecificX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example:</p>
@@ -604,7 +610,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </div>
 <dl class="method">
 <dt id="music21.chord.Chord.hasThird">
-<tt class="descname">hasThird</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasThird" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hasThird</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasThird" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Shortcut for hasScaleX(3)</p>
@@ -782,7 +788,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <p>Returns the number of notes in the chord</p>
 <dl class="method">
 <dt id="music21.chord.Chord.root">
-<tt class="descname">root</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.root" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">root</tt><big>(</big><em>newroot=False</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.root" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example:</p>
@@ -882,7 +888,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
           <a href="moduleDuration.html" title="music21.duration"
              >next</a> |</li>
         <li class="right" >
-          <a href="moduleCorpus.html" title="music21.corpus"
+          <a href="moduleCorpus.html" title="music21.corpus.base"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>

@@ -7,6 +7,8 @@ music21.chord
 
 .. module:: music21.chord
 
+
+
 Class Chord
 -----------
 
@@ -264,7 +266,11 @@ Class Chord
 
     **Class Chord** **Methods**
 
-    .. method:: areZRelations()
+    .. method:: __init__(notes=[])
+
+    No documentation. 
+
+    .. method:: areZRelations(other)
 
     Check of chord other is also a z relations 
 
@@ -276,7 +282,7 @@ Class Chord
     >>> c1.areZRelations(c3)
     False 
 
-    .. method:: bass()
+    .. method:: bass(newbass=0)
 
     returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example: 
 
@@ -353,7 +359,7 @@ Class Chord
     >>> a.determineType()
     'Dominant Seventh' 
 
-    .. method:: duration()
+    .. method:: duration(newDur=0)
 
     Duration of the chord can be defined here OR it should return the duration of the first note of the chord 
 
@@ -373,7 +379,7 @@ Class Chord
     >>> cmaj.findRoot() # returns C
     C 
 
-    .. method:: hasAnyRepeatedScale()
+    .. method:: hasAnyRepeatedScale(testRoot=None)
 
     Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example: 
 
@@ -384,11 +390,11 @@ Class Chord
     >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
     False 
 
-    .. method:: hasFifth()
+    .. method:: hasFifth(testRoot=None)
 
     Shortcut for hasScaleX(5) 
 
-    .. method:: hasRepeatedScaleX()
+    .. method:: hasRepeatedScaleX(scaleDeg, testRoot=None)
 
     Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example: 
 
@@ -396,7 +402,7 @@ Class Chord
     >>> cchord.hasRepeatedScaleX(3) # returns true
     True 
 
-    .. method:: hasScaleX()
+    .. method:: hasScaleX(scaleDegree, testRoot=None)
 
     Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., "c" => "e----"), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we're using "Scale" to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example: 
 
@@ -408,11 +414,11 @@ Class Chord
     >>> cchord.hasScaleX(6) # will return False
     False 
 
-    .. method:: hasSeventh()
+    .. method:: hasSeventh(testRoot=None)
 
     Shortcut for hasScaleX(7) 
 
-    .. method:: hasSpecificX()
+    .. method:: hasSpecificX(scaleDegree, testRoot=None)
 
     Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example: 
 
@@ -424,7 +430,7 @@ Class Chord
     >>> cmaj.hasScaleX(6) #will return False
     False 
 
-    .. method:: hasThird()
+    .. method:: hasThird(testRoot=None)
 
     Shortcut for hasScaleX(3) 
 
@@ -563,7 +569,7 @@ Class Chord
 
     Returns the number of notes in the chord 
 
-    .. method:: root()
+    .. method:: root(newroot=False)
 
     Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example: 
 

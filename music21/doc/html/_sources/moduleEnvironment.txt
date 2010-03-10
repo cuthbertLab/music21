@@ -7,6 +7,8 @@ music21.environment
 
 .. module:: music21.environment
 
+
+
 Class Environment
 -----------------
 
@@ -28,6 +30,12 @@ Class Environment
 
     **Class Environment** **Methods**
 
+    .. method:: __init__(modName=None)
+
+    
+
+    >>> a = Environment()
+
     .. method:: getSettingsPath()
 
     Return the path to the platform specific settings file. 
@@ -36,7 +44,7 @@ Class Environment
 
     Get a temporary directory. Return the user preference if set. 
 
-    .. method:: getTempFile()
+    .. method:: getTempFile(suffix=)
 
     Return a file path to a temporary file with the specified suffix 
 
@@ -44,7 +52,7 @@ Class Environment
 
     No documentation. 
 
-    .. method:: launch()
+    .. method:: launch(fmt, fp, options=)
 
     Open a file with an application specified by a preference (?) Optionally, can add additional command to erase files, if necessary Erase could be called from os or command-line arguemtns after opening the file and then a short time delay. TODO: Move showImageDirectfrom lilyString.py ; add MIDI 
 
@@ -52,15 +60,15 @@ Class Environment
 
     Keys are derived from these defaults 
 
-    .. method:: printDebug()
+    .. method:: printDebug(msg, statusLevel=1)
 
     Format one or more data elements into string suitable for printing straight to stderr or other outputs. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
-    .. method:: read()
+    .. method:: read(fp=None)
 
     Load from an XML file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
 
-    .. method:: write()
+    .. method:: write(fp=None)
 
     Write an XML file. This must be manually called to store preferences. fp is the file path. preferences are stored in self.ref 
 
@@ -85,6 +93,12 @@ Class Preference
     Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
 
     **Class Preference** **Methods**
+
+    .. method:: __init__()
+
+    
+
+    >>> a = Preference()
 
     Methods inherited from :class:`music21.node.Node`: :meth:`music21.node.Node.get`, :meth:`music21.node.Node.getNewDoc`, :meth:`music21.node.Node.loadAttrs`, :meth:`music21.node.Node.merge`, :meth:`music21.node.Node.set`, :meth:`music21.node.Node.setDefaults`, :meth:`music21.node.Node.toxml`, :meth:`music21.node.Node.xmlStr`
 
@@ -111,6 +125,12 @@ Class Settings
     Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
 
     **Class Settings** **Methods**
+
+    .. method:: __init__()
+
+    
+
+    >>> a = Settings()
 
     Methods inherited from :class:`music21.node.NodeList`: :meth:`music21.node.NodeList.append`
 

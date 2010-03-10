@@ -21,7 +21,9 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21 import converter
-from music21 import corpus
+
+from music21.corpus import base as corpus
+
 from music21 import duration
 from music21 import dynamics
 from music21 import editorial
@@ -91,16 +93,237 @@ MODULES = [
 
 
 
+#-------------------------------------------------------------------------------
+class PartitionedName(object):
+
+    def __init__(self, srcNameEval=None):
+
+        self.srcNameEval = srcNameEval
+        self.names = []
+
+        try:
+            self.srcObj = self.srcNameEval()
+        except TypeError:
+            self.srcObj = None
+
+    def getElement(self, partName):
+        return None
+
+    def getSignature(self, partName):
+        '''Expand to include signatures when possible
+
+        >>> from music21 import pitch, meter
+        >>> a = PartitionedClass(pitch.Pitch)
+        >>> a.getSignature('midi')
+        ''
+
+        >>> a = PartitionedClass(meter.MeterSequence)
+        >>> a.getSignature('load')
+        '(value, partitionRequest=None, autoWeight=False, targetWeight=None)'
+
+
+        '''
+        element = self.getElement(partName)
+        if element.kind in ['method', 'function']:
+            data = inspect.getargspec(element.object)
+            #data = inspect.formatargspec()
+            argStr = []
+            # ordered list in same order as args
+            defaults = data[3] 
+            # get index offset to when defaults start
+            if defaults != None:
+                offset = len(data[0]) - len(defaults)
+            else:
+                offset = 0
+
+            for p in range(len(data[0])): # these are required, include self
+                arg = data[0][p]
+                if arg == 'self': continue
+                
+                if defaults != None and p >= offset:
+                    default = defaults[p-offset]
+                    argStr.append('%s=%s' % (arg, default))
+                else:
+                    argStr.append('%s' % (arg))
+            msg = '(%s)' % ', '.join(argStr)
+
+        elif element.kind == 'property':
+            msg = ''
+        elif element.kind == 'data':
+            msg = ''
+        return msg
+
 
 #-------------------------------------------------------------------------------
-class PartitionedClass(object):
+class PartitioinedModule(PartitionedName):
+    '''Given a module name, manage and present data.
+    '''
+    def __init__(self, srcNameEval):
+        PartitionedName.__init__(self, srcNameEval)
+
+        self.srcNameStr = self.srcNameEval.__name__
+
+        self.namesOrdered = [] # any defined order for names
+        if hasattr(self.srcNameEval, '_DOC_ORDER'):
+            # these are evaluated class names, not strings
+            for orderedObj in self.srcNameEval._DOC_ORDER:
+                if hasattr(orderedObj, 'func_name'):
+                    orderedName = orderedObj.func_name
+                elif hasattr(orderedObj, '__name__'):
+                    orderedName = orderedObj.__name__
+                else:
+                    environLocal.printDebug(['cannot get a string name of object:', orderedObj])
+                    continue
+                self.namesOrdered.append(orderedName)
+
+        else:
+            environLocal.printDebug('module %s missing _DOC_ORDER' % 
+                                    self.srcNameStr)
+
+        self.names = dir(self.srcNameEval)
+        self._data = self._fillData()
+        self._sort()
+
+    def _fillData(self):
+        '''
+        >>> from music21 import pitch
+        >>> a = PartitioinedModule(pitch)
+        >>> len(a.names) == len(a._data)
+        True
+        >>> a.namesOrdered
+        ['Pitch', 'Accidental']
+        >>> a.names[0]
+        'Pitch'
+        >>> a.names[0] == a._data[0].name
+        True
+        '''
+        post = []
+        for name in self.names:
+            objName = '%s.%s' % (self.srcNameStr, name)
+            obj = eval(objName)
+
+            # skip for now
+            homecls = self.srcNameEval
+            if hasattr(obj, '__module__'):
+                if self.srcNameStr not in obj.__module__:
+                    homecls = obj.__module__
+
+            # get kind
+            if isinstance(obj, types.ModuleType):
+                kind = 'module'
+            elif (isinstance(obj, types.StringTypes) or 
+                isinstance(obj, types.DictionaryType) or 
+                isinstance(obj, types.ListType) or 
+                common.isNum(obj) or common.isListLike(obj)): 
+                kind = 'data'
+            elif isinstance(obj, types.FunctionType):
+                kind = 'function'
+            elif isinstance(obj, types.TypeType):
+                kind = 'class'
+            elif isinstance(obj, environment.Environment):
+                kind = 'data' # skip environment object
+            else:
+                environLocal.printDebug(['cannot process module level name: %s' % self.srcNameStr])
+                kind = None
+
+            post.append(inspect.Attribute(name, kind, homecls, obj))
+
+        return post
+
+
+    def _sort(self):
+        namesSupply = self.names[:]
+        names = []
+        _data = []
+
+        for name in self.namesOrdered:
+            if name not in namesSupply:
+                raise Exception('module %s does not have name %s' % (self.srcNameStr, name))
+            junk = namesSupply.pop(namesSupply.index(name))
+    
+            i = self.names.index(name)
+            names.append(self.names[i])
+            _data.append(self._data[i])
+
+        # get all others that are not defined
+        for name in namesSupply:
+            i = self.names.index(name)
+            names.append(self.names[i])
+            _data.append(self._data[i])
+
+        self.names = names
+        self._data = _data
+
+
+    def getElement(self, partName):
+        '''
+        '''
+        if partName not in self.names:
+            raise Exception('cannot find %s name in %s' % (partName,    
+                                     self.srcNameEval))
+        return self._data[self.names.index(partName)]
+
+
+    def getNames(self, nameKind, public=True, local=True):
+        '''Local determines if the name is from this module or imported.
+
+        >>> from music21 import pitch
+        >>> a = PartitioinedModule(pitch)
+        >>> a.getNames('classes')
+        ['Pitch', 'Accidental']
+        >>> a.getNames('functions')    
+        ['convertFqToPs', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
+        '''
+
+        post = []
+        if nameKind.lower() in ['classes', 'class']:
+            nameKind = 'class'
+        elif nameKind.lower() in ['modules', 'imports', 'module']:
+            nameKind = 'module'
+        elif nameKind.lower() in ['functions', 'function']:
+            nameKind = 'function'
+        elif nameKind.lower() in ['data', 'attributes', 'attribute']:
+            nameKind = 'data'
+
+        for name in self.names:
+            element = self.getElement(name)
+            if local:
+                # this is really defining module
+                if element.defining_class != self.srcNameEval:
+                    continue
+
+            if public:
+                if name.startswith('__'): # ignore private variables
+                    continue
+                if name.startswith('_'): # ignore private variables
+                    continue
+                elif 'Test' in name: # ignore test classes
+                    continue
+                elif 'Exception' in name: # ignore exceptions
+                    continue
+
+            if not element.kind == nameKind:
+                continue
+
+            post.append(name)
+        return post
+
+
+    def getDoc(self, partName):
+        element = self.getElement(partName)
+        if element.kind in ['class', 'function']:
+            return element.object.__doc__
+
+
+#-------------------------------------------------------------------------------
+class PartitionedClass(PartitionedName):
     '''Given an evaluated class name as an argument, mange and present
     All data for all attributes, methods, and properties.
 
     Note that this only gets data attributes that are defined outside
     of the __init__ definition of the Class. 
     '''
-    def __init__(self, classNameEval):
+    def __init__(self, srcNameEval):
         '''
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
@@ -110,25 +333,22 @@ class PartitionedClass(object):
         (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <type 'object'>)
 
         '''
-        self.classNameEval = classNameEval
-        try:
-            self.classObj = self.classNameEval()
-        except TypeError:
-            self.classObj = None
-        self.mro = inspect.getmro(self.classNameEval)
+        PartitionedName.__init__(self, srcNameEval)
+
+        self.mro = inspect.getmro(self.srcNameEval)
         self.mroLive = self._createMroLive()
 
         # store both a list of names as well as name/mro index pairs
         self.names = []
         self.namesMroIndex = []
 
-        # this is an complete list of names
+        # this is not a complete list of names
         self.namesOrdered = [] # any defined order for names
-        if hasattr(self.classNameEval, '_DOC_ORDER'):
-            self.namesOrdered += self.classNameEval._DOC_ORDER
+        if hasattr(self.srcNameEval, '_DOC_ORDER'):
+            self.namesOrdered += self.srcNameEval._DOC_ORDER
 
         # this will get much but not all data
-        self._dataClassify = inspect.classify_class_attrs(self.classNameEval)
+        self._dataClassify = inspect.classify_class_attrs(self.srcNameEval)
         for element in self._dataClassify:
             # get mro index number
             self.names.append(element.name)
@@ -151,7 +371,7 @@ class PartitionedClass(object):
         self._sort()
 
     def _sort(self):
-        '''Sort _data, self.namesMroIndex, and self.names by placing anything defined in self.classNameEval first.
+        '''Sort _data, self.namesMroIndex, and self.names by placing anything defined in self.srcNameEval first.
         '''
         namesSupply = self.names[:]
 
@@ -159,7 +379,18 @@ class PartitionedClass(object):
         namesMroIndex = []
         _data = []
 
+        # always put first
+        for forceName in ['__init__']:
+            if forceName in namesSupply:
+                junk = namesSupply.pop(namesSupply.index(forceName))
+                i = self.names.index(forceName)
+                names.append(self.names[i])
+                namesMroIndex.append(self.namesMroIndex[i])
+                _data.append(self._data[i])
+
         for name in self.namesOrdered:
+            if name in forceName:
+                continue # already supplied
             # cannot be sure this is the same index as that in self.names
             junk = namesSupply.pop(namesSupply.index(name))
 
@@ -200,16 +431,16 @@ class PartitionedClass(object):
     def _fillDataLive(self):
         post = []
         # we cannot get this data if the object cannot be instantiated
-        if self.classObj == None: 
+        if self.srcObj == None: 
             return post
-        # dir(self.classObj) will get all names
+        # dir(self.srcObj) will get all names
         # want only writable attributes: 
-        for name in self.classObj.__dict__.keys():
+        for name in self.srcObj.__dict__.keys():
             if name in self.names:
                 continue # already have all the info we need
             # using an attribute class to match the form given by 
             # inspect.classify_class_attrs
-            obj = self.classObj.__dict__[name]
+            obj = self.srcObj.__dict__[name]
             kind = 'data' # always from __dict__, it seems
             # go through live mroLive objects and try to find
             # this attribute
@@ -223,7 +454,7 @@ class PartitionedClass(object):
                     homecls = self.mro[mroIndex]
                     break
             if homecls == None:
-                homecls = self.classNameEval
+                homecls = self.srcNameEval
 
             post.append(inspect.Attribute(name, kind, homecls, obj))
         return post
@@ -266,25 +497,11 @@ class PartitionedClass(object):
         Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<function...
 
         '''
+        if partName not in self.names:
+            raise Exception('cannot find %s name in %s' % (partName,    
+                                     self.srcNameEval))
         return self._data[self.names.index(partName)]
 
-    def getSignature(self, partName):
-        '''Expand to include signatures when possible
-
-        >>> from music21 import pitch
-        >>> a = PartitionedClass(pitch.Pitch)
-        >>> a.getSignature('midi')
-        ''
-        '''
-        element = self.getElement(partName)
-        if element.kind == 'method':
-            msg = inspect.formatargspec(inspect.getargspec(element.object))
-
-        elif element.kind == 'property':
-            msg = ''
-        elif element.kind == 'data':
-            msg = ''
-        return msg
 
     def getDefiningClass(self, partName):
         element = getElement(partName)
@@ -297,8 +514,8 @@ class PartitionedClass(object):
     def getDoc(self, partName):
         element = self.getElement(partName)
 
-        if hasattr(self.classNameEval, '_DOC_ATTR'):
-            docAttr = self.classNameEval._DOC_ATTR
+        if hasattr(self.srcNameEval, '_DOC_ATTR'):
+            docAttr = self.srcNameEval._DOC_ATTR
         else:
             docAttr = {}
 
@@ -326,7 +543,7 @@ class PartitionedClass(object):
         else:
             return match
 
-    def getNames(self, nameKind, mroIndex=None, public=True):
+    def getNames(self, nameKind, mroIndex=None, public=True, getInit=True):
         '''Name type can be method, data, property
 
         >>> from music21 import pitch
@@ -339,7 +556,7 @@ class PartitionedClass(object):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        []
+        ['__init__']
         >>> a.getNames('data', mroIndex=0)
         ['defaultOctave']
         >>> a.getNames('data', mroIndex=1)
@@ -350,7 +567,7 @@ class PartitionedClass(object):
         >>> from music21 import converter
         >>> a = PartitionedClass(converter.Converter)
         >>> a.getNames('methods')
-        ['parseData', 'parseFile', 'parseURL']
+        ['__init__', 'parseData', 'parseFile', 'parseURL']
 
         >>> from music21 import meter
         >>> a = PartitionedClass(meter.TimeSignature)
@@ -371,7 +588,11 @@ class PartitionedClass(object):
         for name in self.names:
             element = self.getElement(name)
             if public:
-                if name.startswith('__') or name.startswith('_'): 
+                # special handling for init methods
+                if name == '__init__':
+                    if not getInit:
+                        continue
+                elif name.startswith('__') or name.startswith('_'): 
                     continue
 
             #environLocal.printDebug(['kinds', name, element.kind])
@@ -544,29 +765,30 @@ class ClassDoc(RestructuredWriter):
 
         self.className = className
         self.classNameEval = eval(className)
-        self.pns = PartitionedClass(self.classNameEval)
+        self.partitionedClass = PartitionedClass(self.classNameEval)
         # this is a tuple of class instances that are in the order
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
-        self.docCooked = self.formatDocString(self.classNameEval.__doc__, INDENT)
+        self.docCooked = self.formatDocString(self.classNameEval.__doc__, 
+                                             INDENT)
         self.name = self.classNameEval.__name__
 
 
     #---------------------------------------------------------------------------
-    def _fmtRstAttribute(self, name):
+    def _fmtRstAttribute(self, name, signature):
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
-        docRaw = self.pns.getDoc(name)
+        docRaw = self.partitionedClass.getDoc(name)
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
 
-    def _fmtRstMethod(self, name):
+    def _fmtRstMethod(self, name, signature):
         msg = []
-        msg.append('%s.. method:: %s()\n\n' %  (INDENT, name))
+        msg.append('%s.. method:: %s%s\n\n' %  (INDENT, name, signature))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         # do not need indent as doc is already formatted with indent
-        docRaw = self.pns.getDoc(name)
+        docRaw = self.partitionedClass.getDoc(name)
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
 
@@ -585,33 +807,36 @@ class ClassDoc(RestructuredWriter):
 
         for group in ['attributes', 'properties', 'methods']:    
             msgGroup = []
-            for mroIndex in self.pns.mroIndices():
-                if mroIndex == self.pns.lastMroIndex():
+            for mroIndex in self.partitionedClass.mroIndices():
+                if mroIndex == self.partitionedClass.lastMroIndex():
                     continue
-                names = self.pns.getNames(group, mroIndex, public=True)
+                names = self.partitionedClass.getNames(group, mroIndex, public=True)
                 if len(names) == 0: continue
 
                 if mroIndex != 0:
                     parentSrc = self.formatParent(
-                        self.pns.getClassFromMroIndex(mroIndex))
+                        self.partitionedClass.getClassFromMroIndex(mroIndex))
                     groupStr = group.title()
                     msgGroup.append('%s%s inherited from %s: ' % (INDENT, groupStr, parentSrc))
 
                     msgSub = []
                     for partName in names:
-                        #postfix = self.pns.getSignature(partName)
+                        #postfix = self.partitionedClass.getSignature(partName)
                         #msgSub.append('``%s%s``' % (partName, postfix))   
 
                         msgSub.append(self.formatXRef(partName, group,
-                            self.pns.getClassFromMroIndex(mroIndex)))
+                         self.partitionedClass.getClassFromMroIndex(mroIndex)))
 
                     msgGroup.append('%s\n\n' % ', '.join(msgSub))
                 else: # locally defined, provide complete documentation
                     for partName in names:
+                        signature = self.partitionedClass.getSignature(partName)
                         if group in ['properties', 'attributes']:
-                            msgGroup.append(self._fmtRstAttribute(partName))
+                            msgGroup.append(self._fmtRstAttribute(partName,
+                                                            signature))
                         elif group == 'methods':
-                            msgGroup.append(self._fmtRstMethod(partName))
+                            msgGroup.append(self._fmtRstMethod(partName,
+                                                            signature))
 
             if len(msgGroup) > 0:
                 msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group.title()))
@@ -625,22 +850,25 @@ class ClassDoc(RestructuredWriter):
 
 #-------------------------------------------------------------------------------
 class ModuleDoc(RestructuredWriter):
-    def __init__(self, mod):
+    def __init__(self, modNameEval):
         RestructuredWriter.__init__(self)
 
-        self.mod = mod
-        self.modName = mod.__name__
-        self.modDoc = mod.__doc__
-        self.classes = {} # a dictionary of ClassDoc objects
-        self.functions = {}
-        self.imports = []
-        self.globals = []
+        self.partitionedModule = PartitioinedModule(modNameEval)
+
+        self.docCooked = self.formatDocString(modNameEval.__doc__)
+        self.modNameEval = modNameEval
+        self.modName = self.modNameEval.__name__
+
+#         self.classes = {} # a dictionary of ClassDoc objects
+#         self.functions = {}
+#         self.imports = []
+#         self.globals = []
 
         # file name for this module; leave off music21 part
-        fn = mod.__name__.split('.')
-        self.fileName = 'module' + fn[1][0].upper() + fn[1][1:] + '.rst'
-        # references used in rst table of contents
+        fn = self.modName.split('.')
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
+        self.fileName = self.fileRef + '.rst'
+        # references used in rst table of contents
 
     #---------------------------------------------------------------------------
     # for methods and functions can use
@@ -652,99 +880,106 @@ class ModuleDoc(RestructuredWriter):
     # argspec = inspect.formatargspec(
     # args, varargs, varkw, defaults, formatvalue=self.formatvalue)
 
-    def scanFunction(self, obj):
-        info = {}
-        info['reference'] = obj
-        info['name'] = obj.__name__
-        info['doc']  = self.formatDocString(obj.__doc__)
-        # skip private functions
-        if not obj.__name__.startswith('_'): 
-            self.functions[obj.__name__] = info
+#     def scanFunction(self, obj):
+#         info = {}
+#         info['reference'] = obj
+#         info['name'] = obj.__name__
+#         info['doc']  = self.formatDocString(obj.__doc__)
+#         # skip private functions
+#         if not obj.__name__.startswith('_'): 
+#             self.functions[obj.__name__] = info
 
 
     #---------------------------------------------------------------------------
     # note: can use inspect to get properties:
     # inspect.isdatadescriptor()
 
-    def scanModule(self):
-        '''For a given module, determine which objects need to be documented.
-        '''
-        for component in dir(self.mod):
-            
-            if component.startswith('__'): # ignore private variables
-                continue
-            if component.startswith('_'): # ignore private variables
-                continue
-            elif 'Test' in component: # ignore test classes
-                continue
-            elif 'Exception' in component: # ignore exceptions
-                continue
+#     def scanModule(self):
+#         '''For a given module, determine which objects need to be documented.
+#         '''
+#         for component in dir(self.modNameEval):
+#             
+#             if component.startswith('__'): # ignore private variables
+#                 continue
+#             if component.startswith('_'): # ignore private variables
+#                 continue
+#             elif 'Test' in component: # ignore test classes
+#                 continue
+#             elif 'Exception' in component: # ignore exceptions
+#                 continue
+# 
+#             objName = '%s.%s' % (self.modName, component)
+#             obj = eval(objName)
+#         
+#             # check that this name comes from this moduled;
+#             # that is, that this is not an object imported from another mod
+#             if hasattr(obj, '__module__'):
+#                 if self.modName not in obj.__module__:
+#                     continue
+# 
+#             objType = type(obj)
+#             # print objName, objType
+#             if isinstance(obj, types.ModuleType):
+#                 importName = objName.replace(self.modName+'.', '')
+#                 self.imports.append(importName)
+# 
+#             elif (isinstance(obj, types.StringTypes) or 
+#                 isinstance(obj, types.DictionaryType) or 
+#                 isinstance(obj, types.ListType)):
+#                 self.globals.append(objName)
+#             # assume that these are classes
+#             elif isinstance(obj, types.TypeType):
+#                 #self.classes[obj.__name__] = info
+#                 self.classes[obj.__name__] = ClassDoc(objName)
+#                 #self.scanClass(obj)
+# 
+#             elif isinstance(obj, types.FunctionType):
+#                 self.scanFunction(obj)
+#             elif isinstance(obj, environment.Environment):
+#                 continue # skip environment object
+#             else:
+#                 if common.isNum(obj) or common.isListLike(obj): 
+#                     continue
+#                 environLocal.printDebug(['cannot process: %s' % repr(obj)])
 
-            objName = '%s.%s' % (self.modName, component)
-            obj = eval(objName)
-        
-            # check that this name comes from this moduled;
-            # that is, that this is not an object imported from another mod
-            if hasattr(obj, '__module__'):
-                if self.modName not in obj.__module__:
-                    continue
 
-            objType = type(obj)
-            # print objName, objType
-            if isinstance(obj, types.ModuleType):
-                importName = objName.replace(self.modName+'.', '')
-                self.imports.append(importName)
+#     def _sortModuleNames(self, src='classes'):
+#         names = []
+#         if src == 'classes':
+#             srcNames = self.classes.keys()
+#         elif src == 'functions':
+#             srcNames = self.functions.keys()
+#     
+#         if len(srcNames) == 0:
+#             return []
+# 
+#         if hasattr(self.modNameEval, '_DOC_ORDER'):
+#             # re order names by order specified in doc_order
+#             for orderedObj in self.modNameEval._DOC_ORDER:
+#                 if hasattr(orderedObj, 'func_name'):
+#                     orderedName = orderedObj.func_name
+#                 elif hasattr(orderedObj, '__name__'):
+#                     orderedName = orderedObj.__name__
+#                 else:
+#                     environLocal.printDebug(['cannot get a string name of object:', orderedObj])
+#                     continue
+#                 if orderedName not in srcNames: 
+#                     # possible if mixing functions and classes
+#                     continue
+#                 #environLocal.printDebug(['orderedName', orderedName, srcNames])
+#                 post = srcNames.pop(srcNames.index(orderedName))
+#                 names.append(post)
+#         for n in srcNames:
+#             names.append(n)
+#         return names
+# 
 
-            elif (isinstance(obj, types.StringTypes) or 
-                isinstance(obj, types.DictionaryType) or 
-                isinstance(obj, types.ListType)):
-                self.globals.append(objName)
-            # assume that these are classes
-            elif isinstance(obj, types.TypeType):
-                #self.classes[obj.__name__] = info
-                self.classes[obj.__name__] = ClassDoc(objName)
-                #self.scanClass(obj)
-
-            elif isinstance(obj, types.FunctionType):
-                self.scanFunction(obj)
-            elif isinstance(obj, environment.Environment):
-                continue # skip environment object
-            else:
-                if common.isNum(obj) or common.isListLike(obj): 
-                    continue
-                environLocal.printDebug(['cannot process: %s' % repr(obj)])
-
-
-    def _sortModuleNames(self, src='classes'):
-        names = []
-        if src == 'classes':
-            srcNames = self.classes.keys()
-        elif src == 'functions':
-            srcNames = self.functions.keys()
-    
-        if len(srcNames) == 0:
-            return []
-
-        if hasattr(self.mod, '_DOC_ORDER'):
-            # re order names by order specified in doc_order
-            for orderedObj in self.mod._DOC_ORDER:
-                if hasattr(orderedObj, 'func_name'):
-                    orderedName = orderedObj.func_name
-                elif hasattr(orderedObj, '__name__'):
-                    orderedName = orderedObj.__name__
-                else:
-                    environLocal.printDebug(['cannot get a string name of object:', orderedObj])
-                    continue
-                if orderedName not in srcNames: 
-                    # possible if mixing functions and classes
-                    continue
-                #environLocal.printDebug(['orderedName', orderedName, srcNames])
-                post = srcNames.pop(srcNames.index(orderedName))
-                names.append(post)
-        for n in srcNames:
-            names.append(n)
-        return names
-
+    def _fmtRstFunction(self, name, signature):
+        msg = []
+        msg.append('.. function:: %s%s\n\n' %  (name, signature))
+        docRaw = self.partitionedModule.getDoc(name)
+        msg.append('%s\n' % self.formatDocString(docRaw))
+        return ''.join(msg)
 
     def getRestructured(self):
         '''Produce RST documentation for a complete module.
@@ -754,31 +989,44 @@ class ModuleDoc(RestructuredWriter):
         modNameStr = modNameStr[0].upper() + modNameStr[1:]
 
         msg = []
-
         # the heading needs to immediately follow the underscore identifier
         msg.append('.. _module%s:\n\n' % modNameStr)
         msg += self._heading(self.modName , '=')
 
-
         msg.append(WARN_EDIT)
         # this defines this rst file as a module; does not create output
         msg += '.. module:: %s\n\n' % self.modName
+        msg += self.docCooked
+        msg.append('\n\n')
 
-        msg += self._para(self.modDoc)
 
         # can optionally list imports
         #msg += self._heading('Imports' , '-')
         #msg += self._list(self.imports)
 
-        for funcName in self._sortModuleNames('functions'):
+        for group in ['functions', 'classes']:
+            names = self.partitionedModule.getNames(group)
+            if len(names) == 0: continue
+
+        #for funcName in self._sortModuleNames('functions'):
         #for funcName in funcNames:
             #titleStr = 'Function %s()' % self.functions[funcName]['name']
             #msg += self._heading(titleStr, '-')
-            msg += '.. function:: %s()\n\n' % self.functions[funcName]['name']
-            msg.append('%s\n' % self.functions[funcName]['doc'])
 
-        for className in self._sortModuleNames('classes'):
-            msg += self.classes[className].getRestructuredClass()
+            for partName in names:
+                if group == 'functions':
+                    signature = self.partitionedModule.getSignature(partName)
+                    msg.append(self._fmtRstFunction(partName, signature))
+                    #msg += '.. function:: %s()\n\n' % partName
+                     #msg.append('%s\n' % self.functions[funcName]['doc'])
+                if group == 'classes':
+                    qualifiedName = '%s.%s' % (self.modName, partName)
+                    classDoc = ClassDoc(qualifiedName)
+                    msg += classDoc.getRestructuredClass()
+
+#         for className in self._sortModuleNames('classes'):
+#             msg += self.classes[className].getRestructuredClass()
+
         return ''.join(msg)
 
 
@@ -870,6 +1118,7 @@ class Documentation(RestructuredWriter):
         msg.append('   :maxdepth: 1\n\n')
         for name in self.chaptersGenerated:
             msg.append('   %s\n' % name)        
+        msg.append('\n\n')
 
         msg += self._heading('Developer Reference', '=')
         # second toc has collapsed tree
@@ -877,9 +1126,8 @@ class Documentation(RestructuredWriter):
         msg.append('   :maxdepth: 2\n\n')
         for name in self.chaptersDeveloper:
             msg.append('   %s\n' % name)        
+        msg.append('\n\n')
 
-
-        msg.append('\n')
 
         msg += self._heading(self.titleAppendix, '=')
         for name in self.chaptersAppendix:
@@ -922,7 +1170,7 @@ class Documentation(RestructuredWriter):
         for module in self.modulesToBuild:
             environLocal.printDebug(['writing rst documentation:', module])
             a = ModuleDoc(module)
-            a.scanModule()
+            #a.scanModule()
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
             f.write(a.getRestructured())
             f.close()

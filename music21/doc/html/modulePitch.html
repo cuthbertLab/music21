@@ -88,11 +88,52 @@
             
   <div class="section" id="module-music21.pitch">
 <span id="modulepitch"></span><h1>music21.pitch<a class="headerlink" href="#module-music21.pitch" title="Permalink to this headline">¶</a></h1>
-<p>Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
-Used extensively by note.py</p>
+<p>Classes and functions for creating and manipulating pitches, pitch-space, and accidentals. Used extensively by note.py</p>
+<dl class="function">
+<dt id="music21.pitch.convertFqToPs">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertFqToPs</tt><big>(</big><em>fq</em><big>)</big><a class="headerlink" href="#music21.pitch.convertFqToPs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">440</span><span class="p">)</span>
+<span class="go">69.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">261.62556530059862</span><span class="p">)</span>
+<span class="go">60.0</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.pitch.convertPsToFq">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
+<span class="go">440.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
+<span class="go">261.62556530059862</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">9.1770239974189884</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">19912.126958213179</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.pitch.convertPsToOct">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToOct</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToOct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">59</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">60</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">61</span><span class="p">)]</span>
+<span class="go">[3, 4, 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">12</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">0</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="o">-</span><span class="mf">12</span><span class="p">)]</span>
+<span class="go">[0, -1, -2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
 <dl class="function">
 <dt id="music21.pitch.convertPsToStep">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToStep</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToStep" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToStep</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToStep" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp</p>
@@ -119,22 +160,8 @@ Used extensively by note.py</p>
 </pre></div>
 </div>
 <dl class="function">
-<dt id="music21.pitch.convertPsToOct">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToOct</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToOct" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">59</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">60</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">61</span><span class="p">)]</span>
-<span class="go">[3, 4, 4]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">12</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">0</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="o">-</span><span class="mf">12</span><span class="p">)]</span>
-<span class="go">[0, -1, -2]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
-<span class="go">10</span>
-</pre></div>
-</div>
-<dl class="function">
 <dt id="music21.pitch.convertStepToPs">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertStepToPs</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.convertStepToPs" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertStepToPs</tt><big>(</big><em>step</em>, <em>oct</em>, <em>acc=None</em><big>)</big><a class="headerlink" href="#music21.pitch.convertStepToPs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Utility conversion; does not process internals.</p>
@@ -144,34 +171,6 @@ Used extensively by note.py</p>
 <span class="go">36</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="go">62</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.pitch.convertPsToFq">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
-<span class="go">440.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
-<span class="go">261.62556530059862</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
-<span class="go">9.1770239974189884</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
-<span class="go">19912.126958213179</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.pitch.convertFqToPs">
-<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertFqToPs</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.convertFqToPs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">440</span><span class="p">)</span>
-<span class="go">69.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">261.62556530059862</span><span class="p">)</span>
-<span class="go">60.0</span>
 </pre></div>
 </div>
 <div class="section" id="class-pitch">
@@ -379,9 +378,32 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <tt class="descname">ps</tt><a class="headerlink" href="#music21.pitch.Pitch.ps" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>pitchSpace attribute</p>
+<p>The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="mf">45</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">A2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="mf">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">C4</span>
+</pre></div>
+</div>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
 <p><strong>Class Pitch</strong> <strong>Methods</strong></p>
+<dl class="method">
+<dt id="music21.pitch.Pitch.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
+<span class="go">A#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
+<span class="go">D#</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.isClass()</span></tt></a>, <a title="music21.base.Music21Object.searchParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.searchParent()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.show()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.write()</span></tt></a></p>
 </dd></dl>
 
@@ -469,8 +491,14 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
 <p><strong>Class Accidental</strong> <strong>Methods</strong></p>
 <dl class="method">
+<dt id="music21.pitch.Accidental.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>specifier=natural</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
 <dt id="music21.pitch.Accidental.set">
-<tt class="descname">set</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</p>

@@ -7,6 +7,8 @@ music21.stream
 
 .. module:: music21.stream
 
+
+
 Class Stream
 ------------
 
@@ -241,7 +243,15 @@ Class Stream
 
     **Class Stream** **Methods**
 
-    .. method:: addGroupForElements()
+    .. method:: __init__(givenElements=None)
+
+    
+
+    
+
+    
+
+    .. method:: addGroupForElements(group, classFilter=None)
 
     Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set. 
 
@@ -269,13 +279,13 @@ Class Stream
 
     
 
-    .. method:: allPlayingWhileSounding()
+    .. method:: allPlayingWhileSounding(el, elStream=None, requireClass=False)
 
     Returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream. The offset of this new Stream is set to el's offset, while the offset of elements within the Stream are adjusted relative to their position with respect to the start of el.  Thus, a note that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced to be the length of el -- thus a note sustained after el ends may have a release time beyond that of the duration of the Stream. as above, elStream is an optional Stream to look up el's offset in. 
 
     
 
-    .. method:: append()
+    .. method:: append(others)
 
     Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest "release" of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True 
 
@@ -317,11 +327,11 @@ Class Stream
 
     
 
-    .. method:: attachIntervalsBetweenStreams()
+    .. method:: attachIntervalsBetweenStreams(cmpStream)
 
     For each element in self, creates an interval object in the element's editorial that is the interval between it and the element in cmpStream that is sounding at the moment the element in srcStream is attacked. 
 
-    .. method:: bestClef()
+    .. method:: bestClef(allowTreble8vb=False)
 
     Returns the clef that is the best fit for notes and chords found in thisStream. Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets 
 
@@ -348,7 +358,7 @@ Class Stream
     >>> d.sign
     'F' 
 
-    .. method:: extendDuration()
+    .. method:: extendDuration(objName, inPlace=True)
 
     Given a stream and an object name, go through stream and find each object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to the end of the stream. 
 
@@ -381,7 +391,7 @@ Class Stream
     >>> stream2[-1].offset
     40.0 
 
-    .. method:: extractContext()
+    .. method:: extractContext(searchElement, before=4.0, after=4.0, maxBefore=None, maxAfter=None)
 
     extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) 
 
@@ -399,7 +409,7 @@ Class Stream
 
     
 
-    .. method:: findConsecutiveNotes()
+    .. method:: findConsecutiveNotes(skipRests=False, skipChords=False, skipUnisons=False, skipOctaves=False, skipGaps=False, getOverlaps=False, noNone=False)
 
     Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2's in there as well. See Test.testFindConsecutiveNotes() for usage details. 
 
@@ -409,7 +419,7 @@ Class Stream
 
     returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless 
 
-    .. method:: getElementAfterElement()
+    .. method:: getElementAfterElement(element, classList=None)
 
     given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list 
 
@@ -438,15 +448,15 @@ Class Stream
     >>> t6 is n2
     True 
 
-    .. method:: getElementAfterOffset()
+    .. method:: getElementAfterOffset(offset, classList=None)
 
     Get element after a provided offset 
 
-    .. method:: getElementAtOrAfter()
+    .. method:: getElementAtOrAfter(offset, classList=None)
 
     Given an offset, find the element at this offset, or with the offset greater than and nearest to. 
 
-    .. method:: getElementAtOrBefore()
+    .. method:: getElementAtOrBefore(offset, classList=None)
 
     Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset. 
 
@@ -478,15 +488,15 @@ Class Stream
 
     
 
-    .. method:: getElementBeforeElement()
+    .. method:: getElementBeforeElement(element, classList=None)
 
     given an element, get the element before 
 
-    .. method:: getElementBeforeOffset()
+    .. method:: getElementBeforeOffset(offset, classList=None)
 
     Get element before a provided offset 
 
-    .. method:: getElementById()
+    .. method:: getElementById(id, classFilter=None)
 
     Returns the first encountered element for a given id. Return None if no match 
 
@@ -499,7 +509,7 @@ Class Stream
     >>> a.getElementById('green').id
     'green' 
 
-    .. method:: getElementsByClass()
+    .. method:: getElementsByClass(classFilterList)
 
     Return a list of all Elements that match the className. 
 
@@ -526,7 +536,7 @@ Class Stream
     >>> len(found)
     25 
 
-    .. method:: getElementsByGroup()
+    .. method:: getElementsByGroup(groupFilterList)
 
     
 
@@ -553,7 +563,7 @@ Class Stream
     D 
     E 
 
-    .. method:: getElementsByOffset()
+    .. method:: getElementsByOffset(offsetStart, offsetEnd=None, includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True)
 
     Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding 
 
@@ -624,7 +634,7 @@ Class Stream
     >>> a.getGroups()
     {'P1': 30, 'green': 1} 
 
-    .. method:: getInstrument()
+    .. method:: getInstrument(searchParent=True)
 
     Search this stream or parent streams for instruments, otherwise return a default 
 
@@ -646,7 +656,7 @@ Class Stream
     >>> len(s2) == 1
     True 
 
-    .. method:: getOffsetByElement()
+    .. method:: getOffsetByElement(obj)
 
     Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
 
@@ -665,7 +675,7 @@ Class Stream
     >>> s2.flat.getOffsetByElement(n2)
     110.0 
 
-    .. method:: getOverlaps()
+    .. method:: getOverlaps(includeDurationless=True, includeEndBoundary=False)
 
     Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter. 
 
@@ -712,7 +722,7 @@ Class Stream
 
     Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
 
-    .. method:: getSimultaneous()
+    .. method:: getSimultaneous(includeDurationless=True)
 
     Find and return any elements that start at the same time. 
 
@@ -747,11 +757,11 @@ Class Stream
     >>> len(c) == 1
     True 
 
-    .. method:: groupElementsByOffset()
+    .. method:: groupElementsByOffset(returnDict=False)
 
     returns a List of lists in which each entry in the main list is a list of elements occurring at the same time. list is ordered by offset (since we need to sort the list anyhow in order to group the elements), so there is no need to call stream.sorted before running this, but it can't hurt. it is DEFINITELY a feature that this method does not find elements within substreams that have the same absolute offset.  See Score.lily for how this is useful.  For the other behavior, call Stream.flat first. 
 
-    .. method:: index()
+    .. method:: index(obj)
 
     return the index for the specified object 
 
@@ -762,7 +772,7 @@ Class Stream
     >>> a.index(fSharp)
     10 
 
-    .. method:: insert()
+    .. method:: insert(offsetOrItemOrList, itemOrNone=None, ignoreSort=False)
 
     Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you're going to be inserting dozens of items that don't change the sort status) Has three forms: in the two argument form, inserts an element at the given offset: 
 
@@ -798,7 +808,7 @@ Class Stream
 
     
 
-    .. method:: insertAtIndex()
+    .. method:: insertAtIndex(pos, item)
 
     Insert in elements by index position. 
 
@@ -810,7 +820,7 @@ Class Stream
     >>> a[0].name == 'B'
     True 
 
-    .. method:: insertAtNativeOffset()
+    .. method:: insertAtNativeOffset(item)
 
     inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item) 
 
@@ -829,7 +839,7 @@ Class Stream
     >>> n1.getOffsetBySite(stream2)
     20.0 
 
-    .. method:: isClass()
+    .. method:: isClass(className)
 
     Returns true if the Stream or Stream Subclass is a particular class or subclasses that class. Used by getElementsByClass in Stream 
 
@@ -844,7 +854,7 @@ Class Stream
     >>> b.isClass(Stream)
     True 
 
-    .. method:: isSequence()
+    .. method:: isSequence(includeDurationless=True, includeEndBoundary=False)
 
     A stream is a sequence if it has no overlaps. 
 
@@ -862,7 +872,7 @@ Class Stream
 
     No documentation. 
 
-    .. method:: makeBeams()
+    .. method:: makeBeams(inPlace=True)
 
     Return a new measure with beams applied to all notes. if inPlace is false, this creates a new, independent copy of the source. In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes. 
 
@@ -873,7 +883,7 @@ Class Stream
     >>> aMeasure.repeatAppend(aNote,16)
     >>> bMeasure = aMeasure.makeBeams()
 
-    .. method:: makeMeasures()
+    .. method:: makeMeasures(meterStream=None, refStream=None)
 
     Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If a meterStream is provided, this is used instead of the meterStream found in the Stream. If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar. 
 
@@ -889,7 +899,7 @@ Class Stream
     >>> d.repeatInsert(n, [x+.5 for x in range(10)])
     >>> x = d.makeMeasures()
 
-    .. method:: makeRests()
+    .. method:: makeRests(refStream=None, inPlace=True)
 
     Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream. 
 
@@ -907,7 +917,7 @@ Class Stream
 
     
 
-    .. method:: makeTies()
+    .. method:: makeTies(meterStream=None, inPlace=True)
 
     Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false configure ".previous" and ".next" attributes 
 
@@ -925,7 +935,7 @@ Class Stream
 
     
 
-    .. method:: playingWhenAttacked()
+    .. method:: playingWhenAttacked(el, elStream=None)
 
     Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el's offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want. 
 
@@ -957,7 +967,7 @@ Class Stream
 
     
 
-    .. method:: pop()
+    .. method:: pop(index)
 
     return the matched object from the list. 
 
@@ -967,7 +977,7 @@ Class Stream
     >>> len(a)
     9 
 
-    .. method:: repeatAppend()
+    .. method:: repeatAppend(item, numberOfTimes)
 
     Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer. 
 
@@ -980,7 +990,7 @@ Class Stream
     >>> a[9].offset
     36.0 
 
-    .. method:: repeatInsert()
+    .. method:: repeatInsert(item, offsets)
 
     Given an object, create many DEEPcopies at the positions specified by the offset list: 
 
@@ -993,7 +1003,7 @@ Class Stream
     >>> a[10].offset
     10.0 
 
-    .. method:: shiftElements()
+    .. method:: shiftElements(offset)
 
     Add offset value to every offset of contained Elements. 
 
@@ -1006,7 +1016,7 @@ Class Stream
     >>> a.lowestOffset
     20.0 
 
-    .. method:: simultaneousAttacks()
+    .. method:: simultaneousAttacks(stream2)
 
     returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2. 
 
@@ -1024,7 +1034,7 @@ Class Stream
     >>> simultaneous
     [10.0] 
 
-    .. method:: splitByClass()
+    .. method:: splitByClass(objName, fx)
 
     Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream. 
 
@@ -1041,7 +1051,7 @@ Class Stream
     >>> len(c)
     31 
 
-    .. method:: stripTies()
+    .. method:: stripTies(inPlace=False, matchByPitch=False)
 
     Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique. 
 
@@ -1072,7 +1082,7 @@ Class Stream
     >>> a.lowestOffset
     50.0 
 
-    .. method:: trimPlayingWhileSounding()
+    .. method:: trimPlayingWhileSounding(el, elStream=None, requireClass=False, padStream=False)
 
     returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but with any element that was sounding when el. begins trimmed to begin with el. and any element sounding when el ends trimmed to end with el. if padStream is set to true then empty space at the beginning and end is filled with a generic Music21Object, so that no matter what otherStream is the same length as el. Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies, the difference might bite you if you're not careful. Note that you can make el an empty stream of offset X and duration Y to extract exactly that much information from otherStream. 
 
@@ -1181,11 +1191,15 @@ Class Measure
 
     **Class Measure** **Methods**
 
+    .. method:: __init__()
+
+    No documentation. 
+
     .. method:: addRepeat()
 
     No documentation. 
 
-    .. method:: addTimeDependentDirection()
+    .. method:: addTimeDependentDirection(time, direction)
 
     No documentation. 
 
@@ -1193,15 +1207,79 @@ Class Measure
 
     No documentation. 
 
-    .. method:: setLeftBarline()
+    .. method:: setLeftBarline(blStyle=None)
 
     No documentation. 
 
-    .. method:: setRightBarline()
+    .. method:: setRightBarline(blStyle=None)
 
     No documentation. 
 
     Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
+
+
+Class Page
+----------
+
+.. class:: Page
+
+    Totally optional: designation that all the music in this Stream belongs on a single notated page 
+
+    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    **Class Page** **Attributes**
+
+    .. attribute:: pageNumber
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
+
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+
+    **Class Page** **Properties**
+
+    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
+
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class Page** **Methods**
+
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
+
+
+Class Part
+----------
+
+.. class:: Part
+
+    A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part 
+
+    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    **Class Part** **Attributes**
+
+    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
+
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+
+    **Class Part** **Properties**
+
+    .. attribute:: lily
+
+    No documentation. 
+
+    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
+
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class Part** **Methods**
+
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -1229,7 +1307,7 @@ Class Performer
 
     **Class Performer** **Methods**
 
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -1261,7 +1339,43 @@ Class Score
 
     **Class Score** **Methods**
 
+    .. method:: __init__()
+
+    No documentation. 
+
     Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
+
+
+Class Staff
+-----------
+
+.. class:: Staff
+
+    A Stream subclass for designating music on a single staff 
+
+    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+
+    **Class Staff** **Attributes**
+
+    .. attribute:: staffLines
+
+    No documentation. 
+
+    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
+
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+
+    **Class Staff** **Properties**
+
+    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
+
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class Staff** **Methods**
+
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -1297,39 +1411,7 @@ Class System
 
     **Class System** **Methods**
 
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
-
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
-
-
-Class Part
-----------
-
-.. class:: Part
-
-    A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part 
-
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
-
-    **Class Part** **Attributes**
-
-    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
-
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
-
-    **Class Part** **Properties**
-
-    .. attribute:: lily
-
-    No documentation. 
-
-    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
-
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
-
-    **Class Part** **Methods**
-
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
@@ -1357,71 +1439,7 @@ Class Voice
 
     **Class Voice** **Methods**
 
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
-
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
-
-
-Class Page
-----------
-
-.. class:: Page
-
-    Totally optional: designation that all the music in this Stream belongs on a single notated page 
-
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
-
-    **Class Page** **Attributes**
-
-    .. attribute:: pageNumber
-
-    No documentation. 
-
-    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
-
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
-
-    **Class Page** **Properties**
-
-    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
-
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
-
-    **Class Page** **Methods**
-
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
-
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
-
-
-Class Staff
------------
-
-.. class:: Staff
-
-    A Stream subclass for designating music on a single staff 
-
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
-
-    **Class Staff** **Attributes**
-
-    .. attribute:: staffLines
-
-    No documentation. 
-
-    Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
-
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
-
-    **Class Staff** **Properties**
-
-    Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
-
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
-
-    **Class Staff** **Methods**
-
-    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
+    Methods inherited from :class:`music21.stream.Stream`: :meth:`music21.stream.Stream.__init__`, :meth:`music21.stream.Stream.addGroupForElements`, :meth:`music21.stream.Stream.allPlayingWhileSounding`, :meth:`music21.stream.Stream.append`, :meth:`music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`music21.stream.Stream.bestClef`, :meth:`music21.stream.Stream.extendDuration`, :meth:`music21.stream.Stream.extractContext`, :meth:`music21.stream.Stream.findConsecutiveNotes`, :meth:`music21.stream.Stream.findGaps`, :meth:`music21.stream.Stream.getElementAfterElement`, :meth:`music21.stream.Stream.getElementAfterOffset`, :meth:`music21.stream.Stream.getElementAtOrAfter`, :meth:`music21.stream.Stream.getElementAtOrBefore`, :meth:`music21.stream.Stream.getElementBeforeElement`, :meth:`music21.stream.Stream.getElementBeforeOffset`, :meth:`music21.stream.Stream.getElementById`, :meth:`music21.stream.Stream.getElementsByClass`, :meth:`music21.stream.Stream.getElementsByGroup`, :meth:`music21.stream.Stream.getElementsByOffset`, :meth:`music21.stream.Stream.getGroups`, :meth:`music21.stream.Stream.getInstrument`, :meth:`music21.stream.Stream.getMeasures`, :meth:`music21.stream.Stream.getNotes`, :meth:`music21.stream.Stream.getOffsetByElement`, :meth:`music21.stream.Stream.getOverlaps`, :meth:`music21.stream.Stream.getPitches`, :meth:`music21.stream.Stream.getSimultaneous`, :meth:`music21.stream.Stream.getTimeSignatures`, :meth:`music21.stream.Stream.groupElementsByOffset`, :meth:`music21.stream.Stream.index`, :meth:`music21.stream.Stream.insert`, :meth:`music21.stream.Stream.insertAtIndex`, :meth:`music21.stream.Stream.insertAtNativeOffset`, :meth:`music21.stream.Stream.isClass`, :meth:`music21.stream.Stream.isSequence`, :meth:`music21.stream.Stream.makeAccidentals`, :meth:`music21.stream.Stream.makeBeams`, :meth:`music21.stream.Stream.makeMeasures`, :meth:`music21.stream.Stream.makeRests`, :meth:`music21.stream.Stream.makeTies`, :meth:`music21.stream.Stream.melodicIntervals`, :meth:`music21.stream.Stream.playingWhenAttacked`, :meth:`music21.stream.Stream.pop`, :meth:`music21.stream.Stream.repeatAppend`, :meth:`music21.stream.Stream.repeatInsert`, :meth:`music21.stream.Stream.shiftElements`, :meth:`music21.stream.Stream.simultaneousAttacks`, :meth:`music21.stream.Stream.splitByClass`, :meth:`music21.stream.Stream.stripTies`, :meth:`music21.stream.Stream.transferOffsetToElements`, :meth:`music21.stream.Stream.trimPlayingWhileSounding`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
