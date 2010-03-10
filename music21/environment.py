@@ -83,6 +83,14 @@ class Environment(object):
     '''The Environment object stores user preferences as dictionary-like object. 
     '''
 
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['read', 'write', 'getSettingsPath']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'modNameParent': 'A string representation of the module that contains this Environment instance.',
+    'ref': 'The Python dictionary used to store all internal settings.',
+    }
+
     def __init__(self, modName=None):
         '''Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 

@@ -62,8 +62,8 @@ The path to the environment settings file can always be found with the getSettin
 
 
 
-Import Tools that May Use Environment Settings
--------------------------------------------------
+Important Tools that May Use Environment Settings
+----------------------------------------------------
 
 The following important functions and methods will make use of environment values and are often good to set.
 

@@ -102,13 +102,13 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <tt class="descname">modNameParent</tt><a class="headerlink" href="#music21.environment.Environment.modNameParent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A string representation of the module that contains this Environment instance.</p>
 <dl class="attribute">
 <dt id="music21.environment.Environment.ref">
 <tt class="descname">ref</tt><a class="headerlink" href="#music21.environment.Environment.ref" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>dict() -&gt; new empty dictionary. dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s (key, value) pairs. dict(seq) -&gt; new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2)</p>
+<p>The Python dictionary used to store all internal settings.</p>
 <p><strong>Class Environment</strong> <strong>Methods</strong></p>
 <dl class="method">
 <dt id="music21.environment.Environment.__init__">
@@ -121,6 +121,18 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <span class="go">u&#39;musicxml&#39;</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="music21.environment.Environment.read">
+<tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
+<dl class="method">
+<dt id="music21.environment.Environment.write">
+<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.getSettingsPath">
 <tt class="descname">getSettingsPath</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getSettingsPath" title="Permalink to this definition">¶</a></dt>
@@ -163,18 +175,6 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dd></dd></dl>
 
 <p>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
-<dl class="method">
-<dt id="music21.environment.Environment.read">
-<tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
-<dl class="method">
-<dt id="music21.environment.Environment.write">
-<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.</p>
 </dd></dl>
 
 </div>

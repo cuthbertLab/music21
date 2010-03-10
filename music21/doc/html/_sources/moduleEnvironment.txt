@@ -22,11 +22,11 @@ Class Environment
 
     .. attribute:: modNameParent
 
-    No documentation. 
+    A string representation of the module that contains this Environment instance. 
 
     .. attribute:: ref
 
-    dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
+    The Python dictionary used to store all internal settings. 
 
     **Class Environment** **Methods**
 
@@ -37,6 +37,14 @@ Class Environment
     >>> a = Environment()
     >>> a['writeFormat']
     u'musicxml' 
+
+    .. method:: read(fp=None)
+
+    Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+
+    .. method:: write(fp=None)
+
+    Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
 
     .. method:: getSettingsPath()
 
@@ -65,14 +73,6 @@ Class Environment
     .. method:: printDebug(msg, statusLevel=1)
 
     Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
-
-    .. method:: read(fp=None)
-
-    Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
-
-    .. method:: write(fp=None)
-
-    Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
 
 
 Class Preference
