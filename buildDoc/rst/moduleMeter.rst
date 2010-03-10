@@ -78,9 +78,11 @@ Class TimeSignature
 
     Class inherits from: :class:`music21.base.Music21Object`
 
+    **Class TimeSignature** **Attributes**
+
     .. attribute:: symbolizeDenominator
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
     .. attribute:: display
 
@@ -92,7 +94,7 @@ Class TimeSignature
 
     .. attribute:: symbol
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: accent
 
@@ -100,7 +102,7 @@ Class TimeSignature
 
     .. attribute:: summedNumerator
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
     .. attribute:: beam
 
@@ -108,9 +110,11 @@ Class TimeSignature
 
     .. attribute:: inherited
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+
+    **Class TimeSignature** **Properties**
 
     .. attribute:: barDuration
 
@@ -172,7 +176,9 @@ Class TimeSignature
 
     No documentation. 
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class TimeSignature** **Methods**
 
     .. method:: getAccent()
 
@@ -317,7 +323,7 @@ Class TimeSignature
     >>> a.display
     <MeterSequence {3/4}> 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class CompoundTimeSignature
@@ -328,17 +334,23 @@ Class CompoundTimeSignature
 
     Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
+    **Class CompoundTimeSignature** **Attributes**
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+    Attributes inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.symbolizeDenominator`, :attr:`music21.meter.TimeSignature.display`, :attr:`music21.meter.TimeSignature.beat`, :attr:`music21.meter.TimeSignature.symbol`, :attr:`music21.meter.TimeSignature.accent`, :attr:`music21.meter.TimeSignature.summedNumerator`, :attr:`music21.meter.TimeSignature.beam`, :attr:`music21.meter.TimeSignature.inherited`
 
-    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    **Class CompoundTimeSignature** **Properties**
 
-    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Properties inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.barDuration`, :attr:`music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`music21.meter.TimeSignature.denominator`, :attr:`music21.meter.TimeSignature.lily`, :attr:`music21.meter.TimeSignature.musicxml`, :attr:`music21.meter.TimeSignature.mx`, :attr:`music21.meter.TimeSignature.numerator`, :attr:`music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`music21.meter.TimeSignature.totalLength`
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class CompoundTimeSignature** **Methods**
+
+    Methods inherited from :class:`music21.meter.TimeSignature`: :meth:`music21.meter.TimeSignature.getAccent`, :meth:`music21.meter.TimeSignature.getAccentWeight`, :meth:`music21.meter.TimeSignature.getBeams`, :meth:`music21.meter.TimeSignature.getBeat`, :meth:`music21.meter.TimeSignature.getBeatDepth`, :meth:`music21.meter.TimeSignature.getBeatProgress`, :meth:`music21.meter.TimeSignature.load`, :meth:`music21.meter.TimeSignature.loadRatio`, :meth:`music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`music21.meter.TimeSignature.ratioEqual`, :meth:`music21.meter.TimeSignature.setAccentWeight`, :meth:`music21.meter.TimeSignature.setDisplay`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class NonPowerOfTwoTimeSignature
@@ -349,17 +361,23 @@ Class NonPowerOfTwoTimeSignature
 
     Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
+    **Class NonPowerOfTwoTimeSignature** **Attributes**
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+    Attributes inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.symbolizeDenominator`, :attr:`music21.meter.TimeSignature.display`, :attr:`music21.meter.TimeSignature.beat`, :attr:`music21.meter.TimeSignature.symbol`, :attr:`music21.meter.TimeSignature.accent`, :attr:`music21.meter.TimeSignature.summedNumerator`, :attr:`music21.meter.TimeSignature.beam`, :attr:`music21.meter.TimeSignature.inherited`
 
-    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    **Class NonPowerOfTwoTimeSignature** **Properties**
 
-    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Properties inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.barDuration`, :attr:`music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`music21.meter.TimeSignature.denominator`, :attr:`music21.meter.TimeSignature.lily`, :attr:`music21.meter.TimeSignature.musicxml`, :attr:`music21.meter.TimeSignature.mx`, :attr:`music21.meter.TimeSignature.numerator`, :attr:`music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`music21.meter.TimeSignature.totalLength`
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class NonPowerOfTwoTimeSignature** **Methods**
+
+    Methods inherited from :class:`music21.meter.TimeSignature`: :meth:`music21.meter.TimeSignature.getAccent`, :meth:`music21.meter.TimeSignature.getAccentWeight`, :meth:`music21.meter.TimeSignature.getBeams`, :meth:`music21.meter.TimeSignature.getBeat`, :meth:`music21.meter.TimeSignature.getBeatDepth`, :meth:`music21.meter.TimeSignature.getBeatProgress`, :meth:`music21.meter.TimeSignature.load`, :meth:`music21.meter.TimeSignature.loadRatio`, :meth:`music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`music21.meter.TimeSignature.ratioEqual`, :meth:`music21.meter.TimeSignature.setAccentWeight`, :meth:`music21.meter.TimeSignature.setDisplay`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class MeterTerminal
@@ -382,6 +400,8 @@ Class MeterTerminal
     
 
     
+
+    **Class MeterTerminal** **Properties**
 
     .. attribute:: denominator
 
@@ -413,6 +433,8 @@ Class MeterTerminal
     .. attribute:: weight
 
     No documentation. 
+
+    **Class MeterTerminal** **Methods**
 
     .. method:: ratioEqual()
 
@@ -452,17 +474,23 @@ Class DurationDenominatorTimeSignature
 
     Class inherits from: :class:`music21.meter.TimeSignature`, :class:`music21.base.Music21Object`
 
-    Attributes inherited from :class:`music21.meter.TimeSignature`: ``symbolizeDenominator``, ``display``, ``beat``, ``symbol``, ``accent``, ``summedNumerator``, ``beam``, ``inherited``
+    **Class DurationDenominatorTimeSignature** **Attributes**
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+    Attributes inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.symbolizeDenominator`, :attr:`music21.meter.TimeSignature.display`, :attr:`music21.meter.TimeSignature.beat`, :attr:`music21.meter.TimeSignature.symbol`, :attr:`music21.meter.TimeSignature.accent`, :attr:`music21.meter.TimeSignature.summedNumerator`, :attr:`music21.meter.TimeSignature.beam`, :attr:`music21.meter.TimeSignature.inherited`
 
-    Properties inherited from :class:`music21.meter.TimeSignature`: ``barDuration``, ``beatLengthToQuarterLengthRatio``, ``denominator``, ``lily``, ``musicxml``, ``mx``, ``numerator``, ``quarterLengthToBeatLengthRatio``, ``totalLength``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    **Class DurationDenominatorTimeSignature** **Properties**
 
-    Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
+    Properties inherited from :class:`music21.meter.TimeSignature`: :attr:`music21.meter.TimeSignature.barDuration`, :attr:`music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`music21.meter.TimeSignature.denominator`, :attr:`music21.meter.TimeSignature.lily`, :attr:`music21.meter.TimeSignature.musicxml`, :attr:`music21.meter.TimeSignature.mx`, :attr:`music21.meter.TimeSignature.numerator`, :attr:`music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`music21.meter.TimeSignature.totalLength`
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class DurationDenominatorTimeSignature** **Methods**
+
+    Methods inherited from :class:`music21.meter.TimeSignature`: :meth:`music21.meter.TimeSignature.getAccent`, :meth:`music21.meter.TimeSignature.getAccentWeight`, :meth:`music21.meter.TimeSignature.getBeams`, :meth:`music21.meter.TimeSignature.getBeat`, :meth:`music21.meter.TimeSignature.getBeatDepth`, :meth:`music21.meter.TimeSignature.getBeatProgress`, :meth:`music21.meter.TimeSignature.load`, :meth:`music21.meter.TimeSignature.loadRatio`, :meth:`music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`music21.meter.TimeSignature.ratioEqual`, :meth:`music21.meter.TimeSignature.setAccentWeight`, :meth:`music21.meter.TimeSignature.setDisplay`
+
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class MeterSequence
@@ -474,13 +502,17 @@ Class MeterSequence
 
     Class inherits from: :class:`music21.meter.MeterTerminal`
 
+    **Class MeterSequence** **Attributes**
+
     .. attribute:: parenthesis
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
     .. attribute:: summedNumerator
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
+
+    **Class MeterSequence** **Properties**
 
     .. attribute:: denominator
 
@@ -536,7 +568,9 @@ Class MeterSequence
     >>> d.weight
     0.5 
 
-    Properties inherited from :class:`music21.meter.MeterTerminal`: ``duration``
+    Properties inherited from :class:`music21.meter.MeterTerminal`: :attr:`music21.meter.MeterTerminal.duration`
+
+    **Class MeterSequence** **Methods**
 
     .. method:: getLevel()
 
@@ -755,6 +789,6 @@ Class MeterSequence
 
     
 
-    Methods inherited from :class:`music21.meter.MeterTerminal`: ``ratioEqual()``, ``subdivide()``, ``subdivideByCount()``, ``subdivideByList()``
+    Methods inherited from :class:`music21.meter.MeterTerminal`: :meth:`music21.meter.MeterTerminal.ratioEqual`, :meth:`music21.meter.MeterTerminal.subdivide`, :meth:`music21.meter.MeterTerminal.subdivideByCount`, :meth:`music21.meter.MeterTerminal.subdivideByList`
 
 

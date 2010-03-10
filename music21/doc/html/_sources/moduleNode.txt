@@ -18,13 +18,19 @@ Class Node
 
     
 
+    **Class Node** **Attributes**
+
     .. attribute:: charData
 
     No documentation. 
 
+    **Class Node** **Properties**
+
     .. attribute:: tag
 
     No documentation. 
+
+    **Class Node** **Methods**
 
     .. method:: get()
 
@@ -75,18 +81,24 @@ Class NodeList
 
     Class inherits from: :class:`music21.node.Node`
 
+    **Class NodeList** **Attributes**
+
     .. attribute:: componentList
 
-    list() -> new list list(sequence) -> new list initialized from sequence's items 
+    No documentation. 
 
-    Attributes inherited from :class:`music21.node.Node`: ``charData``
+    Attributes inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.charData`
 
-    Properties inherited from :class:`music21.node.Node`: ``tag``
+    **Class NodeList** **Properties**
+
+    Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
+
+    **Class NodeList** **Methods**
 
     .. method:: append()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.node.Node`: ``get()``, ``getNewDoc()``, ``loadAttrs()``, ``merge()``, ``set()``, ``setDefaults()``, ``toxml()``, ``xmlStr()``
+    Methods inherited from :class:`music21.node.Node`: :meth:`music21.node.Node.get`, :meth:`music21.node.Node.getNewDoc`, :meth:`music21.node.Node.loadAttrs`, :meth:`music21.node.Node.merge`, :meth:`music21.node.Node.set`, :meth:`music21.node.Node.setDefaults`, :meth:`music21.node.Node.toxml`, :meth:`music21.node.Node.xmlStr`
 
 

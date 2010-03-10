@@ -20,6 +20,8 @@ Class NoteEditorial
 
     Class inherits from: :class:`music21.base.Music21Object`
 
+    **Class NoteEditorial** **Attributes**
+
     .. attribute:: comment
 
     No documentation. 
@@ -34,7 +36,7 @@ Class NoteEditorial
 
     .. attribute:: color
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: melodicIntervalOverRests
 
@@ -50,15 +52,19 @@ Class NoteEditorial
 
     .. attribute:: melodicIntervals
 
-    list() -> new list list(sequence) -> new list initialized from sequence's items 
+    No documentation. 
 
     .. attribute:: melodicIntervalsOverRests
 
-    list() -> new list list(sequence) -> new list initialized from sequence's items 
+    No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    **Class NoteEditorial** **Properties**
+
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class NoteEditorial** **Methods**
 
     .. method:: colorLilyStart()
 
@@ -80,7 +86,7 @@ Class NoteEditorial
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class Comment
@@ -91,13 +97,17 @@ Class Comment
 
     
 
+    **Class Comment** **Attributes**
+
     .. attribute:: position
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: text
 
     No documentation. 
+
+    **Class Comment** **Properties**
 
     .. attribute:: lily
 

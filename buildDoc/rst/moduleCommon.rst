@@ -320,6 +320,8 @@ Class Scalar
 
     
 
+    **Class Scalar** **Attributes**
+
     .. attribute:: valType
 
     No documentation. 
@@ -327,6 +329,8 @@ Class Scalar
     .. attribute:: value
 
     No documentation. 
+
+    **Class Scalar** **Methods**
 
     .. method:: toFloat()
 
@@ -350,15 +354,19 @@ Class defList
 
     Class inherits from: list
 
+    **Class defList** **Attributes**
+
     .. attribute:: default
 
     No documentation. 
 
     .. attribute:: callDefault
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
-    Methods inherited from list: ``append()``, ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
+    **Class defList** **Methods**
+
+    Methods inherited from list: :meth:`__builtin__.list.append`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
 
 
 Class defHash
@@ -370,21 +378,25 @@ Class defHash
 
     Class inherits from: dict
 
+    **Class defHash** **Attributes**
+
     .. attribute:: default
 
     No documentation. 
 
     .. attribute:: callDefault
 
-    bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
+    No documentation. 
 
-    Attributes inherited from dict: ``fromkeys``
+    Attributes inherited from dict: :attr:`__builtin__.dict.fromkeys`
+
+    **Class defHash** **Methods**
 
     .. method:: get()
 
     No documentation. 
 
-    Methods inherited from dict: ``clear()``, ``copy()``, ``has_key()``, ``items()``, ``iteritems()``, ``iterkeys()``, ``itervalues()``, ``keys()``, ``pop()``, ``popitem()``, ``setdefault()``, ``update()``, ``values()``
+    Methods inherited from dict: :meth:`__builtin__.dict.clear`, :meth:`__builtin__.dict.copy`, :meth:`__builtin__.dict.has_key`, :meth:`__builtin__.dict.items`, :meth:`__builtin__.dict.iteritems`, :meth:`__builtin__.dict.iterkeys`, :meth:`__builtin__.dict.itervalues`, :meth:`__builtin__.dict.keys`, :meth:`__builtin__.dict.pop`, :meth:`__builtin__.dict.popitem`, :meth:`__builtin__.dict.setdefault`, :meth:`__builtin__.dict.update`, :meth:`__builtin__.dict.values`
 
 
 Class Timer
@@ -395,6 +407,8 @@ Class Timer
     An object for timing. 
 
     
+
+    **Class Timer** **Methods**
 
     .. method:: clear()
 
@@ -417,6 +431,8 @@ Class Iterator
     A simple Iterator object used to handle iteration of Streams and other list-like objects. 
 
     
+
+    **Class Iterator** **Methods**
 
     .. method:: next()
 

@@ -82,6 +82,16 @@ MODULES = [
 ]
 
 
+
+# sphinx notes:
+
+# cross references:
+# http://sphinx.pocoo.org/markup/inline.html?highlight=method
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class PartitionedClass(object):
     '''Given an evaluated class name as an argument, mange and present
@@ -141,7 +151,7 @@ class PartitionedClass(object):
         self._sort()
 
     def _sort(self):
-        '''Sort _data, self.namesMroIndex, and self.names
+        '''Sort _data, self.namesMroIndex, and self.names by placing anything defined in self.classNameEval first.
         '''
         namesSupply = self.names[:]
 
@@ -285,16 +295,30 @@ class PartitionedClass(object):
 
     def getDoc(self, partName):
         element = self.getElement(partName)
-        match = None
-        try:
-            match = element.object.__doc__
-        except AttributeError:
-            match = None
 
-        if match == None:
-            if hasattr(self.classNameEval, '_DOC_ATTR'):
-                if partName in self.classNameEval._DOC_ATTR.keys():
-                    match = self.classNameEval._DOC_ATTR[partName]
+        if hasattr(self.classNameEval, '_DOC_ATTR'):
+            docAttr = self.classNameEval._DOC_ATTR
+        else:
+            docAttr = {}
+
+        match = None
+                
+        if partName in docAttr.keys():
+            match = docAttr[partName]
+        # if its an undocumented public attribute and basic python
+        # data structure, we do not want to show that documentation
+        elif (element.kind in ['data'] and (
+            common.isStr(element.object) or 
+            common.isListLike(element.object) or
+            common.isNum(element.object)
+            )):
+            pass
+        else:
+            try:
+                match = element.object.__doc__
+            except AttributeError:
+                match = None
+
 
         if match == None:
             return 'No documentation.'
@@ -307,11 +331,11 @@ class PartitionedClass(object):
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
 
-        >>> a.getNames('property')
-        ['accidental', 'diatonicNoteNum', 'duration', 'freq440', 'frequency', 'german', 'implicitOctave', 'midi', 'musicxml', 'mx', 'name', 'nameWithOctave', 'octave', 'offset', 'parent', 'pitchClass', 'priority', 'ps', 'step']
+        >>> len(a.getNames('property')) > 10
+        True
 
-        >>> a.getNames('method')
-        ['addContext', 'addLocationAndParent', 'getContextAttr', 'getContextByClass', 'getOffsetBySite', 'isClass', 'searchParent', 'setContextAttr', 'show', 'write']
+        >>> len(a.getNames('method')) > 7
+        True
 
         >>> a.getNames('method', mroIndex=0)
         []
@@ -329,8 +353,8 @@ class PartitionedClass(object):
 
         >>> from music21 import meter
         >>> a = PartitionedClass(meter.TimeSignature)
-        >>> a.getNames('methods')
-        ['addContext', 'addLocationAndParent', 'getAccent', 'getAccentWeight', 'getBeams', 'getBeat', 'getBeatDepth', 'getBeatProgress', 'getContextAttr', 'getContextByClass', 'getOffsetBySite', 'isClass', 'load', 'loadRatio', 'quarterPositionToBeat', 'ratioEqual', 'searchParent', 'setAccentWeight', 'setContextAttr', 'setDisplay', 'show', 'write']
+        >>> len(a.getNames('methods')) > 10
+        True
         >>> a.getNames('attributes', 1)
         ['id', 'groups']
 
@@ -424,6 +448,16 @@ class RestructuredWriter(object):
         else:
             return ':class:`%s.%s`' % (modName, className)
 
+    def formatXRef(self, partName, group, mroEntry):
+        '''Given the name and a containing object, get a cross references
+        '''
+        modName = mroEntry.__module__
+        className = mroEntry.__name__
+        if group in ['attributes', 'properties']:
+            return ':attr:`%s.%s.%s`' % (modName, className, partName)            
+        elif group in ['methods']:
+            return ':meth:`%s.%s.%s`' % (modName, className, partName)
+
     def formatClassInheritance(self, mro):
         '''Given a list of classes from inspect.getmro, return a formatted
         String
@@ -513,14 +547,12 @@ class ClassDoc(RestructuredWriter):
         # this is a tuple of class instances that are in the order
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
-
         self.docCooked = self.formatDocString(self.classNameEval.__doc__, INDENT)
-
         self.name = self.classNameEval.__name__
 
 
     #---------------------------------------------------------------------------
-    def _fmtRstAttribute(self, groupKey, name):
+    def _fmtRstAttribute(self, name):
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
@@ -528,7 +560,7 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
 
-    def _fmtRstMethod(self, groupKey, name):
+    def _fmtRstMethod(self, name):
         msg = []
         msg.append('%s.. method:: %s()\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
@@ -542,15 +574,16 @@ class ClassDoc(RestructuredWriter):
         '''
         msg = []
 
-        titleStr = 'Class %s' % self.name
-        msg += self._heading(titleStr, '-')
+        classNameStr = 'Class %s' % self.name
+        msg += self._heading(classNameStr, '-')
         titleStr = '.. class:: %s\n\n' % self.name
         msg += titleStr
 
         msg.append('%s\n' % self.docCooked)
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
 
-        for group in ['attributes', 'properties', 'methods']:
+        for group in ['attributes', 'properties', 'methods']:    
+            msgGroup = []
             for mroIndex in self.pns.mroIndices():
                 if mroIndex == self.pns.lastMroIndex():
                     continue
@@ -561,21 +594,28 @@ class ClassDoc(RestructuredWriter):
                     parentSrc = self.formatParent(
                         self.pns.getClassFromMroIndex(mroIndex))
                     groupStr = group.title()
-                    msg.append('%s%s inherited from %s: ' % (INDENT, groupStr,
-                                                             parentSrc))
+                    msgGroup.append('%s%s inherited from %s: ' % (INDENT, groupStr, parentSrc))
 
                     msgSub = []
                     for partName in names:
-                        postfix = self.pns.getSignature(partName)
-                        msgSub.append('``%s%s``' % (partName, postfix))   
-                    msg.append('%s\n\n' % ', '.join(msgSub))
-                else:
+                        #postfix = self.pns.getSignature(partName)
+                        #msgSub.append('``%s%s``' % (partName, postfix))   
+
+                        msgSub.append(self.formatXRef(partName, group,
+                            self.pns.getClassFromMroIndex(mroIndex)))
+
+                    msgGroup.append('%s\n\n' % ', '.join(msgSub))
+                else: # locally defined, provide complete documentation
                     for partName in names:
                         if group in ['properties', 'attributes']:
-                            msg.append(self._fmtRstAttribute(group,
-                                       partName))
+                            msgGroup.append(self._fmtRstAttribute(partName))
                         elif group == 'methods':
-                            msg.append(self._fmtRstMethod(group, partName))
+                            msgGroup.append(self._fmtRstMethod(partName))
+
+            if len(msgGroup) > 0:
+                msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group.title()))
+                msg.append(''.join(msgGroup))
+
         msg.append('\n'*1)
         return msg
 

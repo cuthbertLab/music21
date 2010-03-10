@@ -89,11 +89,83 @@ Class Pitch
 
     Class inherits from: :class:`music21.base.Music21Object`
 
+    **Class Pitch** **Attributes**
+
     .. attribute:: defaultOctave
 
-    int(x[, base]) -> integer Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a non-string.  If base is zero, the proper base is guessed based on the string content.  If the argument is outside the integer range a long object will be returned instead. 
+    No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+
+    **Class Pitch** **Properties**
+
+    .. attribute:: name
+
+    Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
+
+    >>> a = Pitch('G#')
+    >>> a.name
+    'G#' 
+
+    .. attribute:: nameWithOctave
+
+    Returns pitch name with octave Perhaps better default action for getName 
+
+    >>> a = Pitch('G#4')
+    >>> a.nameWithOctave
+    'G#4' 
+
+    .. attribute:: step
+
+    
+
+    >>> a = Pitch('C#3')
+    >>> a._getStep()
+    'C' 
+
+    .. attribute:: pitchClass
+
+    
+
+    >>> a = Pitch('a3')
+    >>> a._getPitchClass()
+    9 
+    >>> dis = Pitch('d3')
+    >>> dis.pitchClass
+    2 
+    >>> dis.accidental = Accidental("#")
+    >>> dis.pitchClass
+    3 
+    >>> dis.pitchClass = 11
+    >>> dis.pitchClass
+    11 
+    >>> dis.name
+    'B' 
+
+    .. attribute:: octave
+
+    returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
+
+    >>> a = Pitch('g')
+    >>> a.octave is None
+    True 
+    >>> a.implicitOctave
+    4 
+    >>> a.ps  ## will use implicitOctave
+    67 
+    >>> a.name
+    'G' 
+    >>> a.octave = 14
+    >>> a.implicitOctave
+    14 
+    >>> a.name
+    'G' 
+    >>> a.ps
+    187 
+
+    .. attribute:: midi
+
+    midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
 
     .. attribute:: accidental
 
@@ -163,10 +235,6 @@ Class Pitch
 
     returns the octave of the Pitch, or defaultOctave if octave was never set 
 
-    .. attribute:: midi
-
-    midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
-
     .. attribute:: musicxml
 
     Provide a complete MusicXM: representation. Presently, this is based on 
@@ -180,77 +248,15 @@ Class Pitch
     >>> c.get('pitch').get('step')
     'G' 
 
-    .. attribute:: name
-
-    Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
-
-    >>> a = Pitch('G#')
-    >>> a.name
-    'G#' 
-
-    .. attribute:: nameWithOctave
-
-    Returns pitch name with octave Perhaps better default action for getName 
-
-    >>> a = Pitch('G#4')
-    >>> a.nameWithOctave
-    'G#4' 
-
-    .. attribute:: octave
-
-    returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
-
-    >>> a = Pitch('g')
-    >>> a.octave is None
-    True 
-    >>> a.implicitOctave
-    4 
-    >>> a.ps  ## will use implicitOctave
-    67 
-    >>> a.name
-    'G' 
-    >>> a.octave = 14
-    >>> a.implicitOctave
-    14 
-    >>> a.name
-    'G' 
-    >>> a.ps
-    187 
-
-    .. attribute:: pitchClass
-
-    
-
-    >>> a = Pitch('a3')
-    >>> a._getPitchClass()
-    9 
-    >>> dis = Pitch('d3')
-    >>> dis.pitchClass
-    2 
-    >>> dis.accidental = Accidental("#")
-    >>> dis.pitchClass
-    3 
-    >>> dis.pitchClass = 11
-    >>> dis.pitchClass
-    11 
-    >>> dis.name
-    'B' 
-
     .. attribute:: ps
 
     pitchSpace attribute 
 
-    .. attribute:: step
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    
+    **Class Pitch** **Methods**
 
-    >>> a = Pitch('C#3')
-    >>> a._getStep()
-    'C' 
-
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
-
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class Accidental
@@ -262,39 +268,43 @@ Class Accidental
 
     Class inherits from: :class:`music21.base.Music21Object`
 
+    **Class Accidental** **Attributes**
+
     .. attribute:: displayEvaluated
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: displayLocation
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: displaySize
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    Size in display: "cue", "large", or a percentage. 
 
     .. attribute:: displayStyle
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    Style of display: "parentheses", "bracket", "both". 
 
     .. attribute:: displayType
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: modifier
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: name
 
-    str(object) -> string Return a nice string representation of the object. If the argument is a string, the return value is the same object. 
+    No documentation. 
 
     .. attribute:: alter
 
-    float(x) -> floating point number Convert a string or number to a floating point number, if possible. 
+    No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: ``id``
+    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`
+
+    **Class Accidental** **Properties**
 
     .. attribute:: lily
 
@@ -312,7 +322,9 @@ Class Accidental
     >>> mxAccidental.get('content')
     'quarter-sharp' 
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class Accidental** **Methods**
 
     .. method:: set()
 
@@ -334,6 +346,6 @@ Class Accidental
     >>> a.alter
     -2.0 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 

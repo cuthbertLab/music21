@@ -75,6 +75,19 @@ class Chord(note.NotRest):
     isNote = False
     isRest = False
 
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['pitches']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'isNote': 'Boolean read-only value describing if this object is a Chord.',
+    'isRest': 'Boolean read-only value describing if this is a Rest.',
+    'beams': 'A :class:`music21.note.Beams` object.',
+    }
+    # update inherited _DOC_ATTR dictionary
+    note.NotRest._DOC_ATTR.update(_DOC_ATTR)
+    _DOC_ATTR = note.NotRest._DOC_ATTR
+
     def __init__(self, notes = [], **keywords):
         note.NotRest.__init__(self, **keywords)
 

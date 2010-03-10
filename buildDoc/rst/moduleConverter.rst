@@ -33,9 +33,13 @@ Class Converter
 
     
 
+    **Class Converter** **Properties**
+
     .. attribute:: stream
 
     No documentation. 
+
+    **Class Converter** **Methods**
 
     .. method:: parseData()
 
@@ -60,9 +64,13 @@ Class ConverterMusicXML
 
     
 
+    **Class ConverterMusicXML** **Properties**
+
     .. attribute:: stream
 
     No documentation. 
+
+    **Class ConverterMusicXML** **Methods**
 
     .. method:: getPartNames()
 
@@ -89,9 +97,13 @@ Class ConverterHumdrum
 
     
 
+    **Class ConverterHumdrum** **Attributes**
+
     .. attribute:: stream
 
     No documentation. 
+
+    **Class ConverterHumdrum** **Methods**
 
     .. method:: parseData()
 
@@ -110,6 +122,8 @@ Class PickleFilter
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
 
     
+
+    **Class PickleFilter** **Methods**
 
     .. method:: status()
 

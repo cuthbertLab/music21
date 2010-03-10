@@ -439,26 +439,18 @@ class Lyric(object):
 #-------------------------------------------------------------------------------
 class GeneralNote(music21.Music21Object):
     '''
-    A GeneralNote object is the parent object for the Note, Rest, Unpitched, and 
-    SimpleNote, etc. objects
-    It contains duration, notations, editorial, and tie fields.
+    A GeneralNote object is the parent object for the Note, Rest, Chird, and related objects. 
     '''    
-
-#	### commented out because it is not working due to circular imports
-#        def __new__(classname, *shortcut, **arguments):
-#        if len(shortcut) == 1:
-#            try:
-#                newnote = tinyNotation.TinyNotationNote(shortcut[0]).note
-#                return newnote
-#            except Exception:
-#                return object.__new__(classname, *shortcut, **arguments)
-#        else:
-#            return object.__new__(classname, *shortcut, **arguments)
-#        #doesn't actually work yet, can't import tinyNotation because of 
-# circular imports
-
     isChord = False
-    
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['duration', 'quarterLength', 'editorial']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'isChord': 'Boolean read-only value describing if this object is a Chord.',
+    'lyrics': 'A list of Lyric objects.',
+    'tie': 'A Tie object.'
+    }    
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
 
@@ -845,6 +837,17 @@ class Note(NotRest):
     isUnpitched = False
     isRest = False
     
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave', 'pitchClass']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'isNote': 'Boolean read-only value describing if this object is a Note.',
+    'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
+    'isRest': 'Boolean read-only value describing if this is a Rest.',
+    'beams': 'A :class:`music21.note.Beams` object.',
+    'pitch': 'A :class:`music21.pitch.Pitch` object.',
+    }
+
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
         NotRest.__init__(self, **keywords)

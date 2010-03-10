@@ -28,21 +28,17 @@ Class Music21Object
 
     
 
+    **Class Music21Object** **Attributes**
+
     .. attribute:: id
 
     Unique identification string. 
 
     .. attribute:: groups
 
-    A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
+    An instance of a Group object. 
 
-    >>> g = Groups()
-    >>> g.append("hello")
-    >>> g[0]
-    'hello' 
-    >>> g.append(5)
-    Traceback (most recent call last): 
-    GroupException: Only strings can be used as list names 
+    **Class Music21Object** **Properties**
 
     .. attribute:: duration
 
@@ -65,6 +61,8 @@ Class Music21Object
     >>> a.priority = 'high'
     Traceback (most recent call last): 
     ElementException: priority values must be integers. 
+
+    **Class Music21Object** **Methods**
 
     .. method:: searchParent()
 
@@ -162,9 +160,13 @@ Class ElementWrapper
 
     Class inherits from: :class:`music21.base.Music21Object`
 
+    **Class ElementWrapper** **Attributes**
+
     .. attribute:: obj
 
     No documentation. 
+
+    **Class ElementWrapper** **Properties**
 
     .. attribute:: duration
 
@@ -205,7 +207,9 @@ Class ElementWrapper
 
     
 
-    Properties inherited from :class:`music21.base.Music21Object`: ``parent``, ``priority``
+    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+
+    **Class ElementWrapper** **Methods**
 
     .. method:: getId()
 
@@ -255,7 +259,7 @@ Class ElementWrapper
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
 Class DefinedContexts
@@ -268,6 +272,8 @@ Class DefinedContexts
     
 
     
+
+    **Class DefinedContexts** **Methods**
 
     .. method:: add()
 
@@ -488,10 +494,12 @@ Class Groups
 
     Class inherits from: list
 
+    **Class Groups** **Methods**
+
     .. method:: append()
 
     No documentation. 
 
-    Methods inherited from list: ``count()``, ``extend()``, ``index()``, ``insert()``, ``pop()``, ``remove()``, ``reverse()``, ``sort()``
+    Methods inherited from list: :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
 
 

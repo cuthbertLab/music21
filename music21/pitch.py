@@ -191,6 +191,14 @@ class Accidental(music21.Music21Object):
     displayLocation = "normal" # "normal", "above" = ficta, "below"
     # above and below could also be useful for gruppetti, etc.
 
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['set']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'displaySize': 'Size in display: "cue", "large", or a percentage.',
+    'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
+    }
+
     def __init__(self, specifier='natural'):
         self.name = None
         self.modifier = ''
@@ -446,6 +454,12 @@ class Accidental(music21.Music21Object):
 #-------------------------------------------------------------------------------
 class Pitch(music21.Music21Object):
 
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    }
     def __init__(self, name=None):
         '''An object for storing pitch values. All values are represented
         internally as a scale step (self.step), and octave and an accidental 

@@ -103,6 +103,7 @@ from base import *</blockquote>
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
 <p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+<p><strong>Class Music21Object</strong> <strong>Attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.base.Music21Object.id">
 <tt class="descname">id</tt><a class="headerlink" href="#music21.base.Music21Object.id" title="Permalink to this definition">¶</a></dt>
@@ -114,16 +115,8 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <tt class="descname">groups</tt><a class="headerlink" href="#music21.base.Music21Object.groups" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
-<span class="go">&#39;hello&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
-</pre></div>
-</div>
+<p>An instance of a Group object.</p>
+<p><strong>Class Music21Object</strong> <strong>Properties</strong></p>
 <dl class="attribute">
 <dt id="music21.base.Music21Object.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.Music21Object.duration" title="Permalink to this definition">¶</a></dt>
@@ -155,6 +148,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <span class="nc">ElementException</span>: <span class="n-Identifier">priority values must be integers.</span>
 </pre></div>
 </div>
+<p><strong>Class Music21Object</strong> <strong>Methods</strong></p>
 <dl class="method">
 <dt id="music21.base.Music21Object.searchParent">
 <tt class="descname">searchParent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParent" title="Permalink to this definition">¶</a></dt>
@@ -275,12 +269,14 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
 <p>Class inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>Class ElementWrapper</strong> <strong>Attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.base.ElementWrapper.obj">
 <tt class="descname">obj</tt><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
+<p><strong>Class ElementWrapper</strong> <strong>Properties</strong></p>
 <dl class="attribute">
 <dt id="music21.base.ElementWrapper.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.ElementWrapper.duration" title="Permalink to this definition">¶</a></dt>
@@ -322,7 +318,8 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <tt class="descname">offset</tt><a class="headerlink" href="#music21.base.ElementWrapper.offset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">parent</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.parent" class="reference internal" href="#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference internal" href="#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
+<p><strong>Class ElementWrapper</strong> <strong>Methods</strong></p>
 <dl class="method">
 <dt id="music21.base.ElementWrapper.getId">
 <tt class="descname">getId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.getId" title="Permalink to this definition">¶</a></dt>
@@ -381,7 +378,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParent" class="reference internal" href="#music21.base.Music21Object.searchParent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.searchParent()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference internal" href="#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference internal" href="#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference internal" href="#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference internal" href="#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference internal" href="#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference internal" href="#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference internal" href="#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.show()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference internal" href="#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.write()</span></tt></a></p>
 </dd></dl>
 
 </div>
@@ -392,6 +389,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">DefinedContexts</tt><a class="headerlink" href="#music21.base.DefinedContexts" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts).</p>
+<p><strong>Class DefinedContexts</strong> <strong>Methods</strong></p>
 <dl class="method">
 <dt id="music21.base.DefinedContexts.add">
 <tt class="descname">add</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.add" title="Permalink to this definition">¶</a></dt>
@@ -654,13 +652,14 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
 </pre></div>
 </div>
 <p>Class inherits from: list</p>
+<p><strong>Class Groups</strong> <strong>Methods</strong></p>
 <dl class="method">
 <dt id="music21.base.Groups.append">
 <tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Groups.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p>Methods inherited from list: <tt class="docutils literal"><span class="pre">count()</span></tt>, <tt class="docutils literal"><span class="pre">extend()</span></tt>, <tt class="docutils literal"><span class="pre">index()</span></tt>, <tt class="docutils literal"><span class="pre">insert()</span></tt>, <tt class="docutils literal"><span class="pre">pop()</span></tt>, <tt class="docutils literal"><span class="pre">remove()</span></tt>, <tt class="docutils literal"><span class="pre">reverse()</span></tt>, <tt class="docutils literal"><span class="pre">sort()</span></tt></p>
+<p>Methods inherited from list: <tt class="xref docutils literal"><span class="pre">__builtin__.list.count()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.extend()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.index()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.insert()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.pop()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.remove()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.reverse()</span></tt>, <tt class="xref docutils literal"><span class="pre">__builtin__.list.sort()</span></tt></p>
 </dd></dl>
 
 </div>
