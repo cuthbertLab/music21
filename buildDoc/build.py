@@ -854,125 +854,15 @@ class ModuleDoc(RestructuredWriter):
         RestructuredWriter.__init__(self)
 
         self.partitionedModule = PartitioinedModule(modNameEval)
-
         self.docCooked = self.formatDocString(modNameEval.__doc__)
         self.modNameEval = modNameEval
         self.modName = self.modNameEval.__name__
-
-#         self.classes = {} # a dictionary of ClassDoc objects
-#         self.functions = {}
-#         self.imports = []
-#         self.globals = []
 
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
         self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
         self.fileName = self.fileRef + '.rst'
         # references used in rst table of contents
-
-    #---------------------------------------------------------------------------
-    # for methods and functions can use
-    # inspect.getargspec(func)
-    # to get argument information
-    # can use this to format: inspect.formatargspec(inspect.getargspec(a.show))
-    
-    # args, varargs, varkw, defaults = inspect.getargspec(object)
-    # argspec = inspect.formatargspec(
-    # args, varargs, varkw, defaults, formatvalue=self.formatvalue)
-
-#     def scanFunction(self, obj):
-#         info = {}
-#         info['reference'] = obj
-#         info['name'] = obj.__name__
-#         info['doc']  = self.formatDocString(obj.__doc__)
-#         # skip private functions
-#         if not obj.__name__.startswith('_'): 
-#             self.functions[obj.__name__] = info
-
-
-    #---------------------------------------------------------------------------
-    # note: can use inspect to get properties:
-    # inspect.isdatadescriptor()
-
-#     def scanModule(self):
-#         '''For a given module, determine which objects need to be documented.
-#         '''
-#         for component in dir(self.modNameEval):
-#             
-#             if component.startswith('__'): # ignore private variables
-#                 continue
-#             if component.startswith('_'): # ignore private variables
-#                 continue
-#             elif 'Test' in component: # ignore test classes
-#                 continue
-#             elif 'Exception' in component: # ignore exceptions
-#                 continue
-# 
-#             objName = '%s.%s' % (self.modName, component)
-#             obj = eval(objName)
-#         
-#             # check that this name comes from this moduled;
-#             # that is, that this is not an object imported from another mod
-#             if hasattr(obj, '__module__'):
-#                 if self.modName not in obj.__module__:
-#                     continue
-# 
-#             objType = type(obj)
-#             # print objName, objType
-#             if isinstance(obj, types.ModuleType):
-#                 importName = objName.replace(self.modName+'.', '')
-#                 self.imports.append(importName)
-# 
-#             elif (isinstance(obj, types.StringTypes) or 
-#                 isinstance(obj, types.DictionaryType) or 
-#                 isinstance(obj, types.ListType)):
-#                 self.globals.append(objName)
-#             # assume that these are classes
-#             elif isinstance(obj, types.TypeType):
-#                 #self.classes[obj.__name__] = info
-#                 self.classes[obj.__name__] = ClassDoc(objName)
-#                 #self.scanClass(obj)
-# 
-#             elif isinstance(obj, types.FunctionType):
-#                 self.scanFunction(obj)
-#             elif isinstance(obj, environment.Environment):
-#                 continue # skip environment object
-#             else:
-#                 if common.isNum(obj) or common.isListLike(obj): 
-#                     continue
-#                 environLocal.printDebug(['cannot process: %s' % repr(obj)])
-
-
-#     def _sortModuleNames(self, src='classes'):
-#         names = []
-#         if src == 'classes':
-#             srcNames = self.classes.keys()
-#         elif src == 'functions':
-#             srcNames = self.functions.keys()
-#     
-#         if len(srcNames) == 0:
-#             return []
-# 
-#         if hasattr(self.modNameEval, '_DOC_ORDER'):
-#             # re order names by order specified in doc_order
-#             for orderedObj in self.modNameEval._DOC_ORDER:
-#                 if hasattr(orderedObj, 'func_name'):
-#                     orderedName = orderedObj.func_name
-#                 elif hasattr(orderedObj, '__name__'):
-#                     orderedName = orderedObj.__name__
-#                 else:
-#                     environLocal.printDebug(['cannot get a string name of object:', orderedObj])
-#                     continue
-#                 if orderedName not in srcNames: 
-#                     # possible if mixing functions and classes
-#                     continue
-#                 #environLocal.printDebug(['orderedName', orderedName, srcNames])
-#                 post = srcNames.pop(srcNames.index(orderedName))
-#                 names.append(post)
-#         for n in srcNames:
-#             names.append(n)
-#         return names
-# 
 
     def _fmtRstFunction(self, name, signature):
         msg = []
@@ -999,19 +889,9 @@ class ModuleDoc(RestructuredWriter):
         msg += self.docCooked
         msg.append('\n\n')
 
-
-        # can optionally list imports
-        #msg += self._heading('Imports' , '-')
-        #msg += self._list(self.imports)
-
         for group in ['functions', 'classes']:
             names = self.partitionedModule.getNames(group)
             if len(names) == 0: continue
-
-        #for funcName in self._sortModuleNames('functions'):
-        #for funcName in funcNames:
-            #titleStr = 'Function %s()' % self.functions[funcName]['name']
-            #msg += self._heading(titleStr, '-')
 
             for partName in names:
                 if group == 'functions':
@@ -1023,9 +903,6 @@ class ModuleDoc(RestructuredWriter):
                     qualifiedName = '%s.%s' % (self.modName, partName)
                     classDoc = ClassDoc(qualifiedName)
                     msg += classDoc.getRestructuredClass()
-
-#         for className in self._sortModuleNames('classes'):
-#             msg += self.classes[className].getRestructuredClass()
 
         return ''.join(msg)
 
