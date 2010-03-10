@@ -75,7 +75,6 @@ class Chord(note.NotRest):
     isNote = False
     isRest = False
 
-
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['pitches']
     # documentation for all attributes (not properties or methods)

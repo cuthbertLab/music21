@@ -86,6 +86,7 @@ Class Pitch
 
 .. class:: Pitch
 
+    An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
     Class inherits from: :class:`music21.base.Music21Object`
 

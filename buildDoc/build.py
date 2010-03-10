@@ -809,7 +809,9 @@ class Documentation(RestructuredWriter):
                              'faq',
                              'glossary',
                              ]
-
+        self.chaptersDeveloper = ['documenting',
+                                ]
+    
         self.chaptersGenerated = [] # to be populated
 
         self.titleAppendix = 'Indices and Tables'
@@ -860,11 +862,19 @@ class Documentation(RestructuredWriter):
         for name in self.chaptersMain:
             msg.append('   %s\n' % name)        
         msg.append('\n\n')
+
         msg += self._heading('Module Reference', '=')
         # second toc has collapsed tree
         msg.append('.. toctree::\n')
         msg.append('   :maxdepth: 1\n\n')
         for name in self.chaptersGenerated:
+            msg.append('   %s\n' % name)        
+
+        msg += self._heading('Developer Reference', '=')
+        # second toc has collapsed tree
+        msg.append('.. toctree::\n')
+        msg.append('   :maxdepth: 2\n\n')
+        for name in self.chaptersDeveloper:
             msg.append('   %s\n' % name)        
 
 

@@ -86,7 +86,7 @@ Class Violoncello
 
     .. attribute:: lowestNote
 
-    No documentation. 
+    An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
     Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
 
@@ -165,7 +165,7 @@ Class Viola
 
     .. attribute:: lowestNote
 
-    No documentation. 
+    An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
     Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
 
@@ -198,7 +198,7 @@ Class Violin
 
     .. attribute:: lowestNote
 
-    No documentation. 
+    An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
     Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
 

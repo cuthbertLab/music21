@@ -180,7 +180,8 @@ Used extensively by note.py</p>
 <dt id="music21.pitch.Pitch">
 <em class="property">
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<dd><p>An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.</p>
+<p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
 <p><strong>Class Pitch</strong> <strong>Attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.defaultOctave">

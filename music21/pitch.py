@@ -453,7 +453,8 @@ class Accidental(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class Pitch(music21.Music21Object):
-
+    '''An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
+    '''
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi']
@@ -461,13 +462,7 @@ class Pitch(music21.Music21Object):
     _DOC_ATTR = {
     }
     def __init__(self, name=None):
-        '''An object for storing pitch values. All values are represented
-        internally as a scale step (self.step), and octave and an accidental 
-        object. In addition, pitches know their pitchSpace representation 
-        (self._ps); altering any of the first three changes the pitchSpace
-        representation.  Similarly, altering the pitchSpace representation
-        alters the first three.
-        
+        '''
         optional parameter name should include a step and accidental character(s)
         it can also include a non-negative octave number.  ("C#4", "B--3", etc.)
 

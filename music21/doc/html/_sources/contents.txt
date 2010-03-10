@@ -49,6 +49,13 @@ Module Reference
    moduleSerial
    moduleTempo
    moduleTinyNotation
+Developer Reference
+===================
+
+.. toctree::
+   :maxdepth: 2
+
+   documenting
 
 Indices and Tables
 ==================

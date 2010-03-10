@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documenting music21 Modules and Classes &mdash; music21 v0.2.4a1 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="prev" title="music21.tinyNotation" href="moduleTinyNotation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="moduleTinyNotation.html" title="music21.tinyNotation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Documenting music21 Modules and Classes</a><ul>
+<li><a class="reference external" href="#prohibiting-docstrings-from-display-documentation">Prohibiting Docstrings from Display Documentation</a></li>
+<li><a class="reference external" href="#ordering-module-level-names">Ordering Module-Level Names</a></li>
+<li><a class="reference external" href="#documenting-module-level-functions">Documenting Module-Level Functions</a></li>
+<li><a class="reference external" href="#ordering-class-level-names">Ordering Class-Level Names</a></li>
+<li><a class="reference external" href="#documenting-class-level-attributes">Documenting Class-Level Attributes</a></li>
+<li><a class="reference external" href="#documenting-class-level-properties">Documenting Class-Level Properties</a></li>
+<li><a class="reference external" href="#documenting-class-level-methods">Documenting Class-Level Methods</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleTinyNotation.html"
+                                  title="previous chapter">music21.tinyNotation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/documenting.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="documenting-music21-modules-and-classes">
+<span id="documenting"></span><h1>Documenting music21 Modules and Classes<a class="headerlink" href="#documenting-music21-modules-and-classes" title="Permalink to this headline">¶</a></h1>
+<p>The music21 documentation is generated with Sphinx. RST files for modules, before being processed by Sphinx, are created by the buildDoc/build.py script. All documentation for public modules, module-level functions, classes, and class-level attributes, properties, and methods are contained in the code fill as close to the relevant names as possible.</p>
+<div class="section" id="prohibiting-docstrings-from-display-documentation">
+<h2>Prohibiting Docstrings from Display Documentation<a class="headerlink" href="#prohibiting-docstrings-from-display-documentation" title="Permalink to this headline">¶</a></h2>
+<p>It may be desirable to hide some docstrings from display in the public documentation. All docstring lines following the constant &#8216;OMIT_FROM_DOCS&#8217; from will be omitted from documentation.</p>
+</div>
+<div class="section" id="ordering-module-level-names">
+<h2>Ordering Module-Level Names<a class="headerlink" href="#ordering-module-level-names" title="Permalink to this headline">¶</a></h2>
+<p>To specify the order in which module-level names are presented in documentation, the module must define <cite>_DOC_ORDER</cite>, a list of the class and/or function names in the module. These values are given as evaluated names, not strings.</p>
+<p>Only the first-most names need be specified; any names not included will be presented in default order</p>
+<p>As this list defines evaluated names, this list must come at the end of the module, after Test classes and before calling <cite>music21.mainTest()</cite></p>
+<p>The following example is from note.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="n">Note</span><span class="p">,</span> <span class="n">Rest</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">music21</span><span class="o">.</span><span class="n">mainTest</span><span class="p">(</span><span class="n">Test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="documenting-module-level-functions">
+<h2>Documenting Module-Level Functions<a class="headerlink" href="#documenting-module-level-functions" title="Permalink to this headline">¶</a></h2>
+<p>Module-level functions should have a documentation string and doctest-compatible examples.</p>
+</div>
+<div class="section" id="ordering-class-level-names">
+<h2>Ordering Class-Level Names<a class="headerlink" href="#ordering-class-level-names" title="Permalink to this headline">¶</a></h2>
+<p>To specify the order in which class-level names are presented in documentation, the class must define <cite>_DOC_ORDER</cite> attribute, a list of the attribute, property, and/or method names in the class. These values are given as strings, not evaluated names. The <cite>_DOC_ORDER</cite> attribute must be defined outside of the <cite>__init__()</cite> method to ensure that these values can be read from a Class object alone.</p>
+<p>The following abbreviated example is from pitch.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Pitch</span><span class="p">(</span><span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># define order to present names in documentation; use strings</span>
+    <span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;nameWithOctave&#39;</span><span class="p">,</span> <span class="s">&#39;step&#39;</span><span class="p">,</span> <span class="s">&#39;pitchClass&#39;</span><span class="p">,</span> <span class="s">&#39;octave&#39;</span><span class="p">,</span> <span class="s">&#39;midi&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="documenting-class-level-attributes">
+<h2>Documenting Class-Level Attributes<a class="headerlink" href="#documenting-class-level-attributes" title="Permalink to this headline">¶</a></h2>
+<p>Class-level attributes, names that are neither properties not methods, must define their documentation in the <cite>_DOC_ATTR</cite> dictionary. All values are given as strings, not evaluated names. The <cite>_DOC_ATTR</cite> attribute must be defined outside of the <cite>__init__()</cite> method to ensure that these values can be read from a Class object alone.</p>
+<p>The following abbreviated example is from note.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span><span class="n">NotRest</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">isNote</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">isUnpitched</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">isRest</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="c"># define order to present names in documentation; use strings</span>
+    <span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;duration&#39;</span><span class="p">,</span> <span class="s">&#39;quarterLength&#39;</span><span class="p">,</span> <span class="s">&#39;nameWithOctave&#39;</span><span class="p">,</span> <span class="s">&#39;pitchClass&#39;</span><span class="p">]</span>
+    <span class="c"># documentation for all attributes (not properties or methods)</span>
+    <span class="n">_DOC_ATTR</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;isNote&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this object is a Note.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;isUnpitched&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this is Unpitched.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;isRest&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this is a Rest.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;beams&#39;</span><span class="p">:</span> <span class="s">&#39;A :class:`music21.note.Beams` object.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;pitch&#39;</span><span class="p">:</span> <span class="s">&#39;A :class:`music21.pitch.Pitch` object.&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>If a <cite>_DOC_ATTR</cite> attribute is not defined, the most-recently inherited <cite>_DOC_ATTR</cite> attribute will be used. To explicitly merge an inherited <cite>_DOC_ATTR</cite> attribute with a locally defined <cite>_DOC_ATTR</cite>, use the dictionaries <cite>update()</cite> method.</p>
+<p>The following abbreviated example is from chord.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Chord</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">isChord</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">isNote</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">isRest</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="c"># define order to present names in documentation; use strings</span>
+    <span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;pitches&#39;</span><span class="p">]</span>
+    <span class="c"># documentation for all attributes (not properties or methods)</span>
+    <span class="n">_DOC_ATTR</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;isNote&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this object is a Chord.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;isRest&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this is a Rest.&#39;</span><span class="p">,</span>
+    <span class="s">&#39;beams&#39;</span><span class="p">:</span> <span class="s">&#39;A :class:`music21.note.Beams` object.&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c"># update inherited _DOC_ATTR dictionary</span>
+    <span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="o">.</span><span class="n">_DOC_ATTR</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_DOC_ATTR</span><span class="p">)</span>
+    <span class="n">_DOC_ATTR</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="o">.</span><span class="n">_DOC_ATTR</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="documenting-class-level-properties">
+<h2>Documenting Class-Level Properties<a class="headerlink" href="#documenting-class-level-properties" title="Permalink to this headline">¶</a></h2>
+<p>Class-level property definitions must pass a <cite>doc</cite> argument to the the <cite>property()</cite> global function. Included doctests will be presented in documentation and run as doctests.</p>
+</div>
+<div class="section" id="documenting-class-level-methods">
+<h2>Documenting Class-Level Methods<a class="headerlink" href="#documenting-class-level-methods" title="Permalink to this headline">¶</a></h2>
+<p>Class-level methods should have a documentation string and doctest-compatible examples.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleTinyNotation.html" title="music21.tinyNotation"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Mar 10, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
