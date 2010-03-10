@@ -157,7 +157,7 @@ Class TinyNotationStream
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -205,7 +205,7 @@ Class HarmonyStream
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 

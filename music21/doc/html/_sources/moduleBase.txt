@@ -66,6 +66,37 @@ Class Music21Object
     Traceback (most recent call last): 
     ElementException: priority values must be integers. 
 
+    .. method:: searchParent()
+
+    If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
+
+    .. method:: getContextAttr()
+
+    Given the name of an attribute, search Conctexts and return the best match. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.getContextAttr('attr1')
+    'test' 
+
+    .. method:: setContextAttr()
+
+    Given the name of an attribute, search Conctexts and return the best match. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.getContextAttr('attr1')
+    'test' 
+    >>> a.setContextAttr('attr1', 3000)
+    >>> a.getContextAttr('attr1')
+    3000 
+
     .. method:: addContext()
 
     Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
@@ -94,18 +125,6 @@ Class Music21Object
     >>> o1.getOffsetBySite(st1)
     20.0 
 
-    .. method:: getContextAttr()
-
-    Given the name of an attribute, search Conctexts and return the best match. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> aObj.attr1 = 'test'
-    >>> a = Music21Object()
-    >>> a.addContext(aObj)
-    >>> a.getContextAttr('attr1')
-    'test' 
-
     .. method:: getContextByClass()
 
     Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
@@ -122,25 +141,6 @@ Class Music21Object
     .. method:: isClass()
 
     returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
-
-    .. method:: searchParent()
-
-    If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
-
-    .. method:: setContextAttr()
-
-    Given the name of an attribute, search Conctexts and return the best match. 
-
-    >>> class Mock(Music21Object): attr1=234
-    >>> aObj = Mock()
-    >>> aObj.attr1 = 'test'
-    >>> a = Music21Object()
-    >>> a.addContext(aObj)
-    >>> a.getContextAttr('attr1')
-    'test' 
-    >>> a.setContextAttr('attr1', 3000)
-    >>> a.getContextAttr('attr1')
-    3000 
 
     .. method:: show()
 
@@ -255,7 +255,7 @@ Class ElementWrapper
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``show()``, ``write()``
 
 
 Class DefinedContexts

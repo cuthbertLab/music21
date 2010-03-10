@@ -81,30 +81,6 @@
 <span id="modulecorpus"></span><h1>music21.corpus<a class="headerlink" href="#module-music21.corpus" title="Permalink to this headline">¶</a></h1>
 <p>The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.</p>
 <dl class="function">
-<dt id="music21.corpus.parseWork">
-<tt class="descclassname">music21.corpus.</tt><tt class="descname">parseWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.parseWork" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.corpus.getWork">
-<tt class="descclassname">music21.corpus.</tt><tt class="descname">getWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getWork" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="function">
 <dt id="music21.corpus.getPaths">
 <tt class="descclassname">music21.corpus.</tt><tt class="descname">getPaths</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getPaths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -132,6 +108,15 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getBeethovenStringQuartets</span><span class="p">(</span><span class="s">&#39;xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">400</span>
 <span class="go">False</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.corpus.parseWork">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">parseWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.parseWork" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="function">
@@ -221,6 +206,21 @@
 <span class="go">True</span>
 </pre></div>
 </div>
+<dl class="function">
+<dt id="music21.corpus.getWork">
+<tt class="descclassname">music21.corpus.</tt><tt class="descname">getWork</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.getWork" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -249,7 +249,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 09, 2010.
+      Last updated on Mar 10, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

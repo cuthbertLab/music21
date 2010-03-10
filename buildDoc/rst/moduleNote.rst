@@ -136,7 +136,7 @@ Class Note
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Rest
@@ -187,7 +187,7 @@ Class Rest
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class WholeNote
@@ -218,7 +218,7 @@ Class WholeNote
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Unpitched
@@ -260,7 +260,7 @@ Class Unpitched
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class EighthNote
@@ -291,7 +291,7 @@ Class EighthNote
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class QuarterNote
@@ -322,7 +322,7 @@ Class QuarterNote
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Beam
@@ -397,7 +397,7 @@ Class HalfNote
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Lyric
@@ -585,7 +585,7 @@ Class NotRest
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class GeneralNote
@@ -716,7 +716,7 @@ Class GeneralNote
     >>> b[1].duration.type
     'whole' 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Tie
@@ -758,6 +758,6 @@ Class Tie
 
     Properties inherited from :class:`music21.base.Music21Object`: ``duration``, ``offset``, ``parent``, ``priority``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 

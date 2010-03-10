@@ -317,7 +317,7 @@ Class TimeSignature
     >>> a.display
     <MeterSequence {3/4}> 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class CompoundTimeSignature
@@ -338,7 +338,7 @@ Class CompoundTimeSignature
 
     Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class NonPowerOfTwoTimeSignature
@@ -359,7 +359,7 @@ Class NonPowerOfTwoTimeSignature
 
     Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class MeterTerminal
@@ -462,7 +462,7 @@ Class DurationDenominatorTimeSignature
 
     Methods inherited from :class:`music21.meter.TimeSignature`: ``getAccent()``, ``getAccentWeight()``, ``getBeams()``, ``getBeat()``, ``getBeatDepth()``, ``getBeatProgress()``, ``load()``, ``loadRatio()``, ``quarterPositionToBeat()``, ``ratioEqual()``, ``setAccentWeight()``, ``setDisplay()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class MeterSequence

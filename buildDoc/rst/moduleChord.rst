@@ -619,6 +619,6 @@ Class Chord
 
     Methods inherited from :class:`music21.note.GeneralNote`: ``addLyric()``, ``appendDuration()``, ``clearDurations()``, ``compactNoteInfo()``, ``splitAtDurations()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 

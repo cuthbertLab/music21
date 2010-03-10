@@ -478,7 +478,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Node, NodeList]
+_DOC_ORDER = [Node, NodeList]
 
 
 if __name__ == "__main__":

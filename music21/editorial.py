@@ -120,7 +120,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [NoteEditorial]
+_DOC_ORDER = [NoteEditorial]
 
 
 if __name__ == "__main__":

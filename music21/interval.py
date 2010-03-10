@@ -822,7 +822,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [generateChromatic, generateDiatonic, generateInterval, Interval]
+_DOC_ORDER = [generateChromatic, generateDiatonic, generateInterval, Interval]
 
 
 if __name__ == "__main__":

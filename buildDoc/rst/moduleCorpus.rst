@@ -11,26 +11,6 @@ music21.corpus
 
 The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
 
-.. function:: parseWork()
-
-Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
-
->>> aStream = parseWork('opus74no1/movement3')
-
-.. function:: getWork()
-
-Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
-
->>> import os
->>> a = getWork('opus74no2', 4)
->>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
-True 
->>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
->>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
-True 
-
-
-
 .. function:: getPaths()
 
 Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
@@ -55,6 +35,12 @@ True
 >>> a = getBeethovenStringQuartets('xml')
 >>> len(a) > 400
 False 
+
+.. function:: parseWork()
+
+Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
+
+>>> aStream = parseWork('opus74no1/movement3')
 
 .. function:: getComposer()
 
@@ -128,4 +114,18 @@ False
 >>> a = getBachChorales('xml')
 >>> len(a) > 400
 True 
+
+.. function:: getWork()
+
+Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+
+>>> import os
+>>> a = getWork('opus74no2', 4)
+>>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
+True 
+>>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
+>>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
+True 
+
+
 

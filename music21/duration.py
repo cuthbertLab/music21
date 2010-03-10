@@ -2358,7 +2358,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
+_DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
 
 if __name__ == "__main__":
     import music21

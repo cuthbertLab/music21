@@ -368,7 +368,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Dynamic, Wedge]
+_DOC_ORDER = [Dynamic, Wedge]
 
 
 if __name__ == "__main__":

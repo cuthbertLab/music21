@@ -65,7 +65,7 @@ Class Instrument
 
     Force a unique id by using an MD5 
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Violoncello
@@ -92,7 +92,7 @@ Class Violoncello
 
     Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class StringInstrument
@@ -132,7 +132,7 @@ Class StringInstrument
 
     Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Viola
@@ -159,7 +159,7 @@ Class Viola
 
     Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 
 Class Violin
@@ -186,6 +186,6 @@ Class Violin
 
     Methods inherited from :class:`music21.instrument.Instrument`: ``bestName()``, ``partIdRandomize()``
 
-    Methods inherited from :class:`music21.base.Music21Object`: ``addContext()``, ``addLocationAndParent()``, ``getContextAttr()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``searchParent()``, ``setContextAttr()``, ``show()``, ``write()``
+    Methods inherited from :class:`music21.base.Music21Object`: ``searchParent()``, ``getContextAttr()``, ``setContextAttr()``, ``addContext()``, ``addLocationAndParent()``, ``getContextByClass()``, ``getOffsetBySite()``, ``isClass()``, ``show()``, ``write()``
 
 

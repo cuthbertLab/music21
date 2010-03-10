@@ -2731,7 +2731,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
+_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
 
 
 if __name__ == "__main__":

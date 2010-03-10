@@ -20,7 +20,7 @@ Class Stream
 
     .. attribute:: flattenedRepresentationOf
 
-    No documentation. 
+    Boolean describing if this is a Stream that was created by another Stream's .flat property. 
 
     .. attribute:: isFlat
 
@@ -31,6 +31,25 @@ Class Stream
     bool(x) -> bool Returns True when the argument x is true, False otherwise. The builtins True and False are the only two instances of the class bool. The class bool is a subclass of the class int, and cannot be subclassed. 
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
+
+    .. attribute:: measures
+
+    Return all Measure objects in a Stream() 
+
+    .. attribute:: notes
+
+    Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
+
+    >>> s1 = Stream()
+    >>> c = chord.Chord(['a', 'b'])
+    >>> s1.append(c)
+    >>> s2 = s1.getNotes()
+    >>> len(s2) == 1
+    True 
+
+    .. attribute:: pitches
+
+    Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
 
     .. attribute:: duration
 
@@ -153,10 +172,6 @@ Class Stream
 
     
 
-    .. attribute:: measures
-
-    Return all Measure objects in a Stream() 
-
     .. attribute:: musicxml
 
     Provide a complete MusicXM: representation. 
@@ -171,21 +186,6 @@ Class Stream
     >>> str1 = Stream()
     >>> str1.insert(measure1)
     >>> mxScore = str1.mx
-
-    .. attribute:: notes
-
-    Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream 
-
-    >>> s1 = Stream()
-    >>> c = chord.Chord(['a', 'b'])
-    >>> s1.append(c)
-    >>> s2 = s1.getNotes()
-    >>> len(s2) == 1
-    True 
-
-    .. attribute:: pitches
-
-    Return all pitches found in any element in the stream as a List (since Pitches have no duration, it's a list not a stream) 
 
     .. attribute:: semiFlat
 
@@ -1165,7 +1165,7 @@ Class Measure
     >>> a.timeSignature.numerator, a.timeSignature.denominator
     (2, 4) 
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1207,7 +1207,7 @@ Class Performer
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1233,7 +1233,7 @@ Class Score
 
     returns the lily code for a score. 
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1263,7 +1263,7 @@ Class System
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1289,7 +1289,7 @@ Class Part
 
     No documentation. 
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1311,7 +1311,7 @@ Class Voice
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1337,7 +1337,7 @@ Class Page
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1363,7 +1363,7 @@ Class Staff
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 

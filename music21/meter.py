@@ -2347,7 +2347,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [TimeSignature, CompoundTimeSignature]
+_DOC_ORDER = [TimeSignature, CompoundTimeSignature]
 
 
 if __name__ == "__main__":

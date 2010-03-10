@@ -297,7 +297,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [KeySignature, Key]
+_DOC_ORDER = [KeySignature, Key]
 
 
 if __name__ == "__main__":

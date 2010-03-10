@@ -670,12 +670,13 @@ class Music21Object(object):
     _currentParent = None
     _currentParentId = None # cached id in case the weakref has gone away...
 
-    # define order to present names in documentation; use strings:
-    # deepcopy does not like actual method names
+    # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchParent', 'getContextAttr', 'setContextAttr']
-    _DOC_ATTR = {'id': 'Unique identification string.',
-                 'groups': 'An instance of a Group object.'
-                     }
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'id': 'Unique identification string.',
+    'groups': 'An instance of a Group object.'
+    }
 
     def __init__(self, *arguments, **keywords):
 
@@ -1806,7 +1807,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
+_DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
 
 
 def mainTest(*testClasses):

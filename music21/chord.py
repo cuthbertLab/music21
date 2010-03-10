@@ -2001,7 +2001,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Chord]
+_DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
     music21.mainTest(Test)

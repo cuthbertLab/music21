@@ -552,7 +552,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Clef, TrebleClef, BassClef]
+_DOC_ORDER = [Clef, TrebleClef, BassClef]
 
 
 if __name__ == "__main__":

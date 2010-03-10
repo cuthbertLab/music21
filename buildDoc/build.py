@@ -83,7 +83,7 @@ MODULES = [
 
 
 #-------------------------------------------------------------------------------
-class PartitionedNameSpace(object):
+class PartitionedClass(object):
     '''Given an evaluated class name as an argument, mange and present
     All data for all attributes, methods, and properties.
 
@@ -93,7 +93,7 @@ class PartitionedNameSpace(object):
     def __init__(self, classNameEval):
         '''
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> len(a.names) > 30
         True
         >>> a.mro
@@ -111,6 +111,11 @@ class PartitionedNameSpace(object):
         # store both a list of names as well as name/mro index pairs
         self.names = []
         self.namesMroIndex = []
+
+        # this is an complete list of names
+        self.namesOrdered = [] # any defined order for names
+        if hasattr(self.classNameEval, '_DOC_ORDER'):
+            self.namesOrdered += self.classNameEval._DOC_ORDER
 
         # this will get much but not all data
         self._dataClassify = inspect.classify_class_attrs(self.classNameEval)
@@ -133,11 +138,43 @@ class PartitionedNameSpace(object):
         # this will match the order in names, and namesMroIndex
         self._data = self._dataClassify + self._dataLive
 
+        self._sort()
+
+    def _sort(self):
+        '''Sort _data, self.namesMroIndex, and self.names
+        '''
+        namesSupply = self.names[:]
+
+        names = []
+        namesMroIndex = []
+        _data = []
+
+        for name in self.namesOrdered:
+            # cannot be sure this is the same index as that in self.names
+            junk = namesSupply.pop(namesSupply.index(name))
+
+            i = self.names.index(name)
+            names.append(self.names[i])
+            namesMroIndex.append(self.namesMroIndex[i])
+            _data.append(self._data[i])
+
+        # get all others that are not defined
+        for name in namesSupply:
+            i = self.names.index(name)
+            names.append(self.names[i])
+            namesMroIndex.append(self.namesMroIndex[i])
+            _data.append(self._data[i])
+
+        self.names = names
+        self.namesMroIndex = namesMroIndex
+        self._data = _data
+
+
     def _createMroLive(self):
         '''Try to create the mro order but with live objects.
 
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> len(a._createMroLive()) == 3
         True
         '''
@@ -185,7 +222,7 @@ class PartitionedNameSpace(object):
         '''Given an partName, find from where (in the list of methods) the part is derived. Returns an index number value.
 
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> a.findMroIndex('midi')
         0
         >>> a.findMroIndex('id')
@@ -201,7 +238,7 @@ class PartitionedNameSpace(object):
     def lastMroIndex(self):
         '''
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> a.lastMroIndex()
         2
         '''
@@ -210,7 +247,7 @@ class PartitionedNameSpace(object):
     def getElement(self, partName):
         '''
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getElement('midi')
         Attribute(name='midi', kind='property', defining_class=<class 'music21.pitch.Pitch'>, object=<property object...
         >>> a.getElement('id')
@@ -225,7 +262,7 @@ class PartitionedNameSpace(object):
         '''Expand to include signatures when possible
 
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getSignature('midi')
         ''
         '''
@@ -268,7 +305,7 @@ class PartitionedNameSpace(object):
         '''Name type can be method, data, property
 
         >>> from music21 import pitch
-        >>> a = PartitionedNameSpace(pitch.Pitch)
+        >>> a = PartitionedClass(pitch.Pitch)
 
         >>> a.getNames('property')
         ['accidental', 'diatonicNoteNum', 'duration', 'freq440', 'frequency', 'german', 'implicitOctave', 'midi', 'musicxml', 'mx', 'name', 'nameWithOctave', 'octave', 'offset', 'parent', 'pitchClass', 'priority', 'ps', 'step']
@@ -286,12 +323,12 @@ class PartitionedNameSpace(object):
         []
 
         >>> from music21 import converter
-        >>> a = PartitionedNameSpace(converter.Converter)
+        >>> a = PartitionedClass(converter.Converter)
         >>> a.getNames('methods')
         ['parseData', 'parseFile', 'parseURL']
 
         >>> from music21 import meter
-        >>> a = PartitionedNameSpace(meter.TimeSignature)
+        >>> a = PartitionedClass(meter.TimeSignature)
         >>> a.getNames('methods')
         ['addContext', 'addLocationAndParent', 'getAccent', 'getAccentWeight', 'getBeams', 'getBeat', 'getBeatDepth', 'getBeatProgress', 'getContextAttr', 'getContextByClass', 'getOffsetBySite', 'isClass', 'load', 'loadRatio', 'quarterPositionToBeat', 'ratioEqual', 'searchParent', 'setAccentWeight', 'setContextAttr', 'setDisplay', 'show', 'write']
         >>> a.getNames('attributes', 1)
@@ -323,6 +360,7 @@ class PartitionedNameSpace(object):
             else:
                 post.append(name)
         return post
+
 
 
 #-------------------------------------------------------------------------------
@@ -471,7 +509,7 @@ class ClassDoc(RestructuredWriter):
 
         self.className = className
         self.classNameEval = eval(className)
-        self.pns = PartitionedNameSpace(self.classNameEval)
+        self.pns = PartitionedClass(self.classNameEval)
         # this is a tuple of class instances that are in the order
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
@@ -512,9 +550,6 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s\n' % self.docCooked)
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
 
-        #msg += self._getAttributes()
-
-        #for group in ['attributes', 'properties', 'methods']:
         for group in ['attributes', 'properties', 'methods']:
             for mroIndex in self.pns.mroIndices():
                 if mroIndex == self.pns.lastMroIndex():
@@ -649,9 +684,9 @@ class ModuleDoc(RestructuredWriter):
         if len(srcNames) == 0:
             return []
 
-        if hasattr(self.mod, 'DOC_ORDER'):
+        if hasattr(self.mod, '_DOC_ORDER'):
             # re order names by order specified in doc_order
-            for orderedObj in self.mod.DOC_ORDER:
+            for orderedObj in self.mod._DOC_ORDER:
                 if hasattr(orderedObj, 'func_name'):
                     orderedName = orderedObj.func_name
                 elif hasattr(orderedObj, '__name__'):

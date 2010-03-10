@@ -1089,7 +1089,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [fromRoman, toRoman, Scalar]
+_DOC_ORDER = [fromRoman, toRoman, Scalar]
 
 
 if __name__ == "__main__":

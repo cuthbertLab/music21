@@ -1465,7 +1465,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Note, Rest]
+_DOC_ORDER = [Note, Rest]
 
 
 

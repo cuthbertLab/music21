@@ -42,8 +42,6 @@ _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
 CLASS_SORT_ORDER = ["Clef", "TempoMark", "KeySignature", "TimeSignature", "Dynamic", "GeneralNote"]
-
-
 #-------------------------------------------------------------------------------
 
 class StreamException(Exception):
@@ -98,6 +96,15 @@ class Stream(music21.Music21Object):
     TODO: Get Stream Duration working -- should be the total length of the 
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['measures', 'notes', 'pitches']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'isSorted': 'Boolean describing whether the Stream is sorted or not.',
+    'isFlat': 'Boolean describing whether the Stream is flat.',
+    'flattenedRepresentationOf': 'Boolean describing if this is a Stream that was created by another Stream\'s .flat property.',
+    }
 
     def __init__(self, givenElements = None):
         '''
@@ -5156,7 +5163,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Stream, Measure]
+_DOC_ORDER = [Stream, Measure]
 
 
 

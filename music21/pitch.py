@@ -1095,7 +1095,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Pitch, Accidental]
+_DOC_ORDER = [Pitch, Accidental]
 
 
 if __name__ == "__main__":

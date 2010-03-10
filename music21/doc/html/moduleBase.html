@@ -156,6 +156,45 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </pre></div>
 </div>
 <dl class="method">
+<dt id="music21.base.Music21Object.searchParent">
+<tt class="descname">searchParent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</p>
+<dl class="method">
+<dt id="music21.base.Music21Object.getContextAttr">
+<tt class="descname">getContextAttr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the name of an attribute, search Conctexts and return the best match.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
+<span class="go">&#39;test&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.Music21Object.setContextAttr">
+<tt class="descname">setContextAttr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.setContextAttr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the name of an attribute, search Conctexts and return the best match.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
+<span class="go">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">,</span> <span class="mf">3000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
+<span class="go">3000</span>
+</pre></div>
+</div>
+<dl class="method">
 <dt id="music21.base.Music21Object.addContext">
 <tt class="descname">addContext</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.addContext" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -190,21 +229,6 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </pre></div>
 </div>
 <dl class="method">
-<dt id="music21.base.Music21Object.getContextAttr">
-<tt class="descname">getContextAttr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given the name of an attribute, search Conctexts and return the best match.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
-<span class="go">&#39;test&#39;</span>
-</pre></div>
-</div>
-<dl class="method">
 <dt id="music21.base.Music21Object.getContextByClass">
 <tt class="descname">getContextByClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextByClass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -228,30 +252,6 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <dd></dd></dl>
 
 <p>returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
-<dl class="method">
-<dt id="music21.base.Music21Object.searchParent">
-<tt class="descname">searchParent</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</p>
-<dl class="method">
-<dt id="music21.base.Music21Object.setContextAttr">
-<tt class="descname">setContextAttr</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.setContextAttr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given the name of an attribute, search Conctexts and return the best match.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
-<span class="go">&#39;test&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">,</span> <span class="mf">3000</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getContextAttr</span><span class="p">(</span><span class="s">&#39;attr1&#39;</span><span class="p">)</span>
-<span class="go">3000</span>
-</pre></div>
-</div>
 <dl class="method">
 <dt id="music21.base.Music21Object.show">
 <tt class="descname">show</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
@@ -381,7 +381,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <tt class="docutils literal"><span class="pre">searchParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="docutils literal"><span class="pre">addContext()</span></tt>, <tt class="docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="docutils literal"><span class="pre">show()</span></tt>, <tt class="docutils literal"><span class="pre">write()</span></tt></p>
 </dd></dl>
 
 </div>
@@ -692,7 +692,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 09, 2010.
+      Last updated on Mar 10, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

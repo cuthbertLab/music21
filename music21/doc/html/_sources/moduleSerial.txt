@@ -46,7 +46,7 @@ Class RowSchoenbergOp24Movement4
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -85,7 +85,7 @@ Class RowSchoenbergOp24Movement5
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -124,7 +124,7 @@ Class RowWebernOp26
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -163,7 +163,7 @@ Class RowBergLyricSuitePrimaryRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -202,7 +202,7 @@ Class RowBergConcertoForViolinAndOrchestra
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -241,7 +241,7 @@ Class RowWebernOp21
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -280,7 +280,7 @@ Class RowSchoenbergOp27No4
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -319,7 +319,7 @@ Class RowWebernOp23
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -358,7 +358,7 @@ Class RowWebernOp22
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -397,7 +397,7 @@ Class RowSchoenbergOp27No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -436,7 +436,7 @@ Class RowWebernOp24
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -475,7 +475,7 @@ Class RowSchoenbergOp27No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -514,7 +514,7 @@ Class RowSchoenbergFragmentForPiano
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -553,7 +553,7 @@ Class RowSchoenbergOp50B
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -592,7 +592,7 @@ Class RowSchoenbergOp50C
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -631,7 +631,7 @@ Class RowSchoenbergOp50A
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -654,7 +654,7 @@ Class ToneRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -691,7 +691,7 @@ Class RowSchoenbergOp23No5
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -730,7 +730,7 @@ Class RowSchoenbergOp28No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -769,7 +769,7 @@ Class RowBergChamberConcerto
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -808,7 +808,7 @@ Class RowBergLuluPrimaryRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -847,7 +847,7 @@ Class RowSchoenbergDieJakobsleiter
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -886,7 +886,7 @@ Class RowSchoenbergOp35No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -925,7 +925,7 @@ Class RowSchoenbergOp35No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -964,7 +964,7 @@ Class RowSchoenbergOp35No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1003,7 +1003,7 @@ Class RowSchoenbergOp48No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1042,7 +1042,7 @@ Class RowSchoenbergOp35No5
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1081,7 +1081,7 @@ Class RowSchoenbergOp29
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1120,7 +1120,7 @@ Class RowWebernOp29
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1159,7 +1159,7 @@ Class RowBergLyricSuiteLastMvtPermutation
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1198,7 +1198,7 @@ Class RowBergLuluActIiScene1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1237,7 +1237,7 @@ Class RowSchoenbergOp46
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1276,7 +1276,7 @@ Class RowSchoenbergOp47
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1315,7 +1315,7 @@ Class RowSchoenbergOp44
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1354,7 +1354,7 @@ Class RowSchoenbergOp28No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1393,7 +1393,7 @@ Class RowSchoenbergOp33A
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1432,7 +1432,7 @@ Class RowSchoenbergOp25
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1471,7 +1471,7 @@ Class RowSchoenbergOp26
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1510,7 +1510,7 @@ Class RowSchoenbergOp33B
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1549,7 +1549,7 @@ Class RowWebernOp20
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1588,7 +1588,7 @@ Class RowSchoenbergFragmentOfPhantasiaForPiano
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1627,7 +1627,7 @@ Class RowWebernOp31
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1666,7 +1666,7 @@ Class RowWebernOp25
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1705,7 +1705,7 @@ Class RowWebernOp30
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1744,7 +1744,7 @@ Class RowBergLuluActISceneXx
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1783,7 +1783,7 @@ Class RowWebernOpNo17No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1822,7 +1822,7 @@ Class RowWebernOp28
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1861,7 +1861,7 @@ Class RowSchoenbergOp48No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1900,7 +1900,7 @@ Class RowWebernOp27
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1939,7 +1939,7 @@ Class RowBergWozzeckActIScene4Passacaglia
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -1978,7 +1978,7 @@ Class RowSchoenbergMosesAndAron
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2001,7 +2001,7 @@ Class TwelveToneMatrix
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2038,7 +2038,7 @@ Class RowWebernOp19No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2077,7 +2077,7 @@ Class RowWebernOp19No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2116,7 +2116,7 @@ Class RowSchoenbergOp27No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2155,7 +2155,7 @@ Class RowSchoenbergFragmentOfSonataForOrgan
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2194,7 +2194,7 @@ Class RowSchoenbergOp37
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2233,7 +2233,7 @@ Class RowSchoenbergOp45
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2272,7 +2272,7 @@ Class RowWebernOp18No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2311,7 +2311,7 @@ Class RowWebernOp18No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2350,7 +2350,7 @@ Class RowWebernOp18No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2377,7 +2377,7 @@ Class TwelveToneRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2418,7 +2418,7 @@ Class RowSchoenbergOp42
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2457,7 +2457,7 @@ Class RowSchoenbergOp48No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2496,7 +2496,7 @@ Class RowSchoenbergIsraelExistsAgain
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2535,7 +2535,7 @@ Class RowSchoenbergOp36
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2574,7 +2574,7 @@ Class RowSchoenbergOp34
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2613,7 +2613,7 @@ Class RowBergDerWein
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2652,7 +2652,7 @@ Class RowSchoenbergOp32
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2691,7 +2691,7 @@ Class RowSchoenbergOp31
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2730,7 +2730,7 @@ Class RowSchoenbergOp30
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2769,7 +2769,7 @@ Class RowSchoenbergOp41
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2808,7 +2808,7 @@ Class RowWebernOp17No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 
@@ -2847,7 +2847,7 @@ Class RowWebernOp17No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: ``id``, ``groups``
 
-    Properties inherited from :class:`music21.stream.Stream`: ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``measures``, ``musicxml``, ``mx``, ``notes``, ``pitches``, ``semiFlat``, ``sorted``
+    Properties inherited from :class:`music21.stream.Stream`: ``measures``, ``notes``, ``pitches``, ``duration``, ``elements``, ``flat``, ``highestOffset``, ``highestTime``, ``isGapless``, ``lily``, ``lowestOffset``, ``musicxml``, ``mx``, ``semiFlat``, ``sorted``
 
     Properties inherited from :class:`music21.base.Music21Object`: ``offset``, ``parent``, ``priority``
 

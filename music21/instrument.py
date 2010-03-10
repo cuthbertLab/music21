@@ -231,7 +231,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [Instrument]
+_DOC_ORDER = [Instrument]
 
 
 if __name__ == "__main__":

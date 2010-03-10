@@ -82,7 +82,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-DOC_ORDER = [TempoMark, MetronomeMark]
+_DOC_ORDER = [TempoMark, MetronomeMark]
 
 
 if __name__ == "__main__":
