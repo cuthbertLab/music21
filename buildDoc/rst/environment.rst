@@ -85,5 +85,6 @@ Setting the `directoryScratch` will determine where the file is written. If this
 
 The :func:`music21.converter.parseURL` function, as well as the :func:`music21.corpus.base.parseWork` function, offer the ability to download a files directly directly from the internet.
 
-Users masy configuyre the 'autoDownload' environment setting to determine whether downloading is attempted automatically, without user prompt ('allow'), the user is asked first before attempting a download ('ask'), or downloading is prohibited ('deny')
+Users masy configure the 'autoDownload' environment setting to determine whether downloading is attempted automatically, without user prompt ('allow'), the user is asked first before attempting a download ('ask'), or downloading is prohibited ('deny')
+
 
