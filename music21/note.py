@@ -258,7 +258,7 @@ class Beams(object):
         >>> a.beamsList[2]
         <music21.note.Beam object at 0x...>
 
-        __OMIT_FROM_DOCS__
+        OMIT_FROM_DOCS
         >>> a.fill(4)
         >>> len(a)
         4

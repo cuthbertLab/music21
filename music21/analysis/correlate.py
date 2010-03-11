@@ -431,7 +431,6 @@ class NoteAnalysis(object):
                 yValues.append(y)
         xValues.sort()
         yValues.sort()
-    
 
         # prepare data dictionary; need to pack all values
         # need to provide spacings even for zero values
@@ -488,7 +487,6 @@ class NoteAnalysis(object):
         #g.setTicks('y', yTicks)
 
         g.process()
-
 
 
 
