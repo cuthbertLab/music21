@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -101,8 +101,26 @@ class BeamException(Exception):
     pass
 
 class Beam(object):
-    '''An object representation of a beam, where each beam objects exists
-    for each horizontal line in a total beam structure for one note. 
+    '''
+    A Beam is an object representation of one single beam, that is, one horizontal
+    line connecting two notes together (or less commonly a note to a rest).  Thus it
+    takes two separate Beam objects to represent the beaming of a 16th note.  
+    
+    The Beams object (note the plural) is the object that handles groups of Beam objects;
+    it is defined later on.
+    
+    Here are two ways to define the start of a beam
+    >>> b1 = music21.note.Beam(type = 'start')
+    >>> b2 = music21.note.Beam('start')
+    
+    Here is a partial beam (that is, one that does not
+    connect to any other note, such as the second beam of
+    a dotted eighth, sixteenth group)
+    
+    Two ways of doing the same thing
+    >>> b3 = music21.note.Beam(type = 'partial', direction = 'left')
+    >>> b4 = music21.note.Beam('partial', 'left')
+    
     '''
 
     def __init__(self, type = None, direction = None):
@@ -110,7 +128,7 @@ class Beam(object):
         self.direction = direction # left or right for partial
         self.independentAngle = None
         # represents which beam line referred to
-        # 8th, 16th, etc represetned as 1, 2, ...
+        # 8th, 16th, etc represented as 1, 2, ...
         self.number = None 
 
     def __str__(self):
@@ -122,7 +140,6 @@ class Beam(object):
 
     def _getMX(self):
         '''
-        Returns a Beams object
 
         >>> a = Beam()
         >>> a.type = 'start'
@@ -161,7 +178,7 @@ class Beam(object):
 
 
     def _setMX(self, mxBeam):
-        '''given a list of mxBeam objects, set beamsList
+        '''given a list of mxBeam objects
 
         >>> mxBeam = musicxmlMod.Beam()
         >>> mxBeam.set('charData', 'begin')
@@ -191,7 +208,11 @@ class Beam(object):
 
 
 class Beams(object):
-    '''A group of beams applied to a single note that represents the partial beam structure of many notes beamed together.
+    '''
+    The Beams object stores in it attribute beamsList (a list) all
+    the Beam objects defined above.  Thus note.beams tells you how many
+    beams the note currently has on it.
+    
     '''
     
     def __init__(self):
@@ -215,19 +236,42 @@ class Beams(object):
 
 
     def fill(self, level=None):
-        '''Clear an fill the beams list as commonly needed for various durations
-        do not set type or direction
+        '''
+        A quick way of setting the beams list for a particular duration,
+        for instance, fill("16th") will clear the current list of beams in the
+        Beams object and add two beams.  fill(2) will do the same (though note
+        that that is an int, not a string).
+        
+        It does not do anything to the direction that the beams are going in.
+        
+        Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like
+        512th notes) raises an error.
 
-        >>> a = Beams()
+        >>> a = music21.note.Beams()
         >>> a.fill('16th')
         >>> len(a)
         2
+        
         >>> a.fill('32nd')
         >>> len(a)
         3
+        >>> a.beamsList[2]
+        <music21.note.Beam object at 0x...>
+
+        __OMIT_FROM_DOCS__
+        >>> a.fill(4)
+        >>> len(a)
+        4
+        >>> a.fill('256th')
+        >>> len(a)
+        6
+        >>> a.fill(7)
+        Traceback (most recent call last):
+        ...
+        BeamException: cannot fill beams for level 7
         '''
         self.beamsList = []
-        # 8th, 16th, etc represetned as 1, 2, ...
+        # 8th, 16th, etc represented as 1, 2, ...
         if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
             count = 1
         elif level in [2, duration.typeFromNumDict[16]]:
@@ -238,6 +282,8 @@ class Beams(object):
             count = 4
         elif level in [5, duration.typeFromNumDict[128]]:
             count = 5
+        elif level in [6, duration.typeFromNumDict[256]]:
+            count = 6
         else:
             raise BeamException('cannot fill beams for level %s' % level)
 
@@ -250,9 +296,15 @@ class Beams(object):
 
 
     def setAll(self, type, direction=None):
-        '''Convenience method to set all beam objects within Beams
+        '''
+        setAll is a method of convenience that sets the type 
+        of each of the beam objects within the beamsList to the specified type.
+        It also takes an optional "direction" attribute that sets the direction
+        for each beam (otherwise the direction of each beam is set to None)
+        Acceptable directions (start, stop, continue, etc.) are listed under 
+        Beam() above.
 
-        >>> a = Beams()
+        >>> a = music21.note.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.getTypes()
@@ -300,7 +352,7 @@ class Beams(object):
 
 
     def getByNumber(self, number):
-        '''Set an internal beam object by number, or rhythmic symbol level
+        '''Gets an internal beam object by number...
 
         >>> a = Beams()
         >>> a.fill('16th')
@@ -335,7 +387,7 @@ class Beams(object):
             
 
     def getTypes(self):
-        '''Retur a lost of all types
+        '''Returns a list of all beam types defined for the current beams
 
         >>> a = Beams()
         >>> a.fill('16th')
@@ -346,7 +398,8 @@ class Beams(object):
         return [x.type for x in self.beamsList]
 
     def getNumbers(self):
-        '''Retrun a lost of all defind numbers
+        '''Returns a list of all defined beam numbers; it should normally be
+        a set of consecutive integers, but it might not be.
 
         >>> a = Beams()
         >>> a.fill('32nd')
@@ -367,7 +420,7 @@ class Beams(object):
         return mxBeamList
 
     def _setMX(self, mxBeamList):
-        '''given a list of mxBeam objects, set beamsList
+        '''given a list of mxBeam objects, sets the beamsList
 
         >>> mxBeamList = []
         >>> a = Beams()

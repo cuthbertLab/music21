@@ -1049,7 +1049,7 @@ class Test(unittest.TestCase):
     
 
 if (__name__ == "__main__"):
-    runPiece(388)
+    runPiece(75)
     #music21.mainTest(Test) #, TestExternal)
     
 #    test()
