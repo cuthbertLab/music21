@@ -149,7 +149,15 @@ def  pitchDensity(show=True):
 # graph would be bigger). 
 
 
+    
+def  eventPitchCount(show=True):
 
+    from music21 import corpus
+    from music21.analysis import correlate
+    
+    s = corpus.parseWork('bach/bwv773')
+    na = correlate.NoteAnalysis(s.flat)
+    na.notePitchDurationCount()
 
 
 class Test(unittest.TestCase):

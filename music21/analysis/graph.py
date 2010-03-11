@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -399,9 +399,7 @@ class Graph3DPolygonBars(Graph):
         ...    data[data.keys()[i]] = q
         >>> a.setData(data) 
         >>> a.process()
-
         '''
-
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
         self._axisInit()
@@ -413,10 +411,8 @@ class Graph3DPolygonBars(Graph):
 
 
     def process(self):
-
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(arg, 
                                 alpha=self.alpha)
-
         self.fig = plt.figure()
         ax = Axes3D(self.fig)
 
@@ -439,12 +435,11 @@ class Graph3DPolygonBars(Graph):
                 x, y = self.data[key][i]
                 yVals.append(y)
                 xVals.append(x)
-                # this draws the bar
+                # this draws the bar manually
                 verts_i.append([x-(self.barWidth*.5),0])
                 verts_i.append([x-(self.barWidth*.5),y])
                 verts_i.append([x+(self.barWidth*.5),y])
                 verts_i.append([x+(self.barWidth*.5),0])
-
             verts.append(verts_i)       
             vertsColor.append(cc(colors[q%len(colors)]))
             q += 1
@@ -457,8 +452,7 @@ class Graph3DPolygonBars(Graph):
         if self.axis['y']['range'] == None:
             self.axis['y']['range'] =  min(zVals), max(zVals)+1
             
-
-        # this kinda orks but does not adjust the ticks / scale range on this axis
+        # this kinda works but does not adjust the ticks / scale range on this axis
         #self.axis['x']['scale'] = 'symlog'
 
         low, high = self.axis['y']['range']
@@ -472,14 +466,8 @@ class Graph3DPolygonBars(Graph):
         poly = PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)
         ax.add_collection3d(poly, zs=zs, zdir='y')
-         
         self._applyFormatting(ax)
         self.done()
-
-
-
-
-
 
 
 
@@ -511,6 +499,29 @@ class TestExternal(unittest.TestCase):
         a.setData(data) 
         a.process()
         del a
+
+
+    def test3DGraph(self):
+        a = Graph3DPolygonBars(doneAction='write', title='50 x with random values increase by 10 per x', alpha=.8, colors=['b', 'g']) 
+        data = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        for i in range(len(data.keys())):
+            q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
+            data[data.keys()[i]] = q
+        a.setData(data) 
+
+        xPoints = []
+        xTicks = []
+        for key, value in data.items():
+            for x, y in value:
+                if x not in xPoints:
+                    xPoints.append(x)
+                    xTicks.append([x, 'r'])
+
+        #a.setTicks('x', xTicks)
+
+        a.process()
+
+
 
 class Test(unittest.TestCase):
     
