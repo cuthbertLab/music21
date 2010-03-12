@@ -210,9 +210,8 @@ class Beam(object):
 class Beams(object):
     '''
     The Beams object stores in it attribute beamsList (a list) all
-    the Beam objects defined above.  Thus note.beams tells you how many
+    the Beam objects defined above.  Thus len(note.beams) tells you how many
     beams the note currently has on it.
-    
     '''
     
     def __init__(self):

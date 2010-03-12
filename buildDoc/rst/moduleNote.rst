@@ -213,7 +213,18 @@ Class Beam
 
 .. class:: Beam
 
-    An object representation of a beam, where each beam objects exists for each horizontal line in a total beam structure for one note. 
+    A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam 
+
+    >>> b1 = music21.note.Beam(type = 'start')
+    >>> b2 = music21.note.Beam('start')
+    Here is a partial beam (that is, one that does not 
+    connect to any other note, such as the second beam of 
+    a dotted eighth, sixteenth group) 
+    Two ways of doing the same thing 
+    >>> b3 = music21.note.Beam(type = 'partial', direction = 'left')
+    >>> b4 = music21.note.Beam('partial', 'left')
+
+    
 
     
 
@@ -239,7 +250,9 @@ Class Beam
 
     .. attribute:: mx
 
-    Returns a Beams object 
+    
+
+    
 
     >>> a = Beam()
     >>> a.type = 'start'
@@ -267,7 +280,7 @@ Class Beams
 
 .. class:: Beams
 
-    A group of beams applied to a single note that represents the partial beam structure of many notes beamed together. 
+    The Beams object stores in it attribute beamsList (a list) all the Beam objects defined above.  Thus len(note.beams) tells you how many beams the note currently has on it. 
 
     
 
@@ -299,19 +312,21 @@ Class Beams
 
     .. method:: fill(level=None)
 
-    Clear an fill the beams list as commonly needed for various durations do not set type or direction 
+    A quick way of setting the beams list for a particular duration, for instance, fill("16th") will clear the current list of beams in the Beams object and add two beams.  fill(2) will do the same (though note that that is an int, not a string). It does not do anything to the direction that the beams are going in. Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like 512th notes) raises an error. 
 
-    >>> a = Beams()
+    >>> a = music21.note.Beams()
     >>> a.fill('16th')
     >>> len(a)
     2 
     >>> a.fill('32nd')
     >>> len(a)
     3 
+    >>> a.beamsList[2]
+    <music21.note.Beam object at 0x...> 
 
     .. method:: getByNumber(number)
 
-    Set an internal beam object by number, or rhythmic symbol level 
+    Gets an internal beam object by number... 
 
     >>> a = Beams()
     >>> a.fill('16th')
@@ -321,7 +336,7 @@ Class Beams
 
     .. method:: getNumbers()
 
-    Retrun a lost of all defind numbers 
+    Returns a list of all defined beam numbers; it should normally be a set of consecutive integers, but it might not be. 
 
     >>> a = Beams()
     >>> a.fill('32nd')
@@ -343,7 +358,7 @@ Class Beams
 
     .. method:: getTypes()
 
-    Retur a lost of all types 
+    Returns a list of all beam types defined for the current beams 
 
     >>> a = Beams()
     >>> a.fill('16th')
@@ -353,9 +368,9 @@ Class Beams
 
     .. method:: setAll(type, direction=None)
 
-    Convenience method to set all beam objects within Beams 
+    setAll is a method of convenience that sets the type of each of the beam objects within the beamsList to the specified type. It also takes an optional "direction" attribute that sets the direction for each beam (otherwise the direction of each beam is set to None) Acceptable directions (start, stop, continue, etc.) are listed under Beam() above. 
 
-    >>> a = Beams()
+    >>> a = music21.note.Beams()
     >>> a.fill('16th')
     >>> a.setAll('start')
     >>> a.getTypes()

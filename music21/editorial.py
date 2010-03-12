@@ -29,10 +29,15 @@ class NoteEditorial(music21.Music21Object):
     >>> a.misc
     {}
     '''
+
+    _DOC_ATTR = {
+    'misc': 'A dict to hold anything you might like to store.',
+    }
+    
     def __init__(self):
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.color = ""
-        self.misc  = {}    # dict to hold anything you might like to store
+        self.misc  = {}
         self.harmonicInterval = None
         self.melodicInterval = None
         self.melodicIntervals = []
@@ -89,7 +94,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():

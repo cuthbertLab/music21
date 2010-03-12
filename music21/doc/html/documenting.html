@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Documenting music21 Modules and Classes &mdash; music21 v0.2.4a1 documentation</title>
+    <title>Documenting music21 &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -43,11 +43,13 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Documenting music21 Modules and Classes</a><ul>
-<li><a class="reference external" href="#prohibiting-docstrings-from-display-in-documentation">Prohibiting Docstrings from Display in Documentation</a></li>
+<li><a class="reference external" href="">Documenting music21</a><ul>
+<li><a class="reference external" href="#documenting-modules-and-classes">Documenting modules and classes</a></li>
+<li><a class="reference external" href="#displaying-only-some-of-the-test-code-in-the-documentation">Displaying only some of the test code in the documentation</a></li>
 <li><a class="reference external" href="#ordering-module-level-names">Ordering Module-Level Names</a></li>
 <li><a class="reference external" href="#documenting-module-level-functions">Documenting Module-Level Functions</a></li>
 <li><a class="reference external" href="#ordering-class-level-names">Ordering Class-Level Names</a></li>
+<li><a class="reference external" href="#documenting-properties">Documenting Properties</a></li>
 <li><a class="reference external" href="#documenting-class-level-attributes">Documenting Class-Level Attributes</a></li>
 <li><a class="reference external" href="#documenting-class-level-properties">Documenting Class-Level Properties</a></li>
 <li><a class="reference external" href="#documenting-class-level-methods">Documenting Class-Level Methods</a></li>
@@ -84,19 +86,83 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="documenting-music21-modules-and-classes">
-<span id="documenting"></span><h1>Documenting music21 Modules and Classes<a class="headerlink" href="#documenting-music21-modules-and-classes" title="Permalink to this headline">¶</a></h1>
-<p>The music21 documentation is generated with Sphinx. RST files for modules, before being processed by Sphinx, are created by the buildDoc/build.py script. All documentation for public modules, module-level functions, classes, and class-level attributes, properties, and methods are contained in the code fill as close to the relevant names as possible.</p>
-<div class="section" id="prohibiting-docstrings-from-display-in-documentation">
-<h2>Prohibiting Docstrings from Display in Documentation<a class="headerlink" href="#prohibiting-docstrings-from-display-in-documentation" title="Permalink to this headline">¶</a></h2>
-<p>It may be desirable to hide some docstrings from display in the public documentation. All docstring lines following the constant <cite>OMIT_FROM_DOCS</cite> will be omitted from documentation.</p>
+  <div class="section" id="documenting-music21">
+<span id="documenting"></span><h1>Documenting music21<a class="headerlink" href="#documenting-music21" title="Permalink to this headline">¶</a></h1>
+<p>Music21&#8217;s documentation system uses a combination of handwritten documentation pages (like this one),
+and documentation automatically generated from the documentation found in modules.</p>
+<p>For handwritten pages, the files can be found in the top-level /buildDoc/rst/ directories, outside
+the music21 directory.  The files are written using the <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> format (file extension: .rst),
+which is a pretty simple way of defining structure of documents with things such as hyperlinks, emphasis,
+etc.  We then use the excellent module <a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a> along with our custom-made build.py to translate the code
+to .html (what you&#8217;re reading here) and store that code in /music21/doc/html &#8211; letting you read it
+offline.  (And of course we put a copy of that code online.)</p>
+<p>But most of the music21 documentation is automatically generated from the documentation strings
+found in music21 modules.  We strongly encourage other module writers to create documentation that works
+the same way.  In fact, we won&#8217;t add your module to the music21 repository without documentation
+in this form &#8211; we&#8217;re sort of bastards in how we look out for the users who will come after you &#8211; but
+we&#8217;ll help you learn the ropes.  This doc explains some of the main features (and potential Gotchas!)
+of our automatic documentation system.</p>
+<div class="section" id="documenting-modules-and-classes">
+<h2>Documenting modules and classes<a class="headerlink" href="#documenting-modules-and-classes" title="Permalink to this headline">¶</a></h2>
+<p>music21 documentation for modules is found inside the module itself, usually in triple-quoted strings, like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">I am documentation for this module!</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p>The buildDoc/build.py script creates RST files for modules, which are processed
+by Sphinx.   Place all documentation for public modules, module-level
+functions, classes, and class-level attributes, properties, and methods
+as close to the relevant code as possible.</p>
+<p>If you&#8217;re going to edit docs you&#8217;ll need the latest version of Sphinx.  Go to the command line and Type:</p>
+<div class="highlight-python"><pre>easy_install -U Sphinx
+easy_install rst2pdf</pre>
+</div>
+</div>
+<div class="section" id="displaying-only-some-of-the-test-code-in-the-documentation">
+<h2>Displaying only some of the test code in the documentation<a class="headerlink" href="#displaying-only-some-of-the-test-code-in-the-documentation" title="Permalink to this headline">¶</a></h2>
+<p>We use doctests a lot in music21 &#8211; if you run /music21/test/test.py, it will run
+not only all the code in class Test() but also all the code in the documentation
+preceeded by &#8216;&gt;&gt;&gt;&#8217; marks.  This way our documentation and our test code doesn&#8217;t
+get out of sync with each other.  Pretty cool, eh?</p>
+<p>Here&#8217;s the thing: good programming means that you test as much as possible in the
+code, but good documentation means showing enough example code that the readers
+get it, but not so much that they want to claw out their own eyeballs.  So how to proceed?
+simply add the line</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">OMIT_FROM_DOCS</span>
+</pre></div>
+</div>
+<p>in your documentation code and it won&#8217;t display.  For instance, say we wanted to
+demonstrate the difference between note.name and note.step, but also wanted to
+test to make sure that flats and sharps both were equally eliminated.  We could
+write documentation/test-code like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">&gt;&gt;&gt; c1 = music21.Note(&#39;C#&#39;)</span>
+<span class="sd">&gt;&gt;&gt; c1.step</span>
+<span class="sd">&#39;C&#39;</span>
+
+<span class="sd">OMIT_FROM_DOCS</span>
+<span class="sd">&gt;&gt;&gt; c2 = music21.Note(&#39;C-&#39;)</span>
+<span class="sd">&gt;&gt;&gt; c2.step</span>
+<span class="sd">&#39;C&#39;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p>and what you&#8217;ll get in your documentation is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;C#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;C&#39;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="ordering-module-level-names">
 <h2>Ordering Module-Level Names<a class="headerlink" href="#ordering-module-level-names" title="Permalink to this headline">¶</a></h2>
-<p>To specify the order in which module-level names are presented in documentation, the module must define <cite>_DOC_ORDER</cite>, a list of the class and/or function names in the module. These values are given as evaluated names, not strings.</p>
-<p>Only the first-most names need be specified; any names not included will be presented in default order</p>
-<p>As this list defines evaluated names, this list must come at the end of the module, after Test classes and before calling <cite>music21.mainTest()</cite></p>
-<p>The following example is from the end of note.py:</p>
+<p>Classes, module-level function, etc. are by default presented in the order in which they appear in the module.
+If that&#8217;s not what you want, then create a list called <cite>_DOC_ORDER</cite> which is a list of the class and/or
+function names in the module. These values are given as evaluated names, not strings.</p>
+<p>Since this list uses classes and not strings, this list must come at the end of the module, after the Test classes
+and before calling <cite>music21.mainTest()</cite></p>
+<p>At the end of note.py for instance, we write:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="n">Note</span><span class="p">,</span> <span class="n">Rest</span><span class="p">]</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
@@ -106,11 +172,16 @@
 </div>
 <div class="section" id="documenting-module-level-functions">
 <h2>Documenting Module-Level Functions<a class="headerlink" href="#documenting-module-level-functions" title="Permalink to this headline">¶</a></h2>
-<p>Module-level functions should have a documentation string and doctest-compatible examples.</p>
+<p>Module-level functions should have a documentation string and doctest-compatible examples.
+(DEMO NEEDED)</p>
 </div>
 <div class="section" id="ordering-class-level-names">
 <h2>Ordering Class-Level Names<a class="headerlink" href="#ordering-class-level-names" title="Permalink to this headline">¶</a></h2>
-<p>To specify the order in which class-level names are presented in documentation, the class must define <cite>_DOC_ORDER</cite> attribute, a list of the attribute, property, and/or method names in the class. These values are given as strings, not evaluated names. The <cite>_DOC_ORDER</cite> attribute must be defined outside of the <cite>__init__()</cite> method to ensure that these values can be read from a Class object alone.</p>
+<p>Classes can define a <cite>_DOC_ORDER</cite> attribute which functions the same as the module-level
+<cite>_DOC_ORDER</cite>, that is it defines the order of attributes, properties, and/or methods in the class.</p>
+<p>Unlike for top-level names, these values are given as <strong>strings</strong>, not evaluated names.
+The <cite>_DOC_ORDER</cite> attribute must be defined outside of the <cite>__init__()</cite> method to ensure that
+these values can be read from a Class object and not just instances.</p>
 <p>The following abbreviated example is from pitch.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Pitch</span><span class="p">(</span><span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
@@ -123,12 +194,34 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="documenting-properties">
+<h2>Documenting Properties<a class="headerlink" href="#documenting-properties" title="Permalink to this headline">¶</a></h2>
+<p>To document a property do something like this:</p>
+<div class="highlight-python"><pre>def _getName(self):
+   return self._storedName
+
+def _setName(self, newName):
+   if newName == 'Cuthbert':
+      raise Exception("what a dumb name!")
+   else:
+      self._storedName = newName
+
+name = property(_getName, _setName, doc = '''
+    The name property stores a name for the object
+    unless the name is something truly idiotic.
+    '''</pre>
+</div>
+</div>
 <div class="section" id="documenting-class-level-attributes">
 <h2>Documenting Class-Level Attributes<a class="headerlink" href="#documenting-class-level-attributes" title="Permalink to this headline">¶</a></h2>
-<p>Class-level attributes, names that are neither properties not methods, must define their documentation in the <cite>_DOC_ATTR</cite> dictionary. All values are given as strings, not evaluated names. The <cite>_DOC_ATTR</cite> attribute must be defined outside of the <cite>__init__()</cite> method to ensure that these values can be read from a Class object alone.</p>
-<p>The following abbreviated example is from note.py:</p>
+<p>Class-level attributes, names that are neither properties not methods,
+can place their documentation in a dictionary called <cite>_DOC_ATTR</cite>.  The keys of the dictionary
+are strings (not evaluated names) corresponding to the name of the attribute, and the value
+is the documentation.</p>
+<p>Like <cite>_DOC_ORDER</cite>, don&#8217;t put this in <cite>__init__()</cite>.</p>
+<p>Here&#8217;s an example from note.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span><span class="n">NotRest</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
+    <span class="sd">&#39;&#39;&#39;Class doc string. goes here.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">isNote</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">isUnpitched</span> <span class="o">=</span> <span class="bp">False</span>
@@ -136,7 +229,8 @@
 
     <span class="c"># define order to present names in documentation; use strings</span>
     <span class="n">_DOC_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;duration&#39;</span><span class="p">,</span> <span class="s">&#39;quarterLength&#39;</span><span class="p">,</span> <span class="s">&#39;nameWithOctave&#39;</span><span class="p">,</span> <span class="s">&#39;pitchClass&#39;</span><span class="p">]</span>
-    <span class="c"># documentation for all attributes (not properties or methods)</span>
+
+    <span class="c"># documentation for all attributes (that are not properties or methods)</span>
     <span class="n">_DOC_ATTR</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;isNote&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this object is a Note.&#39;</span><span class="p">,</span>
     <span class="s">&#39;isUnpitched&#39;</span><span class="p">:</span> <span class="s">&#39;Boolean read-only value describing if this is Unpitched.&#39;</span><span class="p">,</span>
@@ -149,7 +243,9 @@
         <span class="k">pass</span>
 </pre></div>
 </div>
-<p>If a <cite>_DOC_ATTR</cite> attribute is not defined, the most-recently inherited <cite>_DOC_ATTR</cite> attribute will be used. To explicitly merge an inherited <cite>_DOC_ATTR</cite> attribute with a locally defined <cite>_DOC_ATTR</cite>, use the dictionaries <cite>update()</cite> method.</p>
+<p>If a <cite>_DOC_ATTR</cite> attribute is not defined, the most-recently inherited <cite>_DOC_ATTR</cite> attribute will be used.
+To explicitly merge an inherited <cite>_DOC_ATTR</cite> attribute with a locally defined <cite>_DOC_ATTR</cite>, use the
+dictionary&#8217;s <cite>update()</cite> method.</p>
 <p>The following abbreviated example, showing the updating of the <cite>_DOC_ATTR</cite> inherited from NotRest, is from chord.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Chord</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">NotRest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Class doc strings.</span>
@@ -208,7 +304,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 10, 2010.
+      Last updated on Mar 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
