@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,8 +27,6 @@ from music21.analysis import graph
 from music21 import environment
 _MOD = 'correlate.py'
 environLocal = environment.Environment(_MOD)
-
-
 
 
 
@@ -298,7 +296,7 @@ class NoteAnalysis(object):
 
 
     def noteAttributeCount(self, fx=None, fy=None, *args, **keywords):
-        '''3D graph of three parameters
+        '''3D graph of two parameters and the count for each of them. 
 
         >>> a = stream.Stream()
         >>> b = NoteAnalysis(a)
@@ -395,99 +393,99 @@ class NoteAnalysis(object):
 
 
 
-    def notePitchDurationCount(self, *args, **keywords):
-        '''3D graph of three parameters
-
-        >>> a = stream.Stream()
-        >>> b = NoteAnalysis(a)
-        '''
-        xLabel = None
-        yLabel = None
-
-        fy = lambda n: n.midi
-        yLabel = 'Pitch Space (MIDI)'
-        yTicks = self._autoTicks(yLabel)
-
-        fx = lambda n:n.quarterLength
-        xLabel = 'Durations'
-        # use these positions as the final values
-        xTicks = [] # fill below
-        
-        if 'barWidth' not in keywords:
-            keywords['barWidth'] = .2
-        if 'title' in keywords:
-            title = keywords['title']
-        else: title = None
-
-        # create discrete storage bins for all value encountered
-        xValues = []
-        yValues = []
-        for noteObj in self.streamObj.getElementsByClass(note.Note):
-            x = fx(noteObj)
-            if x not in xValues:
-                xValues.append(x)
-            y = fy(noteObj)
-            if y not in yValues:
-                yValues.append(y)
-        xValues.sort()
-        yValues.sort()
-
-        # prepare data dictionary; need to pack all values
-        # need to provide spacings even for zero values
-        #for y in range(yValues[0], yValues[-1]+1):
-        # better to use actual y values
-        data = {}
-        for y in yValues:   
-            # y values are keys
-            # this is storing the index value, not the actual value
-            data[y] = [[x, 0] for x in range(len(xValues))]
-            #data[y] = [[x, 0] for x in xValues]
-        #print _MOD, 'data keys', data.keys()
-
-
-        # store x indices that are in use
-        xValuesMapped = []
-        for key, value in data.items():
-            for x, count in value:
-                if x not in xValuesMapped:
-                    xValuesMapped.append(x)
-        xValuesMapped.sort()
-
-        for i in xValuesMapped:
-            xTicks.append([i, 'junk'])
-        keywords['xTicks'] = xTicks
-        environLocal.printDebug(['xTicks here', xTicks])
-
-        maxCount = 0
-        for noteObj in self.streamObj.getElementsByClass(note.Note):
-            # for this note, get the value and find its index in xValues
-            indexToIncrement = xValues.index(fx(noteObj))
-
-            # second position stores count
-            data[fy(noteObj)][indexToIncrement][1] += 1
-            if data[fy(noteObj)][indexToIncrement][1] > maxCount:
-                maxCount = data[fy(noteObj)][indexToIncrement][1] 
-
-        g = graph.Graph3DPolygonBars(**keywords)
-        g.setData(data)
-
-        # this actually appears as the w
-        g.setAxisRange('z', (0, maxCount))
-        g.setAxisLabel('z', 'Count')
-        # thi actually appears as the z
-        g.setAxisRange('y', (yValues[0], yValues[-1]))
-        g.setAxisLabel('y', yLabel)
-
-        #g.setAxisRange('x', (xValues[0], xValues[-1]))
-        g.setAxisRange('x', (xValuesMapped[0], xValuesMapped[-1]))
-        g.setAxisLabel('x', xLabel)
-
-        # note: these do not work: cause massive distortion
-        #g.setTicks('x', xTicks)
-        #g.setTicks('y', yTicks)
-
-        g.process()
-
+#     def notePitchDurationCount(self, *args, **keywords):
+#         '''A specialized version of noteAttributeCount for pitches and durations.
+# 
+#         >>> a = stream.Stream()
+#         >>> b = NoteAnalysis(a)
+#         '''
+#         xLabel = None
+#         yLabel = None
+# 
+#         fy = lambda n: n.midi
+#         yLabel = 'Pitch Space (MIDI)'
+#         yTicks = self._autoTicks(yLabel)
+# 
+#         fx = lambda n:n.quarterLength
+#         xLabel = 'Durations'
+#         # use these positions as the final values
+#         xTicks = [] # fill below
+#         
+#         if 'barWidth' not in keywords:
+#             keywords['barWidth'] = .2
+#         if 'title' in keywords:
+#             title = keywords['title']
+#         else: title = None
+# 
+#         # create discrete storage bins for all value encountered
+#         xValues = []
+#         yValues = []
+#         for noteObj in self.streamObj.getElementsByClass(note.Note):
+#             x = fx(noteObj)
+#             if x not in xValues:
+#                 xValues.append(x)
+#             y = fy(noteObj)
+#             if y not in yValues:
+#                 yValues.append(y)
+#         xValues.sort()
+#         yValues.sort()
+# 
+#         # prepare data dictionary; need to pack all values
+#         # need to provide spacings even for zero values
+#         #for y in range(yValues[0], yValues[-1]+1):
+#         # better to use actual y values
+#         data = {}
+#         for y in yValues:   
+#             # y values are keys
+#             # this is storing the index value, not the actual value
+#             data[y] = [[x, 0] for x in range(len(xValues))]
+#             #data[y] = [[x, 0] for x in xValues]
+#         #print _MOD, 'data keys', data.keys()
+# 
+# 
+#         # store x indices that are in use
+#         xValuesMapped = []
+#         for key, value in data.items():
+#             for x, count in value:
+#                 if x not in xValuesMapped:
+#                     xValuesMapped.append(x)
+#         xValuesMapped.sort()
+# 
+#         for i in xValuesMapped:
+#             xTicks.append([i, 'junk'])
+#         keywords['xTicks'] = xTicks
+#         environLocal.printDebug(['xTicks here', xTicks])
+# 
+#         maxCount = 0
+#         for noteObj in self.streamObj.getElementsByClass(note.Note):
+#             # for this note, get the value and find its index in xValues
+#             indexToIncrement = xValues.index(fx(noteObj))
+# 
+#             # second position stores count
+#             data[fy(noteObj)][indexToIncrement][1] += 1
+#             if data[fy(noteObj)][indexToIncrement][1] > maxCount:
+#                 maxCount = data[fy(noteObj)][indexToIncrement][1] 
+# 
+#         g = graph.Graph3DPolygonBars(**keywords)
+#         g.setData(data)
+# 
+#         # this actually appears as the w
+#         g.setAxisRange('z', (0, maxCount))
+#         g.setAxisLabel('z', 'Count')
+#         # thi actually appears as the z
+#         g.setAxisRange('y', (yValues[0], yValues[-1]))
+#         g.setAxisLabel('y', yLabel)
+# 
+#         #g.setAxisRange('x', (xValues[0], xValues[-1]))
+#         g.setAxisRange('x', (xValuesMapped[0], xValuesMapped[-1]))
+#         g.setAxisLabel('x', xLabel)
+# 
+#         # note: these do not work: cause massive distortion
+#         #g.setTicks('x', xTicks)
+#         #g.setTicks('y', yTicks)
+# 
+#         g.process()
+# 
 
 
     def noteAttributeScatter(self, fx=None, fy=None, *args, **keywords):

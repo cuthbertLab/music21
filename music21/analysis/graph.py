@@ -14,6 +14,11 @@ import unittest, doctest
 import random, math
 
 import music21
+
+from music21 import note
+from music21 import dynamics
+from music21 import pitch
+
 from music21 import environment
 _MOD = 'graph.py'
 environLocal = environment.Environment(_MOD)
@@ -70,7 +75,6 @@ class Graph(object):
         self.axisKeys = ['x', 'y']
         self.grid = True
 
-
         if 'alpha' in keywords:
             self.alpha = keywords['alpha']
         else:
@@ -91,6 +95,11 @@ class Graph(object):
             self.setDoneAction(keywords['doneAction'])
         else: # default is to write a file
             self.setDoneAction('write')
+
+        if 'figureSize' in keywords:
+            self.setFigureSize(keywords['figureSize'])
+        else: # default is to write a file
+            self.setFigureSize([5,5])
 
         # define a list of one or more colors
         if 'colors' in keywords:
@@ -114,6 +123,9 @@ class Graph(object):
     def setTitle(self, title):
         self.title = title
 
+    def setFigureSize(self, figSize):
+        self.figureSize = figSize
+
     def setDoneAction(self, action):
         if action in ['show', 'write', None]:
             self.doneAction = action
@@ -126,9 +138,10 @@ class Graph(object):
         if pairs != None: 
             positions = []
             labels = []
-            for x,y in pairs:
-                positions.append(x)
-                labels.append(y)
+            # ticks are value, label pairs
+            for value, label in pairs:
+                positions.append(value)
+                labels.append(label)
             self.axis[axisKey]['ticks'] = positions, labels
 
 
@@ -195,15 +208,34 @@ class Graph(object):
 
             if 'ticks' in self.axis[axis]:
                 if axis == 'x':
-                    plt.xticks(*self.axis[axis]['ticks'], fontsize=7)
+                    # note: this problem needs to be update to use the
+                    # same format as y, below
+                    #plt.xticks(*self.axis[axis]['ticks'], fontsize=7)
+
+                    if 'ticks' in self.axis[axis].keys():
+                        values, labels = self.axis[axis]['ticks']
+                        environLocal.printDebug(['x tick labels, x tick values', labels, values])
+                        ax.set_xticks(values)
+                        ax.set_xticklabels(labels)
+
                 elif axis == 'y':
-                    plt.yticks(*self.axis[axis]['ticks'])
+                    # this is the old way ticks were set:
+                    #plt.yticks(*self.axis[axis]['ticks'])
+                    # new way:
+                    if 'ticks' in self.axis[axis].keys():
+                        values, labels = self.axis[axis]['ticks']
+                        environLocal.printDebug(['y tick labels, y tick values', labels, values])
+                        ax.set_yticks(values)
+                        ax.set_yticklabels(labels)
 
         if self.title:
             ax.set_title(self.title)
         if self.grid:
-            ax.grid()
+            ax.grid(True)
 
+        # this works if we need to change size
+        self.fig.set_figwidth(self.figureSize[0]) 
+        self.fig.set_figheight(self.figureSize[1]) 
 
 #         ax.set_xscale('linear')
 #         ax.set_yscale('linear')
@@ -237,6 +269,69 @@ class Graph(object):
         #print _MOD, fp
         self.fig.savefig(fp)
         environLocal.launch('png', fp)
+
+
+class Graph2DBrokenHorizontalBar(Graph):
+    def __init__(self, *args, **keywords):
+        '''Given a representation of events in time at various levels, create a time domain representation
+
+        Data provided is a dictionary, where keys become y values and a list of
+        on off points is provided.
+
+        >>> a = Graph2DBrokenHorizontalBar(doneAction=None)
+        >>> data = [('a', [(10,20), (15, 40)]), ('b', [(5,15), (20,40)])]
+        >>> a.setData(data)
+        >>> a.process()
+        '''
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+        self._barSpace = 10
+        self._margin = 2
+        self._barHeight = self._barSpace - (self._margin * 2)
+
+        # if figure size has not been defined, configure
+        if 'figureSize' not in keywords:
+            self.setFigureSize([10,5])
+        if 'alpha' not in keywords:
+            self.alpha = .6
+
+
+    def process(self):
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+
+        ax = self.fig.add_subplot(111)
+
+        yPos = 0
+        xPoints = [] # store all to find min/max
+        yTicks = [] # a list of label, value pairs
+
+        keys = []
+        for key, points in self.data:
+            keys.append(key)
+            # provide a lost of start, end points; 
+            # then start y position, bar height
+            ax.broken_barh(points, (yPos+self._margin, self._barHeight),
+                            facecolors='blue', alpha=self.alpha)
+            for xStart, xEnd in points:
+                for x in [xStart, xEnd]:
+                    if x not in xPoints:
+                        xPoints.append(x)
+            # ticks are value, label
+            yTicks.append([yPos + self._barSpace * .5, key])
+            #yTicks.append([key, yPos + self._barSpace * .5])
+            yPos += self._barSpace
+
+        self.setAxisRange('y', (0, len(keys) * self._barSpace))
+        self.setAxisRange('x', (min(xPoints), max(xPoints)))
+        self.setTicks('y', yTicks)  
+        environLocal.printDebug([yTicks])
+
+        self._applyFormatting(ax)
+        self.done()
+
 
 
 
@@ -328,20 +423,48 @@ class Graph3DBars(Graph):
         self._axisInit()
 
     def process(self):
-
         self.fig = plt.figure()
-        #autoscale_on=False
         ax = Axes3D(self.fig)
 
+        zVals = self.data.keys()
+        zVals.sort()
+
+        yVals = []
+        xVals = []
+        for key in zVals:
+            for i in range(len(self.data[key])):
+                x, y = self.data[key][i]
+                yVals.append(y)
+                xVals.append(x)
+        environLocal.printDebug(['yVals', yVals])
+        environLocal.printDebug(['xVals', xVals])
+
+        if self.axis['x']['range'] == None:
+            self.axis['x']['range'] =  min(xVals), max(xVals)
+        # swap y for z
+        if self.axis['z']['range'] == None:
+            self.axis['z']['range'] =  min(yVals), max(yVals)
+        if self.axis['y']['range'] == None:
+            self.axis['y']['range'] =  min(zVals), max(zVals)+1
+
         for z in range(*self.axis['y']['range']):
-            c = ['b', 'g', 'r', 'c', 'm'][z%5]
+            #c = ['b', 'g', 'r', 'c', 'm'][z%5]
             # list of x values
             xs = [x for x, y in self.data[z]]
             # list of y values
             ys = [y for x, y in self.data[z]]
-            ax.bar(xs, ys, zs=z, zdir='y', width=.1, color=c, alpha=self.alpha)
+            # width=.1, color=c, alpha=self.alpha
+            ax.bar(xs, ys, zs=z, zdir='y')
 
-        self._applyFormatting(ax)
+        self.setAxisLabel('x', 'x')
+        self.setAxisLabel('y', 'y')
+        self.setAxisLabel('z', 'z')
+
+        #ax.set_xlabel('X')
+        #ax.set_ylabel('Y')
+        #ax.set_zlabel('Z')
+
+        #self._applyFormatting(ax)
         self.done()
 
 
@@ -386,11 +509,12 @@ class Graph3DBars(Graph):
 
 
 class Graph3DPolygonBars(Graph):
-    
     def __init__(self, *args, **keywords):
         '''Graph multiple parallel bar graphs in 3D.
 
         This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
+
+        Note: Axis ticks do not seem to be adjustable without distorting the graph.
 
         >>> a = Graph3DPolygonBars(doneAction=None) 
         >>> data = {1:[], 2:[], 3:[]}
@@ -469,6 +593,112 @@ class Graph3DPolygonBars(Graph):
         self._applyFormatting(ax)
         self.done()
 
+#-------------------------------------------------------------------------------
+# graphing utilities that operate on streams
+
+
+class PlotStream(object):
+    '''A base class from which Stream plotting Class inherit.
+    '''
+
+    def __init__(self, streamObj, *args, **keywords):
+        if not isinstance(streamObj, music21.stream.Stream):
+            raise CorrelateException, 'non-stream provided as argument'
+        self.streamObj = streamObj
+        # store instance of graph here
+        self.graph = None
+        self.id = 'plotStream' # string name used to access this class
+
+    def process(self):
+        '''This will process all data, as well as call the done() method
+        '''
+        self.graph.process()
+
+    def show(self):
+        self.graph.show()
+
+    def write(self, fp):
+        self.graph.write()
+
+
+    def ticksPitchClass(self):
+        ticks = []
+        cVals = range(12)
+        for i in cVals:
+            p = pitch.Pitch()
+            p.ps = i
+            ticks.append([i, '%s' % p.name])
+        return ticks
+    
+    def ticksPitchSpaceOctave(self, pitchMin=36, pitchMax=100):
+        ticks = []
+        cVals = range(pitchMin,pitchMax,12)
+        for i in cVals:
+            name, acc = pitch.convertPsToStep(i)
+            oct = pitch.convertPsToOct(i)
+            ticks.append([i, '%s%s' % (name, oct)])
+        return ticks
+
+
+    def ticksPitchSpaceChromatic(self, pitchMin=36, pitchMax=100):
+        ticks = []
+        cVals = range(pitchMin,pitchMax)
+        for i in cVals:
+            name, acc = pitch.convertPsToStep(i)
+            oct = pitch.convertPsToOct(i)
+            ticks.append([i, '%s%s%s' % (name, acc.modifier, oct)])
+        return ticks
+
+    
+    def ticksQuarterLength(self):
+        ticks = []
+        for qLen in (.25, .5, 1, 2, 4):
+            # dtype, match = duration.
+            # ticks.append([qLen, dc.convertQuarterLengthToType(qLen)]) 
+            ticks.append([qLen, duration.Duration(qLen).type]) 
+        return ticks
+    
+    def ticksDynamics(self):
+        ticks = []
+        for i in range(len(dynamics.shortNames)):
+            ticks.append([i, dynamics.shortNames[i]])
+        return ticks
+    
+
+
+
+class PlotStreamTimeDomain(PlotStream):
+    '''A graph of event, sorted by pitch, over time
+    '''
+
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+        self.id = 'timeDomain' # string name used to access this class
+
+        # find listing for any single pitch name
+        dataUnique = {}
+        # collect data
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
+            ps = int(round(noteObj.ps)) # using midi for now
+            if ps not in dataUnique.keys():
+                dataUnique[ps] = []
+            start = noteObj.offset
+            end = noteObj.quarterLength
+            dataUnique[ps].append((start, end))
+
+        # create final data list
+        data = []
+        ticksPitchSpace = self.ticksPitchSpaceChromatic(min(dataUnique.keys()),
+                                                        max(dataUnique.keys()))
+        for ps, label in ticksPitchSpace:
+            if ps in dataUnique.keys():
+                data.append([label, dataUnique[ps]])
+            else:
+                data.append([label, []])
+
+        self.graph = Graph2DBrokenHorizontalBar(*args, **keywords)
+        self.graph.setData(data)
+
 
 
 
@@ -515,11 +745,36 @@ class TestExternal(unittest.TestCase):
             for x, y in value:
                 if x not in xPoints:
                     xPoints.append(x)
-                    xTicks.append([x, 'r'])
+                    xTicks.append(['r', x])
 
+        # this does not work, and instead causes massive distortion
         #a.setTicks('x', xTicks)
-
         a.process()
+
+
+    def testBrokenHorizontal(self):
+        import random
+        data = []
+        for label in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']:
+            points = []
+            for pairs in range(10):
+                start = random.choice(range(150))
+                end = start + random.choice(range(50))
+                points.append((start, end))
+            data.append([label, points])
+        environLocal.printDebug(['data points', data])
+        
+        a = Graph2DBrokenHorizontalBar()
+        a.setData(data)
+        a.process()
+
+
+    def testPlotStreamTimeDomain(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach')
+        b = PlotStreamTimeDomain(a[0].flat, title='bach soprano voice')
+        b.process()
+
 
 
 
@@ -553,4 +808,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    #music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
