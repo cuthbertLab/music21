@@ -10,7 +10,7 @@ music21.tinyNotation
 tinyNotation -- a simple way of specifying single line melodies that uses a notation somewhat similar to Lilypond but with WAY fewer examples.  Originally developed to notate trecento (medieval Italian) music, but it's pretty useful for a lot of short examples. tinyNotation is not meant to expand to cover every single case.  Instead it is meant to be subclassable to extend to the cases *your* project needs. See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote or the Trecento specific examples in trecento/cadencebook.py 
 
 
-Class TinyNotationNote
+class TinyNotationNote
 ----------------------
 
 .. class:: TinyNotationNote
@@ -30,7 +30,7 @@ Class TinyNotationNote
 
     
 
-    **Class TinyNotationNote** **Attributes**
+    **class TinyNotationNote** **attributes**
 
     .. attribute:: DBLDOT
 
@@ -100,7 +100,7 @@ Class TinyNotationNote
 
     Compiled regular expression objects 
 
-    **Class TinyNotationNote** **Methods**
+    **class TinyNotationNote** **methods**
 
     .. method:: __init__(stringRep, storedDict={})
 
@@ -119,7 +119,7 @@ Class TinyNotationNote
     subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
 
 
-Class TinyNotationStream
+class TinyNotationStream
 ------------------------
 
 .. class:: TinyNotationStream
@@ -134,9 +134,9 @@ Class TinyNotationStream
     >>> stream1.notes[0].octave
     3 
 
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class TinyNotationStream** **Attributes**
+    **class TinyNotationStream** **attributes**
 
     .. attribute:: ENDBRAC
 
@@ -158,13 +158,13 @@ Class TinyNotationStream
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TinyNotationStream** **Properties**
+    **class TinyNotationStream** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TinyNotationStream** **Methods**
+    **class TinyNotationStream** **methods**
 
     .. method:: __init__(stringRep=, timeSignature=None)
 
@@ -179,7 +179,7 @@ Class TinyNotationStream
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class HarmonyStream
+class HarmonyStream
 -------------------
 
 .. class:: HarmonyStream
@@ -206,9 +206,9 @@ Class HarmonyStream
 
     
 
-    Class inherits from: :class:`music21.tinyNotation.TinyNotationStream`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.tinyNotation.TinyNotationStream`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class HarmonyStream** **Attributes**
+    **class HarmonyStream** **attributes**
 
     Attributes inherited from :class:`music21.tinyNotation.TinyNotationStream`: :attr:`music21.tinyNotation.TinyNotationStream.ENDBRAC`, :attr:`music21.tinyNotation.TinyNotationStream.QUAD`, :attr:`music21.tinyNotation.TinyNotationStream.TRIP`, :attr:`music21.tinyNotation.TinyNotationStream.stringRep`
 
@@ -216,13 +216,13 @@ Class HarmonyStream
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class HarmonyStream** **Properties**
+    **class HarmonyStream** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class HarmonyStream** **Methods**
+    **class HarmonyStream** **methods**
 
     .. method:: getNote(stringRep, storedDict={})
 
@@ -235,15 +235,15 @@ Class HarmonyStream
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class HarmonyNote
+class HarmonyNote
 -----------------
 
 .. class:: HarmonyNote
 
 
-    Class inherits from: :class:`music21.tinyNotation.TinyNotationNote`
+    inherits from: :class:`music21.tinyNotation.TinyNotationNote`
 
-    **Class HarmonyNote** **Attributes**
+    **class HarmonyNote** **attributes**
 
     .. attribute:: HARMONY
 
@@ -251,7 +251,7 @@ Class HarmonyNote
 
     Attributes inherited from :class:`music21.tinyNotation.TinyNotationNote`: :attr:`music21.tinyNotation.TinyNotationNote.DBLDOT`, :attr:`music21.tinyNotation.TinyNotationNote.DOT`, :attr:`music21.tinyNotation.TinyNotationNote.EDFLAT`, :attr:`music21.tinyNotation.TinyNotationNote.EDNAT`, :attr:`music21.tinyNotation.TinyNotationNote.EDSHARP`, :attr:`music21.tinyNotation.TinyNotationNote.FLAT`, :attr:`music21.tinyNotation.TinyNotationNote.ID_EL`, :attr:`music21.tinyNotation.TinyNotationNote.LYRIC`, :attr:`music21.tinyNotation.TinyNotationNote.OCTAVE2`, :attr:`music21.tinyNotation.TinyNotationNote.OCTAVE3`, :attr:`music21.tinyNotation.TinyNotationNote.OCTAVE4`, :attr:`music21.tinyNotation.TinyNotationNote.OCTAVE5`, :attr:`music21.tinyNotation.TinyNotationNote.PRECTIE`, :attr:`music21.tinyNotation.TinyNotationNote.REST`, :attr:`music21.tinyNotation.TinyNotationNote.SHARP`, :attr:`music21.tinyNotation.TinyNotationNote.TIE`, :attr:`music21.tinyNotation.TinyNotationNote.TYPE`
 
-    **Class HarmonyNote** **Methods**
+    **class HarmonyNote** **methods**
 
     .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
 

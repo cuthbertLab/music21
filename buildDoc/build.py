@@ -693,7 +693,7 @@ class RestructuredWriter(object):
         True
         '''
         msg = []
-        msg.append('Class inherits from:')
+        msg.append('inherits from:')
         sub = []
         for i in range(len(mro)):
             if i == 0: continue # first is always the class itself
@@ -797,7 +797,7 @@ class ClassDoc(RestructuredWriter):
         '''
         msg = []
 
-        classNameStr = 'Class %s' % self.name
+        classNameStr = 'class %s' % self.name
         msg += self._heading(classNameStr, '-')
         titleStr = '.. class:: %s\n\n' % self.name
         msg += titleStr
@@ -839,7 +839,7 @@ class ClassDoc(RestructuredWriter):
                                                             signature))
 
             if len(msgGroup) > 0:
-                msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group.title()))
+                msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group))
                 msg.append(''.join(msgGroup))
 
         msg.append('\n'*1)

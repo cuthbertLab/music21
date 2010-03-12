@@ -13,15 +13,15 @@ music21.clef
 
 Returns a Clef object given a string like "G2" or "F4" etc. 
 
-Class Clef
+class Clef
 ----------
 
 .. class:: Clef
 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Clef** **Attributes**
+    **class Clef** **attributes**
 
     .. attribute:: octaveChange
 
@@ -37,7 +37,7 @@ Class Clef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Clef** **Properties**
+    **class Clef** **properties**
 
     .. attribute:: mx
 
@@ -58,7 +58,7 @@ Class Clef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Clef** **Methods**
+    **class Clef** **methods**
 
     .. method:: __init__()
 
@@ -67,15 +67,15 @@ Class Clef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class TrebleClef
+class TrebleClef
 ----------------
 
 .. class:: TrebleClef
 
 
-    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class TrebleClef** **Attributes**
+    **class TrebleClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -87,7 +87,7 @@ Class TrebleClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TrebleClef** **Properties**
+    **class TrebleClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -95,7 +95,7 @@ Class TrebleClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TrebleClef** **Methods**
+    **class TrebleClef** **methods**
 
     .. method:: __init__()
 
@@ -108,15 +108,15 @@ Class TrebleClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class BassClef
+class BassClef
 --------------
 
 .. class:: BassClef
 
 
-    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class BassClef** **Attributes**
+    **class BassClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -128,7 +128,7 @@ Class BassClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class BassClef** **Properties**
+    **class BassClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -136,7 +136,7 @@ Class BassClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class BassClef** **Methods**
+    **class BassClef** **methods**
 
     .. method:: __init__()
 
@@ -149,15 +149,15 @@ Class BassClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class AltoClef
+class AltoClef
 --------------
 
 .. class:: AltoClef
 
 
-    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class AltoClef** **Attributes**
+    **class AltoClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -169,7 +169,7 @@ Class AltoClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class AltoClef** **Properties**
+    **class AltoClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -177,7 +177,7 @@ Class AltoClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class AltoClef** **Methods**
+    **class AltoClef** **methods**
 
     .. method:: __init__()
 
@@ -190,15 +190,15 @@ Class AltoClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Bass8vaClef
+class Bass8vaClef
 -----------------
 
 .. class:: Bass8vaClef
 
 
-    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class Bass8vaClef** **Attributes**
+    **class Bass8vaClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -210,7 +210,7 @@ Class Bass8vaClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Bass8vaClef** **Properties**
+    **class Bass8vaClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -218,7 +218,7 @@ Class Bass8vaClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Bass8vaClef** **Methods**
+    **class Bass8vaClef** **methods**
 
     .. method:: __init__()
 
@@ -231,15 +231,15 @@ Class Bass8vaClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Bass8vbClef
+class Bass8vbClef
 -----------------
 
 .. class:: Bass8vbClef
 
 
-    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class Bass8vbClef** **Attributes**
+    **class Bass8vbClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -251,7 +251,7 @@ Class Bass8vbClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Bass8vbClef** **Properties**
+    **class Bass8vbClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -259,7 +259,7 @@ Class Bass8vbClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Bass8vbClef** **Methods**
+    **class Bass8vbClef** **methods**
 
     .. method:: __init__()
 
@@ -274,15 +274,15 @@ Class Bass8vbClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class CBaritoneClef
+class CBaritoneClef
 -------------------
 
 .. class:: CBaritoneClef
 
 
-    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class CBaritoneClef** **Attributes**
+    **class CBaritoneClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -294,7 +294,7 @@ Class CBaritoneClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class CBaritoneClef** **Properties**
+    **class CBaritoneClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -302,7 +302,7 @@ Class CBaritoneClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class CBaritoneClef** **Methods**
+    **class CBaritoneClef** **methods**
 
     .. method:: __init__()
 
@@ -317,15 +317,15 @@ Class CBaritoneClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class CClef
+class CClef
 -----------
 
 .. class:: CClef
 
 
-    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class CClef** **Attributes**
+    **class CClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lilyName`
 
@@ -333,7 +333,7 @@ Class CClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class CClef** **Properties**
+    **class CClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -341,7 +341,7 @@ Class CClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class CClef** **Methods**
+    **class CClef** **methods**
 
     .. method:: __init__()
 
@@ -354,15 +354,15 @@ Class CClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class FBaritoneClef
+class FBaritoneClef
 -------------------
 
 .. class:: FBaritoneClef
 
 
-    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class FBaritoneClef** **Attributes**
+    **class FBaritoneClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -374,7 +374,7 @@ Class FBaritoneClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class FBaritoneClef** **Properties**
+    **class FBaritoneClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -382,7 +382,7 @@ Class FBaritoneClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class FBaritoneClef** **Methods**
+    **class FBaritoneClef** **methods**
 
     .. method:: __init__()
 
@@ -402,15 +402,15 @@ Class FBaritoneClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class FClef
+class FClef
 -----------
 
 .. class:: FClef
 
 
-    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class FClef** **Attributes**
+    **class FClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lilyName`
 
@@ -418,7 +418,7 @@ Class FClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class FClef** **Properties**
+    **class FClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -426,7 +426,7 @@ Class FClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class FClef** **Methods**
+    **class FClef** **methods**
 
     .. method:: __init__()
 
@@ -439,15 +439,15 @@ Class FClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class FrenchViolinClef
+class FrenchViolinClef
 ----------------------
 
 .. class:: FrenchViolinClef
 
 
-    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class FrenchViolinClef** **Attributes**
+    **class FrenchViolinClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -459,7 +459,7 @@ Class FrenchViolinClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class FrenchViolinClef** **Properties**
+    **class FrenchViolinClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -467,7 +467,7 @@ Class FrenchViolinClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class FrenchViolinClef** **Methods**
+    **class FrenchViolinClef** **methods**
 
     .. method:: __init__()
 
@@ -480,15 +480,15 @@ Class FrenchViolinClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class GClef
+class GClef
 -----------
 
 .. class:: GClef
 
 
-    Class inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class GClef** **Attributes**
+    **class GClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lilyName`
 
@@ -496,7 +496,7 @@ Class GClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class GClef** **Properties**
+    **class GClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -504,7 +504,7 @@ Class GClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class GClef** **Methods**
+    **class GClef** **methods**
 
     .. method:: __init__()
 
@@ -517,15 +517,15 @@ Class GClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class GSopranoClef
+class GSopranoClef
 ------------------
 
 .. class:: GSopranoClef
 
 
-    Class inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class GSopranoClef** **Attributes**
+    **class GSopranoClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -537,7 +537,7 @@ Class GSopranoClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class GSopranoClef** **Properties**
+    **class GSopranoClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -545,7 +545,7 @@ Class GSopranoClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class GSopranoClef** **Methods**
+    **class GSopranoClef** **methods**
 
     .. method:: __init__()
 
@@ -558,15 +558,15 @@ Class GSopranoClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class MezzoSopranoClef
+class MezzoSopranoClef
 ----------------------
 
 .. class:: MezzoSopranoClef
 
 
-    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class MezzoSopranoClef** **Attributes**
+    **class MezzoSopranoClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -578,7 +578,7 @@ Class MezzoSopranoClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class MezzoSopranoClef** **Properties**
+    **class MezzoSopranoClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -586,7 +586,7 @@ Class MezzoSopranoClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class MezzoSopranoClef** **Methods**
+    **class MezzoSopranoClef** **methods**
 
     .. method:: __init__()
 
@@ -599,69 +599,69 @@ Class MezzoSopranoClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class NoClef
+class NoClef
 ------------
 
 .. class:: NoClef
 
 
-    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class NoClef** **Attributes**
+    **class NoClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.octaveChange`, :attr:`music21.clef.Clef.sign`, :attr:`music21.clef.Clef.line`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class NoClef** **Properties**
+    **class NoClef** **properties**
 
     Properties inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.mx`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class NoClef** **Methods**
+    **class NoClef** **methods**
 
     Methods inherited from :class:`music21.clef.Clef`: :meth:`music21.clef.Clef.__init__`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class PercussionClef
+class PercussionClef
 --------------------
 
 .. class:: PercussionClef
 
 
-    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class PercussionClef** **Attributes**
+    **class PercussionClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.octaveChange`, :attr:`music21.clef.Clef.sign`, :attr:`music21.clef.Clef.line`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class PercussionClef** **Properties**
+    **class PercussionClef** **properties**
 
     Properties inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.mx`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class PercussionClef** **Methods**
+    **class PercussionClef** **methods**
 
     Methods inherited from :class:`music21.clef.Clef`: :meth:`music21.clef.Clef.__init__`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class PitchClef
+class PitchClef
 ---------------
 
 .. class:: PitchClef
 
 
-    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class PitchClef** **Attributes**
+    **class PitchClef** **attributes**
 
     .. attribute:: lilyName
 
@@ -671,7 +671,7 @@ Class PitchClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class PitchClef** **Properties**
+    **class PitchClef** **properties**
 
     .. attribute:: lily
 
@@ -681,7 +681,7 @@ Class PitchClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class PitchClef** **Methods**
+    **class PitchClef** **methods**
 
     .. method:: __init__()
 
@@ -690,15 +690,15 @@ Class PitchClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class SopranoClef
+class SopranoClef
 -----------------
 
 .. class:: SopranoClef
 
 
-    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class SopranoClef** **Attributes**
+    **class SopranoClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -710,7 +710,7 @@ Class SopranoClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class SopranoClef** **Properties**
+    **class SopranoClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -718,7 +718,7 @@ Class SopranoClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class SopranoClef** **Methods**
+    **class SopranoClef** **methods**
 
     .. method:: __init__()
 
@@ -731,15 +731,15 @@ Class SopranoClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class SubBassClef
+class SubBassClef
 -----------------
 
 .. class:: SubBassClef
 
 
-    Class inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.FClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class SubBassClef** **Attributes**
+    **class SubBassClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -751,7 +751,7 @@ Class SubBassClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class SubBassClef** **Properties**
+    **class SubBassClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -759,7 +759,7 @@ Class SubBassClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class SubBassClef** **Methods**
+    **class SubBassClef** **methods**
 
     .. method:: __init__()
 
@@ -772,42 +772,42 @@ Class SubBassClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class TabClef
+class TabClef
 -------------
 
 .. class:: TabClef
 
 
-    Class inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class TabClef** **Attributes**
+    **class TabClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.octaveChange`, :attr:`music21.clef.Clef.sign`, :attr:`music21.clef.Clef.line`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TabClef** **Properties**
+    **class TabClef** **properties**
 
     Properties inherited from :class:`music21.clef.Clef`: :attr:`music21.clef.Clef.mx`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TabClef** **Methods**
+    **class TabClef** **methods**
 
     Methods inherited from :class:`music21.clef.Clef`: :meth:`music21.clef.Clef.__init__`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class TenorClef
+class TenorClef
 ---------------
 
 .. class:: TenorClef
 
 
-    Class inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.CClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class TenorClef** **Attributes**
+    **class TenorClef** **attributes**
 
     .. attribute:: lowestLine
 
@@ -819,7 +819,7 @@ Class TenorClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TenorClef** **Properties**
+    **class TenorClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -827,7 +827,7 @@ Class TenorClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TenorClef** **Methods**
+    **class TenorClef** **methods**
 
     .. method:: __init__()
 
@@ -844,15 +844,15 @@ Class TenorClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Treble8vaClef
+class Treble8vaClef
 -------------------
 
 .. class:: Treble8vaClef
 
 
-    Class inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class Treble8vaClef** **Attributes**
+    **class Treble8vaClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.TrebleClef`: :attr:`music21.clef.TrebleClef.lowestLine`
 
@@ -862,7 +862,7 @@ Class Treble8vaClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Treble8vaClef** **Properties**
+    **class Treble8vaClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -870,7 +870,7 @@ Class Treble8vaClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Treble8vaClef** **Methods**
+    **class Treble8vaClef** **methods**
 
     .. method:: __init__()
 
@@ -885,15 +885,15 @@ Class Treble8vaClef
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Treble8vbClef
+class Treble8vbClef
 -------------------
 
 .. class:: Treble8vbClef
 
 
-    Class inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.clef.TrebleClef`, :class:`music21.clef.GClef`, :class:`music21.clef.PitchClef`, :class:`music21.clef.Clef`, :class:`music21.base.Music21Object`
 
-    **Class Treble8vbClef** **Attributes**
+    **class Treble8vbClef** **attributes**
 
     Attributes inherited from :class:`music21.clef.TrebleClef`: :attr:`music21.clef.TrebleClef.lowestLine`
 
@@ -903,7 +903,7 @@ Class Treble8vbClef
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Treble8vbClef** **Properties**
+    **class Treble8vbClef** **properties**
 
     Properties inherited from :class:`music21.clef.PitchClef`: :attr:`music21.clef.PitchClef.lily`
 
@@ -911,7 +911,7 @@ Class Treble8vbClef
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Treble8vbClef** **Methods**
+    **class Treble8vbClef** **methods**
 
     .. method:: __init__()
 

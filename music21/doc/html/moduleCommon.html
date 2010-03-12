@@ -48,11 +48,11 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.common</a><ul>
-<li><a class="reference external" href="#class-scalar">Class Scalar</a></li>
-<li><a class="reference external" href="#class-iterator">Class Iterator</a></li>
-<li><a class="reference external" href="#class-timer">Class Timer</a></li>
-<li><a class="reference external" href="#class-defhash">Class defHash</a></li>
-<li><a class="reference external" href="#class-deflist">Class defList</a></li>
+<li><a class="reference external" href="#class-scalar">class Scalar</a></li>
+<li><a class="reference external" href="#class-iterator">class Iterator</a></li>
+<li><a class="reference external" href="#class-timer">class Timer</a></li>
+<li><a class="reference external" href="#class-defhash">class defHash</a></li>
+<li><a class="reference external" href="#class-deflist">class defList</a></li>
 </ul>
 </li>
 </ul>
@@ -493,13 +493,13 @@
 
 <p>utility function that wraps objects as weakrefs but does not wrap already wrapped objects</p>
 <div class="section" id="class-scalar">
-<h2>Class Scalar<a class="headerlink" href="#class-scalar" title="Permalink to this headline">¶</a></h2>
+<h2>class Scalar<a class="headerlink" href="#class-scalar" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.common.Scalar">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Scalar</tt><a class="headerlink" href="#music21.common.Scalar" title="Permalink to this definition">¶</a></dt>
 <dd><p>for those of us who miss perl scalars....</p>
-<p><strong>Class Scalar</strong> <strong>Attributes</strong></p>
+<p><strong>class Scalar</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.common.Scalar.valType">
 <tt class="descname">valType</tt><a class="headerlink" href="#music21.common.Scalar.valType" title="Permalink to this definition">¶</a></dt>
@@ -512,7 +512,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>Class Scalar</strong> <strong>Methods</strong></p>
+<p><strong>class Scalar</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.common.Scalar.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#music21.common.Scalar.__init__" title="Permalink to this definition">¶</a></dt>
@@ -541,13 +541,13 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Sc
 
 </div>
 <div class="section" id="class-iterator">
-<h2>Class Iterator<a class="headerlink" href="#class-iterator" title="Permalink to this headline">¶</a></h2>
+<h2>class Iterator<a class="headerlink" href="#class-iterator" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.common.Iterator">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Iterator</tt><a class="headerlink" href="#music21.common.Iterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simple Iterator object used to handle iteration of Streams and other list-like objects.</p>
-<p><strong>Class Iterator</strong> <strong>Methods</strong></p>
+<p><strong>class Iterator</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.common.Iterator.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#music21.common.Iterator.__init__" title="Permalink to this definition">¶</a></dt>
@@ -564,13 +564,13 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
 
 </div>
 <div class="section" id="class-timer">
-<h2>Class Timer<a class="headerlink" href="#class-timer" title="Permalink to this headline">¶</a></h2>
+<h2>class Timer<a class="headerlink" href="#class-timer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.common.Timer">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Timer</tt><a class="headerlink" href="#music21.common.Timer" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for timing.</p>
-<p><strong>Class Timer</strong> <strong>Methods</strong></p>
+<p><strong>class Timer</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.common.Timer.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Timer.__init__" title="Permalink to this definition">¶</a></dt>
@@ -599,14 +599,14 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 
 </div>
 <div class="section" id="class-defhash">
-<h2>Class defHash<a class="headerlink" href="#class-defhash" title="Permalink to this headline">¶</a></h2>
+<h2>class defHash<a class="headerlink" href="#class-defhash" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.common.defHash">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
-<p>Class inherits from: dict</p>
-<p><strong>Class defHash</strong> <strong>Attributes</strong></p>
+<p>inherits from: dict</p>
+<p><strong>class defHash</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.common.defHash.default">
 <tt class="descname">default</tt><a class="headerlink" href="#music21.common.defHash.default" title="Permalink to this definition">¶</a></dt>
@@ -620,7 +620,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 
 <p>No documentation.</p>
 <p>Attributes inherited from dict: <tt class="xref docutils literal"><span class="pre">__builtin__.dict.fromkeys</span></tt></p>
-<p><strong>Class defHash</strong> <strong>Methods</strong></p>
+<p><strong>class defHash</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.common.defHash.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>hash=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defHash.__init__" title="Permalink to this definition">¶</a></dt>
@@ -638,14 +638,14 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 
 </div>
 <div class="section" id="class-deflist">
-<h2>Class defList<a class="headerlink" href="#class-deflist" title="Permalink to this headline">¶</a></h2>
+<h2>class defList<a class="headerlink" href="#class-deflist" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.common.defList">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
-<p>Class inherits from: list</p>
-<p><strong>Class defList</strong> <strong>Attributes</strong></p>
+<p>inherits from: list</p>
+<p><strong>class defList</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.common.defList.default">
 <tt class="descname">default</tt><a class="headerlink" href="#music21.common.defList.default" title="Permalink to this definition">¶</a></dt>
@@ -658,7 +658,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>Class defList</strong> <strong>Methods</strong></p>
+<p><strong>class defList</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.common.defList.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>value=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defList.__init__" title="Permalink to this definition">¶</a></dt>

@@ -326,7 +326,7 @@ True
 
 utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
 
-Class Scalar
+class Scalar
 ------------
 
 .. class:: Scalar
@@ -335,7 +335,7 @@ Class Scalar
 
     
 
-    **Class Scalar** **Attributes**
+    **class Scalar** **attributes**
 
     .. attribute:: valType
 
@@ -345,7 +345,7 @@ Class Scalar
 
     No documentation. 
 
-    **Class Scalar** **Methods**
+    **class Scalar** **methods**
 
     .. method:: __init__(value=None)
 
@@ -364,7 +364,7 @@ Class Scalar
     No documentation. 
 
 
-Class Iterator
+class Iterator
 --------------
 
 .. class:: Iterator
@@ -373,7 +373,7 @@ Class Iterator
 
     
 
-    **Class Iterator** **Methods**
+    **class Iterator** **methods**
 
     .. method:: __init__(data)
 
@@ -384,7 +384,7 @@ Class Iterator
     No documentation. 
 
 
-Class Timer
+class Timer
 -----------
 
 .. class:: Timer
@@ -393,7 +393,7 @@ Class Timer
 
     
 
-    **Class Timer** **Methods**
+    **class Timer** **methods**
 
     .. method:: __init__()
 
@@ -412,16 +412,16 @@ Class Timer
     No documentation. 
 
 
-Class defHash
+class defHash
 -------------
 
 .. class:: defHash
 
     A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
 
-    Class inherits from: dict
+    inherits from: dict
 
-    **Class defHash** **Attributes**
+    **class defHash** **attributes**
 
     .. attribute:: default
 
@@ -433,7 +433,7 @@ Class defHash
 
     Attributes inherited from dict: :attr:`__builtin__.dict.fromkeys`
 
-    **Class defHash** **Methods**
+    **class defHash** **methods**
 
     .. method:: __init__(hash=None, default=None, callDefault=False)
 
@@ -446,16 +446,16 @@ Class defHash
     Methods inherited from dict: :meth:`__builtin__.dict.clear`, :meth:`__builtin__.dict.copy`, :meth:`__builtin__.dict.has_key`, :meth:`__builtin__.dict.items`, :meth:`__builtin__.dict.iteritems`, :meth:`__builtin__.dict.iterkeys`, :meth:`__builtin__.dict.itervalues`, :meth:`__builtin__.dict.keys`, :meth:`__builtin__.dict.pop`, :meth:`__builtin__.dict.popitem`, :meth:`__builtin__.dict.setdefault`, :meth:`__builtin__.dict.update`, :meth:`__builtin__.dict.values`
 
 
-Class defList
+class defList
 -------------
 
 .. class:: defList
 
     A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
 
-    Class inherits from: list
+    inherits from: list
 
-    **Class defList** **Attributes**
+    **class defList** **attributes**
 
     .. attribute:: default
 
@@ -465,7 +465,7 @@ Class defList
 
     No documentation. 
 
-    **Class defList** **Methods**
+    **class defList** **methods**
 
     .. method:: __init__(value=None, default=None, callDefault=False)
 

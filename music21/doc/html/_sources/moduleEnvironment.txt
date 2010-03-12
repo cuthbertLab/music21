@@ -9,7 +9,7 @@ music21.environment
 
 
 
-Class Environment
+class Environment
 -----------------
 
 .. class:: Environment
@@ -18,7 +18,7 @@ Class Environment
 
     
 
-    **Class Environment** **Attributes**
+    **class Environment** **attributes**
 
     .. attribute:: modNameParent
 
@@ -28,7 +28,7 @@ Class Environment
 
     The Python dictionary used to store all internal settings. 
 
-    **Class Environment** **Methods**
+    **class Environment** **methods**
 
     .. method:: __init__(modName=None)
 
@@ -75,7 +75,7 @@ Class Environment
     Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
 
-Class Preference
+class Preference
 ----------------
 
 .. class:: Preference
@@ -84,17 +84,17 @@ Class Preference
 
     
 
-    Class inherits from: :class:`music21.node.Node`
+    inherits from: :class:`music21.node.Node`
 
-    **Class Preference** **Attributes**
+    **class Preference** **attributes**
 
     Attributes inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.charData`
 
-    **Class Preference** **Properties**
+    **class Preference** **properties**
 
     Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
 
-    **Class Preference** **Methods**
+    **class Preference** **methods**
 
     .. method:: __init__()
 
@@ -105,7 +105,7 @@ Class Preference
     Methods inherited from :class:`music21.node.Node`: :meth:`music21.node.Node.get`, :meth:`music21.node.Node.getNewDoc`, :meth:`music21.node.Node.loadAttrs`, :meth:`music21.node.Node.merge`, :meth:`music21.node.Node.set`, :meth:`music21.node.Node.setDefaults`, :meth:`music21.node.Node.toxml`, :meth:`music21.node.Node.xmlStr`
 
 
-Class Settings
+class Settings
 --------------
 
 .. class:: Settings
@@ -114,19 +114,19 @@ Class Settings
 
     
 
-    Class inherits from: :class:`music21.node.NodeList`, :class:`music21.node.Node`
+    inherits from: :class:`music21.node.NodeList`, :class:`music21.node.Node`
 
-    **Class Settings** **Attributes**
+    **class Settings** **attributes**
 
     Attributes inherited from :class:`music21.node.NodeList`: :attr:`music21.node.NodeList.componentList`
 
     Attributes inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.charData`
 
-    **Class Settings** **Properties**
+    **class Settings** **properties**
 
     Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
 
-    **Class Settings** **Methods**
+    **class Settings** **methods**
 
     .. method:: __init__()
 

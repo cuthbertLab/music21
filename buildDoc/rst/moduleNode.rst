@@ -12,7 +12,7 @@ music21.node
 .. function:: fixed_writexml(writer, indent=, addindent=, newl=)
 
 
-Class Node
+class Node
 ----------
 
 .. class:: Node
@@ -20,19 +20,19 @@ Class Node
 
     
 
-    **Class Node** **Attributes**
+    **class Node** **attributes**
 
     .. attribute:: charData
 
     No documentation. 
 
-    **Class Node** **Properties**
+    **class Node** **properties**
 
     .. attribute:: tag
 
     No documentation. 
 
-    **Class Node** **Methods**
+    **class Node** **methods**
 
     .. method:: __init__()
 
@@ -81,16 +81,16 @@ Class Node
     Shortcut method to provide quick xml out. 
 
 
-Class NodeList
+class NodeList
 --------------
 
 .. class:: NodeList
 
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
-    Class inherits from: :class:`music21.node.Node`
+    inherits from: :class:`music21.node.Node`
 
-    **Class NodeList** **Attributes**
+    **class NodeList** **attributes**
 
     .. attribute:: componentList
 
@@ -98,11 +98,11 @@ Class NodeList
 
     Attributes inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.charData`
 
-    **Class NodeList** **Properties**
+    **class NodeList** **properties**
 
     Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
 
-    **Class NodeList** **Methods**
+    **class NodeList** **methods**
 
     .. method:: __init__()
 

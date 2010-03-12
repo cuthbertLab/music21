@@ -9,7 +9,7 @@ music21.editorial
 
 
 
-Class NoteEditorial
+class NoteEditorial
 -------------------
 
 .. class:: NoteEditorial
@@ -20,9 +20,9 @@ Class NoteEditorial
     >>> a.misc
     {} 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class NoteEditorial** **Attributes**
+    **class NoteEditorial** **attributes**
 
     .. attribute:: comment
 
@@ -62,11 +62,11 @@ Class NoteEditorial
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`
 
-    **Class NoteEditorial** **Properties**
+    **class NoteEditorial** **properties**
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class NoteEditorial** **Methods**
+    **class NoteEditorial** **methods**
 
     .. method:: __init__()
 
@@ -95,7 +95,7 @@ Class NoteEditorial
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Comment
+class Comment
 -------------
 
 .. class:: Comment
@@ -103,7 +103,7 @@ Class Comment
 
     
 
-    **Class Comment** **Attributes**
+    **class Comment** **attributes**
 
     .. attribute:: position
 
@@ -113,7 +113,7 @@ Class Comment
 
     No documentation. 
 
-    **Class Comment** **Properties**
+    **class Comment** **properties**
 
     .. attribute:: lily
 

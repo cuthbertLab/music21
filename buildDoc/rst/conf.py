@@ -21,8 +21,11 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'contents'
 
-extensions = ['rst2pdf.pdfbuilder']
-
+try:
+    import rst2pdf
+    extensions = ['rst2pdf.pdfbuilder']
+except ImportError:
+    extensions = []
 
 # General substitutions.
 project = 'music21'

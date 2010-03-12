@@ -12,7 +12,7 @@ Music21 base classes and important utilities. base -- the convention within musi
 
 
 
-Class Music21Object
+class Music21Object
 -------------------
 
 .. class:: Music21Object
@@ -23,7 +23,7 @@ Class Music21Object
 
     
 
-    **Class Music21Object** **Attributes**
+    **class Music21Object** **attributes**
 
     .. attribute:: id
 
@@ -33,7 +33,7 @@ Class Music21Object
 
     An instance of a Group object. 
 
-    **Class Music21Object** **Properties**
+    **class Music21Object** **properties**
 
     .. attribute:: duration
 
@@ -57,7 +57,7 @@ Class Music21Object
     Traceback (most recent call last): 
     ElementException: priority values must be integers. 
 
-    **Class Music21Object** **Methods**
+    **class Music21Object** **methods**
 
     .. method:: __init__()
 
@@ -148,7 +148,7 @@ Class Music21Object
     Write a file. A None file path will result in temporary file 
 
 
-Class ElementWrapper
+class ElementWrapper
 --------------------
 
 .. class:: ElementWrapper
@@ -157,15 +157,15 @@ Class ElementWrapper
 
     
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class ElementWrapper** **Attributes**
+    **class ElementWrapper** **attributes**
 
     .. attribute:: obj
 
     No documentation. 
 
-    **Class ElementWrapper** **Properties**
+    **class ElementWrapper** **properties**
 
     .. attribute:: duration
 
@@ -208,7 +208,7 @@ Class ElementWrapper
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class ElementWrapper** **Methods**
+    **class ElementWrapper** **methods**
 
     .. method:: __init__(obj)
 
@@ -265,7 +265,7 @@ Class ElementWrapper
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class DefinedContexts
+class DefinedContexts
 ---------------------
 
 .. class:: DefinedContexts
@@ -276,7 +276,7 @@ Class DefinedContexts
 
     
 
-    **Class DefinedContexts** **Methods**
+    **class DefinedContexts** **methods**
 
     .. method:: __init__()
 
@@ -484,7 +484,7 @@ Class DefinedContexts
     RelationsException: ... 
 
 
-Class Groups
+class Groups
 ------------
 
 .. class:: Groups
@@ -499,9 +499,9 @@ Class Groups
     Traceback (most recent call last): 
     GroupException: Only strings can be used as list names 
 
-    Class inherits from: list
+    inherits from: list
 
-    **Class Groups** **Methods**
+    **class Groups** **methods**
 
     .. method:: append(value)
 

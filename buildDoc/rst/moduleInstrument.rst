@@ -9,15 +9,15 @@ music21.instrument
 
 
 
-Class Instrument
+class Instrument
 ----------------
 
 .. class:: Instrument
 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Instrument** **Attributes**
+    **class Instrument** **attributes**
 
     .. attribute:: instrumentName
 
@@ -53,7 +53,7 @@ Class Instrument
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Instrument** **Properties**
+    **class Instrument** **properties**
 
     .. attribute:: mx
 
@@ -63,7 +63,7 @@ Class Instrument
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Instrument** **Methods**
+    **class Instrument** **methods**
 
     .. method:: __init__()
 
@@ -80,21 +80,21 @@ Class Instrument
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class StringInstrument
+class StringInstrument
 ----------------------
 
 .. class:: StringInstrument
 
 
-    Class inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
-    **Class StringInstrument** **Attributes**
+    **class StringInstrument** **attributes**
 
     Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class StringInstrument** **Properties**
+    **class StringInstrument** **properties**
 
     .. attribute:: stringPitches
 
@@ -119,22 +119,22 @@ Class StringInstrument
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class StringInstrument** **Methods**
+    **class StringInstrument** **methods**
 
     Methods inherited from :class:`music21.instrument.Instrument`: :meth:`music21.instrument.Instrument.__init__`, :meth:`music21.instrument.Instrument.bestName`, :meth:`music21.instrument.Instrument.partIdRandomize`
 
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Viola
+class Viola
 -----------
 
 .. class:: Viola
 
 
-    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
-    **Class Viola** **Attributes**
+    **class Viola** **attributes**
 
     .. attribute:: lowestNote
 
@@ -144,7 +144,7 @@ Class Viola
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Viola** **Properties**
+    **class Viola** **properties**
 
     Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
 
@@ -152,7 +152,7 @@ Class Viola
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Viola** **Methods**
+    **class Viola** **methods**
 
     .. method:: __init__()
 
@@ -163,15 +163,15 @@ Class Viola
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Violin
+class Violin
 ------------
 
 .. class:: Violin
 
 
-    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
-    **Class Violin** **Attributes**
+    **class Violin** **attributes**
 
     .. attribute:: lowestNote
 
@@ -181,7 +181,7 @@ Class Violin
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Violin** **Properties**
+    **class Violin** **properties**
 
     Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
 
@@ -189,7 +189,7 @@ Class Violin
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Violin** **Methods**
+    **class Violin** **methods**
 
     .. method:: __init__()
 
@@ -200,15 +200,15 @@ Class Violin
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Violoncello
+class Violoncello
 -----------------
 
 .. class:: Violoncello
 
 
-    Class inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
 
-    **Class Violoncello** **Attributes**
+    **class Violoncello** **attributes**
 
     .. attribute:: lowestNote
 
@@ -218,7 +218,7 @@ Class Violoncello
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Violoncello** **Properties**
+    **class Violoncello** **properties**
 
     Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
 
@@ -226,7 +226,7 @@ Class Violoncello
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Violoncello** **Methods**
+    **class Violoncello** **methods**
 
     .. method:: __init__()
 

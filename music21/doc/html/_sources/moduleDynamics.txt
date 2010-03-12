@@ -13,16 +13,16 @@ music21.dynamics
 
 Given a unit interfal value, map to a dynamic name 
 
-Class Dynamic
+class Dynamic
 -------------
 
 .. class:: Dynamic
 
     Object representation of Dyanmics. 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Dynamic** **Attributes**
+    **class Dynamic** **attributes**
 
     .. attribute:: posPlacement
 
@@ -58,7 +58,7 @@ Class Dynamic
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Dynamic** **Properties**
+    **class Dynamic** **properties**
 
     .. attribute:: musicxml
 
@@ -78,7 +78,7 @@ Class Dynamic
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Dynamic** **Methods**
+    **class Dynamic** **methods**
 
     .. method:: __init__(value=None)
 
@@ -87,16 +87,16 @@ Class Dynamic
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Wedge
+class Wedge
 -----------
 
 .. class:: Wedge
 
     Object model of crescendeo/decrescendo wedges. 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Wedge** **Attributes**
+    **class Wedge** **attributes**
 
     .. attribute:: posPlacement
 
@@ -112,7 +112,7 @@ Class Wedge
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Wedge** **Properties**
+    **class Wedge** **properties**
 
     .. attribute:: mx
 
@@ -127,7 +127,7 @@ Class Wedge
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Wedge** **Methods**
+    **class Wedge** **methods**
 
     .. method:: __init__(value=None)
 

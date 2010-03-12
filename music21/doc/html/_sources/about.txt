@@ -51,7 +51,7 @@ projects, in particular:
 
 * `David Huron`_, inventor of `Humdrum`_, the inspiration for music21.
 
-* The `Center for Computer-Assisted Research in the Humanities` at Stanford University,
+* The `Center for Computer-Assisted Research in the Humanities`_ at Stanford University,
   contributing to the knowledge of music since 1984, and publishers of *Computing in Musicology*.
 
 .. _David Huron: http://www.musiccog.ohio-state.edu/Huron/

@@ -252,7 +252,7 @@ True
 >>> g.tuplets[0].type == 'stop'
 True 
 
-Class Duration
+class Duration
 --------------
 
 .. class:: Duration
@@ -261,15 +261,15 @@ Class Duration
 
     A Duration is made of one or more DurationUnits. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Durations are not expressable as a single notation unit. 
 
-    Class inherits from: :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.DurationCommon`
 
-    **Class Duration** **Attributes**
+    **class Duration** **attributes**
 
     .. attribute:: linkages
 
     No documentation. 
 
-    **Class Duration** **Properties**
+    **class Duration** **properties**
 
     .. attribute:: components
 
@@ -324,7 +324,7 @@ Class Duration
 
     Get the duration type. 
 
-    **Class Duration** **Methods**
+    **class Duration** **methods**
 
     .. method:: __init__()
 
@@ -435,7 +435,7 @@ Class Duration
 
     .. method:: show(format=musicxml)
 
-    This might need to return the file path. 
+    Same as Music21Object.show() 
 
     .. method:: sliceComponentAtPosition(quarterPosition)
 
@@ -467,12 +467,12 @@ Class Duration
 
     .. method:: write(fmt=musicxml, fp=None)
 
-    Write a file in the given format (default, musicxml) A None file path will result in temporary file 
+    As in Music21Object.write: Writes a file in the given format (musicxml by default) A None file path will result in temporary file 
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class Tuplet
+class Tuplet
 ------------
 
 .. class:: Tuplet
@@ -510,7 +510,7 @@ Class Tuplet
 
     
 
-    **Class Tuplet** **Attributes**
+    **class Tuplet** **attributes**
 
     .. attribute:: frozen
 
@@ -560,7 +560,7 @@ Class Tuplet
 
     A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
-    **Class Tuplet** **Properties**
+    **class Tuplet** **properties**
 
     .. attribute:: mx
 
@@ -578,7 +578,7 @@ Class Tuplet
 
     No documentation. 
 
-    **Class Tuplet** **Methods**
+    **class Tuplet** **methods**
 
     .. method:: __init__()
 
@@ -655,53 +655,53 @@ Class Tuplet
     0.4 
 
 
-Class AppogiaturaStartDuration
+class AppogiaturaStartDuration
 ------------------------------
 
 .. class:: AppogiaturaStartDuration
 
 
-    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    **Class AppogiaturaStartDuration** **Attributes**
+    **class AppogiaturaStartDuration** **attributes**
 
     Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
 
-    **Class AppogiaturaStartDuration** **Properties**
+    **class AppogiaturaStartDuration** **properties**
 
     Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
 
-    **Class AppogiaturaStartDuration** **Methods**
+    **class AppogiaturaStartDuration** **methods**
 
     Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.__init__`, :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class AppogiaturaStopDuration
+class AppogiaturaStopDuration
 -----------------------------
 
 .. class:: AppogiaturaStopDuration
 
 
-    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    **Class AppogiaturaStopDuration** **Attributes**
+    **class AppogiaturaStopDuration** **attributes**
 
     Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
 
-    **Class AppogiaturaStopDuration** **Properties**
+    **class AppogiaturaStopDuration** **properties**
 
     Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
 
-    **Class AppogiaturaStopDuration** **Methods**
+    **class AppogiaturaStopDuration** **methods**
 
     Methods inherited from :class:`music21.duration.Duration`: :meth:`music21.duration.Duration.__init__`, :meth:`music21.duration.Duration.addDuration`, :meth:`music21.duration.Duration.appendTuplet`, :meth:`music21.duration.Duration.clear`, :meth:`music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`music21.duration.Duration.componentStartTime`, :meth:`music21.duration.Duration.consolidate`, :meth:`music21.duration.Duration.expand`, :meth:`music21.duration.Duration.fill`, :meth:`music21.duration.Duration.show`, :meth:`music21.duration.Duration.sliceComponentAtPosition`, :meth:`music21.duration.Duration.updateQuarterLength`, :meth:`music21.duration.Duration.write`
 
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class DurationCommon
+class DurationCommon
 --------------------
 
 .. class:: DurationCommon
@@ -710,7 +710,7 @@ Class DurationCommon
 
     
 
-    **Class DurationCommon** **Methods**
+    **class DurationCommon** **methods**
 
     .. method:: aggregateTupletRatio()
 
@@ -727,22 +727,22 @@ Class DurationCommon
     (15, 8) 
 
 
-Class DurationUnit
+class DurationUnit
 ------------------
 
 .. class:: DurationUnit
 
     A DurationUnit is a notation that (generally) can be notated with a a single notation unit, such as one note, without a tie. In general, Duration should be used. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page.  For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations 'unexpressable' type for anything that needs a Duration (such as 2.5 quarters) 
 
-    Class inherits from: :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.DurationCommon`
 
-    **Class DurationUnit** **Attributes**
+    **class DurationUnit** **attributes**
 
     .. attribute:: linkStatus
 
     No documentation. 
 
-    **Class DurationUnit** **Properties**
+    **class DurationUnit** **properties**
 
     .. attribute:: dots
 
@@ -778,7 +778,7 @@ Class DurationUnit
 
     Get the duration type. 
 
-    **Class DurationUnit** **Methods**
+    **class DurationUnit** **methods**
 
     .. method:: __init__(prototype=quarter)
 
@@ -811,23 +811,23 @@ Class DurationUnit
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class GraceDuration
+class GraceDuration
 -------------------
 
 .. class:: GraceDuration
 
 
-    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    **Class GraceDuration** **Attributes**
+    **class GraceDuration** **attributes**
 
     Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
 
-    **Class GraceDuration** **Properties**
+    **class GraceDuration** **properties**
 
     Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
 
-    **Class GraceDuration** **Methods**
+    **class GraceDuration** **methods**
 
     .. method:: __init__()
 
@@ -838,23 +838,23 @@ Class GraceDuration
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class LongGraceDuration
+class LongGraceDuration
 -----------------------
 
 .. class:: LongGraceDuration
 
 
-    Class inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.Duration`, :class:`music21.duration.DurationCommon`
 
-    **Class LongGraceDuration** **Attributes**
+    **class LongGraceDuration** **attributes**
 
     Attributes inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.linkages`
 
-    **Class LongGraceDuration** **Properties**
+    **class LongGraceDuration** **properties**
 
     Properties inherited from :class:`music21.duration.Duration`: :attr:`music21.duration.Duration.components`, :attr:`music21.duration.Duration.dots`, :attr:`music21.duration.Duration.isComplex`, :attr:`music21.duration.Duration.lily`, :attr:`music21.duration.Duration.musicxml`, :attr:`music21.duration.Duration.mx`, :attr:`music21.duration.Duration.quarterLength`, :attr:`music21.duration.Duration.tuplets`, :attr:`music21.duration.Duration.type`
 
-    **Class LongGraceDuration** **Methods**
+    **class LongGraceDuration** **methods**
 
     .. method:: __init__()
 
@@ -865,23 +865,23 @@ Class LongGraceDuration
     Methods inherited from :class:`music21.duration.DurationCommon`: :meth:`music21.duration.DurationCommon.aggregateTupletRatio`
 
 
-Class ZeroDuration
+class ZeroDuration
 ------------------
 
 .. class:: ZeroDuration
 
 
-    Class inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
+    inherits from: :class:`music21.duration.DurationUnit`, :class:`music21.duration.DurationCommon`
 
-    **Class ZeroDuration** **Attributes**
+    **class ZeroDuration** **attributes**
 
     Attributes inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.linkStatus`
 
-    **Class ZeroDuration** **Properties**
+    **class ZeroDuration** **properties**
 
     Properties inherited from :class:`music21.duration.DurationUnit`: :attr:`music21.duration.DurationUnit.dots`, :attr:`music21.duration.DurationUnit.lily`, :attr:`music21.duration.DurationUnit.ordinal`, :attr:`music21.duration.DurationUnit.quarterLength`, :attr:`music21.duration.DurationUnit.tuplets`, :attr:`music21.duration.DurationUnit.type`
 
-    **Class ZeroDuration** **Methods**
+    **class ZeroDuration** **methods**
 
     .. method:: __init__()
 

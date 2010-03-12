@@ -1808,7 +1808,8 @@ class Duration(DurationCommon):
     musicxml = property(_getMusicXML)
 
     def write(self, fmt='musicxml', fp=None):
-        '''Write a file in the given format (default, musicxml)
+        '''
+        As in Music21Object.write: Writes a file in the given format (musicxml by default)
         
         A None file path will result in temporary file
         '''
@@ -1827,7 +1828,8 @@ class Duration(DurationCommon):
         return fp
 
     def show(self, format='musicxml'):
-        '''This might need to return the file path.
+        '''
+        Same as Music21Object.show()
         '''
         environLocal.launch(format, self.write(format))
 

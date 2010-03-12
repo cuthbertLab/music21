@@ -26,7 +26,7 @@ Given musical data represented within a Python string, attempt to parse the data
 
 Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
-Class Converter
+class Converter
 ---------------
 
 .. class:: Converter
@@ -35,13 +35,13 @@ Class Converter
 
     
 
-    **Class Converter** **Properties**
+    **class Converter** **properties**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **Class Converter** **Methods**
+    **class Converter** **methods**
 
     .. method:: __init__()
 
@@ -60,7 +60,7 @@ Class Converter
     Given a url, download and parse the file into a Stream. 
 
 
-Class ConverterMusicXML
+class ConverterMusicXML
 -----------------------
 
 .. class:: ConverterMusicXML
@@ -68,13 +68,13 @@ Class ConverterMusicXML
 
     
 
-    **Class ConverterMusicXML** **Properties**
+    **class ConverterMusicXML** **properties**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **Class ConverterMusicXML** **Methods**
+    **class ConverterMusicXML** **methods**
 
     .. method:: __init__(forceSource)
 
@@ -97,7 +97,7 @@ Class ConverterMusicXML
     Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
-Class ConverterHumdrum
+class ConverterHumdrum
 ----------------------
 
 .. class:: ConverterHumdrum
@@ -105,13 +105,13 @@ Class ConverterHumdrum
 
     
 
-    **Class ConverterHumdrum** **Attributes**
+    **class ConverterHumdrum** **attributes**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **Class ConverterHumdrum** **Methods**
+    **class ConverterHumdrum** **methods**
 
     .. method:: __init__()
 
@@ -126,7 +126,7 @@ Class ConverterHumdrum
     Open from file path 
 
 
-Class PickleFilter
+class PickleFilter
 ------------------
 
 .. class:: PickleFilter
@@ -135,7 +135,7 @@ Class PickleFilter
 
     
 
-    **Class PickleFilter** **Methods**
+    **class PickleFilter** **methods**
 
     .. method:: __init__(fp, forceSource=False)
 

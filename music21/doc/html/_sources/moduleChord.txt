@@ -9,7 +9,7 @@ music21.chord
 
 
 
-Class Chord
+class Chord
 -----------
 
 .. class:: Chord
@@ -18,9 +18,9 @@ Class Chord
 
     
 
-    Class inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
 
-    **Class Chord** **Attributes**
+    **class Chord** **attributes**
 
     .. attribute:: isChord
 
@@ -44,7 +44,7 @@ Class Chord
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Chord** **Properties**
+    **class Chord** **properties**
 
     .. attribute:: pitches
 
@@ -264,7 +264,7 @@ Class Chord
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Chord** **Methods**
+    **class Chord** **methods**
 
     .. method:: __init__(notes=[])
 

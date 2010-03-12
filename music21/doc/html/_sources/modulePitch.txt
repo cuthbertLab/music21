@@ -79,16 +79,16 @@ Utility conversion; does not process internals.
 >>> convertStepToPs('b', 3, 3)
 62 
 
-Class Pitch
+class Pitch
 -----------
 
 .. class:: Pitch
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Pitch** **Attributes**
+    **class Pitch** **attributes**
 
     .. attribute:: defaultOctave
 
@@ -96,7 +96,7 @@ Class Pitch
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class Pitch** **Properties**
+    **class Pitch** **properties**
 
     .. attribute:: name
 
@@ -263,7 +263,7 @@ Class Pitch
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Pitch** **Methods**
+    **class Pitch** **methods**
 
     .. method:: __init__(name=None)
 
@@ -279,16 +279,16 @@ Class Pitch
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class Accidental
+class Accidental
 ----------------
 
 .. class:: Accidental
 
     Accidental class. 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class Accidental** **Attributes**
+    **class Accidental** **attributes**
 
     .. attribute:: displayEvaluated
 
@@ -324,7 +324,7 @@ Class Accidental
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`
 
-    **Class Accidental** **Properties**
+    **class Accidental** **properties**
 
     .. attribute:: lily
 
@@ -344,7 +344,7 @@ Class Accidental
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class Accidental** **Methods**
+    **class Accidental** **methods**
 
     .. method:: __init__(specifier=natural)
 

@@ -20,27 +20,27 @@ music21.serial
 .. function:: rowToMatrix(p)
 
 
-Class ToneRow
+class ToneRow
 -------------
 
 .. class:: ToneRow
 
 
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class ToneRow** **Attributes**
+    **class ToneRow** **attributes**
 
     Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class ToneRow** **Properties**
+    **class ToneRow** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class ToneRow** **Methods**
+    **class ToneRow** **methods**
 
     .. method:: __init__()
 
@@ -51,15 +51,15 @@ Class ToneRow
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class TwelveToneRow
+class TwelveToneRow
 -------------------
 
 .. class:: TwelveToneRow
 
 
-    Class inherits from: :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class TwelveToneRow** **Attributes**
+    **class TwelveToneRow** **attributes**
 
     .. attribute:: row
 
@@ -69,13 +69,13 @@ Class TwelveToneRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TwelveToneRow** **Properties**
+    **class TwelveToneRow** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TwelveToneRow** **Methods**
+    **class TwelveToneRow** **methods**
 
     .. method:: __init__()
 
@@ -90,27 +90,27 @@ Class TwelveToneRow
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class TwelveToneMatrix
+class TwelveToneMatrix
 ----------------------
 
 .. class:: TwelveToneMatrix
 
 
-    Class inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class TwelveToneMatrix** **Attributes**
+    **class TwelveToneMatrix** **attributes**
 
     Attributes inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.flattenedRepresentationOf`, :attr:`music21.stream.Stream.isFlat`, :attr:`music21.stream.Stream.isSorted`
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TwelveToneMatrix** **Properties**
+    **class TwelveToneMatrix** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TwelveToneMatrix** **Methods**
+    **class TwelveToneMatrix** **methods**
 
     .. method:: __init__()
 
@@ -123,15 +123,15 @@ Class TwelveToneMatrix
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergChamberConcerto
+class RowBergChamberConcerto
 ----------------------------
 
 .. class:: RowBergChamberConcerto
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergChamberConcerto** **Attributes**
+    **class RowBergChamberConcerto** **attributes**
 
     .. attribute:: composer
 
@@ -153,13 +153,13 @@ Class RowBergChamberConcerto
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergChamberConcerto** **Properties**
+    **class RowBergChamberConcerto** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergChamberConcerto** **Methods**
+    **class RowBergChamberConcerto** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -168,15 +168,15 @@ Class RowBergChamberConcerto
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergConcertoForViolinAndOrchestra
+class RowBergConcertoForViolinAndOrchestra
 ------------------------------------------
 
 .. class:: RowBergConcertoForViolinAndOrchestra
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergConcertoForViolinAndOrchestra** **Attributes**
+    **class RowBergConcertoForViolinAndOrchestra** **attributes**
 
     .. attribute:: composer
 
@@ -198,13 +198,13 @@ Class RowBergConcertoForViolinAndOrchestra
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergConcertoForViolinAndOrchestra** **Properties**
+    **class RowBergConcertoForViolinAndOrchestra** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergConcertoForViolinAndOrchestra** **Methods**
+    **class RowBergConcertoForViolinAndOrchestra** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -213,15 +213,15 @@ Class RowBergConcertoForViolinAndOrchestra
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergDerWein
+class RowBergDerWein
 --------------------
 
 .. class:: RowBergDerWein
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergDerWein** **Attributes**
+    **class RowBergDerWein** **attributes**
 
     .. attribute:: composer
 
@@ -243,13 +243,13 @@ Class RowBergDerWein
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergDerWein** **Properties**
+    **class RowBergDerWein** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergDerWein** **Methods**
+    **class RowBergDerWein** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -258,15 +258,15 @@ Class RowBergDerWein
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergLuluActISceneXx
+class RowBergLuluActISceneXx
 ----------------------------
 
 .. class:: RowBergLuluActISceneXx
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergLuluActISceneXx** **Attributes**
+    **class RowBergLuluActISceneXx** **attributes**
 
     .. attribute:: composer
 
@@ -288,13 +288,13 @@ Class RowBergLuluActISceneXx
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergLuluActISceneXx** **Properties**
+    **class RowBergLuluActISceneXx** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergLuluActISceneXx** **Methods**
+    **class RowBergLuluActISceneXx** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -303,15 +303,15 @@ Class RowBergLuluActISceneXx
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergLuluActIiScene1
+class RowBergLuluActIiScene1
 ----------------------------
 
 .. class:: RowBergLuluActIiScene1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergLuluActIiScene1** **Attributes**
+    **class RowBergLuluActIiScene1** **attributes**
 
     .. attribute:: composer
 
@@ -333,13 +333,13 @@ Class RowBergLuluActIiScene1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergLuluActIiScene1** **Properties**
+    **class RowBergLuluActIiScene1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergLuluActIiScene1** **Methods**
+    **class RowBergLuluActIiScene1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -348,15 +348,15 @@ Class RowBergLuluActIiScene1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergLuluPrimaryRow
+class RowBergLuluPrimaryRow
 ---------------------------
 
 .. class:: RowBergLuluPrimaryRow
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergLuluPrimaryRow** **Attributes**
+    **class RowBergLuluPrimaryRow** **attributes**
 
     .. attribute:: composer
 
@@ -378,13 +378,13 @@ Class RowBergLuluPrimaryRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergLuluPrimaryRow** **Properties**
+    **class RowBergLuluPrimaryRow** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergLuluPrimaryRow** **Methods**
+    **class RowBergLuluPrimaryRow** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -393,15 +393,15 @@ Class RowBergLuluPrimaryRow
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergLyricSuiteLastMvtPermutation
+class RowBergLyricSuiteLastMvtPermutation
 -----------------------------------------
 
 .. class:: RowBergLyricSuiteLastMvtPermutation
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergLyricSuiteLastMvtPermutation** **Attributes**
+    **class RowBergLyricSuiteLastMvtPermutation** **attributes**
 
     .. attribute:: composer
 
@@ -423,13 +423,13 @@ Class RowBergLyricSuiteLastMvtPermutation
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergLyricSuiteLastMvtPermutation** **Properties**
+    **class RowBergLyricSuiteLastMvtPermutation** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergLyricSuiteLastMvtPermutation** **Methods**
+    **class RowBergLyricSuiteLastMvtPermutation** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -438,15 +438,15 @@ Class RowBergLyricSuiteLastMvtPermutation
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergLyricSuitePrimaryRow
+class RowBergLyricSuitePrimaryRow
 ---------------------------------
 
 .. class:: RowBergLyricSuitePrimaryRow
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergLyricSuitePrimaryRow** **Attributes**
+    **class RowBergLyricSuitePrimaryRow** **attributes**
 
     .. attribute:: composer
 
@@ -468,13 +468,13 @@ Class RowBergLyricSuitePrimaryRow
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergLyricSuitePrimaryRow** **Properties**
+    **class RowBergLyricSuitePrimaryRow** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergLyricSuitePrimaryRow** **Methods**
+    **class RowBergLyricSuitePrimaryRow** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -483,15 +483,15 @@ Class RowBergLyricSuitePrimaryRow
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowBergWozzeckActIScene4Passacaglia
+class RowBergWozzeckActIScene4Passacaglia
 -----------------------------------------
 
 .. class:: RowBergWozzeckActIScene4Passacaglia
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowBergWozzeckActIScene4Passacaglia** **Attributes**
+    **class RowBergWozzeckActIScene4Passacaglia** **attributes**
 
     .. attribute:: composer
 
@@ -513,13 +513,13 @@ Class RowBergWozzeckActIScene4Passacaglia
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowBergWozzeckActIScene4Passacaglia** **Properties**
+    **class RowBergWozzeckActIScene4Passacaglia** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowBergWozzeckActIScene4Passacaglia** **Methods**
+    **class RowBergWozzeckActIScene4Passacaglia** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -528,15 +528,15 @@ Class RowBergWozzeckActIScene4Passacaglia
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergDieJakobsleiter
+class RowSchoenbergDieJakobsleiter
 ----------------------------------
 
 .. class:: RowSchoenbergDieJakobsleiter
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergDieJakobsleiter** **Attributes**
+    **class RowSchoenbergDieJakobsleiter** **attributes**
 
     .. attribute:: composer
 
@@ -558,13 +558,13 @@ Class RowSchoenbergDieJakobsleiter
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergDieJakobsleiter** **Properties**
+    **class RowSchoenbergDieJakobsleiter** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergDieJakobsleiter** **Methods**
+    **class RowSchoenbergDieJakobsleiter** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -573,15 +573,15 @@ Class RowSchoenbergDieJakobsleiter
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergFragmentForPiano
+class RowSchoenbergFragmentForPiano
 -----------------------------------
 
 .. class:: RowSchoenbergFragmentForPiano
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergFragmentForPiano** **Attributes**
+    **class RowSchoenbergFragmentForPiano** **attributes**
 
     .. attribute:: composer
 
@@ -603,13 +603,13 @@ Class RowSchoenbergFragmentForPiano
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergFragmentForPiano** **Properties**
+    **class RowSchoenbergFragmentForPiano** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergFragmentForPiano** **Methods**
+    **class RowSchoenbergFragmentForPiano** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -618,15 +618,15 @@ Class RowSchoenbergFragmentForPiano
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergFragmentOfPhantasiaForPiano
+class RowSchoenbergFragmentOfPhantasiaForPiano
 ----------------------------------------------
 
 .. class:: RowSchoenbergFragmentOfPhantasiaForPiano
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergFragmentOfPhantasiaForPiano** **Attributes**
+    **class RowSchoenbergFragmentOfPhantasiaForPiano** **attributes**
 
     .. attribute:: composer
 
@@ -648,13 +648,13 @@ Class RowSchoenbergFragmentOfPhantasiaForPiano
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergFragmentOfPhantasiaForPiano** **Properties**
+    **class RowSchoenbergFragmentOfPhantasiaForPiano** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergFragmentOfPhantasiaForPiano** **Methods**
+    **class RowSchoenbergFragmentOfPhantasiaForPiano** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -663,15 +663,15 @@ Class RowSchoenbergFragmentOfPhantasiaForPiano
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergFragmentOfSonataForOrgan
+class RowSchoenbergFragmentOfSonataForOrgan
 -------------------------------------------
 
 .. class:: RowSchoenbergFragmentOfSonataForOrgan
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergFragmentOfSonataForOrgan** **Attributes**
+    **class RowSchoenbergFragmentOfSonataForOrgan** **attributes**
 
     .. attribute:: composer
 
@@ -693,13 +693,13 @@ Class RowSchoenbergFragmentOfSonataForOrgan
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergFragmentOfSonataForOrgan** **Properties**
+    **class RowSchoenbergFragmentOfSonataForOrgan** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergFragmentOfSonataForOrgan** **Methods**
+    **class RowSchoenbergFragmentOfSonataForOrgan** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -708,15 +708,15 @@ Class RowSchoenbergFragmentOfSonataForOrgan
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergIsraelExistsAgain
+class RowSchoenbergIsraelExistsAgain
 ------------------------------------
 
 .. class:: RowSchoenbergIsraelExistsAgain
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergIsraelExistsAgain** **Attributes**
+    **class RowSchoenbergIsraelExistsAgain** **attributes**
 
     .. attribute:: composer
 
@@ -738,13 +738,13 @@ Class RowSchoenbergIsraelExistsAgain
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergIsraelExistsAgain** **Properties**
+    **class RowSchoenbergIsraelExistsAgain** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergIsraelExistsAgain** **Methods**
+    **class RowSchoenbergIsraelExistsAgain** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -753,15 +753,15 @@ Class RowSchoenbergIsraelExistsAgain
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergMosesAndAron
+class RowSchoenbergMosesAndAron
 -------------------------------
 
 .. class:: RowSchoenbergMosesAndAron
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergMosesAndAron** **Attributes**
+    **class RowSchoenbergMosesAndAron** **attributes**
 
     .. attribute:: composer
 
@@ -783,13 +783,13 @@ Class RowSchoenbergMosesAndAron
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergMosesAndAron** **Properties**
+    **class RowSchoenbergMosesAndAron** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergMosesAndAron** **Methods**
+    **class RowSchoenbergMosesAndAron** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -798,15 +798,15 @@ Class RowSchoenbergMosesAndAron
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp23No5
+class RowSchoenbergOp23No5
 --------------------------
 
 .. class:: RowSchoenbergOp23No5
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp23No5** **Attributes**
+    **class RowSchoenbergOp23No5** **attributes**
 
     .. attribute:: composer
 
@@ -828,13 +828,13 @@ Class RowSchoenbergOp23No5
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp23No5** **Properties**
+    **class RowSchoenbergOp23No5** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp23No5** **Methods**
+    **class RowSchoenbergOp23No5** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -843,15 +843,15 @@ Class RowSchoenbergOp23No5
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp24Movement4
+class RowSchoenbergOp24Movement4
 --------------------------------
 
 .. class:: RowSchoenbergOp24Movement4
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp24Movement4** **Attributes**
+    **class RowSchoenbergOp24Movement4** **attributes**
 
     .. attribute:: composer
 
@@ -873,13 +873,13 @@ Class RowSchoenbergOp24Movement4
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp24Movement4** **Properties**
+    **class RowSchoenbergOp24Movement4** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp24Movement4** **Methods**
+    **class RowSchoenbergOp24Movement4** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -888,15 +888,15 @@ Class RowSchoenbergOp24Movement4
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp24Movement5
+class RowSchoenbergOp24Movement5
 --------------------------------
 
 .. class:: RowSchoenbergOp24Movement5
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp24Movement5** **Attributes**
+    **class RowSchoenbergOp24Movement5** **attributes**
 
     .. attribute:: composer
 
@@ -918,13 +918,13 @@ Class RowSchoenbergOp24Movement5
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp24Movement5** **Properties**
+    **class RowSchoenbergOp24Movement5** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp24Movement5** **Methods**
+    **class RowSchoenbergOp24Movement5** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -933,15 +933,15 @@ Class RowSchoenbergOp24Movement5
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp25
+class RowSchoenbergOp25
 -----------------------
 
 .. class:: RowSchoenbergOp25
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp25** **Attributes**
+    **class RowSchoenbergOp25** **attributes**
 
     .. attribute:: composer
 
@@ -963,13 +963,13 @@ Class RowSchoenbergOp25
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp25** **Properties**
+    **class RowSchoenbergOp25** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp25** **Methods**
+    **class RowSchoenbergOp25** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -978,15 +978,15 @@ Class RowSchoenbergOp25
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp26
+class RowSchoenbergOp26
 -----------------------
 
 .. class:: RowSchoenbergOp26
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp26** **Attributes**
+    **class RowSchoenbergOp26** **attributes**
 
     .. attribute:: composer
 
@@ -1008,13 +1008,13 @@ Class RowSchoenbergOp26
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp26** **Properties**
+    **class RowSchoenbergOp26** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp26** **Methods**
+    **class RowSchoenbergOp26** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1023,15 +1023,15 @@ Class RowSchoenbergOp26
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp27No1
+class RowSchoenbergOp27No1
 --------------------------
 
 .. class:: RowSchoenbergOp27No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp27No1** **Attributes**
+    **class RowSchoenbergOp27No1** **attributes**
 
     .. attribute:: composer
 
@@ -1053,13 +1053,13 @@ Class RowSchoenbergOp27No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp27No1** **Properties**
+    **class RowSchoenbergOp27No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp27No1** **Methods**
+    **class RowSchoenbergOp27No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1068,15 +1068,15 @@ Class RowSchoenbergOp27No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp27No2
+class RowSchoenbergOp27No2
 --------------------------
 
 .. class:: RowSchoenbergOp27No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp27No2** **Attributes**
+    **class RowSchoenbergOp27No2** **attributes**
 
     .. attribute:: composer
 
@@ -1098,13 +1098,13 @@ Class RowSchoenbergOp27No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp27No2** **Properties**
+    **class RowSchoenbergOp27No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp27No2** **Methods**
+    **class RowSchoenbergOp27No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1113,15 +1113,15 @@ Class RowSchoenbergOp27No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp27No3
+class RowSchoenbergOp27No3
 --------------------------
 
 .. class:: RowSchoenbergOp27No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp27No3** **Attributes**
+    **class RowSchoenbergOp27No3** **attributes**
 
     .. attribute:: composer
 
@@ -1143,13 +1143,13 @@ Class RowSchoenbergOp27No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp27No3** **Properties**
+    **class RowSchoenbergOp27No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp27No3** **Methods**
+    **class RowSchoenbergOp27No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1158,15 +1158,15 @@ Class RowSchoenbergOp27No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp27No4
+class RowSchoenbergOp27No4
 --------------------------
 
 .. class:: RowSchoenbergOp27No4
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp27No4** **Attributes**
+    **class RowSchoenbergOp27No4** **attributes**
 
     .. attribute:: composer
 
@@ -1188,13 +1188,13 @@ Class RowSchoenbergOp27No4
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp27No4** **Properties**
+    **class RowSchoenbergOp27No4** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp27No4** **Methods**
+    **class RowSchoenbergOp27No4** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1203,15 +1203,15 @@ Class RowSchoenbergOp27No4
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp28No1
+class RowSchoenbergOp28No1
 --------------------------
 
 .. class:: RowSchoenbergOp28No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp28No1** **Attributes**
+    **class RowSchoenbergOp28No1** **attributes**
 
     .. attribute:: composer
 
@@ -1233,13 +1233,13 @@ Class RowSchoenbergOp28No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp28No1** **Properties**
+    **class RowSchoenbergOp28No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp28No1** **Methods**
+    **class RowSchoenbergOp28No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1248,15 +1248,15 @@ Class RowSchoenbergOp28No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp28No3
+class RowSchoenbergOp28No3
 --------------------------
 
 .. class:: RowSchoenbergOp28No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp28No3** **Attributes**
+    **class RowSchoenbergOp28No3** **attributes**
 
     .. attribute:: composer
 
@@ -1278,13 +1278,13 @@ Class RowSchoenbergOp28No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp28No3** **Properties**
+    **class RowSchoenbergOp28No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp28No3** **Methods**
+    **class RowSchoenbergOp28No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1293,15 +1293,15 @@ Class RowSchoenbergOp28No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp29
+class RowSchoenbergOp29
 -----------------------
 
 .. class:: RowSchoenbergOp29
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp29** **Attributes**
+    **class RowSchoenbergOp29** **attributes**
 
     .. attribute:: composer
 
@@ -1323,13 +1323,13 @@ Class RowSchoenbergOp29
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp29** **Properties**
+    **class RowSchoenbergOp29** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp29** **Methods**
+    **class RowSchoenbergOp29** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1338,15 +1338,15 @@ Class RowSchoenbergOp29
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp30
+class RowSchoenbergOp30
 -----------------------
 
 .. class:: RowSchoenbergOp30
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp30** **Attributes**
+    **class RowSchoenbergOp30** **attributes**
 
     .. attribute:: composer
 
@@ -1368,13 +1368,13 @@ Class RowSchoenbergOp30
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp30** **Properties**
+    **class RowSchoenbergOp30** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp30** **Methods**
+    **class RowSchoenbergOp30** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1383,15 +1383,15 @@ Class RowSchoenbergOp30
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp31
+class RowSchoenbergOp31
 -----------------------
 
 .. class:: RowSchoenbergOp31
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp31** **Attributes**
+    **class RowSchoenbergOp31** **attributes**
 
     .. attribute:: composer
 
@@ -1413,13 +1413,13 @@ Class RowSchoenbergOp31
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp31** **Properties**
+    **class RowSchoenbergOp31** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp31** **Methods**
+    **class RowSchoenbergOp31** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1428,15 +1428,15 @@ Class RowSchoenbergOp31
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp32
+class RowSchoenbergOp32
 -----------------------
 
 .. class:: RowSchoenbergOp32
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp32** **Attributes**
+    **class RowSchoenbergOp32** **attributes**
 
     .. attribute:: composer
 
@@ -1458,13 +1458,13 @@ Class RowSchoenbergOp32
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp32** **Properties**
+    **class RowSchoenbergOp32** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp32** **Methods**
+    **class RowSchoenbergOp32** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1473,15 +1473,15 @@ Class RowSchoenbergOp32
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp33A
+class RowSchoenbergOp33A
 ------------------------
 
 .. class:: RowSchoenbergOp33A
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp33A** **Attributes**
+    **class RowSchoenbergOp33A** **attributes**
 
     .. attribute:: composer
 
@@ -1503,13 +1503,13 @@ Class RowSchoenbergOp33A
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp33A** **Properties**
+    **class RowSchoenbergOp33A** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp33A** **Methods**
+    **class RowSchoenbergOp33A** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1518,15 +1518,15 @@ Class RowSchoenbergOp33A
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp33B
+class RowSchoenbergOp33B
 ------------------------
 
 .. class:: RowSchoenbergOp33B
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp33B** **Attributes**
+    **class RowSchoenbergOp33B** **attributes**
 
     .. attribute:: composer
 
@@ -1548,13 +1548,13 @@ Class RowSchoenbergOp33B
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp33B** **Properties**
+    **class RowSchoenbergOp33B** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp33B** **Methods**
+    **class RowSchoenbergOp33B** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1563,15 +1563,15 @@ Class RowSchoenbergOp33B
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp34
+class RowSchoenbergOp34
 -----------------------
 
 .. class:: RowSchoenbergOp34
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp34** **Attributes**
+    **class RowSchoenbergOp34** **attributes**
 
     .. attribute:: composer
 
@@ -1593,13 +1593,13 @@ Class RowSchoenbergOp34
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp34** **Properties**
+    **class RowSchoenbergOp34** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp34** **Methods**
+    **class RowSchoenbergOp34** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1608,15 +1608,15 @@ Class RowSchoenbergOp34
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp35No1
+class RowSchoenbergOp35No1
 --------------------------
 
 .. class:: RowSchoenbergOp35No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp35No1** **Attributes**
+    **class RowSchoenbergOp35No1** **attributes**
 
     .. attribute:: composer
 
@@ -1638,13 +1638,13 @@ Class RowSchoenbergOp35No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp35No1** **Properties**
+    **class RowSchoenbergOp35No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp35No1** **Methods**
+    **class RowSchoenbergOp35No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1653,15 +1653,15 @@ Class RowSchoenbergOp35No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp35No2
+class RowSchoenbergOp35No2
 --------------------------
 
 .. class:: RowSchoenbergOp35No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp35No2** **Attributes**
+    **class RowSchoenbergOp35No2** **attributes**
 
     .. attribute:: composer
 
@@ -1683,13 +1683,13 @@ Class RowSchoenbergOp35No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp35No2** **Properties**
+    **class RowSchoenbergOp35No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp35No2** **Methods**
+    **class RowSchoenbergOp35No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1698,15 +1698,15 @@ Class RowSchoenbergOp35No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp35No3
+class RowSchoenbergOp35No3
 --------------------------
 
 .. class:: RowSchoenbergOp35No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp35No3** **Attributes**
+    **class RowSchoenbergOp35No3** **attributes**
 
     .. attribute:: composer
 
@@ -1728,13 +1728,13 @@ Class RowSchoenbergOp35No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp35No3** **Properties**
+    **class RowSchoenbergOp35No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp35No3** **Methods**
+    **class RowSchoenbergOp35No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1743,15 +1743,15 @@ Class RowSchoenbergOp35No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp35No5
+class RowSchoenbergOp35No5
 --------------------------
 
 .. class:: RowSchoenbergOp35No5
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp35No5** **Attributes**
+    **class RowSchoenbergOp35No5** **attributes**
 
     .. attribute:: composer
 
@@ -1773,13 +1773,13 @@ Class RowSchoenbergOp35No5
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp35No5** **Properties**
+    **class RowSchoenbergOp35No5** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp35No5** **Methods**
+    **class RowSchoenbergOp35No5** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1788,15 +1788,15 @@ Class RowSchoenbergOp35No5
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp36
+class RowSchoenbergOp36
 -----------------------
 
 .. class:: RowSchoenbergOp36
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp36** **Attributes**
+    **class RowSchoenbergOp36** **attributes**
 
     .. attribute:: composer
 
@@ -1818,13 +1818,13 @@ Class RowSchoenbergOp36
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp36** **Properties**
+    **class RowSchoenbergOp36** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp36** **Methods**
+    **class RowSchoenbergOp36** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1833,15 +1833,15 @@ Class RowSchoenbergOp36
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp37
+class RowSchoenbergOp37
 -----------------------
 
 .. class:: RowSchoenbergOp37
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp37** **Attributes**
+    **class RowSchoenbergOp37** **attributes**
 
     .. attribute:: composer
 
@@ -1863,13 +1863,13 @@ Class RowSchoenbergOp37
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp37** **Properties**
+    **class RowSchoenbergOp37** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp37** **Methods**
+    **class RowSchoenbergOp37** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1878,15 +1878,15 @@ Class RowSchoenbergOp37
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp41
+class RowSchoenbergOp41
 -----------------------
 
 .. class:: RowSchoenbergOp41
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp41** **Attributes**
+    **class RowSchoenbergOp41** **attributes**
 
     .. attribute:: composer
 
@@ -1908,13 +1908,13 @@ Class RowSchoenbergOp41
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp41** **Properties**
+    **class RowSchoenbergOp41** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp41** **Methods**
+    **class RowSchoenbergOp41** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1923,15 +1923,15 @@ Class RowSchoenbergOp41
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp42
+class RowSchoenbergOp42
 -----------------------
 
 .. class:: RowSchoenbergOp42
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp42** **Attributes**
+    **class RowSchoenbergOp42** **attributes**
 
     .. attribute:: composer
 
@@ -1953,13 +1953,13 @@ Class RowSchoenbergOp42
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp42** **Properties**
+    **class RowSchoenbergOp42** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp42** **Methods**
+    **class RowSchoenbergOp42** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -1968,15 +1968,15 @@ Class RowSchoenbergOp42
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp44
+class RowSchoenbergOp44
 -----------------------
 
 .. class:: RowSchoenbergOp44
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp44** **Attributes**
+    **class RowSchoenbergOp44** **attributes**
 
     .. attribute:: composer
 
@@ -1998,13 +1998,13 @@ Class RowSchoenbergOp44
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp44** **Properties**
+    **class RowSchoenbergOp44** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp44** **Methods**
+    **class RowSchoenbergOp44** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2013,15 +2013,15 @@ Class RowSchoenbergOp44
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp45
+class RowSchoenbergOp45
 -----------------------
 
 .. class:: RowSchoenbergOp45
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp45** **Attributes**
+    **class RowSchoenbergOp45** **attributes**
 
     .. attribute:: composer
 
@@ -2043,13 +2043,13 @@ Class RowSchoenbergOp45
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp45** **Properties**
+    **class RowSchoenbergOp45** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp45** **Methods**
+    **class RowSchoenbergOp45** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2058,15 +2058,15 @@ Class RowSchoenbergOp45
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp46
+class RowSchoenbergOp46
 -----------------------
 
 .. class:: RowSchoenbergOp46
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp46** **Attributes**
+    **class RowSchoenbergOp46** **attributes**
 
     .. attribute:: composer
 
@@ -2088,13 +2088,13 @@ Class RowSchoenbergOp46
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp46** **Properties**
+    **class RowSchoenbergOp46** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp46** **Methods**
+    **class RowSchoenbergOp46** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2103,15 +2103,15 @@ Class RowSchoenbergOp46
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp47
+class RowSchoenbergOp47
 -----------------------
 
 .. class:: RowSchoenbergOp47
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp47** **Attributes**
+    **class RowSchoenbergOp47** **attributes**
 
     .. attribute:: composer
 
@@ -2133,13 +2133,13 @@ Class RowSchoenbergOp47
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp47** **Properties**
+    **class RowSchoenbergOp47** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp47** **Methods**
+    **class RowSchoenbergOp47** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2148,15 +2148,15 @@ Class RowSchoenbergOp47
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp48No1
+class RowSchoenbergOp48No1
 --------------------------
 
 .. class:: RowSchoenbergOp48No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp48No1** **Attributes**
+    **class RowSchoenbergOp48No1** **attributes**
 
     .. attribute:: composer
 
@@ -2178,13 +2178,13 @@ Class RowSchoenbergOp48No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp48No1** **Properties**
+    **class RowSchoenbergOp48No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp48No1** **Methods**
+    **class RowSchoenbergOp48No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2193,15 +2193,15 @@ Class RowSchoenbergOp48No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp48No2
+class RowSchoenbergOp48No2
 --------------------------
 
 .. class:: RowSchoenbergOp48No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp48No2** **Attributes**
+    **class RowSchoenbergOp48No2** **attributes**
 
     .. attribute:: composer
 
@@ -2223,13 +2223,13 @@ Class RowSchoenbergOp48No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp48No2** **Properties**
+    **class RowSchoenbergOp48No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp48No2** **Methods**
+    **class RowSchoenbergOp48No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2238,15 +2238,15 @@ Class RowSchoenbergOp48No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp48No3
+class RowSchoenbergOp48No3
 --------------------------
 
 .. class:: RowSchoenbergOp48No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp48No3** **Attributes**
+    **class RowSchoenbergOp48No3** **attributes**
 
     .. attribute:: composer
 
@@ -2268,13 +2268,13 @@ Class RowSchoenbergOp48No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp48No3** **Properties**
+    **class RowSchoenbergOp48No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp48No3** **Methods**
+    **class RowSchoenbergOp48No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2283,15 +2283,15 @@ Class RowSchoenbergOp48No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp50A
+class RowSchoenbergOp50A
 ------------------------
 
 .. class:: RowSchoenbergOp50A
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp50A** **Attributes**
+    **class RowSchoenbergOp50A** **attributes**
 
     .. attribute:: composer
 
@@ -2313,13 +2313,13 @@ Class RowSchoenbergOp50A
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp50A** **Properties**
+    **class RowSchoenbergOp50A** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp50A** **Methods**
+    **class RowSchoenbergOp50A** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2328,15 +2328,15 @@ Class RowSchoenbergOp50A
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp50B
+class RowSchoenbergOp50B
 ------------------------
 
 .. class:: RowSchoenbergOp50B
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp50B** **Attributes**
+    **class RowSchoenbergOp50B** **attributes**
 
     .. attribute:: composer
 
@@ -2358,13 +2358,13 @@ Class RowSchoenbergOp50B
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp50B** **Properties**
+    **class RowSchoenbergOp50B** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp50B** **Methods**
+    **class RowSchoenbergOp50B** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2373,15 +2373,15 @@ Class RowSchoenbergOp50B
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowSchoenbergOp50C
+class RowSchoenbergOp50C
 ------------------------
 
 .. class:: RowSchoenbergOp50C
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowSchoenbergOp50C** **Attributes**
+    **class RowSchoenbergOp50C** **attributes**
 
     .. attribute:: composer
 
@@ -2403,13 +2403,13 @@ Class RowSchoenbergOp50C
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowSchoenbergOp50C** **Properties**
+    **class RowSchoenbergOp50C** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowSchoenbergOp50C** **Methods**
+    **class RowSchoenbergOp50C** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2418,15 +2418,15 @@ Class RowSchoenbergOp50C
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp17No2
+class RowWebernOp17No2
 ----------------------
 
 .. class:: RowWebernOp17No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp17No2** **Attributes**
+    **class RowWebernOp17No2** **attributes**
 
     .. attribute:: composer
 
@@ -2448,13 +2448,13 @@ Class RowWebernOp17No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp17No2** **Properties**
+    **class RowWebernOp17No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp17No2** **Methods**
+    **class RowWebernOp17No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2463,15 +2463,15 @@ Class RowWebernOp17No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp17No3
+class RowWebernOp17No3
 ----------------------
 
 .. class:: RowWebernOp17No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp17No3** **Attributes**
+    **class RowWebernOp17No3** **attributes**
 
     .. attribute:: composer
 
@@ -2493,13 +2493,13 @@ Class RowWebernOp17No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp17No3** **Properties**
+    **class RowWebernOp17No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp17No3** **Methods**
+    **class RowWebernOp17No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2508,15 +2508,15 @@ Class RowWebernOp17No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp18No1
+class RowWebernOp18No1
 ----------------------
 
 .. class:: RowWebernOp18No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp18No1** **Attributes**
+    **class RowWebernOp18No1** **attributes**
 
     .. attribute:: composer
 
@@ -2538,13 +2538,13 @@ Class RowWebernOp18No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp18No1** **Properties**
+    **class RowWebernOp18No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp18No1** **Methods**
+    **class RowWebernOp18No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2553,15 +2553,15 @@ Class RowWebernOp18No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp18No2
+class RowWebernOp18No2
 ----------------------
 
 .. class:: RowWebernOp18No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp18No2** **Attributes**
+    **class RowWebernOp18No2** **attributes**
 
     .. attribute:: composer
 
@@ -2583,13 +2583,13 @@ Class RowWebernOp18No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp18No2** **Properties**
+    **class RowWebernOp18No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp18No2** **Methods**
+    **class RowWebernOp18No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2598,15 +2598,15 @@ Class RowWebernOp18No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp18No3
+class RowWebernOp18No3
 ----------------------
 
 .. class:: RowWebernOp18No3
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp18No3** **Attributes**
+    **class RowWebernOp18No3** **attributes**
 
     .. attribute:: composer
 
@@ -2628,13 +2628,13 @@ Class RowWebernOp18No3
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp18No3** **Properties**
+    **class RowWebernOp18No3** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp18No3** **Methods**
+    **class RowWebernOp18No3** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2643,15 +2643,15 @@ Class RowWebernOp18No3
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp19No1
+class RowWebernOp19No1
 ----------------------
 
 .. class:: RowWebernOp19No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp19No1** **Attributes**
+    **class RowWebernOp19No1** **attributes**
 
     .. attribute:: composer
 
@@ -2673,13 +2673,13 @@ Class RowWebernOp19No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp19No1** **Properties**
+    **class RowWebernOp19No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp19No1** **Methods**
+    **class RowWebernOp19No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2688,15 +2688,15 @@ Class RowWebernOp19No1
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp19No2
+class RowWebernOp19No2
 ----------------------
 
 .. class:: RowWebernOp19No2
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp19No2** **Attributes**
+    **class RowWebernOp19No2** **attributes**
 
     .. attribute:: composer
 
@@ -2718,13 +2718,13 @@ Class RowWebernOp19No2
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp19No2** **Properties**
+    **class RowWebernOp19No2** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp19No2** **Methods**
+    **class RowWebernOp19No2** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2733,15 +2733,15 @@ Class RowWebernOp19No2
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp20
+class RowWebernOp20
 -------------------
 
 .. class:: RowWebernOp20
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp20** **Attributes**
+    **class RowWebernOp20** **attributes**
 
     .. attribute:: composer
 
@@ -2763,13 +2763,13 @@ Class RowWebernOp20
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp20** **Properties**
+    **class RowWebernOp20** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp20** **Methods**
+    **class RowWebernOp20** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2778,15 +2778,15 @@ Class RowWebernOp20
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp21
+class RowWebernOp21
 -------------------
 
 .. class:: RowWebernOp21
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp21** **Attributes**
+    **class RowWebernOp21** **attributes**
 
     .. attribute:: composer
 
@@ -2808,13 +2808,13 @@ Class RowWebernOp21
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp21** **Properties**
+    **class RowWebernOp21** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp21** **Methods**
+    **class RowWebernOp21** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2823,15 +2823,15 @@ Class RowWebernOp21
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp22
+class RowWebernOp22
 -------------------
 
 .. class:: RowWebernOp22
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp22** **Attributes**
+    **class RowWebernOp22** **attributes**
 
     .. attribute:: composer
 
@@ -2853,13 +2853,13 @@ Class RowWebernOp22
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp22** **Properties**
+    **class RowWebernOp22** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp22** **Methods**
+    **class RowWebernOp22** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2868,15 +2868,15 @@ Class RowWebernOp22
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp23
+class RowWebernOp23
 -------------------
 
 .. class:: RowWebernOp23
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp23** **Attributes**
+    **class RowWebernOp23** **attributes**
 
     .. attribute:: composer
 
@@ -2898,13 +2898,13 @@ Class RowWebernOp23
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp23** **Properties**
+    **class RowWebernOp23** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp23** **Methods**
+    **class RowWebernOp23** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2913,15 +2913,15 @@ Class RowWebernOp23
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp24
+class RowWebernOp24
 -------------------
 
 .. class:: RowWebernOp24
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp24** **Attributes**
+    **class RowWebernOp24** **attributes**
 
     .. attribute:: composer
 
@@ -2943,13 +2943,13 @@ Class RowWebernOp24
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp24** **Properties**
+    **class RowWebernOp24** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp24** **Methods**
+    **class RowWebernOp24** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -2958,15 +2958,15 @@ Class RowWebernOp24
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp25
+class RowWebernOp25
 -------------------
 
 .. class:: RowWebernOp25
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp25** **Attributes**
+    **class RowWebernOp25** **attributes**
 
     .. attribute:: composer
 
@@ -2988,13 +2988,13 @@ Class RowWebernOp25
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp25** **Properties**
+    **class RowWebernOp25** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp25** **Methods**
+    **class RowWebernOp25** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3003,15 +3003,15 @@ Class RowWebernOp25
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp26
+class RowWebernOp26
 -------------------
 
 .. class:: RowWebernOp26
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp26** **Attributes**
+    **class RowWebernOp26** **attributes**
 
     .. attribute:: composer
 
@@ -3033,13 +3033,13 @@ Class RowWebernOp26
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp26** **Properties**
+    **class RowWebernOp26** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp26** **Methods**
+    **class RowWebernOp26** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3048,15 +3048,15 @@ Class RowWebernOp26
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp27
+class RowWebernOp27
 -------------------
 
 .. class:: RowWebernOp27
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp27** **Attributes**
+    **class RowWebernOp27** **attributes**
 
     .. attribute:: composer
 
@@ -3078,13 +3078,13 @@ Class RowWebernOp27
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp27** **Properties**
+    **class RowWebernOp27** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp27** **Methods**
+    **class RowWebernOp27** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3093,15 +3093,15 @@ Class RowWebernOp27
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp28
+class RowWebernOp28
 -------------------
 
 .. class:: RowWebernOp28
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp28** **Attributes**
+    **class RowWebernOp28** **attributes**
 
     .. attribute:: composer
 
@@ -3123,13 +3123,13 @@ Class RowWebernOp28
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp28** **Properties**
+    **class RowWebernOp28** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp28** **Methods**
+    **class RowWebernOp28** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3138,15 +3138,15 @@ Class RowWebernOp28
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp29
+class RowWebernOp29
 -------------------
 
 .. class:: RowWebernOp29
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp29** **Attributes**
+    **class RowWebernOp29** **attributes**
 
     .. attribute:: composer
 
@@ -3168,13 +3168,13 @@ Class RowWebernOp29
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp29** **Properties**
+    **class RowWebernOp29** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp29** **Methods**
+    **class RowWebernOp29** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3183,15 +3183,15 @@ Class RowWebernOp29
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp30
+class RowWebernOp30
 -------------------
 
 .. class:: RowWebernOp30
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp30** **Attributes**
+    **class RowWebernOp30** **attributes**
 
     .. attribute:: composer
 
@@ -3213,13 +3213,13 @@ Class RowWebernOp30
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp30** **Properties**
+    **class RowWebernOp30** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp30** **Methods**
+    **class RowWebernOp30** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3228,15 +3228,15 @@ Class RowWebernOp30
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOp31
+class RowWebernOp31
 -------------------
 
 .. class:: RowWebernOp31
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOp31** **Attributes**
+    **class RowWebernOp31** **attributes**
 
     .. attribute:: composer
 
@@ -3258,13 +3258,13 @@ Class RowWebernOp31
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOp31** **Properties**
+    **class RowWebernOp31** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOp31** **Methods**
+    **class RowWebernOp31** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 
@@ -3273,15 +3273,15 @@ Class RowWebernOp31
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class RowWebernOpNo17No1
+class RowWebernOpNo17No1
 ------------------------
 
 .. class:: RowWebernOpNo17No1
 
 
-    Class inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.serial.TwelveToneRow`, :class:`music21.serial.ToneRow`, :class:`music21.stream.Stream`, :class:`music21.base.Music21Object`
 
-    **Class RowWebernOpNo17No1** **Attributes**
+    **class RowWebernOpNo17No1** **attributes**
 
     .. attribute:: composer
 
@@ -3303,13 +3303,13 @@ Class RowWebernOpNo17No1
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class RowWebernOpNo17No1** **Properties**
+    **class RowWebernOpNo17No1** **properties**
 
     Properties inherited from :class:`music21.stream.Stream`: :attr:`music21.stream.Stream.measures`, :attr:`music21.stream.Stream.notes`, :attr:`music21.stream.Stream.pitches`, :attr:`music21.stream.Stream.duration`, :attr:`music21.stream.Stream.elements`, :attr:`music21.stream.Stream.flat`, :attr:`music21.stream.Stream.highestOffset`, :attr:`music21.stream.Stream.highestTime`, :attr:`music21.stream.Stream.isGapless`, :attr:`music21.stream.Stream.lily`, :attr:`music21.stream.Stream.lowestOffset`, :attr:`music21.stream.Stream.musicxml`, :attr:`music21.stream.Stream.mx`, :attr:`music21.stream.Stream.semiFlat`, :attr:`music21.stream.Stream.sorted`
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class RowWebernOpNo17No1** **Methods**
+    **class RowWebernOpNo17No1** **methods**
 
     Methods inherited from :class:`music21.serial.TwelveToneRow`: :meth:`music21.serial.TwelveToneRow.__init__`, :meth:`music21.serial.TwelveToneRow.matrix`
 

@@ -48,10 +48,10 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.base</a><ul>
-<li><a class="reference external" href="#class-music21object">Class Music21Object</a></li>
-<li><a class="reference external" href="#class-elementwrapper">Class ElementWrapper</a></li>
-<li><a class="reference external" href="#class-definedcontexts">Class DefinedContexts</a></li>
-<li><a class="reference external" href="#class-groups">Class Groups</a></li>
+<li><a class="reference external" href="#class-music21object">class Music21Object</a></li>
+<li><a class="reference external" href="#class-elementwrapper">class ElementWrapper</a></li>
+<li><a class="reference external" href="#class-definedcontexts">class DefinedContexts</a></li>
+<li><a class="reference external" href="#class-groups">class Groups</a></li>
 </ul>
 </li>
 </ul>
@@ -92,14 +92,14 @@
 <span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#module-music21.base" title="Permalink to this headline">¶</a></h1>
 <p>Music21 base classes and important utilities. base &#8211; the convention within music21 is that __init__ files contain: from base import * so everything in this file can be accessed as music21.XXXX</p>
 <div class="section" id="class-music21object">
-<h2>Class Music21Object<a class="headerlink" href="#class-music21object" title="Permalink to this headline">¶</a></h2>
+<h2>class Music21Object<a class="headerlink" href="#class-music21object" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.base.Music21Object">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
 <p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
-<p><strong>Class Music21Object</strong> <strong>Attributes</strong></p>
+<p><strong>class Music21Object</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.base.Music21Object.id">
 <tt class="descname">id</tt><a class="headerlink" href="#music21.base.Music21Object.id" title="Permalink to this definition">¶</a></dt>
@@ -112,7 +112,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <dd></dd></dl>
 
 <p>An instance of a Group object.</p>
-<p><strong>Class Music21Object</strong> <strong>Properties</strong></p>
+<p><strong>class Music21Object</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.base.Music21Object.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.Music21Object.duration" title="Permalink to this definition">¶</a></dt>
@@ -144,7 +144,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <span class="nc">ElementException</span>: <span class="n-Identifier">priority values must be integers.</span>
 </pre></div>
 </div>
-<p><strong>Class Music21Object</strong> <strong>Methods</strong></p>
+<p><strong>class Music21Object</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.base.Music21Object.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.__init__" title="Permalink to this definition">¶</a></dt>
@@ -264,21 +264,21 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 
 </div>
 <div class="section" id="class-elementwrapper">
-<h2>Class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
+<h2>class ElementWrapper<a class="headerlink" href="#class-elementwrapper" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.base.ElementWrapper">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj &#8211; however, calls to the ElementWrapper will call Object is now mandatory &#8211; calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object.</p>
-<p>Class inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p><strong>Class ElementWrapper</strong> <strong>Attributes</strong></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>class ElementWrapper</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.base.ElementWrapper.obj">
 <tt class="descname">obj</tt><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>Class ElementWrapper</strong> <strong>Properties</strong></p>
+<p><strong>class ElementWrapper</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.base.ElementWrapper.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.ElementWrapper.duration" title="Permalink to this definition">¶</a></dt>
@@ -321,7 +321,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <dd></dd></dl>
 
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.parent" class="reference internal" href="#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference internal" href="#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
-<p><strong>Class ElementWrapper</strong> <strong>Methods</strong></p>
+<p><strong>class ElementWrapper</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.base.ElementWrapper.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.__init__" title="Permalink to this definition">¶</a></dt>
@@ -391,13 +391,13 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 
 </div>
 <div class="section" id="class-definedcontexts">
-<h2>Class DefinedContexts<a class="headerlink" href="#class-definedcontexts" title="Permalink to this headline">¶</a></h2>
+<h2>class DefinedContexts<a class="headerlink" href="#class-definedcontexts" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.base.DefinedContexts">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">DefinedContexts</tt><a class="headerlink" href="#music21.base.DefinedContexts" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts).</p>
-<p><strong>Class DefinedContexts</strong> <strong>Methods</strong></p>
+<p><strong>class DefinedContexts</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.base.DefinedContexts.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.__init__" title="Permalink to this definition">¶</a></dt>
@@ -650,7 +650,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 
 </div>
 <div class="section" id="class-groups">
-<h2>Class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
+<h2>class Groups<a class="headerlink" href="#class-groups" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.base.Groups">
 <em class="property">
@@ -665,8 +665,8 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
 <span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
 </pre></div>
 </div>
-<p>Class inherits from: list</p>
-<p><strong>Class Groups</strong> <strong>Methods</strong></p>
+<p>inherits from: list</p>
+<p><strong>class Groups</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.base.Groups.append">
 <tt class="descname">append</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.base.Groups.append" title="Permalink to this definition">¶</a></dt>

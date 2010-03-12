@@ -48,10 +48,10 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.interval</a><ul>
-<li><a class="reference external" href="#class-interval">Class Interval</a></li>
-<li><a class="reference external" href="#class-chromaticinterval">Class ChromaticInterval</a></li>
-<li><a class="reference external" href="#class-diatonicinterval">Class DiatonicInterval</a></li>
-<li><a class="reference external" href="#class-genericinterval">Class GenericInterval</a></li>
+<li><a class="reference external" href="#class-interval">class Interval</a></li>
+<li><a class="reference external" href="#class-chromaticinterval">class ChromaticInterval</a></li>
+<li><a class="reference external" href="#class-diatonicinterval">class DiatonicInterval</a></li>
+<li><a class="reference external" href="#class-genericinterval">class GenericInterval</a></li>
 </ul>
 </li>
 </ul>
@@ -225,7 +225,7 @@
 
 <p>Given two notes, returns the lower note based on diatonic note number. Returns the note lower in pitch if the diatonic number is the same, or the first note if pitch is also the same.</p>
 <div class="section" id="class-interval">
-<h2>Class Interval<a class="headerlink" href="#class-interval" title="Permalink to this headline">¶</a></h2>
+<h2>class Interval<a class="headerlink" href="#class-interval" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.interval.Interval">
 <em class="property">
@@ -239,8 +239,8 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <span class="go">&lt;music21.interval.Interval P15&gt;</span>
 </pre></div>
 </div>
-<p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p><strong>Class Interval</strong> <strong>Attributes</strong></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>class Interval</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.interval.Interval.chromatic">
 <tt class="descname">chromatic</tt><a class="headerlink" href="#music21.interval.Interval.chromatic" title="Permalink to this definition">¶</a></dt>
@@ -296,7 +296,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 <p>No documentation.</p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.groups</span></tt></a></p>
-<p><strong>Class Interval</strong> <strong>Properties</strong></p>
+<p><strong>class Interval</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.interval.Interval.complement">
 <tt class="descname">complement</tt><a class="headerlink" href="#music21.interval.Interval.complement" title="Permalink to this definition">¶</a></dt>
@@ -304,7 +304,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 <p>No documentation.</p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
-<p><strong>Class Interval</strong> <strong>Methods</strong></p>
+<p><strong>class Interval</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.interval.Interval.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.Interval.__init__" title="Permalink to this definition">¶</a></dt>
@@ -328,18 +328,18 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 </div>
 <div class="section" id="class-chromaticinterval">
-<h2>Class ChromaticInterval<a class="headerlink" href="#class-chromaticinterval" title="Permalink to this headline">¶</a></h2>
+<h2>class ChromaticInterval<a class="headerlink" href="#class-chromaticinterval" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.interval.ChromaticInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">ChromaticInterval</tt><a class="headerlink" href="#music21.interval.ChromaticInterval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Chromatic interval class &#8211; thinks of everything in semitones chromInt = chromaticInterval (-14) attributes: semitones     # -14 undirected    # 14 mod12         # 10 intervalClass #  2 cents         # -1400</p>
-<p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p><strong>Class ChromaticInterval</strong> <strong>Attributes</strong></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>class ChromaticInterval</strong> <strong>attributes</strong></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.id</span></tt></a></p>
-<p><strong>Class ChromaticInterval</strong> <strong>Properties</strong></p>
+<p><strong>class ChromaticInterval</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
-<p><strong>Class ChromaticInterval</strong> <strong>Methods</strong></p>
+<p><strong>class ChromaticInterval</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.interval.ChromaticInterval.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#music21.interval.ChromaticInterval.__init__" title="Permalink to this definition">¶</a></dt>
@@ -351,13 +351,13 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 </div>
 <div class="section" id="class-diatonicinterval">
-<h2>Class DiatonicInterval<a class="headerlink" href="#class-diatonicinterval" title="Permalink to this headline">¶</a></h2>
+<h2>class DiatonicInterval<a class="headerlink" href="#class-diatonicinterval" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.interval.DiatonicInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">DiatonicInterval</tt><a class="headerlink" href="#music21.interval.DiatonicInterval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p><strong>Class DiatonicInterval</strong> <strong>Attributes</strong></p>
+<dd><p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>class DiatonicInterval</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.interval.DiatonicInterval.specifier">
 <tt class="descname">specifier</tt><a class="headerlink" href="#music21.interval.DiatonicInterval.specifier" title="Permalink to this definition">¶</a></dt>
@@ -371,9 +371,9 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 <p>No documentation.</p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.groups</span></tt></a></p>
-<p><strong>Class DiatonicInterval</strong> <strong>Properties</strong></p>
+<p><strong>class DiatonicInterval</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
-<p><strong>Class DiatonicInterval</strong> <strong>Methods</strong></p>
+<p><strong>class DiatonicInterval</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.interval.DiatonicInterval.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>specifier=None</em>, <em>generic=None</em><big>)</big><a class="headerlink" href="#music21.interval.DiatonicInterval.__init__" title="Permalink to this definition">¶</a></dt>
@@ -385,18 +385,18 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 
 </div>
 <div class="section" id="class-genericinterval">
-<h2>Class GenericInterval<a class="headerlink" href="#class-genericinterval" title="Permalink to this headline">¶</a></h2>
+<h2>class GenericInterval<a class="headerlink" href="#class-genericinterval" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.interval.GenericInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">GenericInterval</tt><a class="headerlink" href="#music21.interval.GenericInterval" title="Permalink to this definition">¶</a></dt>
 <dd><p>A generic interval is an interval such as Third, Seventh, Octave, Tenth. Constructor takes an int specifying the interval and direction: staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
-<p>Class inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
-<p><strong>Class GenericInterval</strong> <strong>Attributes</strong></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a></p>
+<p><strong>class GenericInterval</strong> <strong>attributes</strong></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.id</span></tt></a></p>
-<p><strong>Class GenericInterval</strong> <strong>Properties</strong></p>
+<p><strong>class GenericInterval</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">music21.base.Music21Object.priority</span></tt></a></p>
-<p><strong>Class GenericInterval</strong> <strong>Methods</strong></p>
+<p><strong>class GenericInterval</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.interval.GenericInterval.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.interval.GenericInterval.__init__" title="Permalink to this definition">¶</a></dt>

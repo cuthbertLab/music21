@@ -9,7 +9,7 @@ music21.tempo
 
 
 
-Class TempoMark
+class TempoMark
 ---------------
 
 .. class:: TempoMark
@@ -20,9 +20,9 @@ Class TempoMark
     >>> tm.value
     'adagio' 
 
-    Class inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.base.Music21Object`
 
-    **Class TempoMark** **Attributes**
+    **class TempoMark** **attributes**
 
     .. attribute:: value
 
@@ -30,11 +30,11 @@ Class TempoMark
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class TempoMark** **Properties**
+    **class TempoMark** **properties**
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class TempoMark** **Methods**
+    **class TempoMark** **methods**
 
     .. method:: __init__(value=None)
 
@@ -43,7 +43,7 @@ Class TempoMark
     Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
 
 
-Class MetronomeMark
+class MetronomeMark
 -------------------
 
 .. class:: MetronomeMark
@@ -54,9 +54,9 @@ Class MetronomeMark
     >>> a.number
     40 
 
-    Class inherits from: :class:`music21.tempo.TempoMark`, :class:`music21.base.Music21Object`
+    inherits from: :class:`music21.tempo.TempoMark`, :class:`music21.base.Music21Object`
 
-    **Class MetronomeMark** **Attributes**
+    **class MetronomeMark** **attributes**
 
     .. attribute:: number
 
@@ -70,11 +70,11 @@ Class MetronomeMark
 
     Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
 
-    **Class MetronomeMark** **Properties**
+    **class MetronomeMark** **properties**
 
     Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
 
-    **Class MetronomeMark** **Methods**
+    **class MetronomeMark** **methods**
 
     .. method:: __init__(number=60, referent=None)
 
