@@ -31,14 +31,15 @@ try:
     #matplotlib.use('WXAgg')
 
     from mpl_toolkits.mplot3d import Axes3D
-    from matplotlib.collections import PolyCollection
+    from matplotlib import collections
+    from matplotlib import patches
+
     #from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt
     import numpy
 
 except ImportError:
-    print _MOD, 'no matplotlib available'
-    pass
+    environLocal.printWarn('no matplotlib available')
 
 
 
@@ -214,7 +215,7 @@ class Graph(object):
 
                     if 'ticks' in self.axis[axis].keys():
                         values, labels = self.axis[axis]['ticks']
-                        environLocal.printDebug(['x tick labels, x tick values', labels, values])
+                        #environLocal.printDebug(['x tick labels, x tick values', labels, values])
                         ax.set_xticks(values)
                         ax.set_xticklabels(labels)
 
@@ -224,7 +225,7 @@ class Graph(object):
                     # new way:
                     if 'ticks' in self.axis[axis].keys():
                         values, labels = self.axis[axis]['ticks']
-                        environLocal.printDebug(['y tick labels, y tick values', labels, values])
+                        #environLocal.printDebug(['y tick labels, y tick values', labels, values])
                         ax.set_yticks(values)
                         ax.set_yticklabels(labels)
 
@@ -271,12 +272,14 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
+
+
+
 class Graph2DBrokenHorizontalBar(Graph):
     def __init__(self, *args, **keywords):
-        '''Given a representation of events in time at various levels, create a time domain representation
+        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. 
 
-        Data provided is a dictionary, where keys become y values and a list of
-        on off points is provided.
+        Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-end points. 
 
         >>> a = Graph2DBrokenHorizontalBar(doneAction=None)
         >>> data = [('a', [(10,20), (15, 40)]), ('b', [(5,15), (20,40)])]
@@ -327,11 +330,70 @@ class Graph2DBrokenHorizontalBar(Graph):
         self.setAxisRange('y', (0, len(keys) * self._barSpace))
         self.setAxisRange('x', (min(xPoints), max(xPoints)))
         self.setTicks('y', yTicks)  
-        environLocal.printDebug([yTicks])
+        #environLocal.printDebug([yTicks])
 
         self._applyFormatting(ax)
         self.done()
 
+
+
+class Graph2DScatterWeighted(Graph):
+    def __init__(self, *args, **keywords):
+        '''A scatter plot where points are scaled in size to represent the number of values stored within.
+
+        >>> a = Graph2DScatterWeighted(doneAction=None)
+        >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
+        >>> a.setData(data)
+        >>> a.process()
+        '''
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+        # if figure size has not been defined, configure
+        if 'figureSize' not in keywords:
+            self.setFigureSize([5,5])
+        if 'alpha' not in keywords:
+            self.alpha = .6
+
+        self._maxDiameter = 1
+        self._minDiameter = .1
+        self._rangeDiameter = self._maxDiameter - self._minDiameter
+
+    def process(self):
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+        ax = self.fig.add_subplot(111)
+
+        # need to filter data to weight z values
+        xList = [x for x, y, z in self.data]
+        yList = [y for x, y, z in self.data]
+        zList = [z for x, y, z in self.data]
+
+        zMax = max(zList)
+        zMin = min(zList)
+        zRange = zMax - zMin
+
+        zNorm = []
+        for z in zList:
+            scalar = (z-zMin) / zRange # shifted part / range
+            zNorm.append(self._minDiameter + (self._rangeDiameter * scalar))
+
+        for i in range(len(self.data)):
+            x = xList[i]
+            y = yList[i]
+            z = zNorm[i] # normalized values
+
+            e = patches.Ellipse(xy=(x, y), width=z, height=z)
+            e.set_alpha(self.alpha)
+            e.set_facecolor('b') # can do this here
+
+            ax.add_artist(e)
+
+            environLocal.printDebug([e])
+
+        self._applyFormatting(ax)
+        self.done()
 
 
 
@@ -348,22 +410,14 @@ class Graph2DScatter(Graph):
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
-
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-
-        # this works if we need to change size
-        #self.fig.set_figwidth(10) 
-
         ax = self.fig.add_subplot(111)
         for x, y in self.data:
             ax.plot(x, y, 'o', color='b', alpha=self.alpha)
-
         self._applyFormatting(ax)
         self.done()
-
-
 
 
 class Graph2DHistogram(Graph):
@@ -436,8 +490,8 @@ class Graph3DBars(Graph):
                 x, y = self.data[key][i]
                 yVals.append(y)
                 xVals.append(x)
-        environLocal.printDebug(['yVals', yVals])
-        environLocal.printDebug(['xVals', xVals])
+        #environLocal.printDebug(['yVals', yVals])
+        #environLocal.printDebug(['xVals', xVals])
 
         if self.axis['x']['range'] == None:
             self.axis['x']['range'] =  min(xVals), max(xVals)
@@ -587,11 +641,21 @@ class Graph3DPolygonBars(Graph):
         #assert len(vertsColor) == len(zVals)
         #print _MOD, vertsColor
 
-        poly = PolyCollection(verts, facecolors=vertsColor)
+        poly = collections.PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)
         ax.add_collection3d(poly, zs=zs, zdir='y')
         self._applyFormatting(ax)
         self.done()
+
+
+
+
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 # graphing utilities that operate on streams
@@ -667,13 +731,12 @@ class PlotStream(object):
 
 
 
-class PlotStreamTimeDomain(PlotStream):
+class PlotStreamPitchSpaceOffset(PlotStream):
     '''A graph of event, sorted by pitch, over time
     '''
-
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
-        self.id = 'timeDomain' # string name used to access this class
+        self.id = 'pitchSpaceOffset' # string name used to access this class
 
         # find listing for any single pitch name
         dataUnique = {}
@@ -762,7 +825,7 @@ class TestExternal(unittest.TestCase):
                 end = start + random.choice(range(50))
                 points.append((start, end))
             data.append([label, points])
-        environLocal.printDebug(['data points', data])
+        #environLocal.printDebug(['data points', data])
         
         a = Graph2DBrokenHorizontalBar()
         a.setData(data)
@@ -772,9 +835,23 @@ class TestExternal(unittest.TestCase):
     def testPlotStreamTimeDomain(self):
         from music21 import corpus      
         a = corpus.parseWork('bach')
-        b = PlotStreamTimeDomain(a[0].flat, title='bach soprano voice')
+        b = PlotStreamPitchSpaceOffset(a[0].flat, title='bach soprano voice')
         b.process()
 
+
+    def testScatterWeighted(self):
+        import random
+        data = []
+        for i in range(50):
+            points = []
+            x = random.choice(range(50))
+            y = random.choice(range(50))
+            z = random.choice(range(50))
+            data.append([x, y, z])
+        
+        a = Graph2DScatterWeighted()
+        a.setData(data)
+        a.process()
 
 
 
@@ -804,6 +881,44 @@ class Test(unittest.TestCase):
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
 
+
+
+    def testBasic(self):
+        a = Graph2DScatter(doneAction=None, title='x to x*x', alpha=1)
+        data = [(x, x*x) for x in range(50)]
+        a.setData(data)
+        a.process()
+        del a
+
+        a = Graph2DHistogram(doneAction=None, title='50 x with random(30) y counts')
+        data = [(x, random.choice(range(30))) for x in range(50)]
+        a.setData(data)
+        a.process()
+        del a
+
+        a = Graph3DPolygonBars(doneAction=None, title='50 x with random values increase by 10 per x', alpha=.8, colors=['b', 'g']) 
+        data = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        for i in range(len(data.keys())):
+            q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
+            data[data.keys()[i]] = q
+        a.setData(data) 
+        a.process()
+        del a
+
+    def testBrokenHorizontal(self):
+        import random
+        data = []
+        for label in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']:
+            points = []
+            for pairs in range(10):
+                start = random.choice(range(150))
+                end = start + random.choice(range(50))
+                points.append((start, end))
+            data.append([label, points])
+        
+        a = Graph2DBrokenHorizontalBar(doneAction=None)
+        a.setData(data)
+        a.process()
 
 
 
