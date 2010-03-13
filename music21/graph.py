@@ -452,7 +452,7 @@ class Graph2DScatterWeighted(Graph):
             yDistort = float(yRange)/xRange
         elif yRange > xRange:
             xDistort = float(xRange)/yRange
-        environLocal.printDebug(['xDistort, yDistort', xDistort, yDistort])
+        #environLocal.printDebug(['xDistort, yDistort', xDistort, yDistort])
 
         zNorm = []
         for z in zList:
@@ -505,11 +505,30 @@ class Graph2DScatter(Graph):
         self._axisInit()
 
     def process(self):
+        '''
+        xValueLegit determines if index values or real values are used
+        '''
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         ax = self.fig.add_subplot(111)
+        xValues = []
+        yValues = []
+        i = 0
         for x, y in self.data:
-            ax.plot(x, y, 'o', color='b', alpha=self.alpha)
+            if x not in xValues:
+                xValues.append(x)
+            if y not in yValues:
+                yValues.append(y)
+        xValues.sort()
+        yValues.sort()
+
+        for x, y in self.data:
+            ax.plot(x, y, 'o', color=self.colors[i%len(self.colors)], alpha=self.alpha)
+            i += 1
+
+        self.setAxisRange('y', (min(yValues), max(yValues)), pad=True)
+        self.setAxisRange('x', (min(xValues), max(xValues)), pad=True)
+
         self._applyFormatting(ax)
         self.done()
 
@@ -542,7 +561,6 @@ class Graph2DHistogram(Graph):
             x.append(a)
             y.append(b)
         ax.bar(x, y, alpha=.8, color=self.colors[0])
-
         self._applyFormatting(ax)
         self.done()
 
@@ -784,14 +802,28 @@ class PlotStream(object):
         return '%s%s%s' % (name, acc.modifier, oct)
 
 
-    def ticksQuarterLength(self, qlList):
+    def ticksQuarterLength(self, qlList=None, labelStyle='type'):
+        '''
+
+        >>> from music21 import stream; s = stream.Stream()
+        >>> a = PlotStream(s)
+        >>> a.ticksQuarterLength()
+        [[0.25, '16th'], [0.5, 'eighth'], [1, 'quarter'], [2, 'half'], [4, 'whole']]
+
+        '''
         if qlList == None: # provide a default if not provided
             qlList = (.25, .5, 1, 2, 4)
         ticks = []
-        for qLen in qlList:
+        for i in range(len(qlList)):
+            qLen = qlList[i]
             # dtype, match = duration.
             # ticks.append([qLen, dc.convertQuarterLengthToType(qLen)]) 
-            ticks.append([qLen, duration.Duration(qLen).type]) 
+            if labelStyle == 'type':
+                ticks.append([qLen, duration.Duration(qLen).type]) 
+            elif labelStyle == 'index':
+                ticks.append([i, '%s' % qLen]) 
+            else:
+                raise PlotStreamException('bad label style: %s' % labelStyle)
         return ticks
 
 # this does not get dots
@@ -957,6 +989,123 @@ class PlotQuarterLength(PlotHistogram):
 
 
 #-------------------------------------------------------------------------------
+# scatter plots
+
+class PlotScatter(PlotStream):
+    '''Base class for scatter plots.
+    '''
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+
+        # sample values; customize in subclass
+        self.fy = lambda n:n.ps
+        self.fyTicks = self.ticksPitchSpaceChromatic
+
+        self.fx = lambda n:n.quarterLength
+        self.fxTicks = self.ticksQuarterLength
+
+    def _extractData(self, xValueLegit=True):
+        data = []
+        xValues = []
+        yValues = []
+
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
+            x = self.fx(noteObj)
+            y = self.fy(noteObj)
+            if x not in xValues:
+                xValues.append(x)            
+            if y not in xValues:
+                yValues.append(x)            
+    
+        xValues.sort()
+        yValues.sort()
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
+            x = self.fx(noteObj)
+            y = self.fy(noteObj)
+
+            if not xValueLegit: # get index number, not actual value
+                x = xValues.index(x)
+            data.append([x, y])
+
+        xVals = [x for x,y in data]
+        yVals = [y for x,y in data]
+        # xTicks expects a list of values
+        if xValueLegit:
+            xTicks = self.fxTicks(xValues)
+        else:
+            xTicks = self.fxTicks(xValues, labelStyle='index')
+
+        yTicks = self.fyTicks(min(yVals), max(yVals))
+
+        return data, xTicks, yTicks
+
+
+class PlotPitchSpaceQuarterLength(PlotScatter):
+    '''A scatter plot of pitch space and quarter length
+
+    '''
+    id = 'pitchSpaceQuarterLength' # string name used to access this class
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatter.__init__(self, streamObj, *args, **keywords)
+
+        self.fy = lambda n:n.ps
+        self.fyTicks = self.ticksPitchSpaceChromatic
+
+        self.fx = lambda n:n.quarterLength
+        self.fxTicks = self.ticksQuarterLength
+
+        # will use self.fx and self.fxTick to extract data
+        data, xTicks, yTicks = self._extractData(xValueLegit=False)
+
+        self.graph = Graph2DScatter(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setTicks('y', yTicks)
+        self.graph.setTicks('x', xTicks)
+        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('x', 'Qaurter Length')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Space by Quarter Length Scatter')
+
+
+class PlotPitchClassQuarterLength(PlotScatter):
+    '''A scatter plot of pitch class and quarter length
+
+    '''
+    id = 'pitchClassQuarterLength' # string name used to access this class
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatter.__init__(self, streamObj, *args, **keywords)
+
+        self.fy = lambda n:n.pitchClass
+        self.fyTicks = self.ticksPitchClass
+
+        self.fx = lambda n:n.quarterLength
+        self.fxTicks = self.ticksQuarterLength
+
+        # will use self.fx and self.fxTick to extract data
+        data, xTicks, yTicks = self._extractData(xValueLegit=False)
+
+        self.graph = Graph2DScatter(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setTicks('y', yTicks)
+        self.graph.setTicks('x', xTicks)
+        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('x', 'Qaurter Length')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Space by Quarter Length Scatter')
+
+
+
+#-------------------------------------------------------------------------------
 # horizontal bar graphs
 
 class PlotBrokenHorizontalBar(PlotStream):
@@ -1069,36 +1218,14 @@ class PlotPitchSpaceOffset(PlotBrokenHorizontalBar):
 #-------------------------------------------------------------------------------
 # weighted scatter
 
-
-class PlotPitchSpaceDurationCount(PlotStream):
-    '''A graph of event, sorted by pitch, over time
-    '''
+class PlotScatterWeighted(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
-        self.id = 'pitchSpaceDurationCount'
 
+        # specialize in sub-class
         self.fx = lambda n:n.quarterLength
-        self.xLabel = 'Quarter Length'
         self.fy = lambda n: n.midi
-        self.yLabel = 'Pitch Space'
-
-
-        data, xTicks, yTicks = self._extractData()
-        self.graph = Graph2DScatterWeighted(*args, **keywords)
-        self.graph.setData(data)
-
-        self.graph.setAxisLabel('x', self.xLabel)
-        self.graph.setAxisLabel('y', self.yLabel)
-
-        self.graph.setTicks('y', yTicks)  
-        self.graph.setTicks('x', xTicks)  
-
-
-        # need more space for pitch axis labels
-        if 'figureSize' not in keywords:
-            self.graph.setFigureSize([6,6])
-        if 'title' not in keywords:
-            self.graph.setTitle('Count of Pitch and Quarter Length')
+        self.fyTicks = self.ticksPitchClass
 
     def _extractData(self):
         dataCount = {}
@@ -1120,7 +1247,7 @@ class PlotPitchSpaceDurationCount(PlotStream):
         yMax = max(yValues)
         # create a count slot for all possibilities of x/y
         # y is the pitch axis; get all contiguous pirches
-        for y, label in self.ticksPitchSpaceChromatic(yMin, yMax):
+        for y, label in self.fyTicks(yMin, yMax):
         #for y in yValues:
             dataCount[y] = [[x, 0] for x in xValues]
 
@@ -1135,7 +1262,7 @@ class PlotPitchSpaceDurationCount(PlotStream):
 
         # create final data list
         data = []
-        for y, label in self.ticksPitchSpaceChromatic(yMin, yMax):
+        for y, label in self.fyTicks(yMin, yMax):
 
         #for y in dataCount.keys():
                 
@@ -1152,7 +1279,7 @@ class PlotPitchSpaceDurationCount(PlotStream):
             xTicks.append([i, '%s' % x])
         # only label y values that are defined
         yTicks = []
-        for y, label in self.ticksPitchSpaceChromatic(yMin, yMax):
+        for y, label in self.fyTicks(yMin, yMax):
 
         #for i in range(len(yValues)):
             #y = yValues[i]
@@ -1162,29 +1289,97 @@ class PlotPitchSpaceDurationCount(PlotStream):
         return data, xTicks, yTicks
 
 
+class PlotPitchSpaceQuarterLengthCount(PlotScatterWeighted):
+    '''A graph of event, sorted by pitch, over time
+    '''
+    id = 'pitchSpaceQuarterLengthCount'
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+
+        self.fx = lambda n:n.quarterLength
+        self.fy = lambda n: n.midi
+        self.fyTicks = self.ticksPitchSpaceChromatic
+
+        data, xTicks, yTicks = self._extractData()
+
+        self.graph = Graph2DScatterWeighted(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setAxisLabel('x', 'Quarter Length')
+        self.graph.setAxisLabel('y', 'Pitch Space')
+
+        self.graph.setTicks('y', yTicks)  
+        self.graph.setTicks('x', xTicks)  
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Count of Pitch and Quarter Length')
+
+
+class PlotPitchClassQuarterLengthCount(PlotScatterWeighted):
+    '''A graph of event, sorted by pitch class, over time
+    '''
+    id = 'pitchClassQuarterLengthCount'
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+
+        self.fx = lambda n:n.quarterLength
+        self.fy = lambda n: n.pitchClass
+        self.fyTicks = self.ticksPitchClass
+
+        data, xTicks, yTicks = self._extractData()
+
+        self.graph = Graph2DScatterWeighted(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setAxisLabel('x', 'Quarter Length')
+        self.graph.setAxisLabel('y', 'Pitch Class')
+
+        self.graph.setTicks('y', yTicks)  
+        self.graph.setTicks('x', xTicks)  
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Count of Pitch Class and Quarter Length')
+
+
 
 #-------------------------------------------------------------------------------
 # public function 
 
 def plotStream(streamObj, *args, **keywords):
-    plotClasses = [PlotPitchSpace, PlotPitchClass, 
-        PlotQuarterLength, 
+    '''Public interface to Stream plotting methods. 
+    '''
+    plotClasses = [
+        # histograms
+        PlotPitchSpace, PlotPitchClass, PlotQuarterLength, 
+        # scatters
+        PlotPitchSpaceQuarterLength, PlotPitchClassQuarterLength,
+        # offset based
         PlotPitchSpaceOffset, PlotPitchClassOffset,
-        PlotPitchSpaceDurationCount,
+        # weighted scatter
+        PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
     ]
 
 
-    if 'type' in keywords:
-        plotType = keywords['type']
+    if 'method' in keywords:
+        plotType = keywords['method']
+    elif len(args) > 0:
+        plotType = args[0]
     else:
-        plotType = 'all'
+        plotType = 'PlotPitchSpaceOffset'
 
     plotMake = []
     if plotType.lower() == 'all':
         plotMake = plotClasses
     else:
         for plotClassName in plotClasses:
-            if plotClassName.id.lower() == plotType:
+            if (plotClassName.id.lower() == plotType.lower() or
+                plotClassName.__name__.lower() == plotType.lower()):
                 plotMake.append(plotClassName)
 
     for plotClassName in plotMake:
@@ -1289,12 +1484,20 @@ class TestExternal(unittest.TestCase):
         a.setData(data)
         a.process()
 
-    def testPlotPitchSpaceDurationCount(self):
+    def testPlotPitchSpaceQuarterLengthCount(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotPitchSpaceDurationCount(a[0].flat, 
+        b = PlotPitchSpaceQuarterLengthCount(a[0].flat, 
                         title='Bach (soprano voice)')
         b.process()
+
+    def testPlotPitchClassQuarterLengthCount(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+        b = PlotPitchClassQuarterLengthCount(a[0].flat, 
+                        title='Bach (soprano voice)')
+        b.process()
+
 
     def testPlotPitchSpace(self):
         from music21 import corpus      
@@ -1315,10 +1518,17 @@ class TestExternal(unittest.TestCase):
         b.process()
 
 
+    def testPlotPitchSpaceQuarterLength(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+        b = PlotPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)')
+        b.process()
+
+
     def testAll(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
-        plotStream(a.flat)
+        plotStream(a.flat, 'all')
 
 
 
@@ -1392,7 +1602,7 @@ class Test(unittest.TestCase):
     def testPlotPitchSpaceDurationCount(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotPitchSpaceDurationCount(a[0].flat, doneAction=None,
+        b = PlotPitchSpaceQuarterLengthCount(a[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.process()
 
@@ -1415,7 +1625,10 @@ class Test(unittest.TestCase):
         b.process()
 
 
-
+    def testAll(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+        plotStream(a.flat, doneAction=None)
 
 
 if __name__ == "__main__":

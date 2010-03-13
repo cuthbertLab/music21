@@ -716,6 +716,7 @@ class Stream(music21.Music21Object):
 
     def plot(self, *args, **keywords):
         from music21 import graph
+        # first ordered arg will be method type
         graph.plotStream(self, *args, **keywords)
 
 
