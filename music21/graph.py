@@ -1030,21 +1030,26 @@ class PlotScatter(PlotStream):
         xVals = [x for x,y in data]
         yVals = [y for x,y in data]
         # xTicks expects a list of values
-        if xValueLegit:
-            xTicks = self.fxTicks(xValues)
-        else:
-            xTicks = self.fxTicks(xValues, labelStyle='index')
+        if self.fxTicks != None:
+            if xValueLegit:
+                xTicks = self.fxTicks(xValues)
+            else:
+                xTicks = self.fxTicks(xValues, labelStyle='index')
+        else: # if None, create ticks manually
+            xTicks = []
+            for x in range(min(xVals), max(xVals), 10):
+                xTicks.append([x, '%s' % x])
 
         yTicks = self.fyTicks(min(yVals), max(yVals))
 
         return data, xTicks, yTicks
 
 
-class PlotPitchSpaceQuarterLength(PlotScatter):
+class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
     '''
-    id = 'pitchSpaceQuarterLength' # string name used to access this class
+    id = 'scatterPitchSpaceQuarterLength' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
@@ -1072,11 +1077,11 @@ class PlotPitchSpaceQuarterLength(PlotScatter):
             self.graph.setTitle('Pitch Space by Quarter Length Scatter')
 
 
-class PlotPitchClassQuarterLength(PlotScatter):
+class PlotScatterPitchClassQuarterLength(PlotScatter):
     '''A scatter plot of pitch class and quarter length
-
     '''
-    id = 'pitchClassQuarterLength' # string name used to access this class
+    # string name used to access this class
+    id = 'scatterPitchClassQuarterLength' 
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
@@ -1102,6 +1107,38 @@ class PlotPitchClassQuarterLength(PlotScatter):
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
             self.graph.setTitle('Pitch Space by Quarter Length Scatter')
+
+
+class PlotScatterPitchClassOffset(PlotScatter):
+    '''A scatter plot of pitch class and offset
+
+    '''
+    id = 'scatterPitchClassOffset' # string name used to access this class
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatter.__init__(self, streamObj, *args, **keywords)
+
+        self.fy = lambda n:n.pitchClass
+        self.fyTicks = self.ticksPitchClass
+
+        self.fx = lambda n:n.offset
+        self.fxTicks = None
+
+        # will use self.fx and self.fxTick to extract data
+        data, xTicks, yTicks = self._extractData(xValueLegit=False)
+
+        self.graph = Graph2DScatter(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setTicks('y', yTicks)
+        self.graph.setTicks('x', xTicks)
+        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('x', 'Offset')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Class by Offset Scatter')
 
 
 
@@ -1177,7 +1214,7 @@ class PlotPitchClassOffset(PlotBrokenHorizontalBar):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,3])
+            self.graph.setFigureSize([10,4])
 
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length and Offset by Pitch Class')
@@ -1358,8 +1395,8 @@ def plotStream(streamObj, *args, **keywords):
         # histograms
         PlotPitchSpace, PlotPitchClass, PlotQuarterLength, 
         # scatters
-        PlotPitchSpaceQuarterLength, PlotPitchClassQuarterLength,
-        # offset based
+        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        # offset based horizontal
         PlotPitchSpaceOffset, PlotPitchClassOffset,
         # weighted scatter
         PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
@@ -1521,7 +1558,13 @@ class TestExternal(unittest.TestCase):
     def testPlotPitchSpaceQuarterLength(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)')
+        b = PlotScatterPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)')
+        b.process()
+
+    def testPlotScatterPitchClassOffset(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+        b = PlotScatterPitchClassOffset(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
