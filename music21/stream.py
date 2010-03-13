@@ -713,6 +713,12 @@ class Stream(music21.Music21Object):
 #         f.close()
 
 
+
+    def plot(self, *args, **keywords):
+        from music21.analysis import graph
+        graph.plotStream(self, *args, **keywords)
+
+
     #---------------------------------------------------------------------------
     # methods that act on individual elements without requiring 
     # @ _elementsChanged to fire

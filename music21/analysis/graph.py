@@ -125,7 +125,7 @@ class Graph(object):
         if 'tickFontSize' in keywords:
             self.tickFontSize = keywords['tickFontSize']
         else:
-            self.tickFontSize = 9
+            self.tickFontSize = 8
 
         if 'titleFontSize' in keywords:
             self.titleFontSize = keywords['titleFontSize']
@@ -260,7 +260,7 @@ class Graph(object):
 
                     if 'ticks' in self.axis[axis].keys():
                         values, labels = self.axis[axis]['ticks']
-                        environLocal.printDebug(['x tick labels, x tick values', labels, values])
+                        #environLocal.printDebug(['x tick labels, x tick values', labels, values])
                         ax.set_xticks(values)
                         ax.set_xticklabels(labels, fontsize=self.tickFontSize,
                             family=self.fontFamily)
@@ -280,7 +280,6 @@ class Graph(object):
             ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
         if self.grid:
             ax.grid(True, color=self.colorGrid)
-
 
         # this figure instance is created in the subclased process() method
         # set total size of figure
@@ -392,7 +391,7 @@ class Graph2DBrokenHorizontalBar(Graph):
         self.setAxisRange('x', (xMin, xMax))
         self.setTicks('y', yTicks)  
 
-        for x in range(xMin, xMax, 10):
+        for x in range(int(xMin+10), int(xMax), 10):
             xTicks.append([x, '%s' % x])
         self.setTicks('x', xTicks)  
 
@@ -763,9 +762,11 @@ class PlotStream(object):
 
     id = None # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        if not isinstance(streamObj, music21.stream.Stream):
+        if (not isinstance(streamObj, music21.stream.Stream) or
+            len(streamObj) == 0):
             raise CorrelateException, 'non-stream provided as argument'
         self.streamObj = streamObj
+
         # store instance of graph here
         self.graph = None
 
@@ -877,8 +878,8 @@ class _PlotHistogram(PlotStream):
         dataTick.sort()
         xTicks = dataTick
         # alway have min and max
-        yTicks = [[countMin, '%s' % countMin], [countMax, '%s' % countMax]]
-        for y in range(countMin+5, countMax, 5):
+        yTicks = []
+        for y in range(0, countMax, 10):
             yTicks.append([y, '%s' % y])
         yTicks.sort()
         return data, xTicks, yTicks
@@ -909,8 +910,9 @@ class PlotPitchSpace(_PlotHistogram):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([6,4])
-
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Space Histogram')
 
 
 class PlotPitchClass(_PlotHistogram):
@@ -938,7 +940,9 @@ class PlotPitchClass(_PlotHistogram):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([6,4])
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Class Histogram')
 
 
 class PlotQuarterLength(_PlotHistogram):
@@ -966,7 +970,9 @@ class PlotQuarterLength(_PlotHistogram):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([6,4])
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Quarter Length Histogram')
 
 
 
@@ -975,18 +981,17 @@ class PlotQuarterLength(_PlotHistogram):
 #-------------------------------------------------------------------------------
 # horizontal bar graphs
 
-class PlotPitchSpaceOffset(PlotStream):
-    '''A graph of event, sorted by pitch, over time
+class PlotBrokenHorizontalBar(PlotStream):
+    '''A graph of events, sorted by pitch, over time
 
     '''
-    id = 'pitchSpaceOffset' # string name used to access this class
-
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
-        
 
+    def _extractData(self, dataValueLegit=True):
         # find listing for any single pitch name
         dataUnique = {}
+        xValues = []
         # collect data
         for noteObj in self.streamObj.getElementsByClass(note.Note):
             ps = int(round(noteObj.ps)) # using midi for now
@@ -994,6 +999,8 @@ class PlotPitchSpaceOffset(PlotStream):
                 dataUnique[ps] = []
             start = noteObj.offset
             end = noteObj.quarterLength
+            xValues.append(start)
+            xValues.append(end)
             dataUnique[ps].append((start, end))
 
         # create final data list
@@ -1007,18 +1014,38 @@ class PlotPitchSpaceOffset(PlotStream):
             else:
                 data.append([label, []])
 
+        xTicks = []
+        yTicks = []
+        return data
+
+
+
+class PlotPitchSpaceOffset(PlotBrokenHorizontalBar):
+    '''A graph of events, sorted by pitch, over time
+
+    '''
+    id = 'pitchSpaceOffset' # string name used to access this class
+
+    def __init__(self, streamObj, *args, **keywords):
+        PlotBrokenHorizontalBar.__init__(self, streamObj, *args, **keywords)
+        
+        data = self._extractData()
+
+
         self.graph = Graph2DBrokenHorizontalBar(*args, **keywords)
         self.graph.setData(data)
 
-        self.graph.setTicks('x', xTicks)
-        self.graph.setTicks('y', yTicks)
+        # do not need to add ticks; happens at lower level 
 
         self.graph.setAxisLabel('x', 'Offset')
         self.graph.setAxisLabel('y', 'Pitch Space')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,4])
+            self.graph.setFigureSize([10,5])
+
+        if 'title' not in keywords:
+            self.graph.setTitle('Event Quarter Length and Offset by Pitch')
 
 
 
@@ -1046,9 +1073,15 @@ class PlotPitchSpaceDurationCount(PlotStream):
         self.graph.setAxisLabel('x', self.xLabel)
         self.graph.setAxisLabel('y', self.yLabel)
 
+        self.graph.setTicks('y', yTicks)  
+        self.graph.setTicks('x', xTicks)  
+
+
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Count of Pitch and Quarter Length')
 
     def _extractData(self):
         dataCount = {}
@@ -1110,6 +1143,36 @@ class PlotPitchSpaceDurationCount(PlotStream):
             #nn = self.convertPsToNoteName(y)
             yTicks.append([y, '%s' % label])
         return data, xTicks, yTicks
+
+
+
+#-------------------------------------------------------------------------------
+# public function 
+
+def plotStream(streamObj, *args, **keywords):
+    plotClasses = [PlotPitchSpace, PlotPitchClass, 
+        PlotQuarterLength, 
+        PlotPitchSpaceOffset, PlotPitchSpaceDurationCount,
+    ]
+
+
+    if 'type' in keywords:
+        plotType = keywords['type']
+    else:
+        plotType = 'all'
+
+    plotMake = []
+    if plotType.lower() == 'all':
+        plotMake = plotClasses
+    else:
+        for plotClassName in plotClasses:
+            if plotClassName.id.lower() == plotType:
+                plotMake.append(plotClassName)
+
+    for plotClassName in plotMake:
+        obj = plotClassName(streamObj, *args, **keywords)
+        obj.process()
+
 
 
 #-------------------------------------------------------------------------------
@@ -1290,6 +1353,35 @@ class Test(unittest.TestCase):
         a = Graph2DBrokenHorizontalBar(doneAction=None)
         a.setData(data)
         a.process()
+
+
+
+    def testPlotPitchSpaceDurationCount(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach')
+        b = PlotPitchSpaceDurationCount(a[0].flat, doneAction=None,
+                        title='Bach (soprano voice)')
+        b.process()
+
+    def testPlotPitchSpace(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach')
+        b = PlotPitchSpace(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b.process()
+
+    def testPlotPitchClass(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach')
+        b = PlotPitchClass(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b.process()
+
+    def testPlotQuarterLength(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach')
+        b = PlotQuarterLength(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b.process()
+
+
 
 
 
