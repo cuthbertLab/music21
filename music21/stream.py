@@ -715,7 +715,7 @@ class Stream(music21.Music21Object):
 
 
     def plot(self, *args, **keywords):
-        from music21.analysis import graph
+        from music21 import graph
         graph.plotStream(self, *args, **keywords)
 
 

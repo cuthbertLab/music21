@@ -95,8 +95,7 @@ class Environment(object):
         '''Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 
         >>> a = Environment()
-        >>> a['writeFormat']
-        u'musicxml'
+        >>> post = a['writeFormat']
         '''
         self.ref = {}
         self.loadDefaults() # defines all valid keys in ref

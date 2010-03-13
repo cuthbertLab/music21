@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
-    <link rel="next" title="music21.instrument" href="moduleInstrument.html" />
+    <link rel="next" title="music21.graph" href="moduleGraph.html" />
     <link rel="prev" title="music21.editorial" href="moduleEditorial.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="moduleInstrument.html" title="music21.instrument"
+          <a href="moduleGraph.html" title="music21.graph"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="moduleEditorial.html" title="music21.editorial"
@@ -59,8 +59,8 @@
             <p class="topless"><a href="moduleEditorial.html"
                                   title="previous chapter">music21.editorial</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="moduleInstrument.html"
-                                  title="next chapter">music21.instrument</a></p>
+            <p class="topless"><a href="moduleGraph.html"
+                                  title="next chapter">music21.graph</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/moduleEnvironment.txt"
@@ -117,8 +117,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 
 <p>Create an instance of this object. A modName argument can be provided for use in printDebug() calls.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="s">&#39;writeFormat&#39;</span><span class="p">]</span>
-<span class="go">u&#39;musicxml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="s">&#39;writeFormat&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -175,6 +174,12 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dd></dd></dl>
 
 <p>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
+<dl class="method">
+<dt id="music21.environment.Environment.printWarn">
+<tt class="descname">printWarn</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printWarn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>To print a warning to the user, send a list of strings to this method.</p>
 </dd></dl>
 
 </div>
@@ -246,7 +251,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="moduleInstrument.html" title="music21.instrument"
+          <a href="moduleGraph.html" title="music21.graph"
              >next</a> |</li>
         <li class="right" >
           <a href="moduleEditorial.html" title="music21.editorial"
@@ -256,7 +261,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 12, 2010.
+      Last updated on Mar 13, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

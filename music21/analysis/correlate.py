@@ -22,7 +22,7 @@ from music21 import dynamics
 from music21 import pitch
 from music21 import duration
 
-from music21.analysis import graph
+from music21 import graph
 
 from music21 import environment
 _MOD = 'correlate.py'

@@ -1,0 +1,771 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.graph &mdash; music21 v0.2.4a1 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="next" title="music21.instrument" href="moduleInstrument.html" />
+    <link rel="prev" title="music21.environment" href="moduleEnvironment.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="moduleInstrument.html" title="music21.instrument"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleEnvironment.html" title="music21.environment"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.graph</a><ul>
+<li><a class="reference external" href="#class-graph">class Graph</a></li>
+<li><a class="reference external" href="#class-graph2dbrokenhorizontalbar">class Graph2DBrokenHorizontalBar</a></li>
+<li><a class="reference external" href="#class-graph2dhistogram">class Graph2DHistogram</a></li>
+<li><a class="reference external" href="#class-graph2dscatter">class Graph2DScatter</a></li>
+<li><a class="reference external" href="#class-graph2dscatterweighted">class Graph2DScatterWeighted</a></li>
+<li><a class="reference external" href="#class-graph3dbars">class Graph3DBars</a></li>
+<li><a class="reference external" href="#class-graph3dpolygonbars">class Graph3DPolygonBars</a></li>
+<li><a class="reference external" href="#class-plotbrokenhorizontalbar">class PlotBrokenHorizontalBar</a></li>
+<li><a class="reference external" href="#class-plotpitchclass">class PlotPitchClass</a></li>
+<li><a class="reference external" href="#class-plotpitchspace">class PlotPitchSpace</a></li>
+<li><a class="reference external" href="#class-plotpitchspacedurationcount">class PlotPitchSpaceDurationCount</a></li>
+<li><a class="reference external" href="#class-plotpitchspaceoffset">class PlotPitchSpaceOffset</a></li>
+<li><a class="reference external" href="#class-plotquarterlength">class PlotQuarterLength</a></li>
+<li><a class="reference external" href="#class-plotstream">class PlotStream</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleEnvironment.html"
+                                  title="previous chapter">music21.environment</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleInstrument.html"
+                                  title="next chapter">music21.instrument</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleGraph.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-music21.graph">
+<span id="modulegraph"></span><h1>music21.graph<a class="headerlink" href="#module-music21.graph" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="music21.graph.plotStream">
+<tt class="descclassname">music21.graph.</tt><tt class="descname">plotStream</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.plotStream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="class-graph">
+<h2>class Graph<a class="headerlink" href="#class-graph" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph</tt><a class="headerlink" href="#music21.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file (&#8216;write&#8217;), open an interactive GUI browser (&#8216;show&#8217;) or None (do processing but do not write output.</p>
+<p><strong>class Graph</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.fontFamily">
+<tt class="descname">fontFamily</tt><a class="headerlink" href="#music21.graph.Graph.fontFamily" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.doneAction">
+<tt class="descname">doneAction</tt><a class="headerlink" href="#music21.graph.Graph.doneAction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.title">
+<tt class="descname">title</tt><a class="headerlink" href="#music21.graph.Graph.title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.colorBackgroundFigure">
+<tt class="descname">colorBackgroundFigure</tt><a class="headerlink" href="#music21.graph.Graph.colorBackgroundFigure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.colors">
+<tt class="descname">colors</tt><a class="headerlink" href="#music21.graph.Graph.colors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.tickFontSize">
+<tt class="descname">tickFontSize</tt><a class="headerlink" href="#music21.graph.Graph.tickFontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.colorGrid">
+<tt class="descname">colorGrid</tt><a class="headerlink" href="#music21.graph.Graph.colorGrid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.figureSize">
+<tt class="descname">figureSize</tt><a class="headerlink" href="#music21.graph.Graph.figureSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.colorBackgroundData">
+<tt class="descname">colorBackgroundData</tt><a class="headerlink" href="#music21.graph.Graph.colorBackgroundData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.axisKeys">
+<tt class="descname">axisKeys</tt><a class="headerlink" href="#music21.graph.Graph.axisKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.grid">
+<tt class="descname">grid</tt><a class="headerlink" href="#music21.graph.Graph.grid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.titleFontSize">
+<tt class="descname">titleFontSize</tt><a class="headerlink" href="#music21.graph.Graph.titleFontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.alpha">
+<tt class="descname">alpha</tt><a class="headerlink" href="#music21.graph.Graph.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.labelFontSize">
+<tt class="descname">labelFontSize</tt><a class="headerlink" href="#music21.graph.Graph.labelFontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.data">
+<tt class="descname">data</tt><a class="headerlink" href="#music21.graph.Graph.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="attribute">
+<dt id="music21.graph.Graph.axis">
+<tt class="descname">axis</tt><a class="headerlink" href="#music21.graph.Graph.axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>dict() -&gt; new empty dictionary. dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s (key, value) pairs. dict(seq) -&gt; new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2)</p>
+<p><strong>class Graph</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;green&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph.done">
+<tt class="descname">done</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph.done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Implement the desired doneAction, after data processing</p>
+<dl class="method">
+<dt id="music21.graph.Graph.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>process data and prepare plt</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setAxisLabel">
+<tt class="descname">setAxisLabel</tt><big>(</big><em>axisKey</em>, <em>label</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setAxisLabel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setAxisRange">
+<tt class="descname">setAxisRange</tt><big>(</big><em>axisKey</em>, <em>valueRange</em>, <em>pad=False</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setAxisRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setData">
+<tt class="descname">setData</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setDoneAction">
+<tt class="descname">setDoneAction</tt><big>(</big><em>action</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setDoneAction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setFigureSize">
+<tt class="descname">setFigureSize</tt><big>(</big><em>figSize</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setFigureSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setTicks">
+<tt class="descname">setTicks</tt><big>(</big><em>axisKey</em>, <em>pairs</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setTicks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>paris are positions and labels</p>
+<dl class="method">
+<dt id="music21.graph.Graph.setTitle">
+<tt class="descname">setTitle</tt><big>(</big><em>title</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setTitle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.Graph.write">
+<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph2dbrokenhorizontalbar">
+<h2>class Graph2DBrokenHorizontalBar<a class="headerlink" href="#class-graph2dbrokenhorizontalbar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph2DBrokenHorizontalBar">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph2DBrokenHorizontalBar</tt><a class="headerlink" href="#music21.graph.Graph2DBrokenHorizontalBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph2DBrokenHorizontalBar</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph2DBrokenHorizontalBar</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph2DBrokenHorizontalBar.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DBrokenHorizontalBar.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-end points.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph2DBrokenHorizontalBar</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mf">10</span><span class="p">,</span><span class="mf">20</span><span class="p">),</span> <span class="p">(</span><span class="mf">15</span><span class="p">,</span> <span class="mf">40</span><span class="p">)]),</span> <span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mf">5</span><span class="p">,</span><span class="mf">15</span><span class="p">),</span> <span class="p">(</span><span class="mf">20</span><span class="p">,</span><span class="mf">40</span><span class="p">)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph2DBrokenHorizontalBar.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DBrokenHorizontalBar.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph2dhistogram">
+<h2>class Graph2DHistogram<a class="headerlink" href="#class-graph2dhistogram" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph2DHistogram">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph2DHistogram</tt><a class="headerlink" href="#music21.graph.Graph2DHistogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph2DHistogram</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph2DHistogram</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph2DHistogram.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DHistogram.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph2DHistogram</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">)))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph2DHistogram.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DHistogram.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph2dscatter">
+<h2>class Graph2DScatter<a class="headerlink" href="#class-graph2dscatter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph2DScatter">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph2DScatter</tt><a class="headerlink" href="#music21.graph.Graph2DScatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph2DScatter</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph2DScatter</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph2DScatter.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DScatter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Graph two parameters in a scatter plot</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph2DScatter</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph2DScatter.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DScatter.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph2dscatterweighted">
+<h2>class Graph2DScatterWeighted<a class="headerlink" href="#class-graph2dscatterweighted" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph2DScatterWeighted">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph2DScatterWeighted</tt><a class="headerlink" href="#music21.graph.Graph2DScatterWeighted" title="Permalink to this definition">¶</a></dt>
+<dd><p>A scatter plot where points are scaled in size to represent the number of values stored within.</p>
+<p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph2DScatterWeighted</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph2DScatterWeighted</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph2DScatterWeighted.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DScatterWeighted.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A scatter plot where points are scaled in size to represent the number of values stored within.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph2DScatterWeighted</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">23</span><span class="p">,</span> <span class="mf">15</span><span class="p">,</span> <span class="mf">234</span><span class="p">),</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">12</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph2DScatterWeighted.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph2DScatterWeighted.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph3dbars">
+<h2>class Graph3DBars<a class="headerlink" href="#class-graph3dbars" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph3DBars">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph3DBars</tt><a class="headerlink" href="#music21.graph.Graph3DBars" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph3DBars</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph3DBars</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph3DBars.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph3DBars.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. this is supposed to fixed with a new release Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph3DBars</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph3DBars.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph3DBars.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-graph3dpolygonbars">
+<h2>class Graph3DPolygonBars<a class="headerlink" href="#class-graph3dpolygonbars" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.Graph3DPolygonBars">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph3DPolygonBars</tt><a class="headerlink" href="#music21.graph.Graph3DPolygonBars" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a></p>
+<p><strong>class Graph3DPolygonBars</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.Graph3DPolygonBars.barWidth">
+<tt class="descname">barWidth</tt><a class="headerlink" href="#music21.graph.Graph3DPolygonBars.barWidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.axis</span></tt></a></p>
+<p><strong>class Graph3DPolygonBars</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.Graph3DPolygonBars.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph3DPolygonBars.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Axis ticks do not seem to be adjustable without distorting the graph.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph3DPolygonBars</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1</span><span class="p">:[],</span> <span class="mf">2</span><span class="p">:[],</span> <span class="mf">3</span><span class="p">:[]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+<span class="gp">... </span>   <span class="n">q</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">1</span><span class="p">))))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">20</span><span class="p">)]</span>
+<span class="gp">... </span>   <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">q</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.Graph3DPolygonBars.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph3DPolygonBars.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">music21.graph.Graph.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotbrokenhorizontalbar">
+<h2>class PlotBrokenHorizontalBar<a class="headerlink" href="#class-plotbrokenhorizontalbar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotBrokenHorizontalBar">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotBrokenHorizontalBar</tt><a class="headerlink" href="#music21.graph.PlotBrokenHorizontalBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>A graph of events, sorted by pitch, over time</p>
+<p>inherits from: <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotBrokenHorizontalBar</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.id" class="reference internal" href="#music21.graph.PlotStream.id"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.id</span></tt></a></p>
+<p><strong>class PlotBrokenHorizontalBar</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotBrokenHorizontalBar.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotBrokenHorizontalBar.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotpitchclass">
+<h2>class PlotPitchClass<a class="headerlink" href="#class-plotpitchclass" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotPitchClass">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotPitchClass</tt><a class="headerlink" href="#music21.graph.PlotPitchClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>A histogram of pitch class</p>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">music21.graph._PlotHistogram</span></tt>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotPitchClass</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.PlotPitchClass.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.graph.PlotPitchClass.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p><strong>class PlotPitchClass</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotPitchClass.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotPitchClass.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotpitchspace">
+<h2>class PlotPitchSpace<a class="headerlink" href="#class-plotpitchspace" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotPitchSpace">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotPitchSpace</tt><a class="headerlink" href="#music21.graph.PlotPitchSpace" title="Permalink to this definition">¶</a></dt>
+<dd><p>A histogram of pitch space</p>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">music21.graph._PlotHistogram</span></tt>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotPitchSpace</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.PlotPitchSpace.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.graph.PlotPitchSpace.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p><strong>class PlotPitchSpace</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotPitchSpace.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotPitchSpace.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotpitchspacedurationcount">
+<h2>class PlotPitchSpaceDurationCount<a class="headerlink" href="#class-plotpitchspacedurationcount" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotPitchSpaceDurationCount">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotPitchSpaceDurationCount</tt><a class="headerlink" href="#music21.graph.PlotPitchSpaceDurationCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A graph of event, sorted by pitch, over time</p>
+<p>inherits from: <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotPitchSpaceDurationCount</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.id" class="reference internal" href="#music21.graph.PlotStream.id"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.id</span></tt></a></p>
+<p><strong>class PlotPitchSpaceDurationCount</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotPitchSpaceDurationCount.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotPitchSpaceDurationCount.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotpitchspaceoffset">
+<h2>class PlotPitchSpaceOffset<a class="headerlink" href="#class-plotpitchspaceoffset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotPitchSpaceOffset">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotPitchSpaceOffset</tt><a class="headerlink" href="#music21.graph.PlotPitchSpaceOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A graph of events, sorted by pitch, over time</p>
+<p>inherits from: <a title="music21.graph.PlotBrokenHorizontalBar" class="reference internal" href="#music21.graph.PlotBrokenHorizontalBar"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotBrokenHorizontalBar</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotPitchSpaceOffset</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.PlotPitchSpaceOffset.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.graph.PlotPitchSpaceOffset.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p><strong>class PlotPitchSpaceOffset</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotPitchSpaceOffset.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotPitchSpaceOffset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotquarterlength">
+<h2>class PlotQuarterLength<a class="headerlink" href="#class-plotquarterlength" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotQuarterLength">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotQuarterLength</tt><a class="headerlink" href="#music21.graph.PlotQuarterLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>A histogram of pitch class</p>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">music21.graph._PlotHistogram</span></tt>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a></p>
+<p><strong>class PlotQuarterLength</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.PlotQuarterLength.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.graph.PlotQuarterLength.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p><strong>class PlotQuarterLength</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotQuarterLength.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotQuarterLength.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p>Methods inherited from <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream</span></tt></a>: <a title="music21.graph.PlotStream.convertPsToNoteName" class="reference internal" href="#music21.graph.PlotStream.convertPsToNoteName"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.convertPsToNoteName()</span></tt></a>, <a title="music21.graph.PlotStream.process" class="reference internal" href="#music21.graph.PlotStream.process"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.process()</span></tt></a>, <a title="music21.graph.PlotStream.show" class="reference internal" href="#music21.graph.PlotStream.show"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.show()</span></tt></a>, <a title="music21.graph.PlotStream.ticksDynamics" class="reference internal" href="#music21.graph.PlotStream.ticksDynamics"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksDynamics()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchClass" class="reference internal" href="#music21.graph.PlotStream.ticksPitchClass"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchClass()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceChromatic" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceChromatic()</span></tt></a>, <a title="music21.graph.PlotStream.ticksPitchSpaceOctave" class="reference internal" href="#music21.graph.PlotStream.ticksPitchSpaceOctave"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksPitchSpaceOctave()</span></tt></a>, <a title="music21.graph.PlotStream.ticksQuarterLength" class="reference internal" href="#music21.graph.PlotStream.ticksQuarterLength"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.ticksQuarterLength()</span></tt></a>, <a title="music21.graph.PlotStream.write" class="reference internal" href="#music21.graph.PlotStream.write"><tt class="xref docutils literal"><span class="pre">music21.graph.PlotStream.write()</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-plotstream">
+<h2>class PlotStream<a class="headerlink" href="#class-plotstream" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.PlotStream">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotStream</tt><a class="headerlink" href="#music21.graph.PlotStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit.</p>
+<p><strong>class PlotStream</strong> <strong>attributes</strong></p>
+<dl class="attribute">
+<dt id="music21.graph.PlotStream.id">
+<tt class="descname">id</tt><a class="headerlink" href="#music21.graph.PlotStream.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<p><strong>class PlotStream</strong> <strong>methods</strong></p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.convertPsToNoteName">
+<tt class="descname">convertPsToNoteName</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.convertPsToNoteName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This will process all data, as well as call the done() method. This might be subclassed</p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Call internal Graphs show() method independently of doneAction set and run with process()</p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.ticksDynamics">
+<tt class="descname">ticksDynamics</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksDynamics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility method to get ticks in dynamic values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksDynamics</span><span class="p">()</span>
+<span class="go">[[0, &#39;pppppp&#39;], [1, &#39;ppppp&#39;], [2, &#39;pppp&#39;], [3, &#39;ppp&#39;], [4, &#39;pp&#39;], [5, &#39;p&#39;], [6, &#39;mp&#39;], [7, &#39;mf&#39;], [8, &#39;f&#39;], [9, &#39;fp&#39;], [10, &#39;sf&#39;], [11, &#39;ff&#39;], [12, &#39;fff&#39;], [13, &#39;ffff&#39;], [14, &#39;fffff&#39;], [15, &#39;ffffff&#39;]]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.PlotStream.ticksPitchClass">
+<tt class="descname">ticksPitchClass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility method to get ticks in pitch classes</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchClass</span><span class="p">()</span>
+<span class="go">[[0, &#39;C&#39;], [1, &#39;C#&#39;], [2, &#39;D&#39;], [3, &#39;D#&#39;], [4, &#39;E&#39;], [5, &#39;F&#39;], [6, &#39;F#&#39;], [7, &#39;G&#39;], [8, &#39;G#&#39;], [9, &#39;A&#39;], [10, &#39;A#&#39;], [11, &#39;B&#39;]]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.PlotStream.ticksPitchSpaceChromatic">
+<tt class="descname">ticksPitchSpaceChromatic</tt><big>(</big><em>pitchMin=36</em>, <em>pitchMax=100</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility method to get ticks in pitch space values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceChromatic</span><span class="p">(</span><span class="mf">60</span><span class="p">,</span><span class="mf">72</span><span class="p">)</span>
+<span class="go">[[60, &#39;C4&#39;], [61, &#39;C#4&#39;], [62, &#39;D4&#39;], [63, &#39;D#4&#39;], [64, &#39;E4&#39;], [65, &#39;F4&#39;], [66, &#39;F#4&#39;], [67, &#39;G4&#39;], [68, &#39;G#4&#39;], [69, &#39;A4&#39;], [70, &#39;A#4&#39;], [71, &#39;B4&#39;], [72, &#39;C5&#39;]]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.PlotStream.ticksPitchSpaceOctave">
+<tt class="descname">ticksPitchSpaceOctave</tt><big>(</big><em>pitchMin=36</em>, <em>pitchMax=100</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchSpaceOctave" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility method to get ticks in pitch space only for every octave.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceOctave</span><span class="p">()</span>
+<span class="go">[[36, &#39;C2&#39;], [48, &#39;C3&#39;], [60, &#39;C4&#39;], [72, &#39;C5&#39;], [84, &#39;C6&#39;], [96, &#39;C7&#39;]]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.graph.PlotStream.ticksQuarterLength">
+<tt class="descname">ticksQuarterLength</tt><big>(</big><em>qlList</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksQuarterLength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>No documentation.</p>
+<dl class="method">
+<dt id="music21.graph.PlotStream.write">
+<tt class="descname">write</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Call internal Graphs write() method independently of doneAction set and run with process()</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleInstrument.html" title="music21.instrument"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleEnvironment.html" title="music21.environment"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Mar 13, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

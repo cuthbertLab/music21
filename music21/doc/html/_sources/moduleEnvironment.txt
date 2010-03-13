@@ -35,8 +35,7 @@ class Environment
     Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 
     >>> a = Environment()
-    >>> a['writeFormat']
-    u'musicxml' 
+    >>> post = a['writeFormat']
 
     .. method:: read(fp=None)
 
@@ -73,6 +72,10 @@ class Environment
     .. method:: printDebug(msg, statusLevel=1)
 
     Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+
+    .. method:: printWarn(msg)
+
+    To print a warning to the user, send a list of strings to this method. 
 
 
 class Preference
