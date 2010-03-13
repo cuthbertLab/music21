@@ -969,7 +969,12 @@ class Stream
 
     .. method:: plot()
 
-    No documentation. 
+    Given a method and keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`music21.graph.PlotPitchSpace`) pitchClass (:class:`music21.graph.PlotPitchClass`) quarterLength (:class:`music21.graph.PlotQuarterLength`) scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`) pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`) pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`) 
+
+    >>> a = Stream()
+    >>> n = note.Note()
+    >>> a.append(n)
+    >>> a.plot(method='pitchSpaceOffset', doneAction=None)
 
     .. method:: pop(index)
 

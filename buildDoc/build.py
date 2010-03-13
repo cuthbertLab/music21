@@ -717,13 +717,29 @@ class RestructuredWriter(object):
             return ''
             #return '%sNo documentation.\n' % indent
 
+        # define the start of lines that should not be changed
+        rstExclude = ['.. image::', ':width:']
+
         lines = doc.split('\n')
         sub = []
         for line in lines:
-            line = line.strip()
-            if OMIT_STR in line: # permit blocking doctest examples
+            if OMIT_STR in line.strip(): # permit blocking doctest examples
                 break # do not gather any more lines
-            sub.append(line)
+            
+            match = False
+            for stub in rstExclude:
+                if line.strip().startswith(stub):
+                    # do not strop
+                    environLocal.printDebug(['found rst in doc string:', line.strip()])
+                    if stub == '.. image::':
+                        sub.append('\n\n' + line) # do not strip
+                    else:
+                        sub.append('\n' + line) # do not strip
+                    match = True
+                    break
+            # else, add a stripped line
+            if not match:
+                sub.append(line.strip())
 
         # find double breaks in text
         post = []

@@ -45,16 +45,6 @@ http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend
 
 
 
-..
-    TODO:
-
-    Could you prepare in the docs two graphs examples, one with narrower bars (so I can see how that's done, and so the graphics look better) and also one where we use log(2) of quarterLength as the X axis, with "16th" "eighth" "quarter" etc. as the labels (or 16, 8, 4, if that's too difficult)?  That should be available as a standard representation, because sometimes you're trying to see what notes are used, and not so much how long they are.
-
-
-
-
-
-
 
 Primitive Graphing Formats
 -------------------------------

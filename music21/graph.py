@@ -95,7 +95,7 @@ class Graph(object):
             self.colorBackgroundFigure = '#cccccc'
 
         if 'colorGrid' in keywords:
-            self.colorGrid = keywords['colorBackgroundFigure']
+            self.colorGrid = keywords['colorGrid']
         else:
             self.colorGrid = '#666666'
 
@@ -727,8 +727,9 @@ class PlotStream(object):
 
     id = None # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        if not isinstance(streamObj, music21.stream.Stream):
-            raise PlotStreamException('non-stream provided as argument')
+        #if not isinstance(streamObj, music21.stream.Stream):
+        if not hasattr(streamObj, 'elements'):
+            raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
         self.streamObj = streamObj
         self.graph = None  # store instance of graph class here
 
@@ -847,7 +848,7 @@ class PlotStream(object):
 #-------------------------------------------------------------------------------
 # stream plotting
 
-class PlotHistogram(PlotStream):
+class _PlotHistogram(PlotStream):
     '''Base class for Stream plotting classes.
     '''
     def __init__(self, streamObj, *args, **keywords):
@@ -897,13 +898,16 @@ class PlotHistogram(PlotStream):
 #-------------------------------------------------------------------------------
 # histograms
 
-class PlotPitchSpace(PlotHistogram):
-    '''A histogram of pitch space
+class PlotPitchSpace(_PlotHistogram):
+    '''A histogram of pitch space.
+
+    .. image:: images/PlotPitchSpace.*
+        :width: 500
 
     '''
     id = 'pitchSpace' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        _PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.midi
         self.fxTick = lambda n: n.nameWithOctave
@@ -927,13 +931,16 @@ class PlotPitchSpace(PlotHistogram):
             self.graph.setTitle('Pitch Space Histogram')
 
 
-class PlotPitchClass(PlotHistogram):
+class PlotPitchClass(_PlotHistogram):
     '''A histogram of pitch class
+
+    .. image:: images/PlotPitchClass.*
+        :width: 500
 
     '''
     id = 'pitchClass' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        _PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.pitchClass
         self.fxTick = lambda n: n.nameWithOctave
@@ -957,13 +964,15 @@ class PlotPitchClass(PlotHistogram):
             self.graph.setTitle('Pitch Class Histogram')
 
 
-class PlotQuarterLength(PlotHistogram):
+class PlotQuarterLength(_PlotHistogram):
     '''A histogram of pitch class
 
+    .. image:: images/PlotQuarterLength.*
+        :width: 500
     '''
     id = 'quarterLength' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        _PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.quarterLength
         self.fxTick = lambda n: n.quarterLength
@@ -991,7 +1000,7 @@ class PlotQuarterLength(PlotHistogram):
 #-------------------------------------------------------------------------------
 # scatter plots
 
-class PlotScatter(PlotStream):
+class _PlotScatter(PlotStream):
     '''Base class for scatter plots.
     '''
     def __init__(self, streamObj, *args, **keywords):
@@ -1045,13 +1054,15 @@ class PlotScatter(PlotStream):
         return data, xTicks, yTicks
 
 
-class PlotScatterPitchSpaceQuarterLength(PlotScatter):
+class PlotScatterPitchSpaceQuarterLength(_PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
+    .. image:: images/PlotScatterPitchSpaceQuarterLength.*
+        :width: 500
     '''
     id = 'scatterPitchSpaceQuarterLength' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        _PlotScatter.__init__(self, streamObj, *args, **keywords)
 
         self.fy = lambda n:n.ps
         self.fyTicks = self.ticksPitchSpaceChromatic
@@ -1077,13 +1088,16 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
             self.graph.setTitle('Pitch Space by Quarter Length Scatter')
 
 
-class PlotScatterPitchClassQuarterLength(PlotScatter):
+class PlotScatterPitchClassQuarterLength(_PlotScatter):
     '''A scatter plot of pitch class and quarter length
+
+    .. image:: images/PlotScatterPitchClassQuarterLength.*
+        :width: 500
     '''
     # string name used to access this class
     id = 'scatterPitchClassQuarterLength' 
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        _PlotScatter.__init__(self, streamObj, *args, **keywords)
 
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClass
@@ -1109,13 +1123,15 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
             self.graph.setTitle('Pitch Space by Quarter Length Scatter')
 
 
-class PlotScatterPitchClassOffset(PlotScatter):
+class PlotScatterPitchClassOffset(_PlotScatter):
     '''A scatter plot of pitch class and offset
 
+    .. image:: images/PlotScatterPitchClassOffset.*
+        :width: 500
     '''
     id = 'scatterPitchClassOffset' # string name used to access this class
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        _PlotScatter.__init__(self, streamObj, *args, **keywords)
 
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClass
@@ -1145,7 +1161,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
 #-------------------------------------------------------------------------------
 # horizontal bar graphs
 
-class PlotBrokenHorizontalBar(PlotStream):
+class _PlotBrokenHorizontalBar(PlotStream):
     '''A graph of events, sorted by pitch, over time
 
     '''
@@ -1190,14 +1206,16 @@ class PlotBrokenHorizontalBar(PlotStream):
         return data
 
 
-class PlotPitchClassOffset(PlotBrokenHorizontalBar):
+class PlotPitchClassOffset(_PlotBrokenHorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
+    .. image:: images/PlotPitchClassOffset.*
+        :width: 500
     '''
     id = 'pitchClassOffset' # string name used to access this class
 
     def __init__(self, streamObj, *args, **keywords):
-        PlotBrokenHorizontalBar.__init__(self, streamObj, *args, **keywords)
+        _PlotBrokenHorizontalBar.__init__(self, streamObj, *args, **keywords)
 
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClass
@@ -1221,14 +1239,16 @@ class PlotPitchClassOffset(PlotBrokenHorizontalBar):
 
 
 
-class PlotPitchSpaceOffset(PlotBrokenHorizontalBar):
+class PlotPitchSpaceOffset(_PlotBrokenHorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
+    .. image:: images/PlotPitchSpaceOffset.*
+        :width: 500
     '''
     id = 'pitchSpaceOffset' # string name used to access this class
 
     def __init__(self, streamObj, *args, **keywords):
-        PlotBrokenHorizontalBar.__init__(self, streamObj, *args, **keywords)
+        _PlotBrokenHorizontalBar.__init__(self, streamObj, *args, **keywords)
         
         self.fy = lambda n:n.ps
         self.fyTicks = self.ticksPitchSpaceChromatic
@@ -1255,7 +1275,7 @@ class PlotPitchSpaceOffset(PlotBrokenHorizontalBar):
 #-------------------------------------------------------------------------------
 # weighted scatter
 
-class PlotScatterWeighted(PlotStream):
+class _PlotScatterWeighted(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
@@ -1326,12 +1346,15 @@ class PlotScatterWeighted(PlotStream):
         return data, xTicks, yTicks
 
 
-class PlotPitchSpaceQuarterLengthCount(PlotScatterWeighted):
+class PlotPitchSpaceQuarterLengthCount(_PlotScatterWeighted):
     '''A graph of event, sorted by pitch, over time
+
+    .. image:: images/PlotPitchSpaceQuarterLengthCount.*
+        :width: 500
     '''
     id = 'pitchSpaceQuarterLengthCount'
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+        _PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.quarterLength
         self.fy = lambda n: n.midi
@@ -1353,14 +1376,20 @@ class PlotPitchSpaceQuarterLengthCount(PlotScatterWeighted):
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
             self.graph.setTitle('Count of Pitch and Quarter Length')
+        if 'alpha' not in keywords:
+            self.graph.alpha = .5
 
 
-class PlotPitchClassQuarterLengthCount(PlotScatterWeighted):
-    '''A graph of event, sorted by pitch class, over time
+
+class PlotPitchClassQuarterLengthCount(_PlotScatterWeighted):
+    '''A graph of event, sorted by pitch class, over time.
+
+    .. image:: images/PlotPitchClassQuarterLengthCount.*
+        :width: 500
     '''
     id = 'pitchClassQuarterLengthCount'
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+        _PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.quarterLength
         self.fy = lambda n: n.pitchClass
@@ -1382,6 +1411,15 @@ class PlotPitchClassQuarterLengthCount(PlotScatterWeighted):
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
             self.graph.setTitle('Count of Pitch Class and Quarter Length')
+        if 'alpha' not in keywords:
+            self.graph.alpha = .5
+
+
+
+
+
+
+
 
 
 
@@ -1389,7 +1427,26 @@ class PlotPitchClassQuarterLengthCount(PlotScatterWeighted):
 # public function 
 
 def plotStream(streamObj, *args, **keywords):
-    '''Public interface to Stream plotting methods. 
+    '''Given a stream and any keyword configuration arguments, create and display a plot.
+
+    Note: plots requires matplotib to be installed.
+
+    Plot method can be specified as a second argument or by keyword. Available plots include the following:
+
+    pitchSpace (:class:`music21.graph.PlotPitchSpace`)
+    pitchClass (:class:`music21.graph.PlotPitchClass`)
+    quarterLength (:class:`music21.graph.PlotQuarterLength`)
+
+    scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`)
+    scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`)
+    scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`)
+
+    pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`)
+    pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`)
+
+    pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`)
+    pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`)
+
     '''
     plotClasses = [
         # histograms
@@ -1402,6 +1459,7 @@ def plotStream(streamObj, *args, **keywords):
         PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
     ]
 
+    environLocal.printDebug(['plotStream: stream', streamObj])
 
     if 'method' in keywords:
         plotType = keywords['method']
@@ -1672,6 +1730,20 @@ class Test(unittest.TestCase):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
         plotStream(a.flat, doneAction=None)
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [PlotPitchSpace, PlotPitchClass, PlotQuarterLength, 
+        # scatters
+        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        # offset based horizontal
+        PlotPitchSpaceOffset, PlotPitchClassOffset,
+        # weighted scatter
+        PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
+]
+
 
 
 if __name__ == "__main__":

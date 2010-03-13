@@ -715,8 +715,34 @@ class Stream(music21.Music21Object):
 
 
     def plot(self, *args, **keywords):
+        '''Given a method and keyword configuration arguments, create and display a plot.
+
+        Note: plots requires matplotib to be installed.
+    
+        Plot method can be specified as a second argument or by keyword. Available plots include the following:
+    
+        pitchSpace (:class:`music21.graph.PlotPitchSpace`)
+        pitchClass (:class:`music21.graph.PlotPitchClass`)
+        quarterLength (:class:`music21.graph.PlotQuarterLength`)
+    
+        scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`)
+        scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`)
+        scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`)
+    
+        pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`)
+        pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`)
+    
+        pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`)
+        pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`)
+
+        >>> a = Stream()
+        >>> n = note.Note()
+        >>> a.append(n)
+        >>> a.plot(method='pitchSpaceOffset', doneAction=None)
+        '''
+        # import is here to avoid import of matplotlib problems
         from music21 import graph
-        # first ordered arg will be method type
+        # first ordered arg can be method type
         graph.plotStream(self, *args, **keywords)
 
 

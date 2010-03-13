@@ -11,6 +11,283 @@ music21.graph
 
 .. function:: plotStream(streamObj)
 
+Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`music21.graph.PlotPitchSpace`) pitchClass (:class:`music21.graph.PlotPitchClass`) quarterLength (:class:`music21.graph.PlotQuarterLength`) scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`) pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`) pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`) 
+
+
+
+class PlotPitchSpace
+--------------------
+
+.. class:: PlotPitchSpace
+
+    A histogram of pitch space. 
+
+    .. image:: images/PlotPitchSpace.* 
+        :width: 500 
+
+    
+
+    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchSpace** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchSpace** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotPitchClass
+--------------------
+
+.. class:: PlotPitchClass
+
+    A histogram of pitch class 
+
+    .. image:: images/PlotPitchClass.* 
+        :width: 500 
+
+    
+
+    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchClass** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchClass** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotQuarterLength
+-----------------------
+
+.. class:: PlotQuarterLength
+
+    A histogram of pitch class 
+
+    .. image:: images/PlotQuarterLength.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+
+    **class PlotQuarterLength** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotQuarterLength** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotScatterPitchSpaceQuarterLength
+----------------------------------------
+
+.. class:: PlotScatterPitchSpaceQuarterLength
+
+    A scatter plot of pitch space and quarter length 
+
+    .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+
+    **class PlotScatterPitchSpaceQuarterLength** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotScatterPitchSpaceQuarterLength** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotScatterPitchClassQuarterLength
+----------------------------------------
+
+.. class:: PlotScatterPitchClassQuarterLength
+
+    A scatter plot of pitch class and quarter length 
+
+    .. image:: images/PlotScatterPitchClassQuarterLength.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+
+    **class PlotScatterPitchClassQuarterLength** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotScatterPitchClassQuarterLength** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotScatterPitchClassOffset
+---------------------------------
+
+.. class:: PlotScatterPitchClassOffset
+
+    A scatter plot of pitch class and offset 
+
+    .. image:: images/PlotScatterPitchClassOffset.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+
+    **class PlotScatterPitchClassOffset** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotScatterPitchClassOffset** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotPitchSpaceOffset
+--------------------------
+
+.. class:: PlotPitchSpaceOffset
+
+    A graph of events, sorted by pitch space, over time 
+
+    .. image:: images/PlotPitchSpaceOffset.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotBrokenHorizontalBar`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchSpaceOffset** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchSpaceOffset** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotPitchClassOffset
+--------------------------
+
+.. class:: PlotPitchClassOffset
+
+    A graph of events, sorted by pitch class, over time 
+
+    .. image:: images/PlotPitchClassOffset.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotBrokenHorizontalBar`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchClassOffset** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchClassOffset** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotPitchSpaceQuarterLengthCount
+--------------------------------------
+
+.. class:: PlotPitchSpaceQuarterLengthCount
+
+    A graph of event, sorted by pitch, over time 
+
+    .. image:: images/PlotPitchSpaceQuarterLengthCount.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotScatterWeighted`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchSpaceQuarterLengthCount** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchSpaceQuarterLengthCount** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
+
+class PlotPitchClassQuarterLengthCount
+--------------------------------------
+
+.. class:: PlotPitchClassQuarterLengthCount
+
+    A graph of event, sorted by pitch class, over time. 
+
+    .. image:: images/PlotPitchClassQuarterLengthCount.* 
+        :width: 500 
+
+    inherits from: :class:`music21.graph._PlotScatterWeighted`, :class:`music21.graph.PlotStream`
+
+    **class PlotPitchClassQuarterLengthCount** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **class PlotPitchClassQuarterLengthCount** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+
 
 class Graph
 -----------
@@ -228,7 +505,7 @@ class Graph2DScatter
 
     .. method:: process()
 
-    No documentation. 
+    xValueLegit determines if index values or real values are used 
 
     Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
 
@@ -328,156 +605,6 @@ class Graph3DPolygonBars
     Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
 
 
-class PlotBrokenHorizontalBar
------------------------------
-
-.. class:: PlotBrokenHorizontalBar
-
-    A graph of events, sorted by pitch, over time 
-
-    
-
-    inherits from: :class:`music21.graph.PlotStream`
-
-    **class PlotBrokenHorizontalBar** **attributes**
-
-    Attributes inherited from :class:`music21.graph.PlotStream`: :attr:`music21.graph.PlotStream.id`
-
-    **class PlotBrokenHorizontalBar** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
-class PlotPitchClass
---------------------
-
-.. class:: PlotPitchClass
-
-    A histogram of pitch class 
-
-    
-
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
-
-    **class PlotPitchClass** **attributes**
-
-    .. attribute:: id
-
-    No documentation. 
-
-    **class PlotPitchClass** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
-class PlotPitchSpace
---------------------
-
-.. class:: PlotPitchSpace
-
-    A histogram of pitch space 
-
-    
-
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
-
-    **class PlotPitchSpace** **attributes**
-
-    .. attribute:: id
-
-    No documentation. 
-
-    **class PlotPitchSpace** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
-class PlotPitchSpaceDurationCount
----------------------------------
-
-.. class:: PlotPitchSpaceDurationCount
-
-    A graph of event, sorted by pitch, over time 
-
-    inherits from: :class:`music21.graph.PlotStream`
-
-    **class PlotPitchSpaceDurationCount** **attributes**
-
-    Attributes inherited from :class:`music21.graph.PlotStream`: :attr:`music21.graph.PlotStream.id`
-
-    **class PlotPitchSpaceDurationCount** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
-class PlotPitchSpaceOffset
---------------------------
-
-.. class:: PlotPitchSpaceOffset
-
-    A graph of events, sorted by pitch, over time 
-
-    
-
-    inherits from: :class:`music21.graph.PlotBrokenHorizontalBar`, :class:`music21.graph.PlotStream`
-
-    **class PlotPitchSpaceOffset** **attributes**
-
-    .. attribute:: id
-
-    No documentation. 
-
-    **class PlotPitchSpaceOffset** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
-class PlotQuarterLength
------------------------
-
-.. class:: PlotQuarterLength
-
-    A histogram of pitch class 
-
-    
-
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
-
-    **class PlotQuarterLength** **attributes**
-
-    .. attribute:: id
-
-    No documentation. 
-
-    **class PlotQuarterLength** **methods**
-
-    .. method:: __init__(streamObj)
-
-    No documentation. 
-
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
-
-
 class PlotStream
 ----------------
 
@@ -520,7 +647,7 @@ class PlotStream
     >>> a.ticksDynamics()
     [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']] 
 
-    .. method:: ticksPitchClass()
+    .. method:: ticksPitchClass(pcMin=0, pcMax=11)
 
     Utility method to get ticks in pitch classes 
 
@@ -547,9 +674,18 @@ class PlotStream
     >>> a.ticksPitchSpaceOctave()
     [[36, 'C2'], [48, 'C3'], [60, 'C4'], [72, 'C5'], [84, 'C6'], [96, 'C7']] 
 
-    .. method:: ticksQuarterLength(qlList)
+    .. method:: ticksQuarterLength(qlList=None, labelStyle=type)
 
-    No documentation. 
+    
+
+    
+
+    >>> from music21 import stream; s = stream.Stream()
+    >>> a = PlotStream(s)
+    >>> a.ticksQuarterLength()
+    [[0.25, '16th'], [0.5, 'eighth'], [1, 'quarter'], [2, 'half'], [4, 'whole']] 
+
+    
 
     .. method:: write(fp)
 
