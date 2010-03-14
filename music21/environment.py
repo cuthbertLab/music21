@@ -429,7 +429,7 @@ class Environment(object):
             sys.stderr.write(msg)
     
 
-    def printWarn(self, msg):
+    def warn(self, msg):
         '''To print a warning to the user, send a list of strings to this
         method. 
         '''

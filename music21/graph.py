@@ -40,7 +40,7 @@ try:
     import numpy
 
 except ImportError:
-    environLocal.printWarn('no matplotlib available')
+    environLocal.warn('no matplotlib available')
 
 
 
