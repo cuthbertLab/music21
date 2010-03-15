@@ -12,12 +12,7 @@
 import copy, types, random
 import doctest, unittest
 import sys
-
 from copy import deepcopy
-# try:
-#     import cPickle as pickleMod
-# except ImportError:
-#     import pickle as pickleMod
 
 
 import music21 ## needed to properly do isinstance checking
@@ -696,7 +691,68 @@ class Stream(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # temporary storage: does not work yet!
+    # temporary storage
+
+
+    def _printDefinedContexts(self):
+        '''Debugging tool: show all defined contexts
+        '''
+        print('\nraw defind contexts')
+        print(self._definedContexts._definedContexts)
+        print(self.parent)
+        for element in self.elements:
+            if hasattr(element, "elements"): # recurse time:
+                print(element._definedContexts._definedContexts)   
+                element._printDefinedContexts() # proc defined contexts stored herein
+     
+            elif isinstance(element, music21.Music21Object):
+                print(element._definedContexts._definedContexts)        
+
+
+
+    def setupPickleScaffold(self):
+        '''Prepare this stream and all of its contents for pickling.
+
+        >>> a = Stream()
+        >>> n = note.Note()
+        >>> n.duration.type = "whole"
+        >>> a.repeatAppend(n, 10)
+        >>> a.setupPickleScaffold()
+        '''
+        #environLocal.printDebug(['calling setupPickleScaffold()', self])
+        for element in self.elements:
+            if hasattr(element, "elements"): # recurse time:
+                element.setupPickleScaffold() # recurse
+            #if hasattr(element, "unwrapWeakref"): # recurse time:
+            elif isinstance(element, music21.Music21Object):
+                element.freezeIds()
+                element.unwrapWeakref()
+        self.freezeIds()
+        self.unwrapWeakref()
+
+
+    def teardownPickleScaffold(self):
+        '''After rebuilding this stream from pickled storage, prepare this as a normal Stream.
+
+        >>> a = Stream()
+        >>> n = note.Note()
+        >>> n.duration.type = "whole"
+        >>> a.repeatAppend(n, 10)
+        >>> a.setupPickleScaffold()
+        >>> a.teardownPickleScaffold()
+        '''
+        #environLocal.printDebug(['calling teardownPickleScaffold'])
+
+        self.wrapWeakref()
+        self.unfreezeIds()
+        for element in self.elements:
+            if hasattr(element, "elements"): # recurse time:
+                element.teardownPickleScaffold()
+            elif hasattr(element, "unwrapWeakref"): # recurse time:
+            #elif isinstance(element, music21.Music21Object):
+                #environLocal.printDebug(['processing music21 obj', element])
+                element.wrapWeakref()
+                element.unfreezeIds()
 
 #     def writePickle(self, fp):
 #         f = open(fp, 'wb') # binary
@@ -713,13 +769,15 @@ class Stream(music21.Music21Object):
 #         f.close()
 
 
+    #---------------------------------------------------------------------------
+    # display methods; in the same manner as show() and write()
 
     def plot(self, *args, **keywords):
         '''Given a method and keyword configuration arguments, create and display a plot.
 
         Note: plots requires matplotib to be installed.
     
-        Plot method can be specified as a second argument or by keyword. Available plots include the following:
+        Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following:
     
         pitchSpace (:class:`music21.graph.PlotPitchSpace`)
         pitchClass (:class:`music21.graph.PlotPitchClass`)
@@ -738,7 +796,7 @@ class Stream(music21.Music21Object):
         >>> a = Stream()
         >>> n = note.Note()
         >>> a.append(n)
-        >>> a.plot(method='pitchSpaceOffset', doneAction=None)
+        >>> a.plot('pitchspaceoffset', doneAction=None)
         '''
         # import is here to avoid import of matplotlib problems
         from music21 import graph

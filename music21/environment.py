@@ -367,6 +367,7 @@ class Environment(object):
         '''
         if self.ref['directoryScratch'] == None:
             # get a system specified scratch dir
+            # TODO: implement
             pass
             raise EnvironmentException('cannot get a system specified temporary directory.')
 

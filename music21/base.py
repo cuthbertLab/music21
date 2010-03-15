@@ -28,6 +28,7 @@ import sys
 import types
 import time
 import inspect
+import uuid
 
 from music21 import common
 from music21 import environment
@@ -127,6 +128,8 @@ class DefinedContexts(object):
 
     DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
 
+    All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
+
     '''
     #TODO: make locations, by default, use weak refs
     # make contexts, by default, not use weak refs
@@ -166,6 +169,10 @@ class DefinedContexts(object):
         True
         >>> aContexts.get() == bContexts.get()
         True
+
+        OMIT_FROM_DOCS
+        the not copying object references here may be a problem
+        seems to be a prblem in copying Streams before pickling
         '''
         new = self.__class__()
         for idKey in self._definedContexts.keys():
@@ -174,15 +181,166 @@ class DefinedContexts(object):
                     dict['time'], idKey)
         return new
 
+    #---------------------------------------------------------------------------
+    # utility conversions
+
+    def unwrapWeakref(self):
+        '''Unwrap any and all weakrefs stored.
+
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> common.isWeakref(aContexts.get()[0]) # unwrapping happens 
+        False
+        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        True
+        >>> aContexts.unwrapWeakref()
+        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        False
+        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+        False
+        '''
+        for idKey in self._definedContexts.keys():
+            if common.isWeakref(self._definedContexts[idKey]['obj']):
+
+                #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
+
+                post = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+                self._definedContexts[idKey]['obj'] = post
+
+
+    def wrapWeakref(self):
+        '''Wrap any and all weakrefs stored.
+
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.unwrapWeakref()
+        >>> aContexts.wrapWeakref()
+        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        True
+        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+        True
+        '''
+        for idKey in self._definedContexts.keys():
+            if self._definedContexts[idKey]['obj'] == None:
+                continue # always skip None
+            if not common.isWeakref(self._definedContexts[idKey]['obj']):
+                #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
+
+                post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
+                self._definedContexts[idKey]['obj'] = post
+
+
+
+    def freezeIds(self):
+        '''Temporarily replace are stored keys with a different value.
+
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> oldKeys = aContexts._definedContexts.keys()
+        >>> aContexts.freezeIds()
+        >>> newKeys = aContexts._definedContexts.keys()
+        >>> oldKeys == newKeys
+        False
+        '''
+        # need to store self._locationKeys as well
+
+        post = {}
+        postLocationKeys = []
+        for idKey in self._definedContexts.keys():
+
+            # make a random UUID
+            if idKey != None:
+                newKey = uuid.uuid4()
+            else:
+                newKey = idKey # keep None
+
+            # might want to store old id?
+            #environLocal.printDebug(['freezing key:', idKey, newKey])
+
+            if idKey in self._locationKeys:
+                postLocationKeys.append(newKey)
+            
+            post[newKey] = self._definedContexts[idKey]
+
+        self._definedContexts = post
+        self._locationKeys = postLocationKeys
+
+        #environLocal.printDebug(['post freezeids', self._definedContexts])
+
+
+    def unfreezeIds(self):
+        '''Restore keys to be the id() of the object they contain
+
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mock()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> aContexts.add(cObj, 200) # a location
+
+        >>> oldKeys = aContexts._definedContexts.keys()
+        >>> oldLocations = aContexts._locationKeys[:]
+        >>> aContexts.freezeIds()
+        >>> newKeys = aContexts._definedContexts.keys()
+        >>> oldKeys == newKeys
+        False
+        >>> aContexts.unfreezeIds()
+        >>> postKeys = aContexts._definedContexts.keys()
+        >>> postKeys == newKeys
+        False
+        >>> # restored original ids b/c objs are alive
+        >>> sorted(postKeys) == sorted(oldKeys) 
+        True
+        >>> oldLocations == aContexts._locationKeys
+        True
+        '''
+        #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
+
+        post = {}
+        postLocationKeys = []
+        for idKey in self._definedContexts.keys():
+
+            # check if unwrapped, unwrap
+            obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+            if obj != None:
+                newKey = id(obj)
+            else:
+                newKey = None
+            #environLocal.printDebug(['unfreezing key:', idKey, newKey])
+
+            if idKey in self._locationKeys:
+                postLocationKeys.append(newKey)
+            post[newKey] = self._definedContexts[idKey]
+
+        self._definedContexts = post
+        self._locationKeys = postLocationKeys
+
+
+    #---------------------------------------------------------------------------
+    # general
 
     def clear(self):
-        '''Clear all data.
+        '''Clear all stored data.
         '''
         self._definedContexts = {} 
         self._locationKeys = []
 
     def _prepareObject(self, obj, domain):
-        '''Prepare an object for storage
+        '''Prepare an object for storage. May be stored as a standard refernce or as a weak reference.
         '''
         # can have this perform differently based on domain
         if WEAKREF_ACTIVE:
@@ -190,8 +348,8 @@ class DefinedContexts(object):
                 objRef = obj
             else:
                 objRef = common.wrapWeakref(obj)
-        else: # a references
-            objRef = site
+        else: # a normal reference
+            objRef = obj
         return objRef
 
     def add(self, obj, offset=None, name=None, timeValue=None, idKey=None):
@@ -290,8 +448,9 @@ class DefinedContexts(object):
 
 
     def get(self, locationsTrail=False):
-        '''Get references; unwrap from weakrefs; place in order from 
-        most recently added to least recently added
+        '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
+
+        The locationsTrail option forces locations to come after all other defined contexts.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -306,7 +465,8 @@ class DefinedContexts(object):
         >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
         True
         '''
-        post = []
+        post = [] 
+        # get partitioned lost of all, w/ locations last if necessary
         if locationsTrail:
             keys = []
             for key in self._definedContexts.keys():
@@ -316,6 +476,7 @@ class DefinedContexts(object):
         else:
             keys = self._definedContexts.keys()
             
+        # get each dict from all defined contexts
         for key in keys:
             dict = self._definedContexts[key]
             # need to check if these is weakref
@@ -328,7 +489,7 @@ class DefinedContexts(object):
     #---------------------------------------------------------------------------
     # for dealing with locations
     def getSites(self):
-        '''Get parents for locations; unwrap from weakrefs
+        '''Get all defined contexts that are locations; unwrap from weakrefs
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -382,6 +543,28 @@ class DefinedContexts(object):
         # here, already having location keys may be an advantage
         return [self._definedContexts[x]['offset'] for x in self._locationKeys] 
 
+
+    def getOffsetByObjectMatch(self, obj):
+        '''For a given object return the offset using a direct object match.
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cParent = Mock()
+        >>> aLocations = DefinedContexts()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.getOffsetBySite(aSite)
+        23
+        >>> aLocations.getOffsetBySite(bSite)
+        121.5
+        '''
+        for idKey in self._definedContexts.keys():
+            dict = self._definedContexts[idKey]
+            if dict['obj'] == obj:
+                return dict['offset']
+        raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
+
     def getOffsetBySite(self, site):
         '''For a given site return its offset.
 
@@ -425,6 +608,8 @@ class DefinedContexts(object):
         if post == None: # 
             raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         return self._definedContexts[siteId]['offset']
+
+
     def setOffsetBySite(self, site, value):
         '''
         Changes the offset of the site specified.  Note that this can also be
@@ -535,9 +720,8 @@ class DefinedContexts(object):
         if memo == None:
             memo = {} # intialize
 
-        environLocal.printDebug(['call getByClass from:', self, 
-                                 'callerFirst:', callerFirst])
-        #environLocal.printDebug(['call getByClass from', self])
+        #environLocal.printDebug(['call getByClass from:', self, 
+        #                         'callerFirst:', callerFirst])
         post = None
 
         # search any defined contexts first
@@ -567,9 +751,11 @@ class DefinedContexts(object):
                         if post != None:
                             break
                     else: # this is not a music21 object
-                        environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
+                        pass
+                        #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
                 else: # objec has already been searched
-                    environLocal.printDebug['skipping searching of object already searched:', obj]
+                    pass
+                    #environLocal.printDebug['skipping searching of object already searched:', obj]
             else: 
                 return None
         return post
@@ -901,7 +1087,7 @@ class Music21Object(object):
 
         The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
         '''
-        environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst])
+        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst])
     
         # this method will be called recursively on all object levels, ascending
         # thus, to do serial reverse search we need to 
@@ -940,7 +1126,7 @@ class Music21Object(object):
                     post = self.flat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 
-                environLocal.printDebug(['results of serialReverseSearch:', post, 'searching for:', className, 'starting from offset', offsetOfCaller])
+                #environLocal.printDebug(['results of serialReverseSearch:', post, 'searching for:', className, 'starting from offset', offsetOfCaller])
 
         if post == None: # still no match
             # this will call this method on all defined contexts;
@@ -959,7 +1145,7 @@ class Music21Object(object):
         if WEAKREF_ACTIVE:
             if self._currentParent is None: #leave None
                 return self._currentParent
-            else:
+            else: # even if current parent is not a weakref, this will work
                 return common.unwrapWeakref(self._currentParent)
         else:
             return self._currentParent
@@ -997,6 +1183,7 @@ class Music21Object(object):
         This speeds up things like stream.getElementsById substantially.
 
         Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated)
+
         >>> from stream import Stream
         >>> st1 = Stream()
         >>> o1 = Music21Object()
@@ -1023,7 +1210,7 @@ class Music21Object(object):
         
 
     def _getOffset(self):
-        '''
+        '''Get the offset for the set the parent object.
 
         '''
         #there is a problem if a new parent is being set and no offsets have 
@@ -1043,9 +1230,17 @@ class Music21Object(object):
         elif self.parent is None: # assume we want self
             return self._definedContexts.getOffsetBySite(None)
         else:
-            raise Exception('request for offset cannot be made with parent of %s (id: %s)' % (self.parent, parentId))            
+            # try to look for it in all objects
+            environLocal.printDebug(['doing a manual parent search: problably means that id(self.parent) (%s) is not equal to self._currentParentId (%s)' % (id(self.parent), self._currentParentId)])
+            offset = self._definedContexts.getOffsetByObjectMatch(self.parent)
+            return offset
+
+            environLocal.printDebug(['self._definedContexts', self._definedContexts._definedContexts])
+            raise Exception('request within %s for offset cannot be made with parent of %s (id: %s)' % (self.__class__, self.parent, parentId))            
 
     def _setOffset(self, value):
+        '''Set the offset for the parent object. 
+        '''
         if common.isNum(value):
             # if a number assume it is a quarter length
             # self._offset = duration.DurationUnit()
@@ -1122,6 +1317,110 @@ class Music21Object(object):
         Traceback (most recent call last):
         ElementException: priority values must be integers.
         ''')
+
+
+
+    #---------------------------------------------------------------------------
+    # temporary storage setup routines; public interfdace
+
+    def unwrapWeakref(self):
+        '''Public interface to operation on DefinedContexts.
+
+        >>> aM21Obj = Music21Object()
+        >>> bM21Obj = Music21Object()
+        >>> aM21Obj.offset = 30
+        >>> aM21Obj.getOffsetBySite(None)
+        30.0
+        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+        >>> aM21Obj.unwrapWeakref()
+
+        '''
+        self._definedContexts.unwrapWeakref()
+
+        # doing direct access; not using property parent, as filters
+        # through global WEAKREF_ACTIVE setting
+        self._currentParent = common.unwrapWeakref(self._currentParent)
+
+    def wrapWeakref(self):
+        '''Public interface to operation on DefinedContexts.
+
+        >>> aM21Obj = Music21Object()
+        >>> bM21Obj = Music21Object()
+        >>> aM21Obj.offset = 30
+        >>> aM21Obj.getOffsetBySite(None)
+        30.0
+        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+        >>> aM21Obj.unwrapWeakref()
+        >>> aM21Obj.wrapWeakref()
+        '''
+        self._definedContexts.wrapWeakref()
+
+        # doing direct access; not using property parent, as filters
+        # through global WEAKREF_ACTIVE setting
+        self._currentParent = common.wrapWeakref(self._currentParent)
+        # this is done both here and in unfreezeIds()
+        # not sure if both are necesary
+        if self._currentParent is not None:
+            obj = common.unwrapWeakref(self._currentParent)
+            self._currentParentId = id(obj)
+
+
+    def freezeIds(self):
+        '''Temporarily replace are stored keys with a different value.
+
+        >>> aM21Obj = Music21Object()
+        >>> bM21Obj = Music21Object()
+        >>> aM21Obj.offset = 30
+        >>> aM21Obj.getOffsetBySite(None)
+        30.0
+        >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
+        >>> bM21Obj.parent != None
+        True
+        >>> oldParentId = bM21Obj._currentParentId
+        >>> bM21Obj.freezeIds()
+        >>> newParentId = bM21Obj._currentParentId
+        >>> oldParentId == newParentId
+        False
+        '''
+        self._definedContexts.freezeIds()
+
+        # _currentParent could be a weak ref; may need to manage
+        if self._currentParent is not None:
+            #environLocal.printDebug(['freezeIds: adjusting _currentParentId', self._currentParent])
+            self._currentParentId = uuid.uuid4() # a place holder
+
+
+    def unfreezeIds(self):
+        '''Restore keys to be the id() of the object they contain
+
+        >>> aM21Obj = Music21Object()
+        >>> bM21Obj = Music21Object()
+        >>> aM21Obj.offset = 30
+        >>> aM21Obj.getOffsetBySite(None)
+        30.0
+        >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
+        >>> bM21Obj.parent != None
+        True
+        >>> oldParentId = bM21Obj._currentParentId
+        >>> bM21Obj.freezeIds()
+        >>> newParentId = bM21Obj._currentParentId
+        >>> oldParentId == newParentId
+        False
+        >>> bM21Obj.unfreezeIds()
+        >>> postParentId = bM21Obj._currentParentId
+        >>> oldParentId == postParentId
+        True
+        '''
+        #environLocal.printDebug(['unfreezing ids', self])
+        self._definedContexts.unfreezeIds()
+
+        if self._currentParent is not None:
+            obj = common.unwrapWeakref(self._currentParent)
+            self._currentParentId = id(obj)
+
+
+
+
 
 
     #---------------------------------------------------------------------------

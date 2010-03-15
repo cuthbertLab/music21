@@ -7,7 +7,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Public interface for importing file formats into music21. 
@@ -17,11 +17,17 @@
 import doctest
 import unittest
 import os
-import pickle
 import urllib
+import time
+import copy
+
+try:
+    import cPickle as pickleMod
+except ImportError:
+    import pickle as pickleMod
+
 
 import music21
-
 from music21 import chord
 from music21 import clef
 from music21 import common
@@ -75,8 +81,10 @@ class PickleFilter(object):
         return os.path.join(dir, 'm21-' + common.getMd5(self.fp) + '.p')
 
     def status(self):
-        # look for an up to date pickled version
-        # if it exists, return its fp, other wise return fp
+        '''Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path.
+
+        Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.
+        '''
         fpScratch = environLocal.getTempDir()
         format = common.findFormatFile(self.fp)
 
@@ -110,22 +118,97 @@ class PickleFilter(object):
 
 
 
+
+#-------------------------------------------------------------------------------
+class StreamFreezer(object):
+
+
+    def __init__(self, streamObj=None):
+        # may want to make a copy, as we are destructively modifying
+        self.stream = streamObj
+        #self.stream = copy.deepcopy(streamObj)
+
+    def _getPickleFp(self, dir):
+        if dir == None:
+            raise ValueError
+        # cannot get data from stream, as offsets are broken
+        streamStr = str(time.time())
+        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
+
+
+    #---------------------------------------------------------------------------
+    def writePickle(self, fp=None):
+
+        if fp == None:
+            dir = environLocal.getTempDir()
+            fp = self._getPickleFp(dir)
+        elif os.sep in fp: # assume its a complete path
+            fp = fp
+        else:
+            dir = environLocal.getTempDir()
+            fp = os.path.join(dir, fp)
+
+        #self.stream._printDefinedContexts()
+        self.stream.setupPickleScaffold()
+        #self.stream._printDefinedContexts()
+
+        environLocal.printDebug(['writing fp', fp])
+        f = open(fp, 'wb') # binary
+        # a negative protocal value will get the highest protocal; 
+        # this is generally desirable 
+
+        storage = {'stream': self.stream, 'm21Version': music21.VERSION}
+        pickleMod.dump(storage, f, protocol=-1)
+        f.close()
+        return fp
+
+    def openPickle(self, fp):
+
+        if os.sep in fp: # assume its a complete path
+            fp = fp
+        else:
+            dir = environLocal.getTempDir()
+            fp = os.path.join(dir, fp)
+
+        environLocal.printDebug(['opening fp', fp])
+        f = open(fp, 'rb')
+        storage = pickleMod.load(f)
+        f.close()
+        #self.stream._printDefinedContexts()
+
+        version = storage['m21Version']
+        if version != music21.VERSION:
+            environLocal.warn('this pickled file is out of data and my not function properly.')
+
+        self.stream = storage['stream']
+        self.stream.teardownPickleScaffold()
+        #self.stream._printDefinedContexts()
+
+
+
+
 #-------------------------------------------------------------------------------
 class ConverterHumdrum(object):
-
+    '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
+    '''
 
     def __init__(self):
         self.stream = None
 
     #---------------------------------------------------------------------------
     def parseData(self, humdrumString):
-        '''Open from a string'''
+        '''Open Humdrum data from a string
+
+        >>> humdata = '**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-'
+        >>> c = ConverterHumdrum()
+        >>> s = c.parseData(humdata)
+        '''
         self.data = humdrum.parseData(humdrumString)
         self.stream = self.data.stream
         return self.data
 
     def parseFile(self, filepath):
-        '''Open from file path'''
+        '''Open Humdram data from a file path.'''
         self.data = humdrum.parseFile(filepath)
         self.stream = self.data.stream
         return self.data
@@ -147,7 +230,7 @@ class ConverterMusicXML(object):
         return self._mxScore.getPartNames()
 
     def load(self):
-        '''Load all parts.
+        '''Load all parts from a MusicXML object representation.
         This determines the order parts are found in the stream
         '''
         t = common.Timer()
@@ -167,7 +250,7 @@ class ConverterMusicXML(object):
 
     #---------------------------------------------------------------------------
     def parseData(self, xmlString):
-        '''Open from a string'''
+        '''Open MusicXML data from a string.'''
         c = musicxml.Document()
         c.read(xmlString)
         self._mxScore = c.score
@@ -242,7 +325,9 @@ class ConverterMusicXML(object):
 
 #-------------------------------------------------------------------------------
 class Converter(object):
-    '''Not a subclass, but a wrapper for different converter objects based on format.
+    '''A class used for converting all supported data formats into music21 objects. 
+
+    Not a subclass, but a wrapper for different converter objects based on format.
     '''
 
     def __init__(self):
@@ -264,6 +349,8 @@ class Converter(object):
         return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
 
     def parseFile(self, fp, forceSource=False):
+        '''Given a file path, parse and store a music21 Stream.
+        '''
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
@@ -272,7 +359,7 @@ class Converter(object):
         self._converter.parseFile(fp)
 
     def parseData(self, dataStr):
-        '''need to look at data and determine if it is xml or humdrum
+        '''Given raw data, determine format and parse into a music21 Stream.
         '''
         dataStr = dataStr.lstrip()
         if dataStr.startswith('<?xml'):
@@ -287,7 +374,9 @@ class Converter(object):
 
 
     def parseURL(self, url):
-        '''Given a url, download and parse the file into a Stream.
+        '''Given a url, download and parse the file into a music21 Stream.
+
+        Note that this check the user Environment `autoDownlaad` setting before downloading. 
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload == 'allow':
@@ -375,6 +464,23 @@ def parse(value, forceSource=False):
 
 
 
+def freeze(streamObj, fp=None):
+    '''Given a file path, attempt to parse the file into a Stream.
+    '''
+    v = StreamFreezer(streamObj)
+    return v.writePickle(fp) # returns fp
+
+
+def unfreeze(fp):
+    '''Given a file path, attempt to parse the file into a Stream.
+    '''
+    v = StreamFreezer()
+    v.openPickle(fp)
+    return v.stream
+
+
+
+
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     # interpreter loading
@@ -411,6 +517,23 @@ class TestExternal(unittest.TestCase):
         urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
         for url in [urlA, urlB, urlC]:
             post = parseURL(url)
+
+
+    def testFreezer(self):
+        from music21 import stream, note, corpus
+        s = stream.Stream()
+        n = note.Note()
+        s.append(n)
+
+        s = corpus.parseWork('bach')
+
+        aConverter = StreamFreezer(s)
+        fp = aConverter.writePickle()
+
+        aConverter.openPickle(fp)
+        #aConverter.stream
+        aConverter.stream.show()
+
 
 class Test(unittest.TestCase):
 
