@@ -122,6 +122,24 @@ class Music21Object
     >>> o1.getOffsetBySite(st1)
     20.0 
 
+    .. method:: freezeIds()
+
+    Temporarily replace are stored keys with a different value. 
+
+    >>> aM21Obj = Music21Object()
+    >>> bM21Obj = Music21Object()
+    >>> aM21Obj.offset = 30
+    >>> aM21Obj.getOffsetBySite(None)
+    30.0 
+    >>> bM21Obj.addLocationAndParent(50, aM21Obj)
+    >>> bM21Obj.parent != None
+    True 
+    >>> oldParentId = bM21Obj._currentParentId
+    >>> bM21Obj.freezeIds()
+    >>> newParentId = bM21Obj._currentParentId
+    >>> oldParentId == newParentId
+    False 
+
     .. method:: getContextByClass(className, serialReverseSearch=True, callerFirst=None, memo=None)
 
     Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
@@ -142,6 +160,55 @@ class Music21Object
     .. method:: show(fmt=None)
 
     Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
+
+    .. method:: unfreezeIds()
+
+    Restore keys to be the id() of the object they contain 
+
+    >>> aM21Obj = Music21Object()
+    >>> bM21Obj = Music21Object()
+    >>> aM21Obj.offset = 30
+    >>> aM21Obj.getOffsetBySite(None)
+    30.0 
+    >>> bM21Obj.addLocationAndParent(50, aM21Obj)
+    >>> bM21Obj.parent != None
+    True 
+    >>> oldParentId = bM21Obj._currentParentId
+    >>> bM21Obj.freezeIds()
+    >>> newParentId = bM21Obj._currentParentId
+    >>> oldParentId == newParentId
+    False 
+    >>> bM21Obj.unfreezeIds()
+    >>> postParentId = bM21Obj._currentParentId
+    >>> oldParentId == postParentId
+    True 
+
+    .. method:: unwrapWeakref()
+
+    Public interface to operation on DefinedContexts. 
+
+    >>> aM21Obj = Music21Object()
+    >>> bM21Obj = Music21Object()
+    >>> aM21Obj.offset = 30
+    >>> aM21Obj.getOffsetBySite(None)
+    30.0 
+    >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+    >>> aM21Obj.unwrapWeakref()
+
+    
+
+    .. method:: wrapWeakref()
+
+    Public interface to operation on DefinedContexts. 
+
+    >>> aM21Obj = Music21Object()
+    >>> bM21Obj = Music21Object()
+    >>> aM21Obj.offset = 30
+    >>> aM21Obj.getOffsetBySite(None)
+    30.0 
+    >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+    >>> aM21Obj.unwrapWeakref()
+    >>> aM21Obj.wrapWeakref()
 
     .. method:: write(fmt=None, fp=None)
 
@@ -200,9 +267,7 @@ class ElementWrapper
 
     .. attribute:: offset
 
-    
-
-    
+    Get the offset for the set the parent object. 
 
     
 
@@ -262,7 +327,7 @@ class ElementWrapper
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
 
 
 class DefinedContexts
@@ -270,7 +335,7 @@ class DefinedContexts
 
 .. class:: DefinedContexts
 
-    An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
+    An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
 
     
 
@@ -288,11 +353,27 @@ class DefinedContexts
 
     .. method:: clear()
 
-    Clear all data. 
+    Clear all stored data. 
+
+    .. method:: freezeIds()
+
+    Temporarily replace are stored keys with a different value. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> oldKeys = aContexts._definedContexts.keys()
+    >>> aContexts.freezeIds()
+    >>> newKeys = aContexts._definedContexts.keys()
+    >>> oldKeys == newKeys
+    False 
 
     .. method:: get(locationsTrail=False)
 
-    Get references; unwrap from weakrefs; place in order from most recently added to least recently added 
+    Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The locationsTrail option forces locations to come after all other defined contexts. 
 
     >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
@@ -341,6 +422,22 @@ class DefinedContexts
     True 
     >>> aContexts.getByClass(Mock) == aObj
     True 
+
+    .. method:: getOffsetByObjectMatch(obj)
+
+    For a given object return the offset using a direct object match. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aSite = Mock()
+    >>> bSite = Mock()
+    >>> cParent = Mock()
+    >>> aLocations = DefinedContexts()
+    >>> aLocations.add(aSite, 23)
+    >>> aLocations.add(bSite, 121.5)
+    >>> aLocations.getOffsetBySite(aSite)
+    23 
+    >>> aLocations.getOffsetBySite(bSite)
+    121.5 
 
     .. method:: getOffsetBySite(site)
 
@@ -407,7 +504,7 @@ class DefinedContexts
 
     .. method:: getSites()
 
-    Get parents for locations; unwrap from weakrefs 
+    Get all defined contexts that are locations; unwrap from weakrefs 
 
     >>> class Mock(Music21Object): pass
     >>> aObj = Mock()
@@ -482,6 +579,71 @@ class DefinedContexts
     >>> aLocations.setOffsetBySite(cSite, 30)
     Traceback (most recent call last): 
     RelationsException: ... 
+
+    .. method:: unfreezeIds()
+
+    Restore keys to be the id() of the object they contain 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> cObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> aContexts.add(cObj, 200) # a location
+    >>> oldKeys = aContexts._definedContexts.keys()
+    >>> oldLocations = aContexts._locationKeys[:]
+    >>> aContexts.freezeIds()
+    >>> newKeys = aContexts._definedContexts.keys()
+    >>> oldKeys == newKeys
+    False 
+    >>> aContexts.unfreezeIds()
+    >>> postKeys = aContexts._definedContexts.keys()
+    >>> postKeys == newKeys
+    False 
+    >>> # restored original ids b/c objs are alive
+    >>> sorted(postKeys) == sorted(oldKeys)
+    True 
+    >>> oldLocations == aContexts._locationKeys
+    True 
+
+    .. method:: unwrapWeakref()
+
+    Unwrap any and all weakrefs stored. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> common.isWeakref(aContexts.get()[0]) # unwrapping happens
+    False 
+    >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+    True 
+    >>> aContexts.unwrapWeakref()
+    >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+    False 
+    >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+    False 
+
+    .. method:: wrapWeakref()
+
+    Wrap any and all weakrefs stored. 
+
+    >>> class Mock(Music21Object): pass
+    >>> aObj = Mock()
+    >>> bObj = Mock()
+    >>> aContexts = DefinedContexts()
+    >>> aContexts.add(aObj)
+    >>> aContexts.add(bObj)
+    >>> aContexts.unwrapWeakref()
+    >>> aContexts.wrapWeakref()
+    >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+    True 
+    >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+    True 
 
 
 class Groups

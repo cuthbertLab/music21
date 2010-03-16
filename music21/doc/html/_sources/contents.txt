@@ -19,6 +19,7 @@ Music21 Documentation
    about
    environment
    graphing
+   advancedGraphing
    faq
    glossary
 

@@ -107,6 +107,7 @@
     <dt><a href="moduleConverter.html#music21.converter.ConverterHumdrum.__init__">(music21.converter.ConverterHumdrum method)</a></dt>
     <dt><a href="moduleConverter.html#music21.converter.ConverterMusicXML.__init__">(music21.converter.ConverterMusicXML method)</a></dt>
     <dt><a href="moduleConverter.html#music21.converter.PickleFilter.__init__">(music21.converter.PickleFilter method)</a></dt>
+    <dt><a href="moduleConverter.html#music21.converter.StreamFreezer.__init__">(music21.converter.StreamFreezer method)</a></dt>
     <dt><a href="moduleDuration.html#music21.duration.Duration.__init__">(music21.duration.Duration method)</a></dt>
     <dt><a href="moduleDuration.html#music21.duration.DurationUnit.__init__">(music21.duration.DurationUnit method)</a></dt>
     <dt><a href="moduleDuration.html#music21.duration.GraceDuration.__init__">(music21.duration.GraceDuration method)</a></dt>
@@ -512,8 +513,8 @@
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.flat">flat (music21.meter.MeterSequence attribute)</a></dt>
   <dd><dl>
     <dt><a href="moduleStream.html#music21.stream.Stream.flat">(music21.stream.Stream attribute)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.FLAT">FLAT (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
+  </dl></dd>
+<dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.FLAT">FLAT (music21.tinyNotation.TinyNotationNote attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleStream.html#music21.stream.Stream.flattenedRepresentationOf">flattenedRepresentationOf (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.flatWeight">flatWeight (music21.meter.MeterSequence attribute)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.fontFamily">fontFamily (music21.graph.Graph attribute)</a></dt>
@@ -524,6 +525,11 @@
 <dt><a href="moduleChord.html#music21.chord.Chord.forteClassTnI">forteClassTnI (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.fractionSum">fractionSum() (in module music21.meter)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.fractionToSlashMixed">fractionToSlashMixed() (in module music21.meter)</a></dt>
+<dt><a href="moduleConverter.html#music21.converter.freeze">freeze() (in module music21.converter)</a></dt>
+<dt><a href="moduleBase.html#music21.base.DefinedContexts.freezeIds">freezeIds() (music21.base.DefinedContexts method)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleBase.html#music21.base.Music21Object.freezeIds">(music21.base.Music21Object method)</a></dt>
+  </dl></dd>
 <dt><a href="moduleClef.html#music21.clef.FrenchViolinClef">FrenchViolinClef (class in music21.clef)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Note.freq440">freq440 (music21.note.Note attribute)</a></dt>
   <dd><dl>
@@ -603,6 +609,7 @@
 <dt><a href="moduleStream.html#music21.stream.Stream.getNotes">getNotes() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Beams.getNumbers">getNumbers() (music21.note.Beams method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getOffsetByElement">getOffsetByElement() (music21.stream.Stream method)</a></dt>
+<dt><a href="moduleBase.html#music21.base.DefinedContexts.getOffsetByObjectMatch">getOffsetByObjectMatch() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.getOffsetBySite">getOffsetBySite() (music21.base.DefinedContexts method)</a></dt>
   <dd><dl>
     <dt><a href="moduleBase.html#music21.base.Music21Object.getOffsetBySite">(music21.base.Music21Object method)</a></dt>
@@ -994,6 +1001,7 @@
   <dd><dl>
     <dt><a href="moduleBase.html#music21.base.Music21Object.offset">(music21.base.Music21Object attribute)</a></dt>
   </dl></dd>
+<dt><a href="moduleConverter.html#music21.converter.StreamFreezer.openPickle">openPickle() (music21.converter.StreamFreezer method)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowBergChamberConcerto.opus">opus (music21.serial.RowBergChamberConcerto attribute)</a></dt>
   <dd><dl>
     <dt><a href="moduleSerial.html#music21.serial.RowBergConcertoForViolinAndOrchestra.opus">(music21.serial.RowBergConcertoForViolinAndOrchestra attribute)</a></dt>
@@ -1163,7 +1171,6 @@
 <dt><a href="moduleChord.html#music21.chord.Chord.primeForm">primeForm (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.primeFormString">primeFormString (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleEnvironment.html#music21.environment.Environment.printDebug">printDebug() (music21.environment.Environment method)</a></dt>
-<dt><a href="moduleEnvironment.html#music21.environment.Environment.printWarn">printWarn() (music21.environment.Environment method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.priority">priority (music21.base.Music21Object attribute)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.process">process() (music21.graph.Graph method)</a></dt>
   <dd><dl>
@@ -1406,6 +1413,7 @@
 <dt><a href="moduleEnvironment.html#music21.environment.Settings">Settings (class in music21.environment)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.setTitle">setTitle() (music21.graph.Graph method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.DurationUnit.setTypeFromNum">setTypeFromNum() (music21.duration.DurationUnit method)</a></dt>
+<dt><a href="moduleStream.html#music21.stream.Stream.setupPickleScaffold">setupPickleScaffold() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.SHARP">SHARP (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.shiftElements">shiftElements() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.show">show() (music21.base.Music21Object method)</a></dt>
@@ -1452,7 +1460,9 @@
   <dd><dl>
     <dt><a href="moduleConverter.html#music21.converter.ConverterHumdrum.stream">(music21.converter.ConverterHumdrum attribute)</a></dt>
     <dt><a href="moduleConverter.html#music21.converter.ConverterMusicXML.stream">(music21.converter.ConverterMusicXML attribute)</a></dt>
+    <dt><a href="moduleConverter.html#music21.converter.StreamFreezer.stream">(music21.converter.StreamFreezer attribute)</a></dt>
   </dl></dd>
+<dt><a href="moduleConverter.html#music21.converter.StreamFreezer">StreamFreezer (class in music21.converter)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.StringInstrument">StringInstrument (class in music21.instrument)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.StringInstrument.stringPitches">stringPitches (music21.instrument.StringInstrument attribute)</a></dt>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationStream.stringRep">stringRep (music21.tinyNotation.TinyNotationStream attribute)</a></dt>
@@ -1480,6 +1490,7 @@
 
 <dt><a href="moduleClef.html#music21.clef.TabClef">TabClef (class in music21.clef)</a></dt>
 <dt><a href="moduleNode.html#music21.node.Node.tag">tag (music21.node.Node attribute)</a></dt>
+<dt><a href="moduleStream.html#music21.stream.Stream.teardownPickleScaffold">teardownPickleScaffold() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleTempo.html#music21.tempo.TempoMark">TempoMark (class in music21.tempo)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.TenorClef">TenorClef (class in music21.clef)</a></dt>
 <dt><a href="moduleEditorial.html#music21.editorial.Comment.text">text (music21.editorial.Comment attribute)</a></dt>
@@ -1622,11 +1633,20 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
+<dt><a href="moduleConverter.html#music21.converter.unfreeze">unfreeze() (in module music21.converter)</a></dt>
+<dt><a href="moduleBase.html#music21.base.DefinedContexts.unfreezeIds">unfreezeIds() (music21.base.DefinedContexts method)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleBase.html#music21.base.Music21Object.unfreezeIds">(music21.base.Music21Object method)</a></dt>
+  </dl></dd>
 <dt><a href="moduleDynamics.html#music21.dynamics.unitIntervalToName">unitIntervalToName() (in module music21.dynamics)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.unitSpec">unitSpec() (in module music21.duration)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.DurationUnit.unlink">unlink() (music21.duration.DurationUnit method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Unpitched">Unpitched (class in music21.note)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.unwrapWeakref">unwrapWeakref() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.unwrapWeakref">unwrapWeakref() (in module music21.common)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleBase.html#music21.base.DefinedContexts.unwrapWeakref">(music21.base.DefinedContexts method)</a></dt>
+    <dt><a href="moduleBase.html#music21.base.Music21Object.unwrapWeakref">(music21.base.Music21Object method)</a></dt>
+  </dl></dd></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleDuration.html#music21.duration.Duration.updateQuarterLength">updateQuarterLength() (music21.duration.Duration method)</a></dt>
   <dd><dl>
     <dt><a href="moduleDuration.html#music21.duration.DurationUnit.updateQuarterLength">(music21.duration.DurationUnit method)</a></dt>
@@ -1655,6 +1675,7 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
+<dt><a href="moduleEnvironment.html#music21.environment.Environment.warn">warn() (music21.environment.Environment method)</a></dt>
 <dt><a href="moduleDynamics.html#music21.dynamics.Wedge">Wedge (class in music21.dynamics)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.weight">weight (music21.meter.MeterSequence attribute)</a></dt>
   <dd><dl>
@@ -1662,13 +1683,18 @@
   </dl></dd>
 <dt><a href="moduleNote.html#music21.note.WholeNote">WholeNote (class in music21.note)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.wrapWeakref">wrapWeakref() (in module music21.common)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleBase.html#music21.base.DefinedContexts.wrapWeakref">(music21.base.DefinedContexts method)</a></dt>
+    <dt><a href="moduleBase.html#music21.base.Music21Object.wrapWeakref">(music21.base.Music21Object method)</a></dt>
+  </dl></dd></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleBase.html#music21.base.Music21Object.write">write() (music21.base.Music21Object method)</a></dt>
   <dd><dl>
     <dt><a href="moduleDuration.html#music21.duration.Duration.write">(music21.duration.Duration method)</a></dt>
     <dt><a href="moduleEnvironment.html#music21.environment.Environment.write">(music21.environment.Environment method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.Graph.write">(music21.graph.Graph method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotStream.write">(music21.graph.PlotStream method)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+  </dl></dd>
+<dt><a href="moduleConverter.html#music21.converter.StreamFreezer.writePickle">writePickle() (music21.converter.StreamFreezer method)</a></dt>
 </dl></td></tr></table>
 
 <h2 id="X">X</h2>
@@ -1706,7 +1732,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 13, 2010.
+      Last updated on Mar 15, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

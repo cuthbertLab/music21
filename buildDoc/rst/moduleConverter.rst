@@ -26,12 +26,20 @@ Given musical data represented within a Python string, attempt to parse the data
 
 Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
+.. function:: freeze(streamObj, fp=None)
+
+Given a file path, attempt to parse the file into a Stream. 
+
+.. function:: unfreeze(fp)
+
+Given a file path, attempt to parse the file into a Stream. 
+
 class Converter
 ---------------
 
 .. class:: Converter
 
-    Not a subclass, but a wrapper for different converter objects based on format. 
+    A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format. 
 
     
 
@@ -49,15 +57,15 @@ class Converter
 
     .. method:: parseData(dataStr)
 
-    need to look at data and determine if it is xml or humdrum 
+    Given raw data, determine format and parse into a music21 Stream. 
 
     .. method:: parseFile(fp, forceSource=False)
 
-    No documentation. 
+    Given a file path, parse and store a music21 Stream. 
 
     .. method:: parseURL(url)
 
-    Given a url, download and parse the file into a Stream. 
+    Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
 
 
 class ConverterMusicXML
@@ -86,11 +94,11 @@ class ConverterMusicXML
 
     .. method:: load()
 
-    Load all parts. This determines the order parts are found in the stream 
+    Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
 
     .. method:: parseData(xmlString)
 
-    Open from a string 
+    Open MusicXML data from a string. 
 
     .. method:: parseFile(fp)
 
@@ -102,6 +110,7 @@ class ConverterHumdrum
 
 .. class:: ConverterHumdrum
 
+    Simple class wrapper for parsing Humdrum data provided in a file or in a string. 
 
     
 
@@ -119,11 +128,15 @@ class ConverterHumdrum
 
     .. method:: parseData(humdrumString)
 
-    Open from a string 
+    Open Humdrum data from a string 
+
+    >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
+    >>> c = ConverterHumdrum()
+    >>> s = c.parseData(humdata)
 
     .. method:: parseFile(filepath)
 
-    Open from file path 
+    Open Humdram data from a file path. 
 
 
 class PickleFilter
@@ -142,6 +155,35 @@ class PickleFilter
     Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
 
     .. method:: status()
+
+    Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
+
+
+class StreamFreezer
+-------------------
+
+.. class:: StreamFreezer
+
+
+    
+
+    **class StreamFreezer** **attributes**
+
+    .. attribute:: stream
+
+    No documentation. 
+
+    **class StreamFreezer** **methods**
+
+    .. method:: __init__(streamObj=None)
+
+    No documentation. 
+
+    .. method:: openPickle(fp)
+
+    No documentation. 
+
+    .. method:: writePickle(fp=None)
 
     No documentation. 
 

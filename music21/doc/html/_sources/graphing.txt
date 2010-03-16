@@ -14,37 +14,17 @@ Users can create their own custom graphing routines by extending or reworking ex
 Installing and Using matplotlib
 -------------------------------
 
-The matplotlib library provides powerful and flexible graphing routines. Download from the following URL:
+The powerful and flexible graphing routines of music21 are provided by the matplotlib and numpy libraries. They 
+can be downloaded from the following URLs:
 
+http://numpy.scipy.org
 http://sourceforge.net/projects/matplotlib/files/
 
-For installation and configuration instructions, see the following URL:
+For instructions on getting them installed and running see the following URL:
 
 http://matplotlib.sourceforge.net/users/installing.html
 
-
-Note that numpy is required for matplotlib. Information about numpy can be found at the following URL:
-
-http://numpy.scipy.org
-
-
-
-Selecting the matplotlib Backend
----------------------------------
-
-The matplotlib backend determines what system is used to render and display images. See the following discussion for more information.
-
-http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend
-
-
-
-
-
-
-
-
-
-
+For more information about matplotlib with music21 see `Advanced graphing`_ 
 
 Primitive Graphing Formats
 -------------------------------

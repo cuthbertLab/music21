@@ -73,7 +73,7 @@ class Environment
 
     Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
-    .. method:: printWarn(msg)
+    .. method:: warn(msg)
 
     To print a warning to the user, send a list of strings to this method. 
 

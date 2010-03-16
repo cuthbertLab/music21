@@ -950,6 +950,7 @@ class Documentation(RestructuredWriter):
                              'about', 
                              'environment', 
                              'graphing', 
+                             'advancedGraphing', 
                              'faq',
                              'glossary',
                              ]
