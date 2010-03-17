@@ -812,7 +812,6 @@ class ClassDoc(RestructuredWriter):
         '''Return a string of a complete RST specification for a class.
         '''
         msg = []
-
         classNameStr = '%s' % self.name
         msg += self._heading(classNameStr, '-')
         titleStr = '.. class:: %s\n\n' % self.name
