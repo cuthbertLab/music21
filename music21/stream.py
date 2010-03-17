@@ -779,19 +779,21 @@ class Stream(music21.Music21Object):
     
         Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following:
     
-        pitchSpace (:class:`music21.graph.PlotPitchSpace`)
-        pitchClass (:class:`music21.graph.PlotPitchClass`)
-        quarterLength (:class:`music21.graph.PlotQuarterLength`)
+        pitchSpace (:class:`~music21.graph.PlotPitchSpace`)
+        pitchClass (:class:`~music21.graph.PlotPitchClass`)
+        quarterLength (:class:`~music21.graph.PlotQuarterLength`)
     
-        scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`)
-        scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`)
-        scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`)
+        scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
+        scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
+        scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
     
-        pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`)
-        pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`)
+        pitchClassOffset (:class:`~music21.graph.PlotPitchSpaceOffset`)
+        pitchSpaceOffset (:class:`~music21.graph.PlotPitchClassOffset`)
     
-        pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`)
-        pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`)
+        pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotPitchSpaceQuarterLengthCount`)
+        pitchClassQuarterLengthCount (:class:`~music21.graph.PlotPitchClassQuarterLengthCount`)
+
+        3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DPitchSpaceQuarterLengthCount`)
 
         >>> a = Stream()
         >>> n = note.Note()

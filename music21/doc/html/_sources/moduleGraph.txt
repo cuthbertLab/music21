@@ -11,7 +11,7 @@ music21.graph
 
 .. function:: plotStream(streamObj)
 
-Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`music21.graph.PlotPitchSpace`) pitchClass (:class:`music21.graph.PlotPitchClass`) quarterLength (:class:`music21.graph.PlotQuarterLength`) scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`) pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`) pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`) 
+Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`~music21.graph.PlotPitchSpace`) pitchClass (:class:`~music21.graph.PlotPitchClass`) quarterLength (:class:`~music21.graph.PlotQuarterLength`) scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`~music21.graph.PlotPitchSpaceOffset`) pitchSpaceOffset (:class:`~music21.graph.PlotPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotPitchSpaceQuarterLengthCount`) pitchClassQuarterLengthCount (:class:`~music21.graph.PlotPitchClassQuarterLengthCount`) 3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DPitchSpaceQuarterLengthCount`) 
 
 
 
@@ -289,6 +289,33 @@ PlotPitchClassQuarterLengthCount
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
+Plot3DPitchSpaceQuarterLengthCount
+----------------------------------
+
+.. class:: Plot3DPitchSpaceQuarterLengthCount
+
+    A scatter plot of pitch space and quarter length 
+
+    .. image:: images/Plot3DPitchSpaceQuarterLengthCount.* 
+        :width: 500 
+
+    inherits from: :class:`~music21.graph._Plot3DBars`, :class:`~music21.graph.PlotStream`
+
+    **Plot3DPitchSpaceQuarterLengthCount** **attributes**
+
+    .. attribute:: id
+
+    No documentation. 
+
+    **Plot3DPitchSpaceQuarterLengthCount** **methods**
+
+    .. method:: __init__(streamObj)
+
+    No documentation. 
+
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
 Graph
 -----
 
@@ -373,7 +400,7 @@ Graph
     >>> a = Graph()
     >>> a = Graph(title='green')
 
-    .. method:: done()
+    .. method:: done(fp=None)
 
     Implement the desired doneAction, after data processing 
 
@@ -632,7 +659,7 @@ PlotStream
 
     .. method:: process()
 
-    This will process all data, as well as call the done() method. This might be subclassed 
+    This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph). 
 
     .. method:: show()
 
@@ -687,7 +714,7 @@ PlotStream
 
     
 
-    .. method:: write(fp)
+    .. method:: write(fp=None)
 
     Call internal Graphs write() method independently of doneAction set and run with process() 
 

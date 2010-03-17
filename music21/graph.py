@@ -92,7 +92,7 @@ class Graph(object):
         if 'colorBackgroundFigure' in keywords:
             self.colorBackgroundFigure = keywords['colorBackgroundFigure']
         else:
-            self.colorBackgroundFigure = '#cccccc'
+            self.colorBackgroundFigure = '#c7d2d4'
 
         if 'colorGrid' in keywords:
             self.colorGrid = keywords['colorGrid']
@@ -297,13 +297,13 @@ class Graph(object):
 
 
     #---------------------------------------------------------------------------
-    def done(self):
+    def done(self, fp=None):
         '''Implement the desired doneAction, after data processing
         '''
         if self.doneAction == 'show':
             self.show()
         elif self.doneAction == 'write':
-            self.write()
+            self.write(fp)
         elif self.doneAction == None:
             pass
 
@@ -688,13 +688,18 @@ class Graph3DPolygonBars(Graph):
             vertsColor.append(cc(colors[q%len(colors)]))
             q += 1
 
-        if self.axis['x']['range'] == None:
-            self.axis['x']['range'] =  min(xVals), max(xVals)
-        # swap y for z
-        if self.axis['z']['range'] == None:
-            self.axis['z']['range'] =  min(yVals), max(yVals)
-        if self.axis['y']['range'] == None:
-            self.axis['y']['range'] =  min(zVals), max(zVals)+1
+        # this actually appears as the w
+        #g.setAxisRange('x', (xValues[0], xValues[-1]))
+        self.setAxisRange('x', (min(xVals), max(xVals)))
+        # thi actually appears as the z
+        self.setAxisRange('z', (min(yVals), max(yVals)))
+        self.setAxisRange('y', (min(zVals), max(zVals)))
+
+#         self.axis['x']['range'] =  min(xVals), max(xVals)
+#         # swap y for z
+#         self.axis['z']['range'] =  min(yVals), max(yVals)
+#         # set y range for z here
+#         self.axis['y']['range'] =  min(zVals), max(zVals)
             
         # this kinda works but does not adjust the ticks / scale range
         #self.axis['x']['scale'] = 'symlog'
@@ -734,7 +739,7 @@ class PlotStream(object):
         self.graph = None  # store instance of graph class here
 
     def process(self):
-        '''This will process all data, as well as call the done() method. This might be subclassed
+        '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph). 
         '''
         self.graph.process()
 
@@ -743,10 +748,10 @@ class PlotStream(object):
         '''
         self.graph.show()
 
-    def write(self, fp):
+    def write(self, fp=None):
         '''Call internal Graphs write() method independently of doneAction set and run with process()
         '''
-        self.graph.write()
+        self.graph.write(fp)
 
 
     def ticksPitchClass(self, pcMin=0, pcMax=11):
@@ -1079,7 +1084,7 @@ class PlotScatterPitchSpaceQuarterLength(_PlotScatter):
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'Pitch Space')
-        self.graph.setAxisLabel('x', 'Qaurter Length')
+        self.graph.setAxisLabel('x', 'Quarter Length')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1418,8 +1423,85 @@ class PlotPitchClassQuarterLengthCount(_PlotScatterWeighted):
 
 
 
+class _Plot3DBars(PlotStream):
+    '''Base class for Stream plotting classes.
+    '''
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+
+    def _extractData(self):
+
+        data = {}
+        xValues = []
+        yValues = []
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
+            x = self.fx(noteObj)
+            if x not in xValues:
+                xValues.append(x)
+            y = self.fy(noteObj)
+            if y not in yValues:
+                yValues.append(y)
+        xValues.sort()
+        yValues.sort()
+        # prepare data dictionary; need to pack all values
+        # need to provide spacings even for zero values
+        #for y in range(yValues[0], yValues[-1]+1):
+        # better to use actual y values
+        for y in yValues:
+            data[y] = [[x, 0] for x in xValues]
+        #print _MOD, 'data keys', data.keys()
+
+        maxCount = 0
+        for noteObj in self.streamObj.getElementsByClass(note.Note):
+            indexToIncrement = xValues.index(self.fx(noteObj))
+            # second position stores increment
+            #print _MOD, fy(noteObj), indexToIncrement
+
+            data[self.fy(noteObj)][indexToIncrement][1] += 1
+            if data[self.fy(noteObj)][indexToIncrement][1] > maxCount:
+                maxCount = data[self.fy(noteObj)][indexToIncrement][1] 
+
+        # setting of ticks does not yet work in matplotlib
+        xTicks = []
+        yTicks = []
+        zTicks = []
+
+        return data, xTicks, yTicks, zTicks
 
 
+class Plot3DPitchSpaceQuarterLengthCount(_Plot3DBars):
+    '''A scatter plot of pitch space and quarter length
+
+    .. image:: images/Plot3DPitchSpaceQuarterLengthCount.*
+        :width: 500
+    '''
+    id = '3DPitchSpaceQuarterLengthCount' # string name used to access this class
+    def __init__(self, streamObj, *args, **keywords):
+        _Plot3DBars.__init__(self, streamObj, *args, **keywords)
+
+        self.fy = lambda n:n.ps
+        self.fx = lambda n:n.quarterLength
+
+        # will use self.fx and self.fxTick to extract data
+        data, xTicks, yTicks, zTicks = self._extractData()
+
+        self.graph = Graph3DPolygonBars(*args, **keywords)
+        self.graph.setData(data)
+
+        #self.graph.setTicks('y', yTicks)
+        #self.graph.setTicks('x', xTicks)
+        self.graph.setAxisLabel('y', 'MIDI Note Number')
+        self.graph.setAxisLabel('x', 'Quarter Length')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([6,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Space by Quarter Length Count')
+        if 'barWidth' not in keywords:
+            self.graph.barWidth = .1
+        if 'alpha' not in keywords:
+            self.graph.alpha = .6
 
 
 
@@ -1433,19 +1515,21 @@ def plotStream(streamObj, *args, **keywords):
 
     Plot method can be specified as a second argument or by keyword. Available plots include the following:
 
-    pitchSpace (:class:`music21.graph.PlotPitchSpace`)
-    pitchClass (:class:`music21.graph.PlotPitchClass`)
-    quarterLength (:class:`music21.graph.PlotQuarterLength`)
+    pitchSpace (:class:`~music21.graph.PlotPitchSpace`)
+    pitchClass (:class:`~music21.graph.PlotPitchClass`)
+    quarterLength (:class:`~music21.graph.PlotQuarterLength`)
 
-    scatterPitchSpaceQuarterLength (:class:`music21.graph.PlotScatterPitchSpaceQuarterLength`)
-    scatterPitchClassQuarterLength (:class:`music21.graph.PlotScatterPitchClassQuarterLength`)
-    scatterPitchClassOffset (':class:`graph.PlotScatterPitchClassOffset`)
+    scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
+    scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
+    scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
 
-    pitchClassOffset (:class:`music21.graph.PlotPitchSpaceOffset`)
-    pitchSpaceOffset (:class:`music21.graph.PlotPitchClassOffset`)
+    pitchClassOffset (:class:`~music21.graph.PlotPitchSpaceOffset`)
+    pitchSpaceOffset (:class:`~music21.graph.PlotPitchClassOffset`)
 
-    pitchSpaceQuarterLengthCount (:class:`music21.graph.PlotPitchSpaceQuarterLengthCount`)
-    pitchClassQuarterLengthCount (:class:`music21.graph.PlotPitchClassQuarterLengthCount`)
+    pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotPitchSpaceQuarterLengthCount`)
+    pitchClassQuarterLengthCount (:class:`~music21.graph.PlotPitchClassQuarterLengthCount`)
+
+    3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DPitchSpaceQuarterLengthCount`)
 
     '''
     plotClasses = [
@@ -1457,6 +1541,8 @@ def plotStream(streamObj, *args, **keywords):
         PlotPitchSpaceOffset, PlotPitchClassOffset,
         # weighted scatter
         PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
+        # 3d graphs
+        Plot3DPitchSpaceQuarterLengthCount,
     ]
 
     environLocal.printDebug(['plotStream: stream', streamObj])
@@ -1626,10 +1712,47 @@ class TestExternal(unittest.TestCase):
         b.process()
 
 
+    def testPlot3DPitchSpaceQuarterLengthCount(self):
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+        b = Plot3DPitchSpaceQuarterLengthCount(a.flat, title='Bach (soprano voice)')
+        b.process()
+
+
+
     def testAll(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
         plotStream(a.flat, 'all')
+
+
+    def writeAll(self):
+        '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
+        '''
+        import os
+        plotClasses = [
+        # histograms
+        PlotPitchSpace, PlotPitchClass, PlotQuarterLength, 
+        # scatters
+        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        # offset based horizontal
+        PlotPitchSpaceOffset, PlotPitchClassOffset,
+        # weighted scatter
+        PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
+        # 3d graphs
+        Plot3DPitchSpaceQuarterLengthCount,
+        ]
+
+        from music21 import corpus      
+        a = corpus.parseWork('bach/bwv57.8')
+
+        for plotClassName in plotClasses:
+            obj = plotClassName(a.flat, doneAction=None)
+            obj.process()
+            fn = obj.__class__.__name__ + '.png'
+            fp = os.path.join(environLocal.getTempDir(), fn)
+            environLocal.printDebug(['writing fp:', fp])
+            obj.write(fp)
 
 
 
@@ -1742,6 +1865,9 @@ _DOC_ORDER = [PlotPitchSpace, PlotPitchClass, PlotQuarterLength,
         PlotPitchSpaceOffset, PlotPitchClassOffset,
         # weighted scatter
         PlotPitchSpaceQuarterLengthCount, PlotPitchClassQuarterLengthCount,
+        # 3d graphs
+        Plot3DPitchSpaceQuarterLengthCount,
+
 ]
 
 
