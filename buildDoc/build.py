@@ -670,7 +670,7 @@ class RestructuredWriter(object):
         if modName == '__builtin__':
             return className
         else:
-            return ':class:`%s.%s`' % (modName, className)
+            return ':class:`~%s.%s`' % (modName, className)
 
     def formatXRef(self, partName, group, mroEntry):
         '''Given the name and a containing object, get a cross references
@@ -678,9 +678,9 @@ class RestructuredWriter(object):
         modName = mroEntry.__module__
         className = mroEntry.__name__
         if group in ['attributes', 'properties']:
-            return ':attr:`%s.%s.%s`' % (modName, className, partName)            
+            return ':attr:`~%s.%s.%s`' % (modName, className, partName)            
         elif group in ['methods']:
-            return ':meth:`%s.%s.%s`' % (modName, className, partName)
+            return ':meth:`~%s.%s.%s`' % (modName, className, partName)
 
     def formatClassInheritance(self, mro):
         '''Given a list of classes from inspect.getmro, return a formatted
@@ -716,7 +716,6 @@ class RestructuredWriter(object):
         if doc == None:
             return ''
             #return '%sNo documentation.\n' % indent
-
         # define the start of lines that should not be changed
         rstExclude = ['.. image::', ':width:']
 
@@ -791,7 +790,6 @@ class ClassDoc(RestructuredWriter):
                                              INDENT)
         self.name = self.classNameEval.__name__
 
-
     #---------------------------------------------------------------------------
     def _fmtRstAttribute(self, name, signature):
         msg = []
@@ -815,7 +813,7 @@ class ClassDoc(RestructuredWriter):
         '''
         msg = []
 
-        classNameStr = 'class %s' % self.name
+        classNameStr = '%s' % self.name
         msg += self._heading(classNameStr, '-')
         titleStr = '.. class:: %s\n\n' % self.name
         msg += titleStr
@@ -855,14 +853,11 @@ class ClassDoc(RestructuredWriter):
                         elif group == 'methods':
                             msgGroup.append(self._fmtRstMethod(partName,
                                                             signature))
-
             if len(msgGroup) > 0:
                 msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group))
                 msg.append(''.join(msgGroup))
-
         msg.append('\n'*1)
         return msg
-
 
 
 

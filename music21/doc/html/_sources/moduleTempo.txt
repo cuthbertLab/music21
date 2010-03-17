@@ -9,8 +9,8 @@ music21.tempo
 
 
 
-class TempoMark
----------------
+TempoMark
+---------
 
 .. class:: TempoMark
 
@@ -20,31 +20,31 @@ class TempoMark
     >>> tm.value
     'adagio' 
 
-    inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.base.Music21Object`
 
-    **class TempoMark** **attributes**
+    **TempoMark** **attributes**
 
     .. attribute:: value
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class TempoMark** **properties**
+    **TempoMark** **properties**
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class TempoMark** **methods**
+    **TempoMark** **methods**
 
     .. method:: __init__(value=None)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class MetronomeMark
--------------------
+MetronomeMark
+-------------
 
 .. class:: MetronomeMark
 
@@ -54,9 +54,9 @@ class MetronomeMark
     >>> a.number
     40 
 
-    inherits from: :class:`music21.tempo.TempoMark`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.tempo.TempoMark`, :class:`~music21.base.Music21Object`
 
-    **class MetronomeMark** **attributes**
+    **MetronomeMark** **attributes**
 
     .. attribute:: number
 
@@ -66,20 +66,20 @@ class MetronomeMark
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.tempo.TempoMark`: :attr:`music21.tempo.TempoMark.value`
+    Attributes inherited from :class:`~music21.tempo.TempoMark`: :attr:`~music21.tempo.TempoMark.value`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class MetronomeMark** **properties**
+    **MetronomeMark** **properties**
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class MetronomeMark** **methods**
+    **MetronomeMark** **methods**
 
     .. method:: __init__(number=60, referent=None)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

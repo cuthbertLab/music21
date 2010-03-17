@@ -9,15 +9,15 @@ music21.instrument
 
 
 
-class Instrument
-----------------
+Instrument
+----------
 
 .. class:: Instrument
 
 
-    inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.base.Music21Object`
 
-    **class Instrument** **attributes**
+    **Instrument** **attributes**
 
     .. attribute:: instrumentName
 
@@ -51,9 +51,9 @@ class Instrument
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Instrument** **properties**
+    **Instrument** **properties**
 
     .. attribute:: mx
 
@@ -61,9 +61,9 @@ class Instrument
 
     
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Instrument** **methods**
+    **Instrument** **methods**
 
     .. method:: __init__()
 
@@ -77,24 +77,24 @@ class Instrument
 
     Force a unique id by using an MD5 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class StringInstrument
-----------------------
+StringInstrument
+----------------
 
 .. class:: StringInstrument
 
 
-    inherits from: :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
 
-    **class StringInstrument** **attributes**
+    **StringInstrument** **attributes**
 
-    Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
+    Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class StringInstrument** **properties**
+    **StringInstrument** **properties**
 
     .. attribute:: stringPitches
 
@@ -115,125 +115,125 @@ class StringInstrument
     highest.  The same would hold true for certain violin scordatura pieces, such 
     as some of Biber's *Mystery Sonatas* 
 
-    Properties inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.mx`
+    Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class StringInstrument** **methods**
+    **StringInstrument** **methods**
 
-    Methods inherited from :class:`music21.instrument.Instrument`: :meth:`music21.instrument.Instrument.__init__`, :meth:`music21.instrument.Instrument.bestName`, :meth:`music21.instrument.Instrument.partIdRandomize`
+    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.__init__`, :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Viola
------------
+Viola
+-----
 
 .. class:: Viola
 
 
-    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
 
-    **class Viola** **attributes**
+    **Viola** **attributes**
 
     .. attribute:: lowestNote
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
-    Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
+    Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Viola** **properties**
+    **Viola** **properties**
 
-    Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
+    Properties inherited from :class:`~music21.instrument.StringInstrument`: :attr:`~music21.instrument.StringInstrument.stringPitches`
 
-    Properties inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.mx`
+    Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Viola** **methods**
+    **Viola** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.instrument.Instrument`: :meth:`music21.instrument.Instrument.bestName`, :meth:`music21.instrument.Instrument.partIdRandomize`
+    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Violin
-------------
+Violin
+------
 
 .. class:: Violin
 
 
-    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
 
-    **class Violin** **attributes**
+    **Violin** **attributes**
 
     .. attribute:: lowestNote
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
-    Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
+    Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Violin** **properties**
+    **Violin** **properties**
 
-    Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
+    Properties inherited from :class:`~music21.instrument.StringInstrument`: :attr:`~music21.instrument.StringInstrument.stringPitches`
 
-    Properties inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.mx`
+    Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Violin** **methods**
+    **Violin** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.instrument.Instrument`: :meth:`music21.instrument.Instrument.bestName`, :meth:`music21.instrument.Instrument.partIdRandomize`
+    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Violoncello
------------------
+Violoncello
+-----------
 
 .. class:: Violoncello
 
 
-    inherits from: :class:`music21.instrument.StringInstrument`, :class:`music21.instrument.Instrument`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
 
-    **class Violoncello** **attributes**
+    **Violoncello** **attributes**
 
     .. attribute:: lowestNote
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
 
-    Attributes inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.instrumentName`, :attr:`music21.instrument.Instrument.midiChannel`, :attr:`music21.instrument.Instrument.partId`, :attr:`music21.instrument.Instrument.partName`, :attr:`music21.instrument.Instrument.midiProgram`, :attr:`music21.instrument.Instrument.instrumentAbbreviation`, :attr:`music21.instrument.Instrument.transposition`, :attr:`music21.instrument.Instrument.partAbbreviation`
+    Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Violoncello** **properties**
+    **Violoncello** **properties**
 
-    Properties inherited from :class:`music21.instrument.StringInstrument`: :attr:`music21.instrument.StringInstrument.stringPitches`
+    Properties inherited from :class:`~music21.instrument.StringInstrument`: :attr:`~music21.instrument.StringInstrument.stringPitches`
 
-    Properties inherited from :class:`music21.instrument.Instrument`: :attr:`music21.instrument.Instrument.mx`
+    Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Violoncello** **methods**
+    **Violoncello** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.instrument.Instrument`: :meth:`music21.instrument.Instrument.bestName`, :meth:`music21.instrument.Instrument.partIdRandomize`
+    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

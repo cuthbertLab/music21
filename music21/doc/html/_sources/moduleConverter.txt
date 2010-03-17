@@ -34,8 +34,8 @@ Given a file path, attempt to parse the file into a Stream.
 
 Given a file path, attempt to parse the file into a Stream. 
 
-class Converter
----------------
+Converter
+---------
 
 .. class:: Converter
 
@@ -43,13 +43,13 @@ class Converter
 
     
 
-    **class Converter** **properties**
+    **Converter** **properties**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **class Converter** **methods**
+    **Converter** **methods**
 
     .. method:: __init__()
 
@@ -68,21 +68,21 @@ class Converter
     Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
 
 
-class ConverterMusicXML
------------------------
+ConverterMusicXML
+-----------------
 
 .. class:: ConverterMusicXML
 
 
     
 
-    **class ConverterMusicXML** **properties**
+    **ConverterMusicXML** **properties**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **class ConverterMusicXML** **methods**
+    **ConverterMusicXML** **methods**
 
     .. method:: __init__(forceSource)
 
@@ -105,8 +105,8 @@ class ConverterMusicXML
     Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
-class ConverterHumdrum
-----------------------
+ConverterHumdrum
+----------------
 
 .. class:: ConverterHumdrum
 
@@ -114,13 +114,13 @@ class ConverterHumdrum
 
     
 
-    **class ConverterHumdrum** **attributes**
+    **ConverterHumdrum** **attributes**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **class ConverterHumdrum** **methods**
+    **ConverterHumdrum** **methods**
 
     .. method:: __init__()
 
@@ -139,8 +139,8 @@ class ConverterHumdrum
     Open Humdram data from a file path. 
 
 
-class PickleFilter
-------------------
+PickleFilter
+------------
 
 .. class:: PickleFilter
 
@@ -148,7 +148,7 @@ class PickleFilter
 
     
 
-    **class PickleFilter** **methods**
+    **PickleFilter** **methods**
 
     .. method:: __init__(fp, forceSource=False)
 
@@ -159,21 +159,21 @@ class PickleFilter
     Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
 
 
-class StreamFreezer
--------------------
+StreamFreezer
+-------------
 
 .. class:: StreamFreezer
 
 
     
 
-    **class StreamFreezer** **attributes**
+    **StreamFreezer** **attributes**
 
     .. attribute:: stream
 
     No documentation. 
 
-    **class StreamFreezer** **methods**
+    **StreamFreezer** **methods**
 
     .. method:: __init__(streamObj=None)
 

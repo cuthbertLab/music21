@@ -17,16 +17,16 @@ Classes and functions for creating and manipulating notes, ties, and durations. 
 
 Debugging method to print information about a music21 note called by trecento.trecentoCadence, among other places 
 
-class Note
-----------
+Note
+----
 
 .. class:: Note
 
     Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
-    inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class Note** **attributes**
+    **Note** **attributes**
 
     .. attribute:: isNote
 
@@ -48,13 +48,13 @@ class Note
 
     A :class:`music21.pitch.Pitch` object. 
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Note** **properties**
+    **Note** **properties**
 
     .. attribute:: nameWithOctave
 
@@ -126,11 +126,11 @@ class Note
 
     No documentation. 
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Note** **methods**
+    **Note** **methods**
 
     .. method:: __init__()
 
@@ -140,23 +140,23 @@ class Note
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Rest
-----------
+Rest
+----
 
 .. class:: Rest
 
     General rest class 
 
-    inherits from: :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class Rest** **attributes**
+    **Rest** **attributes**
 
     .. attribute:: isNote
 
@@ -174,11 +174,11 @@ class Rest
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Rest** **properties**
+    **Rest** **properties**
 
     .. attribute:: lily
 
@@ -193,23 +193,23 @@ class Rest
 
     Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Rest** **methods**
+    **Rest** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Beam
-----------
+Beam
+----
 
 .. class:: Beam
 
@@ -228,7 +228,7 @@ class Beam
 
     
 
-    **class Beam** **attributes**
+    **Beam** **attributes**
 
     .. attribute:: direction
 
@@ -246,7 +246,7 @@ class Beam
 
     No documentation. 
 
-    **class Beam** **properties**
+    **Beam** **properties**
 
     .. attribute:: mx
 
@@ -268,15 +268,15 @@ class Beam
     >>> b.get('charData')
     'backward hook' 
 
-    **class Beam** **methods**
+    **Beam** **methods**
 
     .. method:: __init__(type=None, direction=None)
 
     No documentation. 
 
 
-class Beams
------------
+Beams
+-----
 
 .. class:: Beams
 
@@ -284,7 +284,7 @@ class Beams
 
     
 
-    **class Beams** **attributes**
+    **Beams** **attributes**
 
     .. attribute:: feathered
 
@@ -294,13 +294,13 @@ class Beams
 
     No documentation. 
 
-    **class Beams** **properties**
+    **Beams** **properties**
 
     .. attribute:: mx
 
     Returns a list of mxBeam objects 
 
-    **class Beams** **methods**
+    **Beams** **methods**
 
     .. method:: __init__()
 
@@ -398,57 +398,57 @@ class Beams
     'right' 
 
 
-class EighthNote
-----------------
+EighthNote
+----------
 
 .. class:: EighthNote
 
 
-    inherits from: :class:`music21.note.Note`, :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class EighthNote** **attributes**
+    **EighthNote** **attributes**
 
-    Attributes inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.isNote`, :attr:`music21.note.Note.isRest`, :attr:`music21.note.Note.isUnpitched`, :attr:`music21.note.Note.beams`, :attr:`music21.note.Note.pitch`
+    Attributes inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.isNote`, :attr:`~music21.note.Note.isRest`, :attr:`~music21.note.Note.isUnpitched`, :attr:`~music21.note.Note.beams`, :attr:`~music21.note.Note.pitch`
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class EighthNote** **properties**
+    **EighthNote** **properties**
 
-    Properties inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.nameWithOctave`, :attr:`music21.note.Note.pitchClass`, :attr:`music21.note.Note.accidental`, :attr:`music21.note.Note.diatonicNoteNum`, :attr:`music21.note.Note.freq440`, :attr:`music21.note.Note.frequency`, :attr:`music21.note.Note.lily`, :attr:`music21.note.Note.midi`, :attr:`music21.note.Note.mx`, :attr:`music21.note.Note.name`, :attr:`music21.note.Note.octave`, :attr:`music21.note.Note.ps`, :attr:`music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class EighthNote** **methods**
+    **EighthNote** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.Note`: :meth:`music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class GeneralNote
------------------
+GeneralNote
+-----------
 
 .. class:: GeneralNote
 
     A GeneralNote object is the parent object for the Note, Rest, Chird, and related objects. 
 
-    inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.base.Music21Object`
 
-    **class GeneralNote** **attributes**
+    **GeneralNote** **attributes**
 
     .. attribute:: editorial
 
@@ -478,9 +478,9 @@ class GeneralNote
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class GeneralNote** **properties**
+    **GeneralNote** **properties**
 
     .. attribute:: quarterLength
 
@@ -503,9 +503,9 @@ class GeneralNote
 
     This must call _getMX to get basic mxNote objects 
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class GeneralNote** **methods**
+    **GeneralNote** **methods**
 
     .. method:: __init__()
 
@@ -577,59 +577,59 @@ class GeneralNote
     >>> b[1].duration.type
     'whole' 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class HalfNote
---------------
+HalfNote
+--------
 
 .. class:: HalfNote
 
 
-    inherits from: :class:`music21.note.Note`, :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class HalfNote** **attributes**
+    **HalfNote** **attributes**
 
-    Attributes inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.isNote`, :attr:`music21.note.Note.isRest`, :attr:`music21.note.Note.isUnpitched`, :attr:`music21.note.Note.beams`, :attr:`music21.note.Note.pitch`
+    Attributes inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.isNote`, :attr:`~music21.note.Note.isRest`, :attr:`~music21.note.Note.isUnpitched`, :attr:`~music21.note.Note.beams`, :attr:`~music21.note.Note.pitch`
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class HalfNote** **properties**
+    **HalfNote** **properties**
 
-    Properties inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.nameWithOctave`, :attr:`music21.note.Note.pitchClass`, :attr:`music21.note.Note.accidental`, :attr:`music21.note.Note.diatonicNoteNum`, :attr:`music21.note.Note.freq440`, :attr:`music21.note.Note.frequency`, :attr:`music21.note.Note.lily`, :attr:`music21.note.Note.midi`, :attr:`music21.note.Note.mx`, :attr:`music21.note.Note.name`, :attr:`music21.note.Note.octave`, :attr:`music21.note.Note.ps`, :attr:`music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class HalfNote** **methods**
+    **HalfNote** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.Note`: :meth:`music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Lyric
------------
+Lyric
+-----
 
 .. class:: Lyric
 
 
     
 
-    **class Lyric** **attributes**
+    **Lyric** **attributes**
 
     .. attribute:: text
 
@@ -643,7 +643,7 @@ class Lyric
 
     No documentation. 
 
-    **class Lyric** **properties**
+    **Lyric** **properties**
 
     .. attribute:: mx
 
@@ -655,39 +655,39 @@ class Lyric
     >>> mxLyric.get('text')
     'hello' 
 
-    **class Lyric** **methods**
+    **Lyric** **methods**
 
     .. method:: __init__(text=None, number=1, syllabic=None)
 
     No documentation. 
 
 
-class NotRest
--------------
+NotRest
+-------
 
 .. class:: NotRest
 
     Parent class for objects that are not rests; or, object that can be tied. 
 
-    inherits from: :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class NotRest** **attributes**
+    **NotRest** **attributes**
 
     .. attribute:: stemDirection
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class NotRest** **properties**
+    **NotRest** **properties**
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class NotRest** **methods**
+    **NotRest** **methods**
 
     .. method:: __init__()
 
@@ -713,54 +713,54 @@ class NotRest
     >>> c.duration.quarterLength
     1.0 
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class QuarterNote
------------------
+QuarterNote
+-----------
 
 .. class:: QuarterNote
 
 
-    inherits from: :class:`music21.note.Note`, :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class QuarterNote** **attributes**
+    **QuarterNote** **attributes**
 
-    Attributes inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.isNote`, :attr:`music21.note.Note.isRest`, :attr:`music21.note.Note.isUnpitched`, :attr:`music21.note.Note.beams`, :attr:`music21.note.Note.pitch`
+    Attributes inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.isNote`, :attr:`~music21.note.Note.isRest`, :attr:`~music21.note.Note.isUnpitched`, :attr:`~music21.note.Note.beams`, :attr:`~music21.note.Note.pitch`
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class QuarterNote** **properties**
+    **QuarterNote** **properties**
 
-    Properties inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.nameWithOctave`, :attr:`music21.note.Note.pitchClass`, :attr:`music21.note.Note.accidental`, :attr:`music21.note.Note.diatonicNoteNum`, :attr:`music21.note.Note.freq440`, :attr:`music21.note.Note.frequency`, :attr:`music21.note.Note.lily`, :attr:`music21.note.Note.midi`, :attr:`music21.note.Note.mx`, :attr:`music21.note.Note.name`, :attr:`music21.note.Note.octave`, :attr:`music21.note.Note.ps`, :attr:`music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class QuarterNote** **methods**
+    **QuarterNote** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.Note`: :meth:`music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Tie
----------
+Tie
+---
 
 .. class:: Tie
 
@@ -784,43 +784,43 @@ class Tie
     for the case where a single note is tied both voices of a 
     two-note-head unison?) 
 
-    inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.base.Music21Object`
 
-    **class Tie** **attributes**
+    **Tie** **attributes**
 
     .. attribute:: type
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Tie** **properties**
+    **Tie** **properties**
 
     .. attribute:: mx
 
     No documentation. 
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Tie** **methods**
+    **Tie** **methods**
 
     .. method:: __init__(tievalue=start)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class Unpitched
----------------
+Unpitched
+---------
 
 .. class:: Unpitched
 
     General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
 
-    inherits from: :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class Unpitched** **attributes**
+    **Unpitched** **attributes**
 
     .. attribute:: displayOctave
 
@@ -842,61 +842,61 @@ class Unpitched
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Unpitched** **properties**
+    **Unpitched** **properties**
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Unpitched** **methods**
+    **Unpitched** **methods**
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.__init__`, :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.__init__`, :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class WholeNote
----------------
+WholeNote
+---------
 
 .. class:: WholeNote
 
 
-    inherits from: :class:`music21.note.Note`, :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class WholeNote** **attributes**
+    **WholeNote** **attributes**
 
-    Attributes inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.isNote`, :attr:`music21.note.Note.isRest`, :attr:`music21.note.Note.isUnpitched`, :attr:`music21.note.Note.beams`, :attr:`music21.note.Note.pitch`
+    Attributes inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.isNote`, :attr:`~music21.note.Note.isRest`, :attr:`~music21.note.Note.isUnpitched`, :attr:`~music21.note.Note.beams`, :attr:`~music21.note.Note.pitch`
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.isChord`, :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class WholeNote** **properties**
+    **WholeNote** **properties**
 
-    Properties inherited from :class:`music21.note.Note`: :attr:`music21.note.Note.nameWithOctave`, :attr:`music21.note.Note.pitchClass`, :attr:`music21.note.Note.accidental`, :attr:`music21.note.Note.diatonicNoteNum`, :attr:`music21.note.Note.freq440`, :attr:`music21.note.Note.frequency`, :attr:`music21.note.Note.lily`, :attr:`music21.note.Note.midi`, :attr:`music21.note.Note.mx`, :attr:`music21.note.Note.name`, :attr:`music21.note.Note.octave`, :attr:`music21.note.Note.ps`, :attr:`music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.quarterLength`, :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.duration`, :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class WholeNote** **methods**
+    **WholeNote** **methods**
 
     .. method:: __init__()
 
     No documentation. 
 
-    Methods inherited from :class:`music21.note.Note`: :meth:`music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

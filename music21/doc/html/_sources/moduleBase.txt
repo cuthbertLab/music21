@@ -12,8 +12,8 @@ Music21 base classes and important utilities. base -- the convention within musi
 
 
 
-class Music21Object
--------------------
+Music21Object
+-------------
 
 .. class:: Music21Object
 
@@ -23,7 +23,7 @@ class Music21Object
 
     
 
-    **class Music21Object** **attributes**
+    **Music21Object** **attributes**
 
     .. attribute:: id
 
@@ -33,7 +33,7 @@ class Music21Object
 
     An instance of a Group object. 
 
-    **class Music21Object** **properties**
+    **Music21Object** **properties**
 
     .. attribute:: duration
 
@@ -57,7 +57,7 @@ class Music21Object
     Traceback (most recent call last): 
     ElementException: priority values must be integers. 
 
-    **class Music21Object** **methods**
+    **Music21Object** **methods**
 
     .. method:: __init__()
 
@@ -215,8 +215,8 @@ class Music21Object
     Write a file. A None file path will result in temporary file 
 
 
-class ElementWrapper
---------------------
+ElementWrapper
+--------------
 
 .. class:: ElementWrapper
 
@@ -224,15 +224,15 @@ class ElementWrapper
 
     
 
-    inherits from: :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.base.Music21Object`
 
-    **class ElementWrapper** **attributes**
+    **ElementWrapper** **attributes**
 
     .. attribute:: obj
 
     No documentation. 
 
-    **class ElementWrapper** **properties**
+    **ElementWrapper** **properties**
 
     .. attribute:: duration
 
@@ -271,9 +271,9 @@ class ElementWrapper
 
     
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class ElementWrapper** **methods**
+    **ElementWrapper** **methods**
 
     .. method:: __init__(obj)
 
@@ -327,11 +327,11 @@ class ElementWrapper
 
     No documentation. 
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
-class DefinedContexts
----------------------
+DefinedContexts
+---------------
 
 .. class:: DefinedContexts
 
@@ -341,7 +341,7 @@ class DefinedContexts
 
     
 
-    **class DefinedContexts** **methods**
+    **DefinedContexts** **methods**
 
     .. method:: __init__()
 
@@ -646,8 +646,8 @@ class DefinedContexts
     True 
 
 
-class Groups
-------------
+Groups
+------
 
 .. class:: Groups
 
@@ -663,12 +663,12 @@ class Groups
 
     inherits from: list
 
-    **class Groups** **methods**
+    **Groups** **methods**
 
     .. method:: append(value)
 
     No documentation. 
 
-    Methods inherited from list: :meth:`__builtin__.list.__init__`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
+    Methods inherited from list: :meth:`~__builtin__.list.__init__`, :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
 
 

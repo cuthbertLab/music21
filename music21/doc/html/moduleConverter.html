@@ -48,11 +48,11 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">music21.converter</a><ul>
-<li><a class="reference external" href="#class-converter">class Converter</a></li>
-<li><a class="reference external" href="#class-convertermusicxml">class ConverterMusicXML</a></li>
-<li><a class="reference external" href="#class-converterhumdrum">class ConverterHumdrum</a></li>
-<li><a class="reference external" href="#class-picklefilter">class PickleFilter</a></li>
-<li><a class="reference external" href="#class-streamfreezer">class StreamFreezer</a></li>
+<li><a class="reference external" href="#converter">Converter</a></li>
+<li><a class="reference external" href="#convertermusicxml">ConverterMusicXML</a></li>
+<li><a class="reference external" href="#converterhumdrum">ConverterHumdrum</a></li>
+<li><a class="reference external" href="#picklefilter">PickleFilter</a></li>
+<li><a class="reference external" href="#streamfreezer">StreamFreezer</a></li>
 </ul>
 </li>
 </ul>
@@ -128,21 +128,21 @@
 <dd></dd></dl>
 
 <p>Given a file path, attempt to parse the file into a Stream.</p>
-<div class="section" id="class-converter">
-<h2>class Converter<a class="headerlink" href="#class-converter" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="converter">
+<h2>Converter<a class="headerlink" href="#converter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.Converter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">Converter</tt><a class="headerlink" href="#music21.converter.Converter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format.</p>
-<p><strong>class Converter</strong> <strong>properties</strong></p>
+<p><strong>Converter</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.Converter.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.Converter.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>class Converter</strong> <strong>methods</strong></p>
+<p><strong>Converter</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.Converter.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.__init__" title="Permalink to this definition">¶</a></dt>
@@ -170,20 +170,20 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 </dd></dl>
 
 </div>
-<div class="section" id="class-convertermusicxml">
-<h2>class ConverterMusicXML<a class="headerlink" href="#class-convertermusicxml" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="convertermusicxml">
+<h2>ConverterMusicXML<a class="headerlink" href="#convertermusicxml" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.ConverterMusicXML">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMusicXML</tt><a class="headerlink" href="#music21.converter.ConverterMusicXML" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>class ConverterMusicXML</strong> <strong>properties</strong></p>
+<dd><p><strong>ConverterMusicXML</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.ConverterMusicXML.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.ConverterMusicXML.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>class ConverterMusicXML</strong> <strong>methods</strong></p>
+<p><strong>ConverterMusicXML</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>forceSource</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.__init__" title="Permalink to this definition">¶</a></dt>
@@ -217,21 +217,21 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 </dd></dl>
 
 </div>
-<div class="section" id="class-converterhumdrum">
-<h2>class ConverterHumdrum<a class="headerlink" href="#class-converterhumdrum" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="converterhumdrum">
+<h2>ConverterHumdrum<a class="headerlink" href="#converterhumdrum" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.ConverterHumdrum">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterHumdrum</tt><a class="headerlink" href="#music21.converter.ConverterHumdrum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple class wrapper for parsing Humdrum data provided in a file or in a string.</p>
-<p><strong>class ConverterHumdrum</strong> <strong>attributes</strong></p>
+<p><strong>ConverterHumdrum</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.ConverterHumdrum.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.ConverterHumdrum.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>class ConverterHumdrum</strong> <strong>methods</strong></p>
+<p><strong>ConverterHumdrum</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.ConverterHumdrum.__init__">
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.__init__" title="Permalink to this definition">¶</a></dt>
@@ -258,14 +258,14 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 </dd></dl>
 
 </div>
-<div class="section" id="class-picklefilter">
-<h2>class PickleFilter<a class="headerlink" href="#class-picklefilter" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="picklefilter">
+<h2>PickleFilter<a class="headerlink" href="#picklefilter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.PickleFilter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
-<p><strong>class PickleFilter</strong> <strong>methods</strong></p>
+<p><strong>PickleFilter</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.PickleFilter.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.__init__" title="Permalink to this definition">¶</a></dt>
@@ -281,20 +281,20 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 </dd></dl>
 
 </div>
-<div class="section" id="class-streamfreezer">
-<h2>class StreamFreezer<a class="headerlink" href="#class-streamfreezer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="streamfreezer">
+<h2>StreamFreezer<a class="headerlink" href="#streamfreezer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.converter.StreamFreezer">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">StreamFreezer</tt><a class="headerlink" href="#music21.converter.StreamFreezer" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>class StreamFreezer</strong> <strong>attributes</strong></p>
+<dd><p><strong>StreamFreezer</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.StreamFreezer.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.StreamFreezer.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p><strong>class StreamFreezer</strong> <strong>methods</strong></p>
+<p><strong>StreamFreezer</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.StreamFreezer.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>streamObj=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.__init__" title="Permalink to this definition">¶</a></dt>
@@ -344,7 +344,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 15, 2010.
+      Last updated on Mar 16, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

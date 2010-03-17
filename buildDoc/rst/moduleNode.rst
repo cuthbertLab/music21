@@ -12,27 +12,27 @@ music21.node
 .. function:: fixed_writexml(writer, indent=, addindent=, newl=)
 
 
-class Node
-----------
+Node
+----
 
 .. class:: Node
 
 
     
 
-    **class Node** **attributes**
+    **Node** **attributes**
 
     .. attribute:: charData
 
     No documentation. 
 
-    **class Node** **properties**
+    **Node** **properties**
 
     .. attribute:: tag
 
     No documentation. 
 
-    **class Node** **methods**
+    **Node** **methods**
 
     .. method:: __init__()
 
@@ -81,28 +81,28 @@ class Node
     Shortcut method to provide quick xml out. 
 
 
-class NodeList
---------------
+NodeList
+--------
 
 .. class:: NodeList
 
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
-    inherits from: :class:`music21.node.Node`
+    inherits from: :class:`~music21.node.Node`
 
-    **class NodeList** **attributes**
+    **NodeList** **attributes**
 
     .. attribute:: componentList
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.charData`
+    Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
 
-    **class NodeList** **properties**
+    **NodeList** **properties**
 
-    Properties inherited from :class:`music21.node.Node`: :attr:`music21.node.Node.tag`
+    Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
 
-    **class NodeList** **methods**
+    **NodeList** **methods**
 
     .. method:: __init__()
 
@@ -112,6 +112,6 @@ class NodeList
 
     No documentation. 
 
-    Methods inherited from :class:`music21.node.Node`: :meth:`music21.node.Node.get`, :meth:`music21.node.Node.getNewDoc`, :meth:`music21.node.Node.loadAttrs`, :meth:`music21.node.Node.merge`, :meth:`music21.node.Node.set`, :meth:`music21.node.Node.setDefaults`, :meth:`music21.node.Node.toxml`, :meth:`music21.node.Node.xmlStr`
+    Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
 
 

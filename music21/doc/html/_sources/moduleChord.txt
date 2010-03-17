@@ -9,8 +9,8 @@ music21.chord
 
 
 
-class Chord
------------
+Chord
+-----
 
 .. class:: Chord
 
@@ -18,9 +18,9 @@ class Chord
 
     
 
-    inherits from: :class:`music21.note.NotRest`, :class:`music21.note.GeneralNote`, :class:`music21.base.Music21Object`
+    inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
-    **class Chord** **attributes**
+    **Chord** **attributes**
 
     .. attribute:: isChord
 
@@ -38,13 +38,13 @@ class Chord
 
     A :class:`music21.note.Beams` object. 
 
-    Attributes inherited from :class:`music21.note.NotRest`: :attr:`music21.note.NotRest.stemDirection`
+    Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
-    Attributes inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.lyrics`, :attr:`music21.note.GeneralNote.notations`, :attr:`music21.note.GeneralNote.editorial`, :attr:`music21.note.GeneralNote.tie`, :attr:`music21.note.GeneralNote.articulations`
+    Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-    Attributes inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.id`, :attr:`music21.base.Music21Object.groups`
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
-    **class Chord** **properties**
+    **Chord** **properties**
 
     .. attribute:: pitches
 
@@ -260,11 +260,11 @@ class Chord
 
     Return a representation of the Chord as a prime-form set class string. 
 
-    Properties inherited from :class:`music21.note.GeneralNote`: :attr:`music21.note.GeneralNote.color`, :attr:`music21.note.GeneralNote.lyric`, :attr:`music21.note.GeneralNote.musicxml`, :attr:`music21.note.GeneralNote.quarterLength`
+    Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`, :attr:`~music21.note.GeneralNote.quarterLength`
 
-    Properties inherited from :class:`music21.base.Music21Object`: :attr:`music21.base.Music21Object.offset`, :attr:`music21.base.Music21Object.parent`, :attr:`music21.base.Music21Object.priority`
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
-    **class Chord** **methods**
+    **Chord** **methods**
 
     .. method:: __init__(notes=[])
 
@@ -627,10 +627,10 @@ class Chord
 
     Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
 
-    Methods inherited from :class:`music21.note.NotRest`: :meth:`music21.note.NotRest.splitNoteAtPoint`
+    Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-    Methods inherited from :class:`music21.note.GeneralNote`: :meth:`music21.note.GeneralNote.addLyric`, :meth:`music21.note.GeneralNote.appendDuration`, :meth:`music21.note.GeneralNote.clearDurations`, :meth:`music21.note.GeneralNote.compactNoteInfo`, :meth:`music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
-    Methods inherited from :class:`music21.base.Music21Object`: :meth:`music21.base.Music21Object.addContext`, :meth:`music21.base.Music21Object.addLocationAndParent`, :meth:`music21.base.Music21Object.freezeIds`, :meth:`music21.base.Music21Object.getContextAttr`, :meth:`music21.base.Music21Object.getContextByClass`, :meth:`music21.base.Music21Object.getOffsetBySite`, :meth:`music21.base.Music21Object.isClass`, :meth:`music21.base.Music21Object.searchParent`, :meth:`music21.base.Music21Object.setContextAttr`, :meth:`music21.base.Music21Object.show`, :meth:`music21.base.Music21Object.unfreezeIds`, :meth:`music21.base.Music21Object.unwrapWeakref`, :meth:`music21.base.Music21Object.wrapWeakref`, :meth:`music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

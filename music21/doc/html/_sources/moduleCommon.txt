@@ -326,8 +326,8 @@ True
 
 utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
 
-class Scalar
-------------
+Scalar
+------
 
 .. class:: Scalar
 
@@ -335,7 +335,7 @@ class Scalar
 
     
 
-    **class Scalar** **attributes**
+    **Scalar** **attributes**
 
     .. attribute:: valType
 
@@ -345,7 +345,7 @@ class Scalar
 
     No documentation. 
 
-    **class Scalar** **methods**
+    **Scalar** **methods**
 
     .. method:: __init__(value=None)
 
@@ -364,8 +364,8 @@ class Scalar
     No documentation. 
 
 
-class Iterator
---------------
+Iterator
+--------
 
 .. class:: Iterator
 
@@ -373,7 +373,7 @@ class Iterator
 
     
 
-    **class Iterator** **methods**
+    **Iterator** **methods**
 
     .. method:: __init__(data)
 
@@ -384,8 +384,8 @@ class Iterator
     No documentation. 
 
 
-class Timer
------------
+Timer
+-----
 
 .. class:: Timer
 
@@ -393,7 +393,7 @@ class Timer
 
     
 
-    **class Timer** **methods**
+    **Timer** **methods**
 
     .. method:: __init__()
 
@@ -412,8 +412,8 @@ class Timer
     No documentation. 
 
 
-class defHash
--------------
+defHash
+-------
 
 .. class:: defHash
 
@@ -421,7 +421,7 @@ class defHash
 
     inherits from: dict
 
-    **class defHash** **attributes**
+    **defHash** **attributes**
 
     .. attribute:: default
 
@@ -431,9 +431,9 @@ class defHash
 
     No documentation. 
 
-    Attributes inherited from dict: :attr:`__builtin__.dict.fromkeys`
+    Attributes inherited from dict: :attr:`~__builtin__.dict.fromkeys`
 
-    **class defHash** **methods**
+    **defHash** **methods**
 
     .. method:: __init__(hash=None, default=None, callDefault=False)
 
@@ -443,11 +443,11 @@ class defHash
 
     No documentation. 
 
-    Methods inherited from dict: :meth:`__builtin__.dict.clear`, :meth:`__builtin__.dict.copy`, :meth:`__builtin__.dict.has_key`, :meth:`__builtin__.dict.items`, :meth:`__builtin__.dict.iteritems`, :meth:`__builtin__.dict.iterkeys`, :meth:`__builtin__.dict.itervalues`, :meth:`__builtin__.dict.keys`, :meth:`__builtin__.dict.pop`, :meth:`__builtin__.dict.popitem`, :meth:`__builtin__.dict.setdefault`, :meth:`__builtin__.dict.update`, :meth:`__builtin__.dict.values`
+    Methods inherited from dict: :meth:`~__builtin__.dict.clear`, :meth:`~__builtin__.dict.copy`, :meth:`~__builtin__.dict.has_key`, :meth:`~__builtin__.dict.items`, :meth:`~__builtin__.dict.iteritems`, :meth:`~__builtin__.dict.iterkeys`, :meth:`~__builtin__.dict.itervalues`, :meth:`~__builtin__.dict.keys`, :meth:`~__builtin__.dict.pop`, :meth:`~__builtin__.dict.popitem`, :meth:`~__builtin__.dict.setdefault`, :meth:`~__builtin__.dict.update`, :meth:`~__builtin__.dict.values`
 
 
-class defList
--------------
+defList
+-------
 
 .. class:: defList
 
@@ -455,7 +455,7 @@ class defList
 
     inherits from: list
 
-    **class defList** **attributes**
+    **defList** **attributes**
 
     .. attribute:: default
 
@@ -465,12 +465,12 @@ class defList
 
     No documentation. 
 
-    **class defList** **methods**
+    **defList** **methods**
 
     .. method:: __init__(value=None, default=None, callDefault=False)
 
     No documentation. 
 
-    Methods inherited from list: :meth:`__builtin__.list.append`, :meth:`__builtin__.list.count`, :meth:`__builtin__.list.extend`, :meth:`__builtin__.list.index`, :meth:`__builtin__.list.insert`, :meth:`__builtin__.list.pop`, :meth:`__builtin__.list.remove`, :meth:`__builtin__.list.reverse`, :meth:`__builtin__.list.sort`
+    Methods inherited from list: :meth:`~__builtin__.list.append`, :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
 
 

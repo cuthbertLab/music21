@@ -15,8 +15,8 @@ Given a stream and any keyword configuration arguments, create and display a plo
 
 
 
-class PlotPitchSpace
---------------------
+PlotPitchSpace
+--------------
 
 .. class:: PlotPitchSpace
 
@@ -27,25 +27,25 @@ class PlotPitchSpace
 
     
 
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotHistogram`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchSpace** **attributes**
+    **PlotPitchSpace** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchSpace** **methods**
+    **PlotPitchSpace** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotPitchClass
---------------------
+PlotPitchClass
+--------------
 
 .. class:: PlotPitchClass
 
@@ -56,25 +56,25 @@ class PlotPitchClass
 
     
 
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotHistogram`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchClass** **attributes**
+    **PlotPitchClass** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchClass** **methods**
+    **PlotPitchClass** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotQuarterLength
------------------------
+PlotQuarterLength
+-----------------
 
 .. class:: PlotQuarterLength
 
@@ -83,25 +83,25 @@ class PlotQuarterLength
     .. image:: images/PlotQuarterLength.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotHistogram`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotHistogram`, :class:`~music21.graph.PlotStream`
 
-    **class PlotQuarterLength** **attributes**
+    **PlotQuarterLength** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotQuarterLength** **methods**
+    **PlotQuarterLength** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotScatterPitchSpaceQuarterLength
-----------------------------------------
+PlotScatterPitchSpaceQuarterLength
+----------------------------------
 
 .. class:: PlotScatterPitchSpaceQuarterLength
 
@@ -110,25 +110,25 @@ class PlotScatterPitchSpaceQuarterLength
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotScatter`, :class:`~music21.graph.PlotStream`
 
-    **class PlotScatterPitchSpaceQuarterLength** **attributes**
+    **PlotScatterPitchSpaceQuarterLength** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotScatterPitchSpaceQuarterLength** **methods**
+    **PlotScatterPitchSpaceQuarterLength** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotScatterPitchClassQuarterLength
-----------------------------------------
+PlotScatterPitchClassQuarterLength
+----------------------------------
 
 .. class:: PlotScatterPitchClassQuarterLength
 
@@ -137,25 +137,25 @@ class PlotScatterPitchClassQuarterLength
     .. image:: images/PlotScatterPitchClassQuarterLength.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotScatter`, :class:`~music21.graph.PlotStream`
 
-    **class PlotScatterPitchClassQuarterLength** **attributes**
+    **PlotScatterPitchClassQuarterLength** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotScatterPitchClassQuarterLength** **methods**
+    **PlotScatterPitchClassQuarterLength** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotScatterPitchClassOffset
----------------------------------
+PlotScatterPitchClassOffset
+---------------------------
 
 .. class:: PlotScatterPitchClassOffset
 
@@ -164,25 +164,25 @@ class PlotScatterPitchClassOffset
     .. image:: images/PlotScatterPitchClassOffset.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotScatter`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotScatter`, :class:`~music21.graph.PlotStream`
 
-    **class PlotScatterPitchClassOffset** **attributes**
+    **PlotScatterPitchClassOffset** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotScatterPitchClassOffset** **methods**
+    **PlotScatterPitchClassOffset** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotPitchSpaceOffset
---------------------------
+PlotPitchSpaceOffset
+--------------------
 
 .. class:: PlotPitchSpaceOffset
 
@@ -191,25 +191,25 @@ class PlotPitchSpaceOffset
     .. image:: images/PlotPitchSpaceOffset.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotBrokenHorizontalBar`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotBrokenHorizontalBar`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchSpaceOffset** **attributes**
+    **PlotPitchSpaceOffset** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchSpaceOffset** **methods**
+    **PlotPitchSpaceOffset** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotPitchClassOffset
---------------------------
+PlotPitchClassOffset
+--------------------
 
 .. class:: PlotPitchClassOffset
 
@@ -218,25 +218,25 @@ class PlotPitchClassOffset
     .. image:: images/PlotPitchClassOffset.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotBrokenHorizontalBar`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotBrokenHorizontalBar`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchClassOffset** **attributes**
+    **PlotPitchClassOffset** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchClassOffset** **methods**
+    **PlotPitchClassOffset** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotPitchSpaceQuarterLengthCount
---------------------------------------
+PlotPitchSpaceQuarterLengthCount
+--------------------------------
 
 .. class:: PlotPitchSpaceQuarterLengthCount
 
@@ -245,25 +245,25 @@ class PlotPitchSpaceQuarterLengthCount
     .. image:: images/PlotPitchSpaceQuarterLengthCount.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotScatterWeighted`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchSpaceQuarterLengthCount** **attributes**
+    **PlotPitchSpaceQuarterLengthCount** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchSpaceQuarterLengthCount** **methods**
+    **PlotPitchSpaceQuarterLengthCount** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class PlotPitchClassQuarterLengthCount
---------------------------------------
+PlotPitchClassQuarterLengthCount
+--------------------------------
 
 .. class:: PlotPitchClassQuarterLengthCount
 
@@ -272,25 +272,25 @@ class PlotPitchClassQuarterLengthCount
     .. image:: images/PlotPitchClassQuarterLengthCount.* 
         :width: 500 
 
-    inherits from: :class:`music21.graph._PlotScatterWeighted`, :class:`music21.graph.PlotStream`
+    inherits from: :class:`~music21.graph._PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
-    **class PlotPitchClassQuarterLengthCount** **attributes**
+    **PlotPitchClassQuarterLengthCount** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotPitchClassQuarterLengthCount** **methods**
+    **PlotPitchClassQuarterLengthCount** **methods**
 
     .. method:: __init__(streamObj)
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.PlotStream`: :meth:`music21.graph.PlotStream.convertPsToNoteName`, :meth:`music21.graph.PlotStream.process`, :meth:`music21.graph.PlotStream.show`, :meth:`music21.graph.PlotStream.ticksDynamics`, :meth:`music21.graph.PlotStream.ticksPitchClass`, :meth:`music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`music21.graph.PlotStream.ticksQuarterLength`, :meth:`music21.graph.PlotStream.write`
+    Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.convertPsToNoteName`, :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-class Graph
------------
+Graph
+-----
 
 .. class:: Graph
 
@@ -298,7 +298,7 @@ class Graph
 
     
 
-    **class Graph** **attributes**
+    **Graph** **attributes**
 
     .. attribute:: fontFamily
 
@@ -364,7 +364,7 @@ class Graph
 
     dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
 
-    **class Graph** **methods**
+    **Graph** **methods**
 
     .. method:: __init__()
 
@@ -418,19 +418,19 @@ class Graph
     No documentation. 
 
 
-class Graph2DBrokenHorizontalBar
---------------------------------
+Graph2DBrokenHorizontalBar
+--------------------------
 
 .. class:: Graph2DBrokenHorizontalBar
 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph2DBrokenHorizontalBar** **attributes**
+    **Graph2DBrokenHorizontalBar** **attributes**
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph2DBrokenHorizontalBar** **methods**
+    **Graph2DBrokenHorizontalBar** **methods**
 
     .. method:: __init__()
 
@@ -445,22 +445,22 @@ class Graph2DBrokenHorizontalBar
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class Graph2DHistogram
-----------------------
+Graph2DHistogram
+----------------
 
 .. class:: Graph2DHistogram
 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph2DHistogram** **attributes**
+    **Graph2DHistogram** **attributes**
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph2DHistogram** **methods**
+    **Graph2DHistogram** **methods**
 
     .. method:: __init__()
 
@@ -477,22 +477,22 @@ class Graph2DHistogram
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class Graph2DScatter
---------------------
+Graph2DScatter
+--------------
 
 .. class:: Graph2DScatter
 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph2DScatter** **attributes**
+    **Graph2DScatter** **attributes**
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph2DScatter** **methods**
+    **Graph2DScatter** **methods**
 
     .. method:: __init__()
 
@@ -507,23 +507,23 @@ class Graph2DScatter
 
     xValueLegit determines if index values or real values are used 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class Graph2DScatterWeighted
-----------------------------
+Graph2DScatterWeighted
+----------------------
 
 .. class:: Graph2DScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph2DScatterWeighted** **attributes**
+    **Graph2DScatterWeighted** **attributes**
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph2DScatterWeighted** **methods**
+    **Graph2DScatterWeighted** **methods**
 
     .. method:: __init__()
 
@@ -538,22 +538,22 @@ class Graph2DScatterWeighted
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class Graph3DBars
------------------
+Graph3DBars
+-----------
 
 .. class:: Graph3DBars
 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph3DBars** **attributes**
+    **Graph3DBars** **attributes**
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph3DBars** **methods**
+    **Graph3DBars** **methods**
 
     .. method:: __init__()
 
@@ -565,26 +565,26 @@ class Graph3DBars
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class Graph3DPolygonBars
-------------------------
+Graph3DPolygonBars
+------------------
 
 .. class:: Graph3DPolygonBars
 
 
-    inherits from: :class:`music21.graph.Graph`
+    inherits from: :class:`~music21.graph.Graph`
 
-    **class Graph3DPolygonBars** **attributes**
+    **Graph3DPolygonBars** **attributes**
 
     .. attribute:: barWidth
 
     No documentation. 
 
-    Attributes inherited from :class:`music21.graph.Graph`: :attr:`music21.graph.Graph.fontFamily`, :attr:`music21.graph.Graph.doneAction`, :attr:`music21.graph.Graph.title`, :attr:`music21.graph.Graph.colorBackgroundFigure`, :attr:`music21.graph.Graph.colors`, :attr:`music21.graph.Graph.tickFontSize`, :attr:`music21.graph.Graph.colorGrid`, :attr:`music21.graph.Graph.figureSize`, :attr:`music21.graph.Graph.colorBackgroundData`, :attr:`music21.graph.Graph.axisKeys`, :attr:`music21.graph.Graph.grid`, :attr:`music21.graph.Graph.titleFontSize`, :attr:`music21.graph.Graph.alpha`, :attr:`music21.graph.Graph.labelFontSize`, :attr:`music21.graph.Graph.data`, :attr:`music21.graph.Graph.axis`
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
-    **class Graph3DPolygonBars** **methods**
+    **Graph3DPolygonBars** **methods**
 
     .. method:: __init__()
 
@@ -602,11 +602,11 @@ class Graph3DPolygonBars
 
     No documentation. 
 
-    Methods inherited from :class:`music21.graph.Graph`: :meth:`music21.graph.Graph.done`, :meth:`music21.graph.Graph.setAxisLabel`, :meth:`music21.graph.Graph.setAxisRange`, :meth:`music21.graph.Graph.setData`, :meth:`music21.graph.Graph.setDoneAction`, :meth:`music21.graph.Graph.setFigureSize`, :meth:`music21.graph.Graph.setTicks`, :meth:`music21.graph.Graph.setTitle`, :meth:`music21.graph.Graph.show`, :meth:`music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
-class PlotStream
-----------------
+PlotStream
+----------
 
 .. class:: PlotStream
 
@@ -614,13 +614,13 @@ class PlotStream
 
     
 
-    **class PlotStream** **attributes**
+    **PlotStream** **attributes**
 
     .. attribute:: id
 
     No documentation. 
 
-    **class PlotStream** **methods**
+    **PlotStream** **methods**
 
     .. method:: __init__(streamObj)
 
