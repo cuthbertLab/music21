@@ -352,6 +352,28 @@ def isIterable(usrData):
         return False
 
 
+def getNumFromStr(usrStr):
+    '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
+
+    >>> getNumFromStr('23a')
+    ('23', 'a')
+    >>> getNumFromStr('23a954sdfwer')
+    ('23954', 'asdfwer')
+    >>> getNumFromStr('')
+    ('', '')
+    '''
+    numbers = '0123456789'
+    found = []
+    remain = []
+    for char in usrStr:
+        if char in numbers:
+            found.append(char)
+        else:
+            remain.append(char)
+    # returns numbers, and then characeters
+    return ''.join(found), ''.join(remain)
+
+
 def getPlatform():
     '''
     Shared function to get platform names.

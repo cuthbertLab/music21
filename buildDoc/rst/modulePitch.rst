@@ -19,6 +19,36 @@ Utility conversion; does not process internals. Assumes A4 = 440 Hz
 >>> convertFqToPs(261.62556530059862)
 60.0 
 
+.. function:: convertNameToPitchClass(pitchName)
+
+Utility conversion: from a pitch name to a pitch class integer between 0 and 11. 
+
+>>> convertNameToPitchClass('c4')
+0 
+>>> convertNameToPitchClass('c#')
+1 
+>>> convertNameToPitchClass('d-')
+1 
+>>> convertNameToPitchClass('e--')
+2 
+>>> convertNameToPitchClass('b2##')
+1 
+
+.. function:: convertNameToPs(pitchName)
+
+Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values). 
+
+>>> convertNameToPs('c4')
+60 
+>>> convertNameToPs('c2#')
+37.0 
+>>> convertNameToPs('d7-')
+97.0 
+>>> convertNameToPs('e1--')
+26.0 
+>>> convertNameToPs('b2##')
+49.0 
+
 .. function:: convertPsToFq(ps)
 
 Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
@@ -267,7 +297,7 @@ Pitch
 
     .. method:: __init__(name=None)
 
-    optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
+    Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
 
     >>> p1 = Pitch('a#')
     >>> p1

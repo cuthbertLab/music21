@@ -102,6 +102,42 @@
 </pre></div>
 </div>
 <dl class="function">
+<dt id="music21.pitch.convertNameToPitchClass">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPitchClass</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPitchClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility conversion: from a pitch name to a pitch class integer between 0 and 11.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;d-&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;e--&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;b2##&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.pitch.convertNameToPs">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPs</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="go">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c2#&#39;</span><span class="p">)</span>
+<span class="go">37.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;d7-&#39;</span><span class="p">)</span>
+<span class="go">97.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;e1--&#39;</span><span class="p">)</span>
+<span class="go">26.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;b2##&#39;</span><span class="p">)</span>
+<span class="go">49.0</span>
+</pre></div>
+</div>
+<dl class="function">
 <dt id="music21.pitch.convertPsToFq">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -395,7 +431,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <tt class="descname">__init__</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
+<p>Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
 <span class="go">A#</span>

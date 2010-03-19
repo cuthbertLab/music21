@@ -1343,8 +1343,80 @@ class Stream(music21.Music21Object):
     # routines for obtaining specific types of elements form a Stream
     # getNotes and getPitches are found with the interval routines
         
-    def getMeasureNumbers(self):
-        pass
+    def getMeasureRange(self, numberStart, numberEnd, collect=[]):
+        '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
+
+        Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> b = a[0].getMeasureRange(4,6)
+        >>> len(b)
+        3
+        '''
+        # create new part (or whatever object is necessary) for each embedded part. copy measures numbered 15 - 20 inclusive (not necessary measures[14:21]) add at the beginning of new measure 15 at least the correct clef, key signature, instrument, and time signature, and metronome mark. Optionally should also get the TempoMark ("Allegro"), current dynamic, etc.  (actually, the clef and key signature, etc. should be able to be disabled as well in case it's going to be integrated into another score; so maybe make the third, optional argument have a number of different settings).
+        
+        # create a dictionary of measure number, list of Meaures
+        # there may be more than one Measure with the same Measure number
+        mapRaw = {}
+        mNumbersUnique = []
+        for m in self.getMeasures():
+            # mId is a tuple of measure nmber and any suffix
+            mId = (m.measureNumber, m.measureNumberSuffix)
+            # store unique measure numbers for reference
+            if m.measureNumber not in mNumbersUnique:
+                mNumbersUnique.append(m.measureNumber)
+            if mId not in mapRaw.keys():
+                mapRaw[mId] = [] # use a list
+            # these will be in order by measure number
+            # there may be multiple None and/or 0 measure numbers
+            mapRaw[mId].append(m)
+
+        #environLocal.printDebug(['mapRaw', mapRaw])
+
+        # if measure numbers are not defined, we should just count them 
+        # in order, starting from 1
+        if len(mNumbersUnique) == 1:
+            mapCooked = {}  
+            # only one key but we do not know what it is
+            i = 1
+            for number, suffix in mapRaw.keys():
+                for m in mapRaw[(number, suffix)]:
+                    # expecting a lost of measures
+                    mapCooked[(i, None)] = [m]
+                    i += 1
+        else:
+            mapCooked = mapRaw
+
+        #environLocal.printDebug(['mapCooked', mapCooked])
+
+
+        post = Stream()
+        startOffset = None # set with the first measure
+        # get requested range
+        for i in range(numberStart, numberEnd+1):
+            match = None
+            for number, suffix in mapCooked.keys():
+                # this will match regardless of suffix
+                if number == i:
+                    match = mapCooked[(number, suffix)]
+                    break
+            if match == None: # None found in this range
+                continue 
+            # need to make offsets relative to this new Stream
+            for m in match:
+                # this assumes measure are in offset order
+                # this may not always be the case
+                if startOffset == None: # only set on first
+                    startOffset = m.getOffsetBySite(self)
+                oldOffset = m.getOffsetBySite(self)
+                # subtract the offset of the first measure
+                newOffset = oldOffset - startOffset
+                post.insert(newOffset, m)
+
+                environLocal.printDebug(['old/new offset', oldOffset, newOffset])
+
+        return post
 
 
     def getMeasures(self):
@@ -2241,7 +2313,7 @@ class Stream(music21.Music21Object):
         # in result object may not be the same
         posDelete.reverse() # start from highest and go down
         for i in posDelete:
-            environLocal.printDebug(['removing note', notes[i]])
+            #environLocal.printDebug(['removing note', notes[i]])
             junk = notes.pop(i)
 
         return notes
@@ -2983,9 +3055,6 @@ class Stream(music21.Music21Object):
         return post
 
 
-
-
-
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 
         skipUnisons = False, skipOctaves = False,
@@ -3664,36 +3733,41 @@ class Measure(Stream):
     All properties of a Measure that are Music21 objects are found as part of 
     the Stream's elements. 
     '''
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'timeSignatureIsNew': 'Boolean describing if the TimeSignature is different than the previous Measure.',
+    'clefIsNew': 'Boolean describing if the Clef is different than the previous Measure.',
+    'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
+    'measureNumber': 'A number representing the displayed or shown Measure number as presented in a written Score.',
+    'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
+   
+    }
+
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
 
         # clef and timeSignature is defined as a property below
-
         self.timeSignatureIsNew = False
         self.clefIsNew = False
         self.keyIsNew = False
 
         self.filled = False
-        self.measureNumber = 0   # 0 means undefined or pickup
+        # NOTE: it seems that the default measure number should be zero.
+        self.measureNumber = 0 # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
-
 
         # inherits from prev measure or is default for group
         # inherits from next measure or is default for group
 
-        # these attrbute will, ultimate, be obtained form .elements
+        # these need to but on, and obtained from .elements
         self.leftbarline = None  
         self.rightbarline = None 
 
         # for display is overridden by next measure\'s leftbarline if that is not None and
         # the two measures are on the same system
-
-
-        # TODO: it does not seem that Stream objects should be stored
-        # as attributes in another stream: these elements will not be obtained
-        # when this stream is flattend or other stream operations
-        # are performed. it seems that all Streams, base music21 objects, and
-        # Elements should be stored on the Stream's _elements list. 
 
         #self.internalbarlines = Stream()
         # "measure expressions" that are attached to nowhere in particular
@@ -3899,7 +3973,13 @@ class Measure(Stream):
         '''Given an mxMeasure, create a music21 measure
         '''
         # measure number may be a string and not a number (always?)
-        self.measureNumber = mxMeasure.get('number')
+        mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
+        # assume that measure numbers are integers
+        if mNum not in [None, '']:
+            self.measureNumber = int(mNum)
+        if mSuffix not in [None, '']:
+            self.measureNumberSuffix = mSuffix
+
         junk = mxMeasure.get('implicit')
 #         environLocal.printDebug(['_setMX: working on measure:',
 #                                 self.measureNumber])
@@ -4170,6 +4250,16 @@ class Score(Stream):
     lily = property(_getLily)
 
 
+    def getMeasureRange(self, numberStart, numberEnd, collect=[]):
+        '''This method override the getMeasureRange method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+        '''
+        post = Score()
+        # note that this will strip all objects that are not Parts
+        for p in self.getElementsByClass(Part):
+            # insert all at zero
+            post.insert(0, p.getMeasureRange(numberStart, numberEnd,
+                        collect))
+        return post
 
 #-------------------------------------------------------------------------------
 
@@ -5293,6 +5383,30 @@ class Test(unittest.TestCase):
 
 
 
+    def testMeasureRange(self):
+        from music21 import corpus
+        a = corpus.parseWork('bach/bwv324.xml')
+        b = a[0].getMeasureRange(4,6)
+        self.assertEqual(len(b), 3) 
+#        b.show()       
+
+        # test measures with no measure numbesr
+        c = Stream()
+        for i in range(4):
+            m = Measure()
+            n = note.Note()
+            m.repeatAppend(n, 4)
+            c.append(m)
+        #c.show()
+        d = c.getMeasureRange(2,3)
+        self.assertEqual(len(d), 2) 
+
+        # try the score method
+        a = corpus.parseWork('bach/bwv324.xml')
+        b = a.getMeasureRange(2,4)
+        #b.show()
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -5302,3 +5416,7 @@ _DOC_ORDER = [Stream, Measure]
 
 if __name__ == "__main__":    
     music21.mainTest(Test)
+
+    # just for quick testing on in progress stuff
+    #a = Test()
+    #a.testMeasureRange()

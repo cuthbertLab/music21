@@ -2141,7 +2141,6 @@ def mainTest(*testClasses):
         import music21
         if __name__ == '__main__':
             music21.mainTest(Test)
-    
     '''
     
     if ('noDocTest' in testClasses):
