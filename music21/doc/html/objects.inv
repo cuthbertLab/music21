@@ -359,6 +359,7 @@ music21.interval.Interval.generic attribute moduleInterval.html
 music21.graph.PlotScatterPitchSpaceQuarterLength class moduleGraph.html
 music21.pitch.convertPsToStep function modulePitch.html
 music21.common.Scalar.toFloat method moduleCommon.html
+music21.common.getNumFromStr function moduleCommon.html
 music21.serial.RowWebernOp27.opus attribute moduleSerial.html
 music21.graph.Graph2DBrokenHorizontalBar.process method moduleGraph.html
 music21.serial.RowSchoenbergOp37.title attribute moduleSerial.html
@@ -908,6 +909,7 @@ music21.pitch.convertPsToFq function modulePitch.html
 music21.serial.RowSchoenbergOp41.title attribute moduleSerial.html
 music21.base.ElementWrapper.obj attribute moduleBase.html
 music21.duration.typeToMusicXMLType function moduleDuration.html
+music21.stream.Score.getMeasureRange method moduleStream.html
 music21.serial.RowSchoenbergOp41 class moduleSerial.html
 music21.interval.getWrittenLowerNote function moduleInterval.html
 music21.duration.Duration.dots attribute moduleDuration.html

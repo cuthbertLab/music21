@@ -177,6 +177,17 @@ Return a string from an md5 haslib
 >>> getMd5('test')
 '098f6bcd4621d373cade4e832627b4f6' 
 
+.. function:: getNumFromStr(usrStr)
+
+Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters. 
+
+>>> getNumFromStr('23a')
+('23', 'a') 
+>>> getNumFromStr('23a954sdfwer')
+('23954', 'asdfwer') 
+>>> getNumFromStr('')
+('', '') 
+
 .. function:: getPlatform()
 
 Shared function to get platform names. 

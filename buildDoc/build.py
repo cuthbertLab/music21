@@ -942,6 +942,7 @@ class Documentation(RestructuredWriter):
 
                              'install', 
                              'about', 
+                             'applications', 
                              'environment', 
                              'graphing', 
                              'advancedGraphing', 

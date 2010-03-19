@@ -17,6 +17,7 @@ Music21 Documentation
    examples
    install
    about
+   applications
    environment
    graphing
    advancedGraphing
