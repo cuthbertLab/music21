@@ -1167,7 +1167,7 @@ class Music21Object(object):
                     post = self.flat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 
-                environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
+                #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
 
         if post == None: # still no match
             # this will call this method on all defined contexts, including
