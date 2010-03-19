@@ -1087,7 +1087,7 @@ class Music21Object(object):
         '''
         return self._definedContexts.add(obj)
 
-    def isContext(self, obj):
+    def hasContext(self, obj):
         '''Return a Boolean of an object reference is stored in the object's DefinedContexts object
 
         >>> class Mock(Music21Object): attr1=234
@@ -1095,11 +1095,11 @@ class Music21Object(object):
         >>> aObj.attr1 = 'test'
         >>> a = Music21Object()
         >>> a.addContext(aObj)
-        >>> a.isContext(aObj)
+        >>> a.hasContext(aObj)
         True
-        >>> a.isContext(None)
+        >>> a.hasContext(None)
         True
-        >>> a.isContext(45)
+        >>> a.hasContext(45)
         False
         '''
         for dc in self._definedContexts.get(): # get all
@@ -1152,7 +1152,7 @@ class Music21Object(object):
                 # most error tolerant: returns None
                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
 
-                # in some cases we may need to try to get the offset of a semiFlat representation. this is necssary when a Measure
+                # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
                 if offsetOfCaller == None:
                     offsetOfCaller = self.semiFlat.getOffsetByElement(
@@ -2148,14 +2148,14 @@ class Test(unittest.TestCase):
     def testDefinedContextsMeasures(self):
         '''Can a measure determine the last Clef used?
         '''
-        from music21 import corpus, clef
+        from music21 import corpus, clef, stream
         a = corpus.parseWork('bach/bwv324.xml')
         measures = a[0].measures # measures of first part
 
         # the parent of measures[1] is set to the new output stream
         self.assertEqual(measures[1].parent, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(measures[1].isContext(a[0]), True)
+        self.assertEqual(measures[1].hasContext(a[0]), True)
 
         # from the first measure, we can get the clef by using 
         # getElementsByClass
@@ -2170,9 +2170,23 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
         # for the second measure accessed from measures
+        # we can get the clef, now that getContextByClass uses semiFlat
         post = measures[3].getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
+        # add the measure to a new stream
+        newStream = stream.Stream()
+        newStream.insert(0, measures[3])
+        # all previous locations are still available as a context
+        self.assertEqual(measures[3].hasContext(newStream), True)
+        self.assertEqual(measures[3].hasContext(measures), True)
+        self.assertEqual(measures[3].hasContext(a[0]), True)
+        # we can still access the clef through this measure on this
+        # new stream
+        post = newStream[0].getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+
+        
 
     def testDefinedContextsPitch(self):
         # TODO: this form does not yet work
@@ -2238,5 +2252,3 @@ def mainTest(*testClasses):
 if __name__ == "__main__":
     mainTest(Test)
 
-    #a = Test()
-    #a.testDefinedContextsMeasures()

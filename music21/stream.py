@@ -1342,7 +1342,7 @@ class Stream(music21.Music21Object):
     # getNotes and getPitches are found with the interval routines
 
     def getMeasureRange(self, numberStart, numberEnd, 
-        collect=[clef.Clef, meter.TimeSignature, instrument.Instrument]):
+        collect=[clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature]):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -1407,7 +1407,8 @@ class Stream(music21.Music21Object):
                 # this may not always be the case
                 if startOffset == None: # only set on first
                     startOffset = m.getOffsetBySite(self)
-                    # not sure if a deepcopy is necessary
+                    # not sure if a deepcopy is necessary; this does not yet work
+                    #startMeasure = copy.deepcopy(m)
                     startMeasure = m
 
                     # this works here, but not after appending!
@@ -1416,6 +1417,7 @@ class Stream(music21.Music21Object):
 
                 oldOffset = m.getOffsetBySite(self)
                 # subtract the offset of the first measure
+                # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
                 post.insert(newOffset, m)
 
@@ -4279,7 +4281,7 @@ class Score(Stream):
     lily = property(_getLily)
 
 
-    def getMeasureRange(self, numberStart, numberEnd, collect=[]):
+    def getMeasureRange(self, numberStart, numberEnd, collect=[clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature]):
         '''This method override the getMeasureRange method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
@@ -4290,8 +4292,12 @@ class Score(Stream):
                         collect))
         return post
 
-#-------------------------------------------------------------------------------
 
+
+
+
+
+#-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
@@ -5417,6 +5423,13 @@ class Test(unittest.TestCase):
         a = corpus.parseWork('bach/bwv324.xml')
         b = a[3].getMeasureRange(4,6)
         self.assertEqual(len(b), 3) 
+        # first measure now has keu sig
+        self.assertEqual(len(b[0].getElementsByClass(key.KeySignature)), 1) 
+        # first measure now has meter
+        self.assertEqual(len(b[0].getElementsByClass(meter.TimeSignature)), 1) 
+        # first measure now has clef
+        self.assertEqual(len(b[0].getElementsByClass(clef.Clef)), 1) 
+
         #b.show()       
 
         # test measures with no measure numbesr
@@ -5446,7 +5459,3 @@ _DOC_ORDER = [Stream, Measure]
 
 if __name__ == "__main__":    
     music21.mainTest(Test)
-
-    # just for quick testing on in progress stuff
-    #a = Test()
-    #a.testMeasureRange()
