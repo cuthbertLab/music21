@@ -1352,6 +1352,9 @@ class Stream(music21.Music21Object):
         >>> b = a[0].getMeasureRange(4,6)
         >>> len(b)
         3
+
+        OMIT_FROM_DOCS
+        TODO: this probably needs to deepcopy the new first measure.
         '''
         # create new part (or whatever object is necessary) for each embedded part. copy measures numbered 15 - 20 inclusive (not necessary measures[14:21]) add at the beginning of new measure 15 at least the correct clef, key signature, instrument, and time signature, and metronome mark. Optionally should also get the TempoMark ("Allegro"), current dynamic, etc.  (actually, the clef and key signature, etc. should be able to be disabled as well in case it's going to be integrated into another score; so maybe make the third, optional argument have a number of different settings).
         
