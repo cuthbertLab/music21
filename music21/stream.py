@@ -1359,7 +1359,7 @@ class Stream(music21.Music21Object):
         # create a dictionary of measure number, list of Meaures
         # there may be more than one Measure with the same Measure number
         mapRaw = {}
-        mNumbersUnique = []
+        mNumbersUnique = [] # store just the numbers
         for m in self.getMeasures():
             # mId is a tuple of measure nmber and any suffix
             mId = (m.measureNumber, m.measureNumberSuffix)
@@ -1393,6 +1393,7 @@ class Stream(music21.Music21Object):
 
         post = Stream()
         startOffset = None # set with the first measure
+        startMeasure = None # store for adding other objects
         # get requested range
         for i in range(numberStart, numberEnd+1):
             match = None
@@ -1409,12 +1410,15 @@ class Stream(music21.Music21Object):
                 # this may not always be the case
                 if startOffset == None: # only set on first
                     startOffset = m.getOffsetBySite(self)
+                    startMeasure = m
                 oldOffset = m.getOffsetBySite(self)
                 # subtract the offset of the first measure
                 newOffset = oldOffset - startOffset
                 post.insert(newOffset, m)
 
                 environLocal.printDebug(['old/new offset', oldOffset, newOffset])
+
+        # manipulate startMeasure to add desired context objects
 
         return post
 
