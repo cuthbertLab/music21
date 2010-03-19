@@ -857,7 +857,7 @@ class Music21Object(object):
     _currentParentId = None # cached id in case the weakref has gone away...
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['searchParent', 'getContextAttr', 'setContextAttr']
+    _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'id': 'Unique identification string.',
@@ -994,22 +994,37 @@ class Music21Object(object):
     # look at this object for an atttribute; if not here
     # look up to parents
 
-    def searchParent(self, attrName):
+    def searchParentByAttr(self, attrName):
         '''If this element is contained within a Stream or other Music21 element, 
-        searchParent() permits searching attributes of higher-level
+        searchParentByAttr() permits searching attributes of higher-level
         objects. The first encountered match is returned, or None if no match.
+
+        OMIT_FROM_DOCS
+        this presently only searches upward; it does not search other lower level leafs in a container
+
+        this was formerly called SeachParent, but we might do other types 
+        of parent searches
         '''
         found = None
         try:
             found = getattr(self.parent, attrName)
         except AttributeError:
             # not sure of passing here is the best action
-            environLocal.printDebug(['searchParent call raised attribute error for attribute:', attrName])
+            environLocal.printDebug(['searchParentByAttr call raised attribute error for attribute:', attrName])
             pass
         if found is None:
-            found = self.parent.searchParent(attrName)
+            found = self.parent.searchParentByAttr(attrName)
         return found
         
+
+#     def searchParentByClass(self, classFilterList)
+#         '''
+#         The first encountered result is returned. 
+#         '''
+#         if not isinstance(classFilterList, list):
+#             if not isinstance(classFilterList, tuple):
+#                 classFilterList = [classFilterList]
+
 
     def getOffsetBySite(self, site):
         '''If this class has been registered in a container such as a Stream, 
@@ -1072,6 +1087,27 @@ class Music21Object(object):
         '''
         return self._definedContexts.add(obj)
 
+    def isContext(self, obj):
+        '''Return a Boolean of an object reference is stored in the object's DefinedContexts object
+
+        >>> class Mock(Music21Object): attr1=234
+        >>> aObj = Mock()
+        >>> aObj.attr1 = 'test'
+        >>> a = Music21Object()
+        >>> a.addContext(aObj)
+        >>> a.isContext(aObj)
+        True
+        >>> a.isContext(None)
+        True
+        >>> a.isContext(45)
+        False
+        '''
+        for dc in self._definedContexts.get(): # get all
+            if obj == dc:
+                return True
+        else:
+            return False
+
 
     def getContextByClass(self, className, serialReverseSearch=True,
                           callerFirst=None, memo=None):
@@ -1111,11 +1147,16 @@ class Music21Object(object):
                 # to this Stream; it may only be available within a flat
                 # representaiton
 
-                #note: cannt use self.flat.getOffsetBySite() here 
                 # alternative method:
                 #offsetOfCaller = callerFirst.getOffsetBySite(self.flat)
                 # most error tolerant: returns None
                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
+
+                # in some cases we may need to try to get the offset of a semiFlat representation. this is necssary when a Measure
+                # is the caller. 
+                if offsetOfCaller == None:
+                    offsetOfCaller = self.semiFlat.getOffsetByElement(
+                                    callerFirst)
 
                 # in some cases it migth be necessary and/or faster 
                 # to search the 
@@ -1126,10 +1167,11 @@ class Music21Object(object):
                     post = self.flat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 
-                #environLocal.printDebug(['results of serialReverseSearch:', post, 'searching for:', className, 'starting from offset', offsetOfCaller])
+                environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
 
         if post == None: # still no match
-            # this will call this method on all defined contexts;
+            # this will call this method on all defined contexts, including
+            # locations
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
@@ -2102,6 +2144,36 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.BassClef), True)
 
 
+
+    def testDefinedContextsMeasures(self):
+        '''Can a measure determine the last Clef used?
+        '''
+        from music21 import corpus, clef
+        a = corpus.parseWork('bach/bwv324.xml')
+        measures = a[0].measures # measures of first part
+
+        # the parent of measures[1] is set to the new output stream
+        self.assertEqual(measures[1].parent, measures)
+        # the source Part should still be a context of this measure
+        self.assertEqual(measures[1].isContext(a[0]), True)
+
+        # from the first measure, we can get the clef by using 
+        # getElementsByClass
+        post = measures[0].getElementsByClass(clef.Clef)
+        self.assertEqual(isinstance(post[0], clef.TrebleClef), True)
+
+        # make sure we can find offset in a flat representation
+        self.assertEqual(a[0].flat.getOffsetByElement(a[0][3]), None)
+
+        # for the second measure
+        post = a[0][3].getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+
+        # for the second measure accessed from measures
+        post = measures[3].getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+
+
     def testDefinedContextsPitch(self):
         # TODO: this form does not yet work
         from music21 import base, note, stream, clef
@@ -2165,3 +2237,6 @@ def mainTest(*testClasses):
 
 if __name__ == "__main__":
     mainTest(Test)
+
+    #a = Test()
+    #a.testDefinedContextsMeasures()

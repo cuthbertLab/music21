@@ -73,7 +73,7 @@ class StreamIterator():
 #-------------------------------------------------------------------------------
 class Stream(music21.Music21Object):
     '''
-    This is basic container for Music21Objects that occur at certain times. 
+    This is the fundamental container for Music21Objects; objects may be ordered and/or placed in time based on offsets from the start of this container's offset. 
     
     Like the base class, Music21Object, Streams have offsets, priority, id, and groups
     they also have an elements attribute which returns a list of elements; 
@@ -86,7 +86,6 @@ class Stream(music21.Music21Object):
 
     Streams may be embedded within other Streams.
     
-
     OMIT_FROM_DOCS
     TODO: Get Stream Duration working -- should be the total length of the 
     Stream. -- see the ._getDuration() and ._setDuration() methods
@@ -137,7 +136,6 @@ class Stream(music21.Music21Object):
     # append(), count(), index(), extend(), insert(), 
     # pop(), remove(), reverse() and sort(), like Python standard list objects.
     # But we're not there yet.
-
 
     def __len__(self):
         '''Get the total number of elements
@@ -1340,10 +1338,11 @@ class Stream(music21.Music21Object):
 
 
     #--------------------------------------------------------------------------
-    # routines for obtaining specific types of elements form a Stream
+    # routines for obtaining specific types of elements from a Stream
     # getNotes and getPitches are found with the interval routines
-        
-    def getMeasureRange(self, numberStart, numberEnd, collect=[]):
+
+    def getMeasureRange(self, numberStart, numberEnd, 
+        collect=[clef.Clef, meter.TimeSignature, instrument.Instrument]):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -1387,9 +1386,7 @@ class Stream(music21.Music21Object):
                     i += 1
         else:
             mapCooked = mapRaw
-
         #environLocal.printDebug(['mapCooked', mapCooked])
-
 
         post = Stream()
         startOffset = None # set with the first measure
@@ -1410,15 +1407,32 @@ class Stream(music21.Music21Object):
                 # this may not always be the case
                 if startOffset == None: # only set on first
                     startOffset = m.getOffsetBySite(self)
+                    # not sure if a deepcopy is necessary
                     startMeasure = m
+
+                    # this works here, but not after appending!
+                    #found = startMeasure.getContextByClass(clef.Clef)
+                    #environLocal.printDebug(['early clef search', found])
+
                 oldOffset = m.getOffsetBySite(self)
                 # subtract the offset of the first measure
                 newOffset = oldOffset - startOffset
                 post.insert(newOffset, m)
 
-                environLocal.printDebug(['old/new offset', oldOffset, newOffset])
+                #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
         # manipulate startMeasure to add desired context objects
+        for className in collect:
+            # first, see if it is in this Measure
+            found = startMeasure.getElementsByClass(className)
+            if len(found) > 0:
+                continue # already have one on this measure
+
+            found = startMeasure.getContextByClass(className)
+            if found != None:
+                startMeasure.insert(0, found)
+            else:
+                environLocal.printDebug(['cannot find requested class in stream:', className])
 
         return post
 
@@ -1434,9 +1448,7 @@ class Stream(music21.Music21Object):
     def getTimeSignatures(self):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
-    
-        Note: this could be a method of Stream.
-    
+        
         >>> a = Stream()
         >>> b = meter.TimeSignature('3/4')
         >>> a.insert(b)
@@ -1457,7 +1469,6 @@ class Stream(music21.Music21Object):
             post.insert(0, ts)
         return post
     
-
 
     def getInstrument(self, searchParent=True):
         '''Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise 
@@ -1687,6 +1698,9 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
+
+        note: this probably should be renamed, as we use Context in a specail way. Perhaps better is extract neighbors?
+        
         '''
        
         display = Stream()
@@ -2143,10 +2157,7 @@ class Stream(music21.Music21Object):
 
 
     def extendDuration(self, objName, inPlace=True):
-        '''Given a stream and an object name, go through stream and find each 
-        object. The time between adjacent objects is then assigned to the 
-        duration of each object. The last duration of the last object is assigned
-        to the end of the stream.
+        '''Given a Stream and an object class name, go through the Stream and find each instance of the desired object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to extend to the end of the Stream.
         
         >>> import music21.dynamics
         >>> stream1 = Stream()
@@ -2216,7 +2227,7 @@ class Stream(music21.Music21Object):
         # handle last element
         #print elements[-1], qLenTotal, elements[-1].duration
         elements[-1].duration.quarterLength = (qLenTotal -
-                                                 elements[-1].getOffsetBySite(self))
+                    elements[-1].getOffsetBySite(self))
         #print elements[-1], elements[-1].duration    
         return returnObj
     
@@ -2369,7 +2380,7 @@ class Stream(music21.Music21Object):
 
 
         OMIT_FROM_DOCS
-        ## TODO: CLEF ORDER RULES, etc.
+        TODO: CLEF ORDER RULES, etc.
         '''
         post = self.elements ## already a copy
         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority))
@@ -2442,15 +2453,8 @@ class Stream(music21.Music21Object):
 
     flat = property(_getFlat)
 
-    def _getSemiFlat(self):
-## does not yet work (nor same for flat above in part because .copy() does not eliminate the cache...
-#        if not self._cache['semiflat']:
-#            self._cache['semiflat'] = self._getFlatOrSemiFlat(retainContainers = True)
-#        return self._cache['semiflat']
 
-        return self._getFlatOrSemiFlat(retainContainers = True)
 
-    semiFlat = property(_getSemiFlat)
         
     def _getFlatOrSemiFlat(self, retainContainers):
         # this copy will have a shared locations object
@@ -2461,9 +2465,11 @@ class Stream(music21.Music21Object):
 
         for myEl in self.elements:
             # check for stream instance instead
+            # if this element is a stream
             if hasattr(myEl, "elements"): # recurse time:
-                recurseStreamOffset = myEl._definedContexts.getOffsetBySite(self)
-                if retainContainers is True: ## semiFlat
+                recurseStreamOffset = myEl._definedContexts.getOffsetBySite(
+                                      self)
+                if retainContainers is True: # semiFlat
                     newStream.insert(recurseStreamOffset, myEl)
                     recurseStream = myEl.semiFlat
                 else:
@@ -2472,12 +2478,15 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
                 
                 for subEl in recurseStream:
-                    oldOffset = subEl._definedContexts.getOffsetBySite(recurseStream)
+                    # TODO: this should not be access the private attribute 
+                    oldOffset = subEl._definedContexts.getOffsetBySite(
+                                recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
                     #environLocal.printDebug("newOffset: " + str(subEl.id) + " " + str(newOffset))
                     newStream.insert(newOffset, subEl)
-            
+            # if element not a stream
             else:
+                # insert into new stream at offset in old stream
                 newStream.insert(
                     myEl._definedContexts.getOffsetBySite(self), myEl)
 
@@ -2485,6 +2494,16 @@ class Stream(music21.Music21Object):
         newStream.flattenedRepresentationOf = self #common.wrapWeakref(self)
         return newStream
     
+
+    def _getSemiFlat(self):
+    # does not yet work (nor same for flat above in part because .copy() does not eliminate the cache...
+    #        if not self._cache['semiflat']:
+    #            self._cache['semiflat'] = self._getFlatOrSemiFlat(retainContainers = True)
+    #        return self._cache['semiflat']
+        return self._getFlatOrSemiFlat(retainContainers = True)
+
+    semiFlat = property(_getSemiFlat)
+
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -3156,20 +3175,20 @@ class Stream(music21.Music21Object):
     
     def melodicIntervals(self, *skipArgs, **skipKeywords):
         '''
-        returns a Stream of intervals between Notes (and by default, Chords) that follow each other in a stream.
+        returns a Stream of :class:`~music21.interval.Interval` objects between Notes (and by default, Chords) that follow each other in a stream.
         the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, 
         then it is equal to the offset of the second note)
         
-        see Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords 
-        are allowed.
+        See Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed.
         
-        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0].
-        For more complex interval calculations, run findConsecutiveNotes and then use generateInterval
+        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval.
                 
-        returns None of there are not at least two elements found by findConsecutiveNotes
+        Returns None of there are not at least two elements found by findConsecutiveNotes.
 
         See Test.testMelodicIntervals() for usage details.
 
+        OMIT_FROM_DOCS
+        possible rename getMelodicIntervals?
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
         if len(returnList) < 2:
@@ -3523,7 +3542,11 @@ class Stream(music21.Music21Object):
                 break       
         return post
 
-    ### routines for dealing with relationships to other streams.  Formerly in twoStreams.py
+
+    #---------------------------------------------------------------------------
+    # routines for dealing with relationships to other streams.  
+    # Formerly in twoStreams.py
+
     def simultaneousAttacks(self, stream2):
         '''
         returns an ordered list of offsets where elements are started (attacked) in both
@@ -3585,9 +3608,7 @@ class Stream(music21.Music21Object):
                         break
 
     def playingWhenAttacked(self, el, elStream = None):
-        '''
-        Given an element (from another Stream) returns the single element in this Stream
-        that is sounding while the given element starts. 
+        '''Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. 
         
         If there are multiple elements sounding at the moment it is attacked, the method
         returns the first element of the same class as this element, if any. If no element
@@ -3621,7 +3642,7 @@ class Stream(music21.Music21Object):
         >>> s1.playingWhenAttacked(n3).name
         'D#'
 
-        ## optionally, specify the site to get the offset from
+        # optionally, specify the site to get the offset from
         >>> n3._definedContexts.setOffsetBySite(None, 100)
         >>> n3.parent = None
         >>> s1.playingWhenAttacked(n3)
@@ -3629,6 +3650,9 @@ class Stream(music21.Music21Object):
         >>> s1.playingWhenAttacked(n3, s2).name
         'D#'
         
+        OMIT_FROM_DOCS
+        perhaps the idea of 'playing' should be recast as 'sustain' or 'sounding' or some other term?
+
         '''
     
         if elStream is not None: # bit of safety
@@ -3649,8 +3673,7 @@ class Stream(music21.Music21Object):
 
     def allPlayingWhileSounding(self, el, elStream = None, 
                                 requireClass = False):
-        '''Returns a new Stream of elements in this stream that sound at the same time as "el", an element
-        presumably in another Stream.
+        '''Returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream.
         
         The offset of this new Stream is set to el's offset, while the offset of elements within the 
         Stream are adjusted relative to their position with respect to the start of el.  Thus, a note 
@@ -3689,7 +3712,7 @@ class Stream(music21.Music21Object):
     def trimPlayingWhileSounding(self, el, elStream = None, 
                                requireClass = False, padStream = False):
         '''
-        returns a Stream of DEEPCOPIES of elements in otherStream that sound at the same time as el. but
+        Returns a Stream of deepcopies of elements in otherStream that sound at the same time as`el. but
         with any element that was sounding when el. begins trimmed to begin with el. and any element 
         sounding when el ends trimmed to end with el.
         
@@ -3728,6 +3751,8 @@ class Stream(music21.Music21Object):
             thisEl.offset = thisEl.offset - elOffset
         
         return otherElements
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -5390,9 +5415,9 @@ class Test(unittest.TestCase):
     def testMeasureRange(self):
         from music21 import corpus
         a = corpus.parseWork('bach/bwv324.xml')
-        b = a[0].getMeasureRange(4,6)
+        b = a[3].getMeasureRange(4,6)
         self.assertEqual(len(b), 3) 
-#        b.show()       
+        #b.show()       
 
         # test measures with no measure numbesr
         c = Stream()
@@ -5404,6 +5429,7 @@ class Test(unittest.TestCase):
         #c.show()
         d = c.getMeasureRange(2,3)
         self.assertEqual(len(d), 2) 
+        #d.show()
 
         # try the score method
         a = corpus.parseWork('bach/bwv324.xml')
