@@ -45,6 +45,44 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 
 #-------------------------------------------------------------------------------
 # utility functions
+def convertNameToPitchClass(pitchName):
+    '''Utility conversion: from a pitch name to a pitch class integer between 0 and 11.
+
+    >>> convertNameToPitchClass('c4')
+    0
+    >>> convertNameToPitchClass('c#')
+    1
+    >>> convertNameToPitchClass('d-')
+    1
+    >>> convertNameToPitchClass('e--')
+    2
+    >>> convertNameToPitchClass('b2##')
+    1
+    '''
+    # use pitch name reading in Pitch object, 
+    # as an Accidental object is created.
+    p = Pitch(pitchName)
+    return p.pitchClass
+
+def convertNameToPs(pitchName):
+    '''Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values).
+
+    >>> convertNameToPs('c4')
+    60
+    >>> convertNameToPs('c2#')
+    37.0
+    >>> convertNameToPs('d7-')
+    97.0
+    >>> convertNameToPs('e1--')
+    26.0
+    >>> convertNameToPs('b2##')
+    49.0
+    '''
+    # use pitch name reading in Pitch object, 
+    # as an Accidental object is created.
+    p = Pitch(pitchName)
+    return p.ps
+
 def convertPsToOct(ps):
     '''Utility conversion; does not process internals.
     Assume C4 middle C, so 60 returns 4
@@ -462,8 +500,10 @@ class Pitch(music21.Music21Object):
     _DOC_ATTR = {
     }
     def __init__(self, name=None):
-        '''
-        optional parameter name should include a step and accidental character(s)
+        '''Create a Pitch.
+
+        Optional parameter name should include a step and accidental character(s)
+
         it can also include a non-negative octave number.  ("C#4", "B--3", etc.)
 
         >>> p1 = Pitch('a#')

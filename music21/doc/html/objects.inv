@@ -879,6 +879,7 @@ music21.tinyNotation.TinyNotationNote.customPitchMatch method moduleTinyNotation
 music21.serial.RowSchoenbergOp37.composer attribute moduleSerial.html
 music21.node.Node.charData attribute moduleNode.html
 music21.meter.NonPowerOfTwoTimeSignature class moduleMeter.html
+music21.stream.Stream.getMeasureNumbers method moduleStream.html
 music21.tinyNotation.TinyNotationStream.ENDBRAC attribute moduleTinyNotation.html
 music21.meter.MeterSequence.depth attribute moduleMeter.html
 music21.stream.Stream.plot method moduleStream.html

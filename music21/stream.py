@@ -93,7 +93,7 @@ class Stream(music21.Music21Object):
     '''
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['measures', 'notes', 'pitches']
+    _DOC_ORDER = ['append', 'insert', 'measures', 'notes', 'pitches']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isSorted': 'Boolean describing whether the Stream is sorted or not.',
@@ -1343,9 +1343,12 @@ class Stream(music21.Music21Object):
     # routines for obtaining specific types of elements form a Stream
     # getNotes and getPitches are found with the interval routines
         
+    def getMeasureNumbers(self):
+        pass
+
 
     def getMeasures(self):
-        '''Return all Measure objects in a Stream()
+        '''Return all :class:`~music21.stream.Measure` objects in a Stream()
         '''
         return self.getElementsByClass(Measure)
 
@@ -1353,7 +1356,7 @@ class Stream(music21.Music21Object):
 
 
     def getTimeSignatures(self):
-        '''Collect all time signatures in this stream.
+        '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
     
         Note: this could be a method of Stream.
@@ -1381,7 +1384,7 @@ class Stream(music21.Music21Object):
 
 
     def getInstrument(self, searchParent=True):
-        '''Search this stream or parent streams for instruments, otherwise 
+        '''Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise 
         return a default
 
         >>> a = Stream()
@@ -2915,7 +2918,7 @@ class Stream(music21.Music21Object):
 
     #------------ interval routines --------------------------------------------
     def getNotes(self):
-        '''Return all Note, Chord, Rest, etc. objects in a Stream() as a new Stream
+        '''Return all :class:`~music21.note.Note`, :class:`~music21.chord.Chord`, :class:`~music21.note.Rest`, etc. objects in a Stream() as a new Stream.
 
         >>> s1 = Stream()
         >>> c = chord.Chord(['a', 'b'])
@@ -2927,24 +2930,61 @@ class Stream(music21.Music21Object):
         return self.getElementsByClass([note.GeneralNote, chord.Chord])
         # note: class names must be provided in one argument as a list
 
-    notes = property(getNotes)
+    notes = property(getNotes, doc='''
+        Attribute for a Stream of all :class:`~music21.note.Note` objects found in the Stream.
+        ''')
 
     def getPitches(self):
         '''
-        Return all pitches found in any element in the stream as a List
+        Return all :class:`~music21.pitch.Pitch` objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. 
 
-        (since Pitches have no duration, it's a list not a stream)
+        As Pitches have no duration, Pitch objects are returned in a List, not a Stream.
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> len(a[0].pitches)
+        25
+        >>> len(a.pitches)
+        104
         '''  
         returnPitches = []
         for thisEl in self.elements:
             if hasattr(thisEl, "pitch"):
                 returnPitches.append(thisEl.pitch)
+            # both Chords and Stream have a pitches properties            
             elif hasattr(thisEl, "pitches"):
                 for thisPitch in thisEl.pitches:
                     returnPitches.append(thisPitch)
         return returnPitches
     
-    pitches = property(getPitches)
+    pitches = property(getPitches, doc='''
+        Attribute for a List of all :class:`~music21.pitch.Pitch` objects found in any element in the Stream.
+        ''')
+
+
+    def pitchAttributeCount(self, pitchAttr='name'):
+        '''Return a dictionary of pitch class usage (count) by selecting an attribute of the Pitch object. 
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a.pitchAttributeCount('pitchClass')
+        {0: 3, 2: 25, 3: 3, 4: 14, 6: 15, 7: 13, 9: 17, 11: 14}
+        >>> a.pitchAttributeCount('name')
+        {u'A': 17, u'C': 3, u'B': 14, u'E': 14, u'D': 25, u'G': 13, u'D#': 3, u'F#': 15}
+        >>> a.pitchAttributeCount('nameWithOctave')
+        {u'E3': 4, u'G4': 2, u'F#4': 2, u'A2': 2, u'E2': 1, u'G2': 1, u'D3': 9, u'D#3': 1, u'B4': 7, u'A3': 5, u'F#3': 13, u'A4': 10, u'B2': 3, u'B3': 4, u'C3': 2, u'E4': 9, u'D4': 14, u'D5': 2, u'D#4': 2, u'C5': 1, u'G3': 10}
+        '''
+        post = {}
+        for p in self.getPitches():
+            key = getattr(p, pitchAttr)
+            if key not in post.keys():
+                post[key] = 0
+            post[key] += 1
+        return post
+
+
+
+
 
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 

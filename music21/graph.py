@@ -362,7 +362,7 @@ class Graph2DBrokenHorizontalBar(Graph):
         i = 0
         for key, points in self.data:
             keys.append(key)
-            # provide a lost of start, end points; 
+            # provide a list of start, end points; 
             # then start y position, bar height
             ax.broken_barh(points, (yPos+self._margin, self._barHeight),
                             facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
@@ -753,11 +753,68 @@ class PlotStream(object):
         '''
         self.graph.write(fp)
 
+    #---------------------------------------------------------------------------
+    def ticksPitchClassUsage(self, pcMin=0, pcMax=11, showEnharmonic=False,
+            skipUnused=True):
+        '''Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first.
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv324.xml')
+        >>> a = PlotStream(s)
+        >>> a.ticksPitchClassUsage()
+        [[0, u'C'], [2, u'D'], [3, u'D#'], [4, u'E'], [6, u'F#'], [7, u'G'], [9, u'A'], [11, u'B']]
+
+        >>> s = corpus.parseWork('bach/bwv281.xml')
+        >>> a = PlotStream(s)
+        >>> a.ticksPitchClassUsage(showEnharmonic=True)
+        [[0, u'C'], [2, u'D'], [3, u'E-'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'B-'], [11, u'B']]
+        >>> a.ticksPitchClassUsage(showEnharmonic=True, skipUnused=False)
+        [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'E-'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'B-'], [11, u'B']]
+
+        >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+        >>> a = PlotStream(s)
+        >>> a.ticksPitchClassUsage(showEnharmonic=True)
+        [[0, u'C'], [1, u'D-/C#'], [2, u'D'], [3, u'E-/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'A-/G#'], [9, u'A'], [10, u'B-'], [11, u'B']]
+
+        OMIT_FROM_DOCS
+        TODO: this needs to look at key signature/key to determine defaults
+        for undefined notes. 
+
+        '''
+        # keys are integers
+        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # name strings are keys, and enharmonic are thus different
+        nameCount = self.streamObj.pitchAttributeCount('name')
+        ticks = []
+        for i in range(pcMin, pcMax+1):
+            p = pitch.Pitch()
+            p.ps = i
+            weights = [] # a list of pairs of count/label
+            for key in nameCount.keys():
+                if pitch.convertNameToPitchClass(key) == i:
+                    weights.append((nameCount[key], key))
+            weights.sort()
+            label = []
+            if len(weights) == 0: # get a default
+                if not skipUnused:
+                    label.append(p.name)
+                else:
+                    continue
+            elif not showEnharmonic: # get just the first weighted
+                label.append(weights[0][1]) # second value is label
+            else:       
+                sub = []
+                for w, name in weights:
+                    sub.append(name)
+                label.append('/'.join(sub))
+            ticks.append([i, ''.join(label)])
+        return ticks
 
     def ticksPitchClass(self, pcMin=0, pcMax=11):
         '''Utility method to get ticks in pitch classes
 
-        >>> from music21 import stream; s = stream.Stream()
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv324.xml')
         >>> a = PlotStream(s)
         >>> a.ticksPitchClass()
         [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'D#'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'A#'], [11, 'B']]
@@ -799,8 +856,61 @@ class PlotStream(object):
         for i in cVals:
             name, acc = pitch.convertPsToStep(i)
             oct = pitch.convertPsToOct(i)
+            # should be able to just use nameWithOctave
             ticks.append([i, '%s%s%s' % (name, acc.modifier, oct)])
         return ticks
+
+    def ticksPitchSpaceUsage(self, pcMin=36, pcMax=72, 
+            showEnharmonic=False, skipUnused=True):
+        '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv324.xml')
+        >>> a = PlotStream(s[0])
+        >>> a.ticksPitchSpaceUsage()
+        [[64, u'E4'], [66, u'F#4'], [67, u'G4'], [69, u'A4'], [71, u'B4'], [72, u'C5']]
+
+        >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+        >>> a = PlotStream(s)
+        >>> a.ticksPitchSpaceUsage(showEnharmonic=True)
+        [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'A-2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'E-3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'A-3/G#3'], [57, u'A3'], [58, u'B-3'], [59, u'B3'], [60, u'C4'], [61, u'D-4/C#4'], [62, u'D4'], [63, u'E-4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'A-4/G#4'], [69, u'A4'], [70, u'B-4'], [71, u'B4'], [72, u'C5']]
+
+
+        OMIT_FROM_DOCS
+        TODO: this needs to look at key signature/key to determine defaults
+        for undefined notes. 
+
+        '''
+        # keys are integers
+        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # name strings are keys, and enharmonic are thus different
+        nameWithOctaveCount = self.streamObj.pitchAttributeCount(
+                             'nameWithOctave')
+        ticks = []
+        for i in range(pcMin, pcMax+1):
+            p = pitch.Pitch()
+            p.ps = i # set pitch space value
+            weights = [] # a list of pairs of count/label
+            for key in nameWithOctaveCount.keys():
+                if pitch.convertNameToPs(key) == i:
+                    weights.append((nameWithOctaveCount[key], key))
+            weights.sort()
+            label = []
+            if len(weights) == 0: # get a default
+                if not skipUnused:
+                    label.append(p.nameWithOctave)
+                else:
+                    continue
+            elif not showEnharmonic: # get just the first weighted
+                label.append(weights[0][1]) # second value is label
+            else:       
+                sub = []
+                for w, name in weights:
+                    sub.append(name)
+                label.append('/'.join(sub))
+            ticks.append([i, ''.join(label)])
+        return ticks
+
 
     def convertPsToNoteName(self, ps):
         name, acc = pitch.convertPsToStep(ps)
@@ -1233,7 +1343,7 @@ class PlotPitchClassOffset(_PlotBrokenHorizontalBar):
         # do not need to add ticks; happens at lower level 
 
         self.graph.setAxisLabel('x', 'Offset')
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch Class')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
