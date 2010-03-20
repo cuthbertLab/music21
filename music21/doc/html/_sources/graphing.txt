@@ -24,7 +24,7 @@ For instructions on getting them installed and running see the following URL:
 
 http://matplotlib.sourceforge.net/users/installing.html
 
-For more information about matplotlib with music21 see `Advanced graphing`_ 
+For more information about matplotlib with music21 see :ref:`advancedGraphing`.
 
 Primitive Graphing Formats
 -------------------------------

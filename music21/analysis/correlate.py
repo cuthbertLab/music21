@@ -121,7 +121,7 @@ class ActivityMatch(object):
         xVals = [x for x,y in pairs]
         yVals = [y for x,y in pairs]
 
-        g = graph.Graph2DScatter(**keywords)
+        g = graph.GraphScatter(**keywords)
         g.setData(pairs)
         g.setAxisLabel('y', yLabel)
         g.setAxisRange('y', (min(yVals)-1, max(yVals)+1), pad=True)
@@ -534,7 +534,7 @@ class NoteAnalysis(object):
         xVals = [x for x,y in data]
         yVals = [y for x,y in data]
 
-        g = graph.Graph2DScatter(**keywords)
+        g = graph.GraphScatter(**keywords)
         g.setData(data)
         g.setAxisLabel('y', yLabel)
         g.setAxisRange('y', (min(yVals)-1, max(yVals)+1), pad=True)
@@ -610,7 +610,7 @@ class NoteAnalysis(object):
         dataTick = dataTick.items()
         dataTick.sort()
 
-        g = graph.Graph2DHistogram(**keywords)
+        g = graph.GraphHistogram(**keywords)
         g.setData(data) # convert to pairs
         g.setTicks('x', dataTick)
         g.setAxisLabel('x', xLabel)
@@ -790,8 +790,12 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         music21.mainTest(Test, TestExternal)
 
+    elif len(sys.argv) == 2:
+        a = TestExternal()
+        a.testStreamAttributeCount()
+
     elif len(sys.argv) == 3:
         t = TestExternal()
         # provide file path, output
-        t.processHistogram(sys.argv[1], sys.argv[2])
+        t.testStreamAttributeCount()
 

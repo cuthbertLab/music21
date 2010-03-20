@@ -63,9 +63,9 @@ Music21Object
 
     No documentation. 
 
-    .. method:: searchParent(attrName)
+    .. method:: searchParentByAttr(attrName)
 
-    If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
+    If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
 
     .. method:: getContextAttr(attr)
 
@@ -152,6 +152,22 @@ Music21Object
     >>> a.offset = 30
     >>> a.getOffsetBySite(None)
     30.0 
+
+    .. method:: hasContext(obj)
+
+    Return a Boolean if an object reference is stored in the object's DefinedContexts object. 
+
+    >>> class Mock(Music21Object): attr1=234
+    >>> aObj = Mock()
+    >>> aObj.attr1 = 'test'
+    >>> a = Music21Object()
+    >>> a.addContext(aObj)
+    >>> a.hasContext(aObj)
+    True 
+    >>> a.hasContext(None)
+    True 
+    >>> a.hasContext(45)
+    False 
 
     .. method:: isClass(className)
 
@@ -327,7 +343,7 @@ ElementWrapper
 
     No documentation. 
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParent`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 DefinedContexts

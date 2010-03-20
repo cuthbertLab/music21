@@ -152,11 +152,11 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 
 <p>No documentation.</p>
 <dl class="method">
-<dt id="music21.base.Music21Object.searchParent">
-<tt class="descname">searchParent</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParent" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.base.Music21Object.searchParentByAttr">
+<tt class="descname">searchParentByAttr</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParentByAttr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>If this element is contained within a Stream or other Music21 element, searchParent() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</p>
+<p>If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</p>
 <dl class="method">
 <dt id="music21.base.Music21Object.getContextAttr">
 <tt class="descname">getContextAttr</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
@@ -261,6 +261,25 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
 <span class="go">30.0</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.base.Music21Object.hasContext">
+<tt class="descname">hasContext</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.hasContext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return a Boolean if an object reference is stored in the object&#8217;s DefinedContexts object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">hasContext</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">hasContext</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">hasContext</span><span class="p">(</span><span class="mf">45</span><span class="p">)</span>
+<span class="go">False</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -464,7 +483,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <dd></dd></dl>
 
 <p>No documentation.</p>
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParent" class="reference internal" href="#music21.base.Music21Object.searchParent"><tt class="xref docutils literal"><span class="pre">searchParent()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference internal" href="#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference internal" href="#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference internal" href="#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference internal" href="#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference internal" href="#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference internal" href="#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference internal" href="#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference internal" href="#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference internal" href="#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference internal" href="#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference internal" href="#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference internal" href="#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference internal" href="#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference internal" href="#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference internal" href="#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference internal" href="#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference internal" href="#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference internal" href="#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference internal" href="#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference internal" href="#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference internal" href="#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference internal" href="#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference internal" href="#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference internal" href="#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference internal" href="#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference internal" href="#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </dd></dl>
 
 </div>
@@ -895,7 +914,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 19, 2010.
+      Last updated on Mar 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

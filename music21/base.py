@@ -1088,7 +1088,7 @@ class Music21Object(object):
         return self._definedContexts.add(obj)
 
     def hasContext(self, obj):
-        '''Return a Boolean of an object reference is stored in the object's DefinedContexts object
+        '''Return a Boolean if an object reference is stored in the object's DefinedContexts object.
 
         >>> class Mock(Music21Object): attr1=234
         >>> aObj = Mock()

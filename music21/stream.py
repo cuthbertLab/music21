@@ -691,22 +691,18 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # temporary storage
 
-
-    def _printDefinedContexts(self):
-        '''Debugging tool: show all defined contexts
-        '''
-        print('\nraw defind contexts')
-        print(self._definedContexts._definedContexts)
-        print(self.parent)
-        for element in self.elements:
-            if hasattr(element, "elements"): # recurse time:
-                print(element._definedContexts._definedContexts)   
-                element._printDefinedContexts() # proc defined contexts stored herein
-     
-            elif isinstance(element, music21.Music21Object):
-                print(element._definedContexts._definedContexts)        
-
-
+#     def _printDefinedContexts(self):
+#         '''Debugging tool: show all defined contexts
+#         '''
+#         print('\nraw defind contexts')
+#         print(self._definedContexts._definedContexts)
+#         print(self.parent)
+#         for element in self.elements:
+#             if hasattr(element, "elements"): # recurse time:
+#                 print(element._definedContexts._definedContexts)   
+#                 element._printDefinedContexts() # proc defined contexts stored herein     
+#             elif isinstance(element, music21.Music21Object):
+#                 print(element._definedContexts._definedContexts)        
 
     def setupPickleScaffold(self):
         '''Prepare this stream and all of its contents for pickling.
@@ -777,21 +773,21 @@ class Stream(music21.Music21Object):
     
         Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following:
     
-        pitchSpace (:class:`~music21.graph.PlotPitchSpace`)
-        pitchClass (:class:`~music21.graph.PlotPitchClass`)
-        quarterLength (:class:`~music21.graph.PlotQuarterLength`)
+        pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`)
+        pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`)
+        quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`)
     
         scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
         scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
         scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
     
-        pitchClassOffset (:class:`~music21.graph.PlotPitchSpaceOffset`)
-        pitchSpaceOffset (:class:`~music21.graph.PlotPitchClassOffset`)
+        pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`)
+        pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`)
     
-        pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotPitchSpaceQuarterLengthCount`)
-        pitchClassQuarterLengthCount (:class:`~music21.graph.PlotPitchClassQuarterLengthCount`)
+        pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`)
+        pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`)
 
-        3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DPitchSpaceQuarterLengthCount`)
+        3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`)
 
         >>> a = Stream()
         >>> n = note.Note()
@@ -1342,7 +1338,8 @@ class Stream(music21.Music21Object):
     # getNotes and getPitches are found with the interval routines
 
     def getMeasureRange(self, numberStart, numberEnd, 
-        collect=[clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature]):
+        collect=[clef.Clef, meter.TimeSignature, 
+        instrument.Instrument, key.KeySignature]):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -1449,6 +1446,22 @@ class Stream(music21.Music21Object):
 
     measures = property(getMeasures)
 
+    def measureOffsetMap(self):
+        '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> sorted(a[0].measureOffsetMap().keys())
+        [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]
+        '''
+        map = {}
+        for m in self.getMeasures():
+            offset = m.getOffsetBySite(self)
+            if offset not in map.keys():
+                map[offset] = []
+            # there may be more than one measure at the same offset
+            map[offset].append(m)
+        return map
 
     def getTimeSignatures(self):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
@@ -2157,7 +2170,9 @@ class Stream(music21.Music21Object):
 
 
 
-    def makeAccidentals(self):
+    def makeAccidentals(self): 
+        '''To be renamed. A method to set and provide accidentals given varous conditions and contexts.
+        '''
         pass
 
 
@@ -2459,7 +2474,6 @@ class Stream(music21.Music21Object):
     flat = property(_getFlat)
 
 
-
         
     def _getFlatOrSemiFlat(self, retainContainers):
         # this copy will have a shared locations object
@@ -2483,7 +2497,7 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug("recurseStreamOffset: " + str(myEl.id) + " " + str(recurseStreamOffset))
                 
                 for subEl in recurseStream:
-                    # TODO: this should not be access the private attribute 
+                    # TODO: this should not access the private attribute 
                     oldOffset = subEl._definedContexts.getOffsetBySite(
                                 recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
@@ -2507,7 +2521,9 @@ class Stream(music21.Music21Object):
     #        return self._cache['semiflat']
         return self._getFlatOrSemiFlat(retainContainers = True)
 
-    semiFlat = property(_getSemiFlat)
+    semiFlat = property(_getSemiFlat, doc='''
+        Returns a flat-like Stream representation. Stream sub-classed containers, such as Measure or Part, are retained in the output Stream, but positioned at their relative offset. 
+        ''')
 
 
     #---------------------------------------------------------------------------
@@ -2606,11 +2622,9 @@ class Stream(music21.Music21Object):
 
     
     highestTime = property(_getHighestTime, doc='''
-        returns the max(el.offset + el.duration.quarterLength) over all elements,
-        usually representing the last "release" in the Stream.
+        Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last "release" in the Stream.
 
-        The duration of a Stream is usually equal to the highestTime expressed as a Duration object, 
-        but can be set separately.  See below.
+        The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.
         ''')
 
 
@@ -2652,7 +2666,7 @@ class Stream(music21.Music21Object):
         return self._cache["LowestOffset"]
 
     lowestOffset = property(_getLowestOffset, doc='''
-        Get start time of element with the lowest offset in the Stream
+        Get the start time of the Element with the lowest offset in the Stream.
 
         >>> stream1 = Stream()
         >>> stream1.lowestOffset
@@ -4284,8 +4298,10 @@ class Score(Stream):
     lily = property(_getLily)
 
 
-    def getMeasureRange(self, numberStart, numberEnd, collect=[clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature]):
-        '''This method override the getMeasureRange method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+    def getMeasureRange(self, numberStart, numberEnd, 
+        collect=[clef.Clef, meter.TimeSignature, 
+        instrument.Instrument, key.KeySignature]):
+        '''This method override the :meth:`~music21.stream.Stream.getMeasureRange` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
         # note that this will strip all objects that are not Parts
@@ -4295,9 +4311,20 @@ class Score(Stream):
                         collect))
         return post
 
+    def measureOffsetMap(self):
+        '''This method overrides the :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. This creates a map based on all contained Parts in this Score. Measures found in multiple Parts with the same offset will be appended to the same list. 
 
-
-
+        This does not assume that all Parts have measures with identical offsets.
+        '''
+        map = {}
+        for p in self.getElementsByClass(Part):
+            for m in p.getMeasures():
+                offset = m.getOffsetBySite(p)
+                if offset not in map.keys():
+                    map[offset] = []
+                # there may be more than one measure at the same offset
+                map[offset].append(m)
+        return map
 
 
 #-------------------------------------------------------------------------------
@@ -5450,8 +5477,38 @@ class Test(unittest.TestCase):
         # try the score method
         a = corpus.parseWork('bach/bwv324.xml')
         b = a.getMeasureRange(2,4)
+        self.assertEqual(len(b[0].flat.getElementsByClass(clef.Clef)), 1) 
+        self.assertEqual(len(b[1].flat.getElementsByClass(clef.Clef)), 1) 
+        self.assertEqual(len(b[2].flat.getElementsByClass(clef.Clef)), 1) 
+        self.assertEqual(len(b[3].flat.getElementsByClass(clef.Clef)), 1) 
+
+        self.assertEqual(len(b[0].flat.getElementsByClass(key.KeySignature)), 1) 
+        self.assertEqual(len(b[1].flat.getElementsByClass(key.KeySignature)), 1) 
+        self.assertEqual(len(b[2].flat.getElementsByClass(key.KeySignature)), 1) 
+        self.assertEqual(len(b[3].flat.getElementsByClass(key.KeySignature)), 1) 
+
         #b.show()
 
+
+    def testMeasureOffsetMap(self):
+        from music21 import corpus
+        a = corpus.parseWork('bach/bwv324.xml')
+
+        mOffsetMap = a[0].measureOffsetMap()
+
+        self.assertEqual(sorted(mOffsetMap.keys()), 
+            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0] )
+
+        # try on a complete score
+        a = corpus.parseWork('bach/bwv324.xml')
+        mOffsetMap = a.measureOffsetMap()
+        #environLocal.printDebug([mOffsetMap])
+        self.assertEqual(sorted(mOffsetMap.keys()), 
+            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0] )
+
+        for key, value in mOffsetMap.items():
+            # each key contains 4 measures
+            self.assertEqual(len(value), 4)
 
 
 #-------------------------------------------------------------------------------
@@ -5460,5 +5517,10 @@ _DOC_ORDER = [Stream, Measure]
 
 
 
-if __name__ == "__main__":    
-    music21.mainTest(Test)
+if __name__ == "__main__":
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+        a.testMeasureOffsetMap()
