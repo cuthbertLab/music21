@@ -997,7 +997,7 @@ class Music21Object(object):
     def searchParentByAttr(self, attrName):
         '''If this element is contained within a Stream or other Music21 element, 
         searchParentByAttr() permits searching attributes of higher-level
-        objects. The first encountered match is returned, or None if no match.
+        objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward. 
 
         OMIT_FROM_DOCS
         this presently only searches upward; it does not search other lower level leafs in a container

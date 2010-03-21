@@ -777,17 +777,19 @@ class PlotStream(object):
         self.graph.write(fp)
 
     #---------------------------------------------------------------------------
-    def _replaceWithUnicode(self, ticks):
-        '''Given a list of ticks, replace all labels with unicode symbols wehre necessary.
+    def _filterPitchLabel(self, ticks):
+        '''Given a list of ticks, replace all labels with alternative/unicode symbols wehre necessary.
 
-        TODO: this is not yet working!
         '''
+        #TODO: this is not yet working!
+
         post = []
         for value, label in ticks:
             if '-' in label:
-                label = label.replace('-', '&#x266d;')
-            if '#' in label:
-                label = label.replace('-', '&#x266f;')
+                #label = label.replace('-', '&#x266d;')
+                label = label.replace('-', 'b')
+#             if '#' in label:
+#                 label = label.replace('-', '&#x266f;')
             post.append([value, unicode(label)])
         return post
 
@@ -847,7 +849,7 @@ class PlotStream(object):
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
-        #ticks = self._replaceWithUnicode(ticks)
+        ticks = self._filterPitchLabel(ticks)
         return ticks
 
     def ticksPitchClass(self, pcMin=0, pcMax=11):
@@ -864,6 +866,7 @@ class PlotStream(object):
             p = pitch.Pitch()
             p.ps = i
             ticks.append([i, '%s' % p.name])
+        ticks = self._filterPitchLabel(ticks)
         return ticks
     
     def ticksPitchSpaceOctave(self, pitchMin=36, pitchMax=100):
@@ -880,6 +883,7 @@ class PlotStream(object):
             name, acc = pitch.convertPsToStep(i)
             oct = pitch.convertPsToOct(i)
             ticks.append([i, '%s%s' % (name, oct)])
+        ticks = self._filterPitchLabel(ticks)
         return ticks
 
 
@@ -898,6 +902,7 @@ class PlotStream(object):
             oct = pitch.convertPsToOct(i)
             # should be able to just use nameWithOctave
             ticks.append([i, '%s%s%s' % (name, acc.modifier, oct)])
+        ticks = self._filterPitchLabel(ticks)
         return ticks
 
     def ticksPitchSpaceUsage(self, pcMin=36, pcMax=72, 
@@ -951,6 +956,7 @@ class PlotStream(object):
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
+        ticks = self._filterPitchLabel(ticks)
         return ticks
 
 
@@ -997,8 +1003,7 @@ class PlotStream(object):
             for i in range(offsetMin, offsetMax+1, stepSize):
                 ticks.append([i, '%s' % i])
 
-        environLocal.printDebug(['final ticks', ticks])
-
+        #environLocal.printDebug(['final ticks', ticks])
         return ticks
 
         

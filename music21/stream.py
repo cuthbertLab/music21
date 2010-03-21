@@ -3097,6 +3097,10 @@ class Stream(music21.Music21Object):
         return post
 
 
+# possibly implement a more general version
+#     def attributeCount(self, classFilterList, pitchAttr='name'):
+#         pass
+
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 
         skipUnisons = False, skipOctaves = False,
