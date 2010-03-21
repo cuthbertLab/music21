@@ -254,7 +254,8 @@ class Graph(object):
                         fontsize=self.labelFontSize, family=self.fontFamily)
                     elif axis == 'y':
                         ax.set_ylabel(self.axis[axis]['label'], 
-                        fontsize=self.labelFontSize, family=self.fontFamily)
+                        fontsize=self.labelFontSize, family=self.fontFamily,
+                        rotation='horizontal')
                     elif axis == 'z':
                         ax.set_zlabel(self.axis[axis]['label'],
                         fontsize=self.labelFontSize, family=self.fontFamily)
@@ -790,7 +791,8 @@ class PlotStream(object):
                 label = label.replace('-', 'b')
 #             if '#' in label:
 #                 label = label.replace('-', '&#x266f;')
-            post.append([value, unicode(label)])
+            post.append([value, label])
+            #post.append([value, unicode(label)])
         return post
 
 
@@ -807,14 +809,14 @@ class PlotStream(object):
         >>> s = corpus.parseWork('bach/bwv281.xml')
         >>> a = PlotStream(s)
         >>> a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)
-        [[0, u'C'], [2, u'D'], [3, u'E-'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'B-'], [11, u'B']]
+        [[0, u'C'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'Bb'], [11, u'B']]
         >>> a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)
-        [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'E-'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'B-'], [11, u'B']]
+        [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
 
         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
         >>> a.ticksPitchClassUsage(showEnharmonic=True)
-        [[0, u'C'], [1, u'D-/C#'], [2, u'D'], [3, u'E-/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'A-/G#'], [9, u'A'], [10, u'B-'], [11, u'B']]
+        [[0, u'C'], [1, u'Db/C#'], [2, u'D'], [3, u'Eb/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'Ab/G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
 
         OMIT_FROM_DOCS
         TODO: this ultimately needs to look at key signature/key to determine defaults for undefined notes. 
@@ -918,7 +920,7 @@ class PlotStream(object):
         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
         >>> a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)
-        [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'A-2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'E-3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'A-3/G#3'], [57, u'A3'], [58, u'B-3'], [59, u'B3'], [60, u'C4'], [61, u'D-4/C#4'], [62, u'D4'], [63, u'E-4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'A-4/G#4'], [69, u'A4'], [70, u'B-4'], [71, u'B4'], [72, u'C5']]
+        [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'Ab2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'Eb3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'Ab3/G#3'], [57, u'A3'], [58, u'Bb3'], [59, u'B3'], [60, u'C4'], [61, u'Db4/C#4'], [62, u'D4'], [63, u'Eb4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'Ab4/G#4'], [69, u'A4'], [70, u'Bb4'], [71, u'B4'], [72, u'C5']]
 
         OMIT_FROM_DOCS
         TODO: this needs to look at key signature/key to determine defaults
@@ -1132,13 +1134,13 @@ class PlotHistogramPitchSpace(_PlotHistogram):
         self.graph.setTicks('y', yTicks)
 
         self.graph.setAxisLabel('y', 'Count')
-        self.graph.setAxisLabel('x', 'Pitch Space')
+        self.graph.setAxisLabel('x', 'Pitch')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([8,6])
         if 'title' not in keywords:
-            self.graph.setTitle('Pitch Space Histogram')
+            self.graph.setTitle('Pitch Histogram')
 
 
 class PlotHistogramPitchClass(_PlotHistogram):
@@ -1294,14 +1296,14 @@ class PlotScatterPitchSpaceQuarterLength(_PlotScatter):
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch')
         self.graph.setAxisLabel('x', 'Quarter Length')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
-            self.graph.setTitle('Pitch Space by Quarter Length Scatter')
+            self.graph.setTitle('Pitch by Quarter Length Scatter')
         if 'alpha' not in keywords:
             self.graph.alpha = .7
 
@@ -1331,14 +1333,14 @@ class PlotScatterPitchClassQuarterLength(_PlotScatter):
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch')
         self.graph.setAxisLabel('x', 'Quarter Length')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
-            self.graph.setTitle('Pitch Space by Quarter Length Scatter')
+            self.graph.setTitle('Pitch by Quarter Length Scatter')
         if 'alpha' not in keywords:
             self.graph.alpha = .7
 
@@ -1367,7 +1369,7 @@ class PlotScatterPitchClassOffset(_PlotScatter):
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch')
         self.graph.setAxisLabel('x', 'Offset')
 
         # need more space for pitch axis labels
@@ -1463,7 +1465,7 @@ class PlotHorizontalBarPitchClassOffset(_PlotHorizontalBar):
         self.graph.setTicks('x', xTicks)  
 
         if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
-            self.graph.setAxisLabel('x', 'Measures')
+            self.graph.setAxisLabel('x', 'Measure Numbers')
         else:
             self.graph.setAxisLabel('x', 'Offset')
         self.graph.setAxisLabel('y', 'Pitch Class')
@@ -1501,10 +1503,10 @@ class PlotHorizontalBarPitchSpaceOffset(_PlotHorizontalBar):
         self.graph.setTicks('x', xTicks)  
 
         if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
-            self.graph.setAxisLabel('x', 'Measures')
+            self.graph.setAxisLabel('x', 'Measure Numbers')
         else:
             self.graph.setAxisLabel('x', 'Offset')
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1615,7 +1617,7 @@ class PlotScatterWeightedPitchSpaceQuarterLength(_PlotScatterWeighted):
         self.graph.setData(data)
 
         self.graph.setAxisLabel('x', 'Quarter Length')
-        self.graph.setAxisLabel('y', 'Pitch Space')
+        self.graph.setAxisLabel('y', 'Pitch')
 
         self.graph.setTicks('y', yTicks)  
         self.graph.setTicks('x', xTicks)  
@@ -1720,7 +1722,7 @@ class _Plot3DBars(PlotStream):
 
 
 class Plot3DBarsPitchSpaceQuarterLength(_Plot3DBars):
-    '''A scatter plot of pitch space and quarter length
+    '''A scatter plot of pitch and quarter length
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 500
@@ -1747,7 +1749,7 @@ class Plot3DBarsPitchSpaceQuarterLength(_Plot3DBars):
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
-            self.graph.setTitle('Pitch Space by Quarter Length Count')
+            self.graph.setTitle('Pitch by Quarter Length Count')
         if 'barWidth' not in keywords:
             self.graph.barWidth = .1
         if 'alpha' not in keywords:

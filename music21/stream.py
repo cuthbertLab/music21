@@ -1717,7 +1717,7 @@ class Stream(music21.Music21Object):
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
 
-        note: this probably should be renamed, as we use Context in a specail way. Perhaps better is extract neighbors?
+        note: this probably should be renamed, as we use Context in a specail way. Perhaps better is extractNeighbors?
         
         '''
        
