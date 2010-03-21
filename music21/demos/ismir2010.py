@@ -19,7 +19,14 @@ from music21.meter import TimeSignature
 from music21.stream import Measure
 from copy import deepcopy
 
+
+
+
+#-------------------------------------------------------------------------------
+# not being used
+
 def bergEx01(show=True):
+    
     # berg, violin concerto, measure 64-65, p12
     # triplets should be sextuplets
 
@@ -76,8 +83,13 @@ def bergEx01(show=True):
 
 
 
+#-------------------------------------------------------------------------------
+
+
 
 def melodicChordExpression(show=True):
+    '''This method not only searches the entire second violin part of a complete string quarter for a seventh chord expressed melodically, but creates new notation to display the results with analytical markup. 
+    '''
     #from music21 import *
     from music21 import corpus, stream, chord
     beethovenScore = corpus.parseWork(
@@ -88,14 +100,16 @@ def melodicChordExpression(show=True):
     # create an empty container for storing found notes
     display = stream.Stream() 
     
+    # iterate over all measures
     for measure in violin2.measures:
         notes = measure.findConsecutiveNotes(
             skipUnisons=True, skipChords=True, 
             skipOctaves=True, skipRests=True, 
             noNone=True)
         pitches = [n.pitch for n in notes]
-        # examine four-note gruops 
+        # examine four-note gruops, where i is the first of four
         for i in range(len(pitches) - 3):
+            # createa chord from four pitches
             testChord = chord.Chord(pitches[i:i+4])           
             # modify duration for final presentation
             testChord.duration.type = "whole" 
@@ -109,8 +123,7 @@ def melodicChordExpression(show=True):
                    testChord.closedPosition())
                 display.append(emptyMeasure)
                 # append the source measure, tagging 
-                # the first note of the measure with a list
-                # of all pitch classes used in the measure.
+                # the first note with the pitch classes used in the measure
                 measure.notes[0].lyric = chord.Chord(
                     measure.pitches).orderedPitchClassesString
                 display.append(measure)
@@ -123,19 +136,22 @@ def melodicChordExpression(show=True):
 def  pitchDensity(show=True):
 
     from music21 import corpus
-    from music21.analysis import correlate
+    from music21 import graph
     
     beethovenScore = corpus.parseWork('opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
     
     # given a "flat" view of the stream, with nested information removed and all information at the same hierarchical level, combine tied notes into single notes with summed durations
     notes = celloPart.flat.stripTies()
+
+
+    graph.plotStream(notes, 'scatter', values=['pitchclass','offset'])
     
     # NoteAnalysis objects permit graphing attributes of a Stream of notes
-    na = correlate.NoteAnalysis(notes) 
-    # calling noteAttributeScatter() with x and y values as named attributes returns a graph 
-    if show:
-        na.noteAttributeScatter('offset', 'pitchClass')
+#     na = correlate.NoteAnalysis(notes) 
+#     # calling noteAttributeScatter() with x and y values as named attributes returns a graph 
+#     if show:
+#         na.noteAttributeScatter('offset', 'pitchClass')
     
     
 

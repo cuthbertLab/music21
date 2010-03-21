@@ -881,10 +881,10 @@ class Stream(music21.Music21Object):
         ## should probably be whatever class the caller is
         found = Stream()
 
+        # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, list):
             if not isinstance(classFilterList, tuple):
                 classFilterList = [classFilterList]
-            # much faster in the most common case than calling common.isListLike
 
         # appendedAlready fixes bug where if an element matches two 
         # classes it was appendedTwice
@@ -1446,21 +1446,51 @@ class Stream(music21.Music21Object):
 
     measures = property(getMeasures)
 
-    def measureOffsetMap(self):
+    def measureOffsetMap(self, classFilterList=None):
         '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
+
+        The `classFilterList` argument can be a list of classes used to find Measures. A default of None uses Measure. 
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> sorted(a[0].measureOffsetMap().keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]
         '''
+        if classFilterList == None:
+            classFilterList = [Measure]
+        if not common.isListLike(classFilterList):
+            classFilterList = [classFilterList]
+
+        #environLocal.printDebug([classFilterList])
         map = {}
-        for m in self.getMeasures():
-            offset = m.getOffsetBySite(self)
-            if offset not in map.keys():
-                map[offset] = []
-            # there may be more than one measure at the same offset
-            map[offset].append(m)
+        # first, try to get measures
+        # this works best of this is a Part or Score
+        if Measure in classFilterList:
+            for m in self.getMeasures():
+                offset = m.getOffsetBySite(self)
+                if offset not in map.keys():
+                    map[offset] = []
+                # there may be more than one measure at the same offset
+                map[offset].append(m)
+
+        # try other classes
+        for className in classFilterList:
+
+            if className == Measure: # do not redo
+                continue
+            for e in self.getElementsByClass(className):
+                #environLocal.printDebug([e])
+                m = e.getContextByClass(Measure)
+                if m == None: 
+                    continue
+                # assuming that the offset returns the proper offset context
+                # this is, the current offset may not be the stream that 
+                # contains this Measure; its current parent
+                offset = m.offset
+                if offset not in map.keys():
+                    map[offset] = []
+                if m not in map[offset]:
+                    map[offset].append(m)
         return map
 
     def getTimeSignatures(self):
@@ -4315,19 +4345,21 @@ class Score(Stream):
                         collect))
         return post
 
-    def measureOffsetMap(self):
+    def measureOffsetMap(self, classFilterList=None):
         '''This method overrides the :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. This creates a map based on all contained Parts in this Score. Measures found in multiple Parts with the same offset will be appended to the same list. 
 
         This does not assume that all Parts have measures with identical offsets.
         '''
         map = {}
         for p in self.getElementsByClass(Part):
-            for m in p.getMeasures():
-                offset = m.getOffsetBySite(p)
-                if offset not in map.keys():
-                    map[offset] = []
-                # there may be more than one measure at the same offset
-                map[offset].append(m)
+            mapPartial = p.measureOffsetMap(classFilterList)
+            #environLocal.printDebug(['mapPartial', mapPartial])
+            for key in mapPartial.keys():
+                if key not in map.keys():
+                    map[key] = []
+                for m in mapPartial[key]: # get measures from partial
+                    if m not in map[key]:
+                        map[key].append(m)
         return map
 
 
@@ -5513,6 +5545,22 @@ class Test(unittest.TestCase):
         for key, value in mOffsetMap.items():
             # each key contains 4 measures
             self.assertEqual(len(value), 4)
+
+        # we can get this information from Notes too!
+        a = corpus.parseWork('bach/bwv324.xml')
+        # get notes form one measure
+        mOffsetMap = a[0].measures[1].measureOffsetMap(note.Note)
+        self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
+
+        mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
+        self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
+
+        # this should work but does not yet
+        # it seems that the flat score does not work as the flat part
+        #mOffsetMap = a.flat.measureOffsetMap(note.Note)
+        #self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
+
+        
 
 
 #-------------------------------------------------------------------------------
