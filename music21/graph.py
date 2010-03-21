@@ -94,8 +94,8 @@ class Graph(object):
         if 'colorBackgroundFigure' in keywords:
             self.colorBackgroundFigure = keywords['colorBackgroundFigure']
         else:
-            # color options: #c7d2d4'
-            self.colorBackgroundFigure = '#babecf' 
+            # color options: #c7d2d4', '#babecf' 
+            self.colorBackgroundFigure = '#ffffff'
 
         if 'colorGrid' in keywords:
             self.colorGrid = keywords['colorGrid']
@@ -2138,5 +2138,5 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         a = TestExternal()
-        a.writeAll()
+        a.testPlotScatterPitchClassOffset()
 
