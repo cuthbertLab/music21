@@ -3131,9 +3131,22 @@ class Stream(music21.Music21Object):
         return post
 
 
-# possibly implement a more general version
-#     def attributeCount(self, classFilterList, pitchAttr='name'):
-#         pass
+    def attributeCount(self, classFilterList, attrName='quarterLength'):
+        '''Return a dictionary of attribute usage for one or more classes provided in a the `classFilterList` list and having the attribute specified by `attrName`.
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a[0].flat.attributeCount(note.Note, 'quarterLength')
+        {1.0: 12, 2.0: 11, 4.0: 2}
+        '''
+        post = {}
+        for e in self.getElementsByClass(classFilterList):
+            if hasattr(e, attrName):
+                key = getattr(e, attrName)
+                if key not in post.keys():
+                    post[key] = 0
+                post[key] += 1
+        return post
 
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 

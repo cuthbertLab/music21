@@ -11,6 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import unittest, doctest
+import sys
 
 import music21
 from music21 import humdrum
@@ -153,22 +154,62 @@ def  pitchDensity(show=True):
 # Two graph improvements: I'd really like Figure 6 (the 3d graphs) to use the
 # log(base2) of the quarter-length, because it's really hard to see the
 # differences between eighth notes and dotted sixteenths, etc. I think it will
-# make the graphs clearer.  Similarly, it'd be really great if Figure 4 at least
-# used flats instead of sharps (it is the Grosse Fuge in B-flat, not A#!), but
-# maybe it'd be good to plot Name against Offset that way we separate A#s from
-# Bbs -- it would probably make the results even more convincing (though the
-# graph would be bigger). 
 
 
+#     
+# def eventPitchCount(show=True):
+# 
+#     from music21 import corpus
+#     from music21.analysis import correlate
+#     
+#     s = corpus.parseWork('bach/bwv773')
+#     na = correlate.NoteAnalysis(s.flat)
+#     na.notePitchDurationCount()
+# 
+
+
+
+def pitchQuarterLengthUsage(show=True):
     
-def  eventPitchCount(show=True):
-
-    from music21 import corpus
-    from music21.analysis import correlate
+    from music21 import converter, graph
+    from music21.musicxml import testFiles as xml
+    from music21.humdrum import testFiles as kern
     
-    s = corpus.parseWork('bach/bwv773')
-    na = correlate.NoteAnalysis(s.flat)
-    na.notePitchDurationCount()
+    mozartStream = converter.parse(xml.mozartTrioK581Excerpt)
+    notes = mozartStream.flat.stripTies()
+    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
+        title='Mozart Trio K. 581 Excerpt')
+    g.process()
+    
+    g = graph.PlotScatterWeightedPitchClassQuarterLength(notes, 
+        title='Mozart Trio K. 581 Excerpt')
+    g.process()
+    
+    
+    chopinStream = converter.parse(kern.mazurka6) 
+    notes = chopinStream.flat.stripTies()
+    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes,
+        title='Chopin Mazurka 6 Excerpt')
+    g.process()
+    
+    g = graph.PlotScatterWeightedPitchClassQuarterLength(notes,
+        title='Chopin Mazurka 6 Excerpt')
+    g.process()
+
+
+#     na1 = correlate.NoteAnalysis(mozartStream.flat)  
+#     na1.noteAttributeCount(barWidth=.15, 
+#                            colors=['r']) 
+#     
+#     na2 = correlate.NoteAnalysis(chopinStream.flat)
+
+
+
+
+
+
+
+
 
 
 class Test(unittest.TestCase):
@@ -184,8 +225,13 @@ class Test(unittest.TestCase):
         for func in [bergEx01, melodicChordExpression, pitchDensity]:
             func(show=False)
 
+
+
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
 
-
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        #pitchDensity()
+        pitchQuarterLengthUsage()
