@@ -127,17 +127,22 @@
     <dt><a href="moduleGraph.html#music21.graph.GraphHorizontalBar.__init__">(music21.graph.GraphHorizontalBar method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.GraphScatter.__init__">(music21.graph.GraphScatter method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.GraphScatterWeighted.__init__">(music21.graph.GraphScatterWeighted method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.Plot3DBars.__init__">(music21.graph.Plot3DBars method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.Plot3DBarsPitchSpaceQuarterLength.__init__">(music21.graph.Plot3DBarsPitchSpaceQuarterLength method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHistogram.__init__">(music21.graph.PlotHistogram method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchClass.__init__">(music21.graph.PlotHistogramPitchClass method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchSpace.__init__">(music21.graph.PlotHistogramPitchSpace method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotHistogramQuarterLength.__init__">(music21.graph.PlotHistogramQuarterLength method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBar.__init__">(music21.graph.PlotHorizontalBar method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset.__init__">(music21.graph.PlotHorizontalBarPitchClassOffset method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset.__init__">(music21.graph.PlotHorizontalBarPitchSpaceOffset method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatter.__init__">(music21.graph.PlotScatter method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassOffset.__init__">(music21.graph.PlotScatterPitchClassOffset method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength.__init__">(music21.graph.PlotScatterPitchClassQuarterLength method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceQuarterLength.__init__">(music21.graph.PlotScatterPitchSpaceQuarterLength method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeighted.__init__">(music21.graph.PlotScatterWeighted method)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchClassQuarterLength.__init__">(music21.graph.PlotScatterWeightedPitchClassQuarterLength method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength.__init__">(music21.graph.PlotScatterWeightedPitchSpaceQuarterLength method)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeigthedPitchClassQuarterLength.__init__">(music21.graph.PlotScatterWeigthedPitchClassQuarterLength method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotStream.__init__">(music21.graph.PlotStream method)</a></dt>
     <dt><a href="moduleInstrument.html#music21.instrument.Instrument.__init__">(music21.instrument.Instrument method)</a></dt>
     <dt><a href="moduleInstrument.html#music21.instrument.Viola.__init__">(music21.instrument.Viola method)</a></dt>
@@ -201,8 +206,8 @@
 <dt><a href="moduleStream.html#music21.stream.Stream.allPlayingWhileSounding">allPlayingWhileSounding() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.almostEqual">almostEqual() (in module music21.common)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt>
-<dt><a href="moduleGraph.html#music21.graph.Graph.alpha">alpha (music21.graph.Graph attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="modulePitch.html#music21.pitch.Accidental.alter">alter (music21.pitch.Accidental attribute)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.Graph.alpha">alpha (music21.graph.Graph attribute)</a></dt>
+<dt><a href="modulePitch.html#music21.pitch.Accidental.alter">alter (music21.pitch.Accidental attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleClef.html#music21.clef.AltoClef">AltoClef (class in music21.clef)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Groups.append">append() (music21.base.Groups method)</a></dt>
   <dd><dl>
@@ -220,6 +225,7 @@
 <dt><a href="moduleChord.html#music21.chord.Chord.areZRelations">areZRelations() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.GeneralNote.articulations">articulations (music21.note.GeneralNote attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.attachIntervalsBetweenStreams">attachIntervalsBetweenStreams() (music21.stream.Stream method)</a></dt>
+<dt><a href="moduleStream.html#music21.stream.Stream.attributeCount">attributeCount() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.axis">axis (music21.graph.Graph attribute)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.axisKeys">axisKeys (music21.graph.Graph attribute)</a></dt>
 </dl></td></tr></table>
@@ -516,10 +522,18 @@
   <dd><dl>
     <dt><a href="moduleStream.html#music21.stream.Stream.flat">(music21.stream.Stream attribute)</a></dt>
   </dl></dd>
-<dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.FLAT">FLAT (music21.tinyNotation.TinyNotationNote attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.FLAT">FLAT (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.flattenedRepresentationOf">flattenedRepresentationOf (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.flatWeight">flatWeight (music21.meter.MeterSequence attribute)</a></dt>
-<dt><a href="moduleGraph.html#music21.graph.Graph.fontFamily">fontFamily (music21.graph.Graph attribute)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.Graph.fontFamily">fontFamily (music21.graph.Graph attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleGraph.html#music21.graph.Plot3DBars.format">format (music21.graph.Plot3DBars attribute)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHistogram.format">(music21.graph.PlotHistogram attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBar.format">(music21.graph.PlotHorizontalBar attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatter.format">(music21.graph.PlotScatter attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeighted.format">(music21.graph.PlotScatterWeighted attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotStream.format">(music21.graph.PlotStream attribute)</a></dt>
+  </dl></dd>
 <dt><a href="moduleCommon.html#music21.common.formatStr">formatStr() (in module music21.common)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.forteClass">forteClass (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.forteClassNumber">forteClassNumber (music21.chord.Chord attribute)</a></dt>
@@ -691,17 +705,6 @@
 <dt><a href="moduleBase.html#music21.base.ElementWrapper.id">id (music21.base.ElementWrapper attribute)</a></dt>
   <dd><dl>
     <dt><a href="moduleBase.html#music21.base.Music21Object.id">(music21.base.Music21Object attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.Plot3DBarsPitchSpaceQuarterLength.id">(music21.graph.Plot3DBarsPitchSpaceQuarterLength attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchClass.id">(music21.graph.PlotHistogramPitchClass attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchSpace.id">(music21.graph.PlotHistogramPitchSpace attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramQuarterLength.id">(music21.graph.PlotHistogramQuarterLength attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset.id">(music21.graph.PlotHorizontalBarPitchClassOffset attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset.id">(music21.graph.PlotHorizontalBarPitchSpaceOffset attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassOffset.id">(music21.graph.PlotScatterPitchClassOffset attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength.id">(music21.graph.PlotScatterPitchClassQuarterLength attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceQuarterLength.id">(music21.graph.PlotScatterPitchSpaceQuarterLength attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength.id">(music21.graph.PlotScatterWeightedPitchSpaceQuarterLength attribute)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeigthedPitchClassQuarterLength.id">(music21.graph.PlotScatterWeigthedPitchClassQuarterLength attribute)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotStream.id">(music21.graph.PlotStream attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.ID_EL">ID_EL (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
@@ -729,12 +732,12 @@
   <dd><dl>
     <dt><a href="moduleBase.html#music21.base.Music21Object.isClass">(music21.base.Music21Object method)</a></dt>
     <dt><a href="moduleStream.html#music21.stream.Stream.isClass">(music21.stream.Stream method)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+  </dl></dd>
 <dt><a href="moduleDuration.html#music21.duration.Duration.isComplex">isComplex (music21.duration.Duration attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.isDiminishedSeventh">isDiminishedSeventh() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.isDiminishedTriad">isDiminishedTriad() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.isDominantSeventh">isDominantSeventh() (music21.chord.Chord method)</a></dt>
-<dt><a href="moduleChord.html#music21.chord.Chord.isFalseDiminishedSeventh">isFalseDiminishedSeventh() (music21.chord.Chord method)</a></dt>
+<dt><a href="moduleChord.html#music21.chord.Chord.isFalseDiminishedSeventh">isFalseDiminishedSeventh() (music21.chord.Chord method)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleStream.html#music21.stream.Stream.isFlat">isFlat (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.isGapless">isGapless (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.isHalfDiminishedSeventh">isHalfDiminishedSeventh() (music21.chord.Chord method)</a></dt>
@@ -1152,19 +1155,24 @@
     <dt><a href="moduleStream.html#music21.stream.Stream.pitches">(music21.stream.Stream attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleDuration.html#music21.duration.Tuplet.placement">placement (music21.duration.Tuplet attribute)</a></dt>
-<dt><a href="moduleStream.html#music21.stream.Stream.playingWhenAttacked">playingWhenAttacked() (music21.stream.Stream method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleStream.html#music21.stream.Stream.playingWhenAttacked">playingWhenAttacked() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.plot">plot() (music21.stream.Stream method)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.Plot3DBars">Plot3DBars (class in music21.graph)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleGraph.html#music21.graph.Plot3DBarsPitchSpaceQuarterLength">Plot3DBarsPitchSpaceQuarterLength (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotHistogram">PlotHistogram (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchClass">PlotHistogramPitchClass (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchSpace">PlotHistogramPitchSpace (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHistogramQuarterLength">PlotHistogramQuarterLength (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBar">PlotHorizontalBar (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset">PlotHorizontalBarPitchClassOffset (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset">PlotHorizontalBarPitchSpaceOffset (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotScatter">PlotScatter (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassOffset">PlotScatterPitchClassOffset (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength">PlotScatterPitchClassQuarterLength (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceQuarterLength">PlotScatterPitchSpaceQuarterLength (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotScatterWeighted">PlotScatterWeighted (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchClassQuarterLength">PlotScatterWeightedPitchClassQuarterLength (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength">PlotScatterWeightedPitchSpaceQuarterLength (class in music21.graph)</a></dt>
-<dt><a href="moduleGraph.html#music21.graph.PlotScatterWeigthedPitchClassQuarterLength">PlotScatterWeigthedPitchClassQuarterLength (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotStream">PlotStream (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.plotStream">plotStream() (in module music21.graph)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.pop">pop() (music21.stream.Stream method)</a></dt>
@@ -1233,6 +1241,7 @@
 <dt><a href="moduleEnvironment.html#music21.environment.Environment.ref">ref (music21.environment.Environment attribute)</a></dt>
 <dt><a href="moduleTempo.html#music21.tempo.MetronomeMark.referent">referent (music21.tempo.MetronomeMark attribute)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.Interval.reinit">reinit() (music21.interval.Interval method)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotStream.remapQuarterLength">remapQuarterLength() (music21.graph.PlotStream method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.remove">remove() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.removeById">removeById() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.repeatAppend">repeatAppend() (music21.stream.Stream method)</a></dt>
@@ -1683,7 +1692,21 @@
     <dt><a href="moduleDynamics.html#music21.dynamics.Dynamic.value">(music21.dynamics.Dynamic attribute)</a></dt>
     <dt><a href="moduleTempo.html#music21.tempo.TempoMark.value">(music21.tempo.TempoMark attribute)</a></dt>
   </dl></dd>
-<dt><a href="moduleInstrument.html#music21.instrument.Viola">Viola (class in music21.instrument)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleGraph.html#music21.graph.Plot3DBarsPitchSpaceQuarterLength.values">values (music21.graph.Plot3DBarsPitchSpaceQuarterLength attribute)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchClass.values">(music21.graph.PlotHistogramPitchClass attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramPitchSpace.values">(music21.graph.PlotHistogramPitchSpace attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHistogramQuarterLength.values">(music21.graph.PlotHistogramQuarterLength attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset.values">(music21.graph.PlotHorizontalBarPitchClassOffset attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset.values">(music21.graph.PlotHorizontalBarPitchSpaceOffset attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassOffset.values">(music21.graph.PlotScatterPitchClassOffset attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength.values">(music21.graph.PlotScatterPitchClassQuarterLength attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceQuarterLength.values">(music21.graph.PlotScatterPitchSpaceQuarterLength attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchClassQuarterLength.values">(music21.graph.PlotScatterWeightedPitchClassQuarterLength attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength.values">(music21.graph.PlotScatterWeightedPitchSpaceQuarterLength attribute)</a></dt>
+    <dt><a href="moduleGraph.html#music21.graph.PlotStream.values">(music21.graph.PlotStream attribute)</a></dt>
+  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleInstrument.html#music21.instrument.Viola">Viola (class in music21.instrument)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.Violin">Violin (class in music21.instrument)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.Violoncello">Violoncello (class in music21.instrument)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Voice">Voice (class in music21.stream)</a></dt>
@@ -1750,7 +1773,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 20, 2010.
+      Last updated on Mar 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

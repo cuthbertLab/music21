@@ -156,7 +156,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <tt class="descname">searchParentByAttr</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParentByAttr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match.</p>
+<p>If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward.</p>
 <dl class="method">
 <dt id="music21.base.Music21Object.getContextAttr">
 <tt class="descname">getContextAttr</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
@@ -914,7 +914,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 20, 2010.
+      Last updated on Mar 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

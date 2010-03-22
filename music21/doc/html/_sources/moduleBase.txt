@@ -65,7 +65,7 @@ Music21Object
 
     .. method:: searchParentByAttr(attrName)
 
-    If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. 
+    If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward. 
 
     .. method:: getContextAttr(attr)
 

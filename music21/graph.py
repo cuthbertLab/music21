@@ -1600,7 +1600,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,4])
+            self.graph.setFigureSize([8,4])
 
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length and Offset by Pitch Class')
@@ -1638,7 +1638,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,5])
+            self.graph.setFigureSize([8,5])
 
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length by Pitch')
@@ -2301,7 +2301,8 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         a = TestExternal()
-        a.testPlotScatterWeightedPitchSpaceQuarterLength()
+        #a.testPlotScatterWeightedPitchSpaceQuarterLength()
 
         #a.testPlotQuarterLength()
-        a.testPlotScatterPitchSpaceQuarterLength()
+        #a.testPlotScatterPitchSpaceQuarterLength()
+        a.writeAll()
