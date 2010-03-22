@@ -12,81 +12,81 @@
 
 import unittest, doctest
 import sys
-
-import music21
-from music21 import humdrum
-from music21.note import Note
-from music21.meter import TimeSignature
-from music21.stream import Measure
 from copy import deepcopy
 
 
+import music21
+from music21 import *
+import music21.analysis.metrical
+
+from music21.note import Note
+from music21.meter import TimeSignature
+from music21.stream import Measure
+
 
 
 #-------------------------------------------------------------------------------
-# not being used
+def newDots(show=True):
 
-def bergEx01(show=True):
+    # load a Bach Chorale from the music21 corpus of supplied pieces 
+    bwv281 = corpus.parseWork('bach/bwv281.xml')
     
-    # berg, violin concerto, measure 64-65, p12
-    # triplets should be sextuplets
+    # get just the bass part using DOM-like method calls
+    bass = bwv281.getElementById('Bass')
+    
+    # apply a Lerdahl/Jackendoff-style metrical analysis to the piece.
+    music21.analysis.metrical.labelBeatDepth(bass)
+    
+    # display measure 0 (pickup) to measure 6 in the default viewer 
+    # (here Finale Reader 2009)
+    if (show is True):
+        bass.getMeasureRange(0,6).show()
 
-    humdata = '''
-**kern
-*M2/4
-=1
-24r
-24g#
-24f#
-24e
-24c#
-24f
-24r
-24dn
-24e-
-24gn
-24e-
-24dn
-=2
-24e-
-24f#
-24gn
-24b-
-24an
-24gn
-24gn
-24f#
-24an
-24cn
-24a-
-24en
-=3
-*-
-'''
+def newDomSev(show=True):
+    op133 = corpus.parseWork('beethoven/opus133.xml') 
+    violin2 = op133.getElementById('2nd Violin')
+    
+    # an empty container for later display
+    display = stream.Stream() 
+    
+    for thisMeasure in violin2.measures:
+    
+      # get a list of consecutive notes, skipping unisons, octaves,
+         # and rests (and putting nothing in their places)
+      notes = thisMeasure.findConsecutiveNotes(
+      skipUnisons = True, skipOctaves = True, 
+      skipRests = True, noNone = True )
+    
+      pitches = stream.Stream(notes).pitches
+      
+      for i in range(len(pitches) - 3):
+        # makes every set of 4 notes into a whole-note chord
+        testChord = chord.Chord(pitches[i:i+4])           
+        testChord.duration.type = "whole" 
+    
+        if testChord.isDominantSeventh():
+          # A dominant-seventh chord was found in this measure.
 
-    score = humdrum.parseData(humdata).stream[0]
-    if show:
-        score.show()
-   
-    ts = score.getElementsByClass(TimeSignature)[0]
-   
-# TODO: what is the best way to do this now that 
-# this raises a TupletException for being frozen?
-#     for thisNote in score.flat.getNotes():
-#         thisNote.duration.tuplets[0].setRatio(12, 8)
-
-    for thisMeasure in score.getElementsByClass(Measure):
-        thisMeasure.insertAtIndex(0, deepcopy(ts))
-        thisMeasure.makeBeams()
-
-    if show:
-        score.show()
-
-
-
-#-------------------------------------------------------------------------------
-
-
+          # We label the chord with the measure number
+          # and the first note of the measure with the Forte Prime form
+        
+          testChord.lyric = "m. " + str(thisMeasure.measureNumber)
+          
+          primeForm = chord.Chord(thisMeasure.pitches).primeFormString
+          firstNote = thisMeasure.notes[0]
+          firstNote.lyric = primeForm
+          
+          # Thus we append the chord in closed position and  then 
+          #  the measure containing the chord.
+    
+          chordMeasure = stream.Measure()
+          chordMeasure.append(
+            testChord.closedPosition())
+          display.append(chordMeasure)
+          display.append(thisMeasure)
+    
+    if (show is True):
+        display.show()
 
 def melodicChordExpression(show=True):
     '''This method not only searches the entire second violin part of a complete string quarter for a seventh chord expressed melodically, but creates new notation to display the results with analytical markup. 
@@ -154,20 +154,22 @@ def  pitchDensity(show=True):
 # Two graph improvements: I'd really like Figure 6 (the 3d graphs) to use the
 # log(base2) of the quarter-length, because it's really hard to see the
 # differences between eighth notes and dotted sixteenths, etc. I think it will
+# make the graphs clearer.  Similarly, it'd be really great if Figure 4 at least
+# used flats instead of sharps (it is the Grosse Fuge in B-flat, not A#!), but
+# maybe it'd be good to plot Name against Offset that way we separate A#s from
+# Bbs -- it would probably make the results even more convincing (though the
+# graph would be bigger). 
 
 
-#     
-# def eventPitchCount(show=True):
-# 
-#     from music21 import corpus
-#     from music21.analysis import correlate
-#     
-#     s = corpus.parseWork('bach/bwv773')
-#     na = correlate.NoteAnalysis(s.flat)
-#     na.notePitchDurationCount()
-# 
-
-
+    
+#def  eventPitchCount(show=True):
+#
+#    from music21 import corpus
+#    from music21.analysis import correlate
+#    
+#    s = corpus.parseWork('bach/bwv773')
+#    na = correlate.NoteAnalysis(s.flat)
+#    na.notePitchDurationCount()
 
 def pitchQuarterLengthUsage(show=True):
     
@@ -202,15 +204,13 @@ def pitchQuarterLengthUsage(show=True):
 #                            colors=['r']) 
 #     
 #     na2 = correlate.NoteAnalysis(chopinStream.flat)
+#     na2.noteAttributeCount(barWidth=.15, 
+#                            colors=['b']) 
 
 
 
 
-
-
-
-
-
+funcList = [pitchDensity, newDots, newDomSev, pitchDensity]
 
 class Test(unittest.TestCase):
 
@@ -222,17 +222,25 @@ class Test(unittest.TestCase):
 
         removed b/c taking a long time
         '''
-        for func in [bergEx01, melodicChordExpression, pitchDensity]:
+        for func in funcList:
             func(show=False)
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        for func in funcList:
+            func(show=True)
 
 
 if __name__ == "__main__":
-    import music21
-
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         pass
         #pitchDensity()
         #pitchQuarterLengthUsage()
+
+
