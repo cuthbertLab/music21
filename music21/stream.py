@@ -3086,7 +3086,7 @@ class Stream(music21.Music21Object):
         '''
         Return all :class:`~music21.pitch.Pitch` objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. 
 
-        As Pitches have no duration, Pitch objects are returned in a List, not a Stream.
+        Pitch objects are returned in a List, not a Stream.
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
@@ -3094,6 +3094,8 @@ class Stream(music21.Music21Object):
         25
         >>> len(a.pitches)
         104
+        
+        TODO: Get Pitches found directly in a stream
         '''  
         returnPitches = []
         for thisEl in self.elements:
@@ -3156,6 +3158,7 @@ class Stream(music21.Music21Object):
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
         at any point there is a discontinuity (such as if there is a rest between two pitches).
         
+        
         How to determine consecutive pitches is a little tricky and there are many options.  
 
         skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are
@@ -3165,7 +3168,7 @@ class Stream(music21.Music21Object):
                 
         See Test.testFindConsecutiveNotes() for usage details.
         
-
+        
         OMIT_FROM_DOCS
 
         N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX
@@ -3258,7 +3261,6 @@ class Stream(music21.Music21Object):
         See Test.testMelodicIntervals() for usage details.
 
         OMIT_FROM_DOCS
-        possible rename getMelodicIntervals?
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
         if len(returnList) < 2:

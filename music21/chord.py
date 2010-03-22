@@ -1392,7 +1392,9 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return list(chordTables.addressToPrimeForm(self._chordTablesAddress))
         
-    primeForm = property(_getPrimeForm, doc='Return a representation of the Chord as a prime-form list of pitch class integers.')    
+    primeForm = property(_getPrimeForm, doc='''
+       Return a representation of the Chord as a prime-form list of pitch class integers.
+       ''')    
 
     def _getPrimeFormString(self):        
         '''
@@ -1402,7 +1404,9 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getPrimeForm())
 
-    primeFormString = property(_getPrimeFormString, doc='Return a representation of the Chord as a prime-form set class string.')    
+    primeFormString = property(_getPrimeFormString, doc='''
+        Return a representation of the Chord as a prime-form set class string.
+        ''')    
 
 
     def _getIntervalVector(self):

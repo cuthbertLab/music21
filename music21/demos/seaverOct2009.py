@@ -188,7 +188,7 @@ def simple4d():
     from music21 import converter
     from music21 import text
         
-    for part in converter.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
+    for part in music21.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
         lyrics = text.assembleLyrics(part)
         if 'exultavit' in lyrics:
             print(lyrics)
@@ -306,7 +306,7 @@ def threeDimMozart():
     streamObject = converter.parse(testFiles.mozartTrioK581Excerpt)
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
     correlated = correlate.NoteAnalysis(streamObject.flat)  
-    correlated.noteAttributeCount()
+    correlated.noteAttributeCount(colors=['b'], barWidth = 0.2)
 
 
 def threeDimBoth():
@@ -476,4 +476,7 @@ def js_q5():
     returnStream.show()
 
 if (__name__ == "__main__"):
-    januaryThankYou()
+    threeDimMozart()
+
+#    simple4d()
+    #januaryThankYou()

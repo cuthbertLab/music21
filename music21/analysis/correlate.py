@@ -4,7 +4,6 @@
 # Purpose:      Stream analyzer designed to correlate and graph two properties
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL

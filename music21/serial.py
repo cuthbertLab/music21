@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import unittest, doctest
-
+import copy
 
 import music21
 import music21.note
@@ -31,7 +31,15 @@ class TwelveToneMatrix(stream.Stream):
         >>> aMatrix = TwelveToneMatrix()
         '''
         stream.Stream.__init__(self, *arguments, **keywords)
-
+    
+    def __str__(self):
+        ret = ""
+        for rowForm in self.elements:
+            msg = []
+            for pitch in rowForm:
+                msg.append(str(pitch.pitchClass).rjust(3))
+            ret += ''.join(msg) + "\n"
+        return ret
 
 class ToneRow(stream.Stream):
     def __init__(self):
@@ -48,7 +56,15 @@ class TwelveToneRow(ToneRow):
                 self.append(pitch.Pitch(pc))
     
     def matrix(self):
-        p = self.getNotes()
+        '''
+        Returns a TwelveToneMatrix object for the row.  That object can just be printed (or displayed via .show())
+        
+        >>> s37 = music21.serial.RowSchoenbergOp37().matrix()
+        >>> print s37
+        '''        
+        
+        # TODO: FIX!
+        p = self.getElementsByClass(pitch.Pitch)
         i = [(12-x.pitchClass) % 12 for x in p]
         matrix = [[(x.pitchClass+t) % 12 for x in p] for t in i]
 
@@ -58,14 +74,14 @@ class TwelveToneRow(ToneRow):
         
         for row in matrix:
             i += 1
-            rowObject = self.copy()
+            rowObject = copy.copy(self)
             rowObject.elements = []
             rowObject.id = 'row-' + str(i)
-            for pitch in row:
-                note1 = music21.note.Note()
-                note1.pitchClass = pitch
-                rowObject.append(note1)
-            matrixObj.append(rowObject)
+            for thisPitch in row:
+                pObj = pitch.Pitch()
+                pObj.pitchClass = thisPitch
+                rowObject.append(pObj)
+            matrixObj.insert(0, rowObject)
         
         return matrixObj
         
