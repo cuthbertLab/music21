@@ -1455,6 +1455,9 @@ class Stream(music21.Music21Object):
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> sorted(a[0].measureOffsetMap().keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]
+
+        OMIT_FROM_DOCS
+        see important examples in testMeasureOffsetMap() andtestMeasureOffsetMapPostTie()
         '''
         if classFilterList == None:
             classFilterList = [Measure]
@@ -1475,7 +1478,6 @@ class Stream(music21.Music21Object):
 
         # try other classes
         for className in classFilterList:
-
             if className == Measure: # do not redo
                 continue
             for e in self.getElementsByClass(className):
@@ -2286,6 +2288,8 @@ class Stream(music21.Music21Object):
     def stripTies(self, inPlace=False, matchByPitch=False):
         '''Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied 
         constituents. Lastly, remove the formerly-tied notes.
+
+        Presently, this only returns Note objects; Measures and other structures are stripped from the Stream. 
 
         Presently, this only works if tied notes are sequentual; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -5560,7 +5564,52 @@ class Test(unittest.TestCase):
         #mOffsetMap = a.flat.measureOffsetMap(note.Note)
         #self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
 
+
+
+    def testMeasureOffsetMapPostTie(self):
+        from music21 import corpus, stream
         
+        a = corpus.parseWork('bach/bwv4.8.xml')
+        # alto line syncopated/tied notes accross bars
+        alto = a[1]
+        self.assertEqual(len(alto.flat.notes), 73)
+        
+        # offset map for measures looking at the part's Measures
+        post = alto.measureOffsetMap()
+        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+        
+        # looking at Measure and Notes: no problem
+        post = alto.flat.measureOffsetMap([Measure, note.Note])
+        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+        
+        
+        # after stripping ties, we have a stream with fewer notes
+        altoPostTie = a[1].stripTies()
+        # we can get the length of this directly b/c we just of a stream of 
+        # notes, no Measures
+        self.assertEqual(len(altoPostTie.notes), 69)
+        
+        # we can still get measure numbers:
+        mNo = altoPostTie[3].getContextByClass(stream.Measure).measureNumber
+        self.assertEqual(mNo, 1)
+        mNo = altoPostTie[8].getContextByClass(stream.Measure).measureNumber
+        self.assertEqual(mNo, 2)
+        mNo = altoPostTie[15].getContextByClass(stream.Measure).measureNumber
+        self.assertEqual(mNo, 4)
+        
+        # can we get an offset Measure map by looking for measures
+        post = altoPostTie.measureOffsetMap(stream.Measure)
+        # nothing: no Measures:
+        self.assertEqual(post.keys(), [])
+        
+        # but, we can get an offset Measure map by looking at Notes
+        post = altoPostTie.measureOffsetMap(note.Note)
+        # nothing: no Measures:
+        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+
+        #from music21 import graph
+        #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
+
 
 
 #-------------------------------------------------------------------------------
@@ -5575,4 +5624,4 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
-        a.testMeasureOffsetMap()
+        a.testMeasureOffsetMapPostTie()

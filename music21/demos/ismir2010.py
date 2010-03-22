@@ -135,23 +135,18 @@ def melodicChordExpression(show=True):
     
 def  pitchDensity(show=True):
 
-    from music21 import corpus
-    from music21 import graph
+    from music21 import corpus, graph
     
     beethovenScore = corpus.parseWork('opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
     
-    # given a "flat" view of the stream, with nested information removed and all information at the same hierarchical level, combine tied notes into single notes with summed durations
-    notes = celloPart.flat.stripTies()
-
-
-    graph.plotStream(notes, 'scatter', values=['pitchclass','offset'])
+    #First, we take a "flat" view of the Stream, which removes nested containers such as Measures. Second, we combine tied notes into single notes with summed durations.
     
-    # NoteAnalysis objects permit graphing attributes of a Stream of notes
-#     na = correlate.NoteAnalysis(notes) 
-#     # calling noteAttributeScatter() with x and y values as named attributes returns a graph 
-#     if show:
-#         na.noteAttributeScatter('offset', 'pitchClass')
+    notes = celloPart.flat.stripTies()
+    g = graph.PlotScatterPitchClassOffset(notes, 
+        title='Beethoven Opus 133, Cello', alpha=.2)
+    g.process()
+
     
     
 

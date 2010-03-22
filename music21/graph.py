@@ -220,6 +220,12 @@ class Graph(object):
             else:
                 raise ValueError('unknown spine location: %s'%loc)
 
+        # remove top and right ticks
+        for i, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
+            if i % 2 == 1:   # odd indices
+                line.set_visible(False)
+        
+
     def _applyFormatting(self, ax):
         '''Apply formatting to the Axes container and Figure instance.  
         '''
@@ -975,7 +981,7 @@ class PlotStream(object):
         return ticks
 
 
-    def ticksOffset(self, offsetMin=None, offsetMax=None, stepSize=10,
+    def ticksOffset(self, offsetMin=None, offsetMax=None, offsetStepSize=None,
                     displayMeasureNumberZero=False):
         '''Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max.
 
@@ -990,6 +996,11 @@ class PlotStream(object):
         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
 
         '''
+        # importing stream only within method here
+        # need stream.Measure to match measure numbers
+        # may be a better way
+        from music21 import stream
+
         if self.flatten:
             sSrc = self.streamObj.flat
         else:
@@ -1000,11 +1011,15 @@ class PlotStream(object):
         if offsetMax == None:
             offsetMax = sSrc.highestTime
     
-        # see if this stream has any Measures
-        offsetMap = self.streamObj.measureOffsetMap()
+        # see if this stream has any Measures, or has any references to
+        # Measure obtained through contexts
+        offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
         ticks = [] # a lost of graphed value, string label pairs
         if len(offsetMap.keys()) > 0:
             #environLocal.printDebug(['using measures for offset ticks'])
+
+            # store indices in offsetMap
+            mNoToUse = []
             for key in sorted(offsetMap.keys()):
                 if key >= offsetMin and key <= offsetMax:
                     if key == 0 and not displayMeasureNumberZero:
@@ -1013,9 +1028,22 @@ class PlotStream(object):
                     #    continue # skip last
                     # assume we can get the first Measure in the lost if
                     # measurers; this may not always be True
-                    mNumber = offsetMap[key][0].measureNumber
-                    ticks.append([key, '%s' % mNumber])
+                    mNoToUse.append(key)
+
+            if len(mNoToUse) > 20:
+                # get about 10 ticks
+                mNoStepSize = int(len(mNoToUse) / 10.)
+            else:
+                mNoStepSize = 1
+
+            for i in range(0, len(mNoToUse), mNoStepSize):
+                offset = mNoToUse[i]
+                mNumber = offsetMap[offset][0].measureNumber
+                ticks.append([offset, '%s' % mNumber])
+
         else: # generate numeric ticks
+            if offsetStepSize == None:
+                offsetStepSize = 10
             #environLocal.printDebug(['using offsets for offset ticks'])
             for i in range(offsetMin, offsetMax+1, stepSize):
                 ticks.append([i, '%s' % i])
@@ -1078,10 +1106,21 @@ class PlotStream(object):
     def _axisLabelMeasureOrOffset(self):
         '''Return an axis label for measure or offset, depending on if measures are available.
         '''
-        if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
+        from music21 import stream
+
+        # generate an offset map to see if we can find measure numbers, either
+        # by looking at keys or by looking at Notes
+        offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
+        if len(offsetMap.keys()) > 0:
             return 'Measure Numbers'
         else:
             return 'Offset'
+
+
+#         if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
+#             return 'Measure Numbers'
+#         else:
+#             return 'Offset'
 
 
 
