@@ -827,11 +827,13 @@ class PlotStream(object):
         else:
             return 'Offset'
 
-
-#         if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
-#             return 'Measure Numbers'
-#         else:
-#             return 'Offset'
+    def _axisLabelQuarterLength(self, remap):
+        '''Return an axis label for quarter length, showing whether or not values are remaped.
+        '''
+        if remap:
+            return 'Quarter Length ($log_2$)'
+        else:
+            return 'Quarter Length'
 
 
     #---------------------------------------------------------------------------
@@ -1097,7 +1099,7 @@ class PlotStream(object):
         #return pow(x, .5)
 
     def ticksQuarterLength(self, min=.25, max=4, remap=True):
-        '''
+        '''Get ticks for quarterLength. If `remap` is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2. 
 
         >>> from music21 import stream; s = stream.Stream()
         >>> a = PlotStream(s)
@@ -1342,6 +1344,11 @@ class PlotScatter(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
+        if 'xRemap' not in keywords:
+            self.xRemap = True
+        else:
+            self.xRemap = keywords['xRemap']
+
         # sample values; customize in subclass
         self.fy = lambda n:n.ps
         self.fyTicks = self.ticksPitchSpaceUsage
@@ -1349,7 +1356,7 @@ class PlotScatter(PlotStream):
         self.fx = lambda n:n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
-    def _extractData(self, remap=False):
+    def _extractData(self, xRemap=False):
         data = []
         xValues = []
         yValues = []
@@ -1361,7 +1368,7 @@ class PlotScatter(PlotStream):
 
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
-            if remap:
+            if xRemap:
                 x = self.remapQuarterLength(x)
 
             y = self.fy(noteObj)
@@ -1374,7 +1381,7 @@ class PlotScatter(PlotStream):
         yValues.sort()
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
-            if remap:
+            if xRemap:
                 x = self.remapQuarterLength(x)
 
             y = self.fy(noteObj)
@@ -1385,20 +1392,8 @@ class PlotScatter(PlotStream):
 
         xVals = [x for x,y in data]
         yVals = [y for x,y in data]
-        # xTicks expects a list of values
-#         if self.fxTicks != None:
-#             if xValueLegit:
-#                 xTicks = self.fxTicks(xValues)
-#             else:
-#                 xTicks = self.fxTicks(xValues, labelStyle='index')
-#         else: # if None, create ticks manually
-#             xTicks = []
-#             for x in range(min(xVals), max(xVals), 10):
-#                 xTicks.append([x, '%s' % x])
 
-        #environLocal.printDebug(['pre xticks call', min(xVals), max(xVals)])
-
-        xTicks = self.fxTicks(min(xVals), max(xVals))
+        xTicks = self.fxTicks(min(xVals), max(xVals), remap=xRemap)
         yTicks = self.fyTicks(min(yVals), max(yVals))
 
         return data, xTicks, yTicks
@@ -1420,18 +1415,13 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
-        if 'remap' not in keywords:
-            remap = True
-        else:
-            remap = keywords['remap']
-
         self.fy = lambda n:n.ps
         self.fyTicks = self.ticksPitchSpaceUsage
         self.fx = lambda n:n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=remap)
+        data, xTicks, yTicks = self._extractData(xRemap=self.xRemap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1439,7 +1429,8 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'Pitch')
-        self.graph.setAxisLabel('x', 'Quarter Length ($log_2$)')
+        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
+                                remap=self.xRemap))
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1461,12 +1452,6 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
-        if 'remap' not in keywords:
-            remap = True
-        else:
-            remap = keywords['remap']
-
-
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
 
@@ -1474,7 +1459,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=remap)
+        data, xTicks, yTicks = self._extractData(xRemap=self.xRemap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1482,7 +1467,8 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'Pitch Class')
-        self.graph.setAxisLabel('x', 'Quarter Length ($log_2$)')
+        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
+                                remap=self.xRemap))
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1509,13 +1495,13 @@ class PlotScatterPitchClassOffset(PlotScatter):
         self.fx = lambda n:n.offset
         self.fxTicks = self.ticksOffset
 
-        if 'remap' not in keywords:
-            remap = False
+        if 'xRemap' not in keywords:
+            xRemap = True
         else:
-            remap = keywords['remap']
+            xRemap = keywords['xRemap']
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=remap)
+        data, xTicks, yTicks = self._extractData(xRemap=xRemap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1678,17 +1664,24 @@ class PlotScatterWeighted(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
+        if 'xRemap' not in keywords:
+            self.xRemap = True
+        else:
+            self.xRemap = keywords['xRemap']
+
         # specialize in sub-class
         self.fx = lambda n:n.quarterLength
         self.fy = lambda n: n.midi
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
-    def _extractData(self, remap=True):
-        '''If `remap` is true, x values will be remapped using the remapQuarterLength() function.
+    def _extractData(self, xRemap=True):
+        '''If `xRemap` is true, x values will be remapped using the remapQuarterLength() function.
 
         Ultimately, this will need to be madularized
         '''
+        environLocal.printDebug([self, 'xRemap', xRemap])
+
         dataCount = {}
         xValues = []
         yValues = []
@@ -1701,7 +1694,7 @@ class PlotScatterWeighted(PlotStream):
         # find all combinations of x/y
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
-            if remap:
+            if xRemap:
                 x = self.remapQuarterLength(x)
             if x not in xValues:
                 xValues.append(x)
@@ -1721,8 +1714,9 @@ class PlotScatterWeighted(PlotStream):
 
         maxCount = 0 # this is the max z value
         for noteObj in sSrc.getElementsByClass(note.Note):
-            if remap:
-                x = self.remapQuarterLength(self.fx(noteObj))
+            x = self.fx(noteObj)
+            if xRemap:
+                x = self.remapQuarterLength(x)
             indexToIncrement = xValues.index(x)
 
             # second position stores increment
@@ -1730,7 +1724,7 @@ class PlotScatterWeighted(PlotStream):
             if dataCount[self.fy(noteObj)][indexToIncrement][1] > maxCount:
                 maxCount = dataCount[self.fy(noteObj)][indexToIncrement][1]
 
-        xTicks = self.fxTicks(min(xValues), max(xValues))
+        xTicks = self.fxTicks(min(xValues), max(xValues), remap=xRemap)
 
         # create final data list using fy ticks to get values
         data = []
@@ -1760,17 +1754,13 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchSpaceUsage
 
-        if 'remap' not in keywords:
-            remap = True
-        else:
-            remap = keywords['remap']
-
-        data, xTicks, yTicks = self._extractData(remap = remap)
+        data, xTicks, yTicks = self._extractData(xRemap=self.xRemap)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
         self.graph.setData(data)
 
-        self.graph.setAxisLabel('x', 'Quarter Length ($log_2$)')
+        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
+                                remap=self.xRemap))
         self.graph.setAxisLabel('y', 'Pitch')
 
         self.graph.setTicks('y', yTicks)  
@@ -1783,8 +1773,6 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
             self.graph.setTitle('Count of Pitch and Quarter Length')
         if 'alpha' not in keywords:
             self.graph.alpha = .8
-        if 'pointLabelShift' not in keywords:
-            self.graph.pointLabelShift = .8
 
 
 class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
@@ -1803,17 +1791,13 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
-        if 'remap' not in keywords:
-            remap = True
-        else:
-            remap = keywords['remap']
-
-        data, xTicks, yTicks = self._extractData(remap = remap)
+        data, xTicks, yTicks = self._extractData(xRemap = self.xRemap)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
         self.graph.setData(data)
 
-        self.graph.setAxisLabel('x', 'Quarter Length ($log_2$)')
+        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
+                                remap=self.xRemap))
         self.graph.setAxisLabel('y', 'Pitch Class')
 
         self.graph.setTicks('y', yTicks)  
@@ -2129,15 +2113,19 @@ class TestExternal(unittest.TestCase):
 
     def testPlotScatterWeightedPitchSpaceQuarterLength(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
-        b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat,
-                        title='Pitch Space Bach (soprano voice)')
-        b.process()
 
-        a = corpus.parseWork('bach/bwv57.8')
-        b = PlotScatterWeightedPitchClassQuarterLength(a[0].flat,
-                        title='Pitch Class Bach (soprano voice)')
-        b.process()
+        for xRemap in [True, False]:
+            a = corpus.parseWork('bach/bwv57.8')
+            b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat,
+                            title='Pitch Space Bach (soprano voice)',
+                            xRemap=xRemap)
+            b.process()
+    
+            a = corpus.parseWork('bach/bwv57.8')
+            b = PlotScatterWeightedPitchClassQuarterLength(a[0].flat,
+                            title='Pitch Class Bach (soprano voice)',
+                            xRemap=xRemap)
+            b.process()
 
 
     def testPlotPitchSpace(self):
@@ -2161,12 +2149,15 @@ class TestExternal(unittest.TestCase):
 
     def testPlotScatterPitchSpaceQuarterLength(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
-        b = PlotScatterPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)')
-        b.process()
 
-        b = PlotScatterPitchClassQuarterLength(a[0].flat, title='Bach (soprano voice)')
-        b.process()
+        for xRemap in [True, False]:
+
+            a = corpus.parseWork('bach/bwv57.8')
+            b = PlotScatterPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)', xRemap=xRemap)
+            b.process()
+    
+            b = PlotScatterPitchClassQuarterLength(a[0].flat, title='Bach (soprano voice)', xRemap=xRemap)
+            b.process()
 
     def testPlotScatterPitchClassOffset(self):
         from music21 import corpus      
