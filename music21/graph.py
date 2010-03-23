@@ -697,7 +697,6 @@ class Graph3DPolygonBars(Graph):
         else:
             self.barWidth = .1
 
-
     def process(self):
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(arg,
                                 alpha=self.alpha)
@@ -735,8 +734,11 @@ class Graph3DPolygonBars(Graph):
         # this actually appears as the w
         #g.setAxisRange('x', (xValues[0], xValues[-1]))
         self.setAxisRange('x', (min(xVals), max(xVals)))
-        # y values actually appears as z
+
+        # z values here end up being height of the graph
         self.setAxisRange('z', (min(yVals), max(yVals)))
+
+        # y values are the z of the graph, the depth
         self.setAxisRange('y', (min(zVals), max(zVals)))
 
 #         self.axis['x']['range'] =  min(xVals), max(xVals)
@@ -751,10 +753,7 @@ class Graph3DPolygonBars(Graph):
         low, high = self.axis['y']['range']
         low = int(math.floor(low))
         high = int(math.ceil(high))
-        zs = range(low, high)
-        # colors are not working; not sure why
-        #assert len(vertsColor) == len(zVals)
-        #print _MOD, vertsColor
+        zs = range(low, high+1)
 
         poly = collections.PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)
@@ -1818,14 +1817,11 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 class Plot3DBars(PlotStream):
     '''Base class for Stream plotting classes.
     '''
-
     format = '3dBars'
-
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
     def _extractData(self):
-
         data = {}
         xValues = []
         yValues = []
@@ -1834,7 +1830,6 @@ class Plot3DBars(PlotStream):
             sSrc = self.streamObj.flat
         else:
             sSrc = self.streamObj
-
 
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
@@ -1867,7 +1862,6 @@ class Plot3DBars(PlotStream):
         xTicks = []
         yTicks = []
         zTicks = []
-
         return data, xTicks, yTicks, zTicks
 
 
@@ -1894,6 +1888,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         #self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'MIDI Note Number')
         self.graph.setAxisLabel('x', 'Quarter Length')
+        #self.graph.setAxisLabel('z', 'Count')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1903,7 +1898,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         if 'barWidth' not in keywords:
             self.graph.barWidth = .1
         if 'alpha' not in keywords:
-            self.graph.alpha = .6
+            self.graph.alpha = .5
 
 
 

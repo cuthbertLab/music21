@@ -262,7 +262,7 @@ if __name__ == "__main__":
         music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         pass
-        newDots()
+        #newDots()
         altDots()
         #pitchDensity()
         #pitchQuarterLengthUsage()
