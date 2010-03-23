@@ -716,7 +716,7 @@ class Graph3DPolygonBars(Graph):
 
         yVals = []
         xVals = []
-        for key in zVals:
+        for key in zVals: 
             verts_i = []
             for i in range(len(self.data[key])):
                 x, y = self.data[key][i]
@@ -734,12 +734,15 @@ class Graph3DPolygonBars(Graph):
         # this actually appears as the w
         #g.setAxisRange('x', (xValues[0], xValues[-1]))
         self.setAxisRange('x', (min(xVals), max(xVals)))
+        environLocal.printDebug(['3d axis range, x:', min(xVals), max(xVals)])
 
         # z values here end up being height of the graph
         self.setAxisRange('z', (min(yVals), max(yVals)))
+        environLocal.printDebug(['3d axis range, z (from y):', min(yVals), max(yVals)])
 
         # y values are the z of the graph, the depth
         self.setAxisRange('y', (min(zVals), max(zVals)))
+        environLocal.printDebug(['3d axis range, y (from z):', min(zVals), max(zVals)])
 
 #         self.axis['x']['range'] =  min(xVals), max(xVals)
 #         # swap y for z
@@ -1844,7 +1847,8 @@ class Plot3DBars(PlotStream):
         # need to provide spacings even for zero values
         #for y in range(yValues[0], yValues[-1]+1):
         # better to use actual y values
-        for y in yValues:
+        for y, label in self.fyTicks(min(yValues), max(yValues)):
+        #for y in yValues:
             data[y] = [[x, 0] for x in xValues]
         #print _MOD, 'data keys', data.keys()
 
@@ -1875,8 +1879,9 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     def __init__(self, streamObj, *args, **keywords):
         Plot3DBars.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.ps
         self.fx = lambda n:n.quarterLength
+        self.fy = lambda n:n.ps
+        self.fyTicks = self.ticksPitchSpaceUsage
 
         # will use self.fx and self.fxTick to extract data
         data, xTicks, yTicks, zTicks = self._extractData()

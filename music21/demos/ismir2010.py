@@ -184,7 +184,7 @@ def  pitchDensity(show=True):
 #    na = correlate.NoteAnalysis(s.flat)
 #    na.notePitchDurationCount()
 
-def pitchQuarterLengthUsage(show=True):
+def pitchQuarterLengthUsageWeightedScatter(show=True):
     
     from music21 import converter, graph
     from music21.musicxml import testFiles as xml
@@ -211,6 +211,24 @@ def pitchQuarterLengthUsage(show=True):
         title='Chopin Mazurka 6 Excerpt')
     g.process()
 
+
+def pitchQuarterLengthUsage3D(show=True):
+    
+    from music21 import converter, graph
+    from music21.musicxml import testFiles as xml
+    from music21.humdrum import testFiles as kern
+
+    mozartStream = music21.parse(
+        xml.mozartTrioK581Excerpt)
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+        mozartStream.flat.stripTies(), colors=['r'])
+    g.process()
+    
+    chopinStream = music21.parse(kern.mazurka6)
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+        chopinStream.flat.stripTies(), colors=['b']) 
+    g.process()
+    
 
 #     na1 = correlate.NoteAnalysis(mozartStream.flat)  
 #     na1.noteAttributeCount(barWidth=.15, 
@@ -269,5 +287,5 @@ if __name__ == "__main__":
         #altDots()
         #pitchDensity()
         #pitchQuarterLengthUsage()
-        messiaen()
-
+        #messiaen()
+        pitchQuarterLengthUsage3D()
