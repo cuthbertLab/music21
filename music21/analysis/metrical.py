@@ -12,6 +12,7 @@
 import music21.stream
 import music21.meter
 
+
 def labelBeatDepth(streamIn):
     ts = streamIn.flat.getElementsByClass(
          music21.meter.TimeSignature)[0]

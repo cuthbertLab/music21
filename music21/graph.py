@@ -1937,7 +1937,6 @@ def plotStream(streamObj, *args, **keywords):
         Plot3DBarsPitchSpaceQuarterLength,
     ]
 
-    environLocal.printDebug(['plotStream: stream', streamObj])
 
     if 'format' in keywords:
         format = keywords['format']
@@ -1951,7 +1950,7 @@ def plotStream(streamObj, *args, **keywords):
     if len(args) > 0:
         format = args[0]
     if len(args) > 1:
-        values = args[1:] # get all remaining
+        values = args[1] # get all remaining
 
     if not common.isListLike(values):
         values = [values]
@@ -1960,20 +1959,24 @@ def plotStream(streamObj, *args, **keywords):
     if format == None and values == None:
         format = 'horizontalBar'
         values = ['pitch', 'offset']
-    elif format == None:
+    if format == None:
         format = 'histogram'
-    elif values == None:
+    if values == None or values == [None]:
         values = ['pitch']
+
+    environLocal.printDebug(['plotStream: stream', streamObj, 'format, values', format, values])
+
 
     plotMake = []
     if format.lower() == 'all':
         plotMake = plotClasses
     else:
         for plotClassName in plotClasses:
+            if plotClassName.__name__.lower() == format.lower():
+                plotMake.append(plotClassName)
+
             # try direct match
             plotClassNameValues = [x.lower() for x in plotClassName.values]
-            if plotClassName.__name__.lower() == format:
-                plotMake.append(plotClassName)
             if plotClassName.format.lower() == format.lower():
                 match = 0
                 for requestedValue in values:
@@ -1982,6 +1985,8 @@ def plotStream(streamObj, *args, **keywords):
                         match += 1
                 if match == len(values):
                     plotMake.append(plotClassName)
+
+    environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
         obj = plotClassName(streamObj, *args, **keywords)
         obj.process()
