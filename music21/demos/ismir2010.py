@@ -28,6 +28,10 @@ from music21.stream import Measure
 #-------------------------------------------------------------------------------
 def newDots(show=True):
 
+    # alternative chorales:
+    # 26.6 : no pickup, eighth notes
+    # bach/bwv30.6
+
     # load a Bach Chorale from the music21 corpus of supplied pieces 
     bwv281 = corpus.parseWork('bach/bwv281.xml')
     
@@ -41,6 +45,18 @@ def newDots(show=True):
     # (here Finale Reader 2009)
     if (show is True):
         bass.getMeasureRange(0,6).show()
+
+
+def altDots(show=True):
+    '''This adds a syncopated bass line.
+    '''
+    bwv11_6 = corpus.parseWork('bach/bwv11.6.xml')
+    alto = bwv11_6.getElementById('Alto')
+    excerpt = alto.getMeasureRange(13,20)
+    music21.analysis.metrical.labelBeatDepth(excerpt)
+    excerpt.show()
+
+    # 13-20
 
 def newDomSev(show=True):
     op133 = corpus.parseWork('beethoven/opus133.xml') 
@@ -151,16 +167,6 @@ def  pitchDensity(show=True):
     
     
 
-# Two graph improvements: I'd really like Figure 6 (the 3d graphs) to use the
-# log(base2) of the quarter-length, because it's really hard to see the
-# differences between eighth notes and dotted sixteenths, etc. I think it will
-# make the graphs clearer.  Similarly, it'd be really great if Figure 4 at least
-# used flats instead of sharps (it is the Grosse Fuge in B-flat, not A#!), but
-# maybe it'd be good to plot Name against Offset that way we separate A#s from
-# Bbs -- it would probably make the results even more convincing (though the
-# graph would be bigger). 
-
-
     
 #def  eventPitchCount(show=True):
 #
@@ -249,6 +255,8 @@ if __name__ == "__main__":
         music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         pass
+        newDots()
+        altDots()
         #pitchDensity()
         #pitchQuarterLengthUsage()
 

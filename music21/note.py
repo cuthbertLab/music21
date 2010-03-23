@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 class Tie(music21.Music21Object):
-    '''Object added to notes that are tied to other notes
+    '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
 
     >>> note1 = Note()
     >>> note1.tie = Tie("start")
@@ -59,6 +59,7 @@ class Tie(music21.Music21Object):
           .to = note()   # not implimented yet, b/c of garbage coll.
           .from = note()
 
+    OMIT_FROM_DOCS
     (question: should notes be able to be tied to multiple notes
     for the case where a single note is tied both voices of a
     two-note-head unison?)
