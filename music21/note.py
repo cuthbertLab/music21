@@ -86,7 +86,18 @@ class Tie(music21.Music21Object):
     def _setMX(self, mxNote):
         mxTieList = mxNote.get('tieList')
         if len(mxTieList) > 0:
-            self.type = mxTieList[0].get('type')
+            # get all types and see what we have for this note
+            typesFound = []
+            for mxTie in mxTieList:
+                typesFound.append(mxTie.get('type'))
+            # trivial case: have only 1
+            if len(typesFound) == 1:
+                self.type = typesFound[0]
+            elif typesFound == ['stop', 'start']:
+                # take the second, the start value; do not need a stop
+                self.type = typesFound[1]
+            else:
+                environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
 
         mxNotations = mxNote.get('notations')
         if mxNotations != None:

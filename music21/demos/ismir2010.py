@@ -222,10 +222,13 @@ def pitchQuarterLengthUsage(show=True):
 
 
 def messiaen(show = True):
-    messiaen = converter.parse('d:/desktop/messiaen_valeurs.xml')
-    notes = messiaen.flat.stripTies(matchByPitch = True)
+    #messiaen = converter.parse('d:/desktop/messiaen_valeurs.xml')
+    messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+
+    messiaen.show()
+    notes = messiaen.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
-        title='Messiaen, Mode de Valeurs', remap = True)
+        title='Messiaen, Mode de Valeurs', xRemap=False)
     
     if (show is True):
         g.process()
@@ -263,8 +266,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         pass
         #newDots()
-        altDots()
+        #altDots()
         #pitchDensity()
         #pitchQuarterLengthUsage()
-
+        messiaen()
 

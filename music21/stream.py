@@ -2307,6 +2307,9 @@ class Stream(music21.Music21Object):
         >>> m = m.makeTies()
         >>> len(m.flat.notes)
         2
+        >>> m = m.stripTies()
+        >>> len(m.flat.notes)
+        1
         >>> 
         '''
         if not inPlace: # make a copy
@@ -2319,21 +2322,23 @@ class Stream(music21.Music21Object):
         #  returnObj = returnObj.sorted
         notes = returnObj.flat.notes
 
-        posConnected = []
+        posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
 
         for i in range(len(notes)):
-            endMatch = None
+            endMatch = None # can be True, False, or None
 
             n = notes[i]
-            if i > 0:
+            if i > 0: # get i and n for the previous value
                 iLast = i-1
                 nLast = notes[iLast]
             else:
                 iLast = None
                 nLast = None
 
-            if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'start':
+            # a start typed tie may not be a true start tie
+            if (hasattr(n, 'tie') and n.tie is not None and 
+                n.tie.type == 'start'):
                 # find a true start
                 if iLast is None or iLast not in posConnected:
                     posConnected = [i] # reset list with start
@@ -2341,13 +2346,15 @@ class Stream(music21.Music21Object):
                 # start and this note is a tie start
                 elif iLast in posConnected:
                     posConnected.append(i)
-                endMatch = False            
+                endMatch = False # a connection has been started
 
             # establish end condition
             if endMatch is None: # not yet set, not a start
                 if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'stop':
                     endMatch = True
                 elif matchByPitch:
+                    # find out if the the last index is in position connected
+                    # if the pitches are the same for each note
                     if (nLast is not None and iLast in posConnected 
                         and hasattr(nLast, "pitch") and hasattr(n, "pitch")
                         and nLast.pitch == n.pitch):
@@ -5455,6 +5462,19 @@ class Test(unittest.TestCase):
         c = b.stripTies() # gets flat, removes measures
         self.assertEqual(len(c.notes), 40)
 
+    def xtestStripTiesImported(self):
+        '''A test of the messiaen
+        '''
+        from music21 import converter
+        a = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+        #a.show()
+#         for n in a.flat.notes:
+#             environLocal.printDebug([n, n.tie])
+#             if n.tie != None:
+#                 environLocal.printDebug(['\ttie type', n.tie.type])
+        self.assertEqual(len(a.flat.notes), 327)
+        self.assertEqual(len(a.flat.notes.stripTies()), 195)
+
     def testTwoStreamMethods(self):
         from music21.note import Note
     
@@ -5640,4 +5660,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
-        a.testMeasureOffsetMapPostTie()
+        #a.testMeasureOffsetMapPostTie()    
+        a.testStripTies()
+        a.xtestStripTiesImported()
+
+
