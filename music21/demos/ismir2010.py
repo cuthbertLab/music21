@@ -232,7 +232,7 @@ def messiaen(show = True):
 
 
 
-funcList = [messiaen,] #pitchDensity, newDots, newDomSev, pitchDensity]
+funcList = [messiaen, newDomSev, ] #pitchDensity, newDots, pitchDensity]
 
 class Test(unittest.TestCase):
 

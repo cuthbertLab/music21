@@ -109,14 +109,14 @@ class Environment(object):
     def loadDefaults(self):
         '''Load defaults. All keys are derived from these defaults.
         '''
-        self.ref['directoryScratch'] = None # will use temp files
+        self.ref['directoryScratch'] = None # path to a directory for temporary files
         self.ref['lilypondPath'] = None # path to lilypond
         self.ref['lilypondVersion'] = None # version of lilypond
         self.ref['lilypondFormat'] = 'pdf' 
         self.ref['lilypondBackend'] = 'ps' 
-        self.ref['musicxmlPath'] = None # path to a musicxml reader
+        self.ref['musicxmlPath'] = None # path to a MusicXML reader: default, will find "Finale Reader"
         self.ref['midiPath'] = None # path to a midi reader
-        self.ref['graphicsPath'] = None # path to a graphcis viewer
+        self.ref['graphicsPath'] = None # path to a graphics viewer
         self.ref['showFormat'] = 'musicxml' 
         self.ref['writeFormat'] = 'musicxml' 
         self.ref['autoDownload'] = 'ask' 
@@ -404,9 +404,11 @@ class Environment(object):
         if fpApp is None and platform != 'win':
             raise EnvironmentException("Cannot find an application for format %s, specify this in your environment", fmt)
         
-        if platform == 'win':
+        if platform == 'win' and fpApp is None:
             # no need to specify application here: windows starts the program based on the file extension
             cmd = 'start %s' % (fp)
+        elif platform == 'win':  # note extra set of quotes!
+            cmd = '""%s" %s "%s""' % (fpApp, options, fp)
         elif platform == 'darwin':
             cmd = 'open -a"%s" %s %s' % (fpApp, options, fp)
         elif platform == 'nix':
