@@ -50,6 +50,13 @@ def newDots(show=True):
 def altDots(show=True):
     '''This adds a syncopated bass line.
     '''
+    bwv30_6 = corpus.parseWork('bach/bwv30.6.xml')
+    bass = bwv30_6.getElementById('Bass')
+    excerpt = bass.getMeasureRange(1,10)
+    music21.analysis.metrical.labelBeatDepth(excerpt)
+    excerpt.show()
+
+
     bwv11_6 = corpus.parseWork('bach/bwv11.6.xml')
     alto = bwv11_6.getElementById('Alto')
     excerpt = alto.getMeasureRange(13,20)
