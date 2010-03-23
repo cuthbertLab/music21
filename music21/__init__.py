@@ -43,6 +43,7 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus", \
            "chord", "chordTables", "clef","common", "converter", \
            "defaults", "duration", "dynamics",\
            "editorial","enharmonic", "environment", \
+           "graph", \
            "interval", "instrument", "key", \
            "measure", "meter", \
            "notationMod", "note", \

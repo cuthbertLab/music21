@@ -2316,11 +2316,11 @@ class Stream(music21.Music21Object):
 
         # not sure if this must be sorted
         # but: tied notes must be in consecutive order
-        returnObj = returnObj.sorted
+        #  returnObj = returnObj.sorted
         notes = returnObj.flat.notes
 
         posConnected = []
-        posDelete = [] # store delations to process afterward
+        posDelete = [] # store deletions to be processed later
 
         for i in range(len(notes)):
             endMatch = None
@@ -2349,6 +2349,7 @@ class Stream(music21.Music21Object):
                     endMatch = True
                 elif matchByPitch:
                     if (nLast is not None and iLast in posConnected 
+                        and hasattr(nLast, "pitch") and hasattr(n, "pitch")
                         and nLast.pitch == n.pitch):
                         endMatch = True
 

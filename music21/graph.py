@@ -320,7 +320,7 @@ class Graph(object):
 #         ax.set_aspect('normal')
 
     def process(self):
-        '''process data and prepare plt'''
+        '''process data and prepare plot'''
         pass
 
 
@@ -612,7 +612,8 @@ class Graph3DBars(Graph):
         '''
         Graph multiple parallel bar graphs in 3D.
 
-        Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. this is supposed to fixed with a new release
+        Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. 
+        This is supposed to be fixed in a forthcoming release.
 
         Data definition:
         A dictionary where each key forms an array sequence along the z
@@ -1419,6 +1420,10 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
+        if 'remap' not in keywords:
+            remap = True
+        else:
+            remap = keywords['remap']
 
         self.fy = lambda n:n.ps
         self.fyTicks = self.ticksPitchSpaceUsage
@@ -1426,7 +1431,7 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=True)
+        data, xTicks, yTicks = self._extractData(remap=remap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1456,6 +1461,12 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
+        if 'remap' not in keywords:
+            remap = True
+        else:
+            remap = keywords['remap']
+
+
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
 
@@ -1463,7 +1474,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=True)
+        data, xTicks, yTicks = self._extractData(remap=remap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1498,8 +1509,13 @@ class PlotScatterPitchClassOffset(PlotScatter):
         self.fx = lambda n:n.offset
         self.fxTicks = self.ticksOffset
 
+        if 'remap' not in keywords:
+            remap = False
+        else:
+            remap = keywords['remap']
+
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(remap=False)
+        data, xTicks, yTicks = self._extractData(remap=remap)
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -1739,12 +1755,17 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.quarterLength
+        self.fx = lambda n: n.quarterLength
         self.fy = lambda n: n.midi
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchSpaceUsage
 
-        data, xTicks, yTicks = self._extractData()
+        if 'remap' not in keywords:
+            remap = True
+        else:
+            remap = keywords['remap']
+
+        data, xTicks, yTicks = self._extractData(remap = remap)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
         self.graph.setData(data)
@@ -1782,7 +1803,12 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
-        data, xTicks, yTicks = self._extractData()
+        if 'remap' not in keywords:
+            remap = True
+        else:
+            remap = keywords['remap']
+
+        data, xTicks, yTicks = self._extractData(remap = remap)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
         self.graph.setData(data)

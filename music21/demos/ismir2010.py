@@ -208,9 +208,18 @@ def pitchQuarterLengthUsage(show=True):
 #                            colors=['b']) 
 
 
+def messiaen(show = True):
+    messiaen = converter.parse('d:/desktop/messiaen_valeurs.xml')
+    notes = messiaen.flat.stripTies(matchByPitch = True)
+    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
+        title='Messiaen, Mode de Valeurs', remap = True)
+    
+    if (show is True):
+        g.process()
 
 
-funcList = [pitchDensity, newDots, newDomSev, pitchDensity]
+
+funcList = [messiaen,] #pitchDensity, newDots, newDomSev, pitchDensity]
 
 class Test(unittest.TestCase):
 
