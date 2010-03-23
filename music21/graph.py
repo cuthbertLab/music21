@@ -1864,7 +1864,7 @@ class Plot3DBars(PlotStream):
 
         # setting of ticks does not yet work in matplotlib
         xTicks = []
-        yTicks = []
+        yTicks = self.fyTicks(min(yValues), max(yValues))
         zTicks = []
         return data, xTicks, yTicks, zTicks
 
