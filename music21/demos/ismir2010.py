@@ -228,7 +228,7 @@ def messiaen(show = True, user = "myke"):
         messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
     notes = messiaen.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
-        title='Messiaen, Mode de Valeurs, middle voice', xRemap = False)
+        title='Messiaen, Mode de Valeurs, middle voice', xLog = False)
     
     if (show is True):
         g.process()
@@ -254,14 +254,14 @@ def tutorial1(show = True):
     rest1.type = "quarter"
     
     chord2 = chord1.closedPosition()
-    note2 = note.Note(chord2.bass())
+    note2 = note.Note(chord2.root())
     score.append([chord1, rest1, chord2, note2])
     
     if show is True:
         score.show()
 
 
-funcList = [tutorial1] #, capuaTest, messiaen, newDomSev, pitchDensity, newDots, pitchDensity]
+funcList = [messiaen, tutorial1] #, capuaTest, messiaen, newDomSev, pitchDensity, newDots, pitchDensity]
 
 class Test(unittest.TestCase):
 
