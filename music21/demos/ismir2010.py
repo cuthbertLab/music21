@@ -212,6 +212,24 @@ def pitchQuarterLengthUsageWeightedScatter(show=True):
     g.process()
 
 
+def pitchQuarterLengthUsage3D(show=True):
+    
+    from music21 import converter, graph
+    from music21.musicxml import testFiles as xml
+    from music21.humdrum import testFiles as kern
+
+    mozartStream = music21.parse(
+        xml.mozartTrioK581Excerpt)
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+        mozartStream.flat.stripTies(), colors=['r'])
+    g.process()
+    
+    chopinStream = music21.parse(kern.mazurka6)
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+        chopinStream.flat.stripTies(), colors=['b']) 
+    g.process()
+    
+
 #     na1 = correlate.NoteAnalysis(mozartStream.flat)  
 #     na1.noteAttributeCount(barWidth=.15, 
 #                            colors=['r']) 
@@ -221,47 +239,21 @@ def pitchQuarterLengthUsageWeightedScatter(show=True):
 #                            colors=['b']) 
 
 
-def messiaen(show = True, user = "myke"):
-    if user == "myke":
-        messiaen = converter.parse('d:/desktop/messiaen_valeurs_part2.xml')
-    elif user == "chris":
-        messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+def messiaen(show = True):
+    #messiaen = converter.parse('d:/desktop/messiaen_valeurs.xml')
+    messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+
+    messiaen.show()
     notes = messiaen.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
-        title='Messiaen, Mode de Valeurs, middle voice', xLog = False)
+        title='Messiaen, Mode de Valeurs', xRemap=False)
     
     if (show is True):
         g.process()
 
 
-def capuaTest(show = True):
-    if show is True:
-        from music21.trecento import capua
-        capua.runPiece(260, 0) # D'amor mi biasmo -- works badly!
-        capua.runPiece(267, 1) # Deh, pon' quest'amor -- works well
 
-def tutorial1(show = True):
-    score = stream.Score()
-    note1 = note.Note("C4")
-    note1.duration.type = "whole"
-    score.append(note1)
-    
-    chord1 = chord.Chord(["F#4","D5","A5"])
-    chord1.duration.type = "half"
-    chord1.duration.dots = 1
-    
-    rest1 = note.Rest()
-    rest1.type = "quarter"
-    
-    chord2 = chord1.closedPosition()
-    note2 = note.Note(chord2.root())
-    score.append([chord1, rest1, chord2, note2])
-    
-    if show is True:
-        score.show()
-
-
-funcList = [messiaen, tutorial1] #, capuaTest, messiaen, newDomSev, pitchDensity, newDots, pitchDensity]
+funcList = [messiaen, newDomSev, ] #pitchDensity, newDots, pitchDensity]
 
 class Test(unittest.TestCase):
 
@@ -291,10 +283,9 @@ if __name__ == "__main__":
         music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         pass
-        newDots()
-        altDots()
-        messiaen(user = "chris")
+        #newDots()
+        #altDots()
         #pitchDensity()
         #pitchQuarterLengthUsage()
-
-
+        #messiaen()
+        pitchQuarterLengthUsage3D()
