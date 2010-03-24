@@ -1,3 +1,3 @@
 
 
-__ALL__ = ['correlate','keyDetectSketch','metrical']
+__ALL__ = ['correlate','keyDetect','metrical']
