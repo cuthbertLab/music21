@@ -917,7 +917,10 @@ class Note(NotRest):
         NotRest.__init__(self, **keywords)
 
         if len(arguments) > 0:
-            self.pitch = Pitch(arguments[0]) # assume first arg is pitch
+            if isinstance(arguments[0], Pitch):
+                self.pitch = arguments[0]
+            else:
+                self.pitch = Pitch(arguments[0]) # assume first arg is pitch
         else:
             self.pitch = Pitch('C4')
 

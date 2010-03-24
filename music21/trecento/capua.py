@@ -79,7 +79,7 @@ def capuaRuleOne(srcStream):
                 n2.editorial.ficta = Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = Accidental("natural")
                 n1.editorial.color = "blue"
-                n2.editorial.color = "ForestGreen"
+                n2.editorial.color = "forestGreen"
                 n3.editorial.color = "blue"
             else:
                 n2.editorial.ficta = Accidental("sharp")
@@ -858,14 +858,14 @@ def improvedHarmony():
 
     print(checkDict)
 
-def runPiece(pieceNum = 331):  # random default piece...
+def runPiece(pieceNum = 331, snipNum = 0):  # random default piece...
     ballataObj = cadencebook.BallataSheet()
     pieceObj   = ballataObj.makeWork(pieceNum)
 #    pieceObj.snippets[0].lily.showPNG()
     applyCapua(pieceObj)
-    pieceObj.snippets[0].lily.showPNG()
-    srcStream    = pieceObj.snippets[0].streams[0]
-    cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
+    pieceObj.snippets[snipNum].lily.showPNG()
+    srcStream    = pieceObj.snippets[snipNum].streams[0]
+    cmpStream    = pieceObj.snippets[snipNum].streams[1]  ## ignore 3rd voice for now...
     srcStream.attachIntervalsBetweenStreams(cmpStream)
 
     for note in srcStream.notes:
@@ -1049,7 +1049,7 @@ class Test(unittest.TestCase):
     
 
 if (__name__ == "__main__"):
-    runPiece(75)
+    runPiece(267)
     #music21.mainTest(Test) #, TestExternal)
     
 #    test()

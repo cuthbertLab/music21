@@ -1187,8 +1187,8 @@ class Chord(note.NotRest):
         >>> print(chord2.lily.value)
         <cis' e' g'>4
         '''
-        newChord = copy.copy(self)
-        tempChordNotes = copy.deepcopy(self.pitches)
+        newChord = copy.deepcopy(self)
+        tempChordNotes = newChord.pitches
         chordBassPS = self.bass().ps
         for thisPitch in tempChordNotes:
             while thisPitch.ps > chordBassPS + 12:
@@ -1576,8 +1576,8 @@ class Chord(note.NotRest):
         'C'
         '''
 
-        newChord = copy.copy(self)
-        tempChordNotes = copy.copy(self.pitches)
+        newChord = copy.deepcopy(self)
+        tempChordNotes = newChord.pitches
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or \
                             cmp(x.ps, y.ps))
         newChord.pitches = tempChordNotes
@@ -1588,10 +1588,9 @@ class Chord(note.NotRest):
         '''
         Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.
         '''
-        newChord = copy.copy(self)
-        tempChordNotes = copy.copy(self.pitches)
+        newChord = copy.deepcopy(self)
+        tempChordNotes = newChord.pitches
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.ps, y.ps))
-        newChord.pitches = tempChordNotes
         newChord.pitches = tempChordNotes
         return newChord
     
@@ -1601,8 +1600,8 @@ class Chord(note.NotRest):
         C# would be below D- in 1/4-comma meantone, equal in equal temperament,
         but below it in (most) just intonation types.
         '''
-        newChord = copy.copy(self)
-        tempChordNotes = copy.copy(self.pitches)
+        newChord = copy.deepcopy(self)
+        tempChordNotes = newChord.pitches
         tempChordNotes.sort(cmp=lambda x,y: cmp(x.frequency, y.frequency))
         newChord.pitches = tempChordNotes
         return newChord
