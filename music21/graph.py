@@ -347,7 +347,8 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
-
+class GraphSappKeyAnalysis(Graph):
+    pass
 
 
 class GraphHorizontalBar(Graph):
