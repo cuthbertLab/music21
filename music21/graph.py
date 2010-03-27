@@ -546,7 +546,6 @@ class GraphScatter(Graph):
 
     def process(self):
         '''
-        xValueLegit determines if index values or real values are used
         '''
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1029,7 +1028,7 @@ class PlotStream(object):
                     displayMeasureNumberZero=False):
         '''Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max.
 
-        >>> from music21 import corpus
+        >>> from music21 import corpus, stream, note
         >>> s = corpus.parseWork('bach/bwv281.xml')
         >>> a = PlotStream(s)
         >>> a.ticksOffset() # on whole score
@@ -1038,7 +1037,19 @@ class PlotStream(object):
         >>> a = PlotStream(s[0]) # on a Part
         >>> a.ticksOffset() # on whole score
         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
+        >>> a.ticksOffset(8, 12, 2)
+        [[8.0, '2'], [12.0, '3']]
 
+        >>> a = PlotStream(s[0].flat) # on a Flat collection
+        >>> a.ticksOffset(8, 12, 2)
+        [[8.0, '2'], [12.0, '3']]
+
+        >>> n = note.Note('a') # on a raw collection of notes with no measures
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(n, 10)
+        >>> a = PlotStream(s) # on a Part
+        >>> a.ticksOffset() # on whole score
+        [[0, '0'], [10, '10']]
         '''
         # importing stream only within method here
         # need stream.Measure to match measure numbers
@@ -1089,7 +1100,7 @@ class PlotStream(object):
             if offsetStepSize == None:
                 offsetStepSize = 10
             #environLocal.printDebug(['using offsets for offset ticks'])
-            for i in range(offsetMin, offsetMax+1, stepSize):
+            for i in range(offsetMin, offsetMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
         #environLocal.printDebug(['final ticks', ticks])
