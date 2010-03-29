@@ -6,10 +6,11 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
+'''Classes and functions for creating and processing durations. Durations, while a fundamental component of Note objects, are also used to describe the duration of other Music21Objects, such as Stream and TimeSignature objects.
+'''
 
 import unittest, doctest
 import copy
@@ -68,24 +69,41 @@ def roundDuration(qLen):
 
 def unitSpec(durationObjectOrObjects):
     '''
-    simple representation of most durationObjects.
-    works on a single DurationObject or a List of them, returning a list of unitSpecs if given a list otherwise returns a single one
+    A simple data representation of most Duration objects. Processes a single Duration or a List of Durations, returning a single or list of unitSpecs.
     
-    A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, tupletType (assuming top and bottom are the same).
+    A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, and tupletType (assuming top and bottom tuplets are the same).
     
-    Does not deal with nested tuplets, etc.
+    This function does not deal with nested tuplets, etc.
+
+    >>> aDur = Duration()
+    >>> aDur.quarterLength = 3
+    >>> unitSpec(aDur)
+    (3.0, 'half', 1, None, None, None)
+
+    >>> bDur = Duration()
+    >>> bDur.quarterLength = 1.125
+    >>> unitSpec(bDur)
+    (1.125, 'complex', None, None, None, None)
+
+    >>> cDur = Duration()
+    >>> cDur.quarterLength = 0.3333333
+    >>> unitSpec(cDur)
+    (0.33333..., 'eighth', 0, 3, 2, 'eighth')
+
+    >>> unitSpec([aDur, bDur, cDur])
+    [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (0.333333..., 'eighth', 0, 3, 2, 'eighth')]
     '''
     if common.isListLike(durationObjectOrObjects):
         ret = []
         for dO in durationObjectOrObjects:
-            if len(dO.tuplets) == 0:
+            if dO.tuplets == None or len(dO.tuplets) == 0:
                 ret.append((dO.quarterLength, dO.type, dO.dots, None, None, None))
             else:
                 ret.append((dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type))
         return ret
     else:
         dO = durationObjectOrObjects
-        if len(dO.tuplets) == 0:
+        if dO.tuplets == None or len(dO.tuplets) == 0:
             return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
             return (dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type)
@@ -2364,4 +2382,5 @@ _DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, TestExternal)
+    #music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
