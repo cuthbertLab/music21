@@ -16,6 +16,7 @@ import unittest, doctest
 import music21
 from music21 import *
 
+from copy import deepcopy
 
 
 #-------------------------------------------------------------------------------
@@ -63,14 +64,14 @@ def bergEx01(show=True):
     if show:
         score.show()
    
-    ts = score.getElementsByClass(TimeSignature)[0]
+    ts = score.getElementsByClass(meter.TimeSignature)[0]
    
 # TODO: what is the best way to do this now that 
 # this raises a TupletException for being frozen?
 #     for thisNote in score.flat.getNotes():
 #         thisNote.duration.tuplets[0].setRatio(12, 8)
 
-    for thisMeasure in score.getElementsByClass(Measure):
+    for thisMeasure in score.getElementsByClass(stream.Measure):
         thisMeasure.insertAtIndex(0, deepcopy(ts))
         thisMeasure.makeBeams()
 
@@ -176,7 +177,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         '''Test non-showing functions
         '''
-        for func in [bergEx01, showDots, findRaisedSevenths, newAccent]:
+        for func in [bergEx01, showDots, findRaisedSevenths]:
             func(show=False)
 
 class TestExternal(unittest.TestCase):
@@ -188,10 +189,10 @@ class TestExternal(unittest.TestCase):
         '''Test showing functions
         '''
         #  
-        for func in [bergEx01, showDots, findRaisedSevenths, newAccent]:
+        for func in [bergEx01, showDots, findRaisedSevenths]:
             func(show=True)
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)
 

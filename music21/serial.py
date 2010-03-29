@@ -59,8 +59,10 @@ class TwelveToneRow(ToneRow):
         '''
         Returns a TwelveToneMatrix object for the row.  That object can just be printed (or displayed via .show())
         
-        >>> s37 = music21.serial.RowSchoenbergOp37().matrix()
+        >>> s37 = RowSchoenbergOp37().matrix()
         >>> print s37
+        0 11  7  8  3  1  2 10  6  5  4  9
+        ...
         '''        
         
         # TODO: FIX!
