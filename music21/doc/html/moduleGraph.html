@@ -64,6 +64,7 @@
 <li><a class="reference external" href="#graph3dpolygonbars">Graph3DPolygonBars</a></li>
 <li><a class="reference external" href="#graphhistogram">GraphHistogram</a></li>
 <li><a class="reference external" href="#graphhorizontalbar">GraphHorizontalBar</a></li>
+<li><a class="reference external" href="#graphsappkeyanalysis">GraphSappKeyAnalysis</a></li>
 <li><a class="reference external" href="#graphscatter">GraphScatter</a></li>
 <li><a class="reference external" href="#graphscatterweighted">GraphScatterWeighted</a></li>
 <li><a class="reference external" href="#plot3dbars">Plot3DBars</a></li>
@@ -600,7 +601,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph.process" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>process data and prepare plt</p>
+<p>process data and prepare plot</p>
 <dl class="method">
 <dt id="music21.graph.Graph.setAxisLabel">
 <tt class="descname">setAxisLabel</tt><big>(</big><em>axisKey</em>, <em>label</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.setAxisLabel" title="Permalink to this definition">¶</a></dt>
@@ -673,7 +674,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.Graph3DBars.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. this is supposed to fixed with a new release Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates.</p>
+<p>Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. This is supposed to be fixed in a forthcoming release. Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph3DBars</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -792,6 +793,20 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 </dd></dl>
 
 </div>
+<div class="section" id="graphsappkeyanalysis">
+<h2>GraphSappKeyAnalysis<a class="headerlink" href="#graphsappkeyanalysis" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.graph.GraphSappKeyAnalysis">
+<em class="property">
+class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphSappKeyAnalysis</tt><a class="headerlink" href="#music21.graph.GraphSappKeyAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
+<p><strong>GraphSappKeyAnalysis</strong> <strong>attributes</strong></p>
+<p>Attributes inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a>: <a title="music21.graph.Graph.fontFamily" class="reference internal" href="#music21.graph.Graph.fontFamily"><tt class="xref docutils literal"><span class="pre">fontFamily</span></tt></a>, <a title="music21.graph.Graph.doneAction" class="reference internal" href="#music21.graph.Graph.doneAction"><tt class="xref docutils literal"><span class="pre">doneAction</span></tt></a>, <a title="music21.graph.Graph.title" class="reference internal" href="#music21.graph.Graph.title"><tt class="xref docutils literal"><span class="pre">title</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundFigure" class="reference internal" href="#music21.graph.Graph.colorBackgroundFigure"><tt class="xref docutils literal"><span class="pre">colorBackgroundFigure</span></tt></a>, <a title="music21.graph.Graph.colors" class="reference internal" href="#music21.graph.Graph.colors"><tt class="xref docutils literal"><span class="pre">colors</span></tt></a>, <a title="music21.graph.Graph.tickFontSize" class="reference internal" href="#music21.graph.Graph.tickFontSize"><tt class="xref docutils literal"><span class="pre">tickFontSize</span></tt></a>, <a title="music21.graph.Graph.colorGrid" class="reference internal" href="#music21.graph.Graph.colorGrid"><tt class="xref docutils literal"><span class="pre">colorGrid</span></tt></a>, <a title="music21.graph.Graph.figureSize" class="reference internal" href="#music21.graph.Graph.figureSize"><tt class="xref docutils literal"><span class="pre">figureSize</span></tt></a>, <a title="music21.graph.Graph.colorBackgroundData" class="reference internal" href="#music21.graph.Graph.colorBackgroundData"><tt class="xref docutils literal"><span class="pre">colorBackgroundData</span></tt></a>, <a title="music21.graph.Graph.axisKeys" class="reference internal" href="#music21.graph.Graph.axisKeys"><tt class="xref docutils literal"><span class="pre">axisKeys</span></tt></a>, <a title="music21.graph.Graph.grid" class="reference internal" href="#music21.graph.Graph.grid"><tt class="xref docutils literal"><span class="pre">grid</span></tt></a>, <a title="music21.graph.Graph.titleFontSize" class="reference internal" href="#music21.graph.Graph.titleFontSize"><tt class="xref docutils literal"><span class="pre">titleFontSize</span></tt></a>, <a title="music21.graph.Graph.alpha" class="reference internal" href="#music21.graph.Graph.alpha"><tt class="xref docutils literal"><span class="pre">alpha</span></tt></a>, <a title="music21.graph.Graph.labelFontSize" class="reference internal" href="#music21.graph.Graph.labelFontSize"><tt class="xref docutils literal"><span class="pre">labelFontSize</span></tt></a>, <a title="music21.graph.Graph.data" class="reference internal" href="#music21.graph.Graph.data"><tt class="xref docutils literal"><span class="pre">data</span></tt></a>, <a title="music21.graph.Graph.axis" class="reference internal" href="#music21.graph.Graph.axis"><tt class="xref docutils literal"><span class="pre">axis</span></tt></a></p>
+<p><strong>GraphSappKeyAnalysis</strong> <strong>methods</strong></p>
+<p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a>: <a title="music21.graph.Graph.__init__" class="reference internal" href="#music21.graph.Graph.__init__"><tt class="xref docutils literal"><span class="pre">__init__()</span></tt></a>, <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">done()</span></tt></a>, <a title="music21.graph.Graph.process" class="reference internal" href="#music21.graph.Graph.process"><tt class="xref docutils literal"><span class="pre">process()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+</dd></dl>
+
+</div>
 <div class="section" id="graphscatter">
 <h2>GraphScatter<a class="headerlink" href="#graphscatter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -819,7 +834,6 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <tt class="descname">process</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.graph.GraphScatter.process" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>xValueLegit determines if index values or real values are used</p>
 <p>Methods inherited from <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a>: <a title="music21.graph.Graph.done" class="reference internal" href="#music21.graph.Graph.done"><tt class="xref docutils literal"><span class="pre">done()</span></tt></a>, <a title="music21.graph.Graph.setAxisLabel" class="reference internal" href="#music21.graph.Graph.setAxisLabel"><tt class="xref docutils literal"><span class="pre">setAxisLabel()</span></tt></a>, <a title="music21.graph.Graph.setAxisRange" class="reference internal" href="#music21.graph.Graph.setAxisRange"><tt class="xref docutils literal"><span class="pre">setAxisRange()</span></tt></a>, <a title="music21.graph.Graph.setData" class="reference internal" href="#music21.graph.Graph.setData"><tt class="xref docutils literal"><span class="pre">setData()</span></tt></a>, <a title="music21.graph.Graph.setDoneAction" class="reference internal" href="#music21.graph.Graph.setDoneAction"><tt class="xref docutils literal"><span class="pre">setDoneAction()</span></tt></a>, <a title="music21.graph.Graph.setFigureSize" class="reference internal" href="#music21.graph.Graph.setFigureSize"><tt class="xref docutils literal"><span class="pre">setFigureSize()</span></tt></a>, <a title="music21.graph.Graph.setTicks" class="reference internal" href="#music21.graph.Graph.setTicks"><tt class="xref docutils literal"><span class="pre">setTicks()</span></tt></a>, <a title="music21.graph.Graph.setTitle" class="reference internal" href="#music21.graph.Graph.setTitle"><tt class="xref docutils literal"><span class="pre">setTitle()</span></tt></a>, <a title="music21.graph.Graph.show" class="reference internal" href="#music21.graph.Graph.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.graph.Graph.write" class="reference internal" href="#music21.graph.Graph.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </dd></dl>
 
@@ -1071,7 +1085,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <dd></dd></dl>
 
 <p>Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv281.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">()</span> <span class="c"># on whole score</span>
@@ -1079,6 +1093,17 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span> <span class="c"># on a Part</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">()</span> <span class="c"># on whole score</span>
 <span class="go">[[4.0, &#39;1&#39;], [8.0, &#39;2&#39;], [12.0, &#39;3&#39;], [16.0, &#39;4&#39;], [20.0, &#39;5&#39;], [24.0, &#39;6&#39;], [28.0, &#39;7&#39;], [32.0, &#39;8&#39;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">(</span><span class="mf">8</span><span class="p">,</span> <span class="mf">12</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">[[8.0, &#39;2&#39;], [12.0, &#39;3&#39;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="c"># on a Flat collection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">(</span><span class="mf">8</span><span class="p">,</span> <span class="mf">12</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">[[8.0, &#39;2&#39;], [12.0, &#39;3&#39;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="c"># on a raw collection of notes with no measures</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="c"># on a Part</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">()</span> <span class="c"># on whole score</span>
+<span class="go">[[0, &#39;0&#39;], [10, &#39;10&#39;]]</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -1163,6 +1188,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <tt class="descname">ticksQuarterLength</tt><big>(</big><em>min=0.25</em>, <em>max=4</em>, <em>remap=True</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Get ticks for quarterLength. If <cite>remap</cite> is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </pre></div>
@@ -1204,7 +1230,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 22, 2010.
+      Last updated on Mar 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

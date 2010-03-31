@@ -764,7 +764,7 @@ Tie
 
 .. class:: Tie
 
-    Object added to notes that are tied to other notes 
+    Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
 
     >>> note1 = Note()
     >>> note1.tie = Tie("start")
@@ -780,9 +780,6 @@ Tie
     optional (to know what notes are next:) 
     .to = note()   # not implimented yet, b/c of garbage coll. 
     .from = note() 
-    (question: should notes be able to be tied to multiple notes 
-    for the case where a single note is tied both voices of a 
-    two-note-head unison?) 
 
     inherits from: :class:`~music21.base.Music21Object`
 

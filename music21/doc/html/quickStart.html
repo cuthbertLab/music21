@@ -49,8 +49,8 @@
             <ul>
 <li><a class="reference external" href="">Quick Start: Getting Started with music21</a><ul>
 <li><a class="reference external" href="#download-and-install">Download and Install</a></li>
-<li><a class="reference external" href="#start-python">Start Python</a></li>
-<li><a class="reference external" href="#parse-some-music">Parse Some Music</a></li>
+<li><a class="reference external" href="#starting-python-and-importing-modules">Starting Python and Importing Modules</a></li>
+<li><a class="reference external" href="#examining-a-score">Examining a Score</a></li>
 <li><a class="reference external" href="#view-some-notation">View Some Notation</a></li>
 </ul>
 </li>
@@ -93,20 +93,38 @@
 <p>Here are some quick steps to get up and running quickly with music21.</p>
 <div class="section" id="download-and-install">
 <h2>Download and Install<a class="headerlink" href="#download-and-install" title="Permalink to this headline">¶</a></h2>
-<p>First, download and install music21.
-If you have installed other Python packages, do what you normally do
-(include using setuptools/easy_install or pip).</p>
-<p>Otherwise, please read the full instructions here: <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>.</p>
+<p>First, download and install music21. If you have installed other Python packages, do what you normally do (include using setuptools/easy_install or pip).</p>
+<p>Otherwise, please read the full instructions: <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>.</p>
 </div>
-<div class="section" id="start-python">
-<h2>Start Python<a class="headerlink" href="#start-python" title="Permalink to this headline">¶</a></h2>
-<p>Like all Python functionality, music21 can be run from a Python script (a .py file) or
-interactively from the Python intepreter.</p>
+<div class="section" id="starting-python-and-importing-modules">
+<h2>Starting Python and Importing Modules<a class="headerlink" href="#starting-python-and-importing-modules" title="Permalink to this headline">¶</a></h2>
+<p>Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python intepreter. The Python interpreter is designated with the command prompt <cite>&gt;&gt;&gt;</cite>.</p>
+<p>On UNIX-based operating systems with a command line prompt (Terminal.app on Mac OS X), entering <cite>python</cite> will start the Python interpreter.</p>
+<p>On Windows, starting the Python.exe applicatoin or IDLE.py will provide an interactive Python session.</p>
+<p>Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the corpus module from music21, enter the following command.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="parse-some-music">
-<h2>Parse Some Music<a class="headerlink" href="#parse-some-music" title="Permalink to this headline">¶</a></h2>
-<p>Once music21 is installed, parsing some music is often the first step.</p>
-<p>Music21 comes with a large collection of music stored as MusicXML and humdrum.</p>
+<p>Assuming this works, your music21 installation is complete and you can move. However, you may get the following error:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">&lt;module&gt;</span>
+<span class="nc">ImportError</span>: <span class="n-Identifier">No module named music21</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>If this happens, Python is not able to find the music21 package. Return and review the instructions in <a class="reference external" href="install.html#install"><em>Installing Music21</em></a> or contact the music21 group for help:</p>
+<p><a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a></p>
+</div>
+<div class="section" id="examining-a-score">
+<h2>Examining a Score<a class="headerlink" href="#examining-a-score" title="Permalink to this headline">¶</a></h2>
+<p>Once music21 is installed, opening and examing a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.</p>
+<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module. We imported this above, but lets do it again and use the <cite>parseWork</cite> method to get some some music parsed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv7.7&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="view-some-notation">
 <h2>View Some Notation<a class="headerlink" href="#view-some-notation" title="Permalink to this headline">¶</a></h2>
@@ -141,7 +159,7 @@ a common way to share and evaluate what you have done.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 22, 2010.
+      Last updated on Mar 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

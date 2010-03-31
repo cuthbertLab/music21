@@ -935,7 +935,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Quar
 <dt id="music21.note.Tie">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie</tt><a class="headerlink" href="#music21.note.Tie" title="Permalink to this definition">¶</a></dt>
-<dd><p>Object added to notes that are tied to other notes</p>
+<dd><p>Object added to notes that are tied to other notes. The <cite>type</cite> value is generally one of start or stop.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">tie</span> <span class="o">=</span> <span class="n">Tie</span><span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">tieStyle</span> <span class="o">=</span> <span class="s">&quot;normal&quot;</span> <span class="c"># or could be dotted or dashed</span>
@@ -950,9 +950,6 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie<
 <span class="go">optional (to know what notes are next:)</span>
 <span class="go">.to = note()   # not implimented yet, b/c of garbage coll.</span>
 <span class="go">.from = note()</span>
-<span class="go">(question: should notes be able to be tied to multiple notes</span>
-<span class="go">for the case where a single note is tied both voices of a</span>
-<span class="go">two-note-head unison?)</span>
 </pre></div>
 </div>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
@@ -1091,7 +1088,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Whol
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Mar 22, 2010.
+      Last updated on Mar 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

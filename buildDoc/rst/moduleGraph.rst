@@ -25,6 +25,8 @@ PlotHistogramPitchSpace
     .. image:: images/PlotHistogramPitchSpace.* 
         :width: 500 
 
+    
+
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramPitchSpace(s)
@@ -492,7 +494,7 @@ Graph
 
     .. method:: process()
 
-    process data and prepare plt 
+    process data and prepare plot 
 
     .. method:: setAxisLabel(axisKey, label)
 
@@ -547,7 +549,7 @@ Graph3DBars
 
     .. method:: __init__()
 
-    Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. this is supposed to fixed with a new release Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates. 
+    Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. This is supposed to be fixed in a forthcoming release. Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates. 
 
     >>> a = Graph3DBars()
 
@@ -657,6 +659,23 @@ GraphHorizontalBar
     Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
+GraphSappKeyAnalysis
+--------------------
+
+.. class:: GraphSappKeyAnalysis
+
+
+    inherits from: :class:`~music21.graph.Graph`
+
+    **GraphSappKeyAnalysis** **attributes**
+
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **GraphSappKeyAnalysis** **methods**
+
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.__init__`, :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.process`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
+
+
 GraphScatter
 ------------
 
@@ -682,7 +701,9 @@ GraphScatter
 
     .. method:: process()
 
-    xValueLegit determines if index values or real values are used 
+    
+
+    
 
     Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
@@ -925,7 +946,7 @@ PlotStream
 
     Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max. 
 
-    >>> from music21 import corpus
+    >>> from music21 import corpus, stream, note
     >>> s = corpus.parseWork('bach/bwv281.xml')
     >>> a = PlotStream(s)
     >>> a.ticksOffset() # on whole score
@@ -933,8 +954,17 @@ PlotStream
     >>> a = PlotStream(s[0]) # on a Part
     >>> a.ticksOffset() # on whole score
     [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']] 
-
-    
+    >>> a.ticksOffset(8, 12, 2)
+    [[8.0, '2'], [12.0, '3']] 
+    >>> a = PlotStream(s[0].flat) # on a Flat collection
+    >>> a.ticksOffset(8, 12, 2)
+    [[8.0, '2'], [12.0, '3']] 
+    >>> n = note.Note('a') # on a raw collection of notes with no measures
+    >>> s = stream.Stream()
+    >>> s.repeatAppend(n, 10)
+    >>> a = PlotStream(s) # on a Part
+    >>> a.ticksOffset() # on whole score
+    [[0, '0'], [10, '10']] 
 
     .. method:: ticksPitchClass(pcMin=0, pcMax=11)
 
@@ -1000,9 +1030,7 @@ PlotStream
 
     .. method:: ticksQuarterLength(min=0.25, max=4, remap=True)
 
-    
-
-    
+    Get ticks for quarterLength. If `remap` is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2. 
 
     >>> from music21 import stream; s = stream.Stream()
     >>> a = PlotStream(s)

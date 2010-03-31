@@ -447,7 +447,9 @@ Stream
 
     .. method:: findConsecutiveNotes(skipRests=False, skipChords=False, skipUnisons=False, skipOctaves=False, skipGaps=False, getOverlaps=False, noNone=False)
 
-    Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2's in there as well. See Test.testFindConsecutiveNotes() for usage details. 
+    Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list at any point there is a discontinuity (such as if there is a rest between two pitches). 
+
+    How to determine consecutive pitches is a little tricky and there are many options. skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True) will give you the number of P1s in the piece, because there could be d2's in there as well. See Test.testFindConsecutiveNotes() for usage details. 
 
     
 
@@ -766,7 +768,7 @@ Stream
 
     .. method:: getPitches()
 
-    Return all :class:`~music21.pitch.Pitch` objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. As Pitches have no duration, Pitch objects are returned in a List, not a Stream. 
+    Return all :class:`~music21.pitch.Pitch` objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. Pitch objects are returned in a List, not a Stream. 
 
     >>> from music21 import corpus
     >>> a = corpus.parseWork('bach/bwv324.xml')
@@ -774,6 +776,7 @@ Stream
     25 
     >>> len(a.pitches)
     104 
+    TODO: Get Pitches found directly in a stream 
 
     .. method:: getSimultaneous(includeDurationless=True)
 
@@ -1117,6 +1120,9 @@ Stream
     >>> m = m.makeTies()
     >>> len(m.flat.notes)
     2 
+    >>> m = m.stripTies()
+    >>> len(m.flat.notes)
+    1 
     >>>
 
     .. method:: teardownPickleScaffold()

@@ -1194,7 +1194,7 @@ music21.tinyNotation.TinyNotationNote.OCTAVE2 attribute moduleTinyNotation.html
 music21.tinyNotation.TinyNotationNote.OCTAVE5 attribute moduleTinyNotation.html
 music21.environment.Environment.getSettingsPath method moduleEnvironment.html
 music21.chord.Chord.isPrimeFormInversion attribute moduleChord.html
-music21.tinyNotation.TinyNotationNote.getDots method moduleTinyNotation.html
+music21.graph.GraphSappKeyAnalysis class moduleGraph.html
 music21.common.Scalar.toInt method moduleCommon.html
 music21.converter.PickleFilter.__init__ method moduleConverter.html
 music21.serial.RowSchoenbergOp37.opus attribute moduleSerial.html
@@ -1304,6 +1304,7 @@ music21.note.GeneralNote.color attribute moduleNote.html
 music21.interval.generateGeneric function moduleInterval.html
 music21.duration.roundDuration function moduleDuration.html
 music21.stream.Stream.getElementAfterElement method moduleStream.html
+music21.tinyNotation.TinyNotationNote.getDots method moduleTinyNotation.html
 music21.chord.Chord.isFalseDiminishedSeventh method moduleChord.html
 music21.base.ElementWrapper.offset attribute moduleBase.html
 music21.dynamics.Dynamic.__init__ method moduleDynamics.html
