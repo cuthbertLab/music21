@@ -45,7 +45,15 @@ class KeyDetect(object):
         if not isinstance(streamObj, music21.stream.Stream):
             raise KeyDetectException, 'non-stream provided as argument'
         self.streamObj = streamObj
+    
+    
+    def getWeights(self, isMajor): 
         
+        if isMajor:
+            return [6.35, 2.33, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
+        else:
+            return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
+    
         
     def findLongestPart(self, sStream):
         ''' temporary function to find the longest part (based on the number
@@ -67,25 +75,73 @@ class KeyDetect(object):
         a = sorted(keyResults)
         a.reverse()
     
+        ''' Return pairs, the pitch class and the point value, in order by point value
+        '''
         for i in range(len(a)):
-            likelyKeys[i] = Pitch(keyResults.index(a[i]))
+            likelyKeys[i] = (Pitch(keyResults.index(a[i])), a[i])
     
         return likelyKeys
     
     
-    def getDifference(self, keyResults, pcDistribution):
+    def getDifference(self, keyResults, pcDistribution, isMajor=True):
+        pass
+    
+    def getDifferenceDebug(self, keyResults, pcDistribution, isMajor=True):
+    #def getDifference(self, pcDistribution, isMajor=True):
         ''' Takes in a list of numerical probably key results and returns the
             difference of the top two keys
         '''
         
-        a = sorted(keyResults)
-        a.reverse()
+        soln = [0]*12
+        top = [0]*12
+        bottomRight = [0]*12
+        bottomLeft = [0]*12
         
-        #TODO normalization scheme from Krumansl-Schmuckler to go here
-        #pcAverage = sum(pcDistribution)/len(pcDistribution)
+        #a = sorted(keyResults)
+        #a.reverse()
         
-        return float(a[0]-a[1])/float(a[0])
+        if isMajor:
+            toneWeights = self.getWeights(True)
+        else:
+            toneWeights = self.getWeights(False)
         
+        profileAverage = float(sum(toneWeights))/len(toneWeights)
+        histogramAverage = float(sum(pcDistribution))/len(pcDistribution) 
+        
+        for i in range(len(soln)):
+            for j in range(len(toneWeights)):
+                #print "BLAH"
+                top[i] = top[i] + ((toneWeights[(j + i) % 12]-profileAverage) * (pcDistribution[j]-histogramAverage))
+                #print top[i]
+                bottomRight[i] = bottomRight[i] + ((toneWeights[(j+i)%12]-profileAverage)**2)
+                #print bottomRight[i]
+                bottomLeft[i] = bottomLeft[i] + ((pcDistribution[j]-histogramAverage)**2)
+                #print bottomLeft[i]
+                soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
+                #print soln[i]
+        
+        print soln
+        return soln
+
+
+    def convoluteDistribution(self, pcDistribution, isMajor=True):
+        ''' Takes in a pitch class distribution as a list and convolutes it
+            over Sapp's given distribution for finding key, returning the result. 
+        '''
+        soln = [0] * 12
+    
+        if isMajor:
+            toneWeights = self.getWeights(True)
+        else:
+            toneWeights = self.getWeights(False)
+            
+        for i in range(len(soln)):
+            for j in range(len(pcDistribution)):
+                soln[i] = soln[i] + (toneWeights[(j + i) % 12] * pcDistribution[j])
+    
+        #print soln  
+    
+        return soln        
 
 
     def runKeyDetect(self, sStream, minWindow):
@@ -186,38 +242,27 @@ class KeyDetect(object):
         # this is the distribution for the melody of "happy birthday"
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
     
-        keyResults = self.convoluteDistribution(pcDistribution)   
-        likelyKeys = self.getLikelyKeys(keyResults)
-        difference = self.getDifference(keyResults, pcDistribution)
+        keyResultsMajor = self.convoluteDistribution(pcDistribution, True)
+        likelyKeysMajor = self.getLikelyKeys(keyResultsMajor)
+        differenceMajor = self.getDifference(keyResultsMajor, pcDistribution, True)
+        
+        keyResultsMinor = self.convoluteDistribution(pcDistribution, False)   
+        likelyKeysMinor = self.getLikelyKeys(keyResultsMinor)
+        differenceMinor = self.getDifference(keyResultsMinor, pcDistribution, False)
 
+        if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
+            likelyKey = (likelyKeysMajor[0][0], "Major")
+        else:
+            likelyKey = (likelyKeysMinor[0][0], "Minor")
+        
         #print "Key probabilities ordered by pitch class:", keyResults
         #print keySorted
         #print "Possible keys, from most likely to least likely", likelyKeys
     
         #print("Key of analyzed segment:", likelyKeys[0], "(runners up", likelyKeys[1], "and", likelyKeys[2], ")")
-        return [likelyKeys[0], likelyKeys[1], difference]
-
-
-    def convoluteDistribution(self, pcDistribution, isMajor=True):
-        ''' Takes in a pitch class distribution as a list and convolutes it
-            over Sapp's given distribution for finding key, returning the result. 
-        '''
-        majorToneWeights = [6.35, 2.33, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
-        minorToneWeights = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
-        soln = [0] * 12
-    
-        if isMajor:
-            toneWeights = majorToneWeights
-        else:
-            toneWeights = minorToneWeights
-            
-        for i in range(len(soln)):
-            for j in range(len(pcDistribution)):
-                soln[i] = soln[i] + (pcDistribution[(j + i) % 12] * toneWeights[j])
-    
-        #print soln  
-    
-        return soln
+        #return [likelyKeys[0], likelyKeys[1], difference]
+        
+        return likelyKey
 
 
     def createDistributionGraph(self, pcDistribution):
@@ -249,7 +294,7 @@ class Test(unittest.TestCase):
         pass
 
     def testKeyDetect(self):
-        sStream = corpus.parseWork('bach/bwv1.6')
+        sStream = corpus.parseWork('schubert/d576')
         a = KeyDetect(sStream)
         a.runKeyDetect(sStream, 1)
         
