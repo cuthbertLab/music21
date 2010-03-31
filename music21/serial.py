@@ -62,6 +62,9 @@ class TwelveToneRow(ToneRow):
         >>> s37 = RowSchoenbergOp37().matrix()
         >>> print s37
         0 11  7  8  3  1  2 10  6  5  4  9
+        1  0  8  9  4  2  3 11  7  6  5 10
+        5  4  0  1  8  6  7  3 11 10  9  2
+        4  3 11  0  7  5  6  2 10  9  8  1
         ...
         '''        
         
