@@ -42,6 +42,7 @@ Module Reference
    moduleEditorial
    moduleEnvironment
    moduleGraph
+   moduleKey
    moduleInstrument
    moduleInterval
    moduleMeter

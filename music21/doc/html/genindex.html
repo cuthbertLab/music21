@@ -152,6 +152,8 @@
     <dt><a href="moduleInterval.html#music21.interval.DiatonicInterval.__init__">(music21.interval.DiatonicInterval method)</a></dt>
     <dt><a href="moduleInterval.html#music21.interval.GenericInterval.__init__">(music21.interval.GenericInterval method)</a></dt>
     <dt><a href="moduleInterval.html#music21.interval.Interval.__init__">(music21.interval.Interval method)</a></dt>
+    <dt><a href="moduleKey.html#music21.key.Key.__init__">(music21.key.Key method)</a></dt>
+    <dt><a href="moduleKey.html#music21.key.KeySignature.__init__">(music21.key.KeySignature method)</a></dt>
     <dt><a href="moduleMeter.html#music21.meter.MeterSequence.__init__">(music21.meter.MeterSequence method)</a></dt>
     <dt><a href="moduleMeter.html#music21.meter.MeterTerminal.__init__">(music21.meter.MeterTerminal method)</a></dt>
     <dt><a href="moduleMeter.html#music21.meter.TimeSignature.__init__">(music21.meter.TimeSignature method)</a></dt>
@@ -190,10 +192,12 @@
 
 <dt><a href="moduleMeter.html#music21.meter.TimeSignature.accent">accent (music21.meter.TimeSignature attribute)</a></dt>
 <dt><a href="modulePitch.html#music21.pitch.Accidental">Accidental (class in music21.pitch)</a></dt>
-<dt><a href="moduleNote.html#music21.note.Note.accidental">accidental (music21.note.Note attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.Key.accidental">accidental (music21.key.Key attribute)</a></dt>
   <dd><dl>
+    <dt><a href="moduleNote.html#music21.note.Note.accidental">(music21.note.Note attribute)</a></dt>
     <dt><a href="modulePitch.html#music21.pitch.Pitch.accidental">(music21.pitch.Pitch attribute)</a></dt>
   </dl></dd>
+<dt><a href="moduleKey.html#music21.key.Key.accidentalList">accidentalList (music21.key.Key attribute)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.add">add() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.addContext">addContext() (music21.base.Music21Object method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.Duration.addDuration">addDuration() (music21.duration.Duration method)</a></dt>
@@ -206,8 +210,9 @@
 <dt><a href="moduleStream.html#music21.stream.Stream.allPlayingWhileSounding">allPlayingWhileSounding() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.almostEqual">almostEqual() (in module music21.common)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt>
-<dt><a href="moduleGraph.html#music21.graph.Graph.alpha">alpha (music21.graph.Graph attribute)</a></dt>
-<dt><a href="modulePitch.html#music21.pitch.Accidental.alter">alter (music21.pitch.Accidental attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleGraph.html#music21.graph.Graph.alpha">alpha (music21.graph.Graph attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="modulePitch.html#music21.pitch.Accidental.alter">alter (music21.pitch.Accidental attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.KeySignature.alteredTones">alteredTones (music21.key.KeySignature attribute)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.AltoClef">AltoClef (class in music21.clef)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Groups.append">append() (music21.base.Groups method)</a></dt>
   <dd><dl>
@@ -570,6 +575,7 @@
 <dt><a href="moduleInterval.html#music21.interval.generateGeneric">generateGeneric() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.generateInterval">generateInterval() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.generateIntervalFromString">generateIntervalFromString() (in module music21.interval)</a></dt>
+<dt><a href="moduleKey.html#music21.key.Key.generateKey">generateKey() (music21.key.Key method)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.generateNote">generateNote() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.generatePitch">generatePitch() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.Interval.generic">generic (music21.interval.Interval attribute)</a></dt>
@@ -780,9 +786,12 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
+<dt><a href="moduleKey.html#music21.key.Key">Key (class in music21.key)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Measure.key">key (music21.stream.Measure attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.keyFromString">keyFromString() (in module music21.key)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Measure.keyIsNew">keyIsNew (music21.stream.Measure attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleEnvironment.html#music21.environment.Environment.keys">keys() (music21.environment.Environment method)</a></dt>
+<dt><a href="moduleKey.html#music21.key.KeySignature">KeySignature (class in music21.key)</a></dt>
 </dl></td></tr></table>
 
 <h2 id="L">L</h2>
@@ -892,6 +901,7 @@
 <dt><a href="moduleInstrument.html#music21.instrument.Instrument.midiChannel">midiChannel (music21.instrument.Instrument attribute)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.Instrument.midiProgram">midiProgram (music21.instrument.Instrument attribute)</a></dt>
 <dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.misc">misc (music21.editorial.NoteEditorial attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.KeySignature.mode">mode (music21.key.KeySignature attribute)</a></dt>
 <dt><a href="modulePitch.html#music21.pitch.Accidental.modifier">modifier (music21.pitch.Accidental attribute)</a></dt>
 <dt><a href="moduleEnvironment.html#music21.environment.Environment.modNameParent">modNameParent (music21.environment.Environment attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.multisetCardinality">multisetCardinality (music21.chord.Chord attribute)</a></dt>
@@ -908,6 +918,7 @@
 <dt><a href="moduleGraph.html#module-music21.graph">music21.graph (module)</a></dt>
 <dt><a href="moduleInstrument.html#module-music21.instrument">music21.instrument (module)</a></dt>
 <dt><a href="moduleInterval.html#module-music21.interval">music21.interval (module)</a></dt>
+<dt><a href="moduleKey.html#module-music21.key">music21.key (module)</a></dt>
 <dt><a href="moduleMeter.html#module-music21.meter">music21.meter (module)</a></dt>
 <dt><a href="moduleNode.html#module-music21.node">music21.node (module)</a></dt>
 <dt><a href="moduleNote.html#module-music21.note">music21.note (module)</a></dt>
@@ -935,6 +946,7 @@
     <dt><a href="moduleDynamics.html#music21.dynamics.Dynamic.mx">(music21.dynamics.Dynamic attribute)</a></dt>
     <dt><a href="moduleDynamics.html#music21.dynamics.Wedge.mx">(music21.dynamics.Wedge attribute)</a></dt>
     <dt><a href="moduleInstrument.html#music21.instrument.Instrument.mx">(music21.instrument.Instrument attribute)</a></dt>
+    <dt><a href="moduleKey.html#music21.key.KeySignature.mx">(music21.key.KeySignature attribute)</a></dt>
     <dt><a href="moduleMeter.html#music21.meter.TimeSignature.mx">(music21.meter.TimeSignature attribute)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Beam.mx">(music21.note.Beam attribute)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Beams.mx">(music21.note.Beams attribute)</a></dt>
@@ -1142,6 +1154,7 @@
     <dt><a href="modulePitch.html#music21.pitch.Pitch">(class in music21.pitch)</a></dt>
   </dl></dd>
 <dt><a href="moduleNote.html#music21.note.Note.pitch">pitch (music21.note.Note attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.KeySignature.pitchAndMode">pitchAndMode (music21.key.KeySignature attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.pitchAttributeCount">pitchAttributeCount() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Note.pitchClass">pitchClass (music21.note.Note attribute)</a></dt>
   <dd><dl>
@@ -1430,6 +1443,7 @@
 <dt><a href="moduleDuration.html#music21.duration.Tuplet.setDurationType">setDurationType() (music21.duration.Tuplet method)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph.setFigureSize">setFigureSize() (music21.graph.Graph method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.ElementWrapper.setId">setId() (music21.base.ElementWrapper method)</a></dt>
+<dt><a href="moduleKey.html#music21.key.Key.setKey">setKey() (music21.key.Key method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Measure.setLeftBarline">setLeftBarline() (music21.stream.Measure method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.setOffsetBySite">setOffsetBySite() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.Tuplet.setRatio">setRatio() (music21.duration.Tuplet method)</a></dt>
@@ -1440,6 +1454,8 @@
 <dt><a href="moduleDuration.html#music21.duration.DurationUnit.setTypeFromNum">setTypeFromNum() (music21.duration.DurationUnit method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.setupPickleScaffold">setupPickleScaffold() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.SHARP">SHARP (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.KeySignature.sharps">sharps (music21.key.KeySignature attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.sharpsToPitch">sharpsToPitch() (in module music21.key)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.shiftElements">shiftElements() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.show">show() (music21.base.Music21Object method)</a></dt>
   <dd><dl>
@@ -1472,10 +1488,12 @@
 <dt><a href="moduleCommon.html#music21.common.Timer.start">start() (music21.common.Timer method)</a></dt>
 <dt><a href="moduleConverter.html#music21.converter.PickleFilter.status">status() (music21.converter.PickleFilter method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.NotRest.stemDirection">stemDirection (music21.note.NotRest attribute)</a></dt>
-<dt><a href="moduleNote.html#music21.note.Note.step">step (music21.note.Note attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.Key.step">step (music21.key.Key attribute)</a></dt>
   <dd><dl>
+    <dt><a href="moduleNote.html#music21.note.Note.step">(music21.note.Note attribute)</a></dt>
     <dt><a href="modulePitch.html#music21.pitch.Pitch.step">(music21.pitch.Pitch attribute)</a></dt>
   </dl></dd>
+<dt><a href="moduleKey.html#music21.key.Key.stepList">stepList (music21.key.Key attribute)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.Timer.stop">stop() (music21.common.Timer method)</a></dt>
 <dt><a href="glossary.html#term-stream">Stream</a></dt>
   <dd><dl>
@@ -1487,6 +1505,7 @@
     <dt><a href="moduleConverter.html#music21.converter.ConverterMusicXML.stream">(music21.converter.ConverterMusicXML attribute)</a></dt>
     <dt><a href="moduleConverter.html#music21.converter.StreamFreezer.stream">(music21.converter.StreamFreezer attribute)</a></dt>
   </dl></dd>
+<dt><a href="moduleKey.html#music21.key.Key.stream1">stream1 (music21.key.Key attribute)</a></dt>
 <dt><a href="moduleConverter.html#music21.converter.StreamFreezer">StreamFreezer (class in music21.converter)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.StringInstrument">StringInstrument (class in music21.instrument)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.StringInstrument.stringPitches">stringPitches (music21.instrument.StringInstrument attribute)</a></dt>
@@ -1650,10 +1669,12 @@
     <dt><a href="moduleDuration.html#music21.duration.Tuplet.type">(music21.duration.Tuplet attribute)</a></dt>
     <dt><a href="moduleDynamics.html#music21.dynamics.Wedge.type">(music21.dynamics.Wedge attribute)</a></dt>
     <dt><a href="moduleInterval.html#music21.interval.Interval.type">(music21.interval.Interval attribute)</a></dt>
+    <dt><a href="moduleKey.html#music21.key.Key.type">(music21.key.Key attribute)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Beam.type">(music21.note.Beam attribute)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Tie.type">(music21.note.Tie attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.TYPE">TYPE (music21.tinyNotation.TinyNotationNote attribute)</a></dt>
+<dt><a href="moduleKey.html#music21.key.Key.typeList">typeList (music21.key.Key attribute)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.typeToMusicXMLType">typeToMusicXMLType() (in module music21.duration)</a></dt>
 </dl></td></tr></table>
 

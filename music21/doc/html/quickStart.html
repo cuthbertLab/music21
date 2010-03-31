@@ -50,8 +50,9 @@
 <li><a class="reference external" href="">Quick Start: Getting Started with music21</a><ul>
 <li><a class="reference external" href="#download-and-install">Download and Install</a></li>
 <li><a class="reference external" href="#starting-python-and-importing-modules">Starting Python and Importing Modules</a></li>
-<li><a class="reference external" href="#examining-a-score">Examining a Score</a></li>
-<li><a class="reference external" href="#view-some-notation">View Some Notation</a></li>
+<li><a class="reference external" href="#examining-a-score-by-index-and-measure">Examining a Score by Index and Measure</a></li>
+<li><a class="reference external" href="#examining-a-score-by-part-id">Examining a Score by Part Id</a></li>
+<li><a class="reference external" href="#creating-notes-and-measures">Creating Notes and Measures</a></li>
 </ul>
 </li>
 </ul>
@@ -117,19 +118,85 @@
 <p>If this happens, Python is not able to find the music21 package. Return and review the instructions in <a class="reference external" href="install.html#install"><em>Installing Music21</em></a> or contact the music21 group for help:</p>
 <p><a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a></p>
 </div>
-<div class="section" id="examining-a-score">
-<h2>Examining a Score<a class="headerlink" href="#examining-a-score" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="examining-a-score-by-index-and-measure">
+<h2>Examining a Score by Index and Measure<a class="headerlink" href="#examining-a-score-by-index-and-measure" title="Permalink to this headline">¶</a></h2>
 <p>Once music21 is installed, opening and examing a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.</p>
-<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module. We imported this above, but lets do it again and use the <cite>parseWork</cite> method to get some some music parsed.</p>
+<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module. We imported this above, but lets do it again and use the <cite>parseWork</cite> method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv7.7&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The score is returned as music21 <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, which is as type (subclass) of music21 <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>.</p>
+<p>Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user&#8217;s environment settings. See <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete details.) Second, it attempts to open this file with a user-specied helper application. Assuming you have an appropriate MusicXML reader (see <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>), and have set it to handle MusicXML files (see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>), the following output (excerpted) will be displayed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
 </div>
-<div class="section" id="view-some-notation">
-<h2>View Some Notation<a class="headerlink" href="#view-some-notation" title="Permalink to this headline">¶</a></h2>
-<p>After parsing, manipulationg, or creating music21 objects, viewing them as notation is
-a common way to share and evaluate what you have done.</p>
+<img alt="_images/quickStart-01.png" src="_images/quickStart-01.png" style="width: 500px;" />
+<p>If we do not have a MusicXML reader handy, we can always show the components of a Stream in a text format, with the optional &#8216;text&#8217; argument passed to the show method. Here is an excerpt of the output.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.stream.Part object at 0x1b67cb0&gt;</span>
+<span class="go">    {0.0} &lt;music21.instrument.Instrument P1: Soprano: Instrument 1&gt;</span>
+<span class="go">    {0.0} &lt;music21.stream.Measure 0 offset=0.0&gt;</span>
+<span class="go">        {0.0} &lt;music21.meter.TimeSignature 4/4&gt;</span>
+<span class="go">        {0.0} &lt;music21.clef.TrebleClef object at 0x18e9310&gt;</span>
+<span class="go">        {0.0} &lt;music21.key.KeySignature of 2 sharps&gt;</span>
+<span class="go">        {0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">        {0.5} &lt;music21.note.Note F#&gt;</span>
+<span class="go">    {4.0} &lt;music21.stream.Measure 1 offset=4.0&gt;</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>Once the score has been parsed, we can access its components in various ways. All Streams present their components in multiple ways. The components of a Score are usually <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> objects, or specialized Streams that contain Measures.</p>
+<p>The components of a Stream can be accessed as a list of elements accessed by index values. Index values in Python, as common in many programming languages, count from zero. Using the Python len() method, We can see that the Score as four components, index numbers 0 through 3.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aScore</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;music21.stream.Part object at 0x1b67cb0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+<span class="go">&lt;music21.stream.Part object at 0x19b40b0&gt;</span>
+</pre></div>
+</div>
+<p>We can view one of these Parts by accessing the appropriate component and calling the show() method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/quickStart-02.png" src="_images/quickStart-02.png" style="width: 500px;" />
+<p>Again, we can view the componetns of the Part with the &#8216;text&#8217; option for the show() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.instrument.Instrument P1: Soprano: Instrument 1&gt;</span>
+<span class="go">{0.0} &lt;music21.stream.Measure 0 offset=0.0&gt;</span>
+<span class="go">    {0.0} &lt;music21.meter.TimeSignature 4/4&gt;</span>
+<span class="go">    {0.0} &lt;music21.clef.TrebleClef object at 0x18e9310&gt;</span>
+<span class="go">    {0.0} &lt;music21.key.KeySignature of 2 sharps&gt;</span>
+<span class="go">    {0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">    {0.5} &lt;music21.note.Note F#&gt;</span>
+<span class="go">{4.0} &lt;music21.stream.Measure 1 offset=4.0&gt;</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>Parts contain numerous components, including <a title="music21.instrument.Instrument" class="reference external" href="moduleInstrument.html#music21.instrument.Instrument"><tt class="xref docutils literal"><span class="pre">Instrument</span></tt></a> objects. We can access the components of a Part by index, or directly access Measures from within a Part by using the <a title="music21.stream.Stream.getMeasureRange" class="reference external" href="moduleStream.html#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> method. In the following example, measures 2 through 4 are extracted from the Part as a new Stream (called select) and displayed with the show() method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">select</span> <span class="o">=</span> <span class="n">aScore</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasureRange</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">select</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/quickStart-03.png" src="_images/quickStart-03.png" style="width: 500px;" />
+<p>Measures contain numerous components, including <a title="music21.clef.Clef" class="reference external" href="moduleClef.html#music21.clef.Clef"><tt class="xref docutils literal"><span class="pre">Clef</span></tt></a>, <a title="music21.key.KeySignature" class="reference external" href="moduleKey.html#music21.key.KeySignature"><tt class="xref docutils literal"><span class="pre">KeySignature</span></tt></a>, <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a>, <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, and other objects. We can access the Notes of a Measure directly with the <a title="music21.stream.Stream.notes" class="reference external" href="moduleStream.html#music21.stream.Stream.notes"><tt class="xref docutils literal"><span class="pre">notes</span></tt></a> property. This property returns a Stream of all Notes found in a given Measure. Like all Streams, the components can be accessed by index values starting from zero. To view the first note of the second measure (stored in the Stream select), we can do the following.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">select</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/quickStart-04.png" src="_images/quickStart-04.png" style="width: 500px;" />
+</div>
+<div class="section" id="examining-a-score-by-part-id">
+<h2>Examining a Score by Part Id<a class="headerlink" href="#examining-a-score-by-part-id" title="Permalink to this headline">¶</a></h2>
+<p>Alternatively, we can access components of a Stream by <cite>id</cite>, or string identifiers. Streams can get components by <cite>id</cite> by using the <a title="music21.stream.Stream.getElementById" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementById"><tt class="xref docutils literal"><span class="pre">getElementById()</span></tt></a> method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Soprano&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.stream.Part object at 0x1b67cb0&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-notes-and-measures">
+<h2>Creating Notes and Measures<a class="headerlink" href="#creating-notes-and-measures" title="Permalink to this headline">¶</a></h2>
+<p>We can create notes and measures from scratch using music21.</p>
 </div>
 </div>
 

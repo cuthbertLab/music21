@@ -16,7 +16,7 @@ Music21 can be installed with a number of different methods. Based on your platf
 Check Your Python
 -----------------------
 
-Music21 requires Python 2.6 to run. Python 3.x is not yet supported. Check that you have Python on your system, and that that Python is up to date. Whereas many operating systems come with Python, Windows does not. Windows users will need to download install Python. 
+Music21 requires Python 2.6 to run. Python 3.x is not yet supported. Check that you have Python on your system, and that that Python is up to date. Whereas many operating systems come with Python, Windows does not. Windows users will need to download and install Python. 
 
 
 Downloading Python
