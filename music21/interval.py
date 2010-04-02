@@ -1024,30 +1024,31 @@ class Test(unittest.TestCase):
         gInt1 = dInt1.generic
     
         ## TODO: rewrite all assertion code using self.assertEqual etc.
-        assert gInt1.isStep == False
-        assert gInt1.isSkip == True
+        self.assertEqual(gInt1.isStep, False)
+        self.assertEqual(gInt1.isSkip, True)
         
         n1.accidental = Accidental("#")
         int1.reinit()
         
         cInt1 = generateChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
         cInt2 = int1.chromatic        # returns same as cInt1 -- just a different way of thinking of things
-        assert cInt1.semitones == cInt2.semitones
+        self.assertEqual(cInt1.semitones, cInt2.semitones)
         
-        assert int1.simpleNiceName == "Diminished Seventh", "Got %s" % int1.niceName
-        assert int1.directedSimpleNiceName == "Ascending Diminished Seventh"
-        assert int1.name == "d14"
-        assert int1.specifier == DIMINISHED
+        self.assertEqual(int1.simpleNiceName, "Diminished Seventh")
+
+        self.assertEqual(int1.directedSimpleNiceName, "Ascending Diminished Seventh")
+        self.assertEqual(int1.name, "d14")
+        self.assertEqual(int1.specifier, DIMINISHED)
         
-        assert gInt1.directed == 14
-        assert gInt1.undirected == 14
-        assert gInt1.simpleDirected == 7
-        assert gInt1.simpleUndirected == 7
+        self.assertEqual(gInt1.directed, 14)
+        self.assertEqual(gInt1.undirected, 14)
+        self.assertEqual(gInt1.simpleDirected, 7)
+        self.assertEqual(gInt1.simpleUndirected, 7)
         
-        assert cInt1.semitones == 21, cInt1.semitones
-        assert cInt1.undirected == 21
-        assert cInt1.mod12 == 9
-        assert cInt1.intervalClass == 3
+        self.assertEqual(cInt1.semitones, 21)
+        self.assertEqual(cInt1.undirected, 21)
+        self.assertEqual(cInt1.mod12, 9)
+        self.assertEqual(cInt1.intervalClass, 3)
         
         n4 = Note()
         n4.step = "D"
@@ -1063,11 +1064,11 @@ class Test(unittest.TestCase):
         ##print
      
         cI = ChromaticInterval (-14)
-        assert cI.semitones==-14
-        assert cI.cents==-1400
-        assert cI.undirected==14
-        assert cI.mod12==10
-        assert cI.intervalClass==2, "Interval Class should be 2"
+        self.assertEqual(cI.semitones, -14)
+        self.assertEqual(cI.cents, -1400)
+        self.assertEqual(cI.undirected, 14)
+        self.assertEqual(cI.mod12, 10)
+        self.assertEqual(cI.intervalClass, 2)
     
         lowB = Note()
         lowB.name = "B"
@@ -1075,7 +1076,7 @@ class Test(unittest.TestCase):
         highBb.name = "B-"
         highBb.octave = 5
         dimOct = generateInterval(lowB, highBb)
-        assert dimOct.niceName == "Diminished Octave", dimOct.niceName
+        self.assertEqual(dimOct.niceName, "Diminished Octave")
     
         noteA1 = Note()
         noteA1.name = "E-"
@@ -1090,8 +1091,8 @@ class Test(unittest.TestCase):
         noteA3.octave = 1
     
         noteA4 = generatePitch(noteA3, intervalA1)
-        assert noteA4.name == "E#"
-        assert noteA4.octave == 2
+        self.assertEqual(noteA4.name, "E#")
+        self.assertEqual(noteA4.octave, 2)
         
         interval1 = generateIntervalFromString("P-5")
         
@@ -1101,8 +1102,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n6.name, n5.name)
         n7 = Note()
         n8 = generatePitch(n7, "P8")
-        assert n8.name == "C"
-        assert n8.octave == 5
+        self.assertEqual(n8.name, "C")
+        self.assertEqual(n8.octave, 5)
 
         ## same thing using newer syntax:
         
@@ -1110,20 +1111,20 @@ class Test(unittest.TestCase):
         
         n5 = generatePitch(n4, interval1)
         n6 = generatePitch(n4, "P-5")
-        assert n5.name == "G-"
-        assert n6.name == n5.name
+        self.assertEqual(n5.name, "G-")
+        self.assertEqual(n6.name, n5.name)
         n7 = Note()
         n8 = generatePitch(n7, "P8")
-        assert n8.name == "C"
-        assert n8.octave == 5
+        self.assertEqual(n8.name, "C")
+        self.assertEqual(n8.octave, 5)
 
         
         n9 = generatePitch(n7, "m7")  ## should be B-
-        assert n9.name == "B-"
-        assert n9.octave == 4
+        self.assertEqual(n9.name, "B-")
+        self.assertEqual(n9.octave, 4)
         n10 = generatePitch(n7, "dd-2")  ## should be B##
-        assert n10.name == "B##"
-        assert n10.octave == 3
+        self.assertEqual(n10.name, "B##")
+        self.assertEqual(n10.octave, 3)
     
         ## test getWrittenHigherNote fuctions
         (nE, nEsharp, nFflat, nF1, nF2) = (Note(), Note(), Note(), Note(), Note())
@@ -1138,58 +1139,58 @@ class Test(unittest.TestCase):
         higher2 = getWrittenHigherNote(nEsharp, nFflat)
         higher3 = getWrittenHigherNote(nF1, nF2)
         
-        assert higher1 == nEsharp
-        assert higher2 == nFflat
-        assert higher3 == nF1  ### in case of ties, first is returned
+        self.assertEqual(higher1, nEsharp)
+        self.assertEqual(higher2, nFflat)
+        self.assertEqual(higher3, nF1)  ### in case of ties, first is returned
         
         higher4 = getAbsoluteHigherNote(nE, nEsharp)
         higher5 = getAbsoluteHigherNote(nEsharp, nFflat)
         higher6 = getAbsoluteHigherNote(nEsharp, nF1)
         higher7 = getAbsoluteHigherNote(nF1, nEsharp)
         
-        assert higher4 == nEsharp
-        assert higher5 == nEsharp
-        assert higher6 == nEsharp
-        assert higher7 == nF1
+        self.assertEqual(higher4, nEsharp)
+        self.assertEqual(higher5, nEsharp)
+        self.assertEqual(higher6, nEsharp)
+        self.assertEqual(higher7, nF1)
         
         lower1 = getWrittenLowerNote(nEsharp, nE)
         lower2 = getWrittenLowerNote(nFflat, nEsharp)
         lower3 = getWrittenLowerNote(nF1, nF2)
         
         self.assertEqual(lower1, nE)
-        assert lower2 == nEsharp
-        assert lower3 == nF1  ## still returns first.
+        self.assertEqual(lower2, nEsharp)
+        self.assertEqual(lower3, nF1)  ## still returns first.
         
         lower4 = getAbsoluteLowerNote(nEsharp, nE)
         lower5 = getAbsoluteLowerNote(nFflat, nEsharp)
         lower6 = getAbsoluteLowerNote(nEsharp, nF1)
         
-        assert lower4 == nE
-        assert lower5 == nFflat
-        assert lower6 == nEsharp
+        self.assertEqual(lower4, nE)
+        self.assertEqual(lower5, nFflat)
+        self.assertEqual(lower6, nEsharp)
     
         middleC = Note()
         lowerC  = Note()
         lowerC.octave = 3
         descendingOctave = generateInterval(middleC, lowerC)
-        assert descendingOctave.generic.simpleDirected == 1  # no descending unisons ever
-        assert descendingOctave.generic.semiSimpleDirected == -8  # no descending unisons ever
-        assert descendingOctave.directedName == "P-8"
-        assert descendingOctave.directedSimpleName == "P1"
+        self.assertEqual(descendingOctave.generic.simpleDirected, 1)  # no descending unisons ever
+        self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  # no descending unisons ever
+        self.assertEqual(descendingOctave.directedName, "P-8")
+        self.assertEqual(descendingOctave.directedSimpleName, "P1")
     
         lowerG  = Note()
         lowerG.name = "G"
         lowerG.octave = 3
         descendingFourth = generateInterval(middleC, lowerG)
-        assert descendingFourth.diatonic.directedNiceName == "Descending Perfect Fourth"
-        assert descendingFourth.diatonic.directedSimpleName == "P-4"
-        assert descendingFourth.diatonic.simpleName == "P4"
-        assert descendingFourth.diatonic.mod7 == "P5"
+        self.assertEqual(descendingFourth.diatonic.directedNiceName, "Descending Perfect Fourth")
+        self.assertEqual(descendingFourth.diatonic.directedSimpleName, "P-4")
+        self.assertEqual(descendingFourth.diatonic.simpleName, "P4")
+        self.assertEqual(descendingFourth.diatonic.mod7, "P5")
         
         perfectFifth = descendingFourth.complement
         self.assertEqual(perfectFifth.niceName, "Perfect Fifth")
-        assert perfectFifth.diatonic.simpleName == "P5"
-        assert perfectFifth.diatonic.mod7 == "P5"
+        self.assertEqual(perfectFifth.diatonic.simpleName, "P5")
+        self.assertEqual(perfectFifth.diatonic.mod7, "P5")
         self.assertEqual(perfectFifth.complement.niceName, "Perfect Fourth")
 
 
