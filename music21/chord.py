@@ -1221,10 +1221,7 @@ class Chord(note.NotRest):
         '''
         msg = ['<']
         for e in vectorList: # should be numbers
-            if e >= 10: 
-                eStr = '%X' % e  # using hex conversion, good up to 15
-            else:
-                eStr = str(e)
+            eStr = pitch.convertPitchClassToStr(e)
             msg.append(eStr)
         msg.append('>')
         return ''.join(msg)

@@ -45,6 +45,39 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 
 #-------------------------------------------------------------------------------
 # utility functions
+def convertPitchClassToNumber(ps):
+    '''Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation.
+
+    >>> convertPitchClassToNumber(3)
+    3
+    >>> convertPitchClassToNumber('a')
+    10
+    >>> convertPitchClassToNumber('B')
+    11
+    '''
+    if common.isNum(ps):
+        return ps
+    else: # assume is is a string
+        if ps in ['a', 'A']:
+            return 10
+        if ps in ['b', 'B']:
+            return 11
+        # maybe its a string of an integer?
+        return int(ps)
+        
+def convertPitchClassToStr(pc):
+    '''Given a pitch class number, return a string. 
+
+    >>> convertPitchClassToStr(3)
+    '3'
+    >>> convertPitchClassToStr(10)
+    'A'
+    '''
+    pc = pc % 12 # do just in case
+    # replace 10 with A and 11 with B
+    return '%X' % pc  # using hex conversion, good up to 15
+        
+
 def convertNameToPitchClass(pitchName):
     '''Utility conversion: from a pitch name to a pitch class integer between 0 and 11.
 
@@ -167,10 +200,6 @@ def convertStepToPs(step, oct, acc=None):
 
 def convertPsToFq(ps):
     '''Utility conversion; does not process internals.
-
-    NOT CURRENTLY USED: since freq440 had its own conversion
-    methods, and wanted the numbers to be EXACTLY the same
-    either way
     
     Assumes A4 = 440 Hz
     >>> convertPsToFq(69)
@@ -181,6 +210,11 @@ def convertPsToFq(ps):
     9.1770239974189884
     >>> convertPsToFq(135)
     19912.126958213179
+
+    OMIT_FROM_DOCS
+    NOT CURRENTLY USED: since freq440 had its own conversion
+    methods, and wanted the numbers to be EXACTLY the same
+    either way
     '''
     try:
         fq = 440.0 * pow(2, (((ps-60)-9)/12.0))
@@ -787,6 +821,18 @@ class Pitch(music21.Music21Object):
         return int(round(self.ps % 12))
 
     def _setPitchClass(self, value):
+        '''Set the pitchClass.
+
+        >>> a = Pitch('a3')
+        >>> a.pitchClass = 3
+        >>> a
+        D#3
+        >>> a.pitchClass = 'A'
+        >>> a
+        A#3
+        '''
+        # permit the submission of strings, like A an dB
+        value = convertPitchClassToNumber(value)
         # get step and accidental w/o octave
         self._step, self._accidental = convertPsToStep(value)  
         self._pitchSpaceNeedsUpdating = True
@@ -795,6 +841,25 @@ class Pitch(music21.Music21Object):
       
     pitchClass = property(_getPitchClass, _setPitchClass)
 
+
+    def _getPitchClassString(self):
+        '''
+        >>> a = Pitch('a3')
+        >>> a._getPitchClassString()
+        '9'
+        '''
+        return convertPitchClassToStr(self._getPitchClass())
+
+    pitchClassString = property(_getPitchClassString, _setPitchClass, 
+        doc = '''Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`.
+    
+        >>> a = Pitch('a3')
+        >>> a.pitchClassString = 'B'
+        >>> a.pitchClass
+        11
+        >>> a.pitchClassString
+        'B'
+        ''')
 
     def _getOctave(self): 
         '''

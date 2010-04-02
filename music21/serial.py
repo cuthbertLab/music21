@@ -23,8 +23,17 @@ class SerialException(Exception):
     pass
 
 
+
+
+
+
 #-------------------------------------------------------------------------------
 class TwelveToneMatrix(stream.Stream):
+    '''An object representation of a 2-dimensional array of 12 pitches. Internal representation is as a :class:`~music21.stream.Stream`, which stores 12 Streams, each Stream a horizontal row of pitches in the matrix. 
+
+    This object is commonly used by calling the :meth:`~music21.stream.TwelveToneRow.matrix` method of :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+
+    '''
     
     def __init__(self, *arguments, **keywords):
         '''
@@ -33,21 +42,33 @@ class TwelveToneMatrix(stream.Stream):
         stream.Stream.__init__(self, *arguments, **keywords)
     
     def __str__(self):
+        '''Return a string representation of the matrix.
+        '''
         ret = ""
         for rowForm in self.elements:
             msg = []
             for pitch in rowForm:
-                msg.append(str(pitch.pitchClass).rjust(3))
+                msg.append(str(pitch.pitchClassString).rjust(3))
             ret += ''.join(msg) + "\n"
         return ret
 
+
+#-------------------------------------------------------------------------------
 class ToneRow(stream.Stream):
+    '''A Stream representation of a tone row, or an ordered sequence of pitches. 
+
+    '''
     def __init__(self):
         stream.Stream.__init__(self)    
+
 
 class TwelveToneRow(ToneRow):
     
     row = None
+
+    _DOC_ATTR = {
+    'row': 'A list representing the pitch class values of the row.',
+    }
 
     def __init__(self):
         ToneRow.__init__(self)
@@ -57,14 +78,14 @@ class TwelveToneRow(ToneRow):
     
     def matrix(self):
         '''
-        Returns a TwelveToneMatrix object for the row.  That object can just be printed (or displayed via .show())
+        Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
         
         >>> s37 = RowSchoenbergOp37().matrix()
         >>> print s37
-        0 11  7  8  3  1  2 10  6  5  4  9
-        1  0  8  9  4  2  3 11  7  6  5 10
-        5  4  0  1  8  6  7  3 11 10  9  2
-        4  3 11  0  7  5  6  2 10  9  8  1
+          0  B  7  8  3  1  2  A  6  5  4  9
+          1  0  8  9  4  2  3  B  7  6  5  A
+          5  4  0  1  8  6  7  3  B  A  9  2
+          4  3  B  0  7  5  6  2  A  9  8  1
         ...
         '''        
         
@@ -74,9 +95,7 @@ class TwelveToneRow(ToneRow):
         matrix = [[(x.pitchClass+t) % 12 for x in p] for t in i]
 
         matrixObj = TwelveToneMatrix()
-        
         i = 0
-        
         for row in matrix:
             i += 1
             rowObject = copy.copy(self)
@@ -458,25 +477,32 @@ vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Movement4, RowSchoenbergO
 
 
 
-
-
-
-
-
-
 #-------------------------------------------------------------------------------
 def pcToToneRow(pcSet):
-    '''
+    '''A convenience function that, given a list of pitch classes represented as integers 
 
     >>> a = pcToToneRow(range(12))
+    >>> matrixObj = a.matrix()
+    >>> print matrixObj
+      0  1  2  3  4  5  6  7  8  9  A  B
+      B  0  1  2  3  4  5  6  7  8  9  A
+    ...
+
+    >>> import random
+    >>> a = pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
+    >>> matrixObj = a.matrix()
+    >>> print matrixObj
+      0  1  8  2  3  A  6  4  5  9  7  B
+      B  0  7  1  2  9  5  3  4  8  6  A
+    ...
     '''
     if len(pcSet) == 12:
-        ## TODO: check for uniqueness
+        # TODO: check for uniqueness
         a = TwelveToneRow()
         for thisPc in pcSet:
-            newNote = music21.note.Note()
-            newNote.pitchClass = thisPc
-            a.append(newNote)
+            p = music21.pitch.Pitch()
+            p.pitchClass = thisPc
+            a.append(p)
         return a
     else:
         raise SerialException("pcToToneRow requires a 12-tone-row")
@@ -493,6 +519,12 @@ def rowToMatrix(p):
         ret += ''.join(msg) + "\n"
 
     return ret
+
+
+
+
+
+
 
 
 
