@@ -240,6 +240,7 @@ music21.stream.Stream.isFlat attribute moduleStream.html
 music21.graph.Graph.__init__ method moduleGraph.html
 music21.stream.Measure.rightbarline attribute moduleStream.html
 music21.graph.Graph3DPolygonBars.barWidth attribute moduleGraph.html
+music21.note.Note.pitchClassString attribute moduleNote.html
 music21.instrument.Instrument.instrumentAbbreviation attribute moduleInstrument.html
 music21.tinyNotation.TinyNotationNote.customPitchMatch method moduleTinyNotation.html
 music21.stream.System.systemNumbering attribute moduleStream.html

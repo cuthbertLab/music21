@@ -1233,7 +1233,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
 
     .. image:: images/PlotHistogramPitchSpace.*
-        :width: 500
+        :width: 600
 
 
     >>> from music21 import corpus
@@ -1274,7 +1274,7 @@ class PlotHistogramPitchClass(PlotHistogram):
     '''A histogram of pitch class
 
     .. image:: images/PlotHistogramPitchClass.*
-        :width: 500
+        :width: 600
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -1313,7 +1313,7 @@ class PlotHistogramQuarterLength(PlotHistogram):
     '''A histogram of pitch class
 
     .. image:: images/PlotHistogramQuarterLength.*
-        :width: 500
+        :width: 600
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -1417,7 +1417,7 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.*
-        :width: 500
+        :width: 600
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -1459,7 +1459,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     '''A scatter plot of pitch class and quarter length
 
     .. image:: images/PlotScatterPitchClassQuarterLength.*
-        :width: 500
+        :width: 600
     '''
     # string name used to access this class
     values = ['pitchClass', 'quarterLength']
@@ -1497,7 +1497,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
     '''A scatter plot of pitch class and offset
 
     .. image:: images/PlotScatterPitchClassOffset.*
-        :width: 500
+        :width: 600
     '''
     values = ['pitchClass', 'offset']
     def __init__(self, streamObj, *args, **keywords):
@@ -1599,7 +1599,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
     .. image:: images/PlotHorizontalBarPitchClassOffset.*
-        :width: 500
+        :width: 600
     '''
 
     values = ['pitchClass', 'offset']
@@ -1634,7 +1634,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
-        :width: 500
+        :width: 600
     '''
 
 
@@ -1756,7 +1756,7 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch, over time
 
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.*
-        :width: 500
+        :width: 600
     '''
 
     values = ['pitch', 'quarterLength']
@@ -1793,7 +1793,7 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch class, over time.
 
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.*
-        :width: 500
+        :width: 600
     '''
 
     values = ['pitchClass', 'quarterLength']
@@ -1885,7 +1885,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''A scatter plot of pitch and quarter length
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
-        :width: 500
+        :width: 600
     '''
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):

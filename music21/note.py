@@ -1063,6 +1063,28 @@ class Note(NotRest):
     pitchClass = property(_getPitchClass, _setPitchClass)
 
 
+    def _getPitchClassString(self):
+        '''Return pitch class string, replacing 10 and 11 as needed. 
+
+        >>> d = Note()
+        >>> d.pitch = Pitch('b')
+        >>> d.pitchClassString
+        'B'
+        '''
+        return self.pitch.pitchClassString
+
+    def _setPitchClassString(self, value):
+        '''
+        >>> d = Note()
+        >>> d.pitch = Pitch('b')
+        >>> d.pitchClassString = 'a'
+        >>> d.pitchClass
+        10
+        '''
+        self.pitch.pitchClassString = value
+
+    pitchClassString = property(_getPitchClassString, _setPitchClassString)
+
 
     # was diatonicNoteNum
     def _getDiatonicNoteNum(self):

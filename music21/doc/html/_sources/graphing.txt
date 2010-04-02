@@ -50,7 +50,7 @@ A basic example follows::
     >>> a.process()
 
 .. image:: images/graphingScatter-basic.*
-    :width: 500
+    :width: 600
 
 Numerous parameters can be specified through keyword arguments when creating a scatter plot. 
 
@@ -69,7 +69,7 @@ This example provides basic customization to a scatter graph::
     >>> a.process()
 
 .. image:: images/graphingScatter-args.*
-    :width: 500
+    :width: 600
 
 
 
@@ -113,7 +113,7 @@ A basic example follows::
     >>> a.process()
 
 .. image:: images/graphing3dbar-basic.*
-    :width: 500
+    :width: 600
 
 The following examples demonstrates basic customization with keyword arguments using the same data obtained above::
 
@@ -124,7 +124,7 @@ The following examples demonstrates basic customization with keyword arguments u
     >>> b.process()
 
 .. image:: images/graphing3dbar-args.*
-    :width: 500
+    :width: 600
 
 
 
@@ -172,4 +172,4 @@ The following example demonstrates the default settings of the noteAttributeCoun
     >>> b.noteAttributeCount(colors=['#aa46ff'], barWidth=.1, alpha=.7)
 
 .. image:: images/graphingNoteAnalysis-default.*
-    :width: 500
+    :width: 600

@@ -23,7 +23,7 @@ PlotHistogramPitchSpace
     A histogram of pitch space. 
 
     .. image:: images/PlotHistogramPitchSpace.* 
-        :width: 500 
+        :width: 600 
 
     
 
@@ -64,7 +64,7 @@ PlotHistogramPitchClass
     A histogram of pitch class 
 
     .. image:: images/PlotHistogramPitchClass.* 
-        :width: 500 
+        :width: 600 
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -103,7 +103,7 @@ PlotHistogramQuarterLength
     A histogram of pitch class 
 
     .. image:: images/PlotHistogramQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -142,7 +142,7 @@ PlotScatterPitchSpaceQuarterLength
     A scatter plot of pitch space and quarter length 
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
@@ -181,7 +181,7 @@ PlotScatterPitchClassQuarterLength
     A scatter plot of pitch class and quarter length 
 
     .. image:: images/PlotScatterPitchClassQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -214,7 +214,7 @@ PlotScatterPitchClassOffset
     A scatter plot of pitch class and offset 
 
     .. image:: images/PlotScatterPitchClassOffset.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -247,7 +247,7 @@ PlotHorizontalBarPitchSpaceOffset
     A graph of events, sorted by pitch space, over time 
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -280,7 +280,7 @@ PlotHorizontalBarPitchClassOffset
     A graph of events, sorted by pitch class, over time 
 
     .. image:: images/PlotHorizontalBarPitchClassOffset.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -313,7 +313,7 @@ PlotScatterWeightedPitchSpaceQuarterLength
     A graph of event, sorted by pitch, over time 
 
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -346,7 +346,7 @@ PlotScatterWeightedPitchClassQuarterLength
     A graph of event, sorted by pitch class, over time. 
 
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -379,7 +379,7 @@ Plot3DBarsPitchSpaceQuarterLength
     A scatter plot of pitch and quarter length 
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
-        :width: 500 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.Plot3DBars`, :class:`~music21.graph.PlotStream`
 
