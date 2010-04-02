@@ -32,7 +32,7 @@ Settings can be edited in the XML file or through the object interface. The Envi
     ['lilypondBackend', 'lilypondVersion', 'graphicsPath', 'lilypondPath', 
     'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'midiPath']
 
-To set a preference, a key value pair of the Environment object can be set. For example, to set the Music21 scratch directory, the 'directoryScratch' key can be set to a file path of the users choice. Note that changes are not permanent until the object's :meth:`music21.environment.Environment.write` method is called.
+To set a preference, a key value pair of the Environment object can be set. For example, to set the Music21 scratch directory, the 'directoryScratch' key can be set to a file path of the users choice. Note that changes are not permanent until the object's :meth:`~music21.environment.Environment.write` method is called.
 
     >>> a['directoryScratch'] = '/_scratch'
     >>> a.write()

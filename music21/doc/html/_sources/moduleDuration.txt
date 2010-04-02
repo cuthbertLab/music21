@@ -24,7 +24,7 @@ DurationException: cannot convert quarterLength 0.33333 exactly to type
 
 .. function:: convertTypeToNumber(dType)
 
-Convert a duration type string (`dType`) to a numerical scalar representation. 
+Convert a duration type string (`dType`) to a numerical scalar representation that shows how many of that duration type fits within a whole note. 
 
 >>> convertTypeToNumber('quarter')
 4 
@@ -37,7 +37,7 @@ Convert a duration type string (`dType`) to a numerical scalar representation.
 
 .. function:: convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[])
 
-Given a rhythm type (`dType`), number of dots (`dots`), an optional list of Tuplet objects (`tuplets`), and an optional list of dot groups (`dotGroups`), return the equivalent quarter length. 
+Given a rhythm type (`dType`), number of dots (`dots`), an optional list of Tuplet objects (`tuplets`), and a (very) optional list of Medieval dot groups (`dotGroups`), return the equivalent quarter length. 
 
 >>> convertTypeToQuarterLength('whole')
 4.0 
@@ -99,7 +99,7 @@ Given a type (such as 16th or quarter), return the next larger type.
 
 .. function:: partitionQuarterLength(qLen, qLenDiv=4)
 
-Given a `qLen` (quarterLength) and a `qLenDiv` (base quarterLength to divide it into, where the default 4 = whole notes), return a list of Durations that partition the given quarterLength after each division. This is a useful tool for partition a duration by Measures or beat groups. (Little demonstration function) 
+Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into (default = 4; i.e., into whole notes), returns a list of Durations that partition the given quarterLength so that there is no leftovers. This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and make it fit within several measures) or by beat groups. Here is a Little demonstration function that will show how we can use partitionQuarterLength: 
 
 >>> def pql(qLen, qLenDiv):
 ...    partitionList = partitionQuarterLength(qLen, qLenDiv) 
@@ -107,13 +107,14 @@ Given a `qLen` (quarterLength) and a `qLenDiv` (base quarterLength to divide it 
 ...        print(unitSpec(dur)) 
 
 
+Divide 2.5 quarters worth of time into eighth notes. 
 >>> pql(2.5,.5)
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
-Dividing 5 qLen into 2.5 qLen bundles 
+Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time) 
 >>> pql(5, 2.5)
 (2.0, 'half', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
@@ -137,13 +138,14 @@ Dividing 1.5 into triplet eighths
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.1666..., '16th', 0, 3, 2, '16th') 
-No problem if the division unit is larger then the source duration. 
+There is no problem if the division unit is larger then the source duration, it 
+just will not be totally filled. 
 >>> pql(1.5, 4)
 (1.5, 'quarter', 1, None, None, None) 
 
 .. function:: quarterLengthToClosestType(qLen)
 
-Returns a two-unit tuple consisting of 1. The type string ("quarter") that is smaller than or equal to the quarterLength of provided. 2. Bollean, True or False, whether the conversion was exact. 
+Returns a two-unit tuple consisting of 1. The type string ("quarter") that is smaller than or equal to the quarterLength of provided. 2. Boolean, True or False, whether the conversion was exact. 
 
 >>> quarterLengthToClosestType(.5)
 ('eighth', True) 
@@ -591,7 +593,7 @@ Tuplet
 
     .. attribute:: durationActual
 
-    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not directly used instantiated outside of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
     .. attribute:: numberNotesNormal
 
@@ -599,7 +601,7 @@ Tuplet
 
     .. attribute:: durationNormal
 
-    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not directly used instantiated outside of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
     **Tuplet** **properties**
 
@@ -755,7 +757,7 @@ DurationCommon
 
     .. method:: aggregateTupletRatio()
 
-    Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple! (15, 8) in this case. Needed for MusicXML time-modification 
+    Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4, it will return (15, 8). This tuple is needed for MusicXML time-modification among other places 
 
     >>> complexDur = Duration('eighth')
     >>> complexDur.appendTuplet(Tuplet())
@@ -773,7 +775,7 @@ DurationUnit
 
 .. class:: DurationUnit
 
-    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not directly used instantiated outside of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Additional types are needed: 'zero' type for zero durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
     inherits from: :class:`~music21.duration.DurationCommon`
 

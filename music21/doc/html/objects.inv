@@ -100,6 +100,7 @@ music21.note.GeneralNote.quarterLength attribute moduleNote.html
 music21.graph.Graph.show method moduleGraph.html
 music21.stream.Stream.insert method moduleStream.html
 music21.serial.RowSchoenbergOp48No1.row attribute moduleSerial.html
+music21.interval.convertSpecifier function moduleInterval.html
 music21.interval.Interval.__init__ method moduleInterval.html
 music21.stream.Measure.mx attribute moduleStream.html
 music21.stream.Stream.playingWhenAttacked method moduleStream.html
@@ -345,7 +346,6 @@ music21.serial.RowWebernOp19No2.opus attribute moduleSerial.html
 music21.serial.RowWebernOp21.title attribute moduleSerial.html
 music21.chord.Chord.isNote attribute moduleChord.html
 music21.interval.ChromaticInterval.__init__ method moduleInterval.html
-music21.interval.DiatonicInterval.specifier attribute moduleInterval.html
 music21.meter.MeterTerminal.subdivideByList method moduleMeter.html
 music21.duration.Duration.componentStartTime method moduleDuration.html
 music21.key.KeySignature.__init__ method moduleKey.html
@@ -507,7 +507,6 @@ music21.duration.Tuplet.totalTupletLength method moduleDuration.html
 music21.stream.System class moduleStream.html
 music21.base.Music21Object.duration attribute moduleBase.html
 music21.clef.Clef.octaveChange attribute moduleClef.html
-music21.interval.DiatonicInterval.name attribute moduleInterval.html
 music21.graph.Graph3DBars.__init__ method moduleGraph.html
 music21.instrument.Instrument.bestName method moduleInstrument.html
 music21.editorial.NoteEditorial.melodicInterval attribute moduleEditorial.html
@@ -1180,6 +1179,7 @@ music21.duration.DurationUnit.__init__ method moduleDuration.html
 music21.serial.RowBergLuluPrimaryRow.row attribute moduleSerial.html
 music21.note.Note.octave attribute moduleNote.html
 music21.stream.Stream.setupPickleScaffold method moduleStream.html
+music21.interval.convertGeneric function moduleInterval.html
 music21.base.DefinedContexts.getOffsetBySiteId method moduleBase.html
 music21.duration.Duration class moduleDuration.html
 music21.duration.DurationCommon.aggregateTupletRatio method moduleDuration.html
