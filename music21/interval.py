@@ -354,7 +354,7 @@ class DiatonicInterval(music21.Music21Object):
     '''A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). 
     '''
 
-    def __init__(self, specifier = None, generic = None):
+    def __init__(self, specifier, generic):
         '''
         The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
 
