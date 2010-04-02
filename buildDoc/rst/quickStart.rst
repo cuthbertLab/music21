@@ -65,7 +65,7 @@ Once the score is parsed, we can view, transform, and manipulate its components 
     >>> aScore.show()
 
 .. image:: images/quickStart-01.*
-    :width: 500
+    :width: 600
 
 If we do not have a MusicXML reader handy, we can always show the components of a Stream in a text format, with the optional 'text' argument passed to the show method. Here is an excerpt of the output. 
 
@@ -98,7 +98,7 @@ We can view one of these Parts by accessing the appropriate component and callin
     >>> aScore[0].show()
 
 .. image:: images/quickStart-02.*
-    :width: 500
+    :width: 600
 
 
 Again, we can view the componetns of the Part with the 'text' option for the show() method:
@@ -120,14 +120,14 @@ Parts contain numerous components, including :class:`~music21.instrument.Instrum
     >>> select.show()
 
 .. image:: images/quickStart-03.*
-    :width: 500
+    :width: 600
 
 Measures contain numerous components, including :class:`~music21.clef.Clef`, :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature`, :class:`~music21.note.Note`, and other objects. We can access the Notes of a Measure directly with the :attr:`~music21.stream.Stream.notes` property. This property returns a Stream of all Notes found in a given Measure. Like all Streams, the components can be accessed by index values starting from zero. To view the first note of the second measure (stored in the Stream select), we can do the following. 
 
     >>> select[0].notes[0].show()
 
 .. image:: images/quickStart-04.*
-    :width: 500
+    :width: 600
 
 
 

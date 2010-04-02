@@ -111,6 +111,15 @@ Note
 
     No documentation. 
 
+    .. attribute:: pitchClassString
+
+    Return pitch class string, replacing 10 and 11 as needed. 
+
+    >>> d = Note()
+    >>> d.pitch = Pitch('b')
+    >>> d.pitchClassString
+    'B' 
+
     .. attribute:: ps
 
     Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
@@ -418,7 +427,7 @@ EighthNote
 
     **EighthNote** **properties**
 
-    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.pitchClassString`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
     Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
@@ -600,7 +609,7 @@ HalfNote
 
     **HalfNote** **properties**
 
-    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.pitchClassString`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
     Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
@@ -738,7 +747,7 @@ QuarterNote
 
     **QuarterNote** **properties**
 
-    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.pitchClassString`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
     Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
@@ -876,7 +885,7 @@ WholeNote
 
     **WholeNote** **properties**
 
-    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
+    Properties inherited from :class:`~music21.note.Note`: :attr:`~music21.note.Note.nameWithOctave`, :attr:`~music21.note.Note.pitchClass`, :attr:`~music21.note.Note.accidental`, :attr:`~music21.note.Note.diatonicNoteNum`, :attr:`~music21.note.Note.freq440`, :attr:`~music21.note.Note.frequency`, :attr:`~music21.note.Note.lily`, :attr:`~music21.note.Note.midi`, :attr:`~music21.note.Note.mx`, :attr:`~music21.note.Note.name`, :attr:`~music21.note.Note.octave`, :attr:`~music21.note.Note.pitchClassString`, :attr:`~music21.note.Note.ps`, :attr:`~music21.note.Note.step`
 
     Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
