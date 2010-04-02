@@ -486,8 +486,6 @@ class ChromaticInterval(music21.Music21Object):
         10
         >>> aInterval.intervalClass
         2
-        >>> aInterval.cent
-        -1400
         '''
         music21.Music21Object.__init__(self)
 
