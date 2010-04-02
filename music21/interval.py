@@ -26,9 +26,27 @@ from music21 import common
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 
+
+#-------------------------------------------------------------------------------
+# constants
+
+STEPNAMES = ['C','D','E','F','G','A','B']
+
 DESCENDING = -1
 OBLIQUE    = 0
 ASCENDING  = 1
+directionTerms = {DESCENDING:"Descending", 
+                  OBLIQUE:"Oblique", 
+                  ASCENDING:"Ascending"}
+
+# specifiers are derived from these two lists; 
+# perhaps better represented with a dictionary
+# perhaps the first entry, below, should be None, like in prefixSpecs?
+niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished']
+prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd']
+
+# constants provide the common numerical representation of an interval. 
+# this is not the number of half tone shift. 
 
 PERFECT    = 1
 MAJOR      = 2
@@ -40,105 +58,211 @@ DBLDIM     = 7
 TRPAUG     = 8
 TRPDIM     = 9
 
-
-STEPNAMES = ['C','D','E','F','G','A','B']
-
-niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished']
-
-prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd']
+# ordered list of perfect specifiers
 orderedPerfSpecs = ['ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA']
-
-perfspecifiers = [TRPDIM, DBLDIM, DIMINISHED, PERFECT, 
+perfSpecifiers = [TRPDIM, DBLDIM, DIMINISHED, PERFECT, 
                   AUGMENTED, DBLAUG, TRPAUG]
-perfoffset = 3 # that is, Perfect is third on the list.
+perfOffset = 3 # that is, Perfect is third on the list.s
 
+# ordered list of imperfect specifiers
 orderedImperfSpecs = ['ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA']
+# why is this not called imperfSpecifiers?
 specifiers = [TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR, 
               AUGMENTED, DBLAUG, TRPAUG]
-majoffset  = 4
-stepList = ["C", "D", "E", "F", "G", "A", "B"]
+majOffset  = 4 # index of Major
 
+# the following dictionaries provide half step shifts given key values
+# either as integers (generic) or as strings (adjust perfect/imprefect)
 #assuming Perfect or Major
 semitonesGeneric = {1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11} 
-
 semitonesAdjustPerfect = {"P":0, "A":1, "AA":2, "AAA":3, 
                           "d":-1, "dd":-2, "ddd":-3} #offset from Perfect
-
 semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, 
                          "d":-2, "dd":-3, "ddd":-4} #offset from Major
-
-directionTerms = {DESCENDING:"Descending", OBLIQUE:"Oblique", 
-                  ASCENDING:"Ascending"}
-
 
 
 #-------------------------------------------------------------------------------
 class IntervalException(Exception):
     pass
 
-class DiatonicInterval(music21.Music21Object):
-    #TODO: add more documentation
-    def __init__(self, specifier = None, generic = None):
-        music21.Music21Object.__init__(self)
 
-        if (specifier is not None and generic is not None):
-            if type(generic) is int:
-                self.generic = GenericInterval(generic)
-            else:
-                self.generic = generic
+#-------------------------------------------------------------------------------
+# some utility functions
 
-        self.name = ""
-        self.specifier = specifier
-        if (specifier):
-            self.name = prefixSpecs[specifier] + str(self.generic.undirected)
-            self.niceName = niceSpecNames[specifier] + " " + self.generic.niceName
-            self.directedName = prefixSpecs[specifier] + str(self.generic.directed)
-            self.directedNiceName = directionTerms[self.generic.direction] + " " + self.niceName
-            self.simpleName = prefixSpecs[specifier] + str(self.generic.simpleUndirected)
-            self.simpleNiceName = niceSpecNames[specifier] + " " + self.generic.simpleNiceName
-            self.semiSimpleName = prefixSpecs[specifier] + str(self.generic.semiSimpleUndirected)
-            self.semiSimpleNiceName = niceSpecNames[specifier] + " " + self.generic.semiSimpleNiceName
-            self.directedSimpleName = prefixSpecs[specifier] + str(self.generic.simpleDirected)
-            self.directedSimpleNiceName = directionTerms[self.generic.direction] + " " + self.simpleNiceName
-            self.specificName = niceSpecNames[specifier]
-            self.prefectable = self.generic.perfectable
+def convertSpecifier(specifier):
+    '''Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.
 
-            ### for inversions 
-            if self.prefectable:
-                ### generate inversions.  P <-> P; d <-> A; dd <-> AA; etc. 
-                self.orderedSpecifierIndex = orderedPerfSpecs.index(prefixSpecs[specifier])
-                self.invertedOrderedSpecIndex = len(orderedPerfSpecs) - 1 - self.orderedSpecifierIndex
-                self.invertedOrderedSpecifier = orderedPerfSpecs[self.invertedOrderedSpecIndex]
-            else:
-                ### generate inversions.  m <-> M; d <-> A; etc.
-                self.orderedSpecifierIndex = orderedImperfSpecs.index(prefixSpecs[specifier])
-                self.invertedOrderedSpecIndex = len(orderedImperfSpecs) - 1 - self.orderedSpecifierIndex
-                self.invertedOrderedSpecifier = orderedImperfSpecs[self.invertedOrderedSpecIndex]
-            self.mod7inversion = self.invertedOrderedSpecifier + str(self.generic.mod7inversion)
-            if self.generic.direction == DESCENDING:
-                self.mod7 = self.mod7inversion
-            else:
-                self.mod7 = self.simpleName
+    >>> convertSpecifier(3)
+    3
+    >>> convertSpecifier('p')
+    1
+    >>> convertSpecifier('P')
+    1
+    >>> convertSpecifier('M')
+    2
+    >>> convertSpecifier('major')
+    2
+    >>> convertSpecifier('m')
+    3
+    >>> convertSpecifier('Augmented')
+    4
+    >>> convertSpecifier('a')
+    4
+    >>> convertSpecifier(None)
+    '''
+    post = None
+    if common.isNum(specifier):
+        post = specifier
+    # check string matches
+    if common.isStr(specifier):
+        if specifier in prefixSpecs:
+            post = prefixSpecs.index(specifier)
+        # permit specifiers as prefixes without case; this will not distinguish
+        # between m and M, but was taken care of in the line above
+        elif specifier.lower() in [x.lower() for x in prefixSpecs[1:]]:    
+            for i in range(len(prefixSpecs)):
+                if prefixSpecs[i] == None: continue
+                if specifier.lower() == prefixSpecs[i].lower():
+                    post = i
+                    break
 
-    def __repr__(self):
-        return "<music21.interval.DiatonicInterval %s>" % self.name
+        elif specifier.lower() in [x.lower() for x in niceSpecNames[1:]]:    
+            for i in range(len(niceSpecNames)):
+                if niceSpecNames[i] == None: continue
+                if specifier.lower() == niceSpecNames[i].lower():
+                    post = i
+                    break
+    # if no match or None, None will be returned
+    return post
 
-            
+
+def convertGeneric(value):
+    '''Convert an interval specified in terms of its name (second, third) into an integer. If integers are passed, assume the are correct.
+
+    >>> convertGeneric(3)
+    3
+    >>> convertGeneric('third')
+    3
+    >>> convertGeneric('3rd')
+    3
+    >>> convertGeneric('octave')
+    8
+    >>> convertGeneric('twelfth')
+    12
+    >>> convertGeneric('descending twelfth')
+    -12
+    >>> convertGeneric(12)
+    12
+    >>> convertGeneric(-12)
+    -12
+    '''
+    post = None
+    if common.isNum(value):
+        post = value
+        directionScalar = 1 # may still be negative
+
+    elif common.isStr(value):
+        # first, see if there is a direction term
+        directionScalar = ASCENDING # assume ascending
+        for dir in [DESCENDING, ASCENDING]:
+            if directionTerms[dir].lower() in value.lower():
+                directionScalar = dir # assign numeric value
+                # strip direction
+                value = value.lower()
+                value = value.replace(directionTerms[dir].lower(), '')
+                value = value.strip()
+
+        if value.lower() in ['unison']:
+            post = 1
+        elif value.lower() in ['2nd', 'second']:
+            post = 2
+        elif value.lower() in ['3rd', 'third']:
+            post = 3
+        elif value.lower() in ['4th', 'fourth']:
+            post = 4
+        elif value.lower() in ['5th', 'fifth']:
+            post = 5
+        elif value.lower() in ['6th', 'sixth']:
+            post = 6
+        elif value.lower() in ['7th', 'seventh']:
+            post = 7
+        elif value.lower() in ['8th', 'eighth', 'octave']:
+            post = 8
+        elif value.lower() in ['9th', 'ninth']:
+            post = 9
+        elif value.lower() in ['10th', 'tenth']:
+            post = 10
+        elif value.lower() in ['11th', 'eleventh']:
+            post = 11
+        elif value.lower() in ['12th', 'twelfth']:
+            post = 12
+        elif value.lower() in ['13th', 'thirteenth']:
+            post = 13
+        elif value.lower() in ['14th', 'fourteenth']:
+            post = 14
+        elif value.lower() in ['15th', 'fifteenth']:
+            post = 15
+        elif value.lower() in ['16th', 'sixteenth']:
+            post = 16
+    if post != None:
+        post = post * directionScalar
+    return post
+
+
+
+#-------------------------------------------------------------------------------
 class GenericInterval(music21.Music21Object):
     '''
-    A generic interval is an interval such as Third, Seventh, Octave, Tenth.
-    Constructor takes an int specifying the interval and direction:
+    A GenericInterval is an interval such as Third, Seventh, Octave, Tenth.
+    Constructor takes an integer specifying the interval and direction. 
+
+    The interval is not specified in half-steps, but in numeric values equal to names: a Third is 3; a Seventh is 7, etc.
     
     staffDistance: the number of lines or spaces apart;  
         E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1
     '''
     
     def __init__(self, value):
+        '''
+        >>> aInterval = GenericInterval(3)
+        >>> aInterval.direction
+        1
+        >>> aInterval.perfectable
+        False
+        >>> aInterval.staffDistance
+        2
+
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.staffDistance
+        2
+
+        >>> aInterval = GenericInterval(-12)
+        >>> aInterval.perfectable
+        True
+        >>> aInterval.staffDistance
+        -11
+        >>> aInterval.mod7
+        4
+        >>> bInterval = aInterval.complement()
+        >>> bInterval.staffDistance
+        3
+
+        >>> aInterval = GenericInterval('descending twelfth')
+        >>> aInterval.perfectable
+        True
+        >>> aInterval.staffDistance
+        -11
+
+        >>> aInterval = GenericInterval(0)
+        Traceback (most recent call last):
+        IntervalException: The Zeroth is not an interval
+
+        '''
         music21.Music21Object.__init__(self)
 
-        self.value    = value
-        self.directed = value
-        self.undirected = abs(value)
+        self.value = convertGeneric(value)
+        self.directed = self.value
+        self.undirected = abs(self.value)
 
         if (self.directed == 1):
             self.direction = OBLIQUE
@@ -153,11 +277,11 @@ class GenericInterval(music21.Music21Object):
 
         if (self.undirected > 2): self.isSkip = True
         else: self.isSkip = False
+
         if (self.undirected == 2): self.isStep = True
         else: self.isStep = False
         
-        ## unisons (even augmented) are neither steps nor skips.
-
+        # unisons (even augmented) are neither steps nor skips.
         (steps, octaves) = math.modf(self.undirected/7.0)
         steps = int(steps*7 + .001)
         octaves = int(octaves)
@@ -166,7 +290,7 @@ class GenericInterval(music21.Music21Object):
             steps = 7
         self.simpleUndirected = steps
 
-        ## semiSimpleUndirected, same as simple, but P8 != P1
+        # semiSimpleUndirected, same as simple, but P8 != P1
         self.semiSimpleUndirected = steps
         self.undirectedOctaves = octaves
         
@@ -203,9 +327,10 @@ class GenericInterval(music21.Music21Object):
         elif self.directed < -1:
             self.staffDistance = self.directed + 1
         else:
-            raise Exception("Who the hell is using non-integer or -1 or 0 as a diatonic interval????")
+            raise IntervalException("Non-integer, -1, or 0 not permitted as a diatonic interval")
 
-        self.mod7inversion = 9 - self.semiSimpleUndirected #  2 -> 7; 3 -> 6; 8 -> 1 etc.
+        #  2 -> 7; 3 -> 6; 8 -> 1 etc.
+        self.mod7inversion = 9 - self.semiSimpleUndirected 
 
         if self.direction == DESCENDING:
             self.mod7 = self.mod7inversion  ## see chord.hasScaleX for usage...
@@ -221,6 +346,126 @@ class GenericInterval(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.interval.GenericInterval %s>" % self.directed
+
+
+
+
+class DiatonicInterval(music21.Music21Object):
+    #TODO: add more documentation
+    def __init__(self, specifier = None, generic = None):
+        '''
+        The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
+
+        The `generic` is an integer or GenericInterval instance.
+
+        >>> aInterval = DiatonicInterval(1, 1)
+        >>> aInterval.simpleName
+        'P1'
+        >>> aInterval = DiatonicInterval('p', 1)
+        >>> aInterval.simpleName
+        'P1'
+        >>> aInterval = DiatonicInterval('major', 3)
+        >>> aInterval.simpleName
+        'M3'
+        >>> aInterval.niceName
+        'Major Third'
+        >>> aInterval.semiSimpleName
+        'M3'
+        >>> aInterval.directedSimpleName
+        'M3'
+        >>> aInterval.invertedOrderedSpecifier
+        'm'
+        >>> aInterval.mod7
+        'M3'
+
+        >>> aInterval = DiatonicInterval('major', 'third')
+        >>> aInterval.niceName
+        'Major Third'
+
+        >>> aInterval = DiatonicInterval('perfect', 'octave')
+        >>> aInterval.niceName
+        'Perfect Octave'
+
+        >>> aInterval = DiatonicInterval('minor', 10)
+        >>> aInterval.mod7
+        'm3'
+
+        '''
+        music21.Music21Object.__init__(self)
+
+        if (specifier is not None and generic is not None):
+            if common.isNum(generic) or common.isStr(generic):
+                self.generic = GenericInterval(generic)
+            elif isinstance(generic, GenericInterval): 
+                self.generic = generic
+            else:
+                raise IntervalException('incorrect generic argument: %s' % generic)
+
+        self.name = ""
+        # translate strings, if provided, to integers
+        self.specifier = convertSpecifier(specifier)
+        if self.specifier != None:
+            self.name = (prefixSpecs[self.specifier] +
+                        str(self.generic.undirected))
+
+            self.niceName = (niceSpecNames[self.specifier] + " " +
+                             self.generic.niceName)
+
+            self.directedName = (prefixSpecs[self.specifier] +
+                                 str(self.generic.directed))
+
+            self.directedNiceName = (directionTerms[self.generic.direction] + 
+                                    " " + self.niceName)
+
+            self.simpleName = (prefixSpecs[self.specifier] +
+                              str(self.generic.simpleUndirected))
+
+            self.simpleNiceName = (niceSpecNames[self.specifier] + " " +
+                                  self.generic.simpleNiceName)
+
+            self.semiSimpleName = (prefixSpecs[self.specifier] +
+                                 str(self.generic.semiSimpleUndirected))
+
+            self.semiSimpleNiceName = (niceSpecNames[self.specifier] + " " + 
+                                    self.generic.semiSimpleNiceName)
+
+            self.directedSimpleName = (prefixSpecs[self.specifier] +
+                                     str(self.generic.simpleDirected))
+
+            self.directedSimpleNiceName = (directionTerms[
+                self.generic.direction] + " " + self.simpleNiceName)
+
+            self.specificName = niceSpecNames[self.specifier]
+            self.prefectable = self.generic.perfectable
+
+
+            # for inversions 
+            if self.prefectable:
+                # generate inversions.  P <-> P; d <-> A; dd <-> AA; etc. 
+                self.orderedSpecifierIndex = orderedPerfSpecs.index(
+                                             prefixSpecs[self.specifier])
+                self.invertedOrderedSpecIndex = (len(orderedPerfSpecs) - 
+                                        1 - self.orderedSpecifierIndex)
+                self.invertedOrderedSpecifier = orderedPerfSpecs[
+                                        self.invertedOrderedSpecIndex]
+            else:
+                # generate inversions.  m <-> M; d <-> A; etc.
+                self.orderedSpecifierIndex = orderedImperfSpecs.index(
+                                            prefixSpecs[self.specifier])
+                self.invertedOrderedSpecIndex = (len(orderedImperfSpecs) - 
+                                        1 - self.orderedSpecifierIndex)
+                self.invertedOrderedSpecifier = orderedImperfSpecs[
+                                        self.invertedOrderedSpecIndex]
+
+            self.mod7inversion = self.invertedOrderedSpecifier + str(
+                                 self.generic.mod7inversion)
+            if self.generic.direction == DESCENDING:
+                self.mod7 = self.mod7inversion
+            else:
+                self.mod7 = self.simpleName
+
+    def __repr__(self):
+        return "<music21.interval.DiatonicInterval %s>" % self.name
 
 
 class ChromaticInterval(music21.Music21Object):
@@ -296,7 +541,7 @@ class Interval(music21.Music21Object):
     direction = None
     generic   = None
     note1 = None  # n.b. -- at present, changing these does NOT change
-    note2 = None  #   the interval.  Get an interval from two notes from generateInterval(n1, n2)
+    note2 = None  # the interval.  Get an interval from two notes from generateInterval(n1, n2)
     type = "" # harmonic or melodic
     diatonicType = 0
     niceName = ""
@@ -521,7 +766,7 @@ def _separateIntervalFromString(string):
     # a number corresponding to the interval type, as I understand it - JDR
     if gInterval.perfectable:
         specIndex = orderedPerfSpecs.index(specName)
-        specifier = perfspecifiers[specIndex]
+        specifier = perfSpecifiers[specIndex]
     else:
         specIndex = orderedImperfSpecs.index(specName)
         specifier = specifiers[specIndex]
@@ -617,9 +862,9 @@ def getSpecifier(gInt, cInt):
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
     theseSemis  = cInt.undirected
     if gInt.perfectable:
-        specifier = perfspecifiers[perfoffset + theseSemis - normalSemis]
+        specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
     else:
-        specifier = specifiers[majoffset + theseSemis - normalSemis]
+        specifier = specifiers[majOffset + theseSemis - normalSemis]
     return specifier    
 
 
