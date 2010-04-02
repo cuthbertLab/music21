@@ -213,10 +213,10 @@ def convertGeneric(value):
 #-------------------------------------------------------------------------------
 class GenericInterval(music21.Music21Object):
     '''
-    A GenericInterval is an interval such as Third, Seventh, Octave, Tenth.
-    Constructor takes an integer specifying the interval and direction. 
+    A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
+    Constructor takes an integer or string specifying the interval and direction. 
 
-    The interval is not specified in half-steps, but in numeric values equal to names: a Third is 3; a Seventh is 7, etc.
+    The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') are accepted.
     
     staffDistance: the number of lines or spaces apart;  
         E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1
@@ -351,7 +351,9 @@ class GenericInterval(music21.Music21Object):
 
 
 class DiatonicInterval(music21.Music21Object):
-    #TODO: add more documentation
+    '''A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). 
+    '''
+
     def __init__(self, specifier = None, generic = None):
         '''
         The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
@@ -469,19 +471,24 @@ class DiatonicInterval(music21.Music21Object):
 
 
 class ChromaticInterval(music21.Music21Object):
-    '''Chromatic interval class -- thinks of everything in semitones
+    '''Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
 
-    chromInt = chromaticInterval (-14)
-
-    attributes:
-       semitones     # -14
-       undirected    # 14
-       mod12         # 10
-       intervalClass #  2
-       cents         # -1400
     '''
 
     def __init__(self, value = None):
+        '''
+        >>> aInterval = ChromaticInterval(-14)
+        >>> aInterval.semitones
+        -14
+        >>> aInterval.undirected
+        14
+        >>> aInterval.mod12
+        10
+        >>> aInterval.intervalClass
+        2
+        >>> aInterval.cent
+        -1400
+        '''
         music21.Music21Object.__init__(self)
 
         self.semitones = value
