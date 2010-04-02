@@ -474,8 +474,7 @@ class ChromaticInterval(music21.Music21Object):
     '''Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
 
     '''
-
-    def __init__(self, value = None):
+    def __init__(self, value):
         '''
         >>> aInterval = ChromaticInterval(-14)
         >>> aInterval.semitones
