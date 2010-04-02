@@ -109,7 +109,14 @@
 <tt class="descclassname">music21.interval.</tt><tt class="descname">generateDiatonic</tt><big>(</big><em>gInt</em>, <em>cInt</em><big>)</big><a class="headerlink" href="#music21.interval.generateDiatonic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>generateDiatonic(GenericInterval, ChromaticInterval) -&gt; DiatonicInterval Generates a DiatonicInterval from the given Generic and Chromatic intervals.</p>
+<p>Given a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a> and a <a title="music21.interval.ChromaticInterval" class="reference internal" href="#music21.interval.ChromaticInterval"><tt class="xref docutils literal"><span class="pre">ChromaticInterval</span></tt></a> object, return a <a title="music21.interval.DiatonicInterval" class="reference internal" href="#music21.interval.DiatonicInterval"><tt class="xref docutils literal"><span class="pre">DiatonicInterval</span></tt></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="s">&#39;descending fifth&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="o">-</span><span class="mf">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cInterval</span> <span class="o">=</span> <span class="n">generateDiatonic</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cInterval</span>
+<span class="go">&lt;music21.interval.DiatonicInterval P5&gt;</span>
+</pre></div>
+</div>
 <dl class="function">
 <dt id="music21.interval.generateInterval">
 <tt class="descclassname">music21.interval.</tt><tt class="descname">generateInterval</tt><big>(</big><em>n1</em>, <em>n2=None</em><big>)</big><a class="headerlink" href="#music21.interval.generateInterval" title="Permalink to this definition">¶</a></dt>
@@ -290,7 +297,15 @@
 <tt class="descclassname">music21.interval.</tt><tt class="descname">getSpecifier</tt><big>(</big><em>gInt</em>, <em>cInt</em><big>)</big><a class="headerlink" href="#music21.interval.getSpecifier" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>getSpecifier(GenericInterval, ChromaticInterval) -&gt; specifier Returns the specifier (i.e. MAJOR, MINOR, etc...) of the diatonic interval defined by the given Generic and Chromatic intervals.</p>
+<p>Given a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a> and a <a title="music21.interval.ChromaticInterval" class="reference internal" href="#music21.interval.ChromaticInterval"><tt class="xref docutils literal"><span class="pre">ChromaticInterval</span></tt></a> object, return a specifier (i.e. MAJOR, MINOR, etc...).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="s">&#39;seventh&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="mf">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getSpecifier</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;major&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
 <dl class="function">
 <dt id="music21.interval.getWrittenHigherNote">
 <tt class="descclassname">music21.interval.</tt><tt class="descname">getWrittenHigherNote</tt><big>(</big><em>note1</em>, <em>note2</em><big>)</big><a class="headerlink" href="#music21.interval.getWrittenHigherNote" title="Permalink to this definition">¶</a></dt>
@@ -640,7 +655,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 01, 2010.
+      Last updated on Apr 02, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

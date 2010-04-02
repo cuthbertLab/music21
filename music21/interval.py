@@ -964,21 +964,15 @@ def generateGeneric(n1, n2):
     return GenericInterval(genDist)
 
 
-    
-def generateDiatonic(gInt, cInt):
-    '''generateDiatonic(GenericInterval, ChromaticInterval) -> DiatonicInterval
-    
-    Generates a DiatonicInterval from the given Generic and Chromatic intervals.
-    '''
-    specifier = getSpecifier(gInt, cInt)
-    return DiatonicInterval(specifier, gInt)
-    
 def getSpecifier(gInt, cInt):
-    '''getSpecifier(GenericInterval, ChromaticInterval) -> specifier
+    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
     
-    Returns the specifier (i.e. MAJOR, MINOR, etc...) of the diatonic interval 
-    defined by the given Generic and Chromatic intervals.
-
+    >>> aInterval = GenericInterval('seventh')
+    >>> bInterval = ChromaticInterval(11)
+    >>> getSpecifier(aInterval, bInterval)
+    2
+    >>> convertSpecifier('major')
+    2
     '''
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
@@ -988,6 +982,20 @@ def getSpecifier(gInt, cInt):
     else:
         specifier = specifiers[majOffset + theseSemis - normalSemis]
     return specifier    
+
+    
+def generateDiatonic(gInt, cInt):
+    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
+
+    >>> aInterval = GenericInterval('descending fifth')
+    >>> bInterval = ChromaticInterval(-7)
+    >>> cInterval = generateDiatonic(aInterval, bInterval)
+    >>> cInterval
+    <music21.interval.DiatonicInterval P5>
+    '''
+    specifier = getSpecifier(gInt, cInt)
+    return DiatonicInterval(specifier, gInt)
+    
 
 
 #-------------------------------------------------------------------------------

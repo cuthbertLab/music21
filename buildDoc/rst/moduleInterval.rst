@@ -22,7 +22,13 @@ Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interv
 
 .. function:: generateDiatonic(gInt, cInt)
 
-generateDiatonic(GenericInterval, ChromaticInterval) -> DiatonicInterval Generates a DiatonicInterval from the given Generic and Chromatic intervals. 
+Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`. 
+
+>>> aInterval = GenericInterval('descending fifth')
+>>> bInterval = ChromaticInterval(-7)
+>>> cInterval = generateDiatonic(aInterval, bInterval)
+>>> cInterval
+<music21.interval.DiatonicInterval P5> 
 
 .. function:: generateInterval(n1, n2=None)
 
@@ -174,9 +180,14 @@ Given two :class:`~music21.note.Note` objects, returns the lower note based on a
 
 .. function:: getSpecifier(gInt, cInt)
 
-getSpecifier(GenericInterval, ChromaticInterval) -> specifier Returns the specifier (i.e. MAJOR, MINOR, etc...) of the diatonic interval defined by the given Generic and Chromatic intervals. 
+Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...). 
 
-
+>>> aInterval = GenericInterval('seventh')
+>>> bInterval = ChromaticInterval(11)
+>>> getSpecifier(aInterval, bInterval)
+2 
+>>> convertSpecifier('major')
+2 
 
 .. function:: getWrittenHigherNote(note1, note2)
 
