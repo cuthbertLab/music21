@@ -843,6 +843,7 @@ music21.serial.RowSchoenbergOp26.opus attribute moduleSerial.html
 music21.serial.RowSchoenbergOp47.row attribute moduleSerial.html
 music21.clef.BassClef.lowestLine attribute moduleClef.html
 music21.duration.Tuplet.frozen attribute moduleDuration.html
+music21.pitch.convertPitchClassToNumber function modulePitch.html
 music21.serial.RowSchoenbergOp30.opus attribute moduleSerial.html
 music21.note.GeneralNote.appendDuration method moduleNote.html
 music21.meter.fractionSum function moduleMeter.html
@@ -916,6 +917,7 @@ music21.graph.PlotScatterWeightedPitchClassQuarterLength.__init__ method moduleG
 music21.duration.Tuplet.setRatio method moduleDuration.html
 music21.node.Node.tag attribute moduleNode.html
 music21.note.Rest.isRest attribute moduleNote.html
+music21.pitch.Pitch.pitchClassString attribute modulePitch.html
 music21.note.Note.isNote attribute moduleNote.html
 music21.duration.DurationUnit.lily attribute moduleDuration.html
 music21.serial.TwelveToneRow.row attribute moduleSerial.html
@@ -1290,6 +1292,7 @@ music21.graph.Graph3DBars class moduleGraph.html
 music21.stream.Measure.measureNumber attribute moduleStream.html
 music21.duration.Duration.mx attribute moduleDuration.html
 music21.duration.Duration.type attribute moduleDuration.html
+music21.pitch.convertPitchClassToStr function modulePitch.html
 music21.editorial.NoteEditorial.lilyStart method moduleEditorial.html
 music21.common.lessThan function moduleCommon.html
 music21.graph.Graph.setDoneAction method moduleGraph.html

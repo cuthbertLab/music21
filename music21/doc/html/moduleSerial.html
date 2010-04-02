@@ -165,7 +165,20 @@
 <tt class="descclassname">music21.serial.</tt><tt class="descname">pcToToneRow</tt><big>(</big><em>pcSet</em><big>)</big><a class="headerlink" href="#music21.serial.pcToToneRow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>A convenience function that, given a list of pitch classes represented as integers</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pcToToneRow</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">12</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrixObj</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">matrixObj</span>
+<span class="go">0  1  2  3  4  5  6  7  8  9  A  B</span>
+<span class="go">B  0  1  2  3  4  5  6  7  8  9  A</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pcToToneRow</span><span class="p">([</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">,</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrixObj</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">matrixObj</span>
+<span class="go">0  1  8  2  3  A  6  4  5  9  7  B</span>
+<span class="go">B  0  7  1  2  9  5  3  4  8  6  A</span>
+<span class="gp">...</span>
 </pre></div>
 </div>
 <dl class="function">
@@ -179,7 +192,8 @@
 <dt id="music21.serial.ToneRow">
 <em class="property">
 class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">ToneRow</tt><a class="headerlink" href="#music21.serial.ToneRow" title="Permalink to this definition">¶</a></dt>
-<dd><p>inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+<dd><p>A Stream representation of a tone row, or an ordered sequence of pitches.</p>
+<p>inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>ToneRow</strong> <strong>attributes</strong></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference external" href="moduleStream.html#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <a title="music21.stream.Stream.isFlat" class="reference external" href="moduleStream.html#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference external" href="moduleStream.html#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
@@ -211,7 +225,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.TwelveToneRow.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference external" href="moduleStream.html#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <a title="music21.stream.Stream.isFlat" class="reference external" href="moduleStream.html#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference external" href="moduleStream.html#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 <p><strong>TwelveToneRow</strong> <strong>properties</strong></p>
@@ -229,13 +243,13 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <tt class="descname">matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.serial.TwelveToneRow.matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Returns a TwelveToneMatrix object for the row.  That object can just be printed (or displayed via .show())</p>
+<p>Returns a <a title="music21.serial.TwelveToneMatrix" class="reference internal" href="#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a> object for the row.  That object can just be printed (or displayed via .show())</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s37</span> <span class="o">=</span> <span class="n">RowSchoenbergOp37</span><span class="p">()</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">s37</span>
-<span class="go">0 11  7  8  3  1  2 10  6  5  4  9</span>
-<span class="go">1  0  8  9  4  2  3 11  7  6  5 10</span>
-<span class="go">5  4  0  1  8  6  7  3 11 10  9  2</span>
-<span class="go">4  3 11  0  7  5  6  2 10  9  8  1</span>
+<span class="go">0  B  7  8  3  1  2  A  6  5  4  9</span>
+<span class="go">1  0  8  9  4  2  3  B  7  6  5  A</span>
+<span class="go">5  4  0  1  8  6  7  3  B  A  9  2</span>
+<span class="go">4  3  B  0  7  5  6  2  A  9  8  1</span>
 <span class="gp">...</span>
 </pre></div>
 </div>
@@ -250,7 +264,8 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <dt id="music21.serial.TwelveToneMatrix">
 <em class="property">
 class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">TwelveToneMatrix</tt><a class="headerlink" href="#music21.serial.TwelveToneMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+<dd><p>An object representation of a 2-dimensional array of 12 pitches. Internal representation is as a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, which stores 12 Streams, each Stream a horizontal row of pitches in the matrix. This object is commonly used by calling the <tt class="xref docutils literal"><span class="pre">matrix()</span></tt> method of <tt class="xref docutils literal"><span class="pre">TwelveToneRow()</span></tt> (or a subclass).</p>
+<p>inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>TwelveToneMatrix</strong> <strong>attributes</strong></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference external" href="moduleStream.html#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <a title="music21.stream.Stream.isFlat" class="reference external" href="moduleStream.html#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference external" href="moduleStream.html#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
@@ -296,7 +311,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergChamberConcerto.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergChamberConcerto.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergChamberConcerto.title" title="Permalink to this definition">¶</a></dt>
@@ -340,7 +355,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergConcertoForViolinAndOrchestra.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergConcertoForViolinAndOrchestra.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergConcertoForViolinAndOrchestra.title" title="Permalink to this definition">¶</a></dt>
@@ -384,7 +399,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergDerWein.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergDerWein.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergDerWein.title" title="Permalink to this definition">¶</a></dt>
@@ -428,7 +443,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergLuluActISceneXx.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergLuluActISceneXx.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergLuluActISceneXx.title" title="Permalink to this definition">¶</a></dt>
@@ -472,7 +487,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergLuluActIiScene1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergLuluActIiScene1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergLuluActIiScene1.title" title="Permalink to this definition">¶</a></dt>
@@ -516,7 +531,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergLuluPrimaryRow.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergLuluPrimaryRow.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergLuluPrimaryRow.title" title="Permalink to this definition">¶</a></dt>
@@ -560,7 +575,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergLyricSuiteLastMvtPermutation.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergLyricSuiteLastMvtPermutation.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergLyricSuiteLastMvtPermutation.title" title="Permalink to this definition">¶</a></dt>
@@ -604,7 +619,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergLyricSuitePrimaryRow.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergLyricSuitePrimaryRow.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergLyricSuitePrimaryRow.title" title="Permalink to this definition">¶</a></dt>
@@ -648,7 +663,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowBergWozzeckActIScene4Passacaglia.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowBergWozzeckActIScene4Passacaglia.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowBergWozzeckActIScene4Passacaglia.title" title="Permalink to this definition">¶</a></dt>
@@ -692,7 +707,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergDieJakobsleiter.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergDieJakobsleiter.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergDieJakobsleiter.title" title="Permalink to this definition">¶</a></dt>
@@ -736,7 +751,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentForPiano.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergFragmentForPiano.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentForPiano.title" title="Permalink to this definition">¶</a></dt>
@@ -780,7 +795,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano.title" title="Permalink to this definition">¶</a></dt>
@@ -824,7 +839,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentOfSonataForOrgan.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergFragmentOfSonataForOrgan.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergFragmentOfSonataForOrgan.title" title="Permalink to this definition">¶</a></dt>
@@ -868,7 +883,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergIsraelExistsAgain.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergIsraelExistsAgain.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergIsraelExistsAgain.title" title="Permalink to this definition">¶</a></dt>
@@ -912,7 +927,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergMosesAndAron.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergMosesAndAron.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergMosesAndAron.title" title="Permalink to this definition">¶</a></dt>
@@ -956,7 +971,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp23No5.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp23No5.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp23No5.title" title="Permalink to this definition">¶</a></dt>
@@ -1000,7 +1015,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp24Movement4.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp24Movement4.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp24Movement4.title" title="Permalink to this definition">¶</a></dt>
@@ -1044,7 +1059,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp24Movement5.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp24Movement5.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp24Movement5.title" title="Permalink to this definition">¶</a></dt>
@@ -1088,7 +1103,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp25.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp25.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp25.title" title="Permalink to this definition">¶</a></dt>
@@ -1132,7 +1147,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp26.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp26.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp26.title" title="Permalink to this definition">¶</a></dt>
@@ -1176,7 +1191,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp27No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No1.title" title="Permalink to this definition">¶</a></dt>
@@ -1220,7 +1235,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp27No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No2.title" title="Permalink to this definition">¶</a></dt>
@@ -1264,7 +1279,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp27No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No3.title" title="Permalink to this definition">¶</a></dt>
@@ -1308,7 +1323,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No4.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp27No4.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp27No4.title" title="Permalink to this definition">¶</a></dt>
@@ -1352,7 +1367,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp28No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp28No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp28No1.title" title="Permalink to this definition">¶</a></dt>
@@ -1396,7 +1411,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp28No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp28No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp28No3.title" title="Permalink to this definition">¶</a></dt>
@@ -1440,7 +1455,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp29.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp29.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp29.title" title="Permalink to this definition">¶</a></dt>
@@ -1484,7 +1499,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp30.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp30.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp30.title" title="Permalink to this definition">¶</a></dt>
@@ -1528,7 +1543,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp31.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp31.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp31.title" title="Permalink to this definition">¶</a></dt>
@@ -1572,7 +1587,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp32.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp32.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp32.title" title="Permalink to this definition">¶</a></dt>
@@ -1616,7 +1631,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp33A.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp33A.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp33A.title" title="Permalink to this definition">¶</a></dt>
@@ -1660,7 +1675,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp33B.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp33B.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp33B.title" title="Permalink to this definition">¶</a></dt>
@@ -1704,7 +1719,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp34.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp34.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp34.title" title="Permalink to this definition">¶</a></dt>
@@ -1748,7 +1763,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp35No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No1.title" title="Permalink to this definition">¶</a></dt>
@@ -1792,7 +1807,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp35No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No2.title" title="Permalink to this definition">¶</a></dt>
@@ -1836,7 +1851,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp35No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No3.title" title="Permalink to this definition">¶</a></dt>
@@ -1880,7 +1895,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No5.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp35No5.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp35No5.title" title="Permalink to this definition">¶</a></dt>
@@ -1924,7 +1939,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp36.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp36.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp36.title" title="Permalink to this definition">¶</a></dt>
@@ -1968,7 +1983,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp37.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp37.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp37.title" title="Permalink to this definition">¶</a></dt>
@@ -2012,7 +2027,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp41.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp41.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp41.title" title="Permalink to this definition">¶</a></dt>
@@ -2056,7 +2071,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp42.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp42.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp42.title" title="Permalink to this definition">¶</a></dt>
@@ -2100,7 +2115,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp44.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp44.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp44.title" title="Permalink to this definition">¶</a></dt>
@@ -2144,7 +2159,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp45.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp45.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp45.title" title="Permalink to this definition">¶</a></dt>
@@ -2188,7 +2203,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp46.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp46.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp46.title" title="Permalink to this definition">¶</a></dt>
@@ -2232,7 +2247,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp47.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp47.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp47.title" title="Permalink to this definition">¶</a></dt>
@@ -2276,7 +2291,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp48No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No1.title" title="Permalink to this definition">¶</a></dt>
@@ -2320,7 +2335,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp48No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No2.title" title="Permalink to this definition">¶</a></dt>
@@ -2364,7 +2379,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp48No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp48No3.title" title="Permalink to this definition">¶</a></dt>
@@ -2408,7 +2423,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50A.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp50A.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50A.title" title="Permalink to this definition">¶</a></dt>
@@ -2452,7 +2467,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50B.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp50B.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50B.title" title="Permalink to this definition">¶</a></dt>
@@ -2496,7 +2511,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50C.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowSchoenbergOp50C.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowSchoenbergOp50C.title" title="Permalink to this definition">¶</a></dt>
@@ -2540,7 +2555,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp17No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp17No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp17No2.title" title="Permalink to this definition">¶</a></dt>
@@ -2584,7 +2599,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp17No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp17No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp17No3.title" title="Permalink to this definition">¶</a></dt>
@@ -2628,7 +2643,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp18No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No1.title" title="Permalink to this definition">¶</a></dt>
@@ -2672,7 +2687,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp18No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No2.title" title="Permalink to this definition">¶</a></dt>
@@ -2716,7 +2731,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No3.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp18No3.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp18No3.title" title="Permalink to this definition">¶</a></dt>
@@ -2760,7 +2775,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp19No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp19No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp19No1.title" title="Permalink to this definition">¶</a></dt>
@@ -2804,7 +2819,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp19No2.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp19No2.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp19No2.title" title="Permalink to this definition">¶</a></dt>
@@ -2848,7 +2863,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp20.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp20.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp20.title" title="Permalink to this definition">¶</a></dt>
@@ -2892,7 +2907,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp21.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp21.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp21.title" title="Permalink to this definition">¶</a></dt>
@@ -2936,7 +2951,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp22.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp22.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp22.title" title="Permalink to this definition">¶</a></dt>
@@ -2980,7 +2995,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp23.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp23.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp23.title" title="Permalink to this definition">¶</a></dt>
@@ -3024,7 +3039,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp24.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp24.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp24.title" title="Permalink to this definition">¶</a></dt>
@@ -3068,7 +3083,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp25.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp25.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp25.title" title="Permalink to this definition">¶</a></dt>
@@ -3112,7 +3127,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp26.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp26.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp26.title" title="Permalink to this definition">¶</a></dt>
@@ -3156,7 +3171,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp27.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp27.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp27.title" title="Permalink to this definition">¶</a></dt>
@@ -3200,7 +3215,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp28.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp28.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp28.title" title="Permalink to this definition">¶</a></dt>
@@ -3244,7 +3259,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp29.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp29.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp29.title" title="Permalink to this definition">¶</a></dt>
@@ -3288,7 +3303,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp30.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp30.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp30.title" title="Permalink to this definition">¶</a></dt>
@@ -3332,7 +3347,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOp31.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOp31.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOp31.title" title="Permalink to this definition">¶</a></dt>
@@ -3376,7 +3391,7 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Ro
 <tt class="descname">row</tt><a class="headerlink" href="#music21.serial.RowWebernOpNo17No1.row" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>No documentation.</p>
+<p>A list representing the pitch class values of the row.</p>
 <dl class="attribute">
 <dt id="music21.serial.RowWebernOpNo17No1.title">
 <tt class="descname">title</tt><a class="headerlink" href="#music21.serial.RowWebernOpNo17No1.title" title="Permalink to this definition">¶</a></dt>

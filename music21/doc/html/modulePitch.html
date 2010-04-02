@@ -138,11 +138,37 @@
 </pre></div>
 </div>
 <dl class="function">
+<dt id="music21.pitch.convertPitchClassToNumber">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToNumber</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToNumber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span>
+<span class="go">11</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.pitch.convertPitchClassToStr">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToStr</tt><big>(</big><em>pc</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToStr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a pitch class number, return a string.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="go">&#39;3&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">10</span><span class="p">)</span>
+<span class="go">&#39;A&#39;</span>
+</pre></div>
+</div>
+<dl class="function">
 <dt id="music21.pitch.convertPsToFq">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz</p>
+<p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
 <span class="go">440.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
@@ -407,6 +433,20 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;pitch&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;step&#39;</span><span class="p">)</span>
 <span class="go">&#39;G&#39;</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="music21.pitch.Pitch.pitchClassString">
+<tt class="descname">pitchClassString</tt><a class="headerlink" href="#music21.pitch.Pitch.pitchClassString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with <a title="music21.pitch.Pitch.pitchClass" class="reference internal" href="#music21.pitch.Pitch.pitchClass"><tt class="xref docutils literal"><span class="pre">pitchClass</span></tt></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClassString</span> <span class="o">=</span> <span class="s">&#39;B&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClass</span>
+<span class="go">11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClassString</span>
+<span class="go">&#39;B&#39;</span>
 </pre></div>
 </div>
 <dl class="attribute">

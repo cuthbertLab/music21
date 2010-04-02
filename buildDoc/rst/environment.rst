@@ -15,7 +15,7 @@ For complete information on the Environment object, see :mod:`music21.environmen
 Creating and Configuring an Environment
 ----------------------------------------
 
-Environment files are not created by default. To create an environment file, import environment form Music21 and create an Environment object. Then, call the  :meth:`music21.environment.Environment.write` method to create an XML environment file.
+Environment files are not created by default. To create an environment file, import environment form Music21 and create an :class:`music21.environment.Environment` object. Then, call the  :meth:`music21.environment.Environment.write` method to create an XML environment file.
 
     >>> from music21 import environment
     >>> a = environment.Environment()

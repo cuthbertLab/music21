@@ -90,11 +90,18 @@
             
   <div class="section" id="overview-post-tonal-tools">
 <span id="overviewposttonal"></span><h1>Overview: Post-Tonal Tools<a class="headerlink" href="#overview-post-tonal-tools" title="Permalink to this headline">¶</a></h1>
-<p>The music21 system features many tools for post-tonal analysis.</p>
-<p>For complete documentation on post-tonal tools, see <a class="reference external" href="moduleChord.html#modulechord"><em>music21.chord</em></a> and <a class="reference external" href="moduleSerial.html#moduleserial"><em>music21.serial</em></a>.</p>
+<p>The music21 toolkit features many tools for analyzing and creating music within a post-tonal context.</p>
+<p>For complete documentation on post-tonal tools, see the many methods in <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> as well as the objects in <a class="reference external" href="moduleSerial.html#moduleserial"><em>music21.serial</em></a> such as <a title="music21.serial.TwelveToneMatrix" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a>, <a title="music21.serial.TwelveToneRow" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneRow"><tt class="xref docutils literal"><span class="pre">TwelveToneRow</span></tt></a>, and the many twelve tone rows defined in <tt class="xref docutils literal"><span class="pre">vienneseRows</span></tt>.</p>
 <div class="section" id="pitches-as-pitch-classes">
 <h2>Pitches as Pitch Classes<a class="headerlink" href="#pitches-as-pitch-classes" title="Permalink to this headline">¶</a></h2>
-<p>Any music21 Pitch, or a Note containing Pitch, can be expressed as Pitch class.</p>
+<p>Any music21 <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a>, or a  <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> containing Pitch, can be expressed as pitch class integer using the <tt class="xref docutils literal"><span class="pre">pithClass</span></tt> and <tt class="xref docutils literal"><span class="pre">pithClassString</span></tt> properties.</p>
+<p>In the following example, the <tt class="xref docutils literal"><span class="pre">parseWork()</span></tt> function is used to create a <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a> object. The <tt class="xref docutils literal"><span class="pre">id</span></tt> attribute of each contained <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> is presented in a list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aScore</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;beethoven/opus59no2&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">aScore</span><span class="p">]</span>
+<span class="go">[u&#39;Violin I.&#39;, u&#39;Violin II.&#39;, u&#39;Viola.&#39;, u&#39;Violoncello.&#39;]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="chords-as-forte-set-classes">
 <h2>Chords as Forte Set Classes<a class="headerlink" href="#chords-as-forte-set-classes" title="Permalink to this headline">¶</a></h2>

@@ -49,9 +49,29 @@ Utility conversion: from a pitch name to a pitch space number (floating point MI
 >>> convertNameToPs('b2##')
 49.0 
 
+.. function:: convertPitchClassToNumber(ps)
+
+Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation. 
+
+>>> convertPitchClassToNumber(3)
+3 
+>>> convertPitchClassToNumber('a')
+10 
+>>> convertPitchClassToNumber('B')
+11 
+
+.. function:: convertPitchClassToStr(pc)
+
+Given a pitch class number, return a string. 
+
+>>> convertPitchClassToStr(3)
+'3' 
+>>> convertPitchClassToStr(10)
+'A' 
+
 .. function:: convertPsToFq(ps)
 
-Utility conversion; does not process internals. NOT CURRENTLY USED: since freq440 had its own conversion methods, and wanted the numbers to be EXACTLY the same either way Assumes A4 = 440 Hz 
+Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
 >>> convertPsToFq(69)
 440.0 
@@ -276,6 +296,17 @@ Pitch
     >>> c = a.mx
     >>> c.get('pitch').get('step')
     'G' 
+
+    .. attribute:: pitchClassString
+
+    Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
+
+    >>> a = Pitch('a3')
+    >>> a.pitchClassString = 'B'
+    >>> a.pitchClass
+    11 
+    >>> a.pitchClassString
+    'B' 
 
     .. attribute:: ps
 
