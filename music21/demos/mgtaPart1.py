@@ -73,6 +73,14 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 #             k1.show()
 
 
+def ch1_basic_I_C(show=True, *arguments, **keywords):
+    '''
+    p3.
+    start at a key marked with an ex, move finger according to pattern of half and whole steps; mark key at end with an astrick
+    '''
+    start = 'a4'
+    intervals = [interval.Interval()]
+
 
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''

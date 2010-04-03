@@ -546,18 +546,32 @@ class ChromaticInterval(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-def _separateIntervalFromString(string):
+def _convertStringToIntervals(string):
     '''A function for processing interval strings and returning Interval objects. Used by the Interval class, below. 
 
-    >>> _separateIntervalFromString('P5')
+    >>> _convertStringToIntervals('P5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
-    >>> _separateIntervalFromString('P-5')
+    >>> _convertStringToIntervals('P-5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval -7>)
-    >>> _separateIntervalFromString('M3')
+    >>> _convertStringToIntervals('M3')
     (<music21.interval.DiatonicInterval M3>, <music21.interval.ChromaticInterval 4>)
-    >>> _separateIntervalFromString('m3')
+    >>> _convertStringToIntervals('m3')
     (<music21.interval.DiatonicInterval m3>, <music21.interval.ChromaticInterval 3>)
+
+    >>> _convertStringToIntervals('whole')
+    (<music21.interval.DiatonicInterval M2>, <music21.interval.ChromaticInterval 2>)
+    >>> _convertStringToIntervals('half')
+    (<music21.interval.DiatonicInterval m2>, <music21.interval.ChromaticInterval 1>)
+    >>> _convertStringToIntervals('semitone')
+    (<music21.interval.DiatonicInterval m2>, <music21.interval.ChromaticInterval 1>)
+
     '''
+    # permit whole and half appreviations
+    if string.lower() in ['w', 'whole', 'tone']:
+        string = 'M2'
+    elif string.lower() in ['h', 'half', 'semitone']:
+        string = 'm2'
+
     # permit variable case when it does not offer any difference
     # that is, only make m/M matter
     string = string.replace('p', 'P')
@@ -590,10 +604,10 @@ def _separateIntervalFromString(string):
 
     semitones = (octaveOffset*12) + semitonesStart + semitonesAdjust
     if generic < 0: # want direction to be same as original direction
-        semitones *= -1     # (automatically positive until this step)
+        semitones *= -1 # (automatically positive until this step)
                                 
     cInterval = ChromaticInterval(semitones)
-    return (dInterval, cInterval)
+    return dInterval, cInterval
 
 
 class Interval(music21.Music21Object):
@@ -666,15 +680,25 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval('p5')
         >>> aInterval
         <music21.interval.Interval P5>
+
+        >>> aInterval = Interval('half')
+        >>> aInterval
+        <music21.interval.Interval m2>
         '''
 
 
         music21.Music21Object.__init__(self)
         if len(args) == 1 and common.isStr(args[0]):
             # convert common string representations 
-            dInterval, cInterval = _separateIntervalFromString(args[0])
+            dInterval, cInterval = _convertStringToIntervals(args[0])
             self.diatonic = dInterval
             self.chromatic = cInterval
+
+        # if we get a first argument that is a number, treat it as a chromatic
+        # interval creation argument
+        elif len(args) == 1 and common.isNum(args[0]):
+            pass
+
         else:
             if "diatonic" in keydict:
                 self.diatonic = keydict['diatonic']
@@ -945,7 +969,7 @@ def generateIntervalFromString(string):
     <music21.interval.Interval m3>
 
     '''
-    (dInterval, cInterval) = _separateIntervalFromString(string)
+    (dInterval, cInterval) = _convertStringToIntervals(string)
     allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
     return allInterval
         
@@ -958,6 +982,7 @@ def generateChromatic(n1, n2):
     >>> generateChromatic(aNote, bNote)
     <music21.interval.ChromaticInterval 20>
     '''
+    # TODO: rename getChromaticFromNotes
     return ChromaticInterval(n2.midi - n1.midi)
 
 def generateGeneric(n1, n2):
@@ -971,6 +996,7 @@ def generateGeneric(n1, n2):
     <music21.interval.GenericInterval 12>
 
     '''
+    # TODO: rename getGenericFromNotes
     staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
     genDist   = convertStaffDistanceToInterval(staffDist)
     return GenericInterval(genDist)
@@ -1005,6 +1031,8 @@ def generateDiatonic(gInt, cInt):
     >>> cInterval
     <music21.interval.DiatonicInterval P5>
     '''
+
+    # TODO: rename getDiatonicFromIntervals
     specifier = getSpecifier(gInt, cInt)
     return DiatonicInterval(specifier, gInt)
     
