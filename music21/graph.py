@@ -355,7 +355,7 @@ class GraphHorizontalBar(Graph):
     def __init__(self, *args, **keywords):
         '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap.
 
-        Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-end points.
+        Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
 
         >>> a = GraphHorizontalBar(doneAction=None)
         >>> data = [('a', [(10,20), (15, 40)]), ('b', [(5,15), (20,40)])]
@@ -395,7 +395,8 @@ class GraphHorizontalBar(Graph):
             # then start y position, bar height
             ax.broken_barh(points, (yPos+self._margin, self._barHeight),
                             facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
-            for xStart, xEnd in points:
+            for xStart, xLen in points:
+                xEnd = xStart + xLen
                 for x in [xStart, xEnd]:
                     if x not in xPoints:
                         xPoints.append(x)
@@ -405,20 +406,22 @@ class GraphHorizontalBar(Graph):
             yPos += self._barSpace
             i += 1
 
-
         xMin = min(xPoints)
-        xMax = max(xPoints)
+        xMax = max(xPoints) 
+        xRange = xMax - xMin
+
+        environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
         self.setAxisRange('y', (0, len(keys) * self._barSpace))
-        self.setAxisRange('x', (xMin, xMax))
+        self.setAxisRange('x', (xMin, xMax), pad=True)
         self.setTicks('y', yTicks)  
 
-#         for x in range(int(xMin+10), int(xMax), 10):
-#             xTicks.append([x, '%s' % x])
-#         self.setTicks('x', xTicks)  
+        for x in range(int(math.floor(xMin)), 
+                       int(round(math.ceil(xMax))), int(xMin+int(round(xRange/10)))) + [int(round(xMax))]:
+            xTicks.append([x, '%s' % x])
+        self.setTicks('x', xTicks)  
 
         #environLocal.printDebug([yTicks])
-
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
@@ -1568,6 +1571,7 @@ class PlotHorizontalBar(PlotStream):
                 dataUnique[numericValue] = []
             # all work with offset
             start = noteObj.offset
+            # this is not the end, but instead the length
             end = noteObj.quarterLength
             xValues.append(start)
             xValues.append(end)

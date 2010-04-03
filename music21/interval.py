@@ -12,9 +12,10 @@
 #-------------------------------------------------------------------------------
 """Interval.py is a module for creating and manipulating interval objects.
 Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
-There are also a number of useful lists included in the module."""
 
-_MOD = "interval.py"
+There are also a number of useful lists included in the module.
+
+"""
 
 import copy
 import math
@@ -24,6 +25,10 @@ import music21
 from music21 import common 
 
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
+
+from music21 import environment
+_MOD = "interval.py"
+environLocal = environment.Environment(_MOD)
 
 
 
@@ -112,8 +117,21 @@ def convertDiatonicNumberToStep(dn):
     ('C', 2)
     >>> convertDiatonicNumberToStep(23)
     ('D', 3)
+    >>> convertDiatonicNumberToStep(0)
+    ('C', 0)
+    >>> convertDiatonicNumberToStep(1)
+    ('C', 0)
+    >>> convertDiatonicNumberToStep(2)
+    ('D', 0)
+    >>> convertDiatonicNumberToStep(3)
+    ('E', 0)
+    >>> convertDiatonicNumberToStep(4)
+    ('F', 0)
+    >>> convertDiatonicNumberToStep(5)
+    ('G', 0)
     '''
-    (remainder, octave) = math.modf((dn-1)/7.0)
+    remainder, octave = math.modf((dn-1)/7.0)
+    # what is .001 doing here?
     return STEPNAMES[int((remainder*7)+.001)], int(octave)
 
 
@@ -381,6 +399,12 @@ class GenericInterval(music21.Music21Object):
 class DiatonicInterval(music21.Music21Object):
     '''A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). 
     '''
+    _DOC_ATTR = {
+    'name': 'The name of the interval in abbreviated form without direction.',
+    'niceName': 'The name of the interval in full form.',
+    'directedName': 'The name of the interval in abbreviated form with direction.',
+    'directedNiceName': 'The name of the interval in full form with direction.',
+    }
 
     def __init__(self, specifier, generic):
         '''
@@ -562,10 +586,20 @@ def _convertStringToIntervals(string):
     (<music21.interval.DiatonicInterval M2>, <music21.interval.ChromaticInterval 2>)
     >>> _convertStringToIntervals('half')
     (<music21.interval.DiatonicInterval m2>, <music21.interval.ChromaticInterval 1>)
+    >>> _convertStringToIntervals('-h')
+    (<music21.interval.DiatonicInterval m2>, <music21.interval.ChromaticInterval -1>)
+
     >>> _convertStringToIntervals('semitone')
     (<music21.interval.DiatonicInterval m2>, <music21.interval.ChromaticInterval 1>)
 
     '''
+    # find direction        
+    if '-' in string:
+        string = string.replace('-', '') # remove
+        dirShift = -1
+    else:
+        dirShift = 1
+
     # permit whole and half appreviations
     if string.lower() in ['w', 'whole', 'tone']:
         string = 'M2'
@@ -578,8 +612,9 @@ def _convertStringToIntervals(string):
     string = string.replace('a', 'A')
     string = string.replace('D', 'd')
 
-    generic = int(string.lstrip('PMmAd'))
+    generic = int(string.lstrip('PMmAd')) * dirShift # this will be a number
     specName = string.rstrip('-0123456789')
+    # scale by dir shift to add back in direction
     gInterval = GenericInterval(generic)
 
     # DiatonicInterval needs a GenericInterval object as well as a "specifier,"
@@ -608,6 +643,73 @@ def _convertStringToIntervals(string):
                                 
     cInterval = ChromaticInterval(semitones)
     return dInterval, cInterval
+
+
+def generateGeneric(n1, n2):
+    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
+    
+    >>> from music21 import note
+    >>> aNote = note.Note('c4')
+    >>> bNote = note.Note('g5')
+    >>> aInterval = generateGeneric(aNote, bNote)
+    >>> aInterval
+    <music21.interval.GenericInterval 12>
+
+    '''
+    # TODO: rename genericIntervalFromNotes
+    staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
+    genDist = convertStaffDistanceToInterval(staffDist)
+    return GenericInterval(genDist)
+
+def generateChromatic(n1, n2):
+    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
+    
+    >>> from music21 import note
+    >>> aNote = note.Note('c4')
+    >>> bNote = note.Note('g#5')
+    >>> generateChromatic(aNote, bNote)
+    <music21.interval.ChromaticInterval 20>
+    '''
+    # TODO: rename chromaticIntervalFromNotes
+    return ChromaticInterval(n2.midi - n1.midi)
+
+
+def _getSpecifierFromGenericChromatic(gInt, cInt):
+    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
+    
+    >>> aInterval = GenericInterval('seventh')
+    >>> bInterval = ChromaticInterval(11)
+    >>> _getSpecifierFromGenericChromatic(aInterval, bInterval)
+    2
+    >>> convertSpecifier('major')
+    2
+    '''
+    noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
+    normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
+    theseSemis  = cInt.undirected
+    if gInt.perfectable:
+        specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
+    else:
+        specifier = specifiers[majOffset + theseSemis - normalSemis]
+    return specifier    
+
+    
+def generateDiatonic(gInt, cInt):
+    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
+
+    >>> aInterval = GenericInterval('descending fifth')
+    >>> bInterval = ChromaticInterval(-7)
+    >>> cInterval = generateDiatonic(aInterval, bInterval)
+    >>> cInterval
+    <music21.interval.DiatonicInterval P5>
+    '''
+
+    # TODO: rename diatonicIntervalFromIntervals
+    specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
+    return DiatonicInterval(specifier, gInt)
+    
+
+
 
 
 class Interval(music21.Music21Object):
@@ -684,9 +786,12 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval('half')
         >>> aInterval
         <music21.interval.Interval m2>
+
+        >>> aInterval = Interval('-h')
+        >>> aInterval
+        <music21.interval.Interval m-2>
+
         '''
-
-
         music21.Music21Object.__init__(self)
         if len(args) == 1 and common.isStr(args[0]):
             # convert common string representations 
@@ -699,6 +804,10 @@ class Interval(music21.Music21Object):
         elif len(args) == 1 and common.isNum(args[0]):
             pass
 
+        elif (len(args) == 2 and args[0].isNote == True and 
+            args[1].isNote == True):
+            self.note1 = args[0]
+            self.note2 = args[1]
         else:
             if "diatonic" in keydict:
                 self.diatonic = keydict['diatonic']
@@ -756,12 +865,12 @@ class Interval(music21.Music21Object):
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
 
     def __repr__(self):
-        return "<music21.interval.Interval %s>" % self.name
+        return "<music21.interval.Interval %s>" % self.directedName
 
-    def getComplement(self):
+    def _getComplement(self):
         return Interval(self.diatonic.mod7inversion)
     
-    complement = property(getComplement, 
+    complement = property(_getComplement, 
         doc='''Return a new Interval object that is the complement of this Interval.
 
         >>> aInterval = Interval('M3')
@@ -781,6 +890,152 @@ class Interval(music21.Music21Object):
         >>> aInterval.intervalClass
         4
         ''')
+
+
+    def _setNoteStart(self, n):
+        '''Assuming that this interval is defined, we can set a new start note (note1) and automatically have the end note (note2).
+        '''
+        # this is based on the procedure found in generatePitch() and 
+        # generateNote() but offers a more object oriented approach
+
+        self.note1 = n
+        pitch1 = n.pitch
+        pitch2 = copy.deepcopy(pitch1)
+
+        newDiatonicNumber = (pitch1.diatonicNoteNum +
+                             self.diatonic.generic.staffDistance)
+        newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
+        pitch2.step = newStep
+        pitch2.octave = newOctave
+        pitch2.accidental = None
+
+        # have right note name but not accidental
+        interval2 = generateInterval(pitch1, pitch2)    
+
+        #environLocal.printDebug(['calculating half steps to fix:', interval2, self.chromatic.semitones, interval2.chromatic.semitones])
+
+        halfStepsToFix = (self.chromatic.semitones -
+                          interval2.chromatic.semitones)
+        #environLocal.printDebug(['pitch2, pitch1, interval.name, halfStepsToFix:', pitch2, pitch1, self.niceName, halfStepsToFix])
+
+        if halfStepsToFix != 0:
+            pitch2.accidental = halfStepsToFix
+        self.note2 = copy.deepcopy(self.note1)
+        self.note2.pitch = pitch2
+
+    def _getNoteStart(self):
+        return self.note1
+
+    noteStart = property(_getNoteStart, _setNoteStart, 
+        doc = '''Assuming this Interval has been defined, set the start note (note1) to a new value; this will adjust the value of the end note (note2).
+        
+        >>> from music21 import note
+        >>> aInterval = Interval('M3')
+        >>> aInterval.noteStart = note.Note('c4')
+        >>> aInterval.noteEnd.nameWithOctave
+        'E4'
+
+        >>> n1 = note.Note('c3')
+        >>> n2 = note.Note('g#3')
+        >>> aInterval = Interval(n1, n2)
+        >>> aInterval.name
+        'A5'
+        >>> aInterval.noteStart = note.Note('g4')
+        >>> aInterval.noteEnd.nameWithOctave
+        'D#5'
+
+        >>> aInterval = Interval('-M3')
+        >>> aInterval.noteStart = note.Note('c4')
+        >>> aInterval.noteEnd.nameWithOctave
+        'A-3'
+
+        >>> aInterval = Interval('M-2')
+        >>> aInterval.noteStart = note.Note('A#3')
+        >>> aInterval.noteEnd.nameWithOctave
+        'G#3'
+
+        >>> aInterval = Interval('h')
+        >>> aInterval.directedName
+        'm2'
+        >>> aInterval.noteStart = note.Note('F#3')
+        >>> aInterval.noteEnd.nameWithOctave
+        'G3'
+
+        ''')
+
+    def _setNoteEnd(self, n):
+        '''Assuming that this interval is defined, we can set a new end note (note2) and automatically have the start note (note1).
+        '''
+        # this is based on the procedure found in generatePitch() but offers
+        # a more object oriented approach
+
+        self.note2 = n
+        pitch2 = n.pitch
+        pitch1 = copy.deepcopy(pitch2)
+
+        # staff distance has direction; but need to reverse here
+        newDiatonicNumber = (pitch2.diatonicNoteNum -
+                             self.diatonic.generic.staffDistance)
+
+        environLocal.printDebug(['newDiatonicNumber:', newDiatonicNumber, self.diatonic.generic.staffDistance])
+
+        newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
+        pitch1.step = newStep
+        pitch1.octave = newOctave
+        pitch1.accidental = None
+
+        # have right note name but not accidental
+        interval2 = generateInterval(pitch2, pitch1)    
+
+        environLocal.printDebug(['calculating half steps to fix:', interval2, self.chromatic.semitones, interval2.chromatic.semitones])
+
+        # temporarily make this self.chromatic negative
+        halfStepsToFix = (-self.chromatic.semitones -
+                          interval2.chromatic.semitones)
+
+        environLocal.printDebug(['pitch2, pitch1, interval.name, halfStepsToFix:', pitch2, pitch1, self.niceName, halfStepsToFix])
+
+        if halfStepsToFix != 0:
+            pitch1.accidental = halfStepsToFix
+        #pitch1.accidental = halfStepsToFix
+
+        self.note1 = copy.deepcopy(self.note2)
+        self.note1.pitch = pitch1
+
+    def _getNoteEnd(self):
+        return self.note2
+
+    noteEnd = property(_getNoteEnd, _setNoteEnd, 
+        doc = '''Assuming this Interval has been defined, set the end note (note2) to a new value; this will adjust the value of the start note (note1).
+
+        >>> from music21 import note
+        >>> aInterval = Interval('M3')
+        >>> aInterval.noteEnd = note.Note('e4')
+        >>> aInterval.noteStart.nameWithOctave
+        'C4'
+
+        >>> aInterval = Interval('m2')
+        >>> aInterval.noteEnd = note.Note('A#3')
+        >>> aInterval.noteStart.nameWithOctave
+        'G##3'
+
+        >>> n1 = note.Note('g#3')
+        >>> n2 = note.Note('c3')
+        >>> aInterval = Interval(n1, n2)
+        >>> aInterval.directedName # downward augmented fifth
+        'A-5'
+        >>> aInterval.noteEnd = note.Note('c4')
+        >>> aInterval.noteStart.nameWithOctave
+        'G#4'
+
+        >>> aInterval = Interval('M3')
+        >>> aInterval.noteEnd = note.Note('A-3')
+        >>> aInterval.noteStart.nameWithOctave
+        'F-3'
+
+         ''')
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -870,32 +1125,6 @@ def getAbsoluteLowerNote(note1, note2):
     elif semitones < 0: return note2
     else: return note1
 
-def generateInterval(n1, n2 = None):  
-    '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g5')
-    >>> aInterval = generateInterval(aNote, bNote)
-    >>> aInterval
-    <music21.interval.Interval P12>
-
-    >>> bInterval = Interval(note1=aNote, note2=bNote)
-    >>> aInterval.niceName == bInterval.niceName
-    True
-    '''
-
-    #note to self:  what's going on with the Note() representation in help?
-    if n2 is None: 
-        n2 = music21.note.Note() # this is not done in the constructor because of looping problems with tinyNotationNote
-    
-    gInt = generateGeneric(n1, n2)
-    cInt = generateChromatic(n1, n2)
-    dInt = generateDiatonic(gInt, cInt)
-    intObj = Interval(diatonic = dInt, chromatic = cInt,
-                    note1 = n1, note2 = n2)
-    return intObj
-
 def generatePitch(pitch1, interval1):
     '''Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
 
@@ -910,6 +1139,8 @@ def generatePitch(pitch1, interval1):
     >>> cPitch
     F3
     ''' 
+    # TODO: rename pitchFromInterval
+
     # check if interval1 is a string,
     # then convert it to interval object if necessary
     if common.isStr(interval1):
@@ -920,36 +1151,35 @@ def generatePitch(pitch1, interval1):
         pass # assuming it is an interval object
         #raise IntervalException('numeric intervals not yet defined')
         
-    firstStep = pitch1.step
-    distance = interval1.diatonic.generic.staffDistance
-    newDiatonicNumber = pitch1.diatonicNoteNum + distance
-    
+    newDiatonicNumber = (pitch1.diatonicNoteNum +
+                         interval1.diatonic.generic.staffDistance)
     pitch2 = copy.deepcopy(pitch1)
-
-    (newStep, newOctave) = convertDiatonicNumberToStep(newDiatonicNumber)
+    newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
     pitch2.step = newStep
     pitch2.octave = newOctave
     pitch2.accidental = None
-       ## at this point note2 has the right note name (step), but possibly
-       ## the wrong accidental.  We fix that below
-    interval2 = generateInterval(pitch1, pitch2)
-    #print interval2.name, "interval name"
-    
+    # at this point note2 has the right note name (step), but possibly
+    # the wrong accidental.  We fix that below
+    interval2 = generateInterval(pitch1, pitch2)    
     halfStepsToFix = (interval1.chromatic.semitones -
                       interval2.chromatic.semitones)
     pitch2.accidental = halfStepsToFix
-    #print note2.name, "note name"
-
     return pitch2
 
 def generateNote(note1, intervalString):
-    '''Given a :class:`~music21.note.Note` and a interval string (such as 'P5'), return a new Note object at the appropriate pitch level. 
+    '''Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
 
     >>> from music21 import note
     >>> aNote = note.Note('c4')
     >>> bNote = generateNote(aNote, 'p5')
     >>> bNote
     <music21.note.Note G>
+
+    >>> aNote = note.Note('f#4')
+    >>> bNote = generateNote(aNote, 'm2')
+    >>> bNote
+    <music21.note.Note G>
+
     '''
 
     newPitch = generatePitch(note1, intervalString)
@@ -957,6 +1187,34 @@ def generateNote(note1, intervalString):
     newNote.pitch = newPitch
     return newNote
 
+
+def generateInterval(n1, n2 = None):  
+    '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
+
+    >>> from music21 import note
+    >>> aNote = note.Note('c4')
+    >>> bNote = note.Note('g5')
+    >>> aInterval = generateInterval(aNote, bNote)
+    >>> aInterval
+    <music21.interval.Interval P12>
+
+    >>> bInterval = Interval(note1=aNote, note2=bNote)
+    >>> aInterval.niceName == bInterval.niceName
+    True
+    '''
+    # TODO: possible remove: not clear how this offers any better functionality
+    # than just creating an Interval class?
+
+    #note to self:  what's going on with the Note() representation in help?
+    if n2 is None: 
+        n2 = music21.note.Note() 
+        # this is not done in the constructor because of looping problems with tinyNotationNote
+    gInt = generateGeneric(n1, n2)
+    cInt = generateChromatic(n1, n2)
+    dInt = generateDiatonic(gInt, cInt)
+    intObj = Interval(diatonic = dInt, chromatic = cInt,
+                    note1 = n1, note2 = n2)
+    return intObj
 
 def generateIntervalFromString(string):
     '''Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object.
@@ -967,75 +1225,14 @@ def generateIntervalFromString(string):
     >>> aInterval = generateIntervalFromString('m3')
     >>> aInterval
     <music21.interval.Interval m3>
-
     '''
-    (dInterval, cInterval) = _convertStringToIntervals(string)
+    # TODO: rename intervalFromString
+    dInterval, cInterval = _convertStringToIntervals(string)
     allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
     return allInterval
         
-def generateChromatic(n1, n2):
-    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
-    
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g#5')
-    >>> generateChromatic(aNote, bNote)
-    <music21.interval.ChromaticInterval 20>
-    '''
-    # TODO: rename getChromaticFromNotes
-    return ChromaticInterval(n2.midi - n1.midi)
-
-def generateGeneric(n1, n2):
-    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
-    
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g5')
-    >>> aInterval = generateGeneric(aNote, bNote)
-    >>> aInterval
-    <music21.interval.GenericInterval 12>
-
-    '''
-    # TODO: rename getGenericFromNotes
-    staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
-    genDist   = convertStaffDistanceToInterval(staffDist)
-    return GenericInterval(genDist)
 
 
-def getSpecifier(gInt, cInt):
-    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
-    
-    >>> aInterval = GenericInterval('seventh')
-    >>> bInterval = ChromaticInterval(11)
-    >>> getSpecifier(aInterval, bInterval)
-    2
-    >>> convertSpecifier('major')
-    2
-    '''
-    noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
-    normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
-    theseSemis  = cInt.undirected
-    if gInt.perfectable:
-        specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
-    else:
-        specifier = specifiers[majOffset + theseSemis - normalSemis]
-    return specifier    
-
-    
-def generateDiatonic(gInt, cInt):
-    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
-
-    >>> aInterval = GenericInterval('descending fifth')
-    >>> bInterval = ChromaticInterval(-7)
-    >>> cInterval = generateDiatonic(aInterval, bInterval)
-    >>> cInterval
-    <music21.interval.DiatonicInterval P5>
-    '''
-
-    # TODO: rename getDiatonicFromIntervals
-    specifier = getSpecifier(gInt, cInt)
-    return DiatonicInterval(specifier, gInt)
-    
 
 
 #-------------------------------------------------------------------------------

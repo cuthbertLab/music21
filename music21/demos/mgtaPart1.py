@@ -21,6 +21,12 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 
+from music21 import environment
+_MOD = 'mgtaPart1.py'
+environLocal = environment.Environment(_MOD)
+
+
+
 #-------------------------------------------------------------------------------
 # CHAPTER 1 
 
@@ -73,14 +79,50 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 #             k1.show()
 
 
-def ch1_basic_I_C(show=True, *arguments, **keywords):
+
+def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     '''
     p3.
     start at a key marked with an ex, move finger according to pattern of half and whole steps; mark key at end with an astrick
     '''
-    start = 'a4'
-    intervals = [interval.Interval()]
+    from music21 import stream, interval
+    nStart = note.Note('a4')
+    intervals = [interval.Interval('w'), interval.Interval('-h'), 
+                 interval.Interval('-w'), interval.Interval('-w'),
+                 interval.Interval('h')]
+    s = stream.Stream()
+    n = nStart
+    s.append(n)
+    for i in intervals:
+        i.noteStart = n
+        n = i.noteEnd
+        environLocal.printDebug(['interval, note1, note2', i, 
+                                i.noteStart, i.noteEnd])
+        s.append(n)
+    if show:
+        s.show()
+        s.plot('PlotHorizontalBarPitchSpaceOffset')
 
+def ch1_basic_I_C_2(show=True, *arguments, **keywords):
+    '''
+    p3.
+    start at a key marked with an ex, move finger according to pattern of half and whole steps; mark key at end with an astrick
+    '''
+    from music21 import stream
+    nStart = note.Note('e4')
+    intervals = [interval.Interval('w'), interval.Interval('w'), 
+                 interval.Interval('w'), interval.Interval('-h'),
+                 interval.Interval('w'), interval.Interval('h')]
+    s = stream.Stream()
+    n = nStart
+    s.append(n)
+    for i in intervals:
+        i.noteStart = n
+        n = i.noteEnd
+        s.append(n)
+    if show:
+        s.show()
+        s.plot('PlotHorizontalBarPitchSpaceOffset')
 
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
