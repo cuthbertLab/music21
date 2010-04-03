@@ -58,16 +58,19 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
         n1 = note.Note(i)
         n2 = note.Note(j)
         i1 = interval.generateInterval(n1, n2)
-        if i1.ic == 1:
+        if i1.intervalClass == 1: # by interval class
             mark = "H"
-        elif i1.ic == 2:
+        elif i1.intervalClass == 2:
             mark = "W"
         else:
             mark = "N"
-        k1 = keyboard.Diagram()
-        k1.mark(n1, mark)
-        k1.mark(n2)
-        k1.show()
+
+# no keyboard diagram yet!
+#         k1 = keyboard.Diagram()
+#         k1.mark(n1, mark)
+#         k1.mark(n2)
+#         if show:
+#             k1.show()
 
 
 
@@ -98,7 +101,9 @@ def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     #exercise = music21.parseData("ch1_basic_II_A_1.xml")
     for thisNote in exercise.flat.notes: # have to use flat here
         thisNote.lyric = thisNote.nameWithOctave
-    if show: exercise.show()
+    if show: 
+        exercise.show()
+
 
 def ch1_basic_II_A_2(show=True, *arguments, **keywords):
     '''
@@ -124,6 +129,11 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
 
 
+
+
+
+
+
 #-----------------------------------------------------------------||||||||||||--
 class Test(unittest.TestCase):
     
@@ -132,7 +142,9 @@ class Test(unittest.TestCase):
             
     def testBasic(self):
         for func in [ch1_basic_I_A, 
-                     ch1_basic_II_A_1]:
+                     ch1_basic_I_B,
+                     ch1_basic_II_A_1,
+            ]:
             func(show=False, play=False)
 
 

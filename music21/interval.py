@@ -703,6 +703,7 @@ class Interval(music21.Music21Object):
             self.diatonic = diatonicInterval
             self.chromatic = chromaticInterval
 
+        # check for error of only one type being defined
         if (self.chromatic != None and self.diatonic == None or 
             self.diatonic != None and self.chromatic == None):
             raise IntervalException('either both or zero diatonic and chromatic classes must be defined')
@@ -745,6 +746,17 @@ class Interval(music21.Music21Object):
         <music21.interval.Interval m6>
         ''')
 
+
+    def _getIntervalClass(self):
+        return self.chromatic.intervalClass
+
+    intervalClass = property(_getIntervalClass,
+        doc = '''Return the interval class from the chromatic interval.
+
+        >>> aInterval = Interval('M3')
+        >>> aInterval.intervalClass
+        4
+        ''')
 
 
 #-------------------------------------------------------------------------------
@@ -835,7 +847,7 @@ def getAbsoluteLowerNote(note1, note2):
     else: return note1
 
 def generateInterval(n1, n2 = None):  
-    '''Given :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with with Notes as arguments.
+    '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
 
     >>> from music21 import note
     >>> aNote = note.Note('c4')
