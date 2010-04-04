@@ -340,9 +340,13 @@ class Graph(object):
             pass
 
     def show(self):
+        '''Calls the show() method of the matplotlib plot. For most matplotlib back ends, this will open a GUI window with the desired graph.
+        '''
         plt.show()
 
     def write(self, fp=None):
+        '''Writes the graph to a file. If no file path is given, a temporary file is used. 
+        '''
         if fp == None:
             fp = environLocal.getTempFile('.png')
         #print _MOD, fp
@@ -2290,6 +2294,51 @@ class TestExternal(unittest.TestCase):
             fp = os.path.join(environLocal.getTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
+
+
+    def writeGraphingDocs(self):
+        '''Write graphing examples for the docs
+        '''
+        import random, os
+        post = []
+
+        a = GraphScatter(doneAction=None)
+        data = [(x, x*x) for x in range(50)]
+        a.setData(data)
+        post.append([a, 'graphing-01'])
+
+        a = GraphScatter(title='Exponential Graph', alpha=1, doneAction=None)
+        data = [(x, x*x) for x in range(50)]
+        a.setData(data)
+        post.append([a, 'graphing-02'])
+
+        a = GraphHistogram(doneAction=None)
+        data = [(x, random.choice(range(30))) for x in range(50)]
+        a.setData(data)
+        post.append([a, 'graphing-03'])
+
+        a = Graph3DPolygonBars(doneAction=None) 
+        data = {1:[], 2:[], 3:[]}
+        for i in range(len(data.keys())):
+            q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
+            data[data.keys()[i]] = q
+        a.setData(data) 
+        post.append([a, 'graphing-04'])
+
+
+        b = Graph3DPolygonBars(title='Random Data', alpha=.8,\
+        barWidth=.2, doneAction=None, colors=['b','r','g']) 
+        b.setData(data)
+        post.append([b, 'graphing-05'])
+
+
+        for obj, name in post:
+            obj.process()
+            fn = name + '.png'
+            fp = os.path.join(environLocal.getTempDir(), fn)
+            environLocal.printDebug(['writing fp:', fp])
+            obj.write(fp)
+
 
 
 class Test(unittest.TestCase):

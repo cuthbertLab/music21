@@ -526,11 +526,11 @@ Graph
 
     .. method:: show()
 
-    No documentation. 
+    Calls the show() method of the matplotlib plot. For most matplotlib back ends, this will open a GUI window with the desired graph. 
 
     .. method:: write(fp=None)
 
-    No documentation. 
+    Writes the graph to a file. If no file path is given, a temporary file is used. 
 
 
 Graph3DPolygonBars
