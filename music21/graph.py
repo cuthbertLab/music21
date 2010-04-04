@@ -298,6 +298,11 @@ class Graph(object):
                         ax.set_yticks(values)
                         ax.set_yticklabels(labels, fontsize=self.tickFontSize,
                             family=self.fontFamily)
+            else: # apply some default formatting to default ticks
+                ax.set_xticklabels(ax.get_xticks(),
+                    fontsize=self.tickFontSize, family=self.fontFamily) 
+                ax.set_yticklabels(ax.get_yticks(),
+                    fontsize=self.tickFontSize, family=self.fontFamily) 
 
         if self.title:
             ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
@@ -322,7 +327,6 @@ class Graph(object):
     def process(self):
         '''process data and prepare plot'''
         pass
-
 
     #---------------------------------------------------------------------------
     def done(self, fp=None):
@@ -357,10 +361,14 @@ class GraphHorizontalBar(Graph):
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
 
+    .. image:: images/GraphHorizontalBar.*
+        :width: 600
+
         >>> a = GraphHorizontalBar(doneAction=None)
-        >>> data = [('a', [(10,20), (15, 40)]), ('b', [(5,15), (20,40)])]
+        >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
         >>> a.setData(data)
         >>> a.process()
+
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -430,6 +438,10 @@ class GraphHorizontalBar(Graph):
 
 class GraphScatterWeighted(Graph):
     '''A scatter plot where points are scaled in size to represent the number of values stored within.
+
+    .. image:: images/GraphScatterWeighted.*
+        :width: 600
+
     '''
 
     def __init__(self, *args, **keywords):
@@ -538,10 +550,14 @@ class GraphScatter(Graph):
     def __init__(self, *args, **keywords):
         '''Graph two parameters in a scatter plot
 
+    .. image:: images/GraphScatter.*
+        :width: 600
+
         >>> a = GraphScatter(doneAction=None)
         >>> data = [(x, x*x) for x in range(50)]
         >>> a.setData(data)
         >>> a.process()
+
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -583,6 +599,9 @@ class GraphHistogram(Graph):
         is only one of each x value, and y value is the count or magnitude
         of that value
 
+    .. image:: images/GraphHistogram.*
+        :width: 600
+
         >>> a = GraphHistogram(doneAction=None)
         >>> data = [(x, random.choice(range(30))) for x in range(50)]
         >>> a.setData(data)
@@ -596,7 +615,8 @@ class GraphHistogram(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-        ax = self.fig.add_subplot(1, 1, 1.1)
+        # added extra .1 in middle param to permit space on right 
+        ax = self.fig.add_subplot(1, 1.1, 1.1)
 
         x = []
         y = []
@@ -610,7 +630,9 @@ class GraphHistogram(Graph):
         self.done()
 
 
-class Graph3DBars(Graph):
+class _Graph3DBars(Graph):
+    '''Not functioning in all matplotlib versions
+    '''
     def __init__(self, *args, **keywords):
         '''
         Graph multiple parallel bar graphs in 3D.
@@ -681,7 +703,10 @@ class Graph3DPolygonBars(Graph):
 
         This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
 
-        Note: Axis ticks do not seem to be adjustable without distorting the graph.
+        Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.
+
+    .. image:: images/Graph3DPolygonBars.*
+        :width: 600
 
         >>> a = Graph3DPolygonBars(doneAction=None)
         >>> data = {1:[], 2:[], 3:[]}
@@ -690,6 +715,8 @@ class Graph3DPolygonBars(Graph):
         ...    data[data.keys()[i]] = q
         >>> a.setData(data)
         >>> a.process()
+
+
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
@@ -1028,8 +1055,8 @@ class PlotStream(object):
 
 
     def ticksOffset(self, offsetMin=None, offsetMax=None, offsetStepSize=None,
-                    displayMeasureNumberZero=False):
-        '''Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max.
+                    displayMeasureNumberZero=False, remap=False):
+        '''Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
 
         >>> from music21 import corpus, stream, note
         >>> s = corpus.parseWork('bach/bwv281.xml')
@@ -1112,7 +1139,12 @@ class PlotStream(object):
     def remapQuarterLength(self, x):
         '''Remap all quarter lengths.
         '''
-        return math.log(x, 2)
+        if x == 0: # not expected but does happne
+            return 0
+        try:
+            return math.log(x, 2)
+        except ValueError:
+            raise GraphException('cannot take log of x value: %s' %  x)
         #return pow(x, .5)
 
     def ticksQuarterLength(self, min=.25, max=4, remap=True):
@@ -2196,10 +2228,45 @@ class TestExternal(unittest.TestCase):
         plotStream(a.flat, 'all')
 
 
-    def writeAll(self):
+    def writeAllGraphs(self):
         '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
         '''
         import os
+
+        # get some data
+        data3DPolygonBars = {1:[], 2:[], 3:[]}
+        for i in range(len(data3DPolygonBars.keys())):
+            q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
+            data3DPolygonBars[data3DPolygonBars.keys()[i]] = q
+
+        # pair data with class name
+        graphClasses = [
+        (GraphHorizontalBar, 
+            [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]),
+        (GraphScatterWeighted, 
+            [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
+        (GraphScatter, 
+            [(x, x*x) for x in range(50)]),
+        (GraphHistogram, 
+            [(x, random.choice(range(30))) for x in range(50)]),
+        (Graph3DPolygonBars, data3DPolygonBars),
+        ]
+
+        for graphClassName, data in graphClasses:
+            obj = graphClassName(doneAction=None)
+            obj.setData(data) # add data here
+            obj.process()
+            fn = obj.__class__.__name__ + '.png'
+            fp = os.path.join(environLocal.getTempDir(), fn)
+            environLocal.printDebug(['writing fp:', fp])
+            obj.write(fp)
+
+
+    def writeAllPlots(self):
+        '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
+        '''
+        import os
+
         plotClasses = [
         # histograms
         PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
@@ -2223,7 +2290,6 @@ class TestExternal(unittest.TestCase):
             fp = os.path.join(environLocal.getTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
-
 
 
 class Test(unittest.TestCase):

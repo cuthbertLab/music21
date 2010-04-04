@@ -10,6 +10,8 @@ music21.interval
 Interval.py is a module for creating and manipulating interval objects. Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval. There are also a number of useful lists included in the module. 
 
 
+
+
 .. function:: generateChromatic(n1, n2)
 
 Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object. 
@@ -32,7 +34,7 @@ Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interv
 
 .. function:: generateInterval(n1, n2=None)
 
-Given :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with with Notes as arguments. 
+Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments. 
 
 >>> from music21 import note
 >>> aNote = note.Note('c4')
@@ -52,6 +54,18 @@ Convert a diatonic number to a step name and a octave integer.
 ('C', 2) 
 >>> convertDiatonicNumberToStep(23)
 ('D', 3) 
+>>> convertDiatonicNumberToStep(0)
+('C', 0) 
+>>> convertDiatonicNumberToStep(1)
+('C', 0) 
+>>> convertDiatonicNumberToStep(2)
+('D', 0) 
+>>> convertDiatonicNumberToStep(3)
+('E', 0) 
+>>> convertDiatonicNumberToStep(4)
+('F', 0) 
+>>> convertDiatonicNumberToStep(5)
+('G', 0) 
 
 .. function:: convertGeneric(value)
 
@@ -129,17 +143,21 @@ Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.in
 >>> aInterval
 <music21.interval.Interval m3> 
 
-
-
 .. function:: generateNote(note1, intervalString)
 
-Given a :class:`~music21.note.Note` and a interval string (such as 'P5'), return a new Note object at the appropriate pitch level. 
+Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
 
 >>> from music21 import note
 >>> aNote = note.Note('c4')
 >>> bNote = generateNote(aNote, 'p5')
 >>> bNote
 <music21.note.Note G> 
+>>> aNote = note.Note('f#4')
+>>> bNote = generateNote(aNote, 'm2')
+>>> bNote
+<music21.note.Note G> 
+
+
 
 .. function:: generatePitch(pitch1, interval1)
 
@@ -177,17 +195,6 @@ Given two :class:`~music21.note.Note` objects, returns the lower note based on a
 >>> bNote = note.Note('d--3')
 >>> getAbsoluteLowerNote(aNote, bNote)
 <music21.note.Note D--> 
-
-.. function:: getSpecifier(gInt, cInt)
-
-Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...). 
-
->>> aInterval = GenericInterval('seventh')
->>> bInterval = ChromaticInterval(11)
->>> getSpecifier(aInterval, bInterval)
-2 
->>> convertSpecifier('major')
-2 
 
 .. function:: getWrittenHigherNote(note1, note2)
 
@@ -291,6 +298,76 @@ Interval
     >>> bInterval
     <music21.interval.Interval m6> 
 
+    .. attribute:: intervalClass
+
+    Return the interval class from the chromatic interval. 
+
+    >>> aInterval = Interval('M3')
+    >>> aInterval.intervalClass
+    4 
+
+    .. attribute:: noteEnd
+
+    Assuming this Interval has been defined, set the end note (note2) to a new value; this will adjust the value of the start note (note1). 
+
+    >>> from music21 import note
+    >>> aInterval = Interval('M3')
+    >>> aInterval.noteEnd = note.Note('e4')
+    >>> aInterval.noteStart.nameWithOctave
+    'C4' 
+    >>> aInterval = Interval('m2')
+    >>> aInterval.noteEnd = note.Note('A#3')
+    >>> aInterval.noteStart.nameWithOctave
+    'G##3' 
+    >>> n1 = note.Note('g#3')
+    >>> n2 = note.Note('c3')
+    >>> aInterval = Interval(n1, n2)
+    >>> aInterval.directedName # downward augmented fifth
+    'A-5' 
+    >>> aInterval.noteEnd = note.Note('c4')
+    >>> aInterval.noteStart.nameWithOctave
+    'G#4' 
+    >>> aInterval = Interval('M3')
+    >>> aInterval.noteEnd = note.Note('A-3')
+    >>> aInterval.noteStart.nameWithOctave
+    'F-3' 
+
+    
+
+    .. attribute:: noteStart
+
+    Assuming this Interval has been defined, set the start note (note1) to a new value; this will adjust the value of the end note (note2). 
+
+    >>> from music21 import note
+    >>> aInterval = Interval('M3')
+    >>> aInterval.noteStart = note.Note('c4')
+    >>> aInterval.noteEnd.nameWithOctave
+    'E4' 
+    >>> n1 = note.Note('c3')
+    >>> n2 = note.Note('g#3')
+    >>> aInterval = Interval(n1, n2)
+    >>> aInterval.name
+    'A5' 
+    >>> aInterval.noteStart = note.Note('g4')
+    >>> aInterval.noteEnd.nameWithOctave
+    'D#5' 
+    >>> aInterval = Interval('-M3')
+    >>> aInterval.noteStart = note.Note('c4')
+    >>> aInterval.noteEnd.nameWithOctave
+    'A-3' 
+    >>> aInterval = Interval('M-2')
+    >>> aInterval.noteStart = note.Note('A#3')
+    >>> aInterval.noteEnd.nameWithOctave
+    'G#3' 
+    >>> aInterval = Interval('h')
+    >>> aInterval.directedName
+    'm2' 
+    >>> aInterval.noteStart = note.Note('F#3')
+    >>> aInterval.noteEnd.nameWithOctave
+    'G3' 
+
+    
+
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Interval** **methods**
@@ -325,10 +402,14 @@ Interval
     >>> aInterval = Interval('p5')
     >>> aInterval
     <music21.interval.Interval P5> 
+    >>> aInterval = Interval('half')
+    >>> aInterval
+    <music21.interval.Interval m2> 
+    >>> aInterval = Interval('-h')
+    >>> aInterval
+    <music21.interval.Interval m-2> 
 
-    .. method:: getComplement()
-
-    No documentation. 
+    
 
     .. method:: reinit()
 

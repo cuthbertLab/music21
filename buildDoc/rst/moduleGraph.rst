@@ -533,33 +533,6 @@ Graph
     No documentation. 
 
 
-Graph3DBars
------------
-
-.. class:: Graph3DBars
-
-
-    inherits from: :class:`~music21.graph.Graph`
-
-    **Graph3DBars** **attributes**
-
-    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
-
-    **Graph3DBars** **methods**
-
-    .. method:: __init__()
-
-    Graph multiple parallel bar graphs in 3D. Note: there is bug in matplotlib .99.0 that causes the units to be unusual here. This is supposed to be fixed in a forthcoming release. Data definition: A dictionary where each key forms an array sequence along the z plane (which is depth) For each dictionary, a list of value pairs, where each pair is the (x, y) coordinates. 
-
-    >>> a = Graph3DBars()
-
-    .. method:: process()
-
-    No documentation. 
-
-    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
-
-
 Graph3DPolygonBars
 ------------------
 
@@ -580,7 +553,10 @@ Graph3DPolygonBars
 
     .. method:: __init__()
 
-    Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Axis ticks do not seem to be adjustable without distorting the graph. 
+    Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
+
+    .. image:: images/Graph3DPolygonBars.* 
+        :width: 600 
 
     >>> a = Graph3DPolygonBars(doneAction=None)
     >>> data = {1:[], 2:[], 3:[]}
@@ -589,6 +565,10 @@ Graph3DPolygonBars
     ...    data[data.keys()[i]] = q 
     >>> a.setData(data)
     >>> a.process()
+
+    
+
+    
 
     .. method:: process()
 
@@ -614,6 +594,9 @@ GraphHistogram
     .. method:: __init__()
 
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
+
+    .. image:: images/GraphHistogram.* 
+        :width: 600 
 
     >>> a = GraphHistogram(doneAction=None)
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
@@ -645,12 +628,17 @@ GraphHorizontalBar
 
     .. method:: __init__()
 
-    Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-end points. 
+    Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
+
+    .. image:: images/GraphHorizontalBar.* 
+        :width: 600 
 
     >>> a = GraphHorizontalBar(doneAction=None)
-    >>> data = [('a', [(10,20), (15, 40)]), ('b', [(5,15), (20,40)])]
+    >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
     >>> a.setData(data)
     >>> a.process()
+
+    
 
     .. method:: process()
 
@@ -694,10 +682,15 @@ GraphScatter
 
     Graph two parameters in a scatter plot 
 
+    .. image:: images/GraphScatter.* 
+        :width: 600 
+
     >>> a = GraphScatter(doneAction=None)
     >>> data = [(x, x*x) for x in range(50)]
     >>> a.setData(data)
     >>> a.process()
+
+    
 
     .. method:: process()
 
@@ -714,6 +707,11 @@ GraphScatterWeighted
 .. class:: GraphScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
+
+    .. image:: images/GraphScatterWeighted.* 
+        :width: 600 
+
+    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -942,9 +940,9 @@ PlotStream
     >>> a.ticksDynamics()
     [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']] 
 
-    .. method:: ticksOffset(offsetMin=None, offsetMax=None, offsetStepSize=None, displayMeasureNumberZero=False)
+    .. method:: ticksOffset(offsetMin=None, offsetMax=None, offsetStepSize=None, displayMeasureNumberZero=False, remap=False)
 
-    Get offset ticks. If Measures are found, they will be used to create ticks. If not, stepSize will be used to create offset ticks between min and max. 
+    Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
 
     >>> from music21 import corpus, stream, note
     >>> s = corpus.parseWork('bach/bwv281.xml')

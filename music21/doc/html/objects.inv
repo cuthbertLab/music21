@@ -290,8 +290,6 @@ music21.clef.TrebleClef.__init__ method moduleClef.html
 music21.common.Iterator.__init__ method moduleCommon.html
 music21.meter.MeterSequence.flatWeight attribute moduleMeter.html
 music21.instrument.Instrument.midiChannel attribute moduleInstrument.html
-music21.interval.Interval.getComplement method moduleInterval.html
-music21.graph.Graph3DBars.process method moduleGraph.html
 music21.interval.getWrittenHigherNote function moduleInterval.html
 music21.key.Key.step attribute moduleKey.html
 music21.environment.Environment.ref attribute moduleEnvironment.html
@@ -386,6 +384,7 @@ music21.serial.RowBergDerWein.row attribute moduleSerial.html
 music21.serial.RowSchoenbergOp31.opus attribute moduleSerial.html
 music21.duration.AppogiaturaStartDuration class moduleDuration.html
 music21.duration.roundDuration function moduleDuration.html
+music21.interval.Interval.noteStart attribute moduleInterval.html
 music21.chord.Chord.duration method moduleChord.html
 music21.graph.PlotStream.show method moduleGraph.html
 music21.duration.DurationCommon class moduleDuration.html
@@ -508,7 +507,7 @@ music21.duration.Tuplet.totalTupletLength method moduleDuration.html
 music21.stream.System class moduleStream.html
 music21.base.Music21Object.duration attribute moduleBase.html
 music21.clef.Clef.octaveChange attribute moduleClef.html
-music21.graph.Graph3DBars.__init__ method moduleGraph.html
+music21.interval.Interval.intervalClass attribute moduleInterval.html
 music21.instrument.Instrument.bestName method moduleInstrument.html
 music21.editorial.NoteEditorial.melodicInterval attribute moduleEditorial.html
 music21.serial.TwelveToneMatrix.__init__ method moduleSerial.html
@@ -602,6 +601,7 @@ music21.meter.TimeSignature.setAccentWeight method moduleMeter.html
 music21.common.Timer.start method moduleCommon.html
 music21.duration.Tuplet.tupletNormal attribute moduleDuration.html
 music21.duration.Duration.consolidate method moduleDuration.html
+music21.interval.Interval.noteEnd attribute moduleInterval.html
 music21.clef.Clef.sign attribute moduleClef.html
 music21.common.defList.__init__ method moduleCommon.html
 music21.stream.Stream.append method moduleStream.html
@@ -1289,7 +1289,6 @@ music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano.opus attribute moduleSer
 music21.converter.ConverterMusicXML.__init__ method moduleConverter.html
 music21.chord.Chord.isDiminishedSeventh method moduleChord.html
 music21.converter.parse function moduleConverter.html
-music21.graph.Graph3DBars class moduleGraph.html
 music21.stream.Measure.measureNumber attribute moduleStream.html
 music21.duration.Duration.mx attribute moduleDuration.html
 music21.duration.Duration.type attribute moduleDuration.html
@@ -1316,7 +1315,6 @@ music21.stream.Stream.groupElementsByOffset method moduleStream.html
 music21.serial.RowWebernOp18No1.composer attribute moduleSerial.html
 music21.stream.Stream.repeatInsert method moduleStream.html
 music21.dynamics.Dynamic.posPlacement attribute moduleDynamics.html
-music21.interval.getSpecifier function moduleInterval.html
 music21.stream.Stream.lily attribute moduleStream.html
 music21.serial.RowBergLuluPrimaryRow.composer attribute moduleSerial.html
 music21.serial.RowBergWozzeckActIScene4Passacaglia.opus attribute moduleSerial.html
