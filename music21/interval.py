@@ -867,7 +867,6 @@ class Interval(music21.Music21Object):
     >>> aInterval
     <music21.interval.Interval P15>
     '''
-
 #     requires either (1) a string ("P5" etc.) or    
 #     (2) named arguments:
 #     (2a) either both of
@@ -877,7 +876,6 @@ class Interval(music21.Music21Object):
 #        note1 = Pitch (or Note) object
 #        note2 = Pitch (or Note) object
 #     in which case it figures out the diatonic and chromatic intervals itself
-
 
     diatonic = None
     chromatic = None
@@ -1044,18 +1042,30 @@ class Interval(music21.Music21Object):
         ''')
 
 
-    def _setNoteStart(self, n):
-        '''Assuming that this interval is defined, we can set a new start note (note1) and automatically have the end note (note2).
-        '''
-        # this is based on the procedure found in generatePitch() and 
-        # generateNote() but offers a more object oriented approach
+    def transposePitch(self, p, reverse=False):
+        '''Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval.
 
-        self.note1 = n
-        pitch1 = n.pitch
+        >>> from music21 import pitch
+        >>> p1 = pitch.Pitch('a#')
+        >>> i = Interval('m3')
+        >>> p2 = i.transposePitch(p1)
+        >>> p2
+        C#5
+        >>> p2 = i.transposePitch(p1, reverse=True)
+        >>> p2
+        F##4
+
+        '''
+        pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
 
-        newDiatonicNumber = (pitch1.diatonicNoteNum +
+        if not reverse:
+            newDiatonicNumber = (pitch1.diatonicNoteNum +
                              self.diatonic.generic.staffDistance)
+        else:
+            newDiatonicNumber = (pitch1.diatonicNoteNum -
+                             self.diatonic.generic.staffDistance)
+
         newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
         pitch2.step = newStep
         pitch2.octave = newOctave
@@ -1064,14 +1074,28 @@ class Interval(music21.Music21Object):
         # have right note name but not accidental
         interval2 = generateInterval(pitch1, pitch2)    
 
-        #environLocal.printDebug(['calculating half steps to fix:', interval2, self.chromatic.semitones, interval2.chromatic.semitones])
-
-        halfStepsToFix = (self.chromatic.semitones -
+        if not reverse:
+            halfStepsToFix = (self.chromatic.semitones -
                           interval2.chromatic.semitones)
-        #environLocal.printDebug(['pitch2, pitch1, interval.name, halfStepsToFix:', pitch2, pitch1, self.niceName, halfStepsToFix])
+        else:
+            halfStepsToFix = (-self.chromatic.semitones -
+                          interval2.chromatic.semitones)
+
 
         if halfStepsToFix != 0:
             pitch2.accidental = halfStepsToFix
+        return pitch2
+
+
+    def _setNoteStart(self, n):
+        '''Assuming that this interval is defined, we can set a new start note (note1) and automatically have the end note (note2).
+        '''
+        # this is based on the procedure found in generatePitch() and 
+        # generateNote() but offers a more object oriented approach
+
+        self.note1 = n
+        pitch1 = n.pitch
+        pitch2 = self.transposePitch(pitch1)
         self.note2 = copy.deepcopy(self.note1)
         self.note2.pitch = pitch2
 
@@ -1123,34 +1147,7 @@ class Interval(music21.Music21Object):
 
         self.note2 = n
         pitch2 = n.pitch
-        pitch1 = copy.deepcopy(pitch2)
-
-        # staff distance has direction; but need to reverse here
-        newDiatonicNumber = (pitch2.diatonicNoteNum -
-                             self.diatonic.generic.staffDistance)
-
-        environLocal.printDebug(['newDiatonicNumber:', newDiatonicNumber, self.diatonic.generic.staffDistance])
-
-        newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
-        pitch1.step = newStep
-        pitch1.octave = newOctave
-        pitch1.accidental = None
-
-        # have right note name but not accidental
-        interval2 = generateInterval(pitch2, pitch1)    
-
-        environLocal.printDebug(['calculating half steps to fix:', interval2, self.chromatic.semitones, interval2.chromatic.semitones])
-
-        # temporarily make this self.chromatic negative
-        halfStepsToFix = (-self.chromatic.semitones -
-                          interval2.chromatic.semitones)
-
-        environLocal.printDebug(['pitch2, pitch1, interval.name, halfStepsToFix:', pitch2, pitch1, self.niceName, halfStepsToFix])
-
-        if halfStepsToFix != 0:
-            pitch1.accidental = halfStepsToFix
-        #pitch1.accidental = halfStepsToFix
-
+        pitch1 = self.transposePitch(pitch2, reverse=True)
         self.note1 = copy.deepcopy(self.note2)
         self.note1.pitch = pitch1
 
