@@ -650,7 +650,7 @@ class _Graph3DBars(Graph):
         For each dictionary, a list of value pairs, where each pair is the
         (x, y) coordinates.
        
-        >>> a = Graph3DBars()
+        >>> a = _Graph3DBars()
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y', 'z']

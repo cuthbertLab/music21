@@ -1151,7 +1151,10 @@ class Pitch(music21.Music21Object):
                                     _getDiatonicNoteNum.__doc__)
 
 
-
+    def transpose(self, value):
+        '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+        '''
+        pass
 
 
 
