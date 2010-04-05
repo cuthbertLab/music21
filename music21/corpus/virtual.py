@@ -117,8 +117,17 @@ class SchubertD576(VirtualWork):
         VirtualWork.__init__(self)
 
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
-        self.corpusPath = 'schubert/d576'        
+        self.corpusPath = 'schubert/d576-1'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml')        
+
+
+class SchubertD5762(VirtualWork):
+    def __init__(self):
+        VirtualWork.__init__(self)
+        
+        self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
+        self.corpusPath = 'schubert/d576-2'
+        self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6.xml')
 
 
 class PachelbelCanonD(VirtualWork):

@@ -21,6 +21,8 @@ from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import pitch
+from music21 import note
+from music21.note import Note
 from music21.pitch import Pitch
 from pylab import *
 
@@ -48,6 +50,22 @@ def getWeights(isMajor):
         return [6.35, 2.33, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
     else:
         return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]    
+
+
+def getPitchClassDistribution(work, start, windowSize):
+    current = work.getMeasureRange(start+1, start+windowSize).flat
+    pcDist = [0]*12
+    
+    for n in current.notes:        
+        if not n.isRest:
+            length = n.quarterLength
+            if n.isChord:
+                for m in n.pitchClasses:
+                    pcDist[m] = pcDist[m] + (1 * length)
+            else:
+                pcDist[n.pitchClass] = pcDist[n.pitchClass] + (1 * length)
+    
+    return pcDist
 
 
 def convoluteDistribution(pcDistribution, isMajor=True):
@@ -100,6 +118,7 @@ def getLikelyKeys(keyResults):
     
 def getDifference(keyResults, pcDistribution, isMajor=True):
     pass
+    
     
 def getDifferenceDebug(keyResults, pcDistribution, isMajor=True):
 #def getDifference(self, pcDistribution, isMajor=True):
@@ -156,22 +175,6 @@ class KeyDetect(object):
 
     def runKeyDetect(self, sStream, minWindow):
         # names = [x.id for x in sStream]
-    
-        ''' key analysis by pitches
-        max = self.findLongestPart(sStream)
-        
-        solutionMatrix = [[0]*(max-minWindow)]*(len(sStream))
-
-        for i in range(len(sStream)):
-            print("-----WORKING ON PART ", names[i], "-----")
-            part = sStream[i].pitches
-            for j in range(minWindow, len(part)):
-                print("-----window size ", j, "-----")
-                solutionMatrix[i][j-minWindow] = self.windowKeyDetect(j, part) 
-        '''
-        
-        ''' key analysis by measure
-        '''
         
         max = len(sStream[0].measures)
         
@@ -189,58 +192,14 @@ class KeyDetect(object):
     def windowKeyDetect(self, windowSize, work):
         
         max = len(work[0].measures)
-
         key = [0] * (max - windowSize + 1)                
         
-        ''' fill pitch class distribution
-        '''
-        
-        for i in range(max-windowSize + 1):
-            current = work.getMeasureRange(i, i+windowSize).pitchAttributeCount('pitchClass')
-            pcDist = [0] * 12
-            for j in range(12):
-                if current.get(j) == None:
-                    pcDist[j] = 0
-                else:
-                    pcDist[j] = current.get(j)
-            
-            key[i] = self.singleKeyDetect(pcDist)
+        for i in range(max-windowSize + 1):    
+            key[i] = self.singleKeyDetect(getPitchClassDistribution(work, i, windowSize))
              
         return key
-            
-        
+ 
     
-#===============================================================================
-#    def windowKeyDetect(self, windowSize, part):
-#        ''' Takes in windows size as argument to run key detection
-#        '''
-#    
-#        key = [0] * (len(part) - windowSize + 1)
-#    
-#        ''' Run key detection over all possible contiguous windows of a
-#            given window size (by pitches)
-#            
-#        if windowSize > len(part):
-#            windowSize = len(part)
-#        
-#        for i in range(len(part) - windowSize + 1):
-#            pitchClassDist = [0] * 12
-#            pcGroup = [n.pitchClass for n in part[(0 + i):windowSize + i]]
-#            
-#            for j in pcGroup:
-#                pitchClassDist[j] = pitchClassDist[j] + 1
-#                #print("pass", i)
-#                #print pitchClassDist
-#                #print len(part)
-#                
-#            key[i] = self.singleKeyDetect(pitchClassDist)
-#            #createDistributionGraph(pitchClassDist)
-#        '''
-#        
-# 
-#        return key
-#===============================================================================
-
     def singleKeyDetect(self, pcDistribution):    
         ''' Takes in a pitch class distribution and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
@@ -270,13 +229,9 @@ class KeyDetect(object):
         #print "Possible keys, from most likely to least likely", likelyKeys
     
         #print("Key of analyzed segment:", likelyKeys[0], "(runners up", likelyKeys[1], "and", likelyKeys[2], ")")
-        #return [likelyKeys[0], likelyKeys[1], difference]
         
         return likelyKey
 
-    
-class MajorMinor(object):
-    pass
 
 #------------------------------------------------------------------------------
 
@@ -291,12 +246,13 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    '''
     def testKeyDetect(self):
-        #sStream = corpus.parseWork('schubert/d576')
-        sStream = corpus.parseWork('bach/bwv1.6')
+        sStream = corpus.parseWork('schubert/d576-2')
+        #sStream = corpus.parseWork('bach/bwv17.7')
         a = KeyDetect(sStream)
         a.runKeyDetect(sStream, 1)
-        
+    '''    
 
 
 #------------------------------------------------------------------------------
