@@ -23,6 +23,8 @@ from music21 import common
 from music21 import musicxml
 musicxmlMod = musicxml # alias as to avoid name conflict below
 from music21 import defaults
+from music21 import interval
+
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -1153,9 +1155,22 @@ class Pitch(music21.Music21Object):
 
     def transpose(self, value):
         '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
-        '''
-        pass
 
+        >>> a = Pitch('g4')
+        >>> b = a.transpose('m3')
+        >>> b
+        B-4
+        >>> aInterval = interval.Interval(-6)
+        >>> b = a.transpose(aInterval)
+        >>> b
+        C#4
+
+        '''
+        if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        else: # try to process
+            intervalObj = interval.Interval(value)
+        return intervalObj.transposePitch(self)
 
 
 #-------------------------------------------------------------------------------
