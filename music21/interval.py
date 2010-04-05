@@ -94,6 +94,8 @@ class IntervalException(Exception):
 #-------------------------------------------------------------------------------
 # some utility functions
 
+
+
 def convertStaffDistanceToInterval(staffDist):
     '''Returns the interval number from the given staff distance.
 
@@ -139,24 +141,26 @@ def convertSpecifier(specifier):
     '''Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.
 
     >>> convertSpecifier(3)
-    3
+    (3, 'm')
     >>> convertSpecifier('p')
-    1
+    (1, 'P')
     >>> convertSpecifier('P')
-    1
+    (1, 'P')
     >>> convertSpecifier('M')
-    2
+    (2, 'M')
     >>> convertSpecifier('major')
-    2
+    (2, 'M')
     >>> convertSpecifier('m')
-    3
+    (3, 'm')
     >>> convertSpecifier('Augmented')
-    4
+    (4, 'A')
     >>> convertSpecifier('a')
-    4
+    (4, 'A')
     >>> convertSpecifier(None)
+    (None, None)
     '''
     post = None
+    postStr = None
     if common.isNum(specifier):
         post = specifier
     # check string matches
@@ -179,7 +183,9 @@ def convertSpecifier(specifier):
                     post = i
                     break
     # if no match or None, None will be returned
-    return post
+    if post != None:
+        postStr = prefixSpecs[post]
+    return post, postStr
 
 
 def convertGeneric(value):
@@ -254,6 +260,76 @@ def convertGeneric(value):
         post = post * directionScalar
     return post
 
+
+def convertSemitoneToSpecifierGeneric(count):
+    '''Given a number of semitones, return a default diatonic specifier.
+
+    >>> convertSemitoneToSpecifierGeneric(0)
+    ('P', 1)
+    >>> convertSemitoneToSpecifierGeneric(-2)
+    ('M', -2)
+    >>> convertSemitoneToSpecifierGeneric(1)
+    ('m', 2)
+    >>> convertSemitoneToSpecifierGeneric(7)
+    ('P', 5)
+    >>> convertSemitoneToSpecifierGeneric(11)
+    ('M', 7)
+    >>> convertSemitoneToSpecifierGeneric(12)
+    ('P', 8)
+    >>> convertSemitoneToSpecifierGeneric(13)
+    ('m', 9)
+    >>> convertSemitoneToSpecifierGeneric(-15)
+    ('m', -10)
+    >>> convertSemitoneToSpecifierGeneric(24)
+    ('P', 15)
+    '''
+    if count < 0: 
+        dirScale = -1
+    else:
+        dirScale = 1
+    # use mod 13 here to get 12th value
+    size = abs(count) % 12
+    oct = abs(count) // 12 # let floor to int 
+
+    if size == 0:
+        spec = 'P'
+        generic = 1
+    elif size == 1:
+        spec = 'm'
+        generic = 2
+    elif size == 2:
+        spec = 'M'
+        generic = 2
+    elif size == 3:
+        spec = 'm'
+        generic = 3
+    elif size == 4:
+        spec = 'M'
+        generic = 3
+    elif size == 5:
+        spec = 'P'
+        generic = 4
+    elif size == 6:
+        spec = 'd'
+        generic = 5
+    elif size == 7:
+        spec = 'P'
+        generic = 5
+    elif size == 8:
+        spec = 'm'
+        generic = 6
+    elif size == 9:
+        spec = 'M'
+        generic = 6
+    elif size == 10:
+        spec = 'm'
+        generic = 7
+    elif size == 11:
+        spec = 'M'
+        generic = 7
+
+    return spec, (generic+(oct*7)) * dirScale
+    
 
 
 #-------------------------------------------------------------------------------
@@ -386,14 +462,36 @@ class GenericInterval(music21.Music21Object):
     def __int__(self):
         return self.directed
 
+    def __repr__(self):
+        return "<music21.interval.GenericInterval %s>" % self.directed
+
     def complement(self):
         '''generates a new GenericInterval object where descending 3rds are 6ths, etc.'''
         return GenericInterval(self.mod7inversion)
 
-    def __repr__(self):
-        return "<music21.interval.GenericInterval %s>" % self.directed
+    def getDiatonic(self, specifier):
+        '''Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 
 
+        Specifier should be provided as a string name, such as 'dd', 'M', or 'perfect'.
 
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.getDiatonic('major')
+        <music21.interval.DiatonicInterval M3>
+        >>> aInterval.getDiatonic('minor')
+        <music21.interval.DiatonicInterval m3>
+        >>> aInterval.getDiatonic('d')
+        <music21.interval.DiatonicInterval d3>
+        >>> aInterval.getDiatonic('a')
+        <music21.interval.DiatonicInterval A3>
+        >>> aInterval.getDiatonic(2)
+        <music21.interval.DiatonicInterval M3>
+
+        >>> bInterval = GenericInterval('fifth')
+        >>> bInterval.getDiatonic('perfect')
+        <music21.interval.DiatonicInterval P5>
+
+        '''             
+        return DiatonicInterval(specifier, self)
 
 
 class DiatonicInterval(music21.Music21Object):
@@ -460,7 +558,8 @@ class DiatonicInterval(music21.Music21Object):
 
         self.name = ""
         # translate strings, if provided, to integers
-        self.specifier = convertSpecifier(specifier)
+        # specifier here is the index number in the prefixSpecs list
+        self.specifier, specifierStr = convertSpecifier(specifier)
         if self.specifier != None:
             self.name = (prefixSpecs[self.specifier] +
                         str(self.generic.undirected))
@@ -547,7 +646,7 @@ class DiatonicInterval(music21.Music21Object):
 
         '''
         # note: part of this functionality used to be in the function
-        # _stringToDiatonicChromatic()
+        # _stringToDiatonicChromatic(), which used to be named something else
 
         octaveOffset = int(abs(self.generic.staffDistance)/7)
         semitonesStart = semitonesGeneric[self.generic.simpleUndirected]
@@ -616,10 +715,23 @@ class ChromaticInterval(music21.Music21Object):
     def getDiatonic(self):
         '''Given a Chromatic interval, return a Diatonic interval object. 
         
-        While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit chromatic specification of Interval objects.
+        While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit easy chromatic specification of Interval objects.
+
+        >>> aInterval = ChromaticInterval(5)
+        >>> aInterval.getDiatonic()
+        <music21.interval.DiatonicInterval P4>
+
+        >>> aInterval = ChromaticInterval(7)
+        >>> aInterval.getDiatonic()
+        <music21.interval.DiatonicInterval P5>
+
+        >>> aInterval = ChromaticInterval(11)
+        >>> aInterval.getDiatonic()
+        <music21.interval.DiatonicInterval M7>
+
         '''
-        # TODO: is there already a way to do this
-        pass
+        specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
+        return DiatonicInterval(specifier, generic)
     
 
 #-------------------------------------------------------------------------------
@@ -628,6 +740,11 @@ def _stringToDiatonicChromatic(value):
 
     >>> _stringToDiatonicChromatic('P5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
+    >>> _stringToDiatonicChromatic('p5')
+    (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
+    >>> _stringToDiatonicChromatic('perfect5')
+    (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
+
     >>> _stringToDiatonicChromatic('P-5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval -7>)
     >>> _stringToDiatonicChromatic('M3')
@@ -649,54 +766,24 @@ def _stringToDiatonicChromatic(value):
     # find direction        
     if '-' in value:
         value = value.replace('-', '') # remove
-        dirShift = -1
+        dirScale = -1
     else:
-        dirShift = 1
+        dirScale = 1
 
     # permit whole and half appreviations
     if value.lower() in ['w', 'whole', 'tone']:
         value = 'M2'
     elif value.lower() in ['h', 'half', 'semitone']:
         value = 'm2'
-    # permit variable case when it does not offer any difference
-    # that is, only make m/M matter
-    value = value.replace('p', 'P')
-    value = value.replace('a', 'A')
-    value = value.replace('D', 'd')
 
     # apply dir shift value here
-    generic = int(value.lstrip('PMmAd')) * dirShift # this will be a number
-    specName = value.rstrip('-0123456789')
-    # scale by dir shift to add back in direction
-    gInterval = GenericInterval(generic)
+    found, remain = common.getNumFromStr(value)
+    genericNumber = int(found) * dirScale
+    #generic = int(value.lstrip('PMmAd')) * dirShift # this will be a number
+    specName = remain  # value.rstrip('-0123456789')
 
-    # DiatonicInterval needs a GenericInterval object as well as a "specifier,"
-    # a number corresponding to the interval type, as I understand it - JDR
-    if gInterval.perfectable:
-        specIndex = orderedPerfSpecs.index(specName)
-        specifier = perfSpecifiers[specIndex]
-    else:
-        specIndex = orderedImperfSpecs.index(specName)
-        specifier = specifiers[specIndex]
-        
-    dInterval = DiatonicInterval(specifier, gInterval)
-
-    # calculating number of semitones
-#     octaveOffset = int(abs(gInterval.staffDistance)/7)
-#     semitonesStart = semitonesGeneric[gInterval.simpleUndirected]
-#     # dictionary of semitones for major/perfect intervals
-# 
-#     if gInterval.perfectable:
-#         semitonesAdjust = semitonesAdjustPerfect[specName] # dictionary of semitones distance from perfect
-#     else:
-#         semitonesAdjust = semitonesAdjustImperf[specName] # dictionary of semitones distance from major
-# 
-#     semitones = (octaveOffset*12) + semitonesStart + semitonesAdjust
-#     if generic < 0: # want direction to be same as original direction
-#         semitones *= -1 # (automatically positive until this step)
-                                
-#    cInterval = ChromaticInterval(semitones)
-
+    gInterval = GenericInterval(genericNumber)    
+    dInterval = gInterval.getDiatonic(specName)
     return dInterval, dInterval.getChromatic()
 
 
@@ -738,7 +825,7 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     >>> _getSpecifierFromGenericChromatic(aInterval, bInterval)
     2
     >>> convertSpecifier('major')
-    2
+    (2, 'M')
     '''
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
@@ -846,6 +933,14 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval('-h')
         >>> aInterval
         <music21.interval.Interval m-2>
+
+        >>> aInterval = Interval(3)
+        >>> aInterval
+        <music21.interval.Interval m3>
+
+        >>> aInterval = Interval(7)
+        >>> aInterval
+        <music21.interval.Interval P5>
 
         '''
         music21.Music21Object.__init__(self)
@@ -1259,7 +1354,7 @@ def generateInterval(n1, n2 = None):
     >>> aInterval.niceName == bInterval.niceName
     True
     '''
-    # TODO: possible remove: not clear how this offers any better functionality
+    # TODO: possibly remove: not clear how this offers any better functionality
     # than just creating an Interval class?
 
     #note to self:  what's going on with the Note() representation in help?
@@ -1284,11 +1379,14 @@ def generateIntervalFromString(string):
     <music21.interval.Interval m3>
     '''
     # TODO: rename intervalFromString
-    dInterval, cInterval = _stringToDiatonicChromatic(string)
-    allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
-    return allInterval
-        
+    # TODO: possibly remove: exact same functionality is available directly
+    # from Interval instance
 
+#     dInterval, cInterval = _stringToDiatonicChromatic(string)
+#     allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
+#     return allInterval
+        
+    return Interval(string)
 
 
 
