@@ -1153,7 +1153,7 @@ class Pitch(music21.Music21Object):
                                     _getDiatonicNoteNum.__doc__)
 
 
-    def transpose(self, value):
+    def transpose(self, value, inPlace=False):
         '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
         >>> a = Pitch('g4')
@@ -1164,14 +1164,20 @@ class Pitch(music21.Music21Object):
         >>> b = a.transpose(aInterval)
         >>> b
         C#4
-
+        
+        >>> a.transpose(aInterval, inPlace=True)
+        >>> a
+        G4
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)
-        return intervalObj.transposePitch(self)
-
+        if not inPlace:
+            return intervalObj.transposePitch(self)
+        else:
+            self = intervalObj.transposePitch(self)
+            return None
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

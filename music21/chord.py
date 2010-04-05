@@ -470,6 +470,45 @@ class Chord(note.NotRest):
 
 # possibly add methods to create chords form pitch classes:
 # c2 = chord.fromPitchClasses([0, 1, 3, 7])
+    #---------------------------------------------------------------------------
+
+    def transpose(self, value, inPlace=False):
+        '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+
+        >>> a = Chord(['g4', 'a3', 'c#6'])
+        >>> b = a.transpose('m3')
+        >>> b
+        <music21.chord.Chord B-4 C4 E6>
+        >>> aInterval = interval.Interval(-6)
+        >>> b = a.transpose(aInterval)
+        >>> b
+        <music21.chord.Chord C#4 D#3 F##5>
+        
+        >>> a.transpose(aInterval, inPlace=True)
+        >>> a
+        <music21.chord.Chord C#4 D#3 F##5>
+        '''
+        if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        else: # try to process
+            intervalObj = interval.Interval(value)
+
+        if not inPlace:
+            post = copy.deepcopy(self)
+        else:
+            post = self
+        
+        pitches = []
+        for p in self.pitches:
+            pitches.append(intervalObj.transposePitch(p))
+
+        post.pitches = pitches
+
+        if not inPlace:
+            return post
+        else:
+            return None
+
 
 
 

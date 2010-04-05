@@ -23,6 +23,7 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import instrument
+from music21 import interval
 from music21 import editorial
 from music21.lily import LilyString
 from music21 import musicxml
@@ -1096,8 +1097,39 @@ class Note(NotRest):
     diatonicNoteNum = property(_getDiatonicNoteNum)
 
 
+    def transpose(self, value, inPlace=False):
+        '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
+        >>> a = Note('g4')
+        >>> b = a.transpose('m3')
+        >>> b
+        <music21.note.Note B->
+        >>> aInterval = interval.Interval(-6)
+        >>> b = a.transpose(aInterval)
+        >>> b
+        <music21.note.Note C#>
+        
+        >>> a.transpose(aInterval, inPlace=True)
+        >>> a
+        <music21.note.Note C#>
 
+        '''
+        if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        else: # try to process
+            intervalObj = interval.Interval(value)
+
+        if not inPlace:
+            post = copy.deepcopy(self)
+        else:
+            post = self
+
+        post.pitch = intervalObj.transposePitch(self.pitch)
+
+        if not inPlace:
+            return post
+        else:
+            return None
 
     #---------------------------------------------------------------------------
     def _preDurationLily(self):

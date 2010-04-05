@@ -2759,30 +2759,71 @@ class Stream(music21.Music21Object):
             raise Exception, 'this must be a Duration object, not %s' % durationObj
 
     duration = property(_getDuration, _setDuration, doc='''
-    Returns the total duration of the Stream, from the beginning of the stream until the end of the final element.
-    May be set independently by supplying a Duration object.
-
-    >>> a = Stream()
-    >>> q = note.QuarterNote()
-    >>> a.repeatInsert(q, [0,1,2,3])
-    >>> a.highestOffset
-    3.0
-    >>> a.highestTime
-    4.0
-    >>> a.duration.quarterLength
-    4.0
+        Returns the total duration of the Stream, from the beginning of the stream until the end of the final element.
+        May be set independently by supplying a Duration object.
     
-    >>> # Advanced usage: overriding the duration
-    >>> newDuration = duration.Duration("half")
-    >>> newDuration.quarterLength
-    2.0
+        >>> a = Stream()
+        >>> q = note.QuarterNote()
+        >>> a.repeatInsert(q, [0,1,2,3])
+        >>> a.highestOffset
+        3.0
+        >>> a.highestTime
+        4.0
+        >>> a.duration.quarterLength
+        4.0
+        
+        >>> # Advanced usage: overriding the duration
+        >>> newDuration = duration.Duration("half")
+        >>> newDuration.quarterLength
+        2.0
+    
+        >>> a.duration = newDuration
+        >>> a.duration.quarterLength
+        2.0
+        >>> a.highestTime # unchanged
+        4.0
+        ''')
 
-    >>> a.duration = newDuration
-    >>> a.duration.quarterLength
-    2.0
-    >>> a.highestTime # unchanged
-    4.0
-    ''')
+    #---------------------------------------------------------------------------
+    # transformations
+
+    def transpose(self, value, inPlace=False):
+        '''Transpose all Notes and Chords in the Stream by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+
+        >>> aInterval = interval.Interval('d5')
+        
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> part = a[0]
+        >>> a[0].pitches[:10]
+        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        >>> b = a[0].flat.transpose('d5')
+        >>> b.pitches[:10]
+        [F5, A-5, F5, F5, F5, F5, G-5, F5, E-5, E-5]
+        >>> a[0].pitches[:10]
+        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        >>> c = b.flat.transpose('a4')
+        >>> c.pitches[:10]
+        [B5, D6, B5, B5, B5, B5, C6, B5, A5, A5]
+        
+        >>> c.flat.transpose(aInterval, inPlace=True)
+        >>> c.pitches[:10]
+        [F6, A-6, F6, F6, F6, F6, G-6, F6, E-6, E-6]
+        '''
+        # only change the copy
+        if not inPlace:
+            post = copy.deepcopy(self)
+        else:
+            post = self
+        for n in post.notes: # includes chords
+            if not n.isRest:
+                # do inplace transpositions on the deepcopy
+                n.transpose(value, inPlace=True)            
+
+        if not inPlace:
+            return post
+        else:       
+            return None
 
     #---------------------------------------------------------------------------
     def _getLily(self):

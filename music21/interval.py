@@ -931,7 +931,7 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval('-h')
         >>> aInterval
         <music21.interval.Interval m-2>
-
+        
         >>> aInterval = Interval(3)
         >>> aInterval
         <music21.interval.Interval m3>
