@@ -48,6 +48,9 @@ from music21.corpus.mozart import k155
 from music21.corpus.mozart import k156
 from music21.corpus.mozart import k458
 
+from music21.corpus import schoenberg
+from music21.corpus.schoenberg import opus19
+
 from music21.corpus import schumann
 from music21.corpus.schumann import opus41no1
 
@@ -74,6 +77,9 @@ MODULES = [
             k156,
             k458,
             
+            schoenberg,
+            opus19,
+
             schumann,
             opus41no1,
 
