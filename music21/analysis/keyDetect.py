@@ -53,7 +53,7 @@ def getWeights(isMajor):
 
 
 def getPitchClassDistribution(work, start, windowSize):
-    current = work.getMeasureRange(start+1, start+windowSize).flat
+    current = work.getMeasureRange(start, start+windowSize).flat
     pcDist = [0]*12
     
     for n in current.notes:        
@@ -81,10 +81,8 @@ def convoluteDistribution(pcDistribution, isMajor=True):
             
     for i in range(len(soln)):
         for j in range(len(pcDistribution)):
-            soln[i] = soln[i] + (toneWeights[(j + i) % 12] * pcDistribution[j])
-    
-    #print soln  
-    
+            soln[i] = soln[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
+        
     return soln  
 
 
@@ -100,7 +98,7 @@ def findLongestPart(sStream):
     return max
     
     
-def getLikelyKeys(keyResults):
+def getLikelyKeys(keyResults, differences):
     ''' Takes in a list of probably key results in points and returns a
         list of keys in letters, sorted from most likely to least likely
     '''
@@ -108,19 +106,15 @@ def getLikelyKeys(keyResults):
     a = sorted(keyResults)
     a.reverse()
     
-    ''' Return pairs, the pitch class and the point value, in order by point value
+    ''' Return pairs, the pitch class and the correlation value, in order by point value
     '''
     for i in range(len(a)):
-        likelyKeys[i] = (Pitch(keyResults.index(a[i])), a[i])
+        likelyKeys[i] = (Pitch(keyResults.index(a[i])), differences[keyResults.index(a[i])])
     
     return likelyKeys
     
     
 def getDifference(keyResults, pcDistribution, isMajor=True):
-    pass
-    
-    
-def getDifferenceDebug(keyResults, pcDistribution, isMajor=True):
 #def getDifference(self, pcDistribution, isMajor=True):
     ''' Takes in a list of numerical probably key results and returns the
         difference of the top two keys
@@ -145,16 +139,16 @@ def getDifferenceDebug(keyResults, pcDistribution, isMajor=True):
     for i in range(len(soln)):
         for j in range(len(toneWeights)):
             #print "BLAH"
-            top[i] = top[i] + ((toneWeights[(j + i) % 12]-profileAverage) * (pcDistribution[j]-histogramAverage))
+            top[i] = top[i] + ((toneWeights[(j - i) % 12]-profileAverage) * (pcDistribution[j]-histogramAverage))
             #print top[i]
-            bottomRight[i] = bottomRight[i] + ((toneWeights[(j+i)%12]-profileAverage)**2)
+            bottomRight[i] = bottomRight[i] + ((toneWeights[(j-i)%12]-profileAverage)**2)
             #print bottomRight[i]
             bottomLeft[i] = bottomLeft[i] + ((pcDistribution[j]-histogramAverage)**2)
             #print bottomLeft[i]
             soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
             #print soln[i]
         
-    print soln
+    #print soln
     return soln
 
 #------------------------------------------------------------------------------
@@ -212,23 +206,33 @@ class KeyDetect(object):
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
     
         keyResultsMajor = convoluteDistribution(pcDistribution, True)
-        likelyKeysMajor = getLikelyKeys(keyResultsMajor)
         differenceMajor = getDifference(keyResultsMajor, pcDistribution, True)
+        likelyKeysMajor = getLikelyKeys(keyResultsMajor, differenceMajor)
+        
         
         keyResultsMinor = convoluteDistribution(pcDistribution, False)   
-        likelyKeysMinor = getLikelyKeys(keyResultsMinor)
         differenceMinor = getDifference(keyResultsMinor, pcDistribution, False)
-
-        if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
-            likelyKey = (likelyKeysMajor[0][0], "Major")
-        else:
-            likelyKey = (likelyKeysMinor[0][0], "Minor")
+        likelyKeysMinor = getLikelyKeys(keyResultsMinor, differenceMinor)
         
-        #print "Key probabilities ordered by pitch class:", keyResults
-        #print keySorted
-        #print "Possible keys, from most likely to least likely", likelyKeys
-    
-        #print("Key of analyzed segment:", likelyKeys[0], "(runners up", likelyKeys[1], "and", likelyKeys[2], ")")
+
+        ''' find the largest correlation value to use for a key
+        '''
+        if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
+            likelyKey = (likelyKeysMajor[0][0], "Major", likelyKeysMajor[0][1])
+        else:
+            likelyKey = (likelyKeysMinor[0][0], "Minor", likelyKeysMinor[0][1])
+        
+        '''
+        print keyResultsMajor
+        print likelyKeysMajor
+        print differenceMajor
+        
+        print keyResultsMinor
+        print likelyKeysMinor
+        print differenceMinor
+        
+        print likelyKey
+        '''
         
         return likelyKey
 

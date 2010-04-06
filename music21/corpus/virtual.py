@@ -126,8 +126,26 @@ class SchubertD5762(VirtualWork):
         VirtualWork.__init__(self)
         
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
-        self.corpusPath = 'schubert/d576-2'
+        self.corpusPath = 'schubert/d576-6'
         self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6.xml')
+
+
+class SchubertD5763(VirtualWork):
+    def __init__(self):
+        VirtualWork.__init__(self)
+        
+        self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
+        self.corpusPath = 'schubert/d576-6a'
+        self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6a.xml')
+
+
+class SchubertD5764(VirtualWork):
+    def __init__(self):
+        VirtualWork.__init__(self)
+        
+        self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
+        self.corpusPath = 'schubert/d576-6b'
+        self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6b.xml')
 
 
 class PachelbelCanonD(VirtualWork):
