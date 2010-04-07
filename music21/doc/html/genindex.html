@@ -399,6 +399,7 @@
 <dt><a href="modulePitch.html#music21.pitch.convertPsToOct">convertPsToOct() (in module music21.pitch)</a></dt>
 <dt><a href="modulePitch.html#music21.pitch.convertPsToStep">convertPsToStep() (in module music21.pitch)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.convertQuarterLengthToType">convertQuarterLengthToType() (in module music21.duration)</a></dt>
+<dt><a href="moduleInterval.html#music21.interval.convertSemitoneToSpecifierGeneric">convertSemitoneToSpecifierGeneric() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.convertSpecifier">convertSpecifier() (in module music21.interval)</a></dt>
 <dt><a href="moduleInterval.html#music21.interval.convertStaffDistanceToInterval">convertStaffDistanceToInterval() (in module music21.interval)</a></dt>
 <dt><a href="modulePitch.html#music21.pitch.convertStepToPs">convertStepToPs() (in module music21.pitch)</a></dt>
@@ -602,10 +603,15 @@
 <dt><a href="moduleCorpus.html#music21.corpus.base.getBeethovenStringQuartets">getBeethovenStringQuartets() (in module music21.corpus.base)</a></dt>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.getByClass">getByClass() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Beams.getByNumber">getByNumber() (music21.note.Beams method)</a></dt>
+<dt><a href="moduleInterval.html#music21.interval.DiatonicInterval.getChromatic">getChromatic() (music21.interval.DiatonicInterval method)</a></dt>
 <dt><a href="moduleCorpus.html#music21.corpus.base.getComposer">getComposer() (in module music21.corpus.base)</a></dt>
 <dt><a href="moduleCorpus.html#music21.corpus.base.getComposerDir">getComposerDir() (in module music21.corpus.base)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.getContextAttr">getContextAttr() (music21.base.Music21Object method)</a></dt>
 <dt><a href="moduleBase.html#music21.base.Music21Object.getContextByClass">getContextByClass() (music21.base.Music21Object method)</a></dt>
+<dt><a href="moduleInterval.html#music21.interval.ChromaticInterval.getDiatonic">getDiatonic() (music21.interval.ChromaticInterval method)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleInterval.html#music21.interval.GenericInterval.getDiatonic">(music21.interval.GenericInterval method)</a></dt>
+  </dl></dd>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote.getDots">getDots() (music21.tinyNotation.TinyNotationNote method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getElementAfterElement">getElementAfterElement() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getElementAfterOffset">getElementAfterOffset() (music21.stream.Stream method)</a></dt>
@@ -622,8 +628,8 @@
 <dt><a href="moduleStream.html#music21.stream.Stream.getInstrument">getInstrument() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevel">getLevel() (music21.meter.MeterSequence method)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelSpan">getLevelSpan() (music21.meter.MeterSequence method)</a></dt>
-<dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelWeight">getLevelWeight() (music21.meter.MeterSequence method)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.getMd5">getMd5() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelWeight">getLevelWeight() (music21.meter.MeterSequence method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.getMd5">getMd5() (in module music21.common)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Score.getMeasureRange">getMeasureRange() (music21.stream.Score method)</a></dt>
   <dd><dl>
     <dt><a href="moduleStream.html#music21.stream.Stream.getMeasureRange">(music21.stream.Stream method)</a></dt>
@@ -1647,6 +1653,13 @@
 <dt><a href="moduleCommon.html#music21.common.Scalar.toUnicode">toUnicode() (music21.common.Scalar method)</a></dt>
 <dt><a href="moduleNode.html#music21.node.Node.toxml">toxml() (music21.node.Node method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.transferOffsetToElements">transferOffsetToElements() (music21.stream.Stream method)</a></dt>
+<dt><a href="moduleChord.html#music21.chord.Chord.transpose">transpose() (music21.chord.Chord method)</a></dt>
+  <dd><dl>
+    <dt><a href="moduleNote.html#music21.note.Note.transpose">(music21.note.Note method)</a></dt>
+    <dt><a href="modulePitch.html#music21.pitch.Pitch.transpose">(music21.pitch.Pitch method)</a></dt>
+    <dt><a href="moduleStream.html#music21.stream.Stream.transpose">(music21.stream.Stream method)</a></dt>
+  </dl></dd>
+<dt><a href="moduleInterval.html#music21.interval.Interval.transposePitch">transposePitch() (music21.interval.Interval method)</a></dt>
 <dt><a href="moduleInstrument.html#music21.instrument.Instrument.transposition">transposition (music21.instrument.Instrument attribute)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.Treble8vaClef">Treble8vaClef (class in music21.clef)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.Treble8vbClef">Treble8vbClef (class in music21.clef)</a></dt>
@@ -1799,7 +1812,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 04, 2010.
+      Last updated on Apr 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

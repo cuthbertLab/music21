@@ -99,46 +99,45 @@ Given a type (such as 16th or quarter), return the next larger type.
 
 .. function:: partitionQuarterLength(qLen, qLenDiv=4)
 
-Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into (default = 4; i.e., into whole notes), returns a list of Durations that partition the given quarterLength so that there is no leftovers. This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and make it fit within several measures) or by beat groups. Here is a Little demonstration function that will show how we can use partitionQuarterLength: 
+Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into (default = 4; i.e., into whole notes), returns a list of Durations that partition the given quarterLength so that there is no leftovers. This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and make it fit within several measures) or by beat groups. 
 
+>>> # Here is a Little demonstration function that will show how we can use partitionQuarterLength:
 >>> def pql(qLen, qLenDiv):
 ...    partitionList = partitionQuarterLength(qLen, qLenDiv) 
 ...    for dur in partitionList: 
 ...        print(unitSpec(dur)) 
-
-
-Divide 2.5 quarters worth of time into eighth notes. 
+>>> #Divide 2.5 quarters worth of time into eighth notes.
 >>> pql(2.5,.5)
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
-Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time) 
+>>> #Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)
 >>> pql(5, 2.5)
 (2.0, 'half', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
 (2.0, 'half', 0, None, None, None) 
 (0.5, 'eighth', 0, None, None, None) 
-Dividing 5.25 qLen into dotted halves 
+>>> #Dividing 5.25 qLen into dotted halves
 >>> pql(5.25,3)
 (3.0, 'half', 1, None, None, None) 
 (2.0, 'half', 0, None, None, None) 
 (0.25, '16th', 0, None, None, None) 
-Dividing 1.33333 qLen into triplet eighths: 
+>>> #Dividing 1.33333 qLen into triplet eighths:
 >>> pql(4.0/3.0, 1.0/3.0)
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
-Dividing 1.5 into triplet eighths 
+>>> #Dividing 1.5 into triplet eighths
 >>> pql(1.5,.33333333333333)
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.333..., 'eighth', 0, 3, 2, 'eighth') 
 (0.1666..., '16th', 0, 3, 2, '16th') 
-There is no problem if the division unit is larger then the source duration, it 
+>>> #There is no problem if the division unit is larger then the source duration, it
 just will not be totally filled. 
 >>> pql(1.5, 4)
 (1.5, 'quarter', 1, None, None, None) 
@@ -373,7 +372,7 @@ Duration
 
     **Duration** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     First positional argument is assumed to be type string or a quarterLength. 
 
@@ -623,7 +622,7 @@ Tuplet
 
     **Tuplet** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 

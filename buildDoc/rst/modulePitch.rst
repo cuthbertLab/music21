@@ -337,6 +337,22 @@ Pitch
     >>> p2
     D# 
 
+    .. method:: transpose(value, inPlace=False)
+
+    Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+
+    >>> a = Pitch('g4')
+    >>> b = a.transpose('m3')
+    >>> b
+    B-4 
+    >>> aInterval = interval.Interval(-6)
+    >>> b = a.transpose(aInterval)
+    >>> b
+    C#4 
+    >>> a.transpose(aInterval, inPlace=True)
+    >>> a
+    G4 
+
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

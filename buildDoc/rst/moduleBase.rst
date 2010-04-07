@@ -59,7 +59,7 @@ Music21Object
 
     **Music21Object** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 

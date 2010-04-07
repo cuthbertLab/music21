@@ -183,28 +183,55 @@
 </pre></div>
 </div>
 <dl class="function">
+<dt id="music21.interval.convertSemitoneToSpecifierGeneric">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">convertSemitoneToSpecifierGeneric</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#music21.interval.convertSemitoneToSpecifierGeneric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a number of semitones, return a default diatonic specifier.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">(&#39;P&#39;, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="o">-</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">(&#39;M&#39;, -2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">(&#39;m&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
+<span class="go">(&#39;P&#39;, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">11</span><span class="p">)</span>
+<span class="go">(&#39;M&#39;, 7)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">12</span><span class="p">)</span>
+<span class="go">(&#39;P&#39;, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">13</span><span class="p">)</span>
+<span class="go">(&#39;m&#39;, 9)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="o">-</span><span class="mf">15</span><span class="p">)</span>
+<span class="go">(&#39;m&#39;, -10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertSemitoneToSpecifierGeneric</span><span class="p">(</span><span class="mf">24</span><span class="p">)</span>
+<span class="go">(&#39;P&#39;, 15)</span>
+</pre></div>
+</div>
+<dl class="function">
 <dt id="music21.interval.convertSpecifier">
 <tt class="descclassname">music21.interval.</tt><tt class="descname">convertSpecifier</tt><big>(</big><em>specifier</em><big>)</big><a class="headerlink" href="#music21.interval.convertSpecifier" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
-<span class="go">3</span>
+<span class="go">(3, &#39;m&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
-<span class="go">1</span>
+<span class="go">(1, &#39;P&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;P&#39;</span><span class="p">)</span>
-<span class="go">1</span>
+<span class="go">(1, &#39;P&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;M&#39;</span><span class="p">)</span>
-<span class="go">2</span>
+<span class="go">(2, &#39;M&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;major&#39;</span><span class="p">)</span>
-<span class="go">2</span>
+<span class="go">(2, &#39;M&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;m&#39;</span><span class="p">)</span>
-<span class="go">3</span>
+<span class="go">(3, &#39;m&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;Augmented&#39;</span><span class="p">)</span>
-<span class="go">4</span>
+<span class="go">(4, &#39;A&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
-<span class="go">4</span>
+<span class="go">(4, &#39;A&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertSpecifier</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">(None, None)</span>
 </pre></div>
 </div>
 <dl class="function">
@@ -513,7 +540,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <p><strong>Interval</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.interval.Interval.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.Interval.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**keydict</em><big>)</big><a class="headerlink" href="#music21.interval.Interval.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
@@ -548,6 +575,12 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="s">&#39;-h&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
 <span class="go">&lt;music21.interval.Interval m-2&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval m3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval P5&gt;</span>
 </pre></div>
 </div>
 <dl class="method">
@@ -556,6 +589,23 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <dd></dd></dl>
 
 <p>Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes.</p>
+<dl class="method">
+<dt id="music21.interval.Interval.transposePitch">
+<tt class="descname">transposePitch</tt><big>(</big><em>p</em>, <em>reverse=False</em><big>)</big><a class="headerlink" href="#music21.interval.Interval.transposePitch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">transposePitch</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
+<span class="go">C#5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">transposePitch</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
+<span class="go">F##4</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </dd></dl>
 
@@ -589,6 +639,23 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <span class="go">2</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="music21.interval.ChromaticInterval.getDiatonic">
+<tt class="descname">getDiatonic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.ChromaticInterval.getDiatonic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a Chromatic interval, return a Diatonic interval object. While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit easy chromatic specification of Interval objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.DiatonicInterval P4&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.DiatonicInterval P5&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="mf">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.DiatonicInterval M7&gt;</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </dd></dl>
 
@@ -599,7 +666,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <dt id="music21.interval.DiatonicInterval">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">DiatonicInterval</tt><a class="headerlink" href="#music21.interval.DiatonicInterval" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class representing a diatonic interval. Two required arguments are a <cite>specifier</cite> (such as perfect, major, or minor) and a <cite>generic</cite>, an interval size (such as 2, 2nd, or second).</p>
+<dd><p>A class representing a diatonic interval. Two required arguments are a <cite>specifier</cite> (such as perfect, major, or minor) and a <cite>generic</cite>, an interval size (such as 2, 2nd, or second). A DiatonicInterval contains and encapsulates a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a></p>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>DiatonicInterval</strong> <strong>attributes</strong></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
@@ -640,6 +707,29 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="s">&#39;minor&#39;</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">mod7</span>
 <span class="go">&#39;m3&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="music21.interval.DiatonicInterval.getChromatic">
+<tt class="descname">getChromatic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.interval.DiatonicInterval.getChromatic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return a Chromatic interval based on the size of this Interval.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="s">&#39;major&#39;</span><span class="p">,</span> <span class="s">&#39;third&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">niceName</span>
+<span class="go">&#39;Major Third&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getChromatic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.ChromaticInterval 4&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="s">&#39;augmented&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">niceName</span>
+<span class="go">&#39;Augmented Fifth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getChromatic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.ChromaticInterval -8&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="s">&#39;minor&#39;</span><span class="p">,</span> <span class="s">&#39;second&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">niceName</span>
+<span class="go">&#39;Minor Second&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getChromatic</span><span class="p">()</span>
+<span class="go">&lt;music21.interval.ChromaticInterval 1&gt;</span>
 </pre></div>
 </div>
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
@@ -700,6 +790,28 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <dd></dd></dl>
 
 <p>generates a new GenericInterval object where descending 3rds are 6ths, etc.</p>
+<dl class="method">
+<dt id="music21.interval.GenericInterval.getDiatonic">
+<tt class="descname">getDiatonic</tt><big>(</big><em>specifier</em><big>)</big><a class="headerlink" href="#music21.interval.GenericInterval.getDiatonic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a specifier, return a <a title="music21.interval.DiatonicInterval" class="reference internal" href="#music21.interval.DiatonicInterval"><tt class="xref docutils literal"><span class="pre">DiatonicInterval</span></tt></a> object. Specifier should be provided as a string name, such as &#8216;dd&#8217;, &#8216;M&#8217;, or &#8216;perfect&#8217;.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="s">&#39;Third&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="s">&#39;major&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval M3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="s">&#39;minor&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval m3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval d3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval A3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval M3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="s">&#39;fifth&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span><span class="o">.</span><span class="n">getDiatonic</span><span class="p">(</span><span class="s">&#39;perfect&#39;</span><span class="p">)</span>
+<span class="go">&lt;music21.interval.DiatonicInterval P5&gt;</span>
+</pre></div>
+</div>
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </dd></dl>
 
@@ -732,7 +844,7 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 04, 2010.
+      Last updated on Apr 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

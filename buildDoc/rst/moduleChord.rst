@@ -266,7 +266,7 @@ Chord
 
     **Chord** **methods**
 
-    .. method:: __init__(notes=[])
+    .. method:: __init__(notes=[], **keywords)
 
     No documentation. 
 
@@ -626,6 +626,22 @@ Chord
     .. method:: sortFrequencyAscending()
 
     Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
+
+    .. method:: transpose(value, inPlace=False)
+
+    Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+
+    >>> a = Chord(['g4', 'a3', 'c#6'])
+    >>> b = a.transpose('m3')
+    >>> b
+    <music21.chord.Chord B-4 C4 E6> 
+    >>> aInterval = interval.Interval(-6)
+    >>> b = a.transpose(aInterval)
+    >>> b
+    <music21.chord.Chord C#4 D#3 F##5> 
+    >>> a.transpose(aInterval, inPlace=True)
+    >>> a
+    <music21.chord.Chord C#4 D#3 F##5> 
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 

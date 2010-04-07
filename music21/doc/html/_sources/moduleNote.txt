@@ -141,13 +141,31 @@ Note
 
     **Note** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
     .. method:: setAccidental(accidental)
 
     No documentation. 
+
+    .. method:: transpose(value, inPlace=False)
+
+    Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+
+    >>> a = Note('g4')
+    >>> b = a.transpose('m3')
+    >>> b
+    <music21.note.Note B-> 
+    >>> aInterval = interval.Interval(-6)
+    >>> b = a.transpose(aInterval)
+    >>> b
+    <music21.note.Note C#> 
+    >>> a.transpose(aInterval, inPlace=True)
+    >>> a
+    <music21.note.Note C#> 
+
+    
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
@@ -208,7 +226,7 @@ Rest
 
     **Rest** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
@@ -435,11 +453,11 @@ EighthNote
 
     **EighthNote** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
-    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
@@ -516,7 +534,7 @@ GeneralNote
 
     **GeneralNote** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
@@ -617,11 +635,11 @@ HalfNote
 
     **HalfNote** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
-    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
@@ -698,7 +716,7 @@ NotRest
 
     **NotRest** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
@@ -755,11 +773,11 @@ QuarterNote
 
     **QuarterNote** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
-    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
@@ -893,11 +911,11 @@ WholeNote
 
     **WholeNote** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*arguments, **keywords)
 
     No documentation. 
 
-    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`
+    Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 

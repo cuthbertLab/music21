@@ -9,7 +9,7 @@ music21.graph
 
 
 
-.. function:: plotStream(streamObj)
+.. function:: plotStream(streamObj, *args, **keywords)
 
 Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`) pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`) quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`) scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`) pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`) pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`) 3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`) 
 
@@ -49,7 +49,7 @@ PlotHistogramPitchSpace
 
     **PlotHistogramPitchSpace** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -88,7 +88,7 @@ PlotHistogramPitchClass
 
     **PlotHistogramPitchClass** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -127,7 +127,7 @@ PlotHistogramQuarterLength
 
     **PlotHistogramQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -166,7 +166,7 @@ PlotScatterPitchSpaceQuarterLength
 
     **PlotScatterPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -199,7 +199,7 @@ PlotScatterPitchClassQuarterLength
 
     **PlotScatterPitchClassQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -232,7 +232,7 @@ PlotScatterPitchClassOffset
 
     **PlotScatterPitchClassOffset** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -265,7 +265,7 @@ PlotHorizontalBarPitchSpaceOffset
 
     **PlotHorizontalBarPitchSpaceOffset** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -298,7 +298,7 @@ PlotHorizontalBarPitchClassOffset
 
     **PlotHorizontalBarPitchClassOffset** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -331,7 +331,7 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
     **PlotScatterWeightedPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -364,7 +364,7 @@ PlotScatterWeightedPitchClassQuarterLength
 
     **PlotScatterWeightedPitchClassQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -397,7 +397,7 @@ Plot3DBarsPitchSpaceQuarterLength
 
     **Plot3DBarsPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -481,7 +481,7 @@ Graph
 
     **Graph** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
 
@@ -551,7 +551,7 @@ Graph3DPolygonBars
 
     **Graph3DPolygonBars** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
 
@@ -591,7 +591,7 @@ GraphHistogram
 
     **GraphHistogram** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
 
@@ -626,7 +626,7 @@ GraphHorizontalBar
 
     **GraphHorizontalBar** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
 
@@ -678,7 +678,7 @@ GraphScatter
 
     **GraphScatter** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     Graph two parameters in a scatter plot 
 
@@ -721,7 +721,7 @@ GraphScatterWeighted
 
     **GraphScatterWeighted** **methods**
 
-    .. method:: __init__()
+    .. method:: __init__(*args, **keywords)
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
@@ -760,7 +760,7 @@ Plot3DBars
 
     **Plot3DBars** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -790,7 +790,7 @@ PlotHistogram
 
     **PlotHistogram** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -822,7 +822,7 @@ PlotHorizontalBar
 
     **PlotHorizontalBar** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -852,7 +852,7 @@ PlotScatter
 
     **PlotScatter** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -881,7 +881,7 @@ PlotScatterWeighted
 
     **PlotScatterWeighted** **methods**
 
-    .. method:: __init__(streamObj)
+    .. method:: __init__(streamObj, *args, **keywords)
 
     No documentation. 
 
@@ -915,7 +915,7 @@ PlotStream
 
     **PlotStream** **methods**
 
-    .. method:: __init__(streamObj, flatten=True)
+    .. method:: __init__(streamObj, flatten=True, *args, **keywords)
 
     Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened. 
 

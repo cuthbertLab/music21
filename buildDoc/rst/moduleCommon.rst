@@ -161,7 +161,7 @@ Given an input format, find and return all possible input extensions.
 .. function:: findSimpleFraction(working)
 
 
-.. function:: formatStr(msg)
+.. function:: formatStr(msg, *arguments, **keywords)
 
 Format one or more data elements into string suitable for printing straight to stderr or other outputs 
 
@@ -450,7 +450,7 @@ defHash
 
     No documentation. 
 
-    .. method:: get(key)
+    .. method:: get(key, *args)
 
     No documentation. 
 

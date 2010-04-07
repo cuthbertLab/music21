@@ -98,8 +98,9 @@ MODULES = [
 
 
 #-------------------------------------------------------------------------------
-class PartitionedName(object):
-
+class PartitionedName(object):  
+    '''Object to store and manage names (functions, methods, attributes, properties) within a name space. 
+    '''
     def __init__(self, srcNameEval=None):
 
         self.srcNameEval = srcNameEval
@@ -116,7 +117,7 @@ class PartitionedName(object):
     def getSignature(self, partName):
         '''Expand to include signatures when possible
 
-        >>> from music21 import pitch, meter
+        >>> from music21 import pitch, meter, duration
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getSignature('midi')
         ''
@@ -125,6 +126,10 @@ class PartitionedName(object):
         >>> a.getSignature('load')
         '(value, partitionRequest=None, autoWeight=False, targetWeight=None)'
 
+        >>> a = PartitionedClass(duration.Duration)
+        >>> a.getSignature('__init__')
+        '(*arguments, **keywords)'
+
 
         '''
         element = self.getElement(partName)
@@ -132,16 +137,18 @@ class PartitionedName(object):
             data = inspect.getargspec(element.object)
             #data = inspect.formatargspec()
             argStr = []
-            # ordered list in same order as args
-            defaults = data[3] 
+            # defaults is an ordered list in same order as args
+            # varargs and keywwords are the names of * and ** args respectively
+            args, varargs, keywords, defaults = data 
             # get index offset to when defaults start
             if defaults != None:
-                offset = len(data[0]) - len(defaults)
+                offset = len(args) - len(defaults)
             else:
                 offset = 0
 
-            for p in range(len(data[0])): # these are required, include self
-                arg = data[0][p]
+            # iterate through defined args
+            for p in range(len(args)): # these are required, include self
+                arg = args[p]
                 if arg == 'self': continue
                 
                 if defaults != None and p >= offset:
@@ -149,6 +156,12 @@ class PartitionedName(object):
                     argStr.append('%s=%s' % (arg, default))
                 else:
                     argStr.append('%s' % (arg))
+            # add position/keyword args 
+            if varargs != None:
+                argStr.append('*%s' % varargs)
+            if keywords != None:
+                argStr.append('**%s' % keywords)
+
             msg = '(%s)' % ', '.join(argStr)
 
         elif element.kind == 'property':
@@ -159,7 +172,7 @@ class PartitionedName(object):
 
 
 #-------------------------------------------------------------------------------
-class PartitioinedModule(PartitionedName):
+class PartitionedModule(PartitionedName):
     '''Given a module name, manage and present data.
     '''
     def __init__(self, srcNameEval):
@@ -191,7 +204,7 @@ class PartitioinedModule(PartitionedName):
     def _fillData(self):
         '''
         >>> from music21 import pitch
-        >>> a = PartitioinedModule(pitch)
+        >>> a = PartitionedModule(pitch)
         >>> len(a.names) == len(a._data)
         True
         >>> a.namesOrdered
@@ -272,11 +285,11 @@ class PartitioinedModule(PartitionedName):
         '''Local determines if the name is from this module or imported.
 
         >>> from music21 import pitch
-        >>> a = PartitioinedModule(pitch)
+        >>> a = PartitionedModule(pitch)
         >>> a.getNames('classes')
         ['Pitch', 'Accidental']
         >>> a.getNames('functions')    
-        ['convertFqToPs', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
+        ['convertFqToPs', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
         '''
 
         post = []
@@ -541,7 +554,6 @@ class PartitionedClass(PartitionedName):
             except AttributeError:
                 match = None
 
-
         if match == None:
             return 'No documentation.'
         else:
@@ -560,7 +572,7 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__']
+        ['__init__', 'transpose']
         >>> a.getNames('data', mroIndex=0)
         ['defaultOctave']
         >>> a.getNames('data', mroIndex=1)
@@ -730,8 +742,8 @@ class RestructuredWriter(object):
             match = False
             for stub in rstExclude:
                 if line.strip().startswith(stub):
-                    # do not strop
-                    environLocal.printDebug(['found rst in doc string:', line.strip()])
+                    # do not strip
+                    #environLocal.printDebug(['found rst in doc string:', line.strip()])
                     if stub == '.. image::':
                         sub.append('\n\n' + line) # do not strip
                     else:
@@ -867,7 +879,7 @@ class ModuleDoc(RestructuredWriter):
     def __init__(self, modNameEval):
         RestructuredWriter.__init__(self)
 
-        self.partitionedModule = PartitioinedModule(modNameEval)
+        self.partitionedModule = PartitionedModule(modNameEval)
         self.docCooked = self.formatDocString(modNameEval.__doc__)
         self.modNameEval = modNameEval
         self.modName = self.modNameEval.__name__
