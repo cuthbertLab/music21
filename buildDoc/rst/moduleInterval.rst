@@ -258,9 +258,9 @@ Given two :class:`~music21.note.Note` objects, returns the lower note based on d
 Interval
 --------
 
-.. class:: Interval
+.. class:: Interval(*arguments, **keywords)
 
-    An Interval class that encapsulates an both chromatic and diatonic intervals all in one model. The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
+    An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
 
     >>> from music21 import note
     >>> n1 = note.Note('c3')
@@ -268,6 +268,49 @@ Interval
     >>> aInterval = Interval(note1=n1, note2=n2)
     >>> aInterval
     <music21.interval.Interval P15> 
+
+    
+
+    >>> from music21 import note
+    >>> n1 = note.Note('c3')
+    >>> n2 = note.Note('g3')
+    >>> aInterval = Interval(note1=n1, note2=n2)
+    >>> aInterval
+    <music21.interval.Interval P5> 
+    >>> aInterval = Interval(note1=n1, note2=None)
+    Traceback (most recent call last): 
+    IntervalException: two or zero Note classes must be defined 
+    >>> aInterval = DiatonicInterval('major', 'third')
+    >>> bInterval = ChromaticInterval(4)
+    >>> cInterval = Interval(diatonic=aInterval, chromatic=bInterval)
+    >>> cInterval
+    <music21.interval.Interval M3> 
+    >>> cInterval = Interval(diatonic=aInterval, chromatic=None)
+    Traceback (most recent call last): 
+    IntervalException: either both or zero diatonic and chromatic classes must be defined 
+    >>> aInterval = Interval('m3')
+    >>> aInterval
+    <music21.interval.Interval m3> 
+    >>> aInterval = Interval('M3')
+    >>> aInterval
+    <music21.interval.Interval M3> 
+    >>> aInterval = Interval('p5')
+    >>> aInterval
+    <music21.interval.Interval P5> 
+    >>> aInterval = Interval('half')
+    >>> aInterval
+    <music21.interval.Interval m2> 
+    >>> aInterval = Interval('-h')
+    >>> aInterval
+    <music21.interval.Interval m-2> 
+    >>> aInterval = Interval(3)
+    >>> aInterval
+    <music21.interval.Interval m3> 
+    >>> aInterval = Interval(7)
+    >>> aInterval
+    <music21.interval.Interval P5> 
+
+    
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -396,51 +439,6 @@ Interval
 
     **Interval** **methods**
 
-    .. method:: __init__(*args, **keydict)
-
-    
-
-    >>> from music21 import note
-    >>> n1 = note.Note('c3')
-    >>> n2 = note.Note('g3')
-    >>> aInterval = Interval(note1=n1, note2=n2)
-    >>> aInterval
-    <music21.interval.Interval P5> 
-    >>> aInterval = Interval(note1=n1, note2=None)
-    Traceback (most recent call last): 
-    IntervalException: two or zero Note classes must be defined 
-    >>> aInterval = DiatonicInterval('major', 'third')
-    >>> bInterval = ChromaticInterval(4)
-    >>> cInterval = Interval(diatonic=aInterval, chromatic=bInterval)
-    >>> cInterval
-    <music21.interval.Interval M3> 
-    >>> cInterval = Interval(diatonic=aInterval, chromatic=None)
-    Traceback (most recent call last): 
-    IntervalException: either both or zero diatonic and chromatic classes must be defined 
-    >>> aInterval = Interval('m3')
-    >>> aInterval
-    <music21.interval.Interval m3> 
-    >>> aInterval = Interval('M3')
-    >>> aInterval
-    <music21.interval.Interval M3> 
-    >>> aInterval = Interval('p5')
-    >>> aInterval
-    <music21.interval.Interval P5> 
-    >>> aInterval = Interval('half')
-    >>> aInterval
-    <music21.interval.Interval m2> 
-    >>> aInterval = Interval('-h')
-    >>> aInterval
-    <music21.interval.Interval m-2> 
-    >>> aInterval = Interval(3)
-    >>> aInterval
-    <music21.interval.Interval m3> 
-    >>> aInterval = Interval(7)
-    >>> aInterval
-    <music21.interval.Interval P5> 
-
-    
-
     .. method:: reinit()
 
     Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes. 
@@ -467,25 +465,11 @@ Interval
 ChromaticInterval
 -----------------
 
-.. class:: ChromaticInterval
+.. class:: ChromaticInterval(value)
 
     Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
-
-    **ChromaticInterval** **attributes**
-
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
-
-    **ChromaticInterval** **properties**
-
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **ChromaticInterval** **methods**
-
-    .. method:: __init__(value)
 
     
 
@@ -498,6 +482,18 @@ ChromaticInterval
     10 
     >>> aInterval.intervalClass
     2 
+
+    inherits from: :class:`~music21.base.Music21Object`
+
+    **ChromaticInterval** **attributes**
+
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+
+    **ChromaticInterval** **properties**
+
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+
+    **ChromaticInterval** **methods**
 
     .. method:: getDiatonic()
 
@@ -521,25 +517,11 @@ ChromaticInterval
 DiatonicInterval
 ----------------
 
-.. class:: DiatonicInterval
+.. class:: DiatonicInterval(specifier, generic)
 
     A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). A DiatonicInterval contains and encapsulates a :class:`~music21.interval.GenericInterval` 
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
-
-    **DiatonicInterval** **attributes**
-
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
-
-    **DiatonicInterval** **properties**
-
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **DiatonicInterval** **methods**
-
-    .. method:: __init__(specifier, generic)
 
     The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. The `generic` is an integer or GenericInterval instance. 
 
@@ -574,6 +556,18 @@ DiatonicInterval
 
     
 
+    inherits from: :class:`~music21.base.Music21Object`
+
+    **DiatonicInterval** **attributes**
+
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+
+    **DiatonicInterval** **properties**
+
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+
+    **DiatonicInterval** **methods**
+
     .. method:: getChromatic()
 
     Return a Chromatic interval based on the size of this Interval. 
@@ -602,23 +596,9 @@ DiatonicInterval
 GenericInterval
 ---------------
 
-.. class:: GenericInterval
+.. class:: GenericInterval(value)
 
     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth. Constructor takes an integer or string specifying the interval and direction. The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') are accepted. staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1 
-
-    inherits from: :class:`~music21.base.Music21Object`
-
-    **GenericInterval** **attributes**
-
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
-
-    **GenericInterval** **properties**
-
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **GenericInterval** **methods**
-
-    .. method:: __init__(value)
 
     
 
@@ -653,6 +633,18 @@ GenericInterval
 
     
 
+    inherits from: :class:`~music21.base.Music21Object`
+
+    **GenericInterval** **attributes**
+
+    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+
+    **GenericInterval** **properties**
+
+    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+
+    **GenericInterval** **methods**
+
     .. method:: complement()
 
     generates a new GenericInterval object where descending 3rds are 6ths, etc. 
@@ -675,8 +667,6 @@ GenericInterval
     >>> bInterval = GenericInterval('fifth')
     >>> bInterval.getDiatonic('perfect')
     <music21.interval.DiatonicInterval P5> 
-
-    
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

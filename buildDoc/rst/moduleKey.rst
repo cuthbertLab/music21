@@ -32,8 +32,14 @@ F#
 KeySignature
 ------------
 
-.. class:: KeySignature
+.. class:: KeySignature(sharps=None)
 
+
+    
+
+    >>> a = KeySignature(3)
+    >>> a._strDescription()
+    '3 sharps' 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -93,21 +99,13 @@ KeySignature
 
     **KeySignature** **methods**
 
-    .. method:: __init__(sharps=None)
-
-    
-
-    >>> a = KeySignature(3)
-    >>> a._strDescription()
-    '3 sharps' 
-
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Key
 ---
 
-.. class:: Key
+.. class:: Key(stream1=None)
 
     Note that a key is a sort of hypothetical/conceptual object. It probably has a scale (or scales) associated with it and a KeySignature, but not necessarily. 
 
@@ -150,10 +148,6 @@ Key
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Key** **methods**
-
-    .. method:: __init__(stream1=None)
-
-    No documentation. 
 
     .. method:: generateKey()
 

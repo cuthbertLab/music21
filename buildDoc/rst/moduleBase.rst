@@ -15,7 +15,7 @@ Music21 base classes and important utilities. base -- the convention within musi
 Music21Object
 -------------
 
-.. class:: Music21Object
+.. class:: Music21Object(*arguments, **keywords)
 
     Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. 
 
@@ -58,10 +58,6 @@ Music21Object
     ElementException: priority values must be integers. 
 
     **Music21Object** **methods**
-
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
 
     .. method:: searchParentByAttr(attrName)
 
@@ -234,7 +230,7 @@ Music21Object
 ElementWrapper
 --------------
 
-.. class:: ElementWrapper
+.. class:: ElementWrapper(obj)
 
     An element wraps an object so that the same object can be positioned within a stream. The object is always available as element.obj -- however, calls to the ElementWrapper will call Object is now mandatory -- calls to ElementWrapper without an object fail, because in the new (11/29) object model, ElementWrapper should only be used to wrap an object. 
 
@@ -291,10 +287,6 @@ ElementWrapper
 
     **ElementWrapper** **methods**
 
-    .. method:: __init__(obj)
-
-    No documentation. 
-
     .. method:: getId()
 
     No documentation. 
@@ -349,7 +341,7 @@ ElementWrapper
 DefinedContexts
 ---------------
 
-.. class:: DefinedContexts
+.. class:: DefinedContexts()
 
     An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
 
@@ -358,10 +350,6 @@ DefinedContexts
     
 
     **DefinedContexts** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     .. method:: add(obj, offset=None, name=None, timeValue=None, idKey=None)
 
@@ -677,6 +665,8 @@ Groups
     Traceback (most recent call last): 
     GroupException: Only strings can be used as list names 
 
+    x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
+
     inherits from: list
 
     **Groups** **methods**
@@ -685,6 +675,6 @@ Groups
 
     No documentation. 
 
-    Methods inherited from list: :meth:`~__builtin__.list.__init__`, :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
+    Methods inherited from list: :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
 
 

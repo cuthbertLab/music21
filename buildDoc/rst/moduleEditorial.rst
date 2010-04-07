@@ -12,7 +12,7 @@ music21.editorial
 NoteEditorial
 -------------
 
-.. class:: NoteEditorial
+.. class:: NoteEditorial()
 
     EditorialComments that can be applied to notes 
 
@@ -68,10 +68,6 @@ NoteEditorial
 
     **NoteEditorial** **methods**
 
-    .. method:: __init__()
-
-    No documentation. 
-
     .. method:: colorLilyStart()
 
     No documentation. 
@@ -100,6 +96,8 @@ Comment
 
 .. class:: Comment
 
+
+    x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
 
     
 
