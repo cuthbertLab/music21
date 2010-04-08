@@ -18,7 +18,7 @@ Given a stream and any keyword configuration arguments, create and display a plo
 PlotHistogramPitchSpace
 -----------------------
 
-.. class:: PlotHistogramPitchSpace
+.. class:: PlotHistogramPitchSpace(streamObj, *args, **keywords)
 
     A histogram of pitch space. 
 
@@ -49,17 +49,13 @@ PlotHistogramPitchSpace
 
     **PlotHistogramPitchSpace** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHistogramPitchClass
 -----------------------
 
-.. class:: PlotHistogramPitchClass
+.. class:: PlotHistogramPitchClass(streamObj, *args, **keywords)
 
     A histogram of pitch class 
 
@@ -88,17 +84,13 @@ PlotHistogramPitchClass
 
     **PlotHistogramPitchClass** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHistogramQuarterLength
 --------------------------
 
-.. class:: PlotHistogramQuarterLength
+.. class:: PlotHistogramQuarterLength(streamObj, *args, **keywords)
 
     A histogram of pitch class 
 
@@ -127,17 +119,13 @@ PlotHistogramQuarterLength
 
     **PlotHistogramQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterPitchSpaceQuarterLength
 ----------------------------------
 
-.. class:: PlotScatterPitchSpaceQuarterLength
+.. class:: PlotScatterPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
     A scatter plot of pitch space and quarter length 
 
@@ -166,17 +154,13 @@ PlotScatterPitchSpaceQuarterLength
 
     **PlotScatterPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterPitchClassQuarterLength
 ----------------------------------
 
-.. class:: PlotScatterPitchClassQuarterLength
+.. class:: PlotScatterPitchClassQuarterLength(streamObj, *args, **keywords)
 
     A scatter plot of pitch class and quarter length 
 
@@ -199,17 +183,13 @@ PlotScatterPitchClassQuarterLength
 
     **PlotScatterPitchClassQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterPitchClassOffset
 ---------------------------
 
-.. class:: PlotScatterPitchClassOffset
+.. class:: PlotScatterPitchClassOffset(streamObj, *args, **keywords)
 
     A scatter plot of pitch class and offset 
 
@@ -232,17 +212,13 @@ PlotScatterPitchClassOffset
 
     **PlotScatterPitchClassOffset** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHorizontalBarPitchSpaceOffset
 ---------------------------------
 
-.. class:: PlotHorizontalBarPitchSpaceOffset
+.. class:: PlotHorizontalBarPitchSpaceOffset(streamObj, *args, **keywords)
 
     A graph of events, sorted by pitch space, over time 
 
@@ -265,17 +241,13 @@ PlotHorizontalBarPitchSpaceOffset
 
     **PlotHorizontalBarPitchSpaceOffset** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHorizontalBarPitchClassOffset
 ---------------------------------
 
-.. class:: PlotHorizontalBarPitchClassOffset
+.. class:: PlotHorizontalBarPitchClassOffset(streamObj, *args, **keywords)
 
     A graph of events, sorted by pitch class, over time 
 
@@ -298,17 +270,13 @@ PlotHorizontalBarPitchClassOffset
 
     **PlotHorizontalBarPitchClassOffset** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterWeightedPitchSpaceQuarterLength
 ------------------------------------------
 
-.. class:: PlotScatterWeightedPitchSpaceQuarterLength
+.. class:: PlotScatterWeightedPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
     A graph of event, sorted by pitch, over time 
 
@@ -331,17 +299,13 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
     **PlotScatterWeightedPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterWeightedPitchClassQuarterLength
 ------------------------------------------
 
-.. class:: PlotScatterWeightedPitchClassQuarterLength
+.. class:: PlotScatterWeightedPitchClassQuarterLength(streamObj, *args, **keywords)
 
     A graph of event, sorted by pitch class, over time. 
 
@@ -364,17 +328,13 @@ PlotScatterWeightedPitchClassQuarterLength
 
     **PlotScatterWeightedPitchClassQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 Plot3DBarsPitchSpaceQuarterLength
 ---------------------------------
 
-.. class:: Plot3DBarsPitchSpaceQuarterLength
+.. class:: Plot3DBarsPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
     A scatter plot of pitch and quarter length 
 
@@ -397,19 +357,20 @@ Plot3DBarsPitchSpaceQuarterLength
 
     **Plot3DBarsPitchSpaceQuarterLength** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 Graph
 -----
 
-.. class:: Graph
+.. class:: Graph(*args, **keywords)
 
     An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file ('write'), open an interactive GUI browser ('show') or None (do processing but do not write output. 
+
+    Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
+
+    >>> a = Graph()
+    >>> a = Graph(title='green')
 
     
 
@@ -481,13 +442,6 @@ Graph
 
     **Graph** **methods**
 
-    .. method:: __init__(*args, **keywords)
-
-    Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
-
-    >>> a = Graph()
-    >>> a = Graph(title='green')
-
     .. method:: done(fp=None)
 
     Implement the desired doneAction, after data processing 
@@ -536,22 +490,8 @@ Graph
 Graph3DPolygonBars
 ------------------
 
-.. class:: Graph3DPolygonBars
+.. class:: Graph3DPolygonBars(*args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.Graph`
-
-    **Graph3DPolygonBars** **attributes**
-
-    .. attribute:: barWidth
-
-    No documentation. 
-
-    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
-
-    **Graph3DPolygonBars** **methods**
-
-    .. method:: __init__(*args, **keywords)
 
     Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
 
@@ -570,6 +510,18 @@ Graph3DPolygonBars
 
     
 
+    inherits from: :class:`~music21.graph.Graph`
+
+    **Graph3DPolygonBars** **attributes**
+
+    .. attribute:: barWidth
+
+    No documentation. 
+
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **Graph3DPolygonBars** **methods**
+
     .. method:: process()
 
     No documentation. 
@@ -580,18 +532,8 @@ Graph3DPolygonBars
 GraphHistogram
 --------------
 
-.. class:: GraphHistogram
+.. class:: GraphHistogram(*args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.Graph`
-
-    **GraphHistogram** **attributes**
-
-    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
-
-    **GraphHistogram** **methods**
-
-    .. method:: __init__(*args, **keywords)
 
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
 
@@ -605,6 +547,14 @@ GraphHistogram
 
     
 
+    inherits from: :class:`~music21.graph.Graph`
+
+    **GraphHistogram** **attributes**
+
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **GraphHistogram** **methods**
+
     .. method:: process()
 
     No documentation. 
@@ -615,18 +565,8 @@ GraphHistogram
 GraphHorizontalBar
 ------------------
 
-.. class:: GraphHorizontalBar
+.. class:: GraphHorizontalBar(*args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.Graph`
-
-    **GraphHorizontalBar** **attributes**
-
-    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
-
-    **GraphHorizontalBar** **methods**
-
-    .. method:: __init__(*args, **keywords)
 
     Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
 
@@ -640,6 +580,14 @@ GraphHorizontalBar
 
     
 
+    inherits from: :class:`~music21.graph.Graph`
+
+    **GraphHorizontalBar** **attributes**
+
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **GraphHorizontalBar** **methods**
+
     .. method:: process()
 
     No documentation. 
@@ -650,8 +598,13 @@ GraphHorizontalBar
 GraphSappKeyAnalysis
 --------------------
 
-.. class:: GraphSappKeyAnalysis
+.. class:: GraphSappKeyAnalysis(*args, **keywords)
 
+
+    Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
+
+    >>> a = Graph()
+    >>> a = Graph(title='green')
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -661,24 +614,14 @@ GraphSappKeyAnalysis
 
     **GraphSappKeyAnalysis** **methods**
 
-    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.__init__`, :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.process`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
+    Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.process`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
 GraphScatter
 ------------
 
-.. class:: GraphScatter
+.. class:: GraphScatter(*args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.Graph`
-
-    **GraphScatter** **attributes**
-
-    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
-
-    **GraphScatter** **methods**
-
-    .. method:: __init__(*args, **keywords)
 
     Graph two parameters in a scatter plot 
 
@@ -692,6 +635,14 @@ GraphScatter
 
     
 
+    inherits from: :class:`~music21.graph.Graph`
+
+    **GraphScatter** **attributes**
+
+    Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **GraphScatter** **methods**
+
     .. method:: process()
 
     
@@ -704,7 +655,7 @@ GraphScatter
 GraphScatterWeighted
 --------------------
 
-.. class:: GraphScatterWeighted
+.. class:: GraphScatterWeighted(*args, **keywords)
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
@@ -713,6 +664,13 @@ GraphScatterWeighted
 
     
 
+    A scatter plot where points are scaled in size to represent the number of values stored within. 
+
+    >>> a = GraphScatterWeighted(doneAction=None)
+    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
+    >>> a.setData(data)
+    >>> a.process()
+
     inherits from: :class:`~music21.graph.Graph`
 
     **GraphScatterWeighted** **attributes**
@@ -720,15 +678,6 @@ GraphScatterWeighted
     Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
     **GraphScatterWeighted** **methods**
-
-    .. method:: __init__(*args, **keywords)
-
-    A scatter plot where points are scaled in size to represent the number of values stored within. 
-
-    >>> a = GraphScatterWeighted(doneAction=None)
-    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
-    >>> a.setData(data)
-    >>> a.process()
 
     .. method:: process()
 
@@ -740,7 +689,7 @@ GraphScatterWeighted
 Plot3DBars
 ----------
 
-.. class:: Plot3DBars
+.. class:: Plot3DBars(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
 
@@ -760,17 +709,13 @@ Plot3DBars
 
     **Plot3DBars** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHistogram
 -------------
 
-.. class:: PlotHistogram
+.. class:: PlotHistogram(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
 
@@ -790,17 +735,13 @@ PlotHistogram
 
     **PlotHistogram** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotHorizontalBar
 -----------------
 
-.. class:: PlotHorizontalBar
+.. class:: PlotHorizontalBar(streamObj, *args, **keywords)
 
     A graph of events, sorted by pitch, over time 
 
@@ -822,17 +763,13 @@ PlotHorizontalBar
 
     **PlotHorizontalBar** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatter
 -----------
 
-.. class:: PlotScatter
+.. class:: PlotScatter(streamObj, *args, **keywords)
 
     Base class for 2D Scatter plots. 
 
@@ -852,17 +789,13 @@ PlotScatter
 
     **PlotScatter** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotScatterWeighted
 -------------------
 
-.. class:: PlotScatterWeighted
+.. class:: PlotScatterWeighted(streamObj, *args, **keywords)
 
 
     inherits from: :class:`~music21.graph.PlotStream`
@@ -881,19 +814,17 @@ PlotScatterWeighted
 
     **PlotScatterWeighted** **methods**
 
-    .. method:: __init__(streamObj, *args, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
 PlotStream
 ----------
 
-.. class:: PlotStream
+.. class:: PlotStream(streamObj, flatten=True, *args, **keywords)
 
     Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit. 
+
+    Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened. 
 
     
 
@@ -914,10 +845,6 @@ PlotStream
     Each PlotStream has a unique id that consists of its format and a string that defines the parameters that are graphed. 
 
     **PlotStream** **methods**
-
-    .. method:: __init__(streamObj, flatten=True, *args, **keywords)
-
-    Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened. 
 
     .. method:: process()
 

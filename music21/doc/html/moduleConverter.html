@@ -144,12 +144,6 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>No documentation.</p>
 <p><strong>Converter</strong> <strong>methods</strong></p>
 <dl class="method">
-<dt id="music21.converter.Converter.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.Converter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="method">
 <dt id="music21.converter.Converter.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>dataStr</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -175,7 +169,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="class">
 <dt id="music21.converter.ConverterMusicXML">
 <em class="property">
-class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMusicXML</tt><a class="headerlink" href="#music21.converter.ConverterMusicXML" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMusicXML</tt><big>(</big><em>forceSource</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>ConverterMusicXML</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.ConverterMusicXML.stream">
@@ -184,12 +178,6 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 
 <p>No documentation.</p>
 <p><strong>ConverterMusicXML</strong> <strong>methods</strong></p>
-<dl class="method">
-<dt id="music21.converter.ConverterMusicXML.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>forceSource</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.getPartNames">
 <tt class="descname">getPartNames</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.getPartNames" title="Permalink to this definition">¶</a></dt>
@@ -233,12 +221,6 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <p>No documentation.</p>
 <p><strong>ConverterHumdrum</strong> <strong>methods</strong></p>
 <dl class="method">
-<dt id="music21.converter.ConverterHumdrum.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="method">
 <dt id="music21.converter.ConverterHumdrum.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>humdrumString</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -263,15 +245,10 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="class">
 <dt id="music21.converter.PickleFilter">
 <em class="property">
-class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
-<p><strong>PickleFilter</strong> <strong>methods</strong></p>
-<dl class="method">
-<dt id="music21.converter.PickleFilter.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <p>Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned.</p>
+<p><strong>PickleFilter</strong> <strong>methods</strong></p>
 <dl class="method">
 <dt id="music21.converter.PickleFilter.status">
 <tt class="descname">status</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.status" title="Permalink to this definition">¶</a></dt>
@@ -286,7 +263,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="class">
 <dt id="music21.converter.StreamFreezer">
 <em class="property">
-class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">StreamFreezer</tt><a class="headerlink" href="#music21.converter.StreamFreezer" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">StreamFreezer</tt><big>(</big><em>streamObj=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>StreamFreezer</strong> <strong>attributes</strong></p>
 <dl class="attribute">
 <dt id="music21.converter.StreamFreezer.stream">
@@ -295,12 +272,6 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 
 <p>No documentation.</p>
 <p><strong>StreamFreezer</strong> <strong>methods</strong></p>
-<dl class="method">
-<dt id="music21.converter.StreamFreezer.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>streamObj=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.converter.StreamFreezer.openPickle">
 <tt class="descname">openPickle</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.openPickle" title="Permalink to this definition">¶</a></dt>

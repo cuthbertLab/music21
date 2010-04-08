@@ -132,9 +132,18 @@ Utility conversion; does not process internals.
 Pitch
 -----
 
-.. class:: Pitch
+.. class:: Pitch(name=None)
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
+
+    Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
+
+    >>> p1 = Pitch('a#')
+    >>> p1
+    A# 
+    >>> p2 = Pitch(3)
+    >>> p2
+    D# 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -326,17 +335,6 @@ Pitch
 
     **Pitch** **methods**
 
-    .. method:: __init__(name=None)
-
-    Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
-
-    >>> p1 = Pitch('a#')
-    >>> p1
-    A# 
-    >>> p2 = Pitch(3)
-    >>> p2
-    D# 
-
     .. method:: transpose(value, inPlace=False)
 
     Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
@@ -359,7 +357,7 @@ Pitch
 Accidental
 ----------
 
-.. class:: Accidental
+.. class:: Accidental(specifier=natural)
 
     Accidental class. 
 
@@ -422,10 +420,6 @@ Accidental
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Accidental** **methods**
-
-    .. method:: __init__(specifier=natural)
-
-    No documentation. 
 
     .. method:: set(name)
 

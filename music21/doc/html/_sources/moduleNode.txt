@@ -15,8 +15,13 @@ music21.node
 Node
 ----
 
-.. class:: Node
+.. class:: Node()
 
+
+    
+
+    >>> a = Node()
+    >>> a.set('charData', 'test')
 
     
 
@@ -33,13 +38,6 @@ Node
     No documentation. 
 
     **Node** **methods**
-
-    .. method:: __init__()
-
-    
-
-    >>> a = Node()
-    >>> a.set('charData', 'test')
 
     .. method:: get(name)
 
@@ -84,7 +82,7 @@ Node
 NodeList
 --------
 
-.. class:: NodeList
+.. class:: NodeList()
 
     Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
 
@@ -103,10 +101,6 @@ NodeList
     Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
 
     **NodeList** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     .. method:: append(item)
 

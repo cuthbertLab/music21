@@ -12,7 +12,7 @@ music21.instrument
 Instrument
 ----------
 
-.. class:: Instrument
+.. class:: Instrument()
 
 
     inherits from: :class:`~music21.base.Music21Object`
@@ -65,10 +65,6 @@ Instrument
 
     **Instrument** **methods**
 
-    .. method:: __init__()
-
-    No documentation. 
-
     .. method:: bestName()
 
     Find a viable name, looking first at instrument, then part, then abbreviations. 
@@ -83,7 +79,7 @@ Instrument
 StringInstrument
 ----------------
 
-.. class:: StringInstrument
+.. class:: StringInstrument()
 
 
     inherits from: :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
@@ -121,7 +117,7 @@ StringInstrument
 
     **StringInstrument** **methods**
 
-    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.__init__`, :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
+    Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -129,7 +125,7 @@ StringInstrument
 Viola
 -----
 
-.. class:: Viola
+.. class:: Viola()
 
 
     inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
@@ -154,10 +150,6 @@ Viola
 
     **Viola** **methods**
 
-    .. method:: __init__()
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
@@ -166,7 +158,7 @@ Viola
 Violin
 ------
 
-.. class:: Violin
+.. class:: Violin()
 
 
     inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
@@ -191,10 +183,6 @@ Violin
 
     **Violin** **methods**
 
-    .. method:: __init__()
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
@@ -203,7 +191,7 @@ Violin
 Violoncello
 -----------
 
-.. class:: Violoncello
+.. class:: Violoncello()
 
 
     inherits from: :class:`~music21.instrument.StringInstrument`, :class:`~music21.instrument.Instrument`, :class:`~music21.base.Music21Object`
@@ -227,10 +215,6 @@ Violoncello
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Violoncello** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     Methods inherited from :class:`~music21.instrument.Instrument`: :meth:`~music21.instrument.Instrument.bestName`, :meth:`~music21.instrument.Instrument.partIdRandomize`
 

@@ -20,7 +20,7 @@ Debugging method to print information about a music21 note called by trecento.tr
 Note
 ----
 
-.. class:: Note
+.. class:: Note(*arguments, **keywords)
 
     Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
 
@@ -141,10 +141,6 @@ Note
 
     **Note** **methods**
 
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
-
     .. method:: setAccidental(accidental)
 
     No documentation. 
@@ -177,7 +173,7 @@ Note
 Rest
 ----
 
-.. class:: Rest
+.. class:: Rest(*arguments, **keywords)
 
     General rest class 
 
@@ -226,10 +222,6 @@ Rest
 
     **Rest** **methods**
 
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
@@ -238,7 +230,7 @@ Rest
 Beam
 ----
 
-.. class:: Beam
+.. class:: Beam(type=None, direction=None)
 
     A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam 
 
@@ -295,17 +287,11 @@ Beam
     >>> b.get('charData')
     'backward hook' 
 
-    **Beam** **methods**
-
-    .. method:: __init__(type=None, direction=None)
-
-    No documentation. 
-
 
 Beams
 -----
 
-.. class:: Beams
+.. class:: Beams()
 
     The Beams object stores in it attribute beamsList (a list) all the Beam objects defined above.  Thus len(note.beams) tells you how many beams the note currently has on it. 
 
@@ -328,10 +314,6 @@ Beams
     Returns a list of mxBeam objects 
 
     **Beams** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     .. method:: append(type=None, direction=None)
 
@@ -428,7 +410,7 @@ Beams
 EighthNote
 ----------
 
-.. class:: EighthNote
+.. class:: EighthNote(*arguments, **keywords)
 
 
     inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
@@ -453,10 +435,6 @@ EighthNote
 
     **EighthNote** **methods**
 
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
@@ -469,7 +447,7 @@ EighthNote
 GeneralNote
 -----------
 
-.. class:: GeneralNote
+.. class:: GeneralNote(*arguments, **keywords)
 
     A GeneralNote object is the parent object for the Note, Rest, Chird, and related objects. 
 
@@ -533,10 +511,6 @@ GeneralNote
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **GeneralNote** **methods**
-
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
 
     .. method:: addLyric(text, lyricNumber=None)
 
@@ -610,7 +584,7 @@ GeneralNote
 HalfNote
 --------
 
-.. class:: HalfNote
+.. class:: HalfNote(*arguments, **keywords)
 
 
     inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
@@ -635,10 +609,6 @@ HalfNote
 
     **HalfNote** **methods**
 
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
@@ -651,7 +621,7 @@ HalfNote
 Lyric
 -----
 
-.. class:: Lyric
+.. class:: Lyric(text=None, number=1, syllabic=None)
 
 
     
@@ -682,17 +652,11 @@ Lyric
     >>> mxLyric.get('text')
     'hello' 
 
-    **Lyric** **methods**
-
-    .. method:: __init__(text=None, number=1, syllabic=None)
-
-    No documentation. 
-
 
 NotRest
 -------
 
-.. class:: NotRest
+.. class:: NotRest(*arguments, **keywords)
 
     Parent class for objects that are not rests; or, object that can be tied. 
 
@@ -715,10 +679,6 @@ NotRest
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **NotRest** **methods**
-
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
 
     .. method:: splitNoteAtPoint(quarterLength)
 
@@ -748,7 +708,7 @@ NotRest
 QuarterNote
 -----------
 
-.. class:: QuarterNote
+.. class:: QuarterNote(*arguments, **keywords)
 
 
     inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
@@ -773,10 +733,6 @@ QuarterNote
 
     **QuarterNote** **methods**
 
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 
     Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
@@ -789,7 +745,7 @@ QuarterNote
 Tie
 ---
 
-.. class:: Tie
+.. class:: Tie(tievalue=start)
 
     Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
 
@@ -828,17 +784,13 @@ Tie
 
     **Tie** **methods**
 
-    .. method:: __init__(tievalue=start)
-
-    No documentation. 
-
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Unpitched
 ---------
 
-.. class:: Unpitched
+.. class:: Unpitched(*arguments, **keywords)
 
     General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
 
@@ -878,7 +830,7 @@ Unpitched
 
     **Unpitched** **methods**
 
-    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.__init__`, :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+    Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.appendDuration`, :meth:`~music21.note.GeneralNote.clearDurations`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
     Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -886,7 +838,7 @@ Unpitched
 WholeNote
 ---------
 
-.. class:: WholeNote
+.. class:: WholeNote(*arguments, **keywords)
 
 
     inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
@@ -910,10 +862,6 @@ WholeNote
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **WholeNote** **methods**
-
-    .. method:: __init__(*arguments, **keywords)
-
-    No documentation. 
 
     Methods inherited from :class:`~music21.note.Note`: :meth:`~music21.note.Note.setAccidental`, :meth:`~music21.note.Note.transpose`
 

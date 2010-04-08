@@ -37,7 +37,7 @@ Given a file path, attempt to parse the file into a Stream.
 Converter
 ---------
 
-.. class:: Converter
+.. class:: Converter()
 
     A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format. 
 
@@ -50,10 +50,6 @@ Converter
     No documentation. 
 
     **Converter** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     .. method:: parseData(dataStr)
 
@@ -71,7 +67,7 @@ Converter
 ConverterMusicXML
 -----------------
 
-.. class:: ConverterMusicXML
+.. class:: ConverterMusicXML(forceSource)
 
 
     
@@ -83,10 +79,6 @@ ConverterMusicXML
     No documentation. 
 
     **ConverterMusicXML** **methods**
-
-    .. method:: __init__(forceSource)
-
-    No documentation. 
 
     .. method:: getPartNames()
 
@@ -108,7 +100,7 @@ ConverterMusicXML
 ConverterHumdrum
 ----------------
 
-.. class:: ConverterHumdrum
+.. class:: ConverterHumdrum()
 
     Simple class wrapper for parsing Humdrum data provided in a file or in a string. 
 
@@ -121,10 +113,6 @@ ConverterHumdrum
     No documentation. 
 
     **ConverterHumdrum** **methods**
-
-    .. method:: __init__()
-
-    No documentation. 
 
     .. method:: parseData(humdrumString)
 
@@ -142,17 +130,15 @@ ConverterHumdrum
 PickleFilter
 ------------
 
-.. class:: PickleFilter
+.. class:: PickleFilter(fp, forceSource=False)
 
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
+
+    Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
 
     
 
     **PickleFilter** **methods**
-
-    .. method:: __init__(fp, forceSource=False)
-
-    Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
 
     .. method:: status()
 
@@ -162,7 +148,7 @@ PickleFilter
 StreamFreezer
 -------------
 
-.. class:: StreamFreezer
+.. class:: StreamFreezer(streamObj=None)
 
 
     
@@ -174,10 +160,6 @@ StreamFreezer
     No documentation. 
 
     **StreamFreezer** **methods**
-
-    .. method:: __init__(streamObj=None)
-
-    No documentation. 
 
     .. method:: openPickle(fp)
 

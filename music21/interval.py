@@ -489,7 +489,6 @@ class GenericInterval(music21.Music21Object):
         >>> bInterval = GenericInterval('fifth')
         >>> bInterval.getDiatonic('perfect')
         <music21.interval.DiatonicInterval P5>
-
         '''             
         return DiatonicInterval(specifier, self)
 
@@ -856,7 +855,7 @@ def generateDiatonic(gInt, cInt):
 
 
 class Interval(music21.Music21Object):
-    '''An Interval class that encapsulates an both chromatic and diatonic intervals all in one model. 
+    '''An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. 
 
      The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
 
@@ -891,7 +890,7 @@ class Interval(music21.Music21Object):
     diatonicType = 0
     niceName = ""
 
-    def __init__(self, *args, **keydict):
+    def __init__(self, *arguments, **keywords):
         '''
         >>> from music21 import note
         >>> n1 = note.Note('c3')
@@ -942,31 +941,31 @@ class Interval(music21.Music21Object):
 
         '''
         music21.Music21Object.__init__(self)
-        if len(args) == 1 and common.isStr(args[0]):
+        if len(arguments) == 1 and common.isStr(arguments[0]):
             # convert common string representations 
-            dInterval, cInterval = _stringToDiatonicChromatic(args[0])
+            dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
             self.diatonic = dInterval
             self.chromatic = cInterval
 
         # if we get a first argument that is a number, treat it as a chromatic
         # interval creation argument
-        elif len(args) == 1 and common.isNum(args[0]):
-            self.chromatic = ChromaticInterval(args[0])
+        elif len(arguments) == 1 and common.isNum(arguments[0]):
+            self.chromatic = ChromaticInterval(arguments[0])
             self.diatonic = self.chromatic.getDiatonic()
 
-        elif (len(args) == 2 and args[0].isNote == True and 
-            args[1].isNote == True):
-            self.note1 = args[0]
-            self.note2 = args[1]
+        elif (len(arguments) == 2 and arguments[0].isNote == True and 
+            arguments[1].isNote == True):
+            self.note1 = arguments[0]
+            self.note2 = arguments[1]
         else:
-            if "diatonic" in keydict:
-                self.diatonic = keydict['diatonic']
-            if "chromatic" in keydict:
-                self.chromatic = keydict['chromatic']
-            if "note1" in keydict:
-                self.note1 = keydict['note1']
-            if "note2" in keydict:
-                self.note2 = keydict['note2']
+            if "diatonic" in keywords:
+                self.diatonic = keywords['diatonic']
+            if "chromatic" in keywords:
+                self.chromatic = keywords['chromatic']
+            if "note1" in keywords:
+                self.note1 = keywords['note1']
+            if "note2" in keywords:
+                self.note2 = keywords['note2']
 
         # this method will check for incorrectly defined attributes
         self.reinit()

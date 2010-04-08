@@ -240,8 +240,17 @@
 <dl class="class">
 <dt id="music21.pitch.Pitch">
 <em class="property">
-class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.</p>
+<p>Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
+<span class="go">A#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
+<span class="go">D#</span>
+</pre></div>
+</div>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Pitch</strong> <strong>attributes</strong></p>
 <dl class="attribute">
@@ -467,20 +476,6 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 <p><strong>Pitch</strong> <strong>methods</strong></p>
 <dl class="method">
-<dt id="music21.pitch.Pitch.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
-<span class="go">A#</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
-<span class="go">D#</span>
-</pre></div>
-</div>
-<dl class="method">
 <dt id="music21.pitch.Pitch.transpose">
 <tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.transpose" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -508,7 +503,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="class">
 <dt id="music21.pitch.Accidental">
 <em class="property">
-class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><big>(</big><em>specifier=natural</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accidental class.</p>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Accidental</strong> <strong>attributes</strong></p>
@@ -585,12 +580,6 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 </div>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 <p><strong>Accidental</strong> <strong>methods</strong></p>
-<dl class="method">
-<dt id="music21.pitch.Accidental.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>specifier=natural</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.pitch.Accidental.set">
 <tt class="descname">set</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>

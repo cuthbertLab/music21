@@ -12,7 +12,7 @@ music21.chord
 Chord
 -----
 
-.. class:: Chord
+.. class:: Chord(notes=[], **keywords)
 
     Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = 'C' E = note.Note(), E.name = 'E' G = note.Note(), G.name = 'G' And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples 
 
@@ -265,10 +265,6 @@ Chord
     Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Chord** **methods**
-
-    .. method:: __init__(notes=[], **keywords)
-
-    No documentation. 
 
     .. method:: areZRelations(other)
 
