@@ -240,13 +240,13 @@ def pitchQuarterLengthUsage3D(show=True):
 
 
 def messiaen(show = True):
-    #messiaen = converter.parse('d:/desktop/messiaen_valeurs.xml')
-    messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+    messiaen = converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
+    #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
 
-    messiaen.show()
+    #messiaen.show()
     notes = messiaen.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
-        title='Messiaen, Mode de Valeurs', xRemap=False)
+        title='Messiaen, Mode de Valeurs', xLog=False)
     
     if (show is True):
         g.process()

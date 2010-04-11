@@ -190,12 +190,12 @@ if __name__ == "__main__":
 #    searchForNotes("E4 D4 C4 B3 A3 B3 C4") # Benedicamus Domino Seville 25
 #    searchForNotes("D4 E4 C4 D4 E4 D4 C4") # Benedicamus Domino Seville 25
 ######    searchForIntervals("A4 A4 G4 A4 G4 A4") # Reina f. 18r top. = QUAL NOVITA
-#    searchForIntervals("G4 F4 F4 E4 E4 D4 D4 C4") # london 88v C
-#     searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 88v T
+#    searchForIntervals("G4 F4 F4 E4 E4 D4 D4 C4") # london 29987 88v C
+     searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 29987 88v T
 
 #    landiniTonality()
 #    findCasanatense522()
 #    findRandomVerona()
-    findRavi3ORegina()
-    pass
+#    findRavi3ORegina()
+#    pass
 

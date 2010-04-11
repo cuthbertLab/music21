@@ -83,7 +83,8 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     '''
     p3.
-    start at a key marked with an ex, move finger according to pattern of half and whole steps; mark key at end with an astrick
+    start at a key marked with an ex, move finger according to pattern 
+    of half and whole steps; mark key at end with an asterisk
     '''
     from music21 import stream, interval
     nStart = note.Note('a4')
@@ -106,7 +107,8 @@ def ch1_basic_I_C_1(show=True, *arguments, **keywords):
 def ch1_basic_I_C_2(show=True, *arguments, **keywords):
     '''
     p3.
-    start at a key marked with an ex, move finger according to pattern of half and whole steps; mark key at end with an astrick
+    start at a key marked with an ex, move finger according to pattern of 
+    half and whole steps; mark key at end with an asterisk
     '''
     from music21 import stream
     nStart = note.Note('e4')
@@ -127,7 +129,8 @@ def ch1_basic_I_C_2(show=True, *arguments, **keywords):
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
     p3.
-    Write letter names and octave designations for the pitches written in the treble and bass clefs below.
+    Write letter names and octave designations for the pitches written 
+    in the treble and bass clefs below.
 
     (Data in Finale/musicxml format)
     '''

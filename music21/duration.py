@@ -33,24 +33,24 @@ environLocal = environment.Environment(_MOD)
 # duration constants and reference
 
 # MusicXML uses long instead of longa
-typeToDuration = {'duplex-maxima': 64.0, 'maxima': 32.0, 'longa': 16.0, 
+typeToDuration = {'duplex-maxima': 64.0, 'maxima': 32.0, 'longa': 16.0,
                   'breve': 8.0, 'whole': 4.0,
                   'half': 2.0, 'quarter': 1.0, 'eighth': 0.5,
                   '16th': 0.25, '32nd': 0.125,
                   '64th': 0.0625, '128th': 0.03125, '256th': 0.015625,
-                  '512th': 0.015625/2.0, '1024th': 0.015625/4.0,
+                  '512th': 0.015625 / 2.0, '1024th': 0.015625 / 4.0,
                   'zero': 0.0} 
 
-typeFromNumDict = {1: 'whole', 
-                   2: 'half', 
+typeFromNumDict = {1: 'whole',
+                   2: 'half',
                    4: 'quarter',
-                   8: 'eighth', 
-                   16: '16th', 
-                   32: '32nd', 
-                   64: '64th', 
+                   8: 'eighth',
+                   16: '16th',
+                   32: '32nd',
+                   64: '64th',
                    128: '128th',
-                   256: '256th', 
-                   512: '512th', 
+                   256: '256th',
+                   512: '512th',
                    1024: '1024th',
                    0: 'zero',
                    0.5: 'breve',
@@ -58,8 +58,8 @@ typeFromNumDict = {1: 'whole',
                    0.125: 'maxima',
                    0.0625: 'duplex-maxima'}
 
-ordinalTypeFromNum = ["duplex-maxima", "maxima", "longa", "breve", "whole", 
-    "half", "quarter", "eighth", "16th", "32nd", "64th", "128th", "256th", 
+ordinalTypeFromNum = ["duplex-maxima", "maxima", "longa", "breve", "whole",
+    "half", "quarter", "eighth", "16th", "32nd", "64th", "128th", "256th",
     "512th", "1024th"]
 
 defaultTupletNumerators = [3, 5, 7, 11, 13]
@@ -142,13 +142,13 @@ def quarterLengthToClosestType(qLen):
     >>> quarterLengthToClosestType(1.8)
     ('quarter', False)
     '''
-    if (4.0/qLen) in typeFromNumDict:
-        return (typeFromNumDict[4.0/qLen], True)
+    if (4.0 / qLen) in typeFromNumDict:
+        return (typeFromNumDict[4.0 / qLen], True)
     else:
         for numDict in sorted(typeFromNumDict.keys()):
             if numDict == 0: 
                 continue
-            elif (4.0/qLen) < numDict and (8.0/qLen) > numDict:
+            elif (4.0 / qLen) < numDict and (8.0 / qLen) > numDict:
                 return (typeFromNumDict[numDict], False)
         raise DurationException("Cannot return types greater than double duplex-maxima: remove this when we are sure this works...")
 
@@ -204,7 +204,7 @@ def convertQuarterLengthToType(qLen):
     else:
         return dtype
 
-def dottedMatch(qLen, maxDots = 4):
+def dottedMatch(qLen, maxDots=4):
     '''Given a quarterLength, determine if there is a dotted (or non-dotted) type that exactly matches. Returns a pair of (numDots, type) or (False, False) if no exact matches are found.
     
     Returns a maximum of four dots by default.
@@ -227,14 +227,14 @@ def dottedMatch(qLen, maxDots = 4):
     '''
     for dots in range(0, maxDots + 1):
         ## assume qLen has n dots, so find its non-dotted length
-        preDottedLength =  (qLen + 0.0)/common.dotMultiplier(dots)
+        preDottedLength = (qLen + 0.0) / common.dotMultiplier(dots)
         durType, match = quarterLengthToClosestType(preDottedLength)
         if match is True:
             return (dots, durType)
     return (False, False)
 
 
-def quarterLengthToTuplet(qLen, maxToReturn = 4):
+def quarterLengthToTuplet(qLen, maxToReturn=4):
     '''    
     Returns a list of possible Tuplet objects for a given `qLen` (quarterLength). As there may be more than one possible solution, the `maxToReturn` integer specifies the maximum number of values returned.
 
@@ -270,15 +270,15 @@ def quarterLengthToTuplet(qLen, maxToReturn = 4):
         for i in defaultTupletNumerators:
             qLenBase = typeValue / float(i)
             # try multiples of the tuplet division, from 1 to max-1
-            for m in range(1,i):
+            for m in range(1, i):
                 qLenCandidate = qLenBase * m
                 # need to use a courser grain here
                 if common.almostEquals(qLenCandidate, qLen, 1e-5):
                     tupletDuration = Duration(typeKey)
-                    newTuplet = Tuplet(numberNotesActual = i,
-                                       numberNotesNormal = m,
-                                       durationActual = tupletDuration,
-                                       durationNormal = tupletDuration,)
+                    newTuplet = Tuplet(numberNotesActual=i,
+                                       numberNotesNormal=m,
+                                       durationActual=tupletDuration,
+                                       durationNormal=tupletDuration,)
                     post.append(newTuplet)
                     break
         # not looking for these matches will add tuple alternative
@@ -411,7 +411,7 @@ def quarterLengthToDurations(qLen):
         if len(tupleCandidates) > 0:
             # assume that the first, using the smallest type, is best
             dNew = DurationUnit(typeNext)
-            dNew.tuplets = (tupleCandidates[0], )
+            dNew.tuplets = (tupleCandidates[0],)
             post.append(dNew)
             match = True
 
@@ -437,7 +437,7 @@ def quarterLengthToDurations(qLen):
     return post
 
         
-def partitionQuarterLength(qLen, qLenDiv = 4):
+def partitionQuarterLength(qLen, qLenDiv=4):
     '''
     Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into
     (default = 4; i.e., into whole notes), returns a list of Durations that
@@ -508,7 +508,7 @@ def partitionQuarterLength(qLen, qLenDiv = 4):
         return post
 
 
-def convertTypeToQuarterLength(dType, dots = 0, tuplets=[], dotGroups=[]):
+def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of 
     Tuplet objects (`tuplets`), and a (very) optional list of Medieval dot groups (`dotGroups`), 
@@ -637,12 +637,12 @@ def updateTupletType(durationList):
         tuplet, dur = tupletMap[i]
 
         if i > 0:
-            tupletPrevious, durPrevious = tupletMap[i-1]
+            tupletPrevious, durPrevious = tupletMap[i - 1]
         else: 
             tupletPrevious, durPrevious = None, None
 
         if i < len(tupletMap) - 1:
-            tupletNext, durNext = tupletMap[i+1]
+            tupletNext, durNext = tupletMap[i + 1]
             if tupletNext != None:
                 nextNormalType = tupletNext.durationNormal.type
             else:
@@ -662,7 +662,7 @@ def updateTupletType(durationList):
             if tupletPrevious == None or completionTarget == None:
                 tuplet.type = 'start'
                 # get total quarter length of this tuplet
-                completionTarget = (tuplet.numberNotesNormal *             
+                completionTarget = (tuplet.numberNotesNormal * 
                                    tuplet.durationNormal.quarterLength)
 
                 #environLocal.printDebug(['starting tuplet type, value:', 
@@ -720,7 +720,7 @@ class DurationCommon(object):
         currentMultiplier = 1
         for thisTuplet in self.tuplets:
             currentMultiplier *= thisTuplet.tupletMultiplier()
-        return common.decimalToTuplet(1.0/currentMultiplier)
+        return common.decimalToTuplet(1.0 / currentMultiplier)
 
 
 #-------------------------------------------------------------------------------
@@ -743,7 +743,7 @@ class DurationUnit(DurationCommon):
     needs a full Duration object (such as 2.5 quarterLengths.)
     '''
   
-    def __init__(self, prototype = 'quarter'):
+    def __init__(self, prototype='quarter'):
 
         self._type = ""
         # rarely used: dotted-dotted notes; e.g. dotted-dotted half in 9/8
@@ -837,7 +837,7 @@ class DurationUnit(DurationCommon):
         0.25
         '''
         if self.linkStatus is True:
-            self._qtrLength = convertTypeToQuarterLength(self.type, 
+            self._qtrLength = convertTypeToQuarterLength(self.type,
                             self.dots, self.tuplets) # add self.dotGroups
         self._quarterLengthNeedsUpdating = False
 
@@ -893,7 +893,7 @@ class DurationUnit(DurationCommon):
             self._typeNeedsUpdating = True
         self._qtrLength = value
 
-    quarterLength = property(_getQuarterLength, _setQuarterLength, 
+    quarterLength = property(_getQuarterLength, _setQuarterLength,
     doc='''Property for getting or setting the quarterLength of a DurationUnit. 
 
     >>> a = DurationUnit()
@@ -956,7 +956,7 @@ class DurationUnit(DurationCommon):
             self._quarterLengthNeedsUpdating = True
         self._type = value
 
-    type = property(_getType, _setType, 
+    type = property(_getType, _setType,
     doc='''Property for getting or setting the type of a DurationUnit. 
 
     >>> a = DurationUnit()
@@ -1073,7 +1073,7 @@ class DurationUnit(DurationCommon):
 
     def appendTuplet(self, newTuplet):
         newTuplet.frozen = True
-        self._tuplets = self._tuplets + (newTuplet, )
+        self._tuplets = self._tuplets + (newTuplet,)
         self._quarterLengthNeedsUpdating = True
 
     def _getLily(self):
@@ -1210,7 +1210,7 @@ class Tuplet(object):
     #---------------------------------------------------------------------------
     # properties
 
-    def _setTupletActual(self, tupList = []):
+    def _setTupletActual(self, tupList=[]):
         if self.frozen == True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesActual, self.durationActual = tupList
@@ -1221,7 +1221,7 @@ class Tuplet(object):
     tupletActual = property(_getTupletActual, _setTupletActual)
 
 
-    def _setTupletNormal(self, tupList = []):
+    def _setTupletNormal(self, tupList=[]):
         if self.frozen == True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesNormal, self.durationNormal = tupList   
@@ -1514,7 +1514,7 @@ class Duration(DurationCommon):
                 return True
         else: return False
     
-    isComplex = property(_isComplex, 
+    isComplex = property(_isComplex,
         doc='''Property defining if this Duration has more than one DurationUnit object on the `component` list.
 
         >>> aDur = Duration()
@@ -1698,7 +1698,7 @@ class Duration(DurationCommon):
     tuplets = property(_getTuplets, _setTuplets)
 
     def appendTuplet(self, newTuplet):
-        self.tuplets = self.tuplets + (newTuplet, )
+        self.tuplets = self.tuplets + (newTuplet,)
 
 
 
@@ -1786,7 +1786,7 @@ class Duration(DurationCommon):
                     mxTied = musicxmlMod.Tied()
                     mxTied.set('type', 'start') 
                     mxNotations.append(mxTied)
-                elif i == len(self.components)-1: #end 
+                elif i == len(self.components) - 1: #end 
                     mxTie = musicxmlMod.Tie()
                     mxTie.set('type', 'stop') # start, stop
                     mxTieList.append(mxTie)
@@ -2190,7 +2190,7 @@ class Duration(DurationCommon):
         if componentIndex not in range(len(self.components)):
             raise DurationException(('invalid component index value (%s) ' + \
                 'submitted; value must be integers between 0 and %s') % (
-                componentIndex, len(self.components)-1))
+                componentIndex, len(self.components) - 1))
 
         currentPosition = 0.0
         for i in range(componentIndex):
@@ -2254,11 +2254,11 @@ class Duration(DurationCommon):
             d2 = Duration()
             d2.quarterLength = remainder
 
-            self.components[sliceIndex: (sliceIndex+1)] = [d1, d2]
+            self.components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
-    def fill(self, quarterLengthList = ['quarter', 'half', 'quarter']):
+    def fill(self, quarterLengthList=['quarter', 'half', 'quarter']):
         '''Utility method for testing; a quick way to fill components. This will
         remove any exisiting values.
         '''
@@ -2309,7 +2309,7 @@ class TestExternal(unittest.TestCase):
         a = stream.Stream()
 
         for x in range(30):
-            ql = random.choice([1,2,3,4,5]) + random.choice([0,.25,.5,.75])
+            ql = random.choice([1, 2, 3, 4, 5]) + random.choice([0, .25, .5, .75])
             # w/ random.choice([0,.33333,.666666] gets an error
             n = note.Note()
             b = Duration()
@@ -2400,7 +2400,7 @@ class Test(unittest.TestCase):
         self.assertEqual(common.almostEquals(
             tup2.tupletMultiplier(), 0.666666666667), True)
 
-        dur3.tuplets = (tup1,tup2)
+        dur3.tuplets = (tup1, tup2)
 #         print "So a tuplet-dotted-quarter's length under both tuplets is",
 #         print dur3.getQuarterLength(),
 #         print "quarter notes"
@@ -2430,7 +2430,7 @@ class Test(unittest.TestCase):
         '''Test settinf of tuplet type when durations sum to expected completion
         '''
         # default tuplets group into threes when possible
-        test, match = ([.333333]*3+[.1666666]*6, 
+        test, match = ([.333333] * 3 + [.1666666] * 6,
             ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
         input = []
         for qLen in test:
@@ -2457,7 +2457,7 @@ class Test(unittest.TestCase):
         copy.deepcopy(tup5), copy.deepcopy(tup5), copy.deepcopy(tup5),
         copy.deepcopy(tup5), copy.deepcopy(tup5)]
 
-        match = ['start', None, None, None, None, 'stop', 
+        match = ['start', None, None, None, None, 'stop',
                  'start', None, None, None, 'stop']
 
         updateTupletType(input)
@@ -2475,7 +2475,7 @@ class Test(unittest.TestCase):
 
         # the current match results here are a good compromise
         # for a difficult situation. 
-        test, match = ([.333333]*2+[.1666666]*5, 
+        test, match = ([.333333] * 2 + [.1666666] * 5,
             ['start', None, None, 'stop', 'start', None, 'stop']
             )
         input = []
