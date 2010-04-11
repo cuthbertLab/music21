@@ -11,6 +11,7 @@ music21.key
 
 .. function:: keyFromString(strKey)
 
+Given a string representing a key, return the appropriate Key object. 
 
 .. function:: sharpsToPitch(sharpCount)
 
@@ -45,17 +46,7 @@ KeySignature
 
     **KeySignature** **attributes**
 
-    .. attribute:: sharps
-
-    No documentation. 
-
-    .. attribute:: mode
-
-    No documentation. 
-
-    .. attribute:: alteredTones
-
-    No documentation. 
+    Attributes without Documentation: `sharps`, `mode`, `alteredTones`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -73,7 +64,7 @@ KeySignature
 
     .. attribute:: pitchAndMode
 
-    Returns a musicxml.KeySignature object 
+    Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
 
     >>> keyArray = [KeySignature(x) for x in range(-7,8)]
     >>> keyArray[0].pitchAndMode
@@ -113,33 +104,7 @@ Key
 
     **Key** **attributes**
 
-    .. attribute:: accidental
-
-    No documentation. 
-
-    .. attribute:: typeList
-
-    No documentation. 
-
-    .. attribute:: step
-
-    No documentation. 
-
-    .. attribute:: stepList
-
-    No documentation. 
-
-    .. attribute:: stream1
-
-    No documentation. 
-
-    .. attribute:: accidentalList
-
-    No documentation. 
-
-    .. attribute:: type
-
-    No documentation. 
+    Attributes without Documentation: `accidental`, `typeList`, `step`, `stepList`, `stream1`, `accidentalList`, `type`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 

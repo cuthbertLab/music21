@@ -93,6 +93,7 @@
 <tt class="descclassname">music21.key.</tt><tt class="descname">keyFromString</tt><big>(</big><em>strKey</em><big>)</big><a class="headerlink" href="#music21.key.keyFromString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>Given a string representing a key, return the appropriate Key object.</p>
 <dl class="function">
 <dt id="music21.key.sharpsToPitch">
 <tt class="descclassname">music21.key.</tt><tt class="descname">sharpsToPitch</tt><big>(</big><em>sharpCount</em><big>)</big><a class="headerlink" href="#music21.key.sharpsToPitch" title="Permalink to this definition">¶</a></dt>
@@ -126,24 +127,7 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 </div>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>KeySignature</strong> <strong>attributes</strong></p>
-<dl class="attribute">
-<dt id="music21.key.KeySignature.sharps">
-<tt class="descname">sharps</tt><a class="headerlink" href="#music21.key.KeySignature.sharps" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.KeySignature.mode">
-<tt class="descname">mode</tt><a class="headerlink" href="#music21.key.KeySignature.mode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.KeySignature.alteredTones">
-<tt class="descname">alteredTones</tt><a class="headerlink" href="#music21.key.KeySignature.alteredTones" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
+<p>Attributes without Documentation: <cite>sharps</cite>, <cite>mode</cite>, <cite>alteredTones</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 <p><strong>KeySignature</strong> <strong>properties</strong></p>
 <dl class="attribute">
@@ -164,7 +148,7 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <tt class="descname">pitchAndMode</tt><a class="headerlink" href="#music21.key.KeySignature.pitchAndMode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Returns a musicxml.KeySignature object</p>
+<p>Returns a a two value list containg a <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object that names this key and the value of <tt class="xref docutils literal"><span class="pre">mode</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">KeySignature</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pitchAndMode</span>
 <span class="go">(C-, None)</span>
@@ -201,48 +185,7 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">Key</
 <dd><p>Note that a key is a sort of hypothetical/conceptual object. It probably has a scale (or scales) associated with it and a KeySignature, but not necessarily.</p>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Key</strong> <strong>attributes</strong></p>
-<dl class="attribute">
-<dt id="music21.key.Key.accidental">
-<tt class="descname">accidental</tt><a class="headerlink" href="#music21.key.Key.accidental" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.typeList">
-<tt class="descname">typeList</tt><a class="headerlink" href="#music21.key.Key.typeList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.step">
-<tt class="descname">step</tt><a class="headerlink" href="#music21.key.Key.step" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.stepList">
-<tt class="descname">stepList</tt><a class="headerlink" href="#music21.key.Key.stepList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.stream1">
-<tt class="descname">stream1</tt><a class="headerlink" href="#music21.key.Key.stream1" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.accidentalList">
-<tt class="descname">accidentalList</tt><a class="headerlink" href="#music21.key.Key.accidentalList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.key.Key.type">
-<tt class="descname">type</tt><a class="headerlink" href="#music21.key.Key.type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
+<p>Attributes without Documentation: <cite>accidental</cite>, <cite>typeList</cite>, <cite>step</cite>, <cite>stepList</cite>, <cite>stream1</cite>, <cite>accidentalList</cite>, <cite>type</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
 <p><strong>Key</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>

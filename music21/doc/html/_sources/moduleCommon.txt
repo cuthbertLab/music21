@@ -348,13 +348,7 @@ Scalar
 
     **Scalar** **attributes**
 
-    .. attribute:: valType
-
-    No documentation. 
-
-    .. attribute:: value
-
-    No documentation. 
+    Attributes without Documentation: `valType`, `value`
 
     **Scalar** **methods**
 
@@ -422,13 +416,7 @@ defHash
 
     **defHash** **attributes**
 
-    .. attribute:: default
-
-    No documentation. 
-
-    .. attribute:: callDefault
-
-    No documentation. 
+    Attributes without Documentation: `default`, `callDefault`
 
     Attributes inherited from dict: :attr:`~__builtin__.dict.fromkeys`
 
@@ -452,13 +440,7 @@ defList
 
     **defList** **attributes**
 
-    .. attribute:: default
-
-    No documentation. 
-
-    .. attribute:: callDefault
-
-    No documentation. 
+    Attributes without Documentation: `default`, `callDefault`
 
     **defList** **methods**
 

@@ -64,9 +64,7 @@ TinyNotationStream
 
     **TinyNotationStream** **attributes**
 
-    .. attribute:: stringRep
-
-    No documentation. 
+    Attributes without Documentation: `stringRep`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 

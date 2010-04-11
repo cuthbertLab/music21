@@ -135,6 +135,8 @@ class Key(music21.Music21Object):
 
 
 def keyFromString(strKey):
+    '''Given a string representing a key, return the appropriate Key object. 
+    '''
     #TODO: Write keyFromString
     return None
     #raise KeyException("keyFromString not yet written")
@@ -229,7 +231,7 @@ class KeySignature(music21.Music21Object):
 
 
     def _getPitchAndMode(self):
-        '''Returns a musicxml.KeySignature object
+        '''Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`.
        
         >>> keyArray = [KeySignature(x) for x in range(-7,8)]
         >>> keyArray[0].pitchAndMode

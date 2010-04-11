@@ -166,13 +166,7 @@ Rest
 
     Boolean read-only value describing if this is a Rest. 
 
-    .. attribute:: isUnpitched
-
-    No documentation. 
-
-    .. attribute:: name
-
-    No documentation. 
+    Attributes without Documentation: `isUnpitched`, `name`
 
     Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
@@ -226,21 +220,7 @@ Beam
 
     **Beam** **attributes**
 
-    .. attribute:: direction
-
-    No documentation. 
-
-    .. attribute:: type
-
-    No documentation. 
-
-    .. attribute:: number
-
-    No documentation. 
-
-    .. attribute:: independentAngle
-
-    No documentation. 
+    Attributes without Documentation: `direction`, `type`, `number`, `independentAngle`
 
     **Beam** **properties**
 
@@ -276,13 +256,7 @@ Beams
 
     **Beams** **attributes**
 
-    .. attribute:: feathered
-
-    No documentation. 
-
-    .. attribute:: beamsList
-
-    No documentation. 
+    Attributes without Documentation: `feathered`, `beamsList`
 
     **Beams** **properties**
 
@@ -448,17 +422,11 @@ GeneralNote
 
     A list of Lyric objects. 
 
-    .. attribute:: notations
-
-    No documentation. 
-
     .. attribute:: tie
 
     A Tie object. 
 
-    .. attribute:: articulations
-
-    No documentation. 
+    Attributes without Documentation: `notations`, `articulations`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -605,17 +573,7 @@ Lyric
 
     **Lyric** **attributes**
 
-    .. attribute:: text
-
-    No documentation. 
-
-    .. attribute:: number
-
-    No documentation. 
-
-    .. attribute:: syllabic
-
-    No documentation. 
+    Attributes without Documentation: `text`, `number`, `syllabic`
 
     **Lyric** **properties**
 
@@ -641,9 +599,7 @@ NotRest
 
     **NotRest** **attributes**
 
-    .. attribute:: stemDirection
-
-    No documentation. 
+    Attributes without Documentation: `stemDirection`
 
     Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
@@ -745,9 +701,7 @@ Tie
 
     **Tie** **attributes**
 
-    .. attribute:: type
-
-    No documentation. 
+    Attributes without Documentation: `type`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -775,14 +729,6 @@ Unpitched
 
     **Unpitched** **attributes**
 
-    .. attribute:: displayOctave
-
-    No documentation. 
-
-    .. attribute:: displayStep
-
-    No documentation. 
-
     .. attribute:: isNote
 
     Boolean read-only value describing if this object is a Chord. 
@@ -791,9 +737,7 @@ Unpitched
 
     Boolean read-only value describing if this is a Rest. 
 
-    .. attribute:: isUnpitched
-
-    No documentation. 
+    Attributes without Documentation: `displayOctave`, `displayStep`, `isUnpitched`
 
     Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 

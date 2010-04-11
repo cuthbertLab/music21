@@ -1201,10 +1201,6 @@ Measure
 
     A number representing the displayed or shown Measure number as presented in a written Score. 
 
-    .. attribute:: leftbarline
-
-    No documentation. 
-
     .. attribute:: keyIsNew
 
     Boolean describing if KeySignature is different than the previous Measure. 
@@ -1213,17 +1209,11 @@ Measure
 
     Boolean describing if the TimeSignature is different than the previous Measure. 
 
-    .. attribute:: rightbarline
-
-    No documentation. 
-
     .. attribute:: measureNumberSuffix
 
     If a Measure number has a string annotation, such as "a" or similar, this string is stored here. 
 
-    .. attribute:: filled
-
-    No documentation. 
+    Attributes without Documentation: `leftbarline`, `rightbarline`, `filled`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -1324,9 +1314,7 @@ Page
 
     **Page** **attributes**
 
-    .. attribute:: pageNumber
-
-    No documentation. 
+    Attributes without Documentation: `pageNumber`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -1474,9 +1462,7 @@ Staff
 
     **Staff** **attributes**
 
-    .. attribute:: staffLines
-
-    No documentation. 
+    Attributes without Documentation: `staffLines`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -1512,13 +1498,7 @@ System
 
     **System** **attributes**
 
-    .. attribute:: systemNumber
-
-    No documentation. 
-
-    .. attribute:: systemNumbering
-
-    No documentation. 
+    Attributes without Documentation: `systemNumber`, `systemNumbering`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 

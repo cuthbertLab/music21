@@ -24,41 +24,11 @@ NoteEditorial
 
     **NoteEditorial** **attributes**
 
-    .. attribute:: comment
-
-    No documentation. 
-
-    .. attribute:: ficta
-
-    No documentation. 
-
-    .. attribute:: melodicInterval
-
-    No documentation. 
-
-    .. attribute:: color
-
-    No documentation. 
-
-    .. attribute:: melodicIntervalOverRests
-
-    No documentation. 
-
     .. attribute:: misc
 
     A dict to hold anything you might like to store. 
 
-    .. attribute:: harmonicInterval
-
-    No documentation. 
-
-    .. attribute:: melodicIntervals
-
-    No documentation. 
-
-    .. attribute:: melodicIntervalsOverRests
-
-    No documentation. 
+    Attributes without Documentation: `comment`, `ficta`, `melodicInterval`, `color`, `melodicIntervalOverRests`, `harmonicInterval`, `melodicIntervals`, `melodicIntervalsOverRests`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 
@@ -103,13 +73,7 @@ Comment
 
     **Comment** **attributes**
 
-    .. attribute:: position
-
-    No documentation. 
-
-    .. attribute:: text
-
-    No documentation. 
+    Attributes without Documentation: `position`, `text`
 
     **Comment** **properties**
 

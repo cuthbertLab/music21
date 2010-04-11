@@ -149,9 +149,7 @@ Pitch
 
     **Pitch** **attributes**
 
-    .. attribute:: defaultOctave
-
-    No documentation. 
+    Attributes without Documentation: `defaultOctave`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -365,14 +363,6 @@ Accidental
 
     **Accidental** **attributes**
 
-    .. attribute:: displayEvaluated
-
-    No documentation. 
-
-    .. attribute:: displayLocation
-
-    No documentation. 
-
     .. attribute:: displaySize
 
     Size in display: "cue", "large", or a percentage. 
@@ -381,21 +371,7 @@ Accidental
 
     Style of display: "parentheses", "bracket", "both". 
 
-    .. attribute:: displayType
-
-    No documentation. 
-
-    .. attribute:: modifier
-
-    No documentation. 
-
-    .. attribute:: name
-
-    No documentation. 
-
-    .. attribute:: alter
-
-    No documentation. 
+    Attributes without Documentation: `displayEvaluated`, `displayLocation`, `displayType`, `modifier`, `name`, `alter`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 

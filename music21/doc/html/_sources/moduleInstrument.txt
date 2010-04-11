@@ -19,37 +19,7 @@ Instrument
 
     **Instrument** **attributes**
 
-    .. attribute:: instrumentName
-
-    No documentation. 
-
-    .. attribute:: midiChannel
-
-    No documentation. 
-
-    .. attribute:: partId
-
-    No documentation. 
-
-    .. attribute:: partName
-
-    No documentation. 
-
-    .. attribute:: midiProgram
-
-    No documentation. 
-
-    .. attribute:: instrumentAbbreviation
-
-    No documentation. 
-
-    .. attribute:: transposition
-
-    No documentation. 
-
-    .. attribute:: partAbbreviation
-
-    No documentation. 
+    Attributes without Documentation: `instrumentName`, `midiChannel`, `partId`, `partName`, `midiProgram`, `instrumentAbbreviation`, `transposition`, `partAbbreviation`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

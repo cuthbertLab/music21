@@ -316,41 +316,7 @@ Interval
 
     **Interval** **attributes**
 
-    .. attribute:: chromatic
-
-    No documentation. 
-
-    .. attribute:: diatonic
-
-    No documentation. 
-
-    .. attribute:: diatonicType
-
-    No documentation. 
-
-    .. attribute:: direction
-
-    No documentation. 
-
-    .. attribute:: generic
-
-    No documentation. 
-
-    .. attribute:: niceName
-
-    No documentation. 
-
-    .. attribute:: note1
-
-    No documentation. 
-
-    .. attribute:: note2
-
-    No documentation. 
-
-    .. attribute:: type
-
-    No documentation. 
+    Attributes without Documentation: `chromatic`, `diatonic`, `diatonicType`, `direction`, `generic`, `niceName`, `note1`, `note2`, `type`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

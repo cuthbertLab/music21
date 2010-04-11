@@ -23,17 +23,7 @@ Clef
 
     **Clef** **attributes**
 
-    .. attribute:: octaveChange
-
-    No documentation. 
-
-    .. attribute:: sign
-
-    No documentation. 
-
-    .. attribute:: line
-
-    No documentation. 
+    Attributes without Documentation: `octaveChange`, `sign`, `line`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -79,9 +69,7 @@ TrebleClef
 
     **TrebleClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -118,9 +106,7 @@ BassClef
 
     **BassClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -157,9 +143,7 @@ AltoClef
 
     **AltoClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -196,9 +180,7 @@ Bass8vaClef
 
     **Bass8vaClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -237,9 +219,7 @@ Bass8vbClef
 
     **Bass8vbClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -278,9 +258,7 @@ CBaritoneClef
 
     **CBaritoneClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -359,9 +337,7 @@ FBaritoneClef
 
     **FBaritoneClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -433,9 +409,7 @@ FrenchViolinClef
 
     **FrenchViolinClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -507,9 +481,7 @@ GSopranoClef
 
     **GSopranoClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -546,9 +518,7 @@ MezzoSopranoClef
 
     **MezzoSopranoClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -629,9 +599,7 @@ PitchClef
 
     **PitchClef** **attributes**
 
-    .. attribute:: lilyName
-
-    No documentation. 
+    Attributes without Documentation: `lilyName`
 
     Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
@@ -668,9 +636,7 @@ SopranoClef
 
     **SopranoClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -707,9 +673,7 @@ SubBassClef
 
     **SubBassClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
@@ -775,9 +739,7 @@ TenorClef
 
     **TenorClef** **attributes**
 
-    .. attribute:: lowestLine
-
-    No documentation. 
+    Attributes without Documentation: `lowestLine`
 
     Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 

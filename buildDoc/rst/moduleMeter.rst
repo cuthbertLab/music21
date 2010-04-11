@@ -82,10 +82,6 @@ TimeSignature
 
     **TimeSignature** **attributes**
 
-    .. attribute:: symbolizeDenominator
-
-    No documentation. 
-
     .. attribute:: display
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
@@ -94,25 +90,15 @@ TimeSignature
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
-    .. attribute:: symbol
-
-    No documentation. 
-
     .. attribute:: accent
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
-
-    .. attribute:: summedNumerator
-
-    No documentation. 
 
     .. attribute:: beam
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
 
-    .. attribute:: inherited
-
-    No documentation. 
+    Attributes without Documentation: `symbolizeDenominator`, `symbol`, `summedNumerator`, `inherited`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -394,13 +380,7 @@ MeterSequence
 
     **MeterSequence** **attributes**
 
-    .. attribute:: parenthesis
-
-    No documentation. 
-
-    .. attribute:: summedNumerator
-
-    No documentation. 
+    Attributes without Documentation: `parenthesis`, `summedNumerator`
 
     **MeterSequence** **properties**
 

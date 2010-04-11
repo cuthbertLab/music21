@@ -37,9 +37,7 @@ PlotHistogramPitchSpace
 
     **PlotHistogramPitchSpace** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotHistogram`: :attr:`~music21.graph.PlotHistogram.format`
 
@@ -72,9 +70,7 @@ PlotHistogramPitchClass
 
     **PlotHistogramPitchClass** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotHistogram`: :attr:`~music21.graph.PlotHistogram.format`
 
@@ -107,9 +103,7 @@ PlotHistogramQuarterLength
 
     **PlotHistogramQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotHistogram`: :attr:`~music21.graph.PlotHistogram.format`
 
@@ -142,9 +136,7 @@ PlotScatterPitchSpaceQuarterLength
 
     **PlotScatterPitchSpaceQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotScatter`: :attr:`~music21.graph.PlotScatter.format`
 
@@ -171,9 +163,7 @@ PlotScatterPitchClassQuarterLength
 
     **PlotScatterPitchClassQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotScatter`: :attr:`~music21.graph.PlotScatter.format`
 
@@ -200,9 +190,7 @@ PlotScatterPitchClassOffset
 
     **PlotScatterPitchClassOffset** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotScatter`: :attr:`~music21.graph.PlotScatter.format`
 
@@ -229,9 +217,7 @@ PlotHorizontalBarPitchSpaceOffset
 
     **PlotHorizontalBarPitchSpaceOffset** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotHorizontalBar`: :attr:`~music21.graph.PlotHorizontalBar.format`
 
@@ -258,9 +244,7 @@ PlotHorizontalBarPitchClassOffset
 
     **PlotHorizontalBarPitchClassOffset** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotHorizontalBar`: :attr:`~music21.graph.PlotHorizontalBar.format`
 
@@ -287,9 +271,7 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
     **PlotScatterWeightedPitchSpaceQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotScatterWeighted`: :attr:`~music21.graph.PlotScatterWeighted.format`
 
@@ -316,9 +298,7 @@ PlotScatterWeightedPitchClassQuarterLength
 
     **PlotScatterWeightedPitchClassQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.PlotScatterWeighted`: :attr:`~music21.graph.PlotScatterWeighted.format`
 
@@ -345,9 +325,7 @@ Plot3DBarsPitchSpaceQuarterLength
 
     **Plot3DBarsPitchSpaceQuarterLength** **attributes**
 
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `values`
 
     Attributes inherited from :class:`~music21.graph.Plot3DBars`: :attr:`~music21.graph.Plot3DBars.format`
 
@@ -376,69 +354,11 @@ Graph
 
     **Graph** **attributes**
 
-    .. attribute:: fontFamily
-
-    No documentation. 
-
-    .. attribute:: doneAction
-
-    No documentation. 
-
-    .. attribute:: title
-
-    No documentation. 
-
-    .. attribute:: colorBackgroundFigure
-
-    No documentation. 
-
-    .. attribute:: colors
-
-    No documentation. 
-
-    .. attribute:: tickFontSize
-
-    No documentation. 
-
-    .. attribute:: colorGrid
-
-    No documentation. 
-
-    .. attribute:: figureSize
-
-    No documentation. 
-
-    .. attribute:: colorBackgroundData
-
-    No documentation. 
-
-    .. attribute:: axisKeys
-
-    No documentation. 
-
-    .. attribute:: grid
-
-    No documentation. 
-
-    .. attribute:: titleFontSize
-
-    No documentation. 
-
-    .. attribute:: alpha
-
-    No documentation. 
-
-    .. attribute:: labelFontSize
-
-    No documentation. 
-
-    .. attribute:: data
-
-    No documentation. 
-
     .. attribute:: axis
 
     dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
+
+    Attributes without Documentation: `fontFamily`, `doneAction`, `title`, `colorBackgroundFigure`, `colors`, `tickFontSize`, `colorGrid`, `figureSize`, `colorBackgroundData`, `axisKeys`, `grid`, `titleFontSize`, `alpha`, `labelFontSize`, `data`
 
     **Graph** **methods**
 
@@ -514,9 +434,7 @@ Graph3DPolygonBars
 
     **Graph3DPolygonBars** **attributes**
 
-    .. attribute:: barWidth
-
-    No documentation. 
+    Attributes without Documentation: `barWidth`
 
     Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
 
@@ -697,9 +615,7 @@ Plot3DBars
 
     **Plot3DBars** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
+    Attributes without Documentation: `format`
 
     Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
 
@@ -723,9 +639,7 @@ PlotHistogram
 
     **PlotHistogram** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
+    Attributes without Documentation: `format`
 
     Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
 
@@ -751,9 +665,7 @@ PlotHorizontalBar
 
     **PlotHorizontalBar** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
+    Attributes without Documentation: `format`
 
     Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
 
@@ -777,9 +689,7 @@ PlotScatter
 
     **PlotScatter** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
+    Attributes without Documentation: `format`
 
     Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
 
@@ -802,9 +712,7 @@ PlotScatterWeighted
 
     **PlotScatterWeighted** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
+    Attributes without Documentation: `format`
 
     Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
 
@@ -830,13 +738,7 @@ PlotStream
 
     **PlotStream** **attributes**
 
-    .. attribute:: format
-
-    No documentation. 
-
-    .. attribute:: values
-
-    No documentation. 
+    Attributes without Documentation: `format`, `values`
 
     **PlotStream** **properties**
 

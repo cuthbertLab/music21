@@ -573,6 +573,14 @@ class PartitionedClass(PartitionedName):
         else:
             return match
 
+    def hasDoc(self, partName):
+        post = self.getDoc(partName)
+        if post == NO_DOC:
+            return False
+        else:
+            return True
+
+
     def getNames(self, nameKind, mroIndex=None, public=True, getInit=True,
                 getRe=False):
         '''Name type can be method, data, property
@@ -614,7 +622,11 @@ class PartitionedClass(PartitionedName):
         elif nameKind.lower() in ['methods', 'method']:
             nameKind = 'method'
         elif nameKind.lower() in ['data', 'attributes', 'attribute']:
-            nameKind = 'data'
+            nameKind = 'data' # both doc and no doc
+        elif nameKind.lower() in ['attributes-nodoc']:
+            nameKind = 'data-nodoc'
+        elif nameKind.lower() in ['attributes-doc']:
+            nameKind = 'data-doc'
 
         for name in self.names:
             element = self.getElement(name)
@@ -623,16 +635,26 @@ class PartitionedClass(PartitionedName):
                 if name == '__init__':
                     if not getInit:
                         continue
-                if isinstance(element.object, type(MOCK_RE)):
-                    if not getRe:
-                        continue
                 elif name.startswith('__') or name.startswith('_'): 
+                    continue
+
+            if isinstance(element.object, type(MOCK_RE)):
+                if not getRe:
                     continue
 
             #environLocal.printDebug(['kinds', name, element.kind])
 
-            if not element.kind == nameKind:
+            # filter out groups defined for doc/doc
+            if element.kind == 'data' and nameKind.startswith('data-'): #either nodoc or doc
+                if nameKind == 'data-doc':
+                    if not self.hasDoc(name): # has documentation
+                        continue
+                elif nameKind == 'data-nodoc':
+                    if self.hasDoc(name): # has documentation
+                        continue
+            elif not element.kind == nameKind: # if this is not the right kind
                 continue
+
             if mroIndex != None: # select by mro
                 #environLocal.printDebug(['mroindex', self.findMroIndex(name)])
                 if mroIndex == self.findMroIndex(name):
@@ -709,7 +731,7 @@ class RestructuredWriter(object):
         '''
         modName = mroEntry.__module__
         className = mroEntry.__name__
-        if group in ['attributes', 'properties']:
+        if group in ['attributes', 'properties', 'attributes-nodoc']:
             return ':attr:`~%s.%s.%s`' % (modName, className, partName)            
         elif group in ['methods']:
             return ':meth:`~%s.%s.%s`' % (modName, className, partName)
@@ -823,7 +845,21 @@ class ClassDoc(RestructuredWriter):
         self.name = self.classNameEval.__name__
 
     #---------------------------------------------------------------------------
-    def _fmtRstAttribute(self, name, signature):
+
+    def _fmtRstAttributeList(self, names):
+        '''Given a list of attributes, return the RST. This assumes no docs or signatures. 
+        '''
+        msg = []
+        for name in names:
+            # this presently does not work; seems too need line breaks
+            #msg.append('%s.. attribute:: %s' %  (INDENT, name))
+            msg.append('`%s`' %  (name))
+
+        return ', '.join(msg)
+
+
+    def _fmtRstAttribute(self, name):
+        signature = self.partitionedClass.getSignature(name)
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
@@ -831,7 +867,8 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
 
-    def _fmtRstMethod(self, name, signature):
+    def _fmtRstMethod(self, name):
+        signature = self.partitionedClass.getSignature(name)
         msg = []
         msg.append('%s.. method:: %s%s\n\n' %  (INDENT, name, signature))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
@@ -839,6 +876,7 @@ class ClassDoc(RestructuredWriter):
         docRaw = self.partitionedClass.getDoc(name)
         msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
         return ''.join(msg)
+
 
     def getRestructuredClass(self):
         '''Return a string of a complete RST specification for a class.
@@ -873,40 +911,49 @@ class ClassDoc(RestructuredWriter):
         for group in ['attributes', 'properties', 'methods']:    
             msgGroup = []
             for mroIndex in self.partitionedClass.mroIndices():
-                if mroIndex == self.partitionedClass.lastMroIndex():
-                    continue
+                if mroIndex == self.partitionedClass.lastMroIndex(): continue
                 names = self.partitionedClass.getNames(group, mroIndex,
                         public=True, getInit=False)
-                if len(names) == 0: 
-                    continue
+                if len(names) == 0: continue
 
                 if mroIndex != 0: # inherited
                     parentSrc = self.formatParent(
                         self.partitionedClass.getClassFromMroIndex(mroIndex))
                     groupStr = group.title()
                     msgGroup.append('%s%s inherited from %s: ' % (INDENT, groupStr, parentSrc))
-
                     msgSub = []
                     for partName in names:
-                        #postfix = self.partitionedClass.getSignature(partName)
-                        #msgSub.append('``%s%s``' % (partName, postfix))   
-
                         msgSub.append(self.formatXRef(partName, group,
                          self.partitionedClass.getClassFromMroIndex(mroIndex)))
-
                     msgGroup.append('%s\n\n' % ', '.join(msgSub))
-                else: # locally defined, provide complete documentation
-                    for partName in names:
-                        signature = self.partitionedClass.getSignature(partName)
-                        if group in ['properties', 'attributes']:
-                            msgGroup.append(self._fmtRstAttribute(partName,
-                                                            signature))
-                        elif group == 'methods':
-                            msgGroup.append(self._fmtRstMethod(partName,
-                                                            signature))
-            if len(msgGroup) > 0:
-                msg.append('%s**%s** **%s**\n\n' % (INDENT, classNameStr, group))
+
+                elif mroIndex == 0: # local
+                    if group == 'attributes': # split only for local
+                        groupSubList = ['attributes-doc', 'attributes-nodoc']
+                    else:
+                        groupSubList = [group]
+
+                    for groupSub in groupSubList:
+                        # get new names as we are dealing with sub groups
+                        namesSub = self.partitionedClass.getNames(groupSub, 
+                                mroIndex, public=True, getInit=False)
+                        if len(namesSub) == 0: continue
+
+                        if groupSub in ['attributes-nodoc']:
+                            msgGroup.append(
+                            '%sAttributes without Documentation: %s\n\n' % (
+                            INDENT, self._fmtRstAttributeList(namesSub)))
+                        for partName in namesSub:
+                            if groupSub in ['attributes-doc', 'properties']:
+                                msgGroup.append(self._fmtRstAttribute(partName))
+                            elif groupSub == 'methods':
+                                msgGroup.append(self._fmtRstMethod(partName))
+
+            if len(msgGroup) > 0: # add the title for this group
+                msg.append('%s**%s** **%s**\n\n' % (INDENT, 
+                           classNameStr, group))
                 msg.append(''.join(msgGroup))
+
         msg.append('\n'*1)
         return msg
 

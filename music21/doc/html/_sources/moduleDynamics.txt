@@ -24,37 +24,7 @@ Dynamic
 
     **Dynamic** **attributes**
 
-    .. attribute:: posPlacement
-
-    No documentation. 
-
-    .. attribute:: value
-
-    No documentation. 
-
-    .. attribute:: posRelativeY
-
-    No documentation. 
-
-    .. attribute:: posDefaultX
-
-    No documentation. 
-
-    .. attribute:: posDefaultY
-
-    No documentation. 
-
-    .. attribute:: longName
-
-    No documentation. 
-
-    .. attribute:: posRelativeX
-
-    No documentation. 
-
-    .. attribute:: englishName
-
-    No documentation. 
+    Attributes without Documentation: `posPlacement`, `value`, `posRelativeY`, `posDefaultX`, `posDefaultY`, `longName`, `posRelativeX`, `englishName`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -94,17 +64,7 @@ Wedge
 
     **Wedge** **attributes**
 
-    .. attribute:: posPlacement
-
-    No documentation. 
-
-    .. attribute:: spread
-
-    No documentation. 
-
-    .. attribute:: type
-
-    No documentation. 
+    Attributes without Documentation: `posPlacement`, `spread`, `type`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

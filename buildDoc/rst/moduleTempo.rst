@@ -24,9 +24,7 @@ TempoMark
 
     **TempoMark** **attributes**
 
-    .. attribute:: value
-
-    No documentation. 
+    Attributes without Documentation: `value`
 
     Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -54,13 +52,7 @@ MetronomeMark
 
     **MetronomeMark** **attributes**
 
-    .. attribute:: number
-
-    No documentation. 
-
-    .. attribute:: referent
-
-    No documentation. 
+    Attributes without Documentation: `number`, `referent`
 
     Attributes inherited from :class:`~music21.tempo.TempoMark`: :attr:`~music21.tempo.TempoMark.value`
 

@@ -294,9 +294,7 @@ Duration
 
     **Duration** **attributes**
 
-    .. attribute:: linkages
-
-    No documentation. 
+    Attributes without Documentation: `linkages`
 
     **Duration** **properties**
 
@@ -552,53 +550,15 @@ Tuplet
 
     **Tuplet** **attributes**
 
-    .. attribute:: frozen
-
-    No documentation. 
-
-    .. attribute:: tupletActualShow
-
-    No documentation. 
-
-    .. attribute:: placement
-
-    No documentation. 
-
-    .. attribute:: numberNotesActual
-
-    No documentation. 
-
-    .. attribute:: tupletId
-
-    No documentation. 
-
-    .. attribute:: nestedLevel
-
-    No documentation. 
-
-    .. attribute:: bracket
-
-    No documentation. 
-
-    .. attribute:: tupletNormalShow
-
-    No documentation. 
-
-    .. attribute:: type
-
-    No documentation. 
-
     .. attribute:: durationActual
 
     A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
-    .. attribute:: numberNotesNormal
-
-    No documentation. 
-
     .. attribute:: durationNormal
 
     A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+
+    Attributes without Documentation: `frozen`, `tupletActualShow`, `placement`, `numberNotesActual`, `tupletId`, `nestedLevel`, `bracket`, `tupletNormalShow`, `type`, `numberNotesNormal`
 
     **Tuplet** **properties**
 
@@ -780,9 +740,7 @@ DurationUnit
 
     **DurationUnit** **attributes**
 
-    .. attribute:: linkStatus
-
-    No documentation. 
+    Attributes without Documentation: `linkStatus`
 
     **DurationUnit** **properties**
 

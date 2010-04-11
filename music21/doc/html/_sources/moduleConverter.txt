@@ -108,9 +108,7 @@ ConverterHumdrum
 
     **ConverterHumdrum** **attributes**
 
-    .. attribute:: stream
-
-    No documentation. 
+    Attributes without Documentation: `stream`
 
     **ConverterHumdrum** **methods**
 
@@ -155,9 +153,7 @@ StreamFreezer
 
     **StreamFreezer** **attributes**
 
-    .. attribute:: stream
-
-    No documentation. 
+    Attributes without Documentation: `stream`
 
     **StreamFreezer** **methods**
 

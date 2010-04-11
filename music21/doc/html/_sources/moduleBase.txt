@@ -240,9 +240,7 @@ ElementWrapper
 
     **ElementWrapper** **attributes**
 
-    .. attribute:: obj
-
-    No documentation. 
+    Attributes without Documentation: `obj`
 
     **ElementWrapper** **properties**
 

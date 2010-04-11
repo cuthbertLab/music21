@@ -27,9 +27,7 @@ Node
 
     **Node** **attributes**
 
-    .. attribute:: charData
-
-    No documentation. 
+    Attributes without Documentation: `charData`
 
     **Node** **properties**
 
@@ -90,9 +88,7 @@ NodeList
 
     **NodeList** **attributes**
 
-    .. attribute:: componentList
-
-    No documentation. 
+    Attributes without Documentation: `componentList`
 
     Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
 

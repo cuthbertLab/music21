@@ -413,12 +413,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>Duration</strong> <strong>attributes</strong></p>
-<dl class="attribute">
-<dt id="music21.duration.Duration.linkages">
-<tt class="descname">linkages</tt><a class="headerlink" href="#music21.duration.Duration.linkages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
+<p>Attributes without Documentation: <cite>linkages</cite></p>
 <p><strong>Duration</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.duration.Duration.components">
@@ -717,77 +712,18 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 </div>
 <p><strong>Tuplet</strong> <strong>attributes</strong></p>
 <dl class="attribute">
-<dt id="music21.duration.Tuplet.frozen">
-<tt class="descname">frozen</tt><a class="headerlink" href="#music21.duration.Tuplet.frozen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.tupletActualShow">
-<tt class="descname">tupletActualShow</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletActualShow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.placement">
-<tt class="descname">placement</tt><a class="headerlink" href="#music21.duration.Tuplet.placement" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.numberNotesActual">
-<tt class="descname">numberNotesActual</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesActual" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.tupletId">
-<tt class="descname">tupletId</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletId" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.nestedLevel">
-<tt class="descname">nestedLevel</tt><a class="headerlink" href="#music21.duration.Tuplet.nestedLevel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.bracket">
-<tt class="descname">bracket</tt><a class="headerlink" href="#music21.duration.Tuplet.bracket" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.tupletNormalShow">
-<tt class="descname">tupletNormalShow</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletNormalShow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
-<dt id="music21.duration.Tuplet.type">
-<tt class="descname">type</tt><a class="headerlink" href="#music21.duration.Tuplet.type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
 <dt id="music21.duration.Tuplet.durationActual">
 <tt class="descname">durationActual</tt><a class="headerlink" href="#music21.duration.Tuplet.durationActual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</p>
 <dl class="attribute">
-<dt id="music21.duration.Tuplet.numberNotesNormal">
-<tt class="descname">numberNotesNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.numberNotesNormal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
-<dl class="attribute">
 <dt id="music21.duration.Tuplet.durationNormal">
 <tt class="descname">durationNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.durationNormal" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</p>
+<p>Attributes without Documentation: <cite>frozen</cite>, <cite>tupletActualShow</cite>, <cite>placement</cite>, <cite>numberNotesActual</cite>, <cite>tupletId</cite>, <cite>nestedLevel</cite>, <cite>bracket</cite>, <cite>tupletNormalShow</cite>, <cite>type</cite>, <cite>numberNotesNormal</cite></p>
 <p><strong>Tuplet</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.mx">
@@ -907,7 +843,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>AppogiaturaStartDuration</strong> <strong>attributes</strong></p>
-<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.linkages" class="reference internal" href="#music21.duration.Duration.linkages"><tt class="xref docutils literal"><span class="pre">linkages</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <tt class="xref docutils literal"><span class="pre">linkages</span></tt></p>
 <p><strong>AppogiaturaStartDuration</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.components" class="reference internal" href="#music21.duration.Duration.components"><tt class="xref docutils literal"><span class="pre">components</span></tt></a>, <a title="music21.duration.Duration.dots" class="reference internal" href="#music21.duration.Duration.dots"><tt class="xref docutils literal"><span class="pre">dots</span></tt></a>, <a title="music21.duration.Duration.isComplex" class="reference internal" href="#music21.duration.Duration.isComplex"><tt class="xref docutils literal"><span class="pre">isComplex</span></tt></a>, <a title="music21.duration.Duration.lily" class="reference internal" href="#music21.duration.Duration.lily"><tt class="xref docutils literal"><span class="pre">lily</span></tt></a>, <a title="music21.duration.Duration.musicxml" class="reference internal" href="#music21.duration.Duration.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.duration.Duration.mx" class="reference internal" href="#music21.duration.Duration.mx"><tt class="xref docutils literal"><span class="pre">mx</span></tt></a>, <a title="music21.duration.Duration.quarterLength" class="reference internal" href="#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.duration.Duration.tuplets" class="reference internal" href="#music21.duration.Duration.tuplets"><tt class="xref docutils literal"><span class="pre">tuplets</span></tt></a>, <a title="music21.duration.Duration.type" class="reference internal" href="#music21.duration.Duration.type"><tt class="xref docutils literal"><span class="pre">type</span></tt></a></p>
 <p><strong>AppogiaturaStartDuration</strong> <strong>methods</strong></p>
@@ -925,7 +861,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>AppogiaturaStopDuration</strong> <strong>attributes</strong></p>
-<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.linkages" class="reference internal" href="#music21.duration.Duration.linkages"><tt class="xref docutils literal"><span class="pre">linkages</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <tt class="xref docutils literal"><span class="pre">linkages</span></tt></p>
 <p><strong>AppogiaturaStopDuration</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.components" class="reference internal" href="#music21.duration.Duration.components"><tt class="xref docutils literal"><span class="pre">components</span></tt></a>, <a title="music21.duration.Duration.dots" class="reference internal" href="#music21.duration.Duration.dots"><tt class="xref docutils literal"><span class="pre">dots</span></tt></a>, <a title="music21.duration.Duration.isComplex" class="reference internal" href="#music21.duration.Duration.isComplex"><tt class="xref docutils literal"><span class="pre">isComplex</span></tt></a>, <a title="music21.duration.Duration.lily" class="reference internal" href="#music21.duration.Duration.lily"><tt class="xref docutils literal"><span class="pre">lily</span></tt></a>, <a title="music21.duration.Duration.musicxml" class="reference internal" href="#music21.duration.Duration.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.duration.Duration.mx" class="reference internal" href="#music21.duration.Duration.mx"><tt class="xref docutils literal"><span class="pre">mx</span></tt></a>, <a title="music21.duration.Duration.quarterLength" class="reference internal" href="#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.duration.Duration.tuplets" class="reference internal" href="#music21.duration.Duration.tuplets"><tt class="xref docutils literal"><span class="pre">tuplets</span></tt></a>, <a title="music21.duration.Duration.type" class="reference internal" href="#music21.duration.Duration.type"><tt class="xref docutils literal"><span class="pre">type</span></tt></a></p>
 <p><strong>AppogiaturaStopDuration</strong> <strong>methods</strong></p>
@@ -972,12 +908,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dd><p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</p>
 <p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>DurationUnit</strong> <strong>attributes</strong></p>
-<dl class="attribute">
-<dt id="music21.duration.DurationUnit.linkStatus">
-<tt class="descname">linkStatus</tt><a class="headerlink" href="#music21.duration.DurationUnit.linkStatus" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>No documentation.</p>
+<p>Attributes without Documentation: <cite>linkStatus</cite></p>
 <p><strong>DurationUnit</strong> <strong>properties</strong></p>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.dots">
@@ -1124,7 +1055,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">GraceDuration</tt><a class="headerlink" href="#music21.duration.GraceDuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>GraceDuration</strong> <strong>attributes</strong></p>
-<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.linkages" class="reference internal" href="#music21.duration.Duration.linkages"><tt class="xref docutils literal"><span class="pre">linkages</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <tt class="xref docutils literal"><span class="pre">linkages</span></tt></p>
 <p><strong>GraceDuration</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.components" class="reference internal" href="#music21.duration.Duration.components"><tt class="xref docutils literal"><span class="pre">components</span></tt></a>, <a title="music21.duration.Duration.dots" class="reference internal" href="#music21.duration.Duration.dots"><tt class="xref docutils literal"><span class="pre">dots</span></tt></a>, <a title="music21.duration.Duration.isComplex" class="reference internal" href="#music21.duration.Duration.isComplex"><tt class="xref docutils literal"><span class="pre">isComplex</span></tt></a>, <a title="music21.duration.Duration.lily" class="reference internal" href="#music21.duration.Duration.lily"><tt class="xref docutils literal"><span class="pre">lily</span></tt></a>, <a title="music21.duration.Duration.musicxml" class="reference internal" href="#music21.duration.Duration.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.duration.Duration.mx" class="reference internal" href="#music21.duration.Duration.mx"><tt class="xref docutils literal"><span class="pre">mx</span></tt></a>, <a title="music21.duration.Duration.quarterLength" class="reference internal" href="#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.duration.Duration.tuplets" class="reference internal" href="#music21.duration.Duration.tuplets"><tt class="xref docutils literal"><span class="pre">tuplets</span></tt></a>, <a title="music21.duration.Duration.type" class="reference internal" href="#music21.duration.Duration.type"><tt class="xref docutils literal"><span class="pre">type</span></tt></a></p>
 <p><strong>GraceDuration</strong> <strong>methods</strong></p>
@@ -1141,7 +1072,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">LongGraceDuration</tt><a class="headerlink" href="#music21.duration.LongGraceDuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>LongGraceDuration</strong> <strong>attributes</strong></p>
-<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.linkages" class="reference internal" href="#music21.duration.Duration.linkages"><tt class="xref docutils literal"><span class="pre">linkages</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <tt class="xref docutils literal"><span class="pre">linkages</span></tt></p>
 <p><strong>LongGraceDuration</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>: <a title="music21.duration.Duration.components" class="reference internal" href="#music21.duration.Duration.components"><tt class="xref docutils literal"><span class="pre">components</span></tt></a>, <a title="music21.duration.Duration.dots" class="reference internal" href="#music21.duration.Duration.dots"><tt class="xref docutils literal"><span class="pre">dots</span></tt></a>, <a title="music21.duration.Duration.isComplex" class="reference internal" href="#music21.duration.Duration.isComplex"><tt class="xref docutils literal"><span class="pre">isComplex</span></tt></a>, <a title="music21.duration.Duration.lily" class="reference internal" href="#music21.duration.Duration.lily"><tt class="xref docutils literal"><span class="pre">lily</span></tt></a>, <a title="music21.duration.Duration.musicxml" class="reference internal" href="#music21.duration.Duration.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.duration.Duration.mx" class="reference internal" href="#music21.duration.Duration.mx"><tt class="xref docutils literal"><span class="pre">mx</span></tt></a>, <a title="music21.duration.Duration.quarterLength" class="reference internal" href="#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.duration.Duration.tuplets" class="reference internal" href="#music21.duration.Duration.tuplets"><tt class="xref docutils literal"><span class="pre">tuplets</span></tt></a>, <a title="music21.duration.Duration.type" class="reference internal" href="#music21.duration.Duration.type"><tt class="xref docutils literal"><span class="pre">type</span></tt></a></p>
 <p><strong>LongGraceDuration</strong> <strong>methods</strong></p>
@@ -1158,7 +1089,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">ZeroDuration</tt><a class="headerlink" href="#music21.duration.ZeroDuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>inherits from: <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>ZeroDuration</strong> <strong>attributes</strong></p>
-<p>Attributes inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>: <a title="music21.duration.DurationUnit.linkStatus" class="reference internal" href="#music21.duration.DurationUnit.linkStatus"><tt class="xref docutils literal"><span class="pre">linkStatus</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>: <tt class="xref docutils literal"><span class="pre">linkStatus</span></tt></p>
 <p><strong>ZeroDuration</strong> <strong>properties</strong></p>
 <p>Properties inherited from <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>: <a title="music21.duration.DurationUnit.dots" class="reference internal" href="#music21.duration.DurationUnit.dots"><tt class="xref docutils literal"><span class="pre">dots</span></tt></a>, <a title="music21.duration.DurationUnit.lily" class="reference internal" href="#music21.duration.DurationUnit.lily"><tt class="xref docutils literal"><span class="pre">lily</span></tt></a>, <a title="music21.duration.DurationUnit.ordinal" class="reference internal" href="#music21.duration.DurationUnit.ordinal"><tt class="xref docutils literal"><span class="pre">ordinal</span></tt></a>, <a title="music21.duration.DurationUnit.quarterLength" class="reference internal" href="#music21.duration.DurationUnit.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.duration.DurationUnit.tuplets" class="reference internal" href="#music21.duration.DurationUnit.tuplets"><tt class="xref docutils literal"><span class="pre">tuplets</span></tt></a>, <a title="music21.duration.DurationUnit.type" class="reference internal" href="#music21.duration.DurationUnit.type"><tt class="xref docutils literal"><span class="pre">type</span></tt></a></p>
 <p><strong>ZeroDuration</strong> <strong>methods</strong></p>
