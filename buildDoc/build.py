@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import unittest, doctest
-import os, sys, webbrowser
+import os, sys, webbrowser, re
 import types, inspect
 
 import music21
@@ -48,6 +48,10 @@ from music21.trecento import cadencebook as trecentoCadencebook
 #from music21 import environment #redundant
 _MOD = "doc.build.py"
 environLocal = environment.Environment(_MOD)
+
+
+MOCK_RE = re.compile('') # for testing against instance
+
 
 INDENT = ' '*4
 OMIT_STR = 'OMIT_FROM_DOCS'
@@ -222,6 +226,7 @@ class PartitionedModule(PartitionedName):
         True
         '''
         post = []
+
         for name in self.names:
             objName = '%s.%s' % (self.srcNameStr, name)
             obj = eval(objName)
@@ -238,8 +243,10 @@ class PartitionedModule(PartitionedName):
             elif (isinstance(obj, types.StringTypes) or 
                 isinstance(obj, types.DictionaryType) or 
                 isinstance(obj, types.ListType) or 
-                common.isNum(obj) or common.isListLike(obj)): 
+                common.isNum(obj) or common.isListLike(obj) or 
+                isinstance(obj, type(MOCK_RE))): 
                 kind = 'data'
+
             elif isinstance(obj, types.FunctionType):
                 kind = 'function'
             elif isinstance(obj, types.TypeType):
@@ -566,7 +573,8 @@ class PartitionedClass(PartitionedName):
         else:
             return match
 
-    def getNames(self, nameKind, mroIndex=None, public=True, getInit=True):
+    def getNames(self, nameKind, mroIndex=None, public=True, getInit=True,
+                getRe=False):
         '''Name type can be method, data, property
 
         >>> from music21 import pitch
@@ -614,6 +622,9 @@ class PartitionedClass(PartitionedName):
                 # special handling for init methods
                 if name == '__init__':
                     if not getInit:
+                        continue
+                if isinstance(element.object, type(MOCK_RE)):
+                    if not getRe:
                         continue
                 elif name.startswith('__') or name.startswith('_'): 
                     continue

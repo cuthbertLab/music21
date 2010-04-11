@@ -30,76 +30,6 @@ TinyNotationNote
 
     
 
-    **TinyNotationNote** **attributes**
-
-    .. attribute:: DBLDOT
-
-    Compiled regular expression objects 
-
-    .. attribute:: DOT
-
-    Compiled regular expression objects 
-
-    .. attribute:: EDFLAT
-
-    Compiled regular expression objects 
-
-    .. attribute:: EDNAT
-
-    Compiled regular expression objects 
-
-    .. attribute:: EDSHARP
-
-    Compiled regular expression objects 
-
-    .. attribute:: FLAT
-
-    Compiled regular expression objects 
-
-    .. attribute:: ID_EL
-
-    Compiled regular expression objects 
-
-    .. attribute:: LYRIC
-
-    Compiled regular expression objects 
-
-    .. attribute:: OCTAVE2
-
-    Compiled regular expression objects 
-
-    .. attribute:: OCTAVE3
-
-    Compiled regular expression objects 
-
-    .. attribute:: OCTAVE4
-
-    Compiled regular expression objects 
-
-    .. attribute:: OCTAVE5
-
-    Compiled regular expression objects 
-
-    .. attribute:: PRECTIE
-
-    Compiled regular expression objects 
-
-    .. attribute:: REST
-
-    Compiled regular expression objects 
-
-    .. attribute:: SHARP
-
-    Compiled regular expression objects 
-
-    .. attribute:: TIE
-
-    Compiled regular expression objects 
-
-    .. attribute:: TYPE
-
-    Compiled regular expression objects 
-
     **TinyNotationNote** **methods**
 
     .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
@@ -133,18 +63,6 @@ TinyNotationStream
     inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **TinyNotationStream** **attributes**
-
-    .. attribute:: ENDBRAC
-
-    Compiled regular expression objects 
-
-    .. attribute:: QUAD
-
-    Compiled regular expression objects 
-
-    .. attribute:: TRIP
-
-    Compiled regular expression objects 
 
     .. attribute:: stringRep
 
@@ -202,7 +120,7 @@ HarmonyStream
 
     **HarmonyStream** **attributes**
 
-    Attributes inherited from :class:`~music21.tinyNotation.TinyNotationStream`: :attr:`~music21.tinyNotation.TinyNotationStream.ENDBRAC`, :attr:`~music21.tinyNotation.TinyNotationStream.QUAD`, :attr:`~music21.tinyNotation.TinyNotationStream.TRIP`, :attr:`~music21.tinyNotation.TinyNotationStream.stringRep`
+    Attributes inherited from :class:`~music21.tinyNotation.TinyNotationStream`: :attr:`~music21.tinyNotation.TinyNotationStream.stringRep`
 
     Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -232,14 +150,6 @@ HarmonyNote
 
 
     inherits from: :class:`~music21.tinyNotation.TinyNotationNote`
-
-    **HarmonyNote** **attributes**
-
-    .. attribute:: HARMONY
-
-    Compiled regular expression objects 
-
-    Attributes inherited from :class:`~music21.tinyNotation.TinyNotationNote`: :attr:`~music21.tinyNotation.TinyNotationNote.DBLDOT`, :attr:`~music21.tinyNotation.TinyNotationNote.DOT`, :attr:`~music21.tinyNotation.TinyNotationNote.EDFLAT`, :attr:`~music21.tinyNotation.TinyNotationNote.EDNAT`, :attr:`~music21.tinyNotation.TinyNotationNote.EDSHARP`, :attr:`~music21.tinyNotation.TinyNotationNote.FLAT`, :attr:`~music21.tinyNotation.TinyNotationNote.ID_EL`, :attr:`~music21.tinyNotation.TinyNotationNote.LYRIC`, :attr:`~music21.tinyNotation.TinyNotationNote.OCTAVE2`, :attr:`~music21.tinyNotation.TinyNotationNote.OCTAVE3`, :attr:`~music21.tinyNotation.TinyNotationNote.OCTAVE4`, :attr:`~music21.tinyNotation.TinyNotationNote.OCTAVE5`, :attr:`~music21.tinyNotation.TinyNotationNote.PRECTIE`, :attr:`~music21.tinyNotation.TinyNotationNote.REST`, :attr:`~music21.tinyNotation.TinyNotationNote.SHARP`, :attr:`~music21.tinyNotation.TinyNotationNote.TIE`, :attr:`~music21.tinyNotation.TinyNotationNote.TYPE`
 
     **HarmonyNote** **methods**
 
