@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview: Streams, Scores, Measures &mdash; music21 v0.2.4a1 documentation</title>
+    <title>Overview: Streams, Scores, Parts, and Measures &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
-    <link rel="next" title="Overview: File and Data Formats" href="overviewFormats.html" />
+    <link rel="next" title="Overview: File and Data Formats, Input, and Output" href="overviewFormats.html" />
     <link rel="prev" title="Overview: Notes and Pitches" href="overviewNotes.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+          <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="overviewNotes.html" title="Overview: Notes and Pitches"
@@ -47,9 +47,11 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Overview: Streams, Scores, Measures</a><ul>
-<li><a class="reference external" href="#hierarchically-nested-and-flat-streams">Hierarchically Nested and Flat Streams</a></li>
-<li><a class="reference external" href="#streams">Streams</a></li>
+<li><a class="reference external" href="">Overview: Streams, Scores, Parts, and Measures</a><ul>
+<li><a class="reference external" href="#appending-and-inserting-objects-into-streams">Appending and Inserting Objects into Streams</a></li>
+<li><a class="reference external" href="#getting-and-accessing-objects-froms-streams">Getting and Accessing Objects froms Streams</a></li>
+<li><a class="reference external" href="#viewing-and-visualizing-streams">Viewing and Visualizing Streams</a></li>
+<li><a class="reference external" href="#accessing-hierarchically-nested-and-flat-streams">Accessing Hierarchically Nested and Flat Streams</a></li>
 </ul>
 </li>
 </ul>
@@ -59,7 +61,7 @@
                                   title="previous chapter">Overview: Notes and Pitches</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="overviewFormats.html"
-                                  title="next chapter">Overview: File and Data Formats</a></p>
+                                  title="next chapter">Overview: File and Data Formats, Input, and Output</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/overviewStreams.txt"
@@ -86,17 +88,25 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="overview-streams-scores-measures">
-<span id="overviewstreams"></span><h1>Overview: Streams, Scores, Measures<a class="headerlink" href="#overview-streams-scores-measures" title="Permalink to this headline">¶</a></h1>
-<p>Streams are the fundamental container of music21 objects.</p>
-<p>For complete documentation on strams, see <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>.</p>
-<p>(See <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> for basic configuraton information; see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete information on configuring your <a title="music21.environment.Environment" class="reference external" href="moduleEnvironment.html#music21.environment.Environment"><tt class="xref docutils literal"><span class="pre">Environment</span></tt></a>.).</p>
-<div class="section" id="hierarchically-nested-and-flat-streams">
-<h2>Hierarchically Nested and Flat Streams<a class="headerlink" href="#hierarchically-nested-and-flat-streams" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="overview-streams-scores-parts-and-measures">
+<span id="overviewstreams"></span><h1>Overview: Streams, Scores, Parts, and Measures<a class="headerlink" href="#overview-streams-scores-parts-and-measures" title="Permalink to this headline">¶</a></h1>
+<p>The <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> object and its many subclasses offer the fundamental container of music21 objects. As a container like a Python list (or an array in some languages), a Stream can be used to hold objects. These objects can be ordered in more than one way, or treated as an unordered collection. Objects stored in a Stream can be spaced in time; each stored object can have an offset from the beginning of the Stream. Streams, further, can store and offset other Streams, permitting a wide variety of nested, ordered, and timed structures.</p>
+<p>Commonly used subclasses of Streams include the <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a>, and <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a>. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to wide variety of tools for extracting, processing, and manipulating objects on the Stream.</p>
+<p>A critical feature of music21&#8217;s design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> Streams contained in a <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> Stream. If we extract a region of this Part (using the <a title="music21.stream.Stream.getMeasureRange" class="reference external" href="moduleStream.html#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously made to Measures in the source Part.</p>
+<p>This overview will illustrate key features of music21&#8217;s Stream. For complete documentation on Streams, see <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>.</p>
+<div class="section" id="appending-and-inserting-objects-into-streams">
+<h2>Appending and Inserting Objects into Streams<a class="headerlink" href="#appending-and-inserting-objects-into-streams" title="Permalink to this headline">¶</a></h2>
 <p>Streams provide a way to structure and position music21 objects both hierarchically and temporally.</p>
 </div>
-<div class="section" id="streams">
-<h2>Streams<a class="headerlink" href="#streams" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getting-and-accessing-objects-froms-streams">
+<h2>Getting and Accessing Objects froms Streams<a class="headerlink" href="#getting-and-accessing-objects-froms-streams" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="viewing-and-visualizing-streams">
+<h2>Viewing and Visualizing Streams<a class="headerlink" href="#viewing-and-visualizing-streams" title="Permalink to this headline">¶</a></h2>
+<p>(See <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> for basic configuraton information; see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete information on configuring your <a title="music21.environment.Environment" class="reference external" href="moduleEnvironment.html#music21.environment.Environment"><tt class="xref docutils literal"><span class="pre">Environment</span></tt></a>.).</p>
+</div>
+<div class="section" id="accessing-hierarchically-nested-and-flat-streams">
+<h2>Accessing Hierarchically Nested and Flat Streams<a class="headerlink" href="#accessing-hierarchically-nested-and-flat-streams" title="Permalink to this headline">¶</a></h2>
 <p>Streams provide a way to structure and position music21 objects both hierarchically and temporally.</p>
 </div>
 </div>
@@ -117,7 +127,7 @@
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+          <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              >next</a> |</li>
         <li class="right" >
           <a href="overviewNotes.html" title="Overview: Notes and Pitches"

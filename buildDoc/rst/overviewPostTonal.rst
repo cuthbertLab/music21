@@ -6,7 +6,7 @@ Overview: Post-Tonal Tools
 
 The music21 toolkit features many tools for analyzing and creating music within a post-tonal context. A :class:`~music21.chord.Chord` can be identified as a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and many other anaytical tools are available. 
 
-For complete documentation on post-tonal tools, see the many methods in :class:`~music21.chord.Chord` as well as the objects in :ref:`moduleSerial`, such as :class:`~music21.serial.TwelveToneMatrix`, :class:`~music21.serial.TwelveToneRow`, and the many twelve tone rows defined in :attr:`~music21.serial.vienneseRows`.
+This overview will illustrate key features of music21's post tonal tools. For complete documentation on post-tonal tools, see the many methods in :class:`~music21.chord.Chord` as well as the objects in :ref:`moduleSerial`, such as :class:`~music21.serial.TwelveToneMatrix`, :class:`~music21.serial.TwelveToneRow`, and the many twelve tone rows defined in :attr:`~music21.serial.vienneseRows`.
 
 
 Pitches as Pitch Classes

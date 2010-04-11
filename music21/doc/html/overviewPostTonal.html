@@ -21,8 +21,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
-    <link rel="next" title="Examples" href="examples.html" />
-    <link rel="prev" title="Overview: File and Data Formats" href="overviewFormats.html" /> 
+    <link rel="next" title="Examples and Demonstrations" href="examples.html" />
+    <link rel="prev" title="Overview: File and Data Formats, Input, and Output" href="overviewFormats.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,10 +35,10 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="Examples"
+          <a href="examples.html" title="Examples and Demonstrations"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+          <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
@@ -50,17 +50,17 @@
 <li><a class="reference external" href="">Overview: Post-Tonal Tools</a><ul>
 <li><a class="reference external" href="#pitches-as-pitch-classes">Pitches as Pitch Classes</a></li>
 <li><a class="reference external" href="#chords-as-forte-set-classes">Chords as Forte Set Classes</a></li>
-<li><a class="reference external" href="#twelve-tone-matrices-and-processing">Twelve-Tone Matrices and Processing</a></li>
+<li><a class="reference external" href="#creating-and-processing-twelve-tone-matrices">Creating and Processing Twelve-Tone Matrices</a></li>
 </ul>
 </li>
 </ul>
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="overviewFormats.html"
-                                  title="previous chapter">Overview: File and Data Formats</a></p>
+                                  title="previous chapter">Overview: File and Data Formats, Input, and Output</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="examples.html"
-                                  title="next chapter">Examples</a></p>
+                                  title="next chapter">Examples and Demonstrations</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/overviewPostTonal.txt"
@@ -90,7 +90,7 @@
   <div class="section" id="overview-post-tonal-tools">
 <span id="overviewposttonal"></span><h1>Overview: Post-Tonal Tools<a class="headerlink" href="#overview-post-tonal-tools" title="Permalink to this headline">¶</a></h1>
 <p>The music21 toolkit features many tools for analyzing and creating music within a post-tonal context. A <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> can be identified as a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and many other anaytical tools are available.</p>
-<p>For complete documentation on post-tonal tools, see the many methods in <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> as well as the objects in <a class="reference external" href="moduleSerial.html#moduleserial"><em>music21.serial</em></a>, such as <a title="music21.serial.TwelveToneMatrix" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a>, <a title="music21.serial.TwelveToneRow" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneRow"><tt class="xref docutils literal"><span class="pre">TwelveToneRow</span></tt></a>, and the many twelve tone rows defined in <tt class="xref docutils literal"><span class="pre">vienneseRows</span></tt>.</p>
+<p>This overview will illustrate key features of music21&#8217;s post tonal tools. For complete documentation on post-tonal tools, see the many methods in <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> as well as the objects in <a class="reference external" href="moduleSerial.html#moduleserial"><em>music21.serial</em></a>, such as <a title="music21.serial.TwelveToneMatrix" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a>, <a title="music21.serial.TwelveToneRow" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneRow"><tt class="xref docutils literal"><span class="pre">TwelveToneRow</span></tt></a>, and the many twelve tone rows defined in <tt class="xref docutils literal"><span class="pre">vienneseRows</span></tt>.</p>
 <div class="section" id="pitches-as-pitch-classes">
 <h2>Pitches as Pitch Classes<a class="headerlink" href="#pitches-as-pitch-classes" title="Permalink to this headline">¶</a></h2>
 <p>Any music21 <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a>, or a  <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> containing Pitch, can be expressed as pitch class integers using the <a title="music21.pitch.Pitch.pitchClass" class="reference external" href="modulePitch.html#music21.pitch.Pitch.pitchClass"><tt class="xref docutils literal"><span class="pre">pitchClass</span></tt></a> and <a title="music21.pitch.Pitch.pitchClassString" class="reference external" href="modulePitch.html#music21.pitch.Pitch.pitchClassString"><tt class="xref docutils literal"><span class="pre">pitchClassString</span></tt></a> properties.</p>
@@ -188,8 +188,8 @@
 </div>
 <img alt="_images/overviewPostTonal-04.png" src="_images/overviewPostTonal-04.png" style="width: 600px;" />
 </div>
-<div class="section" id="twelve-tone-matrices-and-processing">
-<h2>Twelve-Tone Matrices and Processing<a class="headerlink" href="#twelve-tone-matrices-and-processing" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-and-processing-twelve-tone-matrices">
+<h2>Creating and Processing Twelve-Tone Matrices<a class="headerlink" href="#creating-and-processing-twelve-tone-matrices" title="Permalink to this headline">¶</a></h2>
 <p>The music21 <a class="reference external" href="moduleSerial.html#moduleserial"><em>music21.serial</em></a> module provides a Stream-based representation of a 12-Tone row, as well as the ability to view these rows as a matrix. Additionally, numerous 12-tone rows from works are available as classes.</p>
 <p>For example, we can create an instance of the row from Alban Berg&#8217;s <em>Violin Concerto</em>, use the show() method to display its contents as text, and then create and print a <a title="music21.serial.TwelveToneMatrix" class="reference external" href="moduleSerial.html#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a> object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">serial</span>
@@ -253,10 +253,10 @@
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="Examples"
+          <a href="examples.html" title="Examples and Demonstrations"
              >next</a> |</li>
         <li class="right" >
-          <a href="overviewFormats.html" title="Overview: File and Data Formats"
+          <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Examples &mdash; music21 v0.2.4a1 documentation</title>
+    <title>Examples and Demonstrations &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -47,10 +47,8 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Examples</a><ul>
-<li><a class="reference external" href="#some-simple-ideas-to-get-started">Some simple ideas to get started</a></li>
-<li><a class="reference external" href="#style-analysis">Style Analysis</a></li>
-<li><a class="reference external" href="#statistical-processing">Statistical Processing</a></li>
+<li><a class="reference external" href="">Examples and Demonstrations</a><ul>
+<li><a class="reference external" href="#counting-searching-and-statistical-processing">Counting, Searching, and Statistical Processing</a></li>
 </ul>
 </li>
 </ul>
@@ -87,49 +85,79 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="examples">
-<span id="id1"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="some-simple-ideas-to-get-started">
-<h2>Some simple ideas to get started<a class="headerlink" href="#some-simple-ideas-to-get-started" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="examples-and-demonstrations">
+<span id="examples"></span><h1>Examples and Demonstrations<a class="headerlink" href="#examples-and-demonstrations" title="Permalink to this headline">¶</a></h1>
+<p>The following examples provide a few samples of some of the possibilites available when working with music21.</p>
+<div class="section" id="counting-searching-and-statistical-processing">
+<h2>Counting, Searching, and Statistical Processing<a class="headerlink" href="#counting-searching-and-statistical-processing" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p class="first">Load a musicxml file and count the number of G#&#8217;s in it:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="n">chopinScore</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;mazurka6.xml&quot;</span><span class="p">)</span>
+<span class="n">aScore</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&quot;bach/bwv30.6&quot;</span><span class="p">)</span>
 
-<span class="c">## a flat representation puts all notes, dynamics, etc.</span>
-<span class="c">## from all parts into one giant data stream</span>
-<span class="n">chopinFlat</span> <span class="o">=</span> <span class="n">chopinScore</span><span class="o">.</span><span class="n">flat</span>
-<span class="n">pitches</span> <span class="o">=</span> <span class="n">chopinFlat</span><span class="o">.</span><span class="n">getPitches</span><span class="p">()</span>
+<span class="c"># the getPitches() method will get all Pitch objects from all contained</span>
+<span class="c"># Streams and Stream subclasses recursively</span>
+
+<span class="n">pitches</span> <span class="o">=</span> <span class="n">aScore</span><span class="o">.</span><span class="n">getPitches</span><span class="p">()</span>
 
 <span class="n">totalGSharps</span> <span class="o">=</span> <span class="mf">0</span>
-<span class="k">for</span> <span class="n">thisPitch</span> <span class="ow">in</span> <span class="n">pitches</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">thisPitch</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;G#&#39;</span><span class="p">:</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pitches</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;G#&#39;</span><span class="p">:</span>
         <span class="n">totalGSharps</span> <span class="o">+=</span> <span class="mf">1</span>
 
-<span class="k">print</span> <span class="n">totalGSharps</span>
+<span class="k">print</span> <span class="n">totalGSharps</span> <span class="c"># returns 28</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">This example searches a Part for a particular chord formation, a dominant seventh, expressed melodically:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">op133</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;beethoven/opus133.xml&#39;</span><span class="p">)</span>
+<span class="n">violin2</span> <span class="o">=</span> <span class="n">op133</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;2nd Violin&#39;</span><span class="p">)</span>
+
+<span class="c"># an empty container for later display</span>
+<span class="n">display</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">thisMeasure</span> <span class="ow">in</span> <span class="n">violin2</span><span class="o">.</span><span class="n">measures</span><span class="p">:</span>
+
+    <span class="c"># get a list of consecutive notes, skipping unisons, octaves,</span>
+    <span class="c"># and rests (and putting nothing in their places)</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">thisMeasure</span><span class="o">.</span><span class="n">findConsecutiveNotes</span><span class="p">(</span>
+    <span class="n">skipUnisons</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">skipOctaves</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">skipRests</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">noNone</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+
+    <span class="n">pitches</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">(</span><span class="n">notes</span><span class="p">)</span><span class="o">.</span><span class="n">pitches</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pitches</span><span class="p">)</span> <span class="o">-</span> <span class="mf">3</span><span class="p">):</span>
+        <span class="c"># makes every set of 4 notes into a whole-note chord</span>
+        <span class="n">testChord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">(</span><span class="n">pitches</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mf">4</span><span class="p">])</span>
+        <span class="n">testChord</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
+
+        <span class="k">if</span> <span class="n">testChord</span><span class="o">.</span><span class="n">isDominantSeventh</span><span class="p">():</span>
+            <span class="c"># A dominant-seventh chord was found in this measure.</span>
+            <span class="c"># We label the chord with the measure number</span>
+            <span class="c"># and the first note of the measure with the Forte Prime form</span>
+
+            <span class="n">testChord</span><span class="o">.</span><span class="n">lyric</span> <span class="o">=</span> <span class="s">&quot;m. &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">thisMeasure</span><span class="o">.</span><span class="n">measureNumber</span><span class="p">)</span>
+
+            <span class="n">primeForm</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">(</span><span class="n">thisMeasure</span><span class="o">.</span><span class="n">pitches</span><span class="p">)</span><span class="o">.</span><span class="n">primeFormString</span>
+            <span class="n">firstNote</span> <span class="o">=</span> <span class="n">thisMeasure</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+            <span class="n">firstNote</span><span class="o">.</span><span class="n">lyric</span> <span class="o">=</span> <span class="n">primeForm</span>
+
+            <span class="c"># Thus we append the chord in closed position and  then</span>
+            <span class="c"># the measure containing the chord.</span>
+
+            <span class="n">chordMeasure</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Measure</span><span class="p">()</span>
+            <span class="n">chordMeasure</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">testChord</span><span class="o">.</span><span class="n">closedPosition</span><span class="p">())</span>
+            <span class="n">display</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chordMeasure</span><span class="p">)</span>
+            <span class="n">display</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thisMeasure</span><span class="p">)</span>
+
+<span class="n">display</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </li>
 </ol>
-</div>
-<div class="section" id="style-analysis">
-<h2>Style Analysis<a class="headerlink" href="#style-analysis" title="Permalink to this headline">¶</a></h2>
-<p>These are examples only to test syntax coloring.</p>
-<p>Create a note and process it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>There are many varieties of Note objects:</p>
-<div class="last highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">SimpleNote</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="statistical-processing">
-<h2>Statistical Processing<a class="headerlink" href="#statistical-processing" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/examples-01.png" src="_images/examples-01.png" style="width: 600px;" />
 </div>
 </div>
 

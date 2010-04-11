@@ -10,7 +10,7 @@ Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, 
 
 A critical feature of music21's design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous :class:`~music21.stream.Measure` Streams contained in a :class:`~music21.stream.Part` Stream. If we extract a region of this Part (using the :meth:`~music21.stream.Stream.getMeasureRange` method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously made to Measures in the source Part. 
 
-For complete documentation on Streams, see :ref:`moduleStream`.
+This overview will illustrate key features of music21's Stream. For complete documentation on Streams, see :ref:`moduleStream`.
 
 
 
