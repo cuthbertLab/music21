@@ -1115,7 +1115,7 @@ class Pitch(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _getDiatonicNoteNum(self):
         '''
-        Returns an int that uniquely identifies the note, ignoring accidentals.
+        Returns an integer that uniquely identifies the note, ignoring accidentals.
         The number returned is the diatonic interval above C0 (the lowest C on
         a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc.
         Numbers can be negative for very low notes.        
@@ -1148,11 +1148,11 @@ class Pitch(music21.Music21Object):
         else:
             raise PitchException("Could not find " + self.step + " in the index of notes") 
 
-    diatonicNoteNum = property(_getDiatonicNoteNum, \
-                               doc="Read-only property.\n" + \
-                                    _getDiatonicNoteNum.__doc__)
+    diatonicNoteNum = property(_getDiatonicNoteNum,
+        doc = _getDiatonicNoteNum.__doc__)
+        #Read-only property.\n"
 
-
+                                    
     def transpose(self, value, inPlace=False):
         '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 

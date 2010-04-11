@@ -58,33 +58,27 @@ Note
 
     .. attribute:: nameWithOctave
 
-    No documentation. 
+    Return or set the pitch name with octave from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.nameWithOctave`. 
 
     .. attribute:: pitchClass
 
-    Return pitch class 
-
-    >>> d = Note()
-    >>> d.pitch = Pitch('d-4')
-    >>> d.pitchClass
-    1 
-    >>>
+    Return or set the pitch class from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.pitchClass`. 
 
     .. attribute:: accidental
 
-    No documentation. 
+    Return or set the :class:`music21.pitch.Accidental` object from the :class:`music21.pitch.Pitch` object. 
 
     .. attribute:: diatonicNoteNum
 
-    see Pitch.diatonicNoteNum 
+    Return the diatonic note number from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.diatonicNoteNum`. 
 
     .. attribute:: freq440
 
-    No documentation. 
+    Return or set the freq440 value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.freq440`. 
 
     .. attribute:: frequency
 
-    No documentation. 
+    Return or set the frequency from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.frequency`. 
 
     .. attribute:: lily
 
@@ -92,12 +86,7 @@ Note
 
     .. attribute:: midi
 
-    Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
-
-    >>> a = Note()
-    >>> a.pitch = Pitch('d-4')
-    >>> a.midi
-    61 
+    Return or set the numerical MIDI pitch representation from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.midi`. 
 
     .. attribute:: mx
 
@@ -109,31 +98,19 @@ Note
 
     .. attribute:: octave
 
-    No documentation. 
+    Return or set the octave value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.octave`. 
 
     .. attribute:: pitchClassString
 
-    Return pitch class string, replacing 10 and 11 as needed. 
-
-    >>> d = Note()
-    >>> d.pitch = Pitch('b')
-    >>> d.pitchClassString
-    'B' 
+    Return or set the pitch class string from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.pitchClassString`. 
 
     .. attribute:: ps
 
-    Returns the note's midi number. C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69 
-
-    >>> a = Note()
-    >>> a.ps = 60.5
-    >>> a.midi
-    61 
-    >>> a.ps
-    60.5 
+    Return or set the numerical pitch space representation from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.ps`. 
 
     .. attribute:: step
 
-    No documentation. 
+    Return or set the pitch step from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.step`. 
 
     Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
@@ -143,7 +120,7 @@ Note
 
     .. method:: setAccidental(accidental)
 
-    No documentation. 
+    This method is obsolete: use the `accidental` property instead. 
 
     .. method:: transpose(value, inPlace=False)
 
