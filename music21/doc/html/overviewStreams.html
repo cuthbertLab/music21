@@ -50,9 +50,10 @@
 <li><a class="reference external" href="">Overview: Streams, Scores, Parts, and Measures</a><ul>
 <li><a class="reference external" href="#appending-and-inserting-objects-into-streams">Appending and Inserting Objects into Streams</a></li>
 <li><a class="reference external" href="#accessing-stream-elements-by-iteration-and-index">Accessing Stream Elements by Iteration and Index</a></li>
-<li><a class="reference external" href="#accessing-stream-elements-by-class-and-identifiers">Accessing Stream Elements by Class and Identifiers</a></li>
-<li><a class="reference external" href="#visualizing-streams-in-plots">Visualizing Streams in Plots</a></li>
+<li><a class="reference external" href="#accessing-stream-elements-by-class-and-offset">Accessing Stream Elements by Class and Offset</a></li>
+<li><a class="reference external" href="#accessing-stream-elements-by-group-and-identifiers">Accessing Stream Elements by Group and Identifiers</a></li>
 <li><a class="reference external" href="#nested-and-flat-streams">Nested and Flat Streams</a></li>
+<li><a class="reference external" href="#visualizing-streams-in-plots">Visualizing Streams in Plots</a></li>
 </ul>
 </li>
 </ul>
@@ -245,16 +246,84 @@
 </div>
 <p>The index for <cite>n3</cite> cannot be obtained because the <a title="music21.stream.Stream.repeatAppend" class="reference external" href="moduleStream.html#music21.stream.Stream.repeatAppend"><tt class="xref docutils literal"><span class="pre">repeatAppend()</span></tt></a> method makes independent copies (deep copies) of the object provided as an argument. Thus, only copies of <cite>n3</cite>, not references to <cite>n3</cite>, are stored on the Stream. There are, of course, other ways to find these Notes.</p>
 </div>
-<div class="section" id="accessing-stream-elements-by-class-and-identifiers">
-<h2>Accessing Stream Elements by Class and Identifiers<a class="headerlink" href="#accessing-stream-elements-by-class-and-identifiers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="accessing-stream-elements-by-class-and-offset">
+<h2>Accessing Stream Elements by Class and Offset<a class="headerlink" href="#accessing-stream-elements-by-class-and-offset" title="Permalink to this headline">¶</a></h2>
+<p>We often need to gather elements form a Stream based on criteria other than the index position of the element. We can gather elements based on the class (object type) of the element, but offset range, or by specific identifiers attached to the element. As before, gathering elements from a Stream will often return a new Stream with references to the collected elements.</p>
+<p>Gathering elements from a Stream based on the class of the element provides a way to filter the Stream for desired types of objects. The <a title="music21.stream.Stream.getElementsByClass" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementsByClass"><tt class="xref docutils literal"><span class="pre">getElementsByClass()</span></tt></a> method returns a Stream of elements that are instances or subclasses of the provided classes. The example below gathers all <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects and then all <a title="music21.note.Rest" class="reference external" href="moduleNote.html#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">Rest</span></tt></a> objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">{2.0} &lt;music21.note.Note F#&gt;</span>
+<span class="go">{2.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{2.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.0} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.25} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{4.5} &lt;music21.note.Note B&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="visualizing-streams-in-plots">
-<h2>Visualizing Streams in Plots<a class="headerlink" href="#visualizing-streams-in-plots" title="Permalink to this headline">¶</a></h2>
-<p>While the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method provides valuable output a visual plot a Stream&#8217;s elements is very useful.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{4.0} &lt;music21.note.Rest rest&gt;</span>
+</pre></div>
+</div>
+<p>A number of properties available with Stream instances make getting specific object classes from a Stream easier. The <a title="music21.stream.Stream.notes" class="reference external" href="moduleStream.html#music21.stream.Stream.notes"><tt class="xref docutils literal"><span class="pre">notes</span></tt></a> property returns more than just Note objects; all subclasses of <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a> and <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> are returned in a Stream. This property is very useful for stripping Note-like objects from notational elements such as <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> and <tt class="xref docutils literal"><span class="pre">Clef</span></tt> objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">notes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sOut</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Similarly, the <a title="music21.stream.Stream.pitches" class="reference external" href="moduleStream.html#music21.stream.Stream.pitches"><tt class="xref docutils literal"><span class="pre">pitches</span></tt></a> property returns all Pitch objects. Pitch objects, however, are not subclasses of <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>; they do not have Duration objects or offsets, and are thus are returned in a Python list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">listOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pitches</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">listOut</span><span class="p">)</span>
+<span class="go">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">listOut</span>
+<span class="go">[E4, F#, D#5, D#5, D#5, D#5, D#5, D#5, B5]</span>
+</pre></div>
+</div>
+<p>Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced.</p>
+<p>The <a title="music21.stream.Stream.getElementsByOffset" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementsByOffset"><tt class="xref docutils literal"><span class="pre">getElementsByOffset()</span></tt></a> returns a Stream of all elements that fall either at a single offset or within a range of two offsets provided as an argument. In both cases a Stream is returned.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sOut</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;music21.note.Note D#&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sOut</span><span class="p">)</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{3.0} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.25} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{4.0} &lt;music21.note.Rest rest&gt;</span>
+</pre></div>
+</div>
+<p>In the last example, Note and Rest objects are returned within the offset range. If wanted to only gather the Note objects found in this range, we could first use the <a title="music21.stream.Stream.getElementsByOffset" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementsByOffset"><tt class="xref docutils literal"><span class="pre">getElementsByOffset()</span></tt></a> and then use the <a title="music21.stream.Stream.getElementsByClass" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementsByClass"><tt class="xref docutils literal"><span class="pre">getElementsByClass()</span></tt></a> method. As both methods return Streams, chained method calls are possible and idiomatic.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getElementsByOffset</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sOut</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{3.0} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.25} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.75} &lt;music21.note.Note D#&gt;</span>
+</pre></div>
+</div>
+<p>Numerous additional methods permit gathering elements by offset values and positions. See <a title="music21.stream.Stream.getElementAtOrBefore" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementAtOrBefore"><tt class="xref docutils literal"><span class="pre">getElementAtOrBefore()</span></tt></a> and  <a title="music21.stream.Stream.getElementAfterElement" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementAfterElement"><tt class="xref docutils literal"><span class="pre">getElementAfterElement()</span></tt></a> for more examples.</p>
+</div>
+<div class="section" id="accessing-stream-elements-by-group-and-identifiers">
+<h2>Accessing Stream Elements by Group and Identifiers<a class="headerlink" href="#accessing-stream-elements-by-group-and-identifiers" title="Permalink to this headline">¶</a></h2>
+<p>All <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> subclasses have attributes for <cite>id</cite> and <cite>group</cite>.</p>
 </div>
 <div class="section" id="nested-and-flat-streams">
 <h2>Nested and Flat Streams<a class="headerlink" href="#nested-and-flat-streams" title="Permalink to this headline">¶</a></h2>
 <p>Streams provide a way to structure and position music21 objects both hierarchically and temporally. Frequently, a Stream is placed within a Stream.</p>
+</div>
+<div class="section" id="visualizing-streams-in-plots">
+<h2>Visualizing Streams in Plots<a class="headerlink" href="#visualizing-streams-in-plots" title="Permalink to this headline">¶</a></h2>
+<p>While the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method provides valuable output a visual plot a Stream&#8217;s elements is very useful.</p>
 </div>
 </div>
 

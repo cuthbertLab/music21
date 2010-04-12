@@ -184,18 +184,81 @@ The index for `n3` cannot be obtained because the :meth:`~music21.stream.Stream.
 
 
 
-Accessing Stream Elements by Class and Identifiers
----------------------------------------------------
+Accessing Stream Elements by Class and Offset
+-----------------------------------------------------------
+
+We often need to gather elements form a Stream based on criteria other than the index position of the element. We can gather elements based on the class (object type) of the element, but offset range, or by specific identifiers attached to the element. As before, gathering elements from a Stream will often return a new Stream with references to the collected elements.
+
+Gathering elements from a Stream based on the class of the element provides a way to filter the Stream for desired types of objects. The :meth:`~music21.stream.Stream.getElementsByClass` method returns a Stream of elements that are instances or subclasses of the provided classes. The example below gathers all :class:`~music21.note.Note` objects and then all :class:`~music21.note.Rest` objects.
+
+>>> sOut = s.getElementsByClass(note.Note)
+>>> sOut.show('text')
+{0.0} <music21.note.Note E>
+{2.0} <music21.note.Note F#>
+{2.5} <music21.note.Note D#>
+{2.75} <music21.note.Note D#>
+{3.0} <music21.note.Note D#>
+{3.25} <music21.note.Note D#>
+{3.5} <music21.note.Note D#>
+{3.75} <music21.note.Note D#>
+{4.5} <music21.note.Note B>
+
+>>> sOut = s.getElementsByClass(note.Rest)
+>>> sOut.show('text')
+{4.0} <music21.note.Rest rest>
+
+A number of properties available with Stream instances make getting specific object classes from a Stream easier. The :attr:`~music21.stream.Stream.notes` property returns more than just Note objects; all subclasses of :class:`~music21.note.GeneralNote` and :class:`~music21.chord.Chord` are returned in a Stream. This property is very useful for stripping Note-like objects from notational elements such as :class:`~music21.meter.TimeSignature` and :class:`~music21.meter.Clef` objects. 
+
+>>> sOut = s.notes
+>>> len(sOut) == len(s)
+True
+
+Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch objects. Pitch objects, however, are not subclasses of :class:`~music21.base.Music21Object`; they do not have Duration objects or offsets, and are thus are returned in a Python list.
+
+>>> listOut = s.pitches
+>>> len(listOut)
+9
+>>> listOut
+[E4, F#, D#5, D#5, D#5, D#5, D#5, D#5, B5]
+
+Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced. 
+
+The :meth:`~music21.stream.Stream.getElementsByOffset` returns a Stream of all elements that fall either at a single offset or within a range of two offsets provided as an argument. In both cases a Stream is returned.
+
+>>> sOut = s.getElementsByOffset(3)
+>>> len(sOut)
+1
+>>> sOut[0]
+<music21.note.Note D#>
+
+>>> sOut = s.getElementsByOffset(3, 4)
+>>> len(sOut)
+5
+>>> sOut.show('text')
+{3.0} <music21.note.Note D#>
+{3.25} <music21.note.Note D#>
+{3.5} <music21.note.Note D#>
+{3.75} <music21.note.Note D#>
+{4.0} <music21.note.Rest rest>
+
+In the last example, Note and Rest objects are returned within the offset range. If wanted to only gather the Note objects found in this range, we could first use the :meth:`~music21.stream.Stream.getElementsByOffset` and then use the :meth:`~music21.stream.Stream.getElementsByClass` method. As both methods return Streams, chained method calls are possible and idiomatic.
+
+>>> sOut = s.getElementsByOffset(3, 4).getElementsByClass(note.Note)
+>>> sOut.show('text')
+{3.0} <music21.note.Note D#>
+{3.25} <music21.note.Note D#>
+{3.5} <music21.note.Note D#>
+{3.75} <music21.note.Note D#>
+
+Numerous additional methods permit gathering elements by offset values and positions. See :meth:`~music21.stream.Stream.getElementAtOrBefore` and  :meth:`~music21.stream.Stream.getElementAfterElement` for more examples.
 
 
 
 
+Accessing Stream Elements by Group and Identifiers
+-----------------------------------------------------------
 
-
-Visualizing Streams in Plots
----------------------------------------------
-
-While the :meth:`~music21.stream.Stream.show` method provides valuable output a visual plot a Stream's elements is very useful. 
+All :class:`~music21.base.Music21Object` subclasses have attributes for `id` and `group`. 
 
 
 
@@ -207,6 +270,15 @@ Nested and Flat Streams
 Streams provide a way to structure and position music21 objects both hierarchically and temporally. Frequently, a Stream is placed within a Stream. 
 
 
+
+
+
+
+
+Visualizing Streams in Plots
+---------------------------------------------
+
+While the :meth:`~music21.stream.Stream.show` method provides valuable output a visual plot a Stream's elements is very useful. 
 
 
 

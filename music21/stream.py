@@ -880,7 +880,7 @@ class Stream(music21.Music21Object):
         >>> len(found)
         25
         '''
-        ## should probably be whatever class the caller is
+        # should probably be whatever class the caller is
         found = Stream()
 
         # much faster in the most common case than calling common.isListLike
