@@ -280,7 +280,9 @@ class Stream(music21.Music21Object):
         self._elementsChanged()
         return value
         
-    elements = property(_getElements, _setElements)
+    elements = property(_getElements, _setElements, 
+        doc='''The low-level storage list of all Streams. Directly getting, setting, and manipulating this list is reserved for advanced usage. 
+        ''')
 
     def __setitem__(self, key, value):
         '''Insert items at index positions. Index positions are based
@@ -1974,6 +1976,7 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: rename fillRests() or something else.
+        TODO: if inPlace == True, this should return None
         '''
         #environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
@@ -2668,9 +2671,6 @@ class Stream(music21.Music21Object):
 
         The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.
         ''')
-
-
-
 
     
     def _getLowestOffset(self):

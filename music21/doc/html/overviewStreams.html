@@ -49,9 +49,9 @@
             <ul>
 <li><a class="reference external" href="">Overview: Streams, Scores, Parts, and Measures</a><ul>
 <li><a class="reference external" href="#appending-and-inserting-objects-into-streams">Appending and Inserting Objects into Streams</a></li>
-<li><a class="reference external" href="#getting-and-accessing-objects-froms-streams">Getting and Accessing Objects froms Streams</a></li>
-<li><a class="reference external" href="#viewing-and-visualizing-streams">Viewing and Visualizing Streams</a></li>
-<li><a class="reference external" href="#accessing-hierarchically-nested-and-flat-streams">Accessing Hierarchically Nested and Flat Streams</a></li>
+<li><a class="reference external" href="#getting-and-accessing-objects-from-streams">Getting and Accessing Objects from Streams</a></li>
+<li><a class="reference external" href="#visualizing-streams-in-plots">Visualizing Streams in Plots</a></li>
+<li><a class="reference external" href="#nested-and-flat-streams">Nested and Flat Streams</a></li>
 </ul>
 </li>
 </ul>
@@ -92,11 +92,11 @@
 <span id="overviewstreams"></span><h1>Overview: Streams, Scores, Parts, and Measures<a class="headerlink" href="#overview-streams-scores-parts-and-measures" title="Permalink to this headline">¶</a></h1>
 <p>The <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> object and its many subclasses offer the fundamental container of music21 objects. As a container like a Python list (or an array in some languages), a Stream can be used to hold objects. These objects can be ordered in more than one way, or treated as an unordered collection. Objects stored in a Stream can be spaced in time; each stored object can have an offset from the beginning of the Stream. Streams, further, can store and offset other Streams, permitting a wide variety of nested, ordered, and timed structures.</p>
 <p>Commonly used subclasses of Streams include the <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a>, and <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a>. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to wide variety of tools for extracting, processing, and manipulating objects on the Stream.</p>
-<p>A critical feature of music21&#8217;s design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> Streams contained in a <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> Stream. If we extract a region of this Part (using the <a title="music21.stream.Stream.getMeasureRange" class="reference external" href="moduleStream.html#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously made to Measures in the source Part.</p>
+<p>A critical feature of music21&#8217;s design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> Streams contained in a <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> Stream. If we extract a region of this Part (using the <a title="music21.stream.Stream.getMeasureRange" class="reference external" href="moduleStream.html#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part.</p>
 <p>This overview will illustrate key features of music21&#8217;s Stream. For complete documentation on Streams, see <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>.</p>
 <div class="section" id="appending-and-inserting-objects-into-streams">
 <h2>Appending and Inserting Objects into Streams<a class="headerlink" href="#appending-and-inserting-objects-into-streams" title="Permalink to this headline">¶</a></h2>
-<p>Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time).</p>
+<p>Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time). Objects stored on lists are called elements, and must be either a <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> or an object contained within a <a title="music21.base.ElementWrapper" class="reference external" href="moduleBase.html#music21.base.ElementWrapper"><tt class="xref docutils literal"><span class="pre">ElementWrapper</span></tt></a>. Streams store their objects internally on a list called <a title="music21.stream.Stream.elements" class="reference external" href="moduleStream.html#music21.stream.Stream.elements"><tt class="xref docutils literal"><span class="pre">elements</span></tt></a>, though direct manipulation of this list is rarely needed.</p>
 <p>The most common application of Streams is as a place to store Notes. For an introduction to Notes, see <a class="reference external" href="overviewNotes.html#overviewnotes"><em>Overview: Pitches, Notes, and Durations</em></a>; for complete documentation on Notes, see <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>.</p>
 <p>Notes, like all Muisc21Objects, have a Duration object that describes the time span they occupy. The span of a Duration can be described in many ways, but a convenient measure is quarter lengths (QLs), or the number of whole or fractional quarter note durations. Notes, when placed in a Stream, also have an offset that describes their position. These offset values are also given in QLs.</p>
 <p>To begin, lets create an instance of a Stream and an instance of a Note. We can set the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object to represent an E, and we can set the <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> object to represent a half-note (2 QLs).</p>
@@ -109,17 +109,104 @@
 <span class="go">2.0</span>
 </pre></div>
 </div>
+<p>There is more than one way to place this Note in the Stream. A convenient way is with the Stream method <a title="music21.stream.Stream.append" class="reference external" href="moduleStream.html#music21.stream.Stream.append"><tt class="xref docutils literal"><span class="pre">append()</span></tt></a>. This is related to, but very different from, the <cite>append()</cite> method of Python lists. After using append, there are a number of ways to confirm that our Note is on the Stream. We can use the Python <cite>len()</cite> function to return the number of elements on the Stream. Alternatively, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method with the &#8216;text&#8217; or (assuming correct setup of your environment) the &#8216;musicxml&#8217; argument to return explicit notations. (See <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> for basic configuraton information; see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete information on configuring your <a title="music21.environment.Environment" class="reference external" href="moduleEnvironment.html#music21.environment.Environment"><tt class="xref docutils literal"><span class="pre">Environment</span></tt></a>.)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note E&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="getting-and-accessing-objects-froms-streams">
-<h2>Getting and Accessing Objects froms Streams<a class="headerlink" href="#getting-and-accessing-objects-froms-streams" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="viewing-and-visualizing-streams">
-<h2>Viewing and Visualizing Streams<a class="headerlink" href="#viewing-and-visualizing-streams" title="Permalink to this headline">¶</a></h2>
-<p>(See <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> for basic configuraton information; see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete information on configuring your <a title="music21.environment.Environment" class="reference external" href="moduleEnvironment.html#music21.environment.Environment"><tt class="xref docutils literal"><span class="pre">Environment</span></tt></a>.).</p>
+<img alt="_images/overviewStreams-01.png" src="_images/overviewStreams-01.png" style="width: 600px;" />
+<p>Every element on a Stream has an offset in that Stream (and possibly other Streams). In the last example, no offset was given with the <a title="music21.stream.Stream.append" class="reference external" href="moduleStream.html#music21.stream.Stream.append"><tt class="xref docutils literal"><span class="pre">append()</span></tt></a> method. This method automatically gets an offset for newly-appended objects based on the objects that are already on the Stream. Specifically, the object with the highest offset and combined duration. Generally, this is the next available offset after all current elements have sounded. Whenever we append, we are adding to the end.</p>
+<p>If we add another Note with <a title="music21.stream.Stream.append" class="reference external" href="moduleStream.html#music21.stream.Stream.append"><tt class="xref docutils literal"><span class="pre">append()</span></tt></a>, its offset will automatically be set to the end of the previously added Note.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;f#&#39;</span><span class="p">)</span> <span class="c"># we can supply a note name as an initial argument</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">5</span> <span class="c"># we can access some Duration attributes from Note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span><span class="o">.</span><span class="n">offset</span> <span class="c"># we can examine the Note&#39;s current offset</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">{2.0} &lt;music21.note.Note F#&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="accessing-hierarchically-nested-and-flat-streams">
-<h2>Accessing Hierarchically Nested and Flat Streams<a class="headerlink" href="#accessing-hierarchically-nested-and-flat-streams" title="Permalink to this headline">¶</a></h2>
-<p>Streams provide a way to structure and position music21 objects both hierarchically and temporally.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewStreams-02.png" src="_images/overviewStreams-02.png" style="width: 600px;" />
+<p>In addition to viewing the length of the Stream and the output provided by the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method, we can examine other properties of the Stream. Each Stream can return a Duration object, representing the Duration of the entire Stream. Similarly, we can look at the Stream&#8217;s <a title="music21.stream.Stream.highestTime" class="reference external" href="moduleStream.html#music21.stream.Stream.highestTime"><tt class="xref docutils literal"><span class="pre">highestTime</span></tt></a> property, which returns the QL value of the element with the largest combined offset and Duration. The <a title="music21.stream.Stream.lowestOffset" class="reference external" href="moduleStream.html#music21.stream.Stream.lowestOffset"><tt class="xref docutils literal"><span class="pre">lowestOffset</span></tt></a> property returns the minimum of all offsets for all elements on the Stream.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">2.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">lowestOffset</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+<p>We can add a number of independent, unique copies of the same Note with the Stream method <a title="music21.stream.Stream.repeatAppend" class="reference external" href="moduleStream.html#music21.stream.Stream.repeatAppend"><tt class="xref docutils literal"><span class="pre">repeatAppend()</span></tt></a>. This creates independent copies (using Python&#8217;s <cite>copy.deepcopy</cite> function) of the supplied object, not references. The user must supply an object to be copied and the number of times that object is to be repeatedly placed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;d#5&#39;</span><span class="p">)</span> <span class="c"># octave values can be included in creation arguments</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">25</span> <span class="c"># a sixteenth note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n3</span><span class="p">,</span> <span class="mf">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">highestTime</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">{2.0} &lt;music21.note.Note F#&gt;</span>
+<span class="go">{2.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{2.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.0} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.25} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.75} &lt;music21.note.Note D#&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewStreams-03.png" src="_images/overviewStreams-03.png" style="width: 600px;" />
+<p>As shown above, <a title="music21.stream.Stream.append" class="reference external" href="moduleStream.html#music21.stream.Stream.append"><tt class="xref docutils literal"><span class="pre">append()</span></tt></a> and <a title="music21.stream.Stream.repeatAppend" class="reference external" href="moduleStream.html#music21.stream.Stream.repeatAppend"><tt class="xref docutils literal"><span class="pre">repeatAppend()</span></tt></a>, automatically determine offset times for elements. To explicitly set the offset of an element when adding it to a Stream, the <a title="music21.stream.Stream.insert" class="reference external" href="moduleStream.html#music21.stream.Stream.insert"><tt class="xref docutils literal"><span class="pre">insert()</span></tt></a> method can be used. This method, given an offset, will place an object in the Stream at that offset.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n4</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;b5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n4</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="n">r1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="n">n4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">{2.0} &lt;music21.note.Note F#&gt;</span>
+<span class="go">{2.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{2.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.0} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.25} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.5} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{3.75} &lt;music21.note.Note D#&gt;</span>
+<span class="go">{4.0} &lt;music21.note.Rest rest&gt;</span>
+<span class="go">{4.5} &lt;music21.note.Note B&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewStreams-04.png" src="_images/overviewStreams-04.png" style="width: 600px;" />
+</div>
+<div class="section" id="getting-and-accessing-objects-from-streams">
+<h2>Getting and Accessing Objects from Streams<a class="headerlink" href="#getting-and-accessing-objects-from-streams" title="Permalink to this headline">¶</a></h2>
+<p>Just as there are many ways to add objects to Streams, there are many ways to get a Stream&#8217;s elements. Some of these approaches work like Python lists, using iteration or index numbers. Other approaches filters the Stream, selecting only the objects that match a certain class or tag.</p>
+</div>
+<div class="section" id="visualizing-streams-in-plots">
+<h2>Visualizing Streams in Plots<a class="headerlink" href="#visualizing-streams-in-plots" title="Permalink to this headline">¶</a></h2>
+<p>While the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method provides valuable output a visual plot a Stream&#8217;s elements is very useful.</p>
+</div>
+<div class="section" id="nested-and-flat-streams">
+<h2>Nested and Flat Streams<a class="headerlink" href="#nested-and-flat-streams" title="Permalink to this headline">¶</a></h2>
+<p>Streams provide a way to structure and position music21 objects both hierarchically and temporally. Frequently, a Stream is placed within a Stream.</p>
 </div>
 </div>
 

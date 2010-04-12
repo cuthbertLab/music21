@@ -79,7 +79,7 @@ Stream
 
     .. attribute:: elements
 
-    No documentation. 
+    The low-level storage list of all Streams. Directly getting, setting, and manipulating this list is reserved for advanced usage. 
 
     .. attribute:: flat
 
