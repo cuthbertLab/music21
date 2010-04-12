@@ -348,21 +348,21 @@ Scalar
 
     **Scalar** **attributes**
 
-    Attributes without Documentation: `valType`, `value`
+        Attributes without Documentation: `valType`, `value`
 
     **Scalar** **methods**
 
-    .. method:: toFloat()
+        .. method:: toFloat()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: toInt()
+        .. method:: toInt()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: toUnicode()
+        .. method:: toUnicode()
 
-    No documentation. 
+        No documentation. 
 
 
 Iterator
@@ -376,9 +376,9 @@ Iterator
 
     **Iterator** **methods**
 
-    .. method:: next()
+        .. method:: next()
 
-    No documentation. 
+        No documentation. 
 
 
 Timer
@@ -392,17 +392,17 @@ Timer
 
     **Timer** **methods**
 
-    .. method:: clear()
+        .. method:: clear()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: start()
+        .. method:: start()
 
-    Explicit start method; will clear previous values. Start always happens on initialization. 
+        Explicit start method; will clear previous values. Start always happens on initialization. 
 
-    .. method:: stop()
+        .. method:: stop()
 
-    No documentation. 
+        No documentation. 
 
 
 defHash
@@ -416,17 +416,17 @@ defHash
 
     **defHash** **attributes**
 
-    Attributes without Documentation: `default`, `callDefault`
+        Attributes without Documentation: `default`, `callDefault`
 
-    Attributes inherited from dict: :attr:`~__builtin__.dict.fromkeys`
+        Attributes inherited from dict: :attr:`~__builtin__.dict.fromkeys`
 
     **defHash** **methods**
 
-    .. method:: get(key, *args)
+        .. method:: get(key, *args)
 
-    No documentation. 
+        No documentation. 
 
-    Methods inherited from dict: :meth:`~__builtin__.dict.clear`, :meth:`~__builtin__.dict.copy`, :meth:`~__builtin__.dict.has_key`, :meth:`~__builtin__.dict.items`, :meth:`~__builtin__.dict.iteritems`, :meth:`~__builtin__.dict.iterkeys`, :meth:`~__builtin__.dict.itervalues`, :meth:`~__builtin__.dict.keys`, :meth:`~__builtin__.dict.pop`, :meth:`~__builtin__.dict.popitem`, :meth:`~__builtin__.dict.setdefault`, :meth:`~__builtin__.dict.update`, :meth:`~__builtin__.dict.values`
+        Methods inherited from dict: :meth:`~__builtin__.dict.clear`, :meth:`~__builtin__.dict.copy`, :meth:`~__builtin__.dict.has_key`, :meth:`~__builtin__.dict.items`, :meth:`~__builtin__.dict.iteritems`, :meth:`~__builtin__.dict.iterkeys`, :meth:`~__builtin__.dict.itervalues`, :meth:`~__builtin__.dict.keys`, :meth:`~__builtin__.dict.pop`, :meth:`~__builtin__.dict.popitem`, :meth:`~__builtin__.dict.setdefault`, :meth:`~__builtin__.dict.update`, :meth:`~__builtin__.dict.values`
 
 
 defList
@@ -440,10 +440,10 @@ defList
 
     **defList** **attributes**
 
-    Attributes without Documentation: `default`, `callDefault`
+        Attributes without Documentation: `default`, `callDefault`
 
     **defList** **methods**
 
-    Methods inherited from list: :meth:`~__builtin__.list.append`, :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
+        Methods inherited from list: :meth:`~__builtin__.list.append`, :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
 
 

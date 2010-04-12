@@ -24,41 +24,41 @@ NoteEditorial
 
     **NoteEditorial** **attributes**
 
-    .. attribute:: misc
+        .. attribute:: misc
 
-    A dict to hold anything you might like to store. 
+        A dict to hold anything you might like to store. 
 
-    Attributes without Documentation: `comment`, `ficta`, `melodicInterval`, `color`, `melodicIntervalOverRests`, `harmonicInterval`, `melodicIntervals`, `melodicIntervalsOverRests`
+        Attributes without Documentation: `comment`, `ficta`, `melodicInterval`, `color`, `melodicIntervalOverRests`, `harmonicInterval`, `melodicIntervals`, `melodicIntervalsOverRests`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 
     **NoteEditorial** **properties**
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **NoteEditorial** **methods**
 
-    .. method:: colorLilyStart()
+        .. method:: colorLilyStart()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: fictaLilyStart()
+        .. method:: fictaLilyStart()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: lilyAttached()
+        .. method:: lilyAttached()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: lilyEnd()
+        .. method:: lilyEnd()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: lilyStart()
+        .. method:: lilyStart()
 
-    No documentation. 
+        No documentation. 
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Comment
@@ -73,12 +73,12 @@ Comment
 
     **Comment** **attributes**
 
-    Attributes without Documentation: `position`, `text`
+        Attributes without Documentation: `position`, `text`
 
     **Comment** **properties**
 
-    .. attribute:: lily
+        .. attribute:: lily
 
-    No documentation. 
+        No documentation. 
 
 

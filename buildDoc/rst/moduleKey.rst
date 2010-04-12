@@ -46,51 +46,51 @@ KeySignature
 
     **KeySignature** **attributes**
 
-    Attributes without Documentation: `sharps`, `mode`, `alteredTones`
+        Attributes without Documentation: `sharps`, `mode`, `alteredTones`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **KeySignature** **properties**
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    Returns a musicxml.KeySignature object 
+        Returns a musicxml.KeySignature object 
 
-    >>> a = KeySignature(3)
-    >>> a.sharps = -3
-    >>> mxKey = a.mx
-    >>> mxKey.get('fifths')
-    -3 
+        >>> a = KeySignature(3)
+        >>> a.sharps = -3
+        >>> mxKey = a.mx
+        >>> mxKey.get('fifths')
+        -3 
 
-    .. attribute:: pitchAndMode
+        .. attribute:: pitchAndMode
 
-    Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
+        Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
 
-    >>> keyArray = [KeySignature(x) for x in range(-7,8)]
-    >>> keyArray[0].pitchAndMode
-    (C-, None) 
-    >>> keyArray[1].pitchAndMode
-    (G-, None) 
-    >>> keyArray[2].pitchAndMode
-    (D-, None) 
-    >>> keyArray[3].pitchAndMode
-    (A-, None) 
-    >>> keyArray[4].pitchAndMode
-    (E-, None) 
-    >>> keyArray[5].pitchAndMode
-    (B-, None) 
-    >>> keyArray[6].pitchAndMode
-    (F, None) 
-    >>> keyArray[7].pitchAndMode
-    (C, None) 
-    >>> keyArray[8].pitchAndMode
-    (G, None) 
+        >>> keyArray = [KeySignature(x) for x in range(-7,8)]
+        >>> keyArray[0].pitchAndMode
+        (C-, None) 
+        >>> keyArray[1].pitchAndMode
+        (G-, None) 
+        >>> keyArray[2].pitchAndMode
+        (D-, None) 
+        >>> keyArray[3].pitchAndMode
+        (A-, None) 
+        >>> keyArray[4].pitchAndMode
+        (E-, None) 
+        >>> keyArray[5].pitchAndMode
+        (B-, None) 
+        >>> keyArray[6].pitchAndMode
+        (F, None) 
+        >>> keyArray[7].pitchAndMode
+        (C, None) 
+        >>> keyArray[8].pitchAndMode
+        (G, None) 
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **KeySignature** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Key
@@ -104,24 +104,24 @@ Key
 
     **Key** **attributes**
 
-    Attributes without Documentation: `accidental`, `typeList`, `step`, `stepList`, `stream1`, `accidentalList`, `type`
+        Attributes without Documentation: `accidental`, `typeList`, `step`, `stepList`, `stream1`, `accidentalList`, `type`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 
     **Key** **properties**
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Key** **methods**
 
-    .. method:: generateKey()
+        .. method:: generateKey()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: setKey(name=C, accidental=None, type=major)
+        .. method:: setKey(name=C, accidental=None, type=major)
 
-    No documentation. 
+        No documentation. 
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

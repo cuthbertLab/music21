@@ -45,23 +45,23 @@ Converter
 
     **Converter** **properties**
 
-    .. attribute:: stream
+        .. attribute:: stream
 
-    No documentation. 
+        No documentation. 
 
     **Converter** **methods**
 
-    .. method:: parseData(dataStr)
+        .. method:: parseData(dataStr)
 
-    Given raw data, determine format and parse into a music21 Stream. 
+        Given raw data, determine format and parse into a music21 Stream. 
 
-    .. method:: parseFile(fp, forceSource=False)
+        .. method:: parseFile(fp, forceSource=False)
 
-    Given a file path, parse and store a music21 Stream. 
+        Given a file path, parse and store a music21 Stream. 
 
-    .. method:: parseURL(url)
+        .. method:: parseURL(url)
 
-    Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
+        Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
 
 
 ConverterMusicXML
@@ -74,27 +74,27 @@ ConverterMusicXML
 
     **ConverterMusicXML** **properties**
 
-    .. attribute:: stream
+        .. attribute:: stream
 
-    No documentation. 
+        No documentation. 
 
     **ConverterMusicXML** **methods**
 
-    .. method:: getPartNames()
+        .. method:: getPartNames()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: load()
+        .. method:: load()
 
-    Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
+        Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
 
-    .. method:: parseData(xmlString)
+        .. method:: parseData(xmlString)
 
-    Open MusicXML data from a string. 
+        Open MusicXML data from a string. 
 
-    .. method:: parseFile(fp)
+        .. method:: parseFile(fp)
 
-    Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
+        Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
 ConverterHumdrum
@@ -108,21 +108,21 @@ ConverterHumdrum
 
     **ConverterHumdrum** **attributes**
 
-    Attributes without Documentation: `stream`
+        Attributes without Documentation: `stream`
 
     **ConverterHumdrum** **methods**
 
-    .. method:: parseData(humdrumString)
+        .. method:: parseData(humdrumString)
 
-    Open Humdrum data from a string 
+        Open Humdrum data from a string 
 
-    >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
-    >>> c = ConverterHumdrum()
-    >>> s = c.parseData(humdata)
+        >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
+        >>> c = ConverterHumdrum()
+        >>> s = c.parseData(humdata)
 
-    .. method:: parseFile(filepath)
+        .. method:: parseFile(filepath)
 
-    Open Humdram data from a file path. 
+        Open Humdram data from a file path. 
 
 
 PickleFilter
@@ -138,9 +138,9 @@ PickleFilter
 
     **PickleFilter** **methods**
 
-    .. method:: status()
+        .. method:: status()
 
-    Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
+        Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
 
 
 StreamFreezer
@@ -153,16 +153,16 @@ StreamFreezer
 
     **StreamFreezer** **attributes**
 
-    Attributes without Documentation: `stream`
+        Attributes without Documentation: `stream`
 
     **StreamFreezer** **methods**
 
-    .. method:: openPickle(fp)
+        .. method:: openPickle(fp)
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: writePickle(fp=None)
+        .. method:: writePickle(fp=None)
 
-    No documentation. 
+        No documentation. 
 
 

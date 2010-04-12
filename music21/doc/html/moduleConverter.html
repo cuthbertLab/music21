@@ -136,13 +136,16 @@
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">Converter</tt><a class="headerlink" href="#music21.converter.Converter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format.</p>
 <p><strong>Converter</strong> <strong>properties</strong></p>
+<blockquote>
 <dl class="attribute">
 <dt id="music21.converter.Converter.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.Converter.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
+</blockquote>
 <p><strong>Converter</strong> <strong>methods</strong></p>
+<blockquote>
 <dl class="method">
 <dt id="music21.converter.Converter.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>dataStr</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseData" title="Permalink to this definition">¶</a></dt>
@@ -161,6 +164,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dd></dd></dl>
 
 <p>Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment <cite>autoDownlaad</cite> setting before downloading.</p>
+</blockquote>
 </dd></dl>
 
 </div>
@@ -171,13 +175,16 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMusicXML</tt><big>(</big><em>forceSource</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>ConverterMusicXML</strong> <strong>properties</strong></p>
+<blockquote>
 <dl class="attribute">
 <dt id="music21.converter.ConverterMusicXML.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.ConverterMusicXML.stream" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>No documentation.</p>
+</blockquote>
 <p><strong>ConverterMusicXML</strong> <strong>methods</strong></p>
+<blockquote>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.getPartNames">
 <tt class="descname">getPartNames</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.getPartNames" title="Permalink to this definition">¶</a></dt>
@@ -202,6 +209,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dd></dd></dl>
 
 <p>Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source.</p>
+</blockquote>
 </dd></dl>
 
 </div>
@@ -213,8 +221,10 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterHumdrum</tt><a class="headerlink" href="#music21.converter.ConverterHumdrum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple class wrapper for parsing Humdrum data provided in a file or in a string.</p>
 <p><strong>ConverterHumdrum</strong> <strong>attributes</strong></p>
-<p>Attributes without Documentation: <cite>stream</cite></p>
+<blockquote>
+Attributes without Documentation: <cite>stream</cite></blockquote>
 <p><strong>ConverterHumdrum</strong> <strong>methods</strong></p>
+<blockquote>
 <dl class="method">
 <dt id="music21.converter.ConverterHumdrum.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>humdrumString</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseData" title="Permalink to this definition">¶</a></dt>
@@ -232,6 +242,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dd></dd></dl>
 
 <p>Open Humdram data from a file path.</p>
+</blockquote>
 </dd></dl>
 
 </div>
@@ -244,12 +255,14 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
 <p>Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned.</p>
 <p><strong>PickleFilter</strong> <strong>methods</strong></p>
+<blockquote>
 <dl class="method">
 <dt id="music21.converter.PickleFilter.status">
 <tt class="descname">status</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.status" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.</p>
+</blockquote>
 </dd></dl>
 
 </div>
@@ -260,8 +273,10 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">StreamFreezer</tt><big>(</big><em>streamObj=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>StreamFreezer</strong> <strong>attributes</strong></p>
-<p>Attributes without Documentation: <cite>stream</cite></p>
+<blockquote>
+Attributes without Documentation: <cite>stream</cite></blockquote>
 <p><strong>StreamFreezer</strong> <strong>methods</strong></p>
+<blockquote>
 <dl class="method">
 <dt id="music21.converter.StreamFreezer.openPickle">
 <tt class="descname">openPickle</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.openPickle" title="Permalink to this definition">¶</a></dt>
@@ -274,6 +289,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dd></dd></dl>
 
 <p>No documentation.</p>
+</blockquote>
 </dd></dl>
 
 </div>

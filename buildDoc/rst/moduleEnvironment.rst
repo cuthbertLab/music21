@@ -25,55 +25,55 @@ Environment
 
     **Environment** **attributes**
 
-    .. attribute:: modNameParent
+        .. attribute:: modNameParent
 
-    A string representation of the module that contains this Environment instance. 
+        A string representation of the module that contains this Environment instance. 
 
-    .. attribute:: ref
+        .. attribute:: ref
 
-    The Python dictionary used to store all internal settings. 
+        The Python dictionary used to store all internal settings. 
 
     **Environment** **methods**
 
-    .. method:: read(fp=None)
+        .. method:: read(fp=None)
 
-    Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+        Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
 
-    .. method:: write(fp=None)
+        .. method:: write(fp=None)
 
-    Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
+        Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
 
-    .. method:: getSettingsPath()
+        .. method:: getSettingsPath()
 
-    Return the path to the platform specific settings file. 
+        Return the path to the platform specific settings file. 
 
-    .. method:: getTempDir()
+        .. method:: getTempDir()
 
-    Get a temporary directory. Return the user preference if set. 
+        Get a temporary directory. Return the user preference if set. 
 
-    .. method:: getTempFile(suffix=)
+        .. method:: getTempFile(suffix=)
 
-    Return a file path to a temporary file with the specified suffix 
+        Return a file path to a temporary file with the specified suffix 
 
-    .. method:: keys()
+        .. method:: keys()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: launch(fmt, fp, options=)
+        .. method:: launch(fmt, fp, options=)
 
-    Open a file with an either default or user-specified applications. 
+        Open a file with an either default or user-specified applications. 
 
-    .. method:: loadDefaults()
+        .. method:: loadDefaults()
 
-    Load defaults. All keys are derived from these defaults. 
+        Load defaults. All keys are derived from these defaults. 
 
-    .. method:: printDebug(msg, statusLevel=1)
+        .. method:: printDebug(msg, statusLevel=1)
 
-    Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+        Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
-    .. method:: warn(msg)
+        .. method:: warn(msg)
 
-    To print a warning to the user, send a list of strings to this method. 
+        To print a warning to the user, send a list of strings to this method. 
 
 
 Preference
@@ -93,15 +93,15 @@ Preference
 
     **Preference** **attributes**
 
-    Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
+        Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
 
     **Preference** **properties**
 
-    Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
+        Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
 
     **Preference** **methods**
 
-    Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
+        Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
 
 
 Settings
@@ -121,18 +121,18 @@ Settings
 
     **Settings** **attributes**
 
-    Attributes inherited from :class:`~music21.node.NodeList`: :attr:`~music21.node.NodeList.componentList`
+        Attributes inherited from :class:`~music21.node.NodeList`: :attr:`~music21.node.NodeList.componentList`
 
-    Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
+        Attributes inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.charData`
 
     **Settings** **properties**
 
-    Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
+        Properties inherited from :class:`~music21.node.Node`: :attr:`~music21.node.Node.tag`
 
     **Settings** **methods**
 
-    Methods inherited from :class:`~music21.node.NodeList`: :meth:`~music21.node.NodeList.append`
+        Methods inherited from :class:`~music21.node.NodeList`: :meth:`~music21.node.NodeList.append`
 
-    Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
+        Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
 
 

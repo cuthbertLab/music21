@@ -294,224 +294,224 @@ Duration
 
     **Duration** **attributes**
 
-    Attributes without Documentation: `linkages`
+        Attributes without Documentation: `linkages`
 
     **Duration** **properties**
 
-    .. attribute:: components
+        .. attribute:: components
 
-    No documentation. 
+        No documentation. 
 
-    .. attribute:: dots
+        .. attribute:: dots
 
-    Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
+        Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error. 
 
-    .. attribute:: isComplex
+        .. attribute:: isComplex
 
-    Property defining if this Duration has more than one DurationUnit object on the `component` list. 
+        Property defining if this Duration has more than one DurationUnit object on the `component` list. 
 
-    >>> aDur = Duration()
-    >>> aDur.quarterLength = 1.375
-    >>> aDur.isComplex
-    True 
-    >>> len(aDur.components)
-    2 
-    >>> aDur = Duration()
-    >>> aDur.quarterLength = 1.6666666
-    >>> aDur.isComplex
-    True 
-    >>> len(aDur.components)
-    2 
-    >>> aDur = Duration()
-    >>> aDur.quarterLength = .25
-    >>> aDur.isComplex
-    False 
-    >>> len(aDur.components)
-    1 
+        >>> aDur = Duration()
+        >>> aDur.quarterLength = 1.375
+        >>> aDur.isComplex
+        True 
+        >>> len(aDur.components)
+        2 
+        >>> aDur = Duration()
+        >>> aDur.quarterLength = 1.6666666
+        >>> aDur.isComplex
+        True 
+        >>> len(aDur.components)
+        2 
+        >>> aDur = Duration()
+        >>> aDur.quarterLength = .25
+        >>> aDur.isComplex
+        False 
+        >>> len(aDur.components)
+        1 
 
-    .. attribute:: lily
+        .. attribute:: lily
 
-    Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
+        Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups 
 
-    
+        
 
-    .. attribute:: musicxml
+        .. attribute:: musicxml
 
-    Return a complete MusicXML string with defaults. 
+        Return a complete MusicXML string with defaults. 
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
+        Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
 
-    >>> a = Duration()
-    >>> a.quarterLength = 3
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
-    >>> a = Duration()
-    >>> a.quarterLength = .33333333
-    >>> b = a.mx
-    >>> len(b) == 1
-    True 
-    >>> isinstance(b[0], musicxmlMod.Note)
-    True 
+        >>> a = Duration()
+        >>> a.quarterLength = 3
+        >>> b = a.mx
+        >>> len(b) == 1
+        True 
+        >>> isinstance(b[0], musicxmlMod.Note)
+        True 
+        >>> a = Duration()
+        >>> a.quarterLength = .33333333
+        >>> b = a.mx
+        >>> len(b) == 1
+        True 
+        >>> isinstance(b[0], musicxmlMod.Note)
+        True 
 
-    .. attribute:: quarterLength
+        .. attribute:: quarterLength
 
-    Can be the same as the base class. 
+        Can be the same as the base class. 
 
-    .. attribute:: tuplets
+        .. attribute:: tuplets
 
-    No documentation. 
+        No documentation. 
 
-    .. attribute:: type
+        .. attribute:: type
 
-    Get the duration type. 
+        Get the duration type. 
 
     **Duration** **methods**
 
-    .. method:: addDuration(dur)
+        .. method:: addDuration(dur)
 
-    Add a DurationUnit or a Duration's components to this Duration. 
+        Add a DurationUnit or a Duration's components to this Duration. 
 
-    >>> a = Duration('quarter')
-    >>> b = Duration('quarter')
-    >>> a.addDuration(b)
-    >>> a.quarterLength
-    2.0 
-    >>> a.type
-    'complex' 
+        >>> a = Duration('quarter')
+        >>> b = Duration('quarter')
+        >>> a.addDuration(b)
+        >>> a.quarterLength
+        2.0 
+        >>> a.type
+        'complex' 
 
-    .. method:: appendTuplet(newTuplet)
+        .. method:: appendTuplet(newTuplet)
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: clear()
+        .. method:: clear()
 
-    Permit all componets to be removed. (It is not clear yet if this is needed) 
+        Permit all componets to be removed. (It is not clear yet if this is needed) 
 
-    >>> a = Duration()
-    >>> a.quarterLength = 4
-    >>> a.type
-    'whole' 
-    >>> a.clear()
-    >>> a.quarterLength
-    0.0 
-    >>> a.type
-    'zero' 
+        >>> a = Duration()
+        >>> a.quarterLength = 4
+        >>> a.type
+        'whole' 
+        >>> a.clear()
+        >>> a.quarterLength
+        0.0 
+        >>> a.type
+        'zero' 
 
-    .. method:: componentIndexAtQtrPosition(quarterPosition)
+        .. method:: componentIndexAtQtrPosition(quarterPosition)
 
-    returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
+        returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
 
-    >>> components = []
-    TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
-    better is just to copy and paste three times.  Very easy to see what 
-    is happening. 
-    >>> for x in [1,1,1]:
-    ...   components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentIndexAtQtrPosition(.5)
-    0 
-    >>> a.componentIndexAtQtrPosition(1.5)
-    1 
-    >>> a.componentIndexAtQtrPosition(2.5)
-    2 
-    this is odd behavior: 
-    e.g. given d1, d2, d3 as 3 quarter notes and 
-    self.components = [d1, d2, d3] 
-    then 
-    self.componentIndexAtQtrPosition(1.5) == d2 
-    self.componentIndexAtQtrPosition(2.0) == d3 
-    self.componentIndexAtQtrPosition(2.5) == d3 
+        >>> components = []
+        TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
+        better is just to copy and paste three times.  Very easy to see what 
+        is happening. 
+        >>> for x in [1,1,1]:
+        ...   components.append(Duration('quarter')) 
+        >>> a = Duration()
+        >>> a.components = components
+        >>> a.updateQuarterLength()
+        >>> a.quarterLength
+        3.0 
+        >>> a.componentIndexAtQtrPosition(.5)
+        0 
+        >>> a.componentIndexAtQtrPosition(1.5)
+        1 
+        >>> a.componentIndexAtQtrPosition(2.5)
+        2 
+        this is odd behavior: 
+        e.g. given d1, d2, d3 as 3 quarter notes and 
+        self.components = [d1, d2, d3] 
+        then 
+        self.componentIndexAtQtrPosition(1.5) == d2 
+        self.componentIndexAtQtrPosition(2.0) == d3 
+        self.componentIndexAtQtrPosition(2.5) == d3 
 
-    .. method:: componentStartTime(componentIndex)
+        .. method:: componentStartTime(componentIndex)
 
-    For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
+        For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
 
-    >>> components = []
-    >>> for x in [1,1,1]:
-    ...    components.append(Duration('quarter')) 
-    >>> a = Duration()
-    >>> a.components = components
-    >>> a.updateQuarterLength()
-    >>> a.quarterLength
-    3.0 
-    >>> a.componentStartTime(0)
-    0.0 
-    >>> a.componentStartTime(1)
-    1.0 
+        >>> components = []
+        >>> for x in [1,1,1]:
+        ...    components.append(Duration('quarter')) 
+        >>> a = Duration()
+        >>> a.components = components
+        >>> a.updateQuarterLength()
+        >>> a.quarterLength
+        3.0 
+        >>> a.componentStartTime(0)
+        0.0 
+        >>> a.componentStartTime(1)
+        1.0 
 
-    .. method:: consolidate()
+        .. method:: consolidate()
 
-    Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
+        Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
 
-    >>> a = Duration()
-    >>> a.fill(['quarter', 'half', 'quarter'])
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    3 
-    >>> a.consolidate()
-    >>> a.quarterLength
-    4.0 
-    >>> len(a.components)
-    1 
-    But it gains a type! 
-    >>> a.type
-    'whole' 
+        >>> a = Duration()
+        >>> a.fill(['quarter', 'half', 'quarter'])
+        >>> a.quarterLength
+        4.0 
+        >>> len(a.components)
+        3 
+        >>> a.consolidate()
+        >>> a.quarterLength
+        4.0 
+        >>> len(a.components)
+        1 
+        But it gains a type! 
+        >>> a.type
+        'whole' 
 
-    .. method:: expand(qLenDiv=4)
+        .. method:: expand(qLenDiv=4)
 
-    Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
+        Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength 
 
-    .. method:: fill(quarterLengthList=['quarter', 'half', 'quarter'])
+        .. method:: fill(quarterLengthList=['quarter', 'half', 'quarter'])
 
-    Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
+        Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
 
-    .. method:: show(format=musicxml)
+        .. method:: show(format=musicxml)
 
-    Same as Music21Object.show() 
+        Same as Music21Object.show() 
 
-    .. method:: sliceComponentAtPosition(quarterPosition)
+        .. method:: sliceComponentAtPosition(quarterPosition)
 
-    Given a quarter position within a component, divide that component into two components. 
+        Given a quarter position within a component, divide that component into two components. 
 
-    >>> a = Duration()
-    >>> a.clear() # need to remove default
-    >>> components = []
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.addDuration(Duration('quarter'))
-    >>> a.quarterLength
-    3.0 
-    >>> a.sliceComponentAtPosition(.5)
-    >>> a.quarterLength
-    3.0 
-    >>> len(a.components)
-    4 
-    >>> a.components[0].type
-    'eighth' 
-    >>> a.components[1].type
-    'eighth' 
-    >>> a.components[2].type
-    'quarter' 
+        >>> a = Duration()
+        >>> a.clear() # need to remove default
+        >>> components = []
+        >>> a.addDuration(Duration('quarter'))
+        >>> a.addDuration(Duration('quarter'))
+        >>> a.addDuration(Duration('quarter'))
+        >>> a.quarterLength
+        3.0 
+        >>> a.sliceComponentAtPosition(.5)
+        >>> a.quarterLength
+        3.0 
+        >>> len(a.components)
+        4 
+        >>> a.components[0].type
+        'eighth' 
+        >>> a.components[1].type
+        'eighth' 
+        >>> a.components[2].type
+        'quarter' 
 
-    .. method:: updateQuarterLength()
+        .. method:: updateQuarterLength()
 
-    Look to components and determine quarter length. 
+        Look to components and determine quarter length. 
 
-    .. method:: write(fmt=musicxml, fp=None)
+        .. method:: write(fmt=musicxml, fp=None)
 
-    As in Music21Object.write: Writes a file in the given format (musicxml by default) A None file path will result in temporary file 
+        As in Music21Object.write: Writes a file in the given format (musicxml by default) A None file path will result in temporary file 
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 Tuplet
@@ -550,105 +550,105 @@ Tuplet
 
     **Tuplet** **attributes**
 
-    .. attribute:: durationActual
+        .. attribute:: durationActual
 
-    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+        A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
-    .. attribute:: durationNormal
+        .. attribute:: durationNormal
 
-    A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
+        A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
 
-    Attributes without Documentation: `frozen`, `tupletActualShow`, `placement`, `numberNotesActual`, `tupletId`, `nestedLevel`, `bracket`, `tupletNormalShow`, `type`, `numberNotesNormal`
+        Attributes without Documentation: `frozen`, `tupletActualShow`, `placement`, `numberNotesActual`, `tupletId`, `nestedLevel`, `bracket`, `tupletNormalShow`, `type`, `numberNotesNormal`
 
     **Tuplet** **properties**
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
+        From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
 
-    >>> a = Tuplet()
-    >>> a.bracket = True
-    >>> b, c = a.mx
+        >>> a = Tuplet()
+        >>> a.bracket = True
+        >>> b, c = a.mx
 
-    .. attribute:: tupletActual
+        .. attribute:: tupletActual
 
-    No documentation. 
+        No documentation. 
 
-    .. attribute:: tupletNormal
+        .. attribute:: tupletNormal
 
-    No documentation. 
+        No documentation. 
 
     **Tuplet** **methods**
 
-    .. method:: setDurationType(type)
+        .. method:: setDurationType(type)
 
-    Set the Duration for both actual and normal. 
+        Set the Duration for both actual and normal. 
 
-    >>> a = Tuplet()
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.totalTupletLength()
-    1.0 
-    >>> a.setDurationType('half')
-    >>> a.tupletMultiplier()
-    0.6666... 
-    >>> a.totalTupletLength()
-    4.0 
+        >>> a = Tuplet()
+        >>> a.tupletMultiplier()
+        0.666... 
+        >>> a.totalTupletLength()
+        1.0 
+        >>> a.setDurationType('half')
+        >>> a.tupletMultiplier()
+        0.6666... 
+        >>> a.totalTupletLength()
+        4.0 
 
-    .. method:: setRatio(actual, normal)
+        .. method:: setRatio(actual, normal)
 
-    Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
+        Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
 
-    >>> a = Tuplet()
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.setRatio(6,2)
-    >>> a.tupletMultiplier()
-    0.333... 
-    One way of expressing 6/4-ish triplets without numbers: 
-    >>> a = Tuplet()
-    >>> a.setRatio(3,1)
-    >>> a.durationActual = DurationUnit('quarter')
-    >>> a.durationNormal = DurationUnit('half')
-    >>> a.tupletMultiplier()
-    0.666... 
-    >>> a.totalTupletLength()
-    2.0 
+        >>> a = Tuplet()
+        >>> a.tupletMultiplier()
+        0.666... 
+        >>> a.setRatio(6,2)
+        >>> a.tupletMultiplier()
+        0.333... 
+        One way of expressing 6/4-ish triplets without numbers: 
+        >>> a = Tuplet()
+        >>> a.setRatio(3,1)
+        >>> a.durationActual = DurationUnit('quarter')
+        >>> a.durationNormal = DurationUnit('half')
+        >>> a.tupletMultiplier()
+        0.666... 
+        >>> a.totalTupletLength()
+        2.0 
 
-    .. method:: totalTupletLength()
+        .. method:: totalTupletLength()
 
-    The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
+        The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
 
-    >>> a = Tuplet()
-    >>> a.totalTupletLength()
-    1.0 
-    >>> a.numberNotesActual = 3
-    >>> a.durationActual = Duration('half')
-    >>> a.numberNotesNormal = 2
-    >>> a.durationNormal = Duration('half')
-    >>> a.totalTupletLength()
-    4.0 
-    >>> a.setRatio(5,4)
-    >>> a.totalTupletLength()
-    8.0 
-    >>> a.setRatio(5,2)
-    >>> a.totalTupletLength()
-    4.0 
+        >>> a = Tuplet()
+        >>> a.totalTupletLength()
+        1.0 
+        >>> a.numberNotesActual = 3
+        >>> a.durationActual = Duration('half')
+        >>> a.numberNotesNormal = 2
+        >>> a.durationNormal = Duration('half')
+        >>> a.totalTupletLength()
+        4.0 
+        >>> a.setRatio(5,4)
+        >>> a.totalTupletLength()
+        8.0 
+        >>> a.setRatio(5,2)
+        >>> a.totalTupletLength()
+        4.0 
 
-    .. method:: tupletMultiplier()
+        .. method:: tupletMultiplier()
 
-    Get a floating point value by which to scale the duration that this Tuplet is associated with. 
+        Get a floating point value by which to scale the duration that this Tuplet is associated with. 
 
-    >>> myTuplet = Tuplet()
-    >>> print(round(myTuplet.tupletMultiplier(), 3))
-    0.667 
-    >>> myTuplet.tupletActual = [5, Duration('eighth')]
-    >>> myTuplet.numberNotesActual
-    5 
-    >>> myTuplet.durationActual.type
-    'eighth' 
-    >>> print(myTuplet.tupletMultiplier())
-    0.4 
+        >>> myTuplet = Tuplet()
+        >>> print(round(myTuplet.tupletMultiplier(), 3))
+        0.667 
+        >>> myTuplet.tupletActual = [5, Duration('eighth')]
+        >>> myTuplet.numberNotesActual
+        5 
+        >>> myTuplet.durationActual.type
+        'eighth' 
+        >>> print(myTuplet.tupletMultiplier())
+        0.4 
 
 
 AppogiaturaStartDuration
@@ -663,17 +663,17 @@ AppogiaturaStartDuration
 
     **AppogiaturaStartDuration** **attributes**
 
-    Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
+        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
 
     **AppogiaturaStartDuration** **properties**
 
-    Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
+        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
 
     **AppogiaturaStartDuration** **methods**
 
-    Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
+        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 AppogiaturaStopDuration
@@ -688,17 +688,17 @@ AppogiaturaStopDuration
 
     **AppogiaturaStopDuration** **attributes**
 
-    Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
+        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
 
     **AppogiaturaStopDuration** **properties**
 
-    Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
+        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
 
     **AppogiaturaStopDuration** **methods**
 
-    Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
+        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 DurationCommon
@@ -714,19 +714,19 @@ DurationCommon
 
     **DurationCommon** **methods**
 
-    .. method:: aggregateTupletRatio()
+        .. method:: aggregateTupletRatio()
 
-    Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4, it will return (15, 8). This tuple is needed for MusicXML time-modification among other places 
+        Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4, it will return (15, 8). This tuple is needed for MusicXML time-modification among other places 
 
-    >>> complexDur = Duration('eighth')
-    >>> complexDur.appendTuplet(Tuplet())
-    >>> complexDur.aggregateTupletRatio()
-    (3, 2) 
-    >>> tup2 = Tuplet()
-    >>> tup2.setRatio(5, 4)
-    >>> complexDur.appendTuplet(tup2)
-    >>> complexDur.aggregateTupletRatio()
-    (15, 8) 
+        >>> complexDur = Duration('eighth')
+        >>> complexDur.appendTuplet(Tuplet())
+        >>> complexDur.aggregateTupletRatio()
+        (3, 2) 
+        >>> tup2 = Tuplet()
+        >>> tup2.setRatio(5, 4)
+        >>> complexDur.appendTuplet(tup2)
+        >>> complexDur.aggregateTupletRatio()
+        (15, 8) 
 
 
 DurationUnit
@@ -740,119 +740,119 @@ DurationUnit
 
     **DurationUnit** **attributes**
 
-    Attributes without Documentation: `linkStatus`
+        Attributes without Documentation: `linkStatus`
 
     **DurationUnit** **properties**
 
-    .. attribute:: dots
+        .. attribute:: dots
 
-    _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
+        _dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that's what _getDots returns... 
 
-    .. attribute:: lily
+        .. attribute:: lily
 
-    Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
+        Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets 
 
-    .. attribute:: ordinal
+        .. attribute:: ordinal
 
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6. Based on duration.ordinalTypeFromNum 
+        Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6. Based on duration.ordinalTypeFromNum 
 
-    >>> a = DurationUnit('whole')
-    >>> a.ordinal
-    4 
-    >>> b = DurationUnit('maxima')
-    >>> b.ordinal
-    1 
-    >>> c = DurationUnit('1024th')
-    >>> c.ordinal
-    14 
+        >>> a = DurationUnit('whole')
+        >>> a.ordinal
+        4 
+        >>> b = DurationUnit('maxima')
+        >>> b.ordinal
+        1 
+        >>> c = DurationUnit('1024th')
+        >>> c.ordinal
+        14 
 
-    .. attribute:: quarterLength
+        .. attribute:: quarterLength
 
-    Property for getting or setting the quarterLength of a DurationUnit. 
+        Property for getting or setting the quarterLength of a DurationUnit. 
 
-    >>> a = DurationUnit()
-    >>> a.quarterLength = 3
-    >>> a.type
-    'half' 
-    >>> a.dots
-    1 
-    >>> a.quarterLength = .5
-    >>> a.type
-    'eighth' 
-    >>> a.quarterLength = .75
-    >>> a.type
-    'eighth' 
-    >>> a.dots
-    1 
-    >>> b = DurationUnit()
-    >>> b.quarterLength = 16
-    >>> b.type
-    'longa' 
+        >>> a = DurationUnit()
+        >>> a.quarterLength = 3
+        >>> a.type
+        'half' 
+        >>> a.dots
+        1 
+        >>> a.quarterLength = .5
+        >>> a.type
+        'eighth' 
+        >>> a.quarterLength = .75
+        >>> a.type
+        'eighth' 
+        >>> a.dots
+        1 
+        >>> b = DurationUnit()
+        >>> b.quarterLength = 16
+        >>> b.type
+        'longa' 
 
-    
+        
 
-    .. attribute:: tuplets
+        .. attribute:: tuplets
 
-    Return a tuple of Tuplet objects 
+        Return a tuple of Tuplet objects 
 
-    .. attribute:: type
+        .. attribute:: type
 
-    Property for getting or setting the type of a DurationUnit. 
+        Property for getting or setting the type of a DurationUnit. 
 
-    >>> a = DurationUnit()
-    >>> a.quarterLength = 3
-    >>> a.type
-    'half' 
-    >>> a.dots
-    1 
-    >>> a.type = 'quarter'
-    >>> a.quarterLength
-    1.5 
-    >>> a.type = '16th'
-    >>> a.quarterLength
-    0.375 
+        >>> a = DurationUnit()
+        >>> a.quarterLength = 3
+        >>> a.type
+        'half' 
+        >>> a.dots
+        1 
+        >>> a.type = 'quarter'
+        >>> a.quarterLength
+        1.5 
+        >>> a.type = '16th'
+        >>> a.quarterLength
+        0.375 
 
     **DurationUnit** **methods**
 
-    .. method:: appendTuplet(newTuplet)
+        .. method:: appendTuplet(newTuplet)
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: link()
+        .. method:: link()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: setTypeFromNum(typeNum)
+        .. method:: setTypeFromNum(typeNum)
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: unlink()
+        .. method:: unlink()
 
-    No documentation. 
+        No documentation. 
 
-    .. method:: updateQuarterLength()
+        .. method:: updateQuarterLength()
 
-    Updates the quarterLength if linkStatus is True. Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. To set quarterLength, use self.quarterLength. 
+        Updates the quarterLength if linkStatus is True. Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. To set quarterLength, use self.quarterLength. 
 
-    >>> bDur = DurationUnit('16th')
-    >>> bDur.quarterLength
-    0.25 
-    >>> bDur.unlink()
-    >>> bDur.quarterLength = 234
-    >>> bDur.quarterLength
-    234 
-    >>> bDur.type
-    '16th' 
-    >>> bDur.link() # if linking is restored, type is used to get qLen
-    >>> bDur.updateQuarterLength()
-    >>> bDur.quarterLength
-    0.25 
+        >>> bDur = DurationUnit('16th')
+        >>> bDur.quarterLength
+        0.25 
+        >>> bDur.unlink()
+        >>> bDur.quarterLength = 234
+        >>> bDur.quarterLength
+        234 
+        >>> bDur.type
+        '16th' 
+        >>> bDur.link() # if linking is restored, type is used to get qLen
+        >>> bDur.updateQuarterLength()
+        >>> bDur.quarterLength
+        0.25 
 
-    .. method:: updateType()
+        .. method:: updateType()
 
-    No documentation. 
+        No documentation. 
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 GraceDuration
@@ -865,17 +865,17 @@ GraceDuration
 
     **GraceDuration** **attributes**
 
-    Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
+        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
 
     **GraceDuration** **properties**
 
-    Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
+        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
 
     **GraceDuration** **methods**
 
-    Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
+        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 LongGraceDuration
@@ -888,17 +888,17 @@ LongGraceDuration
 
     **LongGraceDuration** **attributes**
 
-    Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
+        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
 
     **LongGraceDuration** **properties**
 
-    Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
+        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
 
     **LongGraceDuration** **methods**
 
-    Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
+        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 ZeroDuration
@@ -911,16 +911,16 @@ ZeroDuration
 
     **ZeroDuration** **attributes**
 
-    Attributes inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.linkStatus`
+        Attributes inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.linkStatus`
 
     **ZeroDuration** **properties**
 
-    Properties inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.dots`, :attr:`~music21.duration.DurationUnit.lily`, :attr:`~music21.duration.DurationUnit.ordinal`, :attr:`~music21.duration.DurationUnit.quarterLength`, :attr:`~music21.duration.DurationUnit.tuplets`, :attr:`~music21.duration.DurationUnit.type`
+        Properties inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.dots`, :attr:`~music21.duration.DurationUnit.lily`, :attr:`~music21.duration.DurationUnit.ordinal`, :attr:`~music21.duration.DurationUnit.quarterLength`, :attr:`~music21.duration.DurationUnit.tuplets`, :attr:`~music21.duration.DurationUnit.type`
 
     **ZeroDuration** **methods**
 
-    Methods inherited from :class:`~music21.duration.DurationUnit`: :meth:`~music21.duration.DurationUnit.appendTuplet`, :meth:`~music21.duration.DurationUnit.link`, :meth:`~music21.duration.DurationUnit.setTypeFromNum`, :meth:`~music21.duration.DurationUnit.unlink`, :meth:`~music21.duration.DurationUnit.updateQuarterLength`, :meth:`~music21.duration.DurationUnit.updateType`
+        Methods inherited from :class:`~music21.duration.DurationUnit`: :meth:`~music21.duration.DurationUnit.appendTuplet`, :meth:`~music21.duration.DurationUnit.link`, :meth:`~music21.duration.DurationUnit.setTypeFromNum`, :meth:`~music21.duration.DurationUnit.unlink`, :meth:`~music21.duration.DurationUnit.updateQuarterLength`, :meth:`~music21.duration.DurationUnit.updateType`
 
-    Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
+        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 

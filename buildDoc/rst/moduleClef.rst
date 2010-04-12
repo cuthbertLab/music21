@@ -23,34 +23,34 @@ Clef
 
     **Clef** **attributes**
 
-    Attributes without Documentation: `octaveChange`, `sign`, `line`
+        Attributes without Documentation: `octaveChange`, `sign`, `line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Clef** **properties**
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
+        Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
 
-    >>> b = GClef()
-    >>> a = b.mx
-    >>> a.get('sign')
-    'G' 
-    >>> b = Treble8vbClef()
-    >>> b.octaveChange
-    -1 
-    >>> a = b.mx
-    >>> a.get('sign')
-    'G' 
-    >>> a.get('clefOctaveChange')
-    -1 
+        >>> b = GClef()
+        >>> a = b.mx
+        >>> a.get('sign')
+        'G' 
+        >>> b = Treble8vbClef()
+        >>> b.octaveChange
+        -1 
+        >>> a = b.mx
+        >>> a.get('sign')
+        'G' 
+        >>> a.get('clefOctaveChange')
+        -1 
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Clef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 TrebleClef
@@ -69,25 +69,25 @@ TrebleClef
 
     **TrebleClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **TrebleClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **TrebleClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 BassClef
@@ -106,25 +106,25 @@ BassClef
 
     **BassClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **BassClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **BassClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 AltoClef
@@ -143,25 +143,25 @@ AltoClef
 
     **AltoClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **AltoClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **AltoClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Bass8vaClef
@@ -180,25 +180,25 @@ Bass8vaClef
 
     **Bass8vaClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Bass8vaClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Bass8vaClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Bass8vbClef
@@ -219,25 +219,25 @@ Bass8vbClef
 
     **Bass8vbClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Bass8vbClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Bass8vbClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 CBaritoneClef
@@ -258,25 +258,25 @@ CBaritoneClef
 
     **CBaritoneClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **CBaritoneClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **CBaritoneClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 CClef
@@ -295,23 +295,23 @@ CClef
 
     **CClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **CClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **CClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 FBaritoneClef
@@ -337,25 +337,25 @@ FBaritoneClef
 
     **FBaritoneClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **FBaritoneClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **FBaritoneClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 FClef
@@ -374,23 +374,23 @@ FClef
 
     **FClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **FClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **FClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 FrenchViolinClef
@@ -409,25 +409,25 @@ FrenchViolinClef
 
     **FrenchViolinClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **FrenchViolinClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **FrenchViolinClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 GClef
@@ -446,23 +446,23 @@ GClef
 
     **GClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **GClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **GClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 GSopranoClef
@@ -481,25 +481,25 @@ GSopranoClef
 
     **GSopranoClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **GSopranoClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **GSopranoClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 MezzoSopranoClef
@@ -518,25 +518,25 @@ MezzoSopranoClef
 
     **MezzoSopranoClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **MezzoSopranoClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **MezzoSopranoClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 NoClef
@@ -549,19 +549,19 @@ NoClef
 
     **NoClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **NoClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **NoClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 PercussionClef
@@ -574,19 +574,19 @@ PercussionClef
 
     **PercussionClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **PercussionClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **PercussionClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 PitchClef
@@ -599,25 +599,25 @@ PitchClef
 
     **PitchClef** **attributes**
 
-    Attributes without Documentation: `lilyName`
+        Attributes without Documentation: `lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **PitchClef** **properties**
 
-    .. attribute:: lily
+        .. attribute:: lily
 
-    No documentation. 
+        No documentation. 
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **PitchClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 SopranoClef
@@ -636,25 +636,25 @@ SopranoClef
 
     **SopranoClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **SopranoClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **SopranoClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 SubBassClef
@@ -673,25 +673,25 @@ SubBassClef
 
     **SubBassClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **SubBassClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **SubBassClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 TabClef
@@ -704,19 +704,19 @@ TabClef
 
     **TabClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **TabClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **TabClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 TenorClef
@@ -739,25 +739,25 @@ TenorClef
 
     **TenorClef** **attributes**
 
-    Attributes without Documentation: `lowestLine`
+        Attributes without Documentation: `lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **TenorClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **TenorClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Treble8vaClef
@@ -778,25 +778,25 @@ Treble8vaClef
 
     **Treble8vaClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.TrebleClef`: :attr:`~music21.clef.TrebleClef.lowestLine`
+        Attributes inherited from :class:`~music21.clef.TrebleClef`: :attr:`~music21.clef.TrebleClef.lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Treble8vaClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Treble8vaClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Treble8vbClef
@@ -817,24 +817,24 @@ Treble8vbClef
 
     **Treble8vbClef** **attributes**
 
-    Attributes inherited from :class:`~music21.clef.TrebleClef`: :attr:`~music21.clef.TrebleClef.lowestLine`
+        Attributes inherited from :class:`~music21.clef.TrebleClef`: :attr:`~music21.clef.TrebleClef.lowestLine`
 
-    Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
+        Attributes inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lilyName`
 
-    Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
+        Attributes inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.octaveChange`, :attr:`~music21.clef.Clef.sign`, :attr:`~music21.clef.Clef.line`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Treble8vbClef** **properties**
 
-    Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
+        Properties inherited from :class:`~music21.clef.PitchClef`: :attr:`~music21.clef.PitchClef.lily`
 
-    Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
+        Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Treble8vbClef** **methods**
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

@@ -149,207 +149,207 @@ Pitch
 
     **Pitch** **attributes**
 
-    Attributes without Documentation: `defaultOctave`
+        Attributes without Documentation: `defaultOctave`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Pitch** **properties**
 
-    .. attribute:: name
+        .. attribute:: name
 
-    Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
+        Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
 
-    >>> a = Pitch('G#')
-    >>> a.name
-    'G#' 
+        >>> a = Pitch('G#')
+        >>> a.name
+        'G#' 
 
-    .. attribute:: nameWithOctave
+        .. attribute:: nameWithOctave
 
-    Returns pitch name with octave Perhaps better default action for getName 
+        Returns pitch name with octave Perhaps better default action for getName 
 
-    >>> a = Pitch('G#4')
-    >>> a.nameWithOctave
-    'G#4' 
+        >>> a = Pitch('G#4')
+        >>> a.nameWithOctave
+        'G#4' 
 
-    .. attribute:: step
+        .. attribute:: step
 
-    
+        
 
-    >>> a = Pitch('C#3')
-    >>> a._getStep()
-    'C' 
+        >>> a = Pitch('C#3')
+        >>> a._getStep()
+        'C' 
 
-    .. attribute:: pitchClass
+        .. attribute:: pitchClass
 
-    
+        
 
-    >>> a = Pitch('a3')
-    >>> a._getPitchClass()
-    9 
-    >>> dis = Pitch('d3')
-    >>> dis.pitchClass
-    2 
-    >>> dis.accidental = Accidental("#")
-    >>> dis.pitchClass
-    3 
-    >>> dis.pitchClass = 11
-    >>> dis.pitchClass
-    11 
-    >>> dis.name
-    'B' 
+        >>> a = Pitch('a3')
+        >>> a._getPitchClass()
+        9 
+        >>> dis = Pitch('d3')
+        >>> dis.pitchClass
+        2 
+        >>> dis.accidental = Accidental("#")
+        >>> dis.pitchClass
+        3 
+        >>> dis.pitchClass = 11
+        >>> dis.pitchClass
+        11 
+        >>> dis.name
+        'B' 
 
-    .. attribute:: octave
+        .. attribute:: octave
 
-    returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
+        returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
 
-    >>> a = Pitch('g')
-    >>> a.octave is None
-    True 
-    >>> a.implicitOctave
-    4 
-    >>> a.ps  ## will use implicitOctave
-    67 
-    >>> a.name
-    'G' 
-    >>> a.octave = 14
-    >>> a.implicitOctave
-    14 
-    >>> a.name
-    'G' 
-    >>> a.ps
-    187 
+        >>> a = Pitch('g')
+        >>> a.octave is None
+        True 
+        >>> a.implicitOctave
+        4 
+        >>> a.ps  ## will use implicitOctave
+        67 
+        >>> a.name
+        'G' 
+        >>> a.octave = 14
+        >>> a.implicitOctave
+        14 
+        >>> a.name
+        'G' 
+        >>> a.ps
+        187 
 
-    .. attribute:: midi
+        .. attribute:: midi
 
-    midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
+        midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
 
-    .. attribute:: accidental
+        .. attribute:: accidental
 
-    
+        
 
-    >>> a = Pitch('D-2')
-    >>> a.accidental.alter
-    -1.0 
+        >>> a = Pitch('D-2')
+        >>> a.accidental.alter
+        -1.0 
 
-    .. attribute:: diatonicNoteNum
+        .. attribute:: diatonicNoteNum
 
-    Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
+        Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
 
-    >>> c = Pitch('c4')
-    >>> c.diatonicNoteNum
-    29 
-    >>> c = Pitch('c#4')
-    >>> c.diatonicNoteNum
-    29 
-    >>> d = Pitch('d--4')
-    >>> d.accidental.name
-    'double-flat' 
-    >>> d.diatonicNoteNum
-    30 
-    >>> b = Pitch()
-    >>> b.step = "B"
-    >>> b.octave = -1
-    >>> b.diatonicNoteNum
-    0 
-    >>> c = Pitch("C")
-    >>> c.diatonicNoteNum  #implicitOctave
-    29 
+        >>> c = Pitch('c4')
+        >>> c.diatonicNoteNum
+        29 
+        >>> c = Pitch('c#4')
+        >>> c.diatonicNoteNum
+        29 
+        >>> d = Pitch('d--4')
+        >>> d.accidental.name
+        'double-flat' 
+        >>> d.diatonicNoteNum
+        30 
+        >>> b = Pitch()
+        >>> b.step = "B"
+        >>> b.octave = -1
+        >>> b.diatonicNoteNum
+        0 
+        >>> c = Pitch("C")
+        >>> c.diatonicNoteNum  #implicitOctave
+        29 
 
-    .. attribute:: freq440
+        .. attribute:: freq440
 
-    
+        
 
-    >>> a = Pitch('A4')
-    >>> a.freq440
-    440.0 
+        >>> a = Pitch('A4')
+        >>> a.freq440
+        440.0 
 
-    .. attribute:: frequency
+        .. attribute:: frequency
 
-    The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
+        The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
 
-    .. attribute:: german
+        .. attribute:: german
 
-    returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
+        returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
 
-    >>> print Pitch('B-').german
-    B 
-    >>> print Pitch('B').german
-    H 
-    >>> print Pitch('E-').german
-    Es 
-    >>> print Pitch('C#').german
-    Cis 
-    >>> print Pitch('A--').german
-    Ases 
-    >>> p1 = Pitch('C')
-    >>> p1.accidental = Accidental('half-sharp')
-    >>> p1.german
-    Traceback (most recent call last): 
-    PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade! 
+        >>> print Pitch('B-').german
+        B 
+        >>> print Pitch('B').german
+        H 
+        >>> print Pitch('E-').german
+        Es 
+        >>> print Pitch('C#').german
+        Cis 
+        >>> print Pitch('A--').german
+        Ases 
+        >>> p1 = Pitch('C')
+        >>> p1.accidental = Accidental('half-sharp')
+        >>> p1.german
+        Traceback (most recent call last): 
+        PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade! 
 
-    .. attribute:: implicitOctave
+        .. attribute:: implicitOctave
 
-    returns the octave of the Pitch, or defaultOctave if octave was never set 
+        returns the octave of the Pitch, or defaultOctave if octave was never set 
 
-    .. attribute:: musicxml
+        .. attribute:: musicxml
 
-    Provide a complete MusicXM: representation. Presently, this is based on 
+        Provide a complete MusicXM: representation. Presently, this is based on 
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    returns a musicxml.Note() object 
+        returns a musicxml.Note() object 
 
-    >>> a = Pitch('g#4')
-    >>> c = a.mx
-    >>> c.get('pitch').get('step')
-    'G' 
+        >>> a = Pitch('g#4')
+        >>> c = a.mx
+        >>> c.get('pitch').get('step')
+        'G' 
 
-    .. attribute:: pitchClassString
+        .. attribute:: pitchClassString
 
-    Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
+        Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
 
-    >>> a = Pitch('a3')
-    >>> a.pitchClassString = 'B'
-    >>> a.pitchClass
-    11 
-    >>> a.pitchClassString
-    'B' 
+        >>> a = Pitch('a3')
+        >>> a.pitchClassString = 'B'
+        >>> a.pitchClass
+        11 
+        >>> a.pitchClassString
+        'B' 
 
-    .. attribute:: ps
+        .. attribute:: ps
 
-    The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
+        The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
 
-    >>> a = Pitch()
-    >>> a.ps = 45
-    >>> a
-    A2 
-    >>> a.ps = 60
-    >>> a
-    C4 
+        >>> a = Pitch()
+        >>> a.ps = 45
+        >>> a
+        A2 
+        >>> a.ps = 60
+        >>> a
+        C4 
 
-    
+        
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Pitch** **methods**
 
-    .. method:: transpose(value, inPlace=False)
+        .. method:: transpose(value, inPlace=False)
 
-    Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+        Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
-    >>> a = Pitch('g4')
-    >>> b = a.transpose('m3')
-    >>> b
-    B-4 
-    >>> aInterval = interval.Interval(-6)
-    >>> b = a.transpose(aInterval)
-    >>> b
-    C#4 
-    >>> a.transpose(aInterval, inPlace=True)
-    >>> a
-    G4 
+        >>> a = Pitch('g4')
+        >>> b = a.transpose('m3')
+        >>> b
+        B-4 
+        >>> aInterval = interval.Interval(-6)
+        >>> b = a.transpose(aInterval)
+        >>> b
+        C#4 
+        >>> a.transpose(aInterval, inPlace=True)
+        >>> a
+        G4 
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Accidental
@@ -363,60 +363,60 @@ Accidental
 
     **Accidental** **attributes**
 
-    .. attribute:: displaySize
+        .. attribute:: displaySize
 
-    Size in display: "cue", "large", or a percentage. 
+        Size in display: "cue", "large", or a percentage. 
 
-    .. attribute:: displayStyle
+        .. attribute:: displayStyle
 
-    Style of display: "parentheses", "bracket", "both". 
+        Style of display: "parentheses", "bracket", "both". 
 
-    Attributes without Documentation: `displayEvaluated`, `displayLocation`, `displayType`, `modifier`, `name`, `alter`
+        Attributes without Documentation: `displayEvaluated`, `displayLocation`, `displayType`, `modifier`, `name`, `alter`
 
-    Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 
     **Accidental** **properties**
 
-    .. attribute:: lily
+        .. attribute:: lily
 
-    No documentation. 
+        No documentation. 
 
-    .. attribute:: mx
+        .. attribute:: mx
 
-    From music21 to MusicXML 
+        From music21 to MusicXML 
 
-    >>> a = Accidental()
-    >>> a.set('half-sharp')
-    >>> a.alter == .5
-    True 
-    >>> mxAccidental = a.mx
-    >>> mxAccidental.get('content')
-    'quarter-sharp' 
+        >>> a = Accidental()
+        >>> a.set('half-sharp')
+        >>> a.alter == .5
+        True 
+        >>> mxAccidental = a.mx
+        >>> mxAccidental.get('content')
+        'quarter-sharp' 
 
-    Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Accidental** **methods**
 
-    .. method:: set(name)
+        .. method:: set(name)
 
-    Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
+        Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
 
-    >>> a = Accidental()
-    >>> a.set('sharp')
-    >>> a.alter == 1
-    True 
-    >>> a = Accidental()
-    >>> a.set(2)
-    >>> a.modifier == "##"
-    True 
-    >>> a = Accidental()
-    >>> a.set(2.0)
-    >>> a.modifier == "##"
-    True 
-    >>> a = Accidental('--')
-    >>> a.alter
-    -2.0 
+        >>> a = Accidental()
+        >>> a.set('sharp')
+        >>> a.alter == 1
+        True 
+        >>> a = Accidental()
+        >>> a.set(2)
+        >>> a.modifier == "##"
+        True 
+        >>> a = Accidental()
+        >>> a.set(2.0)
+        >>> a.modifier == "##"
+        True 
+        >>> a = Accidental('--')
+        >>> a.alter
+        -2.0 
 
-    Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

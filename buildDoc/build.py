@@ -861,20 +861,20 @@ class ClassDoc(RestructuredWriter):
     def _fmtRstAttribute(self, name):
         signature = self.partitionedClass.getSignature(name)
         msg = []
-        msg.append('%s.. attribute:: %s\n\n' %  (INDENT, name))
+        msg.append('%s.. attribute:: %s\n\n' %  (INDENT*2, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*2))
         return ''.join(msg)
 
     def _fmtRstMethod(self, name):
         signature = self.partitionedClass.getSignature(name)
         msg = []
-        msg.append('%s.. method:: %s%s\n\n' %  (INDENT, name, signature))
+        msg.append('%s.. method:: %s%s\n\n' %  (INDENT*2, name, signature))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         # do not need indent as doc is already formatted with indent
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*2))
         return ''.join(msg)
 
 
@@ -920,7 +920,7 @@ class ClassDoc(RestructuredWriter):
                     parentSrc = self.formatParent(
                         self.partitionedClass.getClassFromMroIndex(mroIndex))
                     groupStr = group.title()
-                    msgGroup.append('%s%s inherited from %s: ' % (INDENT, groupStr, parentSrc))
+                    msgGroup.append('%s%s inherited from %s: ' % (INDENT*2, groupStr, parentSrc))
                     msgSub = []
                     for partName in names:
                         msgSub.append(self.formatXRef(partName, group,
@@ -942,7 +942,7 @@ class ClassDoc(RestructuredWriter):
                         if groupSub in ['attributes-nodoc']:
                             msgGroup.append(
                             '%sAttributes without Documentation: %s\n\n' % (
-                            INDENT, self._fmtRstAttributeList(namesSub)))
+                             INDENT*2, self._fmtRstAttributeList(namesSub)))
                         for partName in namesSub:
                             if groupSub in ['attributes-doc', 'properties']:
                                 msgGroup.append(self._fmtRstAttribute(partName))
