@@ -130,10 +130,64 @@ As shown above, :meth:`~music21.stream.Stream.append` and :meth:`~music21.stream
 
 
 
-Getting and Accessing Objects from Streams
----------------------------------------------
+Accessing Stream Elements by Iteration and Index
+-------------------------------------------------
 
-Just as there are many ways to add objects to Streams, there are many ways to get a Stream's elements. Some of these approaches work like Python lists, using iteration or index numbers. Other approaches filters the Stream, selecting only the objects that match a certain class or tag. 
+Just as there are many ways to add objects to Streams, there are many ways to get a Stream's elements. Some of these approaches work like Python lists, using iteration or index numbers. Other approaches filter the Stream, selecting only the objects that match a certain class or tag. 
+
+In many situations we will want to iterate over the elements in a Stream. This can be done just like any other Python list-like object:
+
+>>> for e in s:
+...     print(e)
+... 
+<music21.note.Note E>
+<music21.note.Note F#>
+<music21.note.Note D#>
+<music21.note.Note D#>
+<music21.note.Note D#>
+<music21.note.Note D#>
+<music21.note.Note D#>
+<music21.note.Note D#>
+<music21.note.Rest rest>
+<music21.note.Note B>
+
+Elements in Streams can also be accessed by index values, integers counting from zero and specifying the ordered positions of elements in a Stream. Importantly, the ordered position is not always the same as the offset position. Multiple elements can exist in a Stream at the same offset, and the offset values are not always in the order of index values. 
+
+The syntax for accessing elements by index is the same as accessing items by index in Python. Similarly, we can take slices of Streams, returning a new Stream, as we would from Python lists. As with Python lists, the last boundary of a slice (e.g. 6 in [3:6]) is not included in the slice. 
+
+>>> s[3]
+<music21.note.Note D#>
+>>> s[3:6]
+<music21.stream.Stream object at 0x18fdef0>
+>>> s[3:6].show('text')
+{2.75} <music21.note.Note D#>
+{3.0} <music21.note.Note D#>
+{3.25} <music21.note.Note D#>
+>>> s[-1]
+<music21.note.Note B>
+
+While full list-like functionality of the Stream is not yet provided, some additional methods familiar to users of Python lists are also available. The Stream :meth:`~music21.stream.Stream.index` method can be used to get the first-encountered index of a supplied object. Given an index, an element from the Stream can be removed with the :meth:`~music21.stream.Stream.pop` method. 
+
+>>> s.index(n2)
+1
+>>> s.index(r1)
+8
+>>> s.index(n3)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/ariza/_x/src/music21/music21/stream.py", line 362, in index
+    match = i
+ValueError: Could not find object in index
+
+
+The index for `n3` cannot be obtained because the :meth:`~music21.stream.Stream.repeatAppend` method makes independent copies (deep copies) of the object provided as an argument. Thus, only copies of `n3`, not references to `n3`, are stored on the Stream. There are, of course, other ways to find these Notes. 
+
+
+
+Accessing Stream Elements by Class and Identifiers
+---------------------------------------------------
+
+
 
 
 
