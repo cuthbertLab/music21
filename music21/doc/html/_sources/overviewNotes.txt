@@ -1,12 +1,12 @@
 .. _overviewNotes:
 
 
-Overview: Notes and Pitches
+Overview: Pitches, Notes, and Durations
 ==========================================
 
 Notes can be used as fundamental units in Music21. Notes and Chords store one or more Pitch objects.
 
-For complete documentation on pitches and notes, see :ref:`modulePitch` and :ref:`moduleNote`.
+This overview will illustrate key features of music21's Pitch, Note, and Duration objects. For complete documentation, see :ref:`modulePitch`, :ref:`moduleNote`, and :ref:`moduleDuration`.
 
 
 Creating a Pitch
@@ -23,6 +23,13 @@ Creating a Note
 
 To create a Note object, simply call the class with optional arguments, if desired.
 
+
+
+
+Manipulating a Note's Duration
+-------------------------------
+
+To create a Note object, simply call the class with optional arguments, if desired.
 
 
 

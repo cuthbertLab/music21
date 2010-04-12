@@ -17,7 +17,21 @@ This overview will illustrate key features of music21's Stream. For complete doc
 Appending and Inserting Objects into Streams
 ---------------------------------------------
 
-Streams provide a way to structure and position music21 objects both hierarchically and temporally.
+Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time).
+
+The most common application of Streams is as a place to store Notes. For an introduction to Notes, see :ref:`overviewNotes`; for complete documentation on Notes, see :ref:`moduleNote`.
+
+Notes, like all Muisc21Objects, have a Duration object that describes the time span they occupy. The span of a Duration can be described in many ways, but a convenient measure is quarter lengths (QLs), or the number of whole or fractional quarter note durations. Notes, when placed in a Stream, also have an offset that describes their position. These offset values are also given in QLs. 
+
+To begin, lets create an instance of a Stream and an instance of a Note. We can set the :class:`~music21.pitch.Pitch` object to represent an E, and we can set the :class:`~music21.duration.Duration` object to represent a half-note (2 QLs).
+
+>>> from music21 import note, stream
+>>> s = stream.Stream()
+>>> n1 = note.Note()
+>>> n1.pitch.name = 'E4'
+>>> n1.duration.type = 'half'
+>>> n1.quarterLength
+2.0
 
 
 
