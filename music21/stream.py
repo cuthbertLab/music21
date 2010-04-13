@@ -4076,8 +4076,8 @@ class Measure(Stream):
     def _getKey(self):
         '''
         >>> a = Measure()
-        >>> a.key = key.KeySignature(0)
-        >>> a.key.sharps 
+        >>> a.keySignature = key.KeySignature(0)
+        >>> a.keySignature.sharps 
         0
         '''
         keyList = self.getElementsByClass(key.KeySignature)
@@ -4091,11 +4091,11 @@ class Measure(Stream):
     def _setKey(self, keyObj):
         '''
         >>> a = Measure()
-        >>> a.key = key.KeySignature(3)
-        >>> a.key.sharps   
+        >>> a.keySignature = key.KeySignature(3)
+        >>> a.keySignature.sharps   
         3
-        >>> a.key = key.KeySignature(6)
-        >>> a.key.sharps
+        >>> a.keySignature = key.KeySignature(6)
+        >>> a.keySignature.sharps
         6
         '''
         oldKey = self._getKey()
@@ -4105,7 +4105,7 @@ class Measure(Stream):
         self.insert(0, keyObj)
 
     # TODO: RENAME TO KEYSIGNATURE
-    key = property(_getKey, _setKey)   
+    keySignature = property(_getKey, _setKey)   
 
     #---------------------------------------------------------------------------
     def _getMX(self):
@@ -4137,9 +4137,9 @@ class Measure(Stream):
         if self.clef is not None:
             mxAttributes.clefList = [self.clef.mx]
 
-        if self.key is not None: 
+        if self.keySignature is not None: 
             # key.mx returns a Key ojbect, needs to be in a list
-            mxAttributes.keyList = [self.key.mx]
+            mxAttributes.keyList = [self.keySignature.mx]
         
         if self.timeSignature is not None:
             mxAttributes.timeList = self.timeSignature.mx 
@@ -4200,8 +4200,8 @@ class Measure(Stream):
             self.clef.mx = mxAttributes.clefList
 
         if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
-            self.key = key.KeySignature()
-            self.key.mx = mxAttributes.keyList
+            self.keySignature = key.KeySignature()
+            self.keySignature.mx = mxAttributes.keyList
 
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure        
