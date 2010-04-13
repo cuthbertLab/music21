@@ -681,7 +681,7 @@ class TestExternal(unittest.TestCase):
 #         a.read(mxString)
 #         a.loadPart('P1')
 #         a.loadPart('P2')
-        #print a.getGroups()
+        #print a.groupCount()
 
         b = NoteAnalysis(a.getElementsByGroup('P1').flat)
 

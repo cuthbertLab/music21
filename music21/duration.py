@@ -2289,7 +2289,7 @@ class AppogiaturaStopDuration(Duration):
     pass
 
 
-##-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
 
     def runTest(self):

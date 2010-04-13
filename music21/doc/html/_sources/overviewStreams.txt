@@ -213,7 +213,7 @@ A number of properties available with Stream instances make getting specific obj
 >>> len(sOut) == len(s)
 True
 
-Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch objects. Pitch objects, however, are not subclasses of :class:`~music21.base.Music21Object`; they do not have Duration objects or offsets, and are thus are returned in a Python list.
+Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch objects. Pitch objects, however, are not subclasses of :class:`~music21.base.Music21Object`; they do not have Duration objects or offsets, and are thus returned in a Python list.
 
 >>> listOut = s.pitches
 >>> len(listOut)
@@ -223,7 +223,7 @@ Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch
 
 Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced. 
 
-The :meth:`~music21.stream.Stream.getElementsByOffset` returns a Stream of all elements that fall either at a single offset or within a range of two offsets provided as an argument. In both cases a Stream is returned.
+The :meth:`~music21.stream.Stream.getElementsByOffset` method returns a Stream of all elements that fall either at a single offset or within a range of two offsets provided as an argument. In both cases a Stream is returned.
 
 >>> sOut = s.getElementsByOffset(3)
 >>> len(sOut)
@@ -255,19 +255,79 @@ Numerous additional methods permit gathering elements by offset values and posit
 
 
 
+Accessing Scores, Parts, Measures, and Notes
+-------------------------------------------------
+
+Streams provide a way to structure and position music21 objects both hierarchically and temporally. A Stream, or a Stream subclass such as :class:`~music21.stream.Measure`, can be placed within another Stream. 
+
+As shown in :ref:`quickStart`, a common arrangement of nested Streams is a :class:`~music21.stream.Score` Stream containing one or more :class:`~music21.stream.Part` Streams, each Part Stream in turn containing one or more :class:`~music21.stream.Measure` Streams. 
+
+Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.base.parseWork` function. 
+
+>>> from music21 import corpus
+>>> sBach = corpus.parseWork('bach/bwv57.8')
+
+We can access and examine elements at each level of this Score by using standard Python syntax for lists within lists. Thus, we can see the length of each component: first the Score, then the Part at index zero, and then the object (a Measure) at index two, all from accessing the same name `sBach`.
+
+>>> len(sBach)
+4
+>>> len(sBach[0])
+19
+>>> len(sBach[0][1])
+6
+
+Note that more than just Measures might be stored in a Part (such as :class:`~music21.instrument.Instrument` objects), and more than just Notes might be stored in a Measure (such as :class:`~music21.meter.TimeSignature` and :class:`~music21.key.KeySignature` objects). We thus frequently need to filter Stream and Stream subclasses by the class we seek. To repeat the count and select specific classes, we can use the :meth:`~music21.stream.Stream.getElementsByClass` method. Notice how the counts deviate from the examples above.
+
+
+>>> from music21 import stream, meter, key, note
+>>> len(sBach.getElementsByClass(stream.Part))
+4
+>>> len(sBach[0].getElementsByClass(stream.Measure))
+18
+>>> len(sBach[0][1].getElementsByClass(note.Note))
+3
+
+The index position of a Measure may not be the same as the Measure number. For that reason, gathering Measures is best accomplished with either the :meth:`~music21.stream.Stream.getMeasureRange` method (returning a Stream of Parts or Measures) or the :meth:`~music21.stream.Stream.getMeasure` method (returning a single Measure). In the following examples a single Measure from each part is appended to a new Stream.
+
+>>> sNew = stream.Stream()
+>>> sNew.append(sBach[0].getMeasure(3))
+>>> sNew.append(sBach[1].getMeasure(5))
+>>> sNew.append(sBach[2].getMeasure(7))
+>>> sNew.append(sBach[3].getMeasure(9))
+>>> sNew.show()
+
+.. image:: images/overviewStreams-05.*
+    :width: 600
+
+
+
+
+
+
+.. TODO: Accessing Components of Parts and Measures
+.. have a section on getting attributes form Parts and Measures
+
+
+
+
+Hierarchical and Flat Streams
+-------------------------------------------------
+
+
+For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of the Measure, then, has an offset of 0.
+
+
+
+
+
+
+
+
 Accessing Stream Elements by Group and Identifiers
 -----------------------------------------------------------
 
-All :class:`~music21.base.Music21Object` subclasses have attributes for `id` and `group`. 
+All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :class:`~music21.base.Music21Object.id` and :class:`~music21.base.Music21Object.gruop`. The `id` attribute is commonly used to distinguish Part objcects in a Score, but may have other applications. 
 
-
-
-
-
-Nested and Flat Streams
--------------------------------------------------
-
-Streams provide a way to structure and position music21 objects both hierarchically and temporally. Frequently, a Stream is placed within a Stream. 
 
 
 

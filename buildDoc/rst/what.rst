@@ -49,7 +49,7 @@ Music21 permits easily creating and transforming musical data. Say you want to r
 Learning music21
 -----------------------------
 
-To learn to use music21, some familiarity with Python is needed. Python is widely regarded as one of the easiest languages to learn, has clear and concise syntax, and is often a taught as a first programing language. You do not need to be a seasoned programmer, or even have complete knowledge of Python. Just a little bit of Python and you will be able to get started with music21. You might skim the following chapters of Python documentation tutorial for a bit of guidance.
+To learn to use music21, some familiarity with Python is needed. Python is widely regarded as one of the easiest languages to learn, has clear and concise syntax, and is often taught as a first programing language. You do not need to be a seasoned programmer, or even have complete knowledge of Python. Just a little bit of Python and you will be able to get started with music21. You might skim the following chapters of Python documentation tutorial for a bit of guidance.
 
 Starting the Python interpreter:
 http://docs.python.org/tutorial/interpreter.html
@@ -64,7 +64,7 @@ To install music21, view :ref:`install`. With some basic Python knowledge, start
 
 The :ref:`overviewNotes`, :ref:`overviewStreams`, :ref:`overviewFormats`, and :ref:`overviewPostTonal` chapters provide surveys of important features of key components of the music21 toolkit.
 
-The main body of the documentation, however, is the module documentation. This provides detailed documentation and examples for every object, method, and function in music21. Surveying the module documentation and the example code will demonstrate much of the music21 functionality. The module documentation will also be your primary reference when writing music21 scripts.
+The main body of the documentation, however, is the module documentation. This provides detailed documentation and examples for every object, method, and function in music21. Surveying the module documentation and the example code will demonstrate much of music21 functionality. The module documentation will also be your primary reference when writing music21 scripts.
 
 
 

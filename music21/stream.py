@@ -327,6 +327,24 @@ class Stream(music21.Music21Object):
         self._elementsChanged()
 
 
+    def __add__(self, other):
+        '''Add, or concatenate, two Streams.
+
+        Presently, this does not manipulate the offsets of the incoming elements to actually be at the end of the Stream. This may be a problem that makes this method not so useful?
+
+        >>> a = Stream()
+        >>> a.repeatInsert(note.Note("C"), range(10))
+        >>> b = Stream()
+        >>> b.repeatInsert(note.Note("G"), range(10))
+        >>> c = a + b   
+        >>> c.pitches
+        [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
+        '''
+        s = Stream()
+        s.elements = self._elements + other._elements
+        s._elementsChanged()
+        return s
+
     def pop(self, index):
         '''return the matched object from the list. 
 
@@ -945,22 +963,21 @@ class Stream(music21.Music21Object):
         return returnStream
 
 
-    def getGroups(self):
+    def groupCount(self):
         '''Get a dictionary for each groupId and the count of instances.
 
         >>> a = Stream()
         >>> n = note.Note()
         >>> a.repeatAppend(n, 30)
         >>> a.addGroupForElements('P1')
-        >>> a.getGroups()
+        >>> a.groupCount()
         {'P1': 30}
         >>> a[12].groups.append('green')
-        >>> a.getGroups()
+        >>> a.groupCount()
         {'P1': 30, 'green': 1}
         '''
 
         # TODO: and related:
-
         #getStreamGroups which does the same but makes the value of the hash key be a stream with all the elements that match the group?
         # this is similar to what getElementsByGroup does
 
@@ -1439,6 +1456,31 @@ class Stream(music21.Music21Object):
                 environLocal.printDebug(['cannot find requested class in stream:', className])
 
         return post
+
+
+    def getMeasure(self, measureNumber, 
+        collect=[clef.Clef, meter.TimeSignature, 
+        instrument.Instrument, key.KeySignature]):
+        '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
+
+        This method is distinguished from :meth:`~music21.stream.Stream.getMeasureRange` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a[0].getMeasure(3)
+        <music21.stream.Measure 3 offset=0.0>
+        '''
+        # we must be able to obtain a measure from this (not a flat) 
+        # representation (e.g., this is a Stream or Part, not a Score)
+        if len(self.getElementsByClass(Measure)) >= 1:
+            s = self.getMeasureRange(measureNumber, measureNumber, collect=collect)
+            if len(s) == 0:
+                return None
+            else:
+                return s.getElementsByClass(Measure)[0]
+        else:   
+            return None
+
 
 
     def getMeasures(self):
@@ -4412,6 +4454,9 @@ class Score(Stream):
             post.insert(0, p.getMeasureRange(numberStart, numberEnd,
                         collect))
         return post
+
+
+
 
     def measureOffsetMap(self, classFilterList=None):
         '''This method overrides the :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. This creates a map based on all contained Parts in this Score. Measures found in multiple Parts with the same offset will be appended to the same list. 
