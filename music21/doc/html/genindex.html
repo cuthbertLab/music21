@@ -89,12 +89,11 @@
 <dt><a href="moduleStream.html#music21.stream.Measure.addTimeDependentDirection">addTimeDependentDirection() (music21.stream.Measure method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.DurationCommon.aggregateTupletRatio">aggregateTupletRatio() (music21.duration.DurationCommon method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.allPlayingWhileSounding">allPlayingWhileSounding() (music21.stream.Stream method)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.almostEqual">almostEqual() (in module music21.common)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.almostEqual">almostEqual() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.AltoClef">AltoClef (class in music21.clef)</a></dt>
-<dt><a href="moduleBase.html#music21.base.Groups.append">append() (music21.base.Groups method)</a></dt>
+<dt><a href="moduleNode.html#music21.node.NodeList.append">append() (music21.node.NodeList method)</a></dt>
   <dd><dl>
-    <dt><a href="moduleNode.html#music21.node.NodeList.append">(music21.node.NodeList method)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Beams.append">(music21.note.Beams method)</a></dt>
     <dt><a href="moduleStream.html#music21.stream.Stream.append">(music21.stream.Stream method)</a></dt>
   </dl></dd>
@@ -167,6 +166,7 @@
 <dt><a href="moduleDuration.html#music21.duration.Duration.componentIndexAtQtrPosition">componentIndexAtQtrPosition() (music21.duration.Duration method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.Duration.components">components (music21.duration.Duration attribute)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.Duration.componentStartTime">componentStartTime() (music21.duration.Duration method)</a></dt>
+<dt><a href="moduleSerial.html#music21.serial.HistoricalTwelveToneRow.composer">composer (music21.serial.HistoricalTwelveToneRow attribute)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.CompoundTimeSignature">CompoundTimeSignature (class in music21.meter)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleDuration.html#music21.duration.Duration.consolidate">consolidate() (music21.duration.Duration method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.containsSeventh">containsSeventh() (music21.chord.Chord method)</a></dt>
@@ -372,19 +372,13 @@
 <dt><a href="moduleStream.html#music21.stream.Stream.getInstrument">getInstrument() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevel">getLevel() (music21.meter.MeterSequence method)</a></dt>
 <dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelSpan">getLevelSpan() (music21.meter.MeterSequence method)</a></dt>
-<dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelWeight">getLevelWeight() (music21.meter.MeterSequence method)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.getMd5">getMd5() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleMeter.html#music21.meter.MeterSequence.getLevelWeight">getLevelWeight() (music21.meter.MeterSequence method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.getMd5">getMd5() (in module music21.common)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getMeasure">getMeasure() (music21.stream.Stream method)</a></dt>
-<dt><a href="moduleStream.html#music21.stream.Score.getMeasureRange">getMeasureRange() (music21.stream.Score method)</a></dt>
-  <dd><dl>
-    <dt><a href="moduleStream.html#music21.stream.Stream.getMeasureRange">(music21.stream.Stream method)</a></dt>
-  </dl></dd>
+<dt><a href="moduleStream.html#music21.stream.Stream.getMeasureRange">getMeasureRange() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getMeasures">getMeasures() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleNode.html#music21.node.Node.getNewDoc">getNewDoc() (music21.node.Node method)</a></dt>
-<dt><a href="moduleTinyNotation.html#music21.tinyNotation.HarmonyStream.getNote">getNote() (music21.tinyNotation.HarmonyStream method)</a></dt>
-  <dd><dl>
-    <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationStream.getNote">(music21.tinyNotation.TinyNotationStream method)</a></dt>
-  </dl></dd>
+<dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationStream.getNote">getNote() (music21.tinyNotation.TinyNotationStream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.getNotes">getNotes() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleNote.html#music21.note.Beams.getNumbers">getNumbers() (music21.note.Beams method)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.getNumFromStr">getNumFromStr() (in module music21.common)</a></dt>
@@ -444,14 +438,15 @@
 <dt><a href="moduleBase.html#music21.base.Music21Object.hasContext">hasContext() (music21.base.Music21Object method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.hasFifth">hasFifth() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.hasRepeatedScaleX">hasRepeatedScaleX() (music21.chord.Chord method)</a></dt>
-<dt><a href="moduleChord.html#music21.chord.Chord.hasScaleX">hasScaleX() (music21.chord.Chord method)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="moduleChord.html#music21.chord.Chord.hasSeventh">hasSeventh() (music21.chord.Chord method)</a></dt>
+<dt><a href="moduleChord.html#music21.chord.Chord.hasScaleX">hasScaleX() (music21.chord.Chord method)</a></dt>
+<dt><a href="moduleChord.html#music21.chord.Chord.hasSeventh">hasSeventh() (music21.chord.Chord method)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleBase.html#music21.base.DefinedContexts.hasSiteId">hasSiteId() (music21.base.DefinedContexts method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.hasSpecificX">hasSpecificX() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.hasThird">hasThird() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.hasZRelation">hasZRelation (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.highestOffset">highestOffset (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.highestTime">highestTime (music21.stream.Stream attribute)</a></dt>
+<dt><a href="moduleSerial.html#music21.serial.HistoricalTwelveToneRow">HistoricalTwelveToneRow (class in music21.serial)</a></dt>
 </dl></td></tr></table>
 
 <h2 id="I">I</h2>
@@ -552,13 +547,11 @@
     <dt><a href="moduleNote.html#music21.note.Note.lily">(music21.note.Note attribute)</a></dt>
     <dt><a href="moduleNote.html#music21.note.Rest.lily">(music21.note.Rest attribute)</a></dt>
     <dt><a href="modulePitch.html#music21.pitch.Accidental.lily">(music21.pitch.Accidental attribute)</a></dt>
-    <dt><a href="moduleStream.html#music21.stream.Part.lily">(music21.stream.Part attribute)</a></dt>
-    <dt><a href="moduleStream.html#music21.stream.Score.lily">(music21.stream.Score attribute)</a></dt>
     <dt><a href="moduleStream.html#music21.stream.Stream.lily">(music21.stream.Stream attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.lilyAttached">lilyAttached() (music21.editorial.NoteEditorial method)</a></dt>
-<dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.lilyEnd">lilyEnd() (music21.editorial.NoteEditorial method)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.lilyStart">lilyStart() (music21.editorial.NoteEditorial method)</a></dt>
+<dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.lilyEnd">lilyEnd() (music21.editorial.NoteEditorial method)</a></dt>
+<dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.lilyStart">lilyStart() (music21.editorial.NoteEditorial method)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleDuration.html#music21.duration.DurationUnit.link">link() (music21.duration.DurationUnit method)</a></dt>
 <dt><a href="moduleConverter.html#music21.converter.ConverterMusicXML.load">load() (music21.converter.ConverterMusicXML method)</a></dt>
   <dd><dl>
@@ -597,10 +590,7 @@
 <dt><a href="moduleStream.html#music21.stream.Measure.measureNumber">measureNumber (music21.stream.Measure attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Measure.measureNumberSuffix">measureNumberSuffix (music21.stream.Measure attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Measure.measureNumberWithSuffix">measureNumberWithSuffix() (music21.stream.Measure method)</a></dt>
-<dt><a href="moduleStream.html#music21.stream.Score.measureOffsetMap">measureOffsetMap() (music21.stream.Score method)</a></dt>
-  <dd><dl>
-    <dt><a href="moduleStream.html#music21.stream.Stream.measureOffsetMap">(music21.stream.Stream method)</a></dt>
-  </dl></dd>
+<dt><a href="moduleStream.html#music21.stream.Stream.measureOffsetMap">measureOffsetMap() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.measures">measures (music21.stream.Stream attribute)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.melodicIntervals">melodicIntervals() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleNode.html#music21.node.Node.merge">merge() (music21.node.Node method)</a></dt>
@@ -627,8 +617,8 @@
 <dt><a href="moduleEnvironment.html#module-music21.environment">music21.environment (module)</a></dt>
 <dt><a href="moduleGraph.html#module-music21.graph">music21.graph (module)</a></dt>
 <dt><a href="moduleInstrument.html#module-music21.instrument">music21.instrument (module)</a></dt>
-<dt><a href="moduleInterval.html#module-music21.interval">music21.interval (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="moduleKey.html#module-music21.key">music21.key (module)</a></dt>
+<dt><a href="moduleInterval.html#module-music21.interval">music21.interval (module)</a></dt>
+<dt><a href="moduleKey.html#module-music21.key">music21.key (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleMeter.html#module-music21.meter">music21.meter (module)</a></dt>
 <dt><a href="moduleNode.html#module-music21.node">music21.node (module)</a></dt>
 <dt><a href="moduleNote.html#module-music21.note">music21.note (module)</a></dt>
@@ -722,6 +712,7 @@
     <dt><a href="moduleBase.html#music21.base.Music21Object.offset">(music21.base.Music21Object attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleConverter.html#music21.converter.StreamFreezer.openPickle">openPickle() (music21.converter.StreamFreezer method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleSerial.html#music21.serial.HistoricalTwelveToneRow.opus">opus (music21.serial.HistoricalTwelveToneRow attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.orderedPitchClasses">orderedPitchClasses (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.orderedPitchClassesString">orderedPitchClassesString (music21.chord.Chord attribute)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.DurationUnit.ordinal">ordinal (music21.duration.DurationUnit attribute)</a></dt>
@@ -780,11 +771,11 @@
     <dt><a href="modulePitch.html#music21.pitch.Pitch.pitchClassString">(music21.pitch.Pitch attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleClef.html#music21.clef.PitchClef">PitchClef (class in music21.clef)</a></dt>
-<dt><a href="moduleChord.html#music21.chord.Chord.pitchedCommonName">pitchedCommonName (music21.chord.Chord attribute)</a></dt>
+<dt><a href="moduleChord.html#music21.chord.Chord.pitchedCommonName">pitchedCommonName (music21.chord.Chord attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleChord.html#music21.chord.Chord.pitches">pitches (music21.chord.Chord attribute)</a></dt>
   <dd><dl>
     <dt><a href="moduleStream.html#music21.stream.Stream.pitches">(music21.stream.Stream attribute)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+  </dl></dd>
 <dt><a href="moduleStream.html#music21.stream.Stream.playingWhenAttacked">playingWhenAttacked() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.plot">plot() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Plot3DBars">Plot3DBars (class in music21.graph)</a></dt>
@@ -818,10 +809,6 @@
 <dt><a href="moduleGraph.html#music21.graph.Graph.process">process() (music21.graph.Graph method)</a></dt>
   <dd><dl>
     <dt><a href="moduleGraph.html#music21.graph.Graph3DPolygonBars.process">(music21.graph.Graph3DPolygonBars method)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.GraphHistogram.process">(music21.graph.GraphHistogram method)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.GraphHorizontalBar.process">(music21.graph.GraphHorizontalBar method)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.GraphScatter.process">(music21.graph.GraphScatter method)</a></dt>
-    <dt><a href="moduleGraph.html#music21.graph.GraphScatterWeighted.process">(music21.graph.GraphScatterWeighted method)</a></dt>
     <dt><a href="moduleGraph.html#music21.graph.PlotStream.process">(music21.graph.PlotStream method)</a></dt>
   </dl></dd>
 <dt><a href="moduleNote.html#music21.note.Note.ps">ps (music21.note.Note attribute)</a></dt>
@@ -866,80 +853,7 @@
 <dt><a href="moduleNote.html#music21.note.Rest">Rest (class in music21.note)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.root">root() (music21.chord.Chord method)</a></dt>
 <dt><a href="moduleDuration.html#music21.duration.roundDuration">roundDuration() (in module music21.duration)</a></dt>
-<dt><a href="moduleSerial.html#music21.serial.RowBergChamberConcerto.row">row (music21.serial.RowBergChamberConcerto attribute)</a></dt>
-  <dd><dl>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergConcertoForViolinAndOrchestra.row">(music21.serial.RowBergConcertoForViolinAndOrchestra attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergDerWein.row">(music21.serial.RowBergDerWein attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergLuluActISceneXx.row">(music21.serial.RowBergLuluActISceneXx attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergLuluActIiScene1.row">(music21.serial.RowBergLuluActIiScene1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergLuluPrimaryRow.row">(music21.serial.RowBergLuluPrimaryRow attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergLyricSuiteLastMvtPermutation.row">(music21.serial.RowBergLyricSuiteLastMvtPermutation attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergLyricSuitePrimaryRow.row">(music21.serial.RowBergLyricSuitePrimaryRow attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowBergWozzeckActIScene4Passacaglia.row">(music21.serial.RowBergWozzeckActIScene4Passacaglia attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergDieJakobsleiter.row">(music21.serial.RowSchoenbergDieJakobsleiter attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergFragmentForPiano.row">(music21.serial.RowSchoenbergFragmentForPiano attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano.row">(music21.serial.RowSchoenbergFragmentOfPhantasiaForPiano attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergFragmentOfSonataForOrgan.row">(music21.serial.RowSchoenbergFragmentOfSonataForOrgan attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergIsraelExistsAgain.row">(music21.serial.RowSchoenbergIsraelExistsAgain attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergMosesAndAron.row">(music21.serial.RowSchoenbergMosesAndAron attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp23No5.row">(music21.serial.RowSchoenbergOp23No5 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp24Movement4.row">(music21.serial.RowSchoenbergOp24Movement4 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp24Movement5.row">(music21.serial.RowSchoenbergOp24Movement5 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp25.row">(music21.serial.RowSchoenbergOp25 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp26.row">(music21.serial.RowSchoenbergOp26 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp27No1.row">(music21.serial.RowSchoenbergOp27No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp27No2.row">(music21.serial.RowSchoenbergOp27No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp27No3.row">(music21.serial.RowSchoenbergOp27No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp27No4.row">(music21.serial.RowSchoenbergOp27No4 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp28No1.row">(music21.serial.RowSchoenbergOp28No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp28No3.row">(music21.serial.RowSchoenbergOp28No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp29.row">(music21.serial.RowSchoenbergOp29 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp30.row">(music21.serial.RowSchoenbergOp30 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp31.row">(music21.serial.RowSchoenbergOp31 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp32.row">(music21.serial.RowSchoenbergOp32 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp33A.row">(music21.serial.RowSchoenbergOp33A attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp33B.row">(music21.serial.RowSchoenbergOp33B attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp34.row">(music21.serial.RowSchoenbergOp34 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp35No1.row">(music21.serial.RowSchoenbergOp35No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp35No2.row">(music21.serial.RowSchoenbergOp35No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp35No3.row">(music21.serial.RowSchoenbergOp35No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp35No5.row">(music21.serial.RowSchoenbergOp35No5 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp36.row">(music21.serial.RowSchoenbergOp36 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp37.row">(music21.serial.RowSchoenbergOp37 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp41.row">(music21.serial.RowSchoenbergOp41 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp42.row">(music21.serial.RowSchoenbergOp42 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp44.row">(music21.serial.RowSchoenbergOp44 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp45.row">(music21.serial.RowSchoenbergOp45 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp46.row">(music21.serial.RowSchoenbergOp46 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp47.row">(music21.serial.RowSchoenbergOp47 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp48No1.row">(music21.serial.RowSchoenbergOp48No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp48No2.row">(music21.serial.RowSchoenbergOp48No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp48No3.row">(music21.serial.RowSchoenbergOp48No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp50A.row">(music21.serial.RowSchoenbergOp50A attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp50B.row">(music21.serial.RowSchoenbergOp50B attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp50C.row">(music21.serial.RowSchoenbergOp50C attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp17No2.row">(music21.serial.RowWebernOp17No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp17No3.row">(music21.serial.RowWebernOp17No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp18No1.row">(music21.serial.RowWebernOp18No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp18No2.row">(music21.serial.RowWebernOp18No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp18No3.row">(music21.serial.RowWebernOp18No3 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp19No1.row">(music21.serial.RowWebernOp19No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp19No2.row">(music21.serial.RowWebernOp19No2 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp20.row">(music21.serial.RowWebernOp20 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp21.row">(music21.serial.RowWebernOp21 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp22.row">(music21.serial.RowWebernOp22 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp23.row">(music21.serial.RowWebernOp23 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp24.row">(music21.serial.RowWebernOp24 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp25.row">(music21.serial.RowWebernOp25 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp26.row">(music21.serial.RowWebernOp26 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp27.row">(music21.serial.RowWebernOp27 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp28.row">(music21.serial.RowWebernOp28 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp29.row">(music21.serial.RowWebernOp29 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp30.row">(music21.serial.RowWebernOp30 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOp31.row">(music21.serial.RowWebernOp31 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.RowWebernOpNo17No1.row">(music21.serial.RowWebernOpNo17No1 attribute)</a></dt>
-    <dt><a href="moduleSerial.html#music21.serial.TwelveToneRow.row">(music21.serial.TwelveToneRow attribute)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleSerial.html#music21.serial.TwelveToneRow.row">row (music21.serial.TwelveToneRow attribute)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowBergChamberConcerto">RowBergChamberConcerto (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowBergConcertoForViolinAndOrchestra">RowBergConcertoForViolinAndOrchestra (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowBergDerWein">RowBergDerWein (class in music21.serial)</a></dt>
@@ -969,7 +883,7 @@
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp29">RowSchoenbergOp29 (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp30">RowSchoenbergOp30 (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp31">RowSchoenbergOp31 (class in music21.serial)</a></dt>
-<dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp32">RowSchoenbergOp32 (class in music21.serial)</a></dt>
+<dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp32">RowSchoenbergOp32 (class in music21.serial)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp33A">RowSchoenbergOp33A (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp33B">RowSchoenbergOp33B (class in music21.serial)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.RowSchoenbergOp34">RowSchoenbergOp34 (class in music21.serial)</a></dt>
@@ -1132,6 +1046,7 @@
 <dt><a href="moduleStream.html#music21.stream.Measure.timeSignatureIsNew">timeSignatureIsNew (music21.stream.Measure attribute)</a></dt>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationNote">TinyNotationNote (class in music21.tinyNotation)</a></dt>
 <dt><a href="moduleTinyNotation.html#music21.tinyNotation.TinyNotationStream">TinyNotationStream (class in music21.tinyNotation)</a></dt>
+<dt><a href="moduleSerial.html#music21.serial.HistoricalTwelveToneRow.title">title (music21.serial.HistoricalTwelveToneRow attribute)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.Scalar.toFloat">toFloat() (music21.common.Scalar method)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.Scalar.toInt">toInt() (music21.common.Scalar method)</a></dt>
 <dt><a href="moduleSerial.html#music21.serial.ToneRow">ToneRow (class in music21.serial)</a></dt>

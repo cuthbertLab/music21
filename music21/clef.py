@@ -171,6 +171,7 @@ class GClef(PitchClef):
         '''
         PitchClef.__init__(self)
         self.sign = "G"
+        self.lowestLine = None
 
 class FrenchViolinClef(GClef):
     def __init__(self):
@@ -243,7 +244,8 @@ class CClef(PitchClef):
         '''
         PitchClef.__init__(self)
         self.sign = "C"
-    
+        self.lowestLine = None
+
 class SopranoClef(CClef):
     def __init__(self):
         '''
@@ -315,6 +317,7 @@ class FClef(PitchClef):
         '''
         PitchClef.__init__(self)
         self.sign = "F"
+        self.lowestLine = None
 
 class FBaritoneClef(FClef):
     def __init__(self):

@@ -322,24 +322,6 @@ CompoundTimeSignature
 
     inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
 
-    **CompoundTimeSignature** **attributes**
-
-        Attributes inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.symbolizeDenominator`, :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.symbol`, :attr:`~music21.meter.TimeSignature.accent`, :attr:`~music21.meter.TimeSignature.summedNumerator`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.inherited`
-
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
-
-    **CompoundTimeSignature** **properties**
-
-        Properties inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.barDuration`, :attr:`~music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`~music21.meter.TimeSignature.denominator`, :attr:`~music21.meter.TimeSignature.lily`, :attr:`~music21.meter.TimeSignature.musicxml`, :attr:`~music21.meter.TimeSignature.mx`, :attr:`~music21.meter.TimeSignature.numerator`, :attr:`~music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`~music21.meter.TimeSignature.totalLength`
-
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **CompoundTimeSignature** **methods**
-
-        Methods inherited from :class:`~music21.meter.TimeSignature`: :meth:`~music21.meter.TimeSignature.getAccent`, :meth:`~music21.meter.TimeSignature.getAccentWeight`, :meth:`~music21.meter.TimeSignature.getBeams`, :meth:`~music21.meter.TimeSignature.getBeat`, :meth:`~music21.meter.TimeSignature.getBeatDepth`, :meth:`~music21.meter.TimeSignature.getBeatProgress`, :meth:`~music21.meter.TimeSignature.load`, :meth:`~music21.meter.TimeSignature.loadRatio`, :meth:`~music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`~music21.meter.TimeSignature.ratioEqual`, :meth:`~music21.meter.TimeSignature.setAccentWeight`, :meth:`~music21.meter.TimeSignature.setDisplay`
-
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
-
 
 DurationDenominatorTimeSignature
 --------------------------------
@@ -349,24 +331,6 @@ DurationDenominatorTimeSignature
     If you have played Hindemith you know these, 3/(dot-quarter) etc. 
 
     inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
-
-    **DurationDenominatorTimeSignature** **attributes**
-
-        Attributes inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.symbolizeDenominator`, :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.symbol`, :attr:`~music21.meter.TimeSignature.accent`, :attr:`~music21.meter.TimeSignature.summedNumerator`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.inherited`
-
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
-
-    **DurationDenominatorTimeSignature** **properties**
-
-        Properties inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.barDuration`, :attr:`~music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`~music21.meter.TimeSignature.denominator`, :attr:`~music21.meter.TimeSignature.lily`, :attr:`~music21.meter.TimeSignature.musicxml`, :attr:`~music21.meter.TimeSignature.mx`, :attr:`~music21.meter.TimeSignature.numerator`, :attr:`~music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`~music21.meter.TimeSignature.totalLength`
-
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **DurationDenominatorTimeSignature** **methods**
-
-        Methods inherited from :class:`~music21.meter.TimeSignature`: :meth:`~music21.meter.TimeSignature.getAccent`, :meth:`~music21.meter.TimeSignature.getAccentWeight`, :meth:`~music21.meter.TimeSignature.getBeams`, :meth:`~music21.meter.TimeSignature.getBeat`, :meth:`~music21.meter.TimeSignature.getBeatDepth`, :meth:`~music21.meter.TimeSignature.getBeatProgress`, :meth:`~music21.meter.TimeSignature.load`, :meth:`~music21.meter.TimeSignature.loadRatio`, :meth:`~music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`~music21.meter.TimeSignature.ratioEqual`, :meth:`~music21.meter.TimeSignature.setAccentWeight`, :meth:`~music21.meter.TimeSignature.setDisplay`
-
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 MeterSequence
@@ -754,23 +718,5 @@ NonPowerOfTwoTimeSignature
 
 
     inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
-
-    **NonPowerOfTwoTimeSignature** **attributes**
-
-        Attributes inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.symbolizeDenominator`, :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.symbol`, :attr:`~music21.meter.TimeSignature.accent`, :attr:`~music21.meter.TimeSignature.summedNumerator`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.inherited`
-
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
-
-    **NonPowerOfTwoTimeSignature** **properties**
-
-        Properties inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.barDuration`, :attr:`~music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`~music21.meter.TimeSignature.denominator`, :attr:`~music21.meter.TimeSignature.lily`, :attr:`~music21.meter.TimeSignature.musicxml`, :attr:`~music21.meter.TimeSignature.mx`, :attr:`~music21.meter.TimeSignature.numerator`, :attr:`~music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`~music21.meter.TimeSignature.totalLength`
-
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
-
-    **NonPowerOfTwoTimeSignature** **methods**
-
-        Methods inherited from :class:`~music21.meter.TimeSignature`: :meth:`~music21.meter.TimeSignature.getAccent`, :meth:`~music21.meter.TimeSignature.getAccentWeight`, :meth:`~music21.meter.TimeSignature.getBeams`, :meth:`~music21.meter.TimeSignature.getBeat`, :meth:`~music21.meter.TimeSignature.getBeatDepth`, :meth:`~music21.meter.TimeSignature.getBeatProgress`, :meth:`~music21.meter.TimeSignature.load`, :meth:`~music21.meter.TimeSignature.loadRatio`, :meth:`~music21.meter.TimeSignature.quarterPositionToBeat`, :meth:`~music21.meter.TimeSignature.ratioEqual`, :meth:`~music21.meter.TimeSignature.setAccentWeight`, :meth:`~music21.meter.TimeSignature.setDisplay`
-
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 

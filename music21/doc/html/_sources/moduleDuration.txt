@@ -661,20 +661,6 @@ AppogiaturaStartDuration
 
     inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
-    **AppogiaturaStartDuration** **attributes**
-
-        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
-
-    **AppogiaturaStartDuration** **properties**
-
-        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
-
-    **AppogiaturaStartDuration** **methods**
-
-        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
-
-        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
-
 
 AppogiaturaStopDuration
 -----------------------
@@ -685,20 +671,6 @@ AppogiaturaStopDuration
     First positional argument is assumed to be type string or a quarterLength. 
 
     inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
-
-    **AppogiaturaStopDuration** **attributes**
-
-        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
-
-    **AppogiaturaStopDuration** **properties**
-
-        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
-
-    **AppogiaturaStopDuration** **methods**
-
-        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
-
-        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 
 DurationCommon
@@ -863,20 +835,6 @@ GraceDuration
 
     inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
-    **GraceDuration** **attributes**
-
-        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
-
-    **GraceDuration** **properties**
-
-        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
-
-    **GraceDuration** **methods**
-
-        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
-
-        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
-
 
 LongGraceDuration
 -----------------
@@ -886,20 +844,6 @@ LongGraceDuration
 
     inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
-    **LongGraceDuration** **attributes**
-
-        Attributes inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.linkages`
-
-    **LongGraceDuration** **properties**
-
-        Properties inherited from :class:`~music21.duration.Duration`: :attr:`~music21.duration.Duration.components`, :attr:`~music21.duration.Duration.dots`, :attr:`~music21.duration.Duration.isComplex`, :attr:`~music21.duration.Duration.lily`, :attr:`~music21.duration.Duration.musicxml`, :attr:`~music21.duration.Duration.mx`, :attr:`~music21.duration.Duration.quarterLength`, :attr:`~music21.duration.Duration.tuplets`, :attr:`~music21.duration.Duration.type`
-
-    **LongGraceDuration** **methods**
-
-        Methods inherited from :class:`~music21.duration.Duration`: :meth:`~music21.duration.Duration.addDuration`, :meth:`~music21.duration.Duration.appendTuplet`, :meth:`~music21.duration.Duration.clear`, :meth:`~music21.duration.Duration.componentIndexAtQtrPosition`, :meth:`~music21.duration.Duration.componentStartTime`, :meth:`~music21.duration.Duration.consolidate`, :meth:`~music21.duration.Duration.expand`, :meth:`~music21.duration.Duration.fill`, :meth:`~music21.duration.Duration.show`, :meth:`~music21.duration.Duration.sliceComponentAtPosition`, :meth:`~music21.duration.Duration.updateQuarterLength`, :meth:`~music21.duration.Duration.write`
-
-        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
-
 
 ZeroDuration
 ------------
@@ -908,19 +852,5 @@ ZeroDuration
 
 
     inherits from: :class:`~music21.duration.DurationUnit`, :class:`~music21.duration.DurationCommon`
-
-    **ZeroDuration** **attributes**
-
-        Attributes inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.linkStatus`
-
-    **ZeroDuration** **properties**
-
-        Properties inherited from :class:`~music21.duration.DurationUnit`: :attr:`~music21.duration.DurationUnit.dots`, :attr:`~music21.duration.DurationUnit.lily`, :attr:`~music21.duration.DurationUnit.ordinal`, :attr:`~music21.duration.DurationUnit.quarterLength`, :attr:`~music21.duration.DurationUnit.tuplets`, :attr:`~music21.duration.DurationUnit.type`
-
-    **ZeroDuration** **methods**
-
-        Methods inherited from :class:`~music21.duration.DurationUnit`: :meth:`~music21.duration.DurationUnit.appendTuplet`, :meth:`~music21.duration.DurationUnit.link`, :meth:`~music21.duration.DurationUnit.setTypeFromNum`, :meth:`~music21.duration.DurationUnit.unlink`, :meth:`~music21.duration.DurationUnit.updateQuarterLength`, :meth:`~music21.duration.DurationUnit.updateType`
-
-        Methods inherited from :class:`~music21.duration.DurationCommon`: :meth:`~music21.duration.DurationCommon.aggregateTupletRatio`
 
 

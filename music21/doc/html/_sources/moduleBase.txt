@@ -667,12 +667,4 @@ Groups
 
     inherits from: list
 
-    **Groups** **methods**
-
-        .. method:: append(value)
-
-        No documentation. 
-
-        Methods inherited from list: :meth:`~__builtin__.list.count`, :meth:`~__builtin__.list.extend`, :meth:`~__builtin__.list.index`, :meth:`~__builtin__.list.insert`, :meth:`~__builtin__.list.pop`, :meth:`~__builtin__.list.remove`, :meth:`~__builtin__.list.reverse`, :meth:`~__builtin__.list.sort`
-
 

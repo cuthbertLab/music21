@@ -4455,8 +4455,6 @@ class Score(Stream):
         return post
 
 
-
-
     def measureOffsetMap(self, classFilterList=None):
         '''This method overrides the :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. This creates a map based on all contained Parts in this Score. Measures found in multiple Parts with the same offset will be appended to the same list. 
 

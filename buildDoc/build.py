@@ -615,6 +615,15 @@ class PartitionedClass(PartitionedName):
         >>> a.getNames('attributes', 1)
         ['id', 'groups']
 
+        >>> from music21 import serial
+        >>> a = PartitionedClass(serial.RowSchoenbergOp23No5)
+        >>> a.getNames('attributes', 0)
+        ['composer', 'opus', 'row', 'title']
+        >>> a.getNames('data', 1) # returns empty b/c defined here
+        []
+        >>> a.mroLive[1]
+        <music21.serial.HistoricalTwelveToneRow...
+
         '''
         post = []
         if nameKind.lower() in ['properties', 'property']:
@@ -878,6 +887,52 @@ class ClassDoc(RestructuredWriter):
         return ''.join(msg)
 
 
+    def _isAllInherited(self):
+        '''Try to determine if a class is all inherited, that is: all the attributes and methods are from a subclass, and the docs will look identical.
+        '''
+        post = True
+        for group in ['attributes', 'properties', 'methods']:    
+            # in order for this to be all-inherited, it must have 
+            # an inherited class that has all the same names just
+            # one level up. 
+
+            namesParent = []
+            # get all that are not the first, which is zero
+            #environLocal.printDebug([group, 'mroIndices', self.partitionedClass.mroIndices()[1:]])
+            for i in self.partitionedClass.mroIndices()[1:]:
+                # this returns unique names; we need all names!
+                level = self.partitionedClass.getNames(group, 
+                        i, public=True, getInit=False)
+                #environLocal.printDebug(['mro group', i, level])
+                namesParent += level
+                # get all names if possible; this covers cases where
+                # names are present but the are defined in the final class
+                if self.partitionedClass.mroLive[i] != None:
+                    namesParent += dir(self.partitionedClass.mroLive[i])
+
+            names = self.partitionedClass.getNames(group, 
+                    0, public=True, getInit=False)
+
+            # no public names means that nothing new has been defined
+            if len(names) == 0:
+                continue
+            # if all names defined here are in the parent, then it is also
+            # still is all inherited
+            namesParentSet = set(namesParent)
+            namesSet = set(names)
+
+            #environLocal.printDebug(['namesParentSet', namesParentSet])
+            #environLocal.printDebug(['namesSet', namesSet])
+
+            # TODO: may need to look at doc strings in order to be sure
+            # that we are not cutting out original content
+            if not namesSet.issubset(namesParentSet):
+                post = False
+                break
+
+        return post
+
+
     def getRestructuredClass(self):
         '''Return a string of a complete RST specification for a class.
     
@@ -905,8 +960,17 @@ class ClassDoc(RestructuredWriter):
         # add init doc after main class doc
         if docInitCooked != None:
             msg.append('%s\n' % docInitCooked)
-
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
+
+        environLocal.printDebug(['result of _isAllInherited:', self.name,
+            self._isAllInherited()
+            ])
+
+        # if all names are inherited (the are not newly defined) then skip
+        # documentation of values
+        if self._isAllInherited():
+            msg.append('\n'*1)
+            return msg
 
         for group in ['attributes', 'properties', 'methods']:    
             msgGroup = []
