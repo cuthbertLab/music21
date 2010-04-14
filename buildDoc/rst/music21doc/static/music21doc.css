@@ -14,7 +14,7 @@
 body {
     font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
                  'Verdana', sans-serif;
-    font-size: .95em;
+    font-size: 0.9em;
     letter-spacing: -0.01em;
     line-height: 150%;
     text-align: center;
@@ -45,7 +45,7 @@ div.body {
 }
 
 div.related {
-    font-size: 1em;
+    font-size: 0.9em;
 }
 
 div.related ul {
@@ -87,13 +87,13 @@ div.sphinxsidebar {
     padding: 0.5em 15px 15px 0;
     width: 210px;
     float: right;
-    font-size: 1em;
+    font-size: 0.9em;
     text-align: left;
 }
 
 div.sphinxsidebar h3, div.sphinxsidebar h4 {
     margin: 1em 0 0.5em 0;
-    font-size: 1em;
+    font-size: 0.9em;
     padding: 0.1em 0 0.1em 0.5em;
     color: white;
     border: 1px solid #86989B;
@@ -151,7 +151,8 @@ div.body a {
 h1 {
     margin: 0;
     padding: 0.7em 0 0.3em 0;
-    font-size: 2.0em;
+    font-size: 1.8em;
+    line-height: 1.1em;
     color: #11557C;
 }
 
@@ -190,7 +191,7 @@ h5 a.anchor:hover, h6 a.anchor:hover {
 
 a.headerlink {
     color: #c60f0f!important;
-    font-size: 1em;
+    font-size: 0.9em;
     margin-left: 6px;
     padding: 0 4px 0 4px;
     text-decoration: none!important;
@@ -204,7 +205,7 @@ a.headerlink:hover {
 cite, code, tt {
     font-family: 'Consolas', 'Deja Vu Sans Mono',
                  'Bitstream Vera Sans Mono', monospace;
-    font-size: 0.95em;
+    font-size: 0.85em;
     letter-spacing: 0.01em;
 }
 
@@ -221,10 +222,10 @@ tt.descname, tt.descclassname, tt.xref {
 .class { 
     margin-top: -5px;
     margin-left: 10px;
-    font-size: .9em;
+    font-size: 0.9em;
 }
 .class EM.property { display: none }
-.class .descname { font-size: 1.0em }
+.class .descname { font-size: 0.9em }
 
 
 hr {
@@ -244,7 +245,7 @@ a tt:hover {
 pre {
     font-family: 'Consolas', 'Deja Vu Sans Mono',
                  'Bitstream Vera Sans Mono', monospace;
-    font-size: 0.95em;
+    font-size: 0.85em;
     letter-spacing: 0.015em;
     line-height: 120%;
     padding: 0.5em;
