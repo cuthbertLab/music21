@@ -4104,7 +4104,6 @@ class Measure(Stream):
             junk = self.pop(self.index(oldKey))
         self.insert(0, keyObj)
 
-    # TODO: RENAME TO KEYSIGNATURE
     keySignature = property(_getKey, _setKey)   
 
     #---------------------------------------------------------------------------

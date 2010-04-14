@@ -665,7 +665,7 @@ Stream
 
         .. method:: getMeasure(measureNumber, collect=[<class 'music21.clef.Clef'>, <class 'music21.meter.TimeSignature'>, <class 'music21.instrument.Instrument'>, <class 'music21.key.KeySignature'>])
 
-        Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists. This method is distinguished from :meth:`~music21.stream.Stream.getMeasureRange` in that this method returns a single Measure object, not a Stream containing multiple one or more Measures. 
+        Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None. This method is distinguished from :meth:`~music21.stream.Stream.getMeasureRange` in that this method returns a single Measure object, not a Stream containing one or more Measure objects. 
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
@@ -1239,13 +1239,13 @@ Measure
         >>> a.clef.sign    # clef is an element
         'G' 
 
-        .. attribute:: key
+        .. attribute:: keySignature
 
         
 
         >>> a = Measure()
-        >>> a.key = key.KeySignature(0)
-        >>> a.key.sharps
+        >>> a.keySignature = key.KeySignature(0)
+        >>> a.keySignature.sharps
         0 
 
         .. attribute:: musicxml

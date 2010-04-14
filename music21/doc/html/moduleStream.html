@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.stream &mdash; music21 v0.2.4a1 documentation</title>
+    <title>music21.stream &mdash; music21 v0.2.4b1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.4a1',
+        VERSION:     '0.2.4b1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4b1 documentation" href="index.html" />
     <link rel="next" title="music21.serial" href="moduleSerial.html" />
     <link rel="prev" title="music21.pitch" href="modulePitch.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="modulePitch.html" title="music21.pitch"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -823,7 +823,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <tt class="descname">getMeasure</tt><big>(</big><em>measureNumber</em>, <em>collect=</em><span class="optional">[</span>, <em>&lt;class 'music21.clef.Clef'&gt;</em>, <em>&lt;class 'music21.meter.TimeSignature'&gt;</em>, <em>&lt;class 'music21.instrument.Instrument'&gt;</em>, <em>&lt;class 'music21.key.KeySignature'&gt;</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.stream.Stream.getMeasure" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Given a measure number, return a single <a title="music21.stream.Measure" class="reference internal" href="#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> object if the Measure number exists. This method is distinguished from <a title="music21.stream.Stream.getMeasureRange" class="reference internal" href="#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> in that this method returns a single Measure object, not a Stream containing multiple one or more Measures.</p>
+<p>Given a measure number, return a single <a title="music21.stream.Measure" class="reference internal" href="#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> object if the Measure number exists, otherwise return None. This method is distinguished from <a title="music21.stream.Stream.getMeasureRange" class="reference internal" href="#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> in that this method returns a single Measure object, not a Stream containing one or more Measure objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasure</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
@@ -1511,13 +1511,13 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="music21.stream.Measure.key">
-<tt class="descname">key</tt><a class="headerlink" href="#music21.stream.Measure.key" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.stream.Measure.keySignature">
+<tt class="descname">keySignature</tt><a class="headerlink" href="#music21.stream.Measure.keySignature" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">sharps</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">keySignature</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">keySignature</span><span class="o">.</span><span class="n">sharps</span>
 <span class="go">0</span>
 </pre></div>
 </div>
@@ -1828,7 +1828,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
         <li class="right" >
           <a href="modulePitch.html" title="music21.pitch"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

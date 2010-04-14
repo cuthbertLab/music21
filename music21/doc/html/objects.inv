@@ -292,6 +292,7 @@ music21.serial.RowWebernOp18No2 class moduleSerial.html
 music21.base.DefinedContexts.clear method moduleBase.html
 music21.duration.DurationUnit.appendTuplet method moduleDuration.html
 music21.key.Key.setKey method moduleKey.html
+music21.stream.Measure.keySignature attribute moduleStream.html
 music21.stream.Stream.makeTies method moduleStream.html
 music21.chord.Chord.normalFormString attribute moduleChord.html
 music21.corpus.base.getVirtualWorkList function moduleCorpus.html
@@ -571,7 +572,6 @@ music21.meter.CompoundTimeSignature class moduleMeter.html
 music21.stream.Stream.isFlat attribute moduleStream.html
 music21.clef.Clef class moduleClef.html
 music21.stream.Stream.getMeasures method moduleStream.html
-music21.stream.Measure.key attribute moduleStream.html
 music21.common.defList class moduleCommon.html
 music21.pitch.Accidental.lily attribute modulePitch.html
 music21.note.Unpitched class moduleNote.html

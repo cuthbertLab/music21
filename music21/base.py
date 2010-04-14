@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 VERSION = (0, 2, 4)  # increment any time picked versions will be obsolete.
-VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a1'
+VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'b1'
 WEAKREF_ACTIVE = True
 
 #-------------------------------------------------------------------------------

@@ -6,7 +6,7 @@ Overview: Streams, Scores, Parts, and Measures
 
 The :class:`~music21.stream.Stream` object and its many subclasses offer the fundamental container of music21 objects. As a container like a Python list (or an array in some languages), a Stream can be used to hold objects. These objects can be ordered in more than one way, or treated as an unordered collection. Objects stored in a Stream can be spaced in time; each stored object can have an offset from the beginning of the Stream. Streams, further, can store and offset other Streams, permitting a wide variety of nested, ordered, and timed structures.
 
-Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, :class:`~music21.stream.Part`, and :class:`~music21.stream.Measure`. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to wide variety of tools for extracting, processing, and manipulating objects on the Stream. 
+Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, :class:`~music21.stream.Part`, and :class:`~music21.stream.Measure`. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to a wide variety of tools for extracting, processing, and manipulating objects on the Stream. 
 
 A critical feature of music21's design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous :class:`~music21.stream.Measure` Streams contained in a :class:`~music21.stream.Part` Stream. If we extract a region of this Part (using the :meth:`~music21.stream.Stream.getMeasureRange` method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part. 
 
@@ -300,25 +300,45 @@ The index position of a Measure may not be the same as the Measure number. For t
     :width: 600
 
 
-
-
-
-
 .. TODO: Accessing Components of Parts and Measures
 .. have a section on getting attributes form Parts and Measures
+.. can show how to use .measureNumber, .timeSignature attributes of Measure
 
 
 
-
-Hierarchical and Flat Streams
+Flattening Hierarchical Streams
 -------------------------------------------------
 
+While nested Streams offer expressive flexibility, it is often useful to be able to flatten all Stream and Stream subclasses into a single Stream containing only the elements that are not Stream subclasses. The  :attr:`~music21.stream.Stream.flat` property provides immediate access to such a flat representation of a Stream. For example, doing a similar count of components, such as that show above, we see that we cannot get to all of the Note objects of a complete Score until we flatten its Part and Measure objects by accessing the `flat` attribute. 
 
-For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of the Measure, then, has an offset of 0.
+>>> len(sBach.getElementsByClass(note.Note))
+0
+>>> len(sBach.flat.getElementsByClass(note.Note))
+213
 
+Element offsets are always relative to the Stream that contains them. For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of this Measure, then, has an offset of 0. In the following example we find the offset of the measure eight (using the :meth:`~music21.base.Music21Object.getOffsetBySite` method) is 21; the offset of the second Note in this Measure (index 1), however, is 1.
 
+.. NOTE: intentionally skipping a discussion of objects having offsets stored
+.. for multiple sites here; see below
 
+>>> m = sBach[0].getMeasure(8)
+>>> m.getOffsetBySite(sBach[0])
+21.0
+>>> n = sBach[0].getMeasure(8).notes[0]
+>>> n
+<music21.note.Note B->
+>>> n.getOffsetBySite(m)
+1.0
 
+Flattening a structure of nested Streams will set new, shifted offsets for each of the elements on the Stream, reflecting their appropriate position in the context of the Stream from which the `flat` property was accessed. For example, if a flat version of the first part of the Bach chorale is obtained, the note defined above has the appropriate offset of 22 (the Measure offset of 21 plus the Note offset within this Measure of 1). 
+
+>>> pFlat = sBach[0].flat
+>>> pFlat[pFlat.index(n)]
+<music21.note.Note B->
+>>> pFlat[pFlat.index(n)].offset
+22.0
+
+As an aside, it is important to recognize that the offset of the Note has not been edited; instead, a Note, as all Music21Objects, can store multiple pairs of sites and offsets. Music21Objects retain an offset relative to all Stream or Stream subclasses they are contained within, even if just in passing.
 
 
 
@@ -326,19 +346,36 @@ For example, a Measure, when placed in a Stream, might have an offset of 16. Thi
 Accessing Stream Elements by Group and Identifiers
 -----------------------------------------------------------
 
-All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :class:`~music21.base.Music21Object.id` and :class:`~music21.base.Music21Object.gruop`. The `id` attribute is commonly used to distinguish Part objcects in a Score, but may have other applications. 
+All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :class:`~music21.base.Music21Object.id` and :class:`~music21.base.Music21Object.gruop`. 
 
+As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguish Part objcects in a Score, but may have other applications. The :meth:`~music21.stream.Stream.getElementById` method can be used to access elements of a Stream by `id`. As an example, after examining all of the `id` attributes of the Score, a new Score can be created, rearranging the order of the Parts by using the :meth:`~music21.stream.Stream.insert` method with an offset of zero.
 
+>>> [part.id for part in sBach]
+[u'Soprano', u'Alto', u'Tenor', u'Bass']
+>>> sNew = stream.Score()
+>>> sNew.insert(0, sBach.getElementById('Bass'))
+>>> sNew.insert(0, sBach.getElementById('Tenor'))
+>>> sNew.insert(0, sBach.getElementById('Alto'))
+>>> sNew.insert(0, sBach.getElementById('Soprano'))
+>>> sNew.show()
 
-
-
+.. image:: images/overviewStreams-06.*
+    :width: 600
 
 
 
 Visualizing Streams in Plots
 ---------------------------------------------
 
-While the :meth:`~music21.stream.Stream.show` method provides valuable output a visual plot a Stream's elements is very useful. 
+While the :meth:`~music21.stream.Stream.show` method provides a valuable view of a Stream, a visual plot a Stream's elements is very useful. Sometimes called a piano roll, we might graph the pitch of a Note over its position in a Measure (or offset if no Measures are defined). The :meth:`~music21.stream.Stream.plot` method permits us to create a plot of any Stream or Stream subclass. There are a large variety of plots: see :ref:`moduleGraph` for a complete list. There are a number of ways to get the desired plot; one, as demonstrated below, is to provide the name of the plot as a string. We can also add a keyward argument for the title of the plot (and configure many other feautures).
+
+
+>>> sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')
+
+.. image:: images/overviewStreams-07.*
+    :width: 600
+
+
 
 
 

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview: Streams, Scores, Parts, and Measures &mdash; music21 v0.2.4a1 documentation</title>
+    <title>Overview: Streams, Scores, Parts, and Measures &mdash; music21 v0.2.4b1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.4a1',
+        VERSION:     '0.2.4b1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4b1 documentation" href="index.html" />
     <link rel="next" title="Overview: File and Data Formats, Input, and Output" href="overviewFormats.html" />
     <link rel="prev" title="Overview: Pitches, Notes, and Durations" href="overviewNotes.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="overviewNotes.html" title="Overview: Pitches, Notes, and Durations"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -52,7 +52,7 @@
 <li><a class="reference external" href="#accessing-stream-elements-by-iteration-and-index">Accessing Stream Elements by Iteration and Index</a></li>
 <li><a class="reference external" href="#accessing-stream-elements-by-class-and-offset">Accessing Stream Elements by Class and Offset</a></li>
 <li><a class="reference external" href="#accessing-scores-parts-measures-and-notes">Accessing Scores, Parts, Measures, and Notes</a></li>
-<li><a class="reference external" href="#hierarchical-and-flat-streams">Hierarchical and Flat Streams</a></li>
+<li><a class="reference external" href="#flattening-hierarchical-streams">Flattening Hierarchical Streams</a></li>
 <li><a class="reference external" href="#accessing-stream-elements-by-group-and-identifiers">Accessing Stream Elements by Group and Identifiers</a></li>
 <li><a class="reference external" href="#visualizing-streams-in-plots">Visualizing Streams in Plots</a></li>
 </ul>
@@ -94,7 +94,7 @@
   <div class="section" id="overview-streams-scores-parts-and-measures">
 <span id="overviewstreams"></span><h1>Overview: Streams, Scores, Parts, and Measures<a class="headerlink" href="#overview-streams-scores-parts-and-measures" title="Permalink to this headline">¶</a></h1>
 <p>The <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> object and its many subclasses offer the fundamental container of music21 objects. As a container like a Python list (or an array in some languages), a Stream can be used to hold objects. These objects can be ordered in more than one way, or treated as an unordered collection. Objects stored in a Stream can be spaced in time; each stored object can have an offset from the beginning of the Stream. Streams, further, can store and offset other Streams, permitting a wide variety of nested, ordered, and timed structures.</p>
-<p>Commonly used subclasses of Streams include the <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a>, and <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a>. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to wide variety of tools for extracting, processing, and manipulating objects on the Stream.</p>
+<p>Commonly used subclasses of Streams include the <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a>, and <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a>. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to a wide variety of tools for extracting, processing, and manipulating objects on the Stream.</p>
 <p>A critical feature of music21&#8217;s design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous <a title="music21.stream.Measure" class="reference external" href="moduleStream.html#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> Streams contained in a <a title="music21.stream.Part" class="reference external" href="moduleStream.html#music21.stream.Part"><tt class="xref docutils literal"><span class="pre">Part</span></tt></a> Stream. If we extract a region of this Part (using the <a title="music21.stream.Stream.getMeasureRange" class="reference external" href="moduleStream.html#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part.</p>
 <p>This overview will illustrate key features of music21&#8217;s Stream. For complete documentation on Streams, see <a class="reference external" href="moduleStream.html#modulestream"><em>music21.stream</em></a>.</p>
 <div class="section" id="appending-and-inserting-objects-into-streams">
@@ -353,17 +353,59 @@
 </div>
 <img alt="_images/overviewStreams-05.png" src="_images/overviewStreams-05.png" style="width: 600px;" />
 </div>
-<div class="section" id="hierarchical-and-flat-streams">
-<h2>Hierarchical and Flat Streams<a class="headerlink" href="#hierarchical-and-flat-streams" title="Permalink to this headline">¶</a></h2>
-<p>For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of the Measure, then, has an offset of 0.</p>
+<div class="section" id="flattening-hierarchical-streams">
+<h2>Flattening Hierarchical Streams<a class="headerlink" href="#flattening-hierarchical-streams" title="Permalink to this headline">¶</a></h2>
+<p>While nested Streams offer expressive flexibility, it is often useful to be able to flatten all Stream and Stream subclasses into a single Stream containing only the elements that are not Stream subclasses. The  <a title="music21.stream.Stream.flat" class="reference external" href="moduleStream.html#music21.stream.Stream.flat"><tt class="xref docutils literal"><span class="pre">flat</span></tt></a> property provides immediate access to such a flat representation of a Stream. For example, doing a similar count of components, such as that show above, we see that we cannot get to all of the Note objects of a complete Score until we flatten its Part and Measure objects by accessing the <cite>flat</cite> attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sBach</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sBach</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">))</span>
+<span class="go">213</span>
+</pre></div>
+</div>
+<p>Element offsets are always relative to the Stream that contains them. For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of this Measure, then, has an offset of 0. In the following example we find the offset of the measure eight (using the <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a> method) is 21; the offset of the second Note in this Measure (index 1), however, is 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasure</span><span class="p">(</span><span class="mf">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="go">21.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasure</span><span class="p">(</span><span class="mf">8</span><span class="p">)</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span>
+<span class="go">&lt;music21.note.Note B-&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<p>Flattening a structure of nested Streams will set new, shifted offsets for each of the elements on the Stream, reflecting their appropriate position in the context of the Stream from which the <cite>flat</cite> property was accessed. For example, if a flat version of the first part of the Bach chorale is obtained, the note defined above has the appropriate offset of 22 (the Measure offset of 21 plus the Note offset within this Measure of 1).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pFlat</span> <span class="o">=</span> <span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pFlat</span><span class="p">[</span><span class="n">pFlat</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+<span class="go">&lt;music21.note.Note B-&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pFlat</span><span class="p">[</span><span class="n">pFlat</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span><span class="o">.</span><span class="n">offset</span>
+<span class="go">22.0</span>
+</pre></div>
+</div>
+<p>As an aside, it is important to recognize that the offset of the Note has not been edited; instead, a Note, as all Music21Objects, can store multiple pairs of sites and offsets. Music21Objects retain an offset relative to all Stream or Stream subclasses they are contained within, even if just in passing.</p>
 </div>
 <div class="section" id="accessing-stream-elements-by-group-and-identifiers">
 <h2>Accessing Stream Elements by Group and Identifiers<a class="headerlink" href="#accessing-stream-elements-by-group-and-identifiers" title="Permalink to this headline">¶</a></h2>
-<p>All <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> subclasses, such as <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, have attributes for <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a> and <tt class="xref docutils literal"><span class="pre">gruop</span></tt>. The <cite>id</cite> attribute is commonly used to distinguish Part objcects in a Score, but may have other applications.</p>
+<p>All <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> subclasses, such as <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, have attributes for <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a> and <tt class="xref docutils literal"><span class="pre">gruop</span></tt>.</p>
+<p>As shown in <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a>, the <cite>id</cite> attribute is commonly used to distinguish Part objcects in a Score, but may have other applications. The <a title="music21.stream.Stream.getElementById" class="reference external" href="moduleStream.html#music21.stream.Stream.getElementById"><tt class="xref docutils literal"><span class="pre">getElementById()</span></tt></a> method can be used to access elements of a Stream by <cite>id</cite>. As an example, after examining all of the <cite>id</cite> attributes of the Score, a new Score can be created, rearranging the order of the Parts by using the <a title="music21.stream.Stream.insert" class="reference external" href="moduleStream.html#music21.stream.Stream.insert"><tt class="xref docutils literal"><span class="pre">insert()</span></tt></a> method with an offset of zero.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">part</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">sBach</span><span class="p">]</span>
+<span class="go">[u&#39;Soprano&#39;, u&#39;Alto&#39;, u&#39;Tenor&#39;, u&#39;Bass&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Score</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">sBach</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Bass&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">sBach</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Tenor&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">sBach</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Alto&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">sBach</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Soprano&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewStreams-06.png" src="_images/overviewStreams-06.png" style="width: 600px;" />
 </div>
 <div class="section" id="visualizing-streams-in-plots">
 <h2>Visualizing Streams in Plots<a class="headerlink" href="#visualizing-streams-in-plots" title="Permalink to this headline">¶</a></h2>
-<p>While the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method provides valuable output a visual plot a Stream&#8217;s elements is very useful.</p>
+<p>While the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method provides a valuable view of a Stream, a visual plot a Stream&#8217;s elements is very useful. Sometimes called a piano roll, we might graph the pitch of a Note over its position in a Measure (or offset if no Measures are defined). The <a title="music21.stream.Stream.plot" class="reference external" href="moduleStream.html#music21.stream.Stream.plot"><tt class="xref docutils literal"><span class="pre">plot()</span></tt></a> method permits us to create a plot of any Stream or Stream subclass. There are a large variety of plots: see <a class="reference external" href="moduleGraph.html#modulegraph"><em>music21.graph</em></a> for a complete list. There are a number of ways to get the desired plot; one, as demonstrated below, is to provide the name of the plot as a string. We can also add a keyward argument for the title of the plot (and configure many other feautures).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Soprano&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">&#39;PlotHorizontalBarPitchSpaceOffset&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Soprano&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewStreams-07.png" src="_images/overviewStreams-07.png" style="width: 600px;" />
 </div>
 </div>
 
@@ -388,7 +430,7 @@
         <li class="right" >
           <a href="overviewNotes.html" title="Overview: Pitches, Notes, and Durations"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
