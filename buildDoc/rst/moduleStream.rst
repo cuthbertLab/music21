@@ -177,7 +177,7 @@ Stream
 
         .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. 
+        Provide a complete MusicXML representation. 
 
         .. attribute:: mx
 

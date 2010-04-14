@@ -3142,7 +3142,7 @@ class Stream(music21.Music21Object):
 
 
     def _getMusicXML(self):
-        '''Provide a complete MusicXM: representation. 
+        '''Provide a complete MusicXML representation. 
         '''
         mxScore = self._getMX()
         return mxScore.xmlStr()

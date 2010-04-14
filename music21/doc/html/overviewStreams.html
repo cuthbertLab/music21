@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.4b1 documentation" href="index.html" />
     <link rel="next" title="Overview: File and Data Formats, Input, and Output" href="overviewFormats.html" />
-    <link rel="prev" title="Overview: Pitches, Notes, and Durations" href="overviewNotes.html" /> 
+    <link rel="prev" title="Overview: Pitches, Durations, Notes, and Chords" href="overviewNotes.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="overviewNotes.html" title="Overview: Pitches, Notes, and Durations"
+          <a href="overviewNotes.html" title="Overview: Pitches, Durations, Notes, and Chords"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
@@ -61,7 +61,7 @@
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="overviewNotes.html"
-                                  title="previous chapter">Overview: Pitches, Notes, and Durations</a></p>
+                                  title="previous chapter">Overview: Pitches, Durations, Notes, and Chords</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="overviewFormats.html"
                                   title="next chapter">Overview: File and Data Formats, Input, and Output</a></p>
@@ -100,7 +100,7 @@
 <div class="section" id="appending-and-inserting-objects-into-streams">
 <h2>Appending and Inserting Objects into Streams<a class="headerlink" href="#appending-and-inserting-objects-into-streams" title="Permalink to this headline">¶</a></h2>
 <p>Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time). Objects stored on lists are called elements, and must be either a <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> or an object contained within a <a title="music21.base.ElementWrapper" class="reference external" href="moduleBase.html#music21.base.ElementWrapper"><tt class="xref docutils literal"><span class="pre">ElementWrapper</span></tt></a>. Streams store their objects internally on a list called <a title="music21.stream.Stream.elements" class="reference external" href="moduleStream.html#music21.stream.Stream.elements"><tt class="xref docutils literal"><span class="pre">elements</span></tt></a>, though direct manipulation of this list is rarely needed.</p>
-<p>The most common application of Streams is as a place to store Notes. For an introduction to Notes, see <a class="reference external" href="overviewNotes.html#overviewnotes"><em>Overview: Pitches, Notes, and Durations</em></a>; for complete documentation on Notes, see <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>.</p>
+<p>The most common application of Streams is as a place to store Notes. For an introduction to Notes, see <a class="reference external" href="overviewNotes.html#overviewnotes"><em>Overview: Pitches, Durations, Notes, and Chords</em></a>; for complete documentation on Notes, see <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>.</p>
 <p>Notes, like all Muisc21Objects, have a Duration object that describes the time span they occupy. The span of a Duration can be described in many ways, but a convenient measure is quarter lengths (QLs), or the number of whole or fractional quarter note durations. Notes, when placed in a Stream, also have an offset that describes their position. These offset values are also given in QLs.</p>
 <p>To begin, lets create an instance of a Stream and an instance of a Note. We can set the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object to represent an E, and we can set the <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> object to represent a half-note (2 QLs).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">stream</span>
@@ -428,14 +428,14 @@
           <a href="overviewFormats.html" title="Overview: File and Data Formats, Input, and Output"
              >next</a> |</li>
         <li class="right" >
-          <a href="overviewNotes.html" title="Overview: Pitches, Notes, and Durations"
+          <a href="overviewNotes.html" title="Overview: Pitches, Durations, Notes, and Chords"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 13, 2010.
+      Last updated on Apr 14, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

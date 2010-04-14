@@ -9,7 +9,7 @@ Music21 features an environment configuration system. This permits the user to c
 
 Environment configuration is particularly useful in setting default third-party applications for handling Music21 output in different media formats (e.g. MusicXML, lilypond, graphics files).
 
-For complete information on the Environment object, see :mod:`music21.environment`.
+For complete information on the Environment object, see :mod:`~music21.environment`.
 
 
 Creating and Configuring an Environment
@@ -21,7 +21,7 @@ Environment files are not created by default. To create an environment file, imp
     >>> a = environment.Environment()
     >>> a.write()
 
-After creating an environment file, this XML preference file can be edited directly by the user. To find where the XML file is written, the :meth:`music21.environment.Environment.getSettingsPath` method can be called. This path will be different depending on your platform and user name. 
+After creating an environment file, this XML preference file can be edited directly by the user. To find where the XML file is written, the :meth:`~music21.environment.Environment.getSettingsPath` method can be called. This path will be different depending on your platform and user name. 
 
     >>> a.getSettingsPath()
     '/Users/ariza/.music21rc'
@@ -71,7 +71,7 @@ The following important functions and methods will make use of environment value
 `show()` Methods and 'directoryScratch', 'showFormat' and 'writeFormat'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The show method, inherited from :meth:`music21.base.Music21Object.show`, will, depending on user settings, write a temporary file in a user specified format in a user-specified scratch directory. 
+The show method, inherited from :meth:`~music21.base.Music21Object.show`, will, depending on user settings, write a temporary file in a user specified format in a user-specified scratch directory. 
 
 Setting the `showFormat` will set the default output format of all calls to `show()` methods. The behavior can be deviated from by providing an argument to `show()`.
 
@@ -83,7 +83,7 @@ Setting the `directoryScratch` will determine where the file is written. If this
 `parseURL()` and `parseWork()` Functions and 'autoDownload'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`music21.converter.parseURL` function, as well as the :func:`music21.corpus.base.parseWork` function, offer the ability to download a files directly directly from the internet.
+The :func:`~music21.converter.parseURL` function, as well as the :func:`~music21.corpus.base.parseWork` function, offer the ability to download a files directly directly from the internet.
 
 Users masy configure the 'autoDownload' environment setting to determine whether downloading is attempted automatically, without user prompt ('allow'), the user is asked first before attempting a download ('ask'), or downloading is prohibited ('deny')
 

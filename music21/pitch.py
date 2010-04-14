@@ -1077,7 +1077,7 @@ class Pitch(music21.Music21Object):
 
 
     def _getMusicXML(self):
-        '''Provide a complete MusicXM: representation. Presently, this is based on 
+        '''Provide a complete MusicXML representation. Presently, this is based on 
         '''
         mxNote = self._getMX()
         mxMeasure = musicxml.Measure()

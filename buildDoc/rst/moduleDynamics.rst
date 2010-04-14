@@ -11,7 +11,7 @@ music21.dynamics
 
 .. function:: unitIntervalToName(n)
 
-Given a unit interfal value, map to a dynamic name 
+Given a unit interval value, map to a dynamic name. 
 
 Dynamic
 -------
@@ -32,7 +32,7 @@ Dynamic
 
         .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. 
+        Provide a complete MusicXML representation. 
 
         .. attribute:: mx
 

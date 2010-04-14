@@ -49,7 +49,7 @@ englishNames  = {'ppp': 'extremely soft',
 
 
 def unitIntervalToName(n):
-    '''Given a unit interfal value, map to a dynamic name
+    '''Given a unit interval value, map to a dynamic name.
     '''
     if n > 0 and n < .1:
         return 'ppp'
@@ -191,7 +191,7 @@ class Dynamic(music21.Music21Object):
 
 
     def _getMusicXML(self):
-        '''Provide a complete MusicXM: representation.
+        '''Provide a complete MusicXML representation.
         '''
         mxDirection = self._getMX()
 

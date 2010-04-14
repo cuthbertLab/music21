@@ -607,7 +607,8 @@ class GeneralNote(music21.Music21Object):
         >>> n1.lyrics[1].number
         3
         '''
-                
+        if not common.isStr(text):
+            text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
             self.lyrics.append(Lyric(text, maxLyrics))

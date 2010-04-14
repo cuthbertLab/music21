@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview: Pitches, Notes, and Durations &mdash; music21 v0.2.4b1 documentation</title>
+    <title>Overview: Pitches, Durations, Notes, and Chords &mdash; music21 v0.2.4b1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -47,10 +47,11 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Overview: Pitches, Notes, and Durations</a><ul>
-<li><a class="reference external" href="#creating-a-pitch">Creating a Pitch</a></li>
-<li><a class="reference external" href="#creating-a-note">Creating a Note</a></li>
-<li><a class="reference external" href="#manipulating-a-note-s-duration">Manipulating a Note&#8217;s Duration</a></li>
+<li><a class="reference external" href="">Overview: Pitches, Durations, Notes, and Chords</a><ul>
+<li><a class="reference external" href="#creating-and-editing-pitches">Creating and Editing Pitches</a></li>
+<li><a class="reference external" href="#creating-and-editing-durations">Creating and Editing Durations</a></li>
+<li><a class="reference external" href="#creating-and-editing-notes">Creating and Editing Notes</a></li>
+<li><a class="reference external" href="#creating-and-editing-chords">Creating and Editing Chords</a></li>
 </ul>
 </li>
 </ul>
@@ -87,21 +88,153 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="overview-pitches-notes-and-durations">
-<span id="overviewnotes"></span><h1>Overview: Pitches, Notes, and Durations<a class="headerlink" href="#overview-pitches-notes-and-durations" title="Permalink to this headline">¶</a></h1>
-<p>Notes can be used as fundamental units in Music21. Notes and Chords store one or more Pitch objects.</p>
-<p>This overview will illustrate key features of music21&#8217;s Pitch, Note, and Duration objects. For complete documentation, see <a class="reference external" href="modulePitch.html#modulepitch"><em>music21.pitch</em></a>, <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>, and <a class="reference external" href="moduleDuration.html#moduleduration"><em>music21.duration</em></a>.</p>
-<div class="section" id="creating-a-pitch">
-<h2>Creating a Pitch<a class="headerlink" href="#creating-a-pitch" title="Permalink to this headline">¶</a></h2>
-<p>To create a Pitch object, simply call the class with a note name.</p>
+  <div class="section" id="overview-pitches-durations-notes-and-chords">
+<span id="overviewnotes"></span><h1>Overview: Pitches, Durations, Notes, and Chords<a class="headerlink" href="#overview-pitches-durations-notes-and-chords" title="Permalink to this headline">¶</a></h1>
+<p>For represented notated music, the <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> object is a critical tool. Note and <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> objects are both subclasses of <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>, and share many features. Both are built, in part, from <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> and <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects.</p>
+<p>This overview will illustrate key features of music21&#8217;s Pitch, Duration, Note, and Chord objects. For complete documentation of these objects, see <a class="reference external" href="modulePitch.html#modulepitch"><em>music21.pitch</em></a>, <a class="reference external" href="moduleDuration.html#moduleduration"><em>music21.duration</em></a>, <a class="reference external" href="moduleNote.html#modulenote"><em>music21.note</em></a>, and <a class="reference external" href="moduleChord.html#modulechord"><em>music21.chord</em></a>.</p>
+<div class="section" id="creating-and-editing-pitches">
+<h2>Creating and Editing Pitches<a class="headerlink" href="#creating-and-editing-pitches" title="Permalink to this headline">¶</a></h2>
+<p>To create a Pitch object, simply call the class with a note name. A name (such as <em>B</em>) can be provided with optional symbols for sharp or flat (<em>#</em> or <em>-</em> respectively). An octave designation can optionally be provided (where middle C is C4).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;b-4&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="creating-a-note">
-<h2>Creating a Note<a class="headerlink" href="#creating-a-note" title="Permalink to this headline">¶</a></h2>
-<p>To create a Note object, simply call the class with optional arguments, if desired.</p>
+<p>There are numerous ways of expressing pitch. Many are available as properties from the Pitch object. The following example demonstrates many of these properties.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">octave</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">pitchClass</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;B-&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">nameWithOctave</span>
+<span class="go">&#39;B-4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">70</span>
+</pre></div>
 </div>
-<div class="section" id="manipulating-a-note-s-duration">
-<h2>Manipulating a Note&#8217;s Duration<a class="headerlink" href="#manipulating-a-note-s-duration" title="Permalink to this headline">¶</a></h2>
-<p>To create a Note object, simply call the class with optional arguments, if desired.</p>
+<p>Some of these parameters are settable. By setting a parameter in the appropriate format, the Pitch object is changed to reflect the new value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;d#&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">octave</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
+<span class="go">D#2</span>
+</pre></div>
+</div>
+<p>Accidentals are represented with an <a title="music21.pitch.Accidental" class="reference external" href="modulePitch.html#music21.pitch.Accidental"><tt class="xref docutils literal"><span class="pre">Accidental</span></tt></a> object on the <a title="music21.pitch.Pitch.accidental" class="reference external" href="modulePitch.html#music21.pitch.Pitch.accidental"><tt class="xref docutils literal"><span class="pre">accidental</span></tt></a> attribute of Pitch.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">accidental</span>
+<span class="go">&lt;accidental sharp&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">alter</span>
+<span class="go">-1.0</span>
+</pre></div>
+</div>
+<p>Pitches, like many objects, can be transposed by an interval specified in any format permitted by the <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object. Common string presentation are acceptable. The <a title="music21.pitch.Pitch.transpose" class="reference external" href="modulePitch.html#music21.pitch.Pitch.transpose"><tt class="xref docutils literal"><span class="pre">transpose()</span></tt></a> method returns a new Pitch object, leaving the original unchanged.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s">&#39;M7&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span>
+<span class="go">C##4</span>
+</pre></div>
+</div>
+<p>As with nearly all music21 objects, we can call the <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show</span></tt></a> method to display this Pitch in notation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-01.png" src="_images/overviewNotes-01.png" style="width: 600px;" />
+</div>
+<div class="section" id="creating-and-editing-durations">
+<h2>Creating and Editing Durations<a class="headerlink" href="#creating-and-editing-durations" title="Permalink to this headline">¶</a></h2>
+<p>Duration objects are ubiquitous in music21. Nearly all objects have, or can have, a Duration. A Duration can represent any time span, either quantized to common whole number ratios or otherwise. A Duration may represent a single notated entity (such as dotted quarter note) or tied aggregation of durations (such as a half note tied to a sixteenth note).</p>
+<p>To create Duration, call the class with an optional duration value, expressed either as a string (such as &#8220;quarter&#8221; or &#8220;half&#8221;) or with a number (a value in Quarter Lengths). The following example creates a half note duration and a dotted quarter note duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">Duration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d2</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As with pitch, there are many ways of expressing duration. Many are available as properties from the Duration object. The <a title="music21.duration.Duration.quarterLength" class="reference external" href="moduleDuration.html#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a> property expresses the duration in Quarter Lengths, a common unit throughout music21. The following example demonstrates many of these properties.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d2</span><span class="o">.</span><span class="n">dots</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d2</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d2</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.5</span>
+</pre></div>
+</div>
+<p>Some of the Duration parameters are settable. In the following example the <a title="music21.duration.Duration.quarterLength" class="reference external" href="moduleDuration.html#music21.duration.Duration.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a> property is set to a new value. All corresponding parameters are updated when necessary.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;complex&#39;</span>
+</pre></div>
+</div>
+<p>The <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show</span></tt></a> method can be used to display the Duration with a default pitch value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-02.png" src="_images/overviewNotes-02.png" style="width: 600px;" />
+</div>
+<div class="section" id="creating-and-editing-notes">
+<h2>Creating and Editing Notes<a class="headerlink" href="#creating-and-editing-notes" title="Permalink to this headline">¶</a></h2>
+<p>Note objects contain, as key components, a Pitch and a Duration instance. Notes contain additional parameters and functionality. We can create a Note in the same way we do a Pitch, by providing an initial Pitch value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;e-5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Numerous Pitch and Duration attributes are made available as attributes of Note. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;E-&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">pitchClass</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">75</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<p>Notes can store numerous lines of text as lyrics or other notations on the <tt class="xref docutils literal"><span class="pre">lyric</span></tt> property. While this value can be set directly, the <a title="music21.note.GeneralNote.addLyric" class="reference external" href="moduleNote.html#music21.note.GeneralNote.addLyric"><tt class="xref docutils literal"><span class="pre">addLyric()</span></tt></a> method permits adding multiple notations to a single Note sequential;y. In the following example three Note attributes are added to the Note as annotations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="n">n1</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="n">n1</span><span class="o">.</span><span class="n">pitchClass</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&#39;QL: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">n1</span><span class="o">.</span><span class="n">quarterLength</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As should be clear, we can alway check our work with the <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show</span></tt></a> method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-03.png" src="_images/overviewNotes-03.png" style="width: 600px;" />
+<p>As with the Duration object, we can edit the <tt class="xref docutils literal"><span class="pre">quarterLength</span></tt> property to quickly change the Note&#8217;s Duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">6.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-04.png" src="_images/overviewNotes-04.png" style="width: 600px;" />
+<p>As is clear, a Note may be tied to another. If so, a <a title="music21.note.Tie" class="reference external" href="moduleNote.html#music21.note.Tie"><tt class="xref docutils literal"><span class="pre">Tie</span></tt></a> object will be found on the <tt class="xref docutils literal"><span class="pre">tie</span></tt> attribute.</p>
+</div>
+<div class="section" id="creating-and-editing-chords">
+<h2>Creating and Editing Chords<a class="headerlink" href="#creating-and-editing-chords" title="Permalink to this headline">¶</a></h2>
+<p>Note and Chord objects, as both subclasses of the <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a> object, share many features. Both contain a Duration object. A Note has only one Pitch; a Chord, however, contains a list one or more Pitch objects accessed via the <a title="music21.chord.Chord.pitches" class="reference external" href="moduleChord.html#music21.chord.Chord.pitches"><tt class="xref docutils literal"><span class="pre">pitches</span></tt></a> property. The Chord object additional has numerous analytic methods (such as <a title="music21.chord.Chord.isDiminishedSeventh" class="reference external" href="moduleChord.html#music21.chord.Chord.isDiminishedSeventh"><tt class="xref docutils literal"><span class="pre">isDiminishedSeventh()</span></tt></a>) as well as a variety of post-tanal tools (such as <a title="music21.chord.Chord.forteClass" class="reference external" href="moduleChord.html#music21.chord.Chord.forteClass"><tt class="xref docutils literal"><span class="pre">forteClass</span></tt></a>; see <a class="reference external" href="overviewPostTonal.html#overviewposttonal"><em>Overview: Post-Tonal Tools</em></a>).</p>
+<p>A Chord can be created with a list of Pitch objects or strings identical to those used for creating Pitches. Additional, pitch class integers can be provided.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">chord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a#3&#39;</span><span class="p">,</span> <span class="s">&#39;g4&#39;</span><span class="p">,</span> <span class="s">&#39;f#5&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitches</span>
+<span class="go">[A#3, G4, F#5]</span>
+</pre></div>
+</div>
+<p>Like with a Note, Duration object properties can be configured from properties on Chord. For example, the Quarter Length of the Chord can be accessed from the <tt class="xref docutils literal"><span class="pre">quarterLength</span></tt> property. The <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show</span></tt></a> method can be used to display the results.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1</span> <span class="o">+</span> <span class="mf">1</span><span class="o">/</span><span class="mf">3.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-05.png" src="_images/overviewNotes-05.png" style="width: 600px;" />
+<p>A Chord, like a Note and Pitch, can be transposed by an interval specified in any format permitted by the <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object. The <a title="music21.chord.Chord.transpose" class="reference external" href="moduleChord.html#music21.chord.Chord.transpose"><tt class="xref docutils literal"><span class="pre">transpose()</span></tt></a> method returns a new Chord instance.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s">&#39;m2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-06.png" src="_images/overviewNotes-06.png" style="width: 600px;" />
+<p>Finally, a Chord, like a Note, can have one or my lyrics. The <a title="music21.note.GeneralNote.addLyric" class="reference external" href="moduleNote.html#music21.note.GeneralNote.addLyric"><tt class="xref docutils literal"><span class="pre">addLyric()</span></tt></a> method functions the same as it does for Note. In the following example, a text annotation of the Forte set class name is added to the Chord.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewNotes-07.png" src="_images/overviewNotes-07.png" style="width: 600px;" />
 </div>
 </div>
 
@@ -131,7 +264,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 13, 2010.
+      Last updated on Apr 14, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

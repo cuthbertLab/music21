@@ -293,7 +293,7 @@ Pitch
 
         .. attribute:: musicxml
 
-        Provide a complete MusicXM: representation. Presently, this is based on 
+        Provide a complete MusicXML representation. Presently, this is based on 
 
         .. attribute:: mx
 
