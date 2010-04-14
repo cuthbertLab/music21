@@ -962,13 +962,11 @@ class ClassDoc(RestructuredWriter):
             msg.append('%s\n' % docInitCooked)
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
 
-        environLocal.printDebug(['result of _isAllInherited:', self.name,
-            self._isAllInherited()
-            ])
 
         # if all names are inherited (the are not newly defined) then skip
         # documentation of values
         if self._isAllInherited():
+            environLocal.printDebug([self.name, 'skipping detailed component documentation'])
             msg.append('\n'*1)
             return msg
 
