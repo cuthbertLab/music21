@@ -196,7 +196,9 @@ class Test(unittest.TestCase):
     def testBasic(self):
         for func in [ch1_basic_I_A, 
                      ch1_basic_I_B,
+                     ch1_basic_I_C_1,
                      ch1_basic_II_A_1,
+                     ch1_basic_I_C_2,
             ]:
             func(show=False, play=False)
 

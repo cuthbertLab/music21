@@ -155,15 +155,6 @@ RowBergChamberConcerto
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowBergConcertoForViolinAndOrchestra
-------------------------------------
-
-.. class:: RowBergConcertoForViolinAndOrchestra()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
 RowBergDerWein
 --------------
 
@@ -173,109 +164,118 @@ RowBergDerWein
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowBergLuluActISceneXx
-----------------------
+RowBergLulu
+-----------
 
-.. class:: RowBergLuluActISceneXx()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowBergLuluActIiScene1
-----------------------
-
-.. class:: RowBergLuluActIiScene1()
+.. class:: RowBergLulu()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowBergLuluPrimaryRow
+RowBergLuluActIIScene1
+----------------------
+
+.. class:: RowBergLuluActIIScene1()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowBergLuluActIScene20
+----------------------
+
+.. class:: RowBergLuluActIScene20()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowBergLyricSuite
+-----------------
+
+.. class:: RowBergLyricSuite()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowBergLyricSuitePerm
 ---------------------
 
-.. class:: RowBergLuluPrimaryRow()
+.. class:: RowBergLyricSuitePerm()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowBergLyricSuiteLastMvtPermutation
------------------------------------
+RowBergViolinConcerto
+---------------------
 
-.. class:: RowBergLyricSuiteLastMvtPermutation()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowBergLyricSuitePrimaryRow
----------------------------
-
-.. class:: RowBergLyricSuitePrimaryRow()
+.. class:: RowBergViolinConcerto()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowBergWozzeckActIScene4Passacaglia
------------------------------------
-
-.. class:: RowBergWozzeckActIScene4Passacaglia()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergDieJakobsleiter
-----------------------------
-
-.. class:: RowSchoenbergDieJakobsleiter()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergFragmentForPiano
------------------------------
-
-.. class:: RowSchoenbergFragmentForPiano()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergFragmentOfPhantasiaForPiano
-----------------------------------------
-
-.. class:: RowSchoenbergFragmentOfPhantasiaForPiano()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergFragmentOfSonataForOrgan
--------------------------------------
-
-.. class:: RowSchoenbergFragmentOfSonataForOrgan()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergIsraelExistsAgain
-------------------------------
-
-.. class:: RowSchoenbergIsraelExistsAgain()
-
-
-    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
-
-RowSchoenbergMosesAndAron
+RowBergWozzeckPassacaglia
 -------------------------
 
-.. class:: RowSchoenbergMosesAndAron()
+.. class:: RowBergWozzeckPassacaglia()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergFragOrganSonata
+----------------------------
+
+.. class:: RowSchoenbergFragOrganSonata()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergFragPiano
+----------------------
+
+.. class:: RowSchoenbergFragPiano()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergFragPianoPhantasia
+-------------------------------
+
+.. class:: RowSchoenbergFragPianoPhantasia()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergIsraelExists
+-------------------------
+
+.. class:: RowSchoenbergIsraelExists()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergJakobsleiter
+-------------------------
+
+.. class:: RowSchoenbergJakobsleiter()
+
+
+    inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
+
+RowSchoenbergMosesAron
+----------------------
+
+.. class:: RowSchoenbergMosesAron()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
@@ -290,19 +290,19 @@ RowSchoenbergOp23No5
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowSchoenbergOp24Movement4
---------------------------
+RowSchoenbergOp24Mvmt4
+----------------------
 
-.. class:: RowSchoenbergOp24Movement4()
+.. class:: RowSchoenbergOp24Mvmt4()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 
-RowSchoenbergOp24Movement5
---------------------------
+RowSchoenbergOp24Mvmt5
+----------------------
 
-.. class:: RowSchoenbergOp24Movement5()
+.. class:: RowSchoenbergOp24Mvmt5()
 
 
     inherits from: :class:`~music21.serial.HistoricalTwelveToneRow`, :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
