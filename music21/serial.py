@@ -132,12 +132,12 @@ class RowSchoenbergOp23No5(HistoricalTwelveToneRow):
     opus = 'Op. 23, No. 5'
     title = 'Five Piano Pieces'
     row = [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]
-class RowSchoenbergOp24Movement4(HistoricalTwelveToneRow):
+class RowSchoenbergOp24Mvmt4(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 24'
     title = 'Serenade, Mvt. 4, "Sonett"'
     row = [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]
-class RowSchoenbergOp24Movement5(HistoricalTwelveToneRow):
+class RowSchoenbergOp24Mvmt5(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 24'
     title = 'Serenade, Mvt. 5, "Tanzscene"'
@@ -247,17 +247,17 @@ class RowSchoenbergOp37(HistoricalTwelveToneRow):
     opus = 'Op. 37'
     title = 'Fourth String Quartet'
     row = [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]
-class RowSchoenbergFragmentOfPhantasiaForPiano(HistoricalTwelveToneRow):
+class RowSchoenbergFragPianoPhantasia(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Fragment of Phantasia For Piano'
     row = [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]
-class RowSchoenbergFragmentOfSonataForOrgan(HistoricalTwelveToneRow):
+class RowSchoenbergFragOrganSonata(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Fragment of Sonata For Organ'
     row = [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]
-class RowSchoenbergFragmentForPiano(HistoricalTwelveToneRow):
+class RowSchoenbergFragPiano(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Fragment For Piano'
@@ -272,7 +272,7 @@ class RowSchoenbergOp42(HistoricalTwelveToneRow):
     opus = 'Op. 42'
     title = 'Concerto For Piano And Orchestra'
     row = [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]
-class RowSchoenbergDieJakobsleiter(HistoricalTwelveToneRow):
+class RowSchoenbergJakobsleiter(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Die Jakobsleiter'
@@ -312,7 +312,7 @@ class RowSchoenbergOp48No3(HistoricalTwelveToneRow):
     opus = 'Op. 48'
     title = 'Three Songs, No, 3, "Madchenlied"'
     row = [1, 7, 9, 11, 3, 5, 10, 6, 11, 0, 8, 2]
-class RowSchoenbergIsraelExistsAgain(HistoricalTwelveToneRow):
+class RowSchoenbergIsraelExists(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Israel Exists Again'
@@ -332,7 +332,7 @@ class RowSchoenbergOp50C(HistoricalTwelveToneRow):
     opus = 'Op. 50C'
     title = 'Modern Psalms, The First Psalm'
     row = [4, 3, 0, 8, 9, 7, 5, 9, 6, 10, 1, 2]
-class RowSchoenbergMosesAndAron(HistoricalTwelveToneRow):
+class RowSchoenbergMosesAron(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
     title = 'Moses And Aron'
@@ -344,17 +344,17 @@ class RowBergChamberConcerto(HistoricalTwelveToneRow):
     opus = None
     title = 'Chamber Concerto'
     row = [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]
-class RowBergWozzeckActIScene4Passacaglia(HistoricalTwelveToneRow):
+class RowBergWozzeckPassacaglia(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
     title = 'Wozzeck, Act I, Scene 4 "Passacaglia"'
     row = [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]
-class RowBergLyricSuitePrimaryRow(HistoricalTwelveToneRow):
+class RowBergLyricSuite(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
     title = 'Lyric Suite Primary Row'
     row = [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
-class RowBergLyricSuiteLastMvtPermutation(HistoricalTwelveToneRow):
+class RowBergLyricSuitePerm(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
     title = 'Lyric Suite, Last Mvt. Permutation'
@@ -364,22 +364,22 @@ class RowBergDerWein(HistoricalTwelveToneRow):
     opus = None
     title = 'Der Wein'
     row = [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]
-class RowBergLuluPrimaryRow(HistoricalTwelveToneRow):
+class RowBergLulu(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
     title = 'Lulu: Primary Row'
     row = [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]
-class RowBergLuluActISceneXx(HistoricalTwelveToneRow):
+class RowBergLuluActIScene20(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = 'Lulu, Act I , Scene XX'
     title = 'Perm. (Every 7th Note Of Primary Row)'
     row = [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]
-class RowBergLuluActIiScene1(HistoricalTwelveToneRow):
+class RowBergLuluActIIScene1(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = 'Lulu, Act II, Scene 1'
     title = 'Perm. (Every 5th Note Of Primary Row)'
     row = [10, 7, 1, 0, 9, 2, 11, 5, 8, 3, 6]
-class RowBergConcertoForViolinAndOrchestra(HistoricalTwelveToneRow):
+class RowBergViolinConcerto(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
     title = 'Concerto For Violin And Orchestra'
@@ -489,7 +489,7 @@ class RowWebernOp31(HistoricalTwelveToneRow):
 
 
 
-vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Movement4, RowSchoenbergOp24Movement5, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27No1, RowSchoenbergOp27No2, RowSchoenbergOp27No3, RowSchoenbergOp27No4, RowSchoenbergOp28No1, RowSchoenbergOp28No3, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35No1, RowSchoenbergOp35No2, RowSchoenbergOp35No3, RowSchoenbergOp35No5, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragmentOfPhantasiaForPiano, RowSchoenbergFragmentOfSonataForOrgan, RowSchoenbergFragmentForPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergDieJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48No1, RowSchoenbergOp48No2, RowSchoenbergOp48No3, RowSchoenbergIsraelExistsAgain, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAndAron, RowBergChamberConcerto, RowBergWozzeckActIScene4Passacaglia, RowBergLyricSuitePrimaryRow, RowBergLyricSuiteLastMvtPermutation, RowBergDerWein, RowBergLuluPrimaryRow, RowBergLuluActISceneXx, RowBergLuluActIiScene1, RowBergConcertoForViolinAndOrchestra, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
+vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Mvmt4, RowSchoenbergOp24Mvmt5, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27No1, RowSchoenbergOp27No2, RowSchoenbergOp27No3, RowSchoenbergOp27No4, RowSchoenbergOp28No1, RowSchoenbergOp28No3, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35No1, RowSchoenbergOp35No2, RowSchoenbergOp35No3, RowSchoenbergOp35No5, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragPianoPhantasia, RowSchoenbergFragOrganSonata, RowSchoenbergFragPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48No1, RowSchoenbergOp48No2, RowSchoenbergOp48No3, RowSchoenbergIsraelExists, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAron, RowBergChamberConcerto, RowBergWozzeckPassacaglia, RowBergLyricSuite, RowBergLyricSuitePerm, RowBergDerWein, RowBergLulu, RowBergLuluActIScene20, RowBergLuluActIIScene1, RowBergViolinConcerto, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
 
 
 
