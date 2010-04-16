@@ -2612,7 +2612,7 @@ class Stream(music21.Music21Object):
         # this copy will have a shared locations object
         sNew = copy.copy(self)
 
-        # manually provide an independent _definedContexts object
+        # could manually provide an independent _definedContexts object
         # deepcopy of defind contexts does not copy references
         # this does not solve problem of fiding contexts in a flat stream
         #sNew._definedContexts = copy.deepcopy(self._definedContexts)
