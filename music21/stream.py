@@ -5922,15 +5922,20 @@ class Test(unittest.TestCase):
         '''Testing getting clefs from higher-level streams
         '''
         from music21 import note, clef
-
+        
         s1 = Stream()
         s2 = Stream()
         n1 = note.Note()
         c1 = clef.AltoClef()
-
+        
         s1.append(n1) # this is the model of a stream with a single part
         s2.append(s1)
         s2.insert(0, c1)
+        
+        # this works fine
+        post = s1.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
 
         # if we flatten s1, we cannot still get the clef: why?
         s1Flat = s1.flat
@@ -5938,9 +5943,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Flat.hasContext(s2), True)
         #environLocal.printDebug(['_definedContexts.get() of s1Flat', s1Flat._definedContexts.get()])
         #environLocal.printDebug(['_definedContexts._definedContexts of s1Flat', s1Flat._definedContexts._definedContexts])
-
-
-        # TODO: this is the problem. 
+        
+        # TODO: this is the problem!
         post = s1Flat.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
