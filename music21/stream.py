@@ -1230,7 +1230,7 @@ class Stream(music21.Music21Object):
                     nearestTrailSpan = span
                 else:
                     continue
-        #environLocal.printDebug(['element candidates', candidates])
+        #environLocal.printDebug(['getElementAtOrBefore(), element candidates', candidates])
         if len(candidates) > 0:
             candidates.sort()
             return candidates[0][1]
@@ -1562,7 +1562,7 @@ class Stream(music21.Music21Object):
             #ts.denominator = defaults.meterDenominatorBeatType
             post.insert(0, ts)
         return post
-    
+        
 
     def getInstrument(self, searchParent=True):
         '''Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise 
@@ -1586,7 +1586,8 @@ class Stream(music21.Music21Object):
                 if isinstance(self.parent, Stream) and self.parent != self:
                     #environLocal.printDebug(['searching parent Stream', 
                     #    self, self.parent])
-                    instObj = self.parent.getInstrument()         
+                    instObj = self.parent.getInstrument(
+                              searchParent=searchParent) 
 
         # if still not defined, get default
         if instObj is None:
@@ -1672,6 +1673,48 @@ class Stream(music21.Music21Object):
                 return clef.Treble8vbClef()
             else:
                 return clef.BassClef()
+
+
+    def getClefs(self, searchParent=True, searchContext=True):
+        '''Collect all :class:`~music21.clef.Clef` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
+
+        If no Clef objects are defined, get a default using :meth:`~music21.stream.Stream.bestClef`
+        
+        >>> from music21 import clef
+        >>> a = Stream()
+        >>> b = clef.AltoClef()
+        >>> a.insert(0, b)
+        >>> a.repeatInsert(note.Note("C#"), range(10)) 
+        >>> c = a.getClefs()
+        >>> len(c) == 1
+        True
+        '''
+        # this may not be useful unless a stream is flat
+        post = self.getElementsByClass(clef.Clef)
+        environLocal.printDebug(['getClefs(); results of post',len(post)])
+
+        if len(post) == 0 and searchParent:
+            if isinstance(self.parent, Stream) and self.parent != self:
+                environLocal.printDebug(['getClefs() searching parent Stream', 
+                    self, self.parent])
+                post = self.parent.getClefs(searchParent=searchParent)  
+       
+        if len(post) == 0 and searchContext:
+            # returns a single value
+            post = Stream()
+            obj = self.getContextByClass(clef.Clef)
+            environLocal.printDebug(['getClefs(): searching contexts: results', 
+                    obj])
+
+            if obj != None:
+                post.append(obj)
+
+        # get a default and/or place default at zero if nothing at zero
+        if len(post) == 0 or post[0].offset > 0: 
+            environLocal.printDebug(['getClefs(): using bestClef()'])
+            post.insert(0, self.bestClef())
+        return post
+
 
 
     #--------------------------------------------------------------------------
@@ -1895,8 +1938,12 @@ class Stream(music21.Music21Object):
         if meterStream is None:
             meterStream = srcObj.getTimeSignatures()
 
-        # get a clef and for the entire stream
-        clefObj = srcObj.bestClef()
+        # get a clef for the entire stream; this will use bestClef
+        # presently, this only gets the first clef
+        # may need to store a clefStream and access changes in clefs
+        # as is done with meterStream
+        clefObj = srcObj.getClefs()[0]
+        environLocal.printDebug(['makeMeasures(): first clef found', clefObj])
     
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
@@ -2247,7 +2294,7 @@ class Stream(music21.Music21Object):
 
 
 
-    def makeAccidentals(self): 
+    def setAccidentalVisibility(self): 
         '''To be renamed. A method to set and provide accidentals given varous conditions and contexts.
         '''
         pass
@@ -3013,11 +3060,14 @@ class Stream(music21.Music21Object):
             # must repack into a new stream at each step
             midStream = Stream()
             finalStream = Stream()
-            partStream = copy.copy(self)
+            # not sure a shallow copy is useful here
+            # TODO: check 
+            partStream = self #copy.copy(self)
 
             for obj in partStream.getElementsByClass(Stream):
                 # need to copy element here
-                obj.transferOffsetToElements() # apply this streams offset to elements
+                # apply this streams offset to elements
+                obj.transferOffsetToElements() 
 
                 ts = obj.getTimeSignatures()
                 # the longest meterStream is used as the meterStream for all parts

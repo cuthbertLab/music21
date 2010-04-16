@@ -12,6 +12,7 @@
 
 
 import unittest, doctest
+import sys
 
 import music21
 from music21 import clef
@@ -29,6 +30,13 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 # CHAPTER 1 
+
+
+#-------------------------------------------------------------------------------
+# Basic Elements
+
+#-------------------------------------------------------------------------------
+# I. Using keyboard diagrams
 
 
 def ch1_basic_I_A(show=True, *arguments, **keywords):
@@ -79,7 +87,7 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 #             k1.show()
 
 
-
+    
 def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     '''
     p3.
@@ -97,8 +105,6 @@ def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     for i in intervals:
         i.noteStart = n
         n = i.noteEnd
-        environLocal.printDebug(['interval, note1, note2', i, 
-                                i.noteStart, i.noteEnd])
         s.append(n)
     if show:
         s.show()
@@ -126,6 +132,11 @@ def ch1_basic_I_C_2(show=True, *arguments, **keywords):
         s.show()
         s.plot('PlotHorizontalBarPitchSpaceOffset')
 
+
+#-------------------------------------------------------------------------------
+# II. Staff notation
+
+
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
     p3.
@@ -152,18 +163,121 @@ def ch1_basic_II_A_1(show=True, *arguments, **keywords):
 '''
     exercise = converter.parseData(humdata)
     #exercise = music21.parseData("ch1_basic_II_A_1.xml")
-    for thisNote in exercise.flat.notes: # have to use flat here
-        thisNote.lyric = thisNote.nameWithOctave
+    for n in exercise.flat.notes: # have to use flat here
+        n.lyric = n.nameWithOctave
     if show: 
         exercise.show()
 
 
 def ch1_basic_II_A_2(show=True, *arguments, **keywords):
     '''
-    bass clef
+    p3.
+    Write letter names and octave designations for the pitches written 
+    in the treble and bass clefs below.
     '''
+    from music21 import clef
+    humdata = '''
+**kern
+1BBD
+1C##
+1B
+1DD-
+1f#
+1FF
+1D-
+1d
+1CC#
+1AA-
+1c
+1F
+*-
+'''
+    exercise = converter.parseData(humdata)
+    for n in exercise.flat.notes: # have to use flat here
+        n.lyric = n.nameWithOctave
+    exercise.insert(0, clef.BassClef())
+    exercise = exercise.sorted # need sorted to get clef
+    if show: 
+        exercise.show()
+
+
+
+def ch1_basic_II_B_1(show=True, *arguments, **keywords):
+    '''
+    p4.
+    For each of the five trebleclef pitches on the left, write the alto-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
+    '''
+    from music21 import clef
+    humdata = '''
+**kern
+1B-
+1f#
+1a-
+1c
+1G#
+*-
+'''
+    exercise = converter.parseData(humdata)
+    for n in exercise.flat.notes: # have to use flat here
+        n.lyric = n.nameWithOctave
+    exercise.insert(0, clef.AltoClef())
+    # TODO: must get flat Stream here 
+    # even though base.Test.testDefinedContextsClef() should
+    # model what is happening here; it seems like a parent/context
+    # is being lost in the process of making measures
+    exercise = exercise.flat # need flat to get clef
+    exercise.show('t')
+    if show: 
+        exercise.show()
+
+
+def ch1_basic_II_B_2(show=True, *arguments, **keywords):
+    '''
+    p4.
+    For each of the five bass clef pitches on the left, write the tenord-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
+    '''
+    from music21 import clef
+    humdata = '''
+**kern
+1F#
+1e-
+1B
+1D-
+1c
+*-
+'''
+    exercise = converter.parseData(humdata)
+    for n in exercise.flat.notes: # have to use flat here
+        n.lyric = n.nameWithOctave
+    exercise.insert(0, clef.TenorClef())
+    exercise = exercise.flat # need flat to get clef
+    exercise.show('t')
+    if show: 
+        exercise.show()
+
+
+
+#-----------------------------------------------------------------||||||||||||--
+# Writing Exercises
+
+#-----------------------------------------------------------------||||||||||||--
+# !. Arranging
+
+
+def ch1_writing_I_A_1(show=True, *arguments, **keywords):
     pass
 
+def ch1_writing_I_A_2(show=True, *arguments, **keywords):
+    pass
+
+
+
+def ch1_writing_I_B_1(show=True, *arguments, **keywords):
+    pass
+
+
+def ch1_writing_I_B_2(show=True, *arguments, **keywords):
+    pass
 
 def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     '''
@@ -181,6 +295,8 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     purcellScore.show() 
 
 
+#-----------------------------------------------------------------||||||||||||--
+# !I. Composing melodies
 
 
 
@@ -194,20 +310,25 @@ class Test(unittest.TestCase):
         pass
             
     def testBasic(self):
-        for func in [ch1_basic_I_A, 
-                     ch1_basic_I_B,
-                     ch1_basic_I_C_1,
-                     ch1_basic_II_A_1,
-                     ch1_basic_I_C_2,
+        for func in [
+            ch1_basic_I_A, 
+            ch1_basic_I_B,
+            ch1_basic_I_C_1,
+            ch1_basic_II_A_1,
+            ch1_basic_I_C_2,
+            ch1_basic_II_A_1,
+            ch1_basic_II_A_2,
+            ch1_basic_II_B_1,
+            ch1_basic_II_B_2,
             ]:
             func(show=False, play=False)
-
-
-
         
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    if len(sys.argv) == 1:
+        music21.mainTest(Test)
+    else:
+        ch1_basic_II_B_2(show=True)
 
 

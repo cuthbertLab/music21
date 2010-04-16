@@ -720,8 +720,7 @@ class DefinedContexts(object):
         if memo == None:
             memo = {} # intialize
 
-        #environLocal.printDebug(['call getByClass from:', self, 
-        #                         'callerFirst:', callerFirst])
+        #environLocal.printDebug(['call getByClass() from:', self, 'callerFirst:', callerFirst])
         post = None
 
         # search any defined contexts first
@@ -1111,7 +1110,7 @@ class Music21Object(object):
 
     def getContextByClass(self, className, serialReverseSearch=True,
                           callerFirst=None, memo=None):
-        '''Search both DefinedContexts as well as associated objects to find a matching class.
+        '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
         object of the caller. This is needed for serialReverseSearch.
@@ -2188,6 +2187,29 @@ class Test(unittest.TestCase):
 
         
 
+
+    def testDefinedContextsClef(self):
+        from music21 import base, note, stream, clef
+        s1 = stream.Stream()
+        s2 = stream.Stream()
+        n = note.Note()
+        s2.append(n)
+        s1.append(s2)
+        # append clef to outer stream
+        s1.insert(0, clef.AltoClef()) 
+        pre = s1.getElementAtOrBefore(0, [clef.Clef])
+        self.assertEqual(isinstance(pre, clef.AltoClef), True)
+
+
+        # we should be able to find a clef from the lower-level stream
+        post = s2.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        post = s2.getClefs(clef.Clef)
+        self.assertEqual(isinstance(post[0], clef.AltoClef), True)
+
+
+
     def testDefinedContextsPitch(self):
         # TODO: this form does not yet work
         from music21 import base, note, stream, clef
@@ -2199,6 +2221,7 @@ class Test(unittest.TestCase):
         #pitchMeasure = n.pitch.getContextAttr('measureNumber')
         #n.pitch.setContextAttr('lyric', pitchMeasure)
         #self.assertEqual(n.lyric, 34)
+
 
 
 
@@ -2250,5 +2273,9 @@ def mainTest(*testClasses):
     runner.run(s1)  
 
 if __name__ == "__main__":
-    mainTest(Test)
+    if len(sys.argv) == 1:
+        mainTest(Test)
+    else:
+        t = Test()
+        t.testDefinedContextsClef()
 
