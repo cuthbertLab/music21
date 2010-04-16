@@ -366,6 +366,7 @@ class DefinedContexts(object):
         # for the same object, may need to append character code to id
         if idKey == None and obj != None:
             idKey = id(obj)
+
         # a None object will have a key of None
         elif idKey == None and obj == None:
             idKey = None
@@ -583,7 +584,11 @@ class DefinedContexts(object):
         siteId = None
         if site is not None:
             siteId = id(site)
-        post = self._definedContexts[siteId]['offset']
+        try:
+            post = self._definedContexts[siteId]['offset']
+        except KeyError: # the site id is not valid
+            environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contxts:', self._definedContexts])
+            raise # re-raise Exception
         if post == None: # 
             raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         return self._definedContexts[siteId]['offset']
@@ -723,11 +728,15 @@ class DefinedContexts(object):
         #environLocal.printDebug(['call getByClass() from:', self, 'callerFirst:', callerFirst])
         post = None
 
+        count = 0
         # search any defined contexts first
-        # TODO: get here should return non-locations first
         for obj in self.get(locationsTrail=True):
+            #environLocal.printDebug(['searching defined context', obj])
+            count += 1
+
             #environLocal.printDebug(['memo', memo])
-            if obj is None: continue # in case the reference is dead
+            if obj is None: 
+                continue # in case the reference is dead
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
                     post = obj       
@@ -755,8 +764,9 @@ class DefinedContexts(object):
                 else: # objec has already been searched
                     pass
                     #environLocal.printDebug['skipping searching of object already searched:', obj]
-            else: 
-                return None
+            else: # post is not None
+                break
+        environLocal.printDebug(['getByClass(): defined contexts searched:', count])
         return post
 
     def getAttrByName(self, attrName):
@@ -841,7 +851,6 @@ class Music21Object(object):
     (8) priority  : int representing the position of an object among all
                     objects at the same offset.
 
-
     Each of these may be passed in as a named keyword to any music21 object.
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)
     '''
@@ -886,7 +895,7 @@ class Music21Object(object):
         elif self.groups is None:
             self.groups = Groups()
 
-        # TODO: propery key word should be definedContexts
+        # TODO: key word should be definedContexts
         if "locations" in keywords and self._definedContexts is None:
             self._definedContexts = keywords["locations"]
         else:
@@ -1483,6 +1492,10 @@ class Music21Object(object):
             if fp is None:
                 fp = environLocal.getTempFile(ext)
             dataStr = self._reprText()
+        elif format == 'textline':
+            if fp is None:
+                fp = environLocal.getTempFile(ext)
+            dataStr = self._reprTextLine()
         elif format == 'musicxml':
             if fp is None:
                 fp = environLocal.getTempFile(ext)
@@ -1496,11 +1509,14 @@ class Music21Object(object):
 
 
     def _reprText(self):
-        '''Retrun a text representation. This methods can be overridden by
-        subclasses to provide alternative text representations.
+        '''Retrun a text representation possible with line breaks. This methods can be overridden by subclasses to provide alternative text representations.
         '''
         return self.__repr__()
 
+    def _reprTextLine(self):
+        '''Retrun a text representation without line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''
+        return self.__repr__()
 
     def show(self, fmt=None):
         '''
@@ -1517,8 +1533,13 @@ class Music21Object(object):
         if format not in common.VALID_SHOW_FORMATS:
             raise Music21ObjectException('cannot support showing in this format yet: %s' % format)
 
+        # standard text presentation has line breaks, is printed
         if format == 'text':
             print(self._reprText())
+        # a text line compacts the complete recursive representation into a 
+        # single line of text; most for debugging. returned, not printed
+        elif format == 'textline': 
+            return self._reprTextLine()
         else: # a format that writes a file
             environLocal.launch(format, self.write(format))
 

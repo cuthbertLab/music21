@@ -29,6 +29,7 @@ import inspect
 # keys are assumed to be formats
 fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
+    'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
@@ -63,8 +64,8 @@ DEBUG_ALL = 255
 
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
@@ -88,6 +89,8 @@ def findFormat(fmt):
     ('humdrum', '.krn')
     >>> findFormat('txt')
     ('text', '.txt')
+    >>> findFormat('textline')
+    ('textline', '.txt')
     '''
     for key in fileExtensions.keys():
         if fmt.startswith('.'):
