@@ -118,8 +118,10 @@ class Stream(music21.Music21Object):
         self.isSorted = True
         self.isFlat = True  ## does it have no embedded elements
 
-        # seems that this hsould be named with a leading lower case?
-        self.flattenedRepresentationOf = None ## is this a stream returned by Stream().flat ?
+        # seems that this should be named with a leading lower case?
+        # when derivin a flat stream, store a reference to the non-flat Stream          
+        # from which this was taken
+        self.flattenedRepresentationOf = None 
         
         self._cache = common.defHash()
 
@@ -940,7 +942,7 @@ class Stream(music21.Music21Object):
                 if appendedAlready is False and myEl.isClass(myCl):
                     appendedAlready = True
                     found.insert(myEl.getOffsetBySite(self), myEl, ignoreSort = True)
-
+        # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
         return found
 
@@ -1717,7 +1719,7 @@ class Stream(music21.Music21Object):
         '''
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
-        environLocal.printDebug(['getClefs(); count of local',len(post)])
+        environLocal.printDebug(['getClefs(); count of local', len(post), post])
 
 # do not do this: this returns the default before the context search is complete
 #         if len(post) == 0 and searchParent:
@@ -1730,9 +1732,7 @@ class Stream(music21.Music21Object):
             # returns a single value
             post = Stream()
             obj = self.getContextByClass(clef.Clef)
-            environLocal.printDebug(['getClefs(): searching contexts: results', 
-                    obj])
-
+            #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
 
@@ -1963,7 +1963,7 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
-        environLocal.printDebug(['calling Stream.makeMeasures()'])
+        #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         # the srcObj shold not be modified or chagned
         # removed element copyig below and now making a deepcopy of entire stream
@@ -1971,15 +1971,11 @@ class Stream(music21.Music21Object):
         # position components, and sub-streams might hide elements that
         # should be contained
 
-        environLocal.printDebug('\nStream.makeMeasures: pre flat')
-        environLocal.printDebug([self.getClefs()[0]])
 
-        environLocal.printDebug('\nStream.makeMeasures: post flat')
-        environLocal.printDebug([self.flat.getClefs()[0]])
+        environLocal.printDebug(['makeMeasures(): first clef found before copying and flattening', self.getClefs()[0]])
 
-
+        # TODO: make inPlace an option
         srcObj = copy.deepcopy(self.flat)
-
         # may need to look in parent if no time signatures are found
         if meterStream is None:
             meterStream = srcObj.getTimeSignatures()
@@ -1988,8 +1984,11 @@ class Stream(music21.Music21Object):
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
         # as is done with meterStream
-        clefObj = srcObj.getClefs()[0]
-        environLocal.printDebug(['makeMeasures(): first clef found', clefObj])
+        clefStream = srcObj.getClefs()
+        clefObj = clefStream[0]
+
+
+        environLocal.printDebug(['makeMeasures(): first clef found after copying and flattening', clefObj])
     
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
@@ -2001,8 +2000,9 @@ class Stream(music21.Music21Object):
                 dur = 0 
             # NOTE: rounding here may cause secondary problems
             offset = round(e.getOffsetBySite(srcObj), 8)
-            # NOTE: used to make a copy.copy of elements here; this does not
-            # seem necessary nor appropriate. changed on 4/16/2010
+            # NOTE: used to make a copy.copy of elements here; 
+            # this is not necssary b/c making deepcopy of entire Stream
+            # changed on 4/16/2010
             offsetMap.append([offset, offset + dur, e])
             #offsetMap.append([offset, offset + dur, copy.copy(e)])
     
@@ -2190,6 +2190,8 @@ class Stream(music21.Music21Object):
         if len(measureStream) == 0:
             raise StreamException('cannot process a stream without measures')        
     
+        environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
+
         # may need to look in parent if no time signatures are found
         if meterStream is None:
             meterStream = returnObj.getTimeSignatures()
@@ -2230,6 +2232,7 @@ class Stream(music21.Music21Object):
                 mNext.measureNumber = m.measureNumber + 1
                 mNextAdd = True # new measure, needs to be appended
     
+            #environLocal.printDebug(['makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
             # for each measure, go through each element and see if its
             # duraton fits in the bar that contains it
             mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
@@ -2243,7 +2246,7 @@ class Stream(music21.Music21Object):
                     # assume end can be at boundary of end of measure
                     if eEnd > mEnd:
                         if eoffset >= mEnd:
-                            raise StreamException('element has offset %s within a measure that ends at offset %s' % (e.offset, mEnd))  
+                            raise StreamException('element (%s) has offset %s within a measure that ends at offset %s' % (e, eoffset, mEnd))  
     
                         # note: cannot use GeneralNote.splitNoteAtPoint b/c
                         # we are not assuming that these are notes, only elements
@@ -2267,7 +2270,10 @@ class Stream(music21.Music21Object):
                             eRemain.tie = note.Tie('stop')
     
                         # TODO: not sure this is the best way to make sure
-                        # eRamin comes first                     
+                        # eRamin comes first 
+                        # NOTE: must set parent here b/c otherwise offset
+                        # setting is for the wrong location
+                        eRemain.parent = mNext # manually set parent
                         eRemain.offset = 0
                         mNext.elements = [eRemain] + mNext.elements
 
@@ -2279,6 +2285,7 @@ class Stream(music21.Music21Object):
                         # completely in the next measure, thus, need to continue
                         # processing each measure
                         if mNextAdd:
+                            environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
                             returnObj.insert(mNext.offset, mNext)
             mCount += 1
 
@@ -2645,6 +2652,8 @@ class Stream(music21.Music21Object):
                 sNew.insert(e._definedContexts.getOffsetBySite(self), e)
 
         sNew.isFlat = True
+        # here, we store the source stream from which thiss stream was derived
+        # TODO: this should probably be a weakref
         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
         return sNew
     
@@ -3032,10 +3041,7 @@ class Stream(music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        environLocal.printDebug(['calling Stream._getMXPart'])
-
-        environLocal.printDebug('\nStream._getMXPart: start')
-        environLocal.printDebug([self.getClefs()[0]])
+        #environLocal.printDebug(['calling Stream._getMXPart'])
 
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
@@ -3058,11 +3064,12 @@ class Stream(music21.Music21Object):
             # try to add measures if none defined
             # returns a new stream w/ new Measures but the same objects
 
-            environLocal.printDebug('\nStream._getMXPart: pre makeMeasures')
-            environLocal.printDebug([self.getClefs()[0]])
+            #environLocal.printDebug('\nStream._getMXPart: pre makeMeasures')
+            #environLocal.printDebug([self.getClefs()[0]])
 
             measureStream = self.makeMeasures(meterStream, refStream)
-            #environLocal.printDebug(['Stream._getMXPart: post makeMeasures'])
+            #environLocal.printDebug(['Stream._getMXPart: post makeMeasures, length', len(measureStream)])
+
             measureStream = measureStream.makeTies(meterStream)
             measureStream = measureStream.makeBeams()
 
@@ -3120,19 +3127,19 @@ class Stream(music21.Music21Object):
 
 
         if multiPart:
-            environLocal.printDebug('Stream._getMX: interpreting multipart')
+            #environLocal.printDebug('Stream._getMX: interpreting multipart')
             # need to edit streams contained within streams
             # must repack into a new stream at each step
-            midStream = Stream()
-            finalStream = Stream()
+            #midStream = Stream()
+            #finalStream = Stream()
 
             # NOTE: used to make a shallow copy here
             # TODO: check; removed 4/16/2010
-            # TODO: probably should be a deepcopy, as edits may happen 
-            partStream = self #copy.copy(self)
+            # TODO: now making a deepcopy, as we are going to edit internal objs
+            partStream = copy.deepcopy(self)
 
             for obj in partStream.getElementsByClass(Stream):
-                # need to copy element here
+                # may need to copy element here
                 # apply this streams offset to elements
                 obj.transferOffsetToElements() 
 
@@ -3143,8 +3150,8 @@ class Stream(music21.Music21Object):
                 ht = obj.highestTime
                 if ht > highestTime:
                     highestTime = ht
-                # this should insert at the same offset last defined
-                midStream.insert(obj)
+                # used to place in intermediary stram
+                #midStream.insert(obj)
 
             refStream = Stream()
             refStream.insert(0, music21.Music21Object()) # placeholder at 0
@@ -3152,16 +3159,17 @@ class Stream(music21.Music21Object):
 
             # would like to do something like this but cannot
             # replace object inside of the stream
-            for obj in midStream.getElementsByClass(Stream):
+            for obj in partStream.getElementsByClass(Stream):
                 obj.makeRests(refStream, inPlace=True)
-                finalStream.insert(obj)
+                # used to move into a final Stream: no longer necessary
+                #finalStream.insert(obj)
 
             environLocal.printDebug(['handling multi-part Stream of length:',
-                                    len(finalStream)])
+                                    len(partStream)])
             count = 0
-            for obj in finalStream:
+            for obj in partStream.getElementsByClass(Stream):
                 count += 1
-                if count > len(finalStream):
+                if count > len(partStream):
                     raise StreamException('infinite stream encountered')
 
                 # only things that can be treated as parts are in finalStream
@@ -5936,19 +5944,154 @@ class Test(unittest.TestCase):
         post = s1.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-
         # if we flatten s1, we cannot still get the clef: why?
         s1Flat = s1.flat
         # but it has s2 has a context
         self.assertEqual(s1Flat.hasContext(s2), True)
         #environLocal.printDebug(['_definedContexts.get() of s1Flat', s1Flat._definedContexts.get()])
         #environLocal.printDebug(['_definedContexts._definedContexts of s1Flat', s1Flat._definedContexts._definedContexts])
-        
-        # TODO: this is the problem!
+
+
+        self.assertEqual(s1Flat.hasContext(s2), True)
+
+        # this returns the proper dictionary entry
+        environLocal.printDebug(
+            ['s1Flat._definedContexts._definedContexts[id(s1)', s1Flat._definedContexts._definedContexts[id(s2)]])
+        # we can extract out the same refernce
+        s2Out = s1Flat._definedContexts.getById(id(s2))
+
+        # this works
         post = s1Flat.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
+        # this will only work if the callerFirst is manually set to s1Flat
+        # otherwise, this interprets the DefinedContext object as the first 
+        # caller
+        post = s1Flat._definedContexts.getByClass(clef.Clef, callerFirst=s1Flat)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
 
+
+
+    def testContextNestedC(self):
+        '''Testing getting clefs from higher-level streams
+        '''
+        from music21 import note, clef
+        
+        s1 = Stream()
+        s1.id = 's1'
+        s2 = Stream()
+        s2.id = 's2'
+        n1 = note.Note()
+        c1 = clef.AltoClef()
+        
+        s1.append(n1) # this is the model of a stream with a single part
+        s2.append(s1)
+        s2.insert(0, c1)
+        
+        # this works fine
+        post = s1.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        # this is a key tool of the serial reverse search
+        post = s2.getElementAtOrBefore(0, [clef.Clef])
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+
+        # this is a key tool of the serial reverse search
+        post = s2.flat.getElementAtOrBefore(0, [clef.Clef])
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        # s1 is in s2; but s1.flat is not in s2!
+        self.assertEqual(s2.getOffsetByElement(s1), 0.0)
+        self.assertEqual(s2.getOffsetByElement(s1.flat), None)
+
+
+        # this does not work; the clef is in s2; its not in a context of s2
+        post = s2.getContextByClass(clef.Clef)
+        self.assertEqual(post, None)
+
+        # we can find the clef from the flat version of 21
+        post = s1.flat.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+
+    def testContextNestedD(self):
+        '''Testing getting clefs from higher-level streams
+        '''
+
+        from music21 import clef, note
+        n1 = note.Note()
+        n2 = note.Note()
+
+        s1 = Stream()
+        s2 = Stream()
+        s3 = Stream()
+        s1.append(n1)
+        s2.append(n2)
+        s3.insert(0, s1)
+        s3.insert(0, s2)
+        
+        s3.insert(0, clef.AltoClef())
+        # both output parts have alto clefs
+        #s3.show()
+
+        # get clef form higher level stream; only option
+        post = s1.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        post = s2.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        
+
+        # now we in sert a clef in s2; s2 will get this clef first
+        s2.insert(0, clef.TenorClef())
+        # only second part should ahve tenor clef
+        post = s2.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.TenorClef), True)
+
+        # but stream s1 should get the alto clef still
+        post = s1.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        # but s2 flat
+        post = s2.flat.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.TenorClef), True)
+
+        s2FlatCopy = copy.deepcopy(s2.flat)
+        post = s2FlatCopy.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.TenorClef), True)
+
+
+        # but s1 flat
+        post = s1.flat.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+        s1FlatCopy = copy.deepcopy(s1.flat)
+        post = s1FlatCopy.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
+
+
+        s1Measures = s1.makeMeasures()
+        self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
+
+        s2Measures = s2.makeMeasures()
+        self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
+
+
+        # try making a deep copy of s3
+
+        s3copy = copy.deepcopy(s3)
+        s1Measures = s3copy[0].makeMeasures()
+        self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
+        #s1Measures.show() # these show the proper clefs
+
+        s2Measures = s3copy[1].makeMeasures()
+        self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
+        #s2Measures.show() # this shows the proper clef
+
+        #TODO: this still retruns tenor cleff for both parts
+        # need to examine
+        #s3.show()
 
 
 #-------------------------------------------------------------------------------
@@ -5963,11 +6106,16 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
+        b = TestExternal()
         #a.testMeasureOffsetMapPostTie()    
         #a.testStripTies()
         #a.xtestStripTiesImported()
 
-        a.testContextNestedA()
-        a.testContextNestedB()
+        #a.testContextNestedA()
+        #a.testContextNestedB()
+        #a.testContextNestedC()
+
+        a.testContextNestedD()
+
 
 

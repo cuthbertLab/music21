@@ -221,7 +221,6 @@ def ch1_basic_II_B_1(show=True, *arguments, **keywords):
     for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.AltoClef())
-    exercise.show('t')
     if show: 
         exercise.show()
 
@@ -231,22 +230,12 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
     p4.
     For each of the five bass clef pitches on the left, write the tenord-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
     '''
-    from music21 import clef
-    humdata = '''
-**kern
-1F#
-1e-
-1B
-1D-
-1c
-*-
-'''
+    from music21 import clef, converter
+    humdata = '**kern\n1F#1e-\n1B\n1D-\n1c\n*-'
     exercise = converter.parseData(humdata)
     for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.TenorClef())
-    #exercise = exercise.flat # need flat to get clef
-    exercise.show('t')
     if show: 
         exercise.show()
 
@@ -304,50 +293,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
-    def testImportClefAssign(self):
-        environLocal.printDebug('special case')
-        from music21 import clef
-        humdata = '''
-**kern
-1F#
-1e-
-1B
-1D-
-1c
-*-
-    '''
-        exercise = converter.parseData(humdata)
-        self.assertEqual(len(exercise), 1)
-        # if we insert into the part; this works fine
-        #exercise[0].insert(0, clef.TenorClef())
-
-
-        # insert at top level
-        exercise.insert(0, clef.TenorClef())
-        exercise = exercise.sorted
-        exercise.show('t')
-
-        # this works, and finds the proper clef
-#         s = exercise.makeMeasures()
-#         s.show('t')
-        #s.show()
-
-
-        # this works, and finds the proper clef
-#         environLocal.printDebug('calling make measures on the part')
-#         exercise[0].transferOffsetToElements()
-#         s = exercise[0].makeMeasures()
-#         s.show('t')
-#         s.show()
-
-
-
-        #exercise.show()    
-            
-        environLocal.printDebug('end special case')
-
-
     def testBasic(self):
         for func in [
             ch1_basic_I_A, 
@@ -372,6 +317,7 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     else:
         ch1_basic_II_B_1(show=True)
+        ch1_basic_II_B_2(show=True)
 
         #t = Test()
         #t.testImportClefAssign()

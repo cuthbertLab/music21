@@ -448,6 +448,18 @@ class DefinedContexts(object):
             self._locationKeys.pop(self._locationKeys.index(idKey))
 
 
+    def getById(self, id):
+        '''Return the object specified by an id.
+        Used for testing and debugging. 
+        '''
+        dict = self._definedContexts[id]
+        # need to check if these is weakref
+        if common.isWeakref(dict['obj']):
+            return common.unwrapWeakref(dict['obj'])
+        else:
+            return dict['obj']
+
+
     def get(self, locationsTrail=False):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
@@ -766,7 +778,7 @@ class DefinedContexts(object):
                     #environLocal.printDebug['skipping searching of object already searched:', obj]
             else: # post is not None
                 break
-        environLocal.printDebug(['getByClass(): defined contexts searched:', count])
+        #environLocal.printDebug(['getByClass(): defined contexts searched:', count])
         return post
 
     def getAttrByName(self, attrName):
@@ -1163,10 +1175,35 @@ class Music21Object(object):
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
                 if offsetOfCaller == None:
+                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
                     offsetOfCaller = self.semiFlat.getOffsetByElement(
                                     callerFirst)
 
-                # in some cases it migth be necessary and/or faster 
+                # our caller might have been flattened after contexts were set
+                # this, this object may be in the caller's defined contexts, 
+                # but this object knows nothing about a flat version of the 
+                # caller (it cannot get an offset of the caller, which we need
+                # to do the serial reverse search
+                if offsetOfCaller == None and hasattr(
+                    callerFirst, 'flattenedRepresentationOf'):
+                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
+                    offsetOfCaller = self.getOffsetByElement(
+                        callerFirst.flattenedRepresentationOf)
+
+                # TODO: check semiflat for flattenedRepresentationOf?
+                # no reason to check a flat representaiton, b/c if the caller
+                # is a Stream, it will not be there.         
+            
+                # last possibility: try to get offset of caller form a a 
+                # non-flat representation of self. this would only be necessary
+                # if the semiflat operation is not not flattening 
+                # the right things
+                if offsetOfCaller == None:
+                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
+                    offsetOfCaller = self.getOffsetByElement(callerFirst)
+
+
+                # in some cases it might be necessary and/or faster 
                 # to search the 
                 # offsetOfCaller = caller.flat.getOffsetBySite(self)
                 # offsetOfCaller = caller.getOffsetBySite(self)
