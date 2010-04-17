@@ -5853,6 +5853,27 @@ class Test(unittest.TestCase):
         #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
 
 
+    def testCanons(self):
+        '''Same as test canons above, but without the who method being called
+        '''
+        
+        a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
+
+        s = Stream()
+        partOffsetShift = 1.25
+        partOffset = 0
+        for part in range(6):  
+            p = Stream()
+            for pitchName in a:
+                n = note.Note(pitchName)
+                n.quarterLength = 1.5
+                p.append(n)
+            p.offset = partOffset
+            s.insert(p)
+            partOffset += partOffsetShift
+
+        post = s.musicxml
+
 
     def testContextNestedA(self):
         '''Testing getting clefs from higher-level streams
