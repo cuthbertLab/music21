@@ -5668,18 +5668,6 @@ class Test(unittest.TestCase):
         c = b.stripTies() # gets flat, removes measures
         self.assertEqual(len(c.notes), 40)
 
-    def xtestStripTiesImported(self):
-        '''A test of the messiaen
-        '''
-        from music21 import converter
-        a = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
-        #a.show()
-#         for n in a.flat.notes:
-#             environLocal.printDebug([n, n.tie])
-#             if n.tie != None:
-#                 environLocal.printDebug(['\ttie type', n.tie.type])
-        self.assertEqual(len(a.flat.notes), 327)
-        self.assertEqual(len(a.flat.notes.stripTies()), 195)
 
     def testTwoStreamMethods(self):
         from music21.note import Note
@@ -5853,8 +5841,8 @@ class Test(unittest.TestCase):
         #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
 
 
-    def testCanons(self):
-        '''Same as test canons above, but without the who method being called
+    def testMusicXMLAttribute(self):
+        '''Test output tests above just by calling the musicxml attribute
         '''
         
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
@@ -5873,6 +5861,23 @@ class Test(unittest.TestCase):
             partOffset += partOffsetShift
 
         post = s.musicxml
+
+
+        n = note.Note()        
+        n.quarterLength = 3
+        a = Stream()
+        a.repeatInsert(n, range(0,120,3))
+        #a.show() # default time signature used
+        
+        a.insert( 0, meter.TimeSignature("5/4")  )
+        a.insert(10, meter.TimeSignature("2/4")  )
+        a.insert( 3, meter.TimeSignature("3/16") )
+        a.insert(20, meter.TimeSignature("9/8")  )
+        a.insert(40, meter.TimeSignature("10/4") )
+
+        post = a.musicxml
+
+
 
 
     def testContextNestedA(self):
@@ -6143,7 +6148,7 @@ if __name__ == "__main__":
         #a.testContextNestedB()
         #a.testContextNestedC()
 
-        a.testContextNestedD()
+        #a.testContextNestedD()
 
-
+        b.testMxMeasures()
 
