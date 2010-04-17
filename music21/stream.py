@@ -6112,6 +6112,13 @@ class Test(unittest.TestCase):
 
         #TODO: this still retruns tenor cleff for both parts
         # need to examine
+
+        # now we in sert a clef in s2; s2 will get this clef first
+        s1.insert(0, clef.BassClef())
+        post = s1.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.BassClef), True)
+
+
         #s3.show()
 
 
