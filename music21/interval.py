@@ -386,25 +386,27 @@ class GenericInterval(music21.Music21Object):
         self.directed = self.value
         self.undirected = abs(self.value)
 
-        if (self.directed == 1):
+        if self.directed == 1:
             self.direction = OBLIQUE
-        elif (self.directed == -1):
+        elif self.directed == -1:
             raise IntervalException("Descending P1s not allowed")
-        elif (self.directed == 0):
+        elif self.directed == 0:
             raise IntervalException("The Zeroth is not an interval")
-        elif (self.directed == self.undirected):
+        elif self.directed == self.undirected:
             self.direction = ASCENDING
         else:
             self.direction = DESCENDING
 
-        if (self.undirected > 2): self.isSkip = True
-        else: self.isSkip = False
+        if self.undirected > 2: 
+            self.isSkip = True
+        else: 
+            self.isSkip = False
 
-        if (self.undirected == 2): self.isStep = True
+        if self.undirected == 2: self.isStep = True
         else: self.isStep = False
         
         # unisons (even augmented) are neither steps nor skips.
-        (steps, octaves) = math.modf(self.undirected/7.0)
+        steps, octaves = math.modf(self.undirected/7.0)
         steps = int(steps*7 + .001)
         octaves = int(octaves)
         if (steps == 0):
@@ -466,8 +468,29 @@ class GenericInterval(music21.Music21Object):
         return "<music21.interval.GenericInterval %s>" % self.directed
 
     def complement(self):
-        '''generates a new GenericInterval object where descending 3rds are 6ths, etc.'''
+        '''Returns a new GenericInterval object where descending 3rds are 6ths, etc.
+
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.complement()
+        <music21.interval.GenericInterval 6>
+        '''
         return GenericInterval(self.mod7inversion)
+
+    def invert(self):
+        '''Returns a new GenericInterval object that is inverted. 
+
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.invert()
+        <music21.interval.GenericInterval -3>
+
+        >>> aInterval = GenericInterval(-13)
+        >>> aInterval.direction
+        -1
+        >>> aInterval.invert()
+        <music21.interval.GenericInterval 13>
+        '''
+        return GenericInterval(self.undirected * (-1 * self.direction))
+
 
     def getDiatonic(self, specifier):
         '''Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 
@@ -547,7 +570,7 @@ class DiatonicInterval(music21.Music21Object):
         '''
         music21.Music21Object.__init__(self)
 
-        if (specifier is not None and generic is not None):
+        if specifier is not None and generic is not None:
             if common.isNum(generic) or common.isStr(generic):
                 self.generic = GenericInterval(generic)
             elif isinstance(generic, GenericInterval): 
@@ -594,16 +617,14 @@ class DiatonicInterval(music21.Music21Object):
             self.prefectable = self.generic.perfectable
 
             # for inversions 
-            if self.prefectable:
-                # generate inversions.  P <-> P; d <-> A; dd <-> AA; etc. 
+            if self.prefectable: # inversions P <-> P; d <-> A; dd <-> AA; etc. 
                 self.orderedSpecifierIndex = orderedPerfSpecs.index(
                                              prefixSpecs[self.specifier])
                 self.invertedOrderedSpecIndex = (len(orderedPerfSpecs) - 
                                         1 - self.orderedSpecifierIndex)
                 self.invertedOrderedSpecifier = orderedPerfSpecs[
                                         self.invertedOrderedSpecIndex]
-            else:
-                # generate inversions.  m <-> M; d <-> A; etc.
+            else: # generate inversions.  m <-> M; d <-> A; etc.
                 self.orderedSpecifierIndex = orderedImperfSpecs.index(
                                             prefixSpecs[self.specifier])
                 self.invertedOrderedSpecIndex = (len(orderedImperfSpecs) - 
@@ -620,6 +641,22 @@ class DiatonicInterval(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.interval.DiatonicInterval %s>" % self.name
+
+
+    def invert(self):
+        '''Return a DiatonicInterval that is an inversion of this Interval.
+
+        >>> aInterval = DiatonicInterval('major', 3)
+        >>> aInterval.invert().directedName
+        'M-3'
+
+        >>> aInterval = DiatonicInterval('augmented', 5)
+        >>> aInterval.invert().directedName
+        'A-5'
+        '''
+        # self.invertedOrderedSpecifier gives a complement, not an inversion?
+        return DiatonicInterval(self.specifier, 
+                                self.generic.invert())
 
 
     def getChromatic(self):
@@ -710,6 +747,18 @@ class ChromaticInterval(music21.Music21Object):
     def __repr__(self):
         return "<music21.interval.ChromaticInterval %s>" % self.directed
 
+    def invert(self):
+        '''Return an inverted interval, that is, reversing the direction.
+
+        >>> aInterval = ChromaticInterval(-14)
+        >>> aInterval.invert()
+        <music21.interval.ChromaticInterval 14>
+
+        >>> aInterval = ChromaticInterval(3)
+        >>> aInterval.invert()
+        <music21.interval.ChromaticInterval -3>
+        '''
+        return ChromaticInterval(self.undirected * (-1 * self.direction))
 
     def getDiatonic(self):
         '''Given a Chromatic interval, return a Diatonic interval object. 
@@ -853,7 +902,7 @@ def generateDiatonic(gInt, cInt):
 
 
 
-
+#-------------------------------------------------------------------------------
 class Interval(music21.Music21Object):
     '''An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. 
 
@@ -881,8 +930,7 @@ class Interval(music21.Music21Object):
     direction = None
     generic = None
 
-    # n.b. -- at present, changing these does NOT change the interval.  
-    # Get an interval from two notes from generateInterval(n1, n2)
+    # these can be accessed through noteStart and noteEnd properties
     note1 = None 
     note2 = None 
 
@@ -1080,10 +1128,37 @@ class Interval(music21.Music21Object):
             halfStepsToFix = (-self.chromatic.semitones -
                           interval2.chromatic.semitones)
 
-
         if halfStepsToFix != 0:
             pitch2.accidental = halfStepsToFix
+            # inherit accidental display properties
+            pitch2.inheritDisplay(pitch1)
         return pitch2
+
+
+    def invert(self):
+        '''Return an inverted version of this interval. If given Notes, these notes are reversed. 
+
+        >>> from music21 import note
+        >>> n1 = note.Note('c3')
+        >>> n2 = note.Note('g3')
+        >>> aInterval = Interval(note1=n1, note2=n2)
+        >>> aInterval
+        <music21.interval.Interval P5>
+        >>> bInterval = aInterval.invert()
+        >>> bInterval
+        <music21.interval.Interval P-5>
+        >>> bInterval.noteStart == aInterval.noteEnd
+        True
+        
+        >>> aInterval = Interval('m3')
+        >>> aInterval.invert()
+        <music21.interval.Interval m-3>
+        '''
+        if self.note1 != None and self.note2 != None:
+            return Interval(note1=self.note2, note2=self.note1)
+        else:
+            return Interval(diatonic=self.diatonic.invert(),
+                            chromatic=self.chromatic.invert())
 
 
     def _setNoteStart(self, n):

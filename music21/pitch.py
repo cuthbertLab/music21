@@ -416,7 +416,25 @@ class Accidental(music21.Music21Object):
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
         
-        
+    def inheritDisplay(self, other):
+        '''Given another Accidental object, inherit all the display properites
+        of that object. 
+
+        This is needed when transposing Pitches: we need to retain accidental display properties. 
+
+        >>> a = Accidental('double-flat')
+        >>> a.displayType = 'always'
+        >>> b = Accidental('sharp')
+        >>> b.inheritDisplay(a)
+        >>> b.displayType
+        'always'
+        '''        
+        if other != None: # empty accidental attributes are None
+            for attr in ['displayType', 'displayEvaluated', 
+                        'displayStyle', 'displaySize', 'displayLocation']:
+                value = getattr(other, attr)
+                setattr(self, attr, value)
+
     def _getLily(self):
         lilyRet = ""
         if (self.name == "sharp"): lilyRet = "is"
@@ -1156,19 +1174,22 @@ class Pitch(music21.Music21Object):
     def transpose(self, value, inPlace=False):
         '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
-        >>> a = Pitch('g4')
-        >>> b = a.transpose('m3')
-        >>> b
+        >>> aPitch = Pitch('g4')
+        >>> bPitch = aPitch.transpose('m3')
+        >>> bPitch
         B-4
         >>> aInterval = interval.Interval(-6)
-        >>> b = a.transpose(aInterval)
-        >>> b
+        >>> bPitch = aPitch.transpose(aInterval)
+        >>> bPitch
         C#4
         
-        >>> a.transpose(aInterval, inPlace=True)
-        >>> a
+        >>> aPitch
         G4
+        >>> aPitch.transpose(aInterval, inPlace=True)
+        >>> aPitch
+        C#4
         '''
+        #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class
             intervalObj = value
         else: # try to process
@@ -1176,8 +1197,33 @@ class Pitch(music21.Music21Object):
         if not inPlace:
             return intervalObj.transposePitch(self)
         else:
-            self = intervalObj.transposePitch(self)
+            p = intervalObj.transposePitch(self)
+            # can setName with nameWithOctave to recreate all essential
+            # pitch attributes
+            # NOTE: in some cases this may not return exactly the proper config
+            self._setName(p.nameWithOctave)
+            # manually copy accidental object
+            self.accidental = p.accidental
             return None
+
+
+    def inheritDisplay(self, other):
+        '''Inherit display properties from another Pitch, including those found on the Accidental object.
+
+        >>> 
+        >>> a = Pitch('c#')
+        >>> a.accidental.displayType = 'always'
+        >>> b = Pitch('c-')
+        >>> b.inheritDisplay(a)
+        >>> b.accidental.displayType
+        'always'
+
+        '''
+        # if other.accidental is None no problem
+        if self._accidental != None:
+            self._accidental.inheritDisplay(other.accidental)
+
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

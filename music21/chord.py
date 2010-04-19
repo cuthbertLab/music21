@@ -498,11 +498,10 @@ class Chord(note.NotRest):
         else:
             post = self
         
-        pitches = []
-        for p in self.pitches:
-            pitches.append(intervalObj.transposePitch(p))
-
-        post.pitches = pitches
+        for p in post.pitches:
+            # we are either operating on self or a copy; always use inPlace
+            p.transpose(intervalObj, inPlace=True)
+            #pitches.append(intervalObj.transposePitch(p))
 
         if not inPlace:
             return post

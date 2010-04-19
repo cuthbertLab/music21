@@ -718,8 +718,8 @@ class Stream(music21.Music21Object):
                 msg.append(indent + "{" + off + "} " + element.__repr__())
         if addBreaks:
             msg = '\n'.join(msg)
-        else:
-            msg = ' '.join(msg) # use space
+        else: # use a slashs
+            msg = ' / '.join(msg) # use space
         return msg
 
 
@@ -2949,21 +2949,21 @@ class Stream(music21.Music21Object):
         >>> aInterval = interval.Interval('d5')
         
         >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> part = a[0]
-        >>> a[0].pitches[:10]
+        >>> aStream = corpus.parseWork('bach/bwv324.xml')
+        >>> part = aStream[0]
+        >>> aStream[0].pitches[:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
-        >>> b = a[0].flat.transpose('d5')
-        >>> b.pitches[:10]
+        >>> bStream = aStream[0].flat.transpose('d5')
+        >>> bStream.pitches[:10]
         [F5, A-5, F5, F5, F5, F5, G-5, F5, E-5, E-5]
-        >>> a[0].pitches[:10]
+        >>> aStream[0].pitches[:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
-        >>> c = b.flat.transpose('a4')
-        >>> c.pitches[:10]
+        >>> cStream = bStream.flat.transpose('a4')
+        >>> cStream.pitches[:10]
         [B5, D6, B5, B5, B5, B5, C6, B5, A5, A5]
         
-        >>> c.flat.transpose(aInterval, inPlace=True)
-        >>> c.pitches[:10]
+        >>> cStream.flat.transpose(aInterval, inPlace=True)
+        >>> cStream.pitches[:10]
         [F6, A-6, F6, F6, F6, F6, G-6, F6, E-6, E-6]
         '''
         # only change the copy
@@ -2971,10 +2971,14 @@ class Stream(music21.Music21Object):
             post = copy.deepcopy(self)
         else:
             post = self
-        for n in post.notes: # includes chords
-            if not n.isRest:
-                # do inplace transpositions on the deepcopy
-                n.transpose(value, inPlace=True)            
+#         for n in post.notes: # includes chords
+#             if not n.isRest:
+#                 # do inplace transpositions on the deepcopy
+#                 n.transpose(value, inPlace=True)            
+
+        for p in post.pitches: # includes chords
+            # do inplace transpositions on the deepcopy
+            p.transpose(value, inPlace=True)            
 
         if not inPlace:
             return post
@@ -3309,8 +3313,8 @@ class Stream(music21.Music21Object):
         >>> len(a.pitches)
         104
         
-        TODO: Get Pitches found directly in a stream
         '''  
+        # TODO: Get Pitches found directly in a stream
         returnPitches = []
         for thisEl in self.elements:
             if hasattr(thisEl, "pitch"):

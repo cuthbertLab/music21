@@ -1154,7 +1154,9 @@ class Note(NotRest):
         else:
             post = self
 
-        post.pitch = intervalObj.transposePitch(self.pitch)
+        # use inPlace, b/c if we are inPlace, we operate on self;
+        # if we are not inPlace, post is a copy
+        post.pitch.transpose(intervalObj, inPlace=True)
 
         if not inPlace:
             return post
