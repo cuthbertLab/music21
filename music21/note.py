@@ -1264,7 +1264,7 @@ class Note(NotRest):
                 mxNoteList[0].notationsObj.componentList += mxTiedList
 
         # need to apply beams to notes, but application needs to be
-        # reconfigured based on what is gotten from self.duratoin.mx
+        # reconfigured based on what is gotten from self.duration.mx
 
         # likely, this means that many continue beams will need to be added
 
@@ -1277,21 +1277,35 @@ class Note(NotRest):
 
         # if we have any articulations, they only go on the first of any 
         # component notes
-        mxArticulations = None
+        mxArticulations = []
         for i in range(len(self.articulations)):
-            obj = self.articulations[i]
-            if i == 0: # assign first
-                mxArticulations = obj.mx # mxArt... stores more than one artic
-            else: # concatenate any remaining
-                mxArticulations += obj.mx
-        if mxArticulations != None:
+            obj = self.articulations[i] # assuming all return a list
+            mxArticulations += obj.mx
+        if mxArticulations != []:
             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
+
+        # notations and articulations are mixed in musicxml
+        for i in range(len(self.notations)):
+            obj = self.notations[i] 
+            mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
         return mxNoteList
 
 
     def _setMX(self, mxNote):
-        '''Given an mxNote, fill the necessary parameters
+        '''Given an mxNote, fill the necessary parameters of a Note
+
+        >>> from music21 import musicxml
+        >>> from music21 import corpus
+        >>> mxNote = musicxml.Note()
+        >>> mxNote.setDefaults()
+        >>> mxMeasure = musicxml.Measure()
+        >>> mxMeasure.setDefaults()
+        >>> mxMeasure.append(mxNote)
+        >>> mxNote.external['measure'] = mxMeasure # manually create ref
+        >>> mxNote.external['divisions'] = mxMeasure.external['divisions']
+        >>> n = Note('c')
+        >>> n.mx = mxNote
         '''
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream 
@@ -1322,6 +1336,16 @@ class Note(NotRest):
                 articulationObj = articulations.Articulation()
                 articulationObj.mx = mxObj
                 self.articulations.append(articulationObj)
+
+            # get any fermatas, store on notations
+            mxFermataList = mxNotations.getFermatas()
+            for mxObj in mxFermataList:
+                fermataObj = notationMod.Fermata()
+                fermataObj.mx = mxObj
+                # placing this as an articulation for now
+                self.notations.append(fermataObj)
+
+                #environLocal.printDebug(['_setMX(), self.mxFermataList', mxFermataList])
 
     mx = property(_getMX, _setMX)    
 
@@ -1617,6 +1641,17 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(mxNotes), 5)
         self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)
+
+
+    def testMusicXMLFermata(self):
+        from music21 import corpus
+        a = corpus.parseWork('bach/bwv5.7')
+        found = []
+        for n in a.flat.notes:
+            for obj in n.notations:
+                if isinstance(obj, notationMod.Fermata):
+                    found.append(obj)
+        self.assertEqual(len(found), 6)
 
 
 #-------------------------------------------------------------------------------

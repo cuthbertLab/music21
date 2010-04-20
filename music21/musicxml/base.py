@@ -934,10 +934,9 @@ class Measure(MusicXMLElementList):
         self._attr['width'] = None
         # elements
         self.attributesObj = None # an object
-        self.componentList = [] # a lost notes and other things
+        self.componentList = [] # a list notes and other things
 
         self._crossReference['attributesObj'] = ['attributes']
-
 
     def _getComponents(self):
         c = [] # have not checked order of this
@@ -954,8 +953,7 @@ class Measure(MusicXMLElementList):
 
 
     def update(self):
-        ''' look at all note, forward, and backup objects and updates
-         note start times'''
+        '''This method looks at all note, forward, and backup objects and updates note start times'''
         counter = 0
         noteThis = None
         noteNext = None
@@ -1348,7 +1346,6 @@ class Note(MusicXMLElement):
         # enctountered divisions value
         self.external['divisions'] = None
 
-
         # attributes: mostly position information default-x, etc
         self._attr['color'] = None
         self._attr['print-object'] = None # may be yes or no
@@ -1550,6 +1547,18 @@ class Notations(MusicXMLElementList):
                 post += part.componentList
         return post
 
+    def getFermatas(self):
+        '''Get a fermata.
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Fermata):
+                post.append(part)
+        return post
+
+
+
+
 
 class Dynamics(MusicXMLElementList):
     def __init__(self, type=None):
@@ -1712,7 +1721,7 @@ class Fermata(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'fermata'
         # attributes
-        self._attr['type'] = type
+        self._attr['type'] = type # upright
         # character data
         self.charData = None
 

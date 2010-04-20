@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ class Trill(Ornament):
 
     def _getMX(self):
         '''
-        returns a musicxml.DynamicMark object
+        Returns a musicxml.TrillMark object
         >>> a = Trill()
         >>> a.placement = 'above'
         >>> mxTrillMark = a.mx
@@ -71,7 +71,7 @@ class Trill(Ornament):
 
     def _setMX(self, mxTrillMark):
         '''
-        given an mxDynamicMark, load instance
+        Given an mxTrillMark, load instance
 
         >>> mxTrillMark = musicxml.TrillMark()
         >>> mxTrillMark.set('placement', 'above')
@@ -101,11 +101,39 @@ class Turn(Ornament):
 class InvertedTurn(Ornament):
     pass
 
+
+
 class Fermata(music21.Music21Object):
     shape = "normal"
-    type  = ""
+    type  = "upright" # for musicmxml, can be upright, upright-inverted
     lily  = "\\fermata"
 
+    def _getMX(self):
+        '''
+        Returns a musicxml.DynamicMark object
+        >>> a = Fermata()
+        >>> mxFermata = a.mx
+        >>> mxFermata.get('type')
+        'upright'
+        '''
+        mxFermata = musicxml.Fermata()
+        mxFermata.set('type', self.type)
+        return mxFermata
+
+    def _setMX(self, mxFermata):
+        '''
+        given an mxFermata, load instance
+
+        >>> mxFermata = musicxml.Fermata()
+        >>> mxFermata.set('type', 'upright')
+        >>> a = Fermata()
+        >>> a.mx = mxFermata
+        >>> a.type
+        'upright'
+        '''
+        self.type = mxFermata.get('type')
+
+    mx = property(_getMX, _setMX)
 
 
 
