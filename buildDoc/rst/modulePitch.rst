@@ -333,21 +333,37 @@ Pitch
 
     **Pitch** **methods**
 
+        .. method:: inheritDisplay(other)
+
+        Inherit display properties from another Pitch, including those found on the Accidental object. 
+
+        >>>
+        >>> a = Pitch('c#')
+        >>> a.accidental.displayType = 'always'
+        >>> b = Pitch('c-')
+        >>> b.inheritDisplay(a)
+        >>> b.accidental.displayType
+        'always' 
+
+        
+
         .. method:: transpose(value, inPlace=False)
 
-        Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+        Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
-        >>> a = Pitch('g4')
-        >>> b = a.transpose('m3')
-        >>> b
+        >>> aPitch = Pitch('g4')
+        >>> bPitch = aPitch.transpose('m3')
+        >>> bPitch
         B-4 
         >>> aInterval = interval.Interval(-6)
-        >>> b = a.transpose(aInterval)
-        >>> b
+        >>> bPitch = aPitch.transpose(aInterval)
+        >>> bPitch
         C#4 
-        >>> a.transpose(aInterval, inPlace=True)
-        >>> a
+        >>> aPitch
         G4 
+        >>> aPitch.transpose(aInterval, inPlace=True)
+        >>> aPitch
+        C#4 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -416,6 +432,17 @@ Accidental
         >>> a = Accidental('--')
         >>> a.alter
         -2.0 
+
+        .. method:: inheritDisplay(other)
+
+        Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties. 
+
+        >>> a = Accidental('double-flat')
+        >>> a.displayType = 'always'
+        >>> b = Accidental('sharp')
+        >>> b.inheritDisplay(a)
+        >>> b.displayType
+        'always' 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

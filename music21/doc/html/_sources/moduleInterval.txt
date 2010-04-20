@@ -405,6 +405,25 @@ Interval
 
     **Interval** **methods**
 
+        .. method:: invert()
+
+        Return an inverted version of this interval. If given Notes, these notes are reversed. 
+
+        >>> from music21 import note
+        >>> n1 = note.Note('c3')
+        >>> n2 = note.Note('g3')
+        >>> aInterval = Interval(note1=n1, note2=n2)
+        >>> aInterval
+        <music21.interval.Interval P5> 
+        >>> bInterval = aInterval.invert()
+        >>> bInterval
+        <music21.interval.Interval P-5> 
+        >>> bInterval.noteStart == aInterval.noteEnd
+        True 
+        >>> aInterval = Interval('m3')
+        >>> aInterval.invert()
+        <music21.interval.Interval m-3> 
+
         .. method:: reinit()
 
         Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes. 
@@ -476,6 +495,17 @@ ChromaticInterval
         <music21.interval.DiatonicInterval M7> 
 
         
+
+        .. method:: invert()
+
+        Return an inverted interval, that is, reversing the direction. 
+
+        >>> aInterval = ChromaticInterval(-14)
+        >>> aInterval.invert()
+        <music21.interval.ChromaticInterval 14> 
+        >>> aInterval = ChromaticInterval(3)
+        >>> aInterval.invert()
+        <music21.interval.ChromaticInterval -3> 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -556,6 +586,17 @@ DiatonicInterval
 
         
 
+        .. method:: invert()
+
+        Return a DiatonicInterval that is an inversion of this Interval. 
+
+        >>> aInterval = DiatonicInterval('major', 3)
+        >>> aInterval.invert().directedName
+        'M-3' 
+        >>> aInterval = DiatonicInterval('augmented', 5)
+        >>> aInterval.invert().directedName
+        'A-5' 
+
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
@@ -613,7 +654,11 @@ GenericInterval
 
         .. method:: complement()
 
-        generates a new GenericInterval object where descending 3rds are 6ths, etc. 
+        Returns a new GenericInterval object where descending 3rds are 6ths, etc. 
+
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.complement()
+        <music21.interval.GenericInterval 6> 
 
         .. method:: getDiatonic(specifier)
 
@@ -633,6 +678,19 @@ GenericInterval
         >>> bInterval = GenericInterval('fifth')
         >>> bInterval.getDiatonic('perfect')
         <music21.interval.DiatonicInterval P5> 
+
+        .. method:: invert()
+
+        Returns a new GenericInterval object that is inverted. 
+
+        >>> aInterval = GenericInterval('Third')
+        >>> aInterval.invert()
+        <music21.interval.GenericInterval -3> 
+        >>> aInterval = GenericInterval(-13)
+        >>> aInterval.direction
+        -1 
+        >>> aInterval.invert()
+        <music21.interval.GenericInterval 13> 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

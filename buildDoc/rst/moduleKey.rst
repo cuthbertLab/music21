@@ -13,6 +13,33 @@ music21.key
 
 Given a string representing a key, return the appropriate Key object. 
 
+.. function:: pitchToSharps(value, mode=None)
+
+Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None, 'major', or 'minor'. 
+
+>>> pitchToSharps('c')
+0 
+>>> pitchToSharps('c', 'minor')
+-3 
+>>> pitchToSharps('a', 'minor')
+0 
+>>> pitchToSharps('d')
+2 
+>>> pitchToSharps('e-')
+-3 
+>>> pitchToSharps('a')
+3 
+>>> pitchToSharps('e', 'minor')
+1 
+>>> pitchToSharps('f#', 'major')
+6 
+>>> pitchToSharps('g-', 'major')
+-6 
+>>> pitchToSharps('c#')
+7 
+>>> pitchToSharps('g#')
+8 
+
 .. function:: sharpsToPitch(sharpCount)
 
 Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value. 
@@ -89,6 +116,29 @@ KeySignature
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **KeySignature** **methods**
+
+        .. method:: transpose(value, inPlace=False)
+
+        Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
+
+        >>> a = KeySignature(2)
+        >>> a.pitchAndMode
+        (D, None) 
+        >>> b = a.transpose('p5')
+        >>> b.pitchAndMode
+        (A, None) 
+        >>> b.sharps
+        3 
+        >>> c = b.transpose('-m2')
+        >>> c.pitchAndMode
+        (G#, None) 
+        >>> c.sharps
+        8 
+        >>> d = c.transpose('-a3')
+        >>> d.pitchAndMode
+        (E-, None) 
+        >>> d.sharps
+        -3 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

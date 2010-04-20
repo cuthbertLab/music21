@@ -28,6 +28,7 @@ from music21 import duration
 from music21 import dynamics
 from music21 import editorial
 from music21 import environment
+from music21 import expressions
 from music21 import graph
 from music21 import key
 from music21 import instrument
@@ -74,6 +75,7 @@ MODULES = [
     dynamics,
     editorial,
     environment, 
+    expressions,
     graph,
     key,
     instrument,

@@ -103,6 +103,8 @@ Given a format defined either by a format name or an extension, return the forma
 ('humdrum', '.krn') 
 >>> findFormat('txt')
 ('text', '.txt') 
+>>> findFormat('textline')
+('textline', '.txt') 
 
 .. function:: findFormatExtURL(url)
 

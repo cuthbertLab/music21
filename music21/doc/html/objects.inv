@@ -23,6 +23,7 @@ music21.environment mod moduleEnvironment.html
 music21.editorial mod moduleEditorial.html
 music21.pitch mod modulePitch.html
 music21.interval mod moduleInterval.html
+music21.expressions mod moduleExpressions.html
 music21.duration.Duration.componentStartTime method moduleDuration.html
 music21.tinyNotation.HarmonyStream class moduleTinyNotation.html
 music21.graph.Graph.axis attribute moduleGraph.html
@@ -42,6 +43,7 @@ music21.instrument.StringInstrument class moduleInstrument.html
 music21.pitch.Pitch.octave attribute modulePitch.html
 music21.converter.PickleFilter.status method moduleConverter.html
 music21.chord.Chord.isMinorTriad method moduleChord.html
+music21.stream.Stream.getOverlaps method moduleStream.html
 music21.environment.Environment.launch method moduleEnvironment.html
 music21.interval.GenericInterval.getDiatonic method moduleInterval.html
 music21.common.findInputExtension function moduleCommon.html
@@ -50,7 +52,7 @@ music21.common.fromRoman function moduleCommon.html
 music21.meter.TimeSignature.accent attribute moduleMeter.html
 music21.duration.quarterLengthToTuplet function moduleDuration.html
 music21.converter.Converter.stream attribute moduleConverter.html
-music21.environment.Environment.keys method moduleEnvironment.html
+music21.editorial.NoteEditorial.lilyEnd method moduleEditorial.html
 music21.clef.Treble8vbClef class moduleClef.html
 music21.stream.Stream.insertAtIndex method moduleStream.html
 music21.environment.Environment class moduleEnvironment.html
@@ -60,7 +62,9 @@ music21.chord.Chord.pitches attribute moduleChord.html
 music21.base.Music21Object.addLocationAndParent method moduleBase.html
 music21.duration.Tuplet.tupletActual attribute moduleDuration.html
 music21.note.Beams.mx attribute moduleNote.html
+music21.stream.Stream.index method moduleStream.html
 music21.duration.Tuplet.setDurationType method moduleDuration.html
+music21.interval.Interval.invert method moduleInterval.html
 music21.chord.Chord.isTriad method moduleChord.html
 music21.note.Beams.fill method moduleNote.html
 music21.meter.TimeSignature.totalLength attribute moduleMeter.html
@@ -80,6 +84,7 @@ music21.meter.MeterTerminal.ratioEqual method moduleMeter.html
 music21.graph.PlotScatterWeightedPitchSpaceQuarterLength class moduleGraph.html
 music21.serial.RowBergLulu class moduleSerial.html
 music21.stream.Measure class moduleStream.html
+music21.pitch.Accidental.inheritDisplay method modulePitch.html
 music21.dynamics.Dynamic class moduleDynamics.html
 music21.serial.RowBergDerWein class moduleSerial.html
 music21.common.isPowerOfTwo function moduleCommon.html
@@ -90,10 +95,12 @@ music21.meter.slashCompoundToFraction function moduleMeter.html
 music21.stream.Measure.measureNumber attribute moduleStream.html
 music21.clef.SopranoClef class moduleClef.html
 music21.duration.AppogiaturaStartDuration class moduleDuration.html
+music21.duration.updateTupletType function moduleDuration.html
 music21.base.Music21Object.setContextAttr method moduleBase.html
 music21.duration.Duration.appendTuplet method moduleDuration.html
 music21.serial.RowSchoenbergOp33A class moduleSerial.html
 music21.serial.RowSchoenbergOp33B class moduleSerial.html
+music21.note.GeneralNote.clearDurations method moduleNote.html
 music21.interval.Interval.noteEnd attribute moduleInterval.html
 music21.common.findFormat function moduleCommon.html
 music21.base.DefinedContexts.wrapWeakref method moduleBase.html
@@ -108,6 +115,7 @@ music21.note.GeneralNote.compactNoteInfo method moduleNote.html
 music21.node.NodeList.append method moduleNode.html
 music21.common.lcm function moduleCommon.html
 music21.dynamics.Dynamic.mx attribute moduleDynamics.html
+music21.expressions.HalfStepMordent class moduleExpressions.html
 music21.stream.Measure.addRepeat method moduleStream.html
 music21.base.DefinedContexts.remove method moduleBase.html
 music21.converter.ConverterMusicXML.parseData method moduleConverter.html
@@ -164,9 +172,10 @@ music21.stream.Stream.getNotes method moduleStream.html
 music21.serial.RowBergChamberConcerto class moduleSerial.html
 music21.meter.TimeSignature.beat attribute moduleMeter.html
 music21.environment.Environment.getTempDir method moduleEnvironment.html
-music21.stream.Stream.index method moduleStream.html
+music21.interval.ChromaticInterval.invert method moduleInterval.html
 music21.common.dirPartitioned function moduleCommon.html
-music21.editorial.NoteEditorial.lilyEnd method moduleEditorial.html
+music21.expressions.InvertedTurn class moduleExpressions.html
+music21.environment.Environment.keys method moduleEnvironment.html
 music21.chord.Chord.isHalfDiminishedSeventh method moduleChord.html
 music21.node.NodeList class moduleNode.html
 music21.serial.RowBergLuluActIScene20 class moduleSerial.html
@@ -192,6 +201,7 @@ music21.stream.Stream.insert method moduleStream.html
 music21.meter.TimeSignature.numerator attribute moduleMeter.html
 music21.graph.Graph.show method moduleGraph.html
 music21.instrument.Violoncello class moduleInstrument.html
+music21.expressions.InvertedMordent class moduleExpressions.html
 music21.interval.convertSpecifier function moduleInterval.html
 music21.common.isNum function moduleCommon.html
 music21.meter.MeterSequence.getLevelSpan method moduleMeter.html
@@ -217,7 +227,8 @@ music21.note.NotRest class moduleNote.html
 music21.graph.PlotHistogramPitchClass class moduleGraph.html
 music21.node.Node.get method moduleNode.html
 music21.meter.TimeSignature.getBeat method moduleMeter.html
-music21.duration.updateTupletType function moduleDuration.html
+music21.expressions.Fermata.mx attribute moduleExpressions.html
+music21.key.KeySignature.transpose method moduleKey.html
 music21.duration.Tuplet.totalTupletLength method moduleDuration.html
 music21.stream.Stream.musicxml attribute moduleStream.html
 music21.serial.ToneRow class moduleSerial.html
@@ -235,6 +246,7 @@ music21.graph.PlotScatter class moduleGraph.html
 music21.note.noteFromDiatonicNumber function moduleNote.html
 music21.base.DefinedContexts.hasSiteId method moduleBase.html
 music21.base.ElementWrapper.setId method moduleBase.html
+music21.interval.GenericInterval.invert method moduleInterval.html
 music21.pitch.Pitch.transpose method modulePitch.html
 music21.chord.Chord.chordTablesAddress attribute moduleChord.html
 music21.interval.generateChromatic function moduleInterval.html
@@ -257,6 +269,7 @@ music21.duration.Duration.components attribute moduleDuration.html
 music21.chord.Chord.closedPosition method moduleChord.html
 music21.duration.LongGraceDuration class moduleDuration.html
 music21.note.Tie class moduleNote.html
+music21.expressions.WholeStepTrill class moduleExpressions.html
 music21.note.Note.nameWithOctave attribute moduleNote.html
 music21.duration.Duration.write method moduleDuration.html
 music21.stream.Stream.flat attribute moduleStream.html
@@ -330,6 +343,7 @@ music21.base.Music21Object.show method moduleBase.html
 music21.pitch.Pitch.musicxml attribute modulePitch.html
 music21.meter.MeterSequence.partitionByList method moduleMeter.html
 music21.stream.Stream.groupElementsByOffset method moduleStream.html
+music21.expressions.Fermata class moduleExpressions.html
 music21.chord.Chord.hasRepeatedScaleX method moduleChord.html
 music21.common.basicallyEqual function moduleCommon.html
 music21.base.Music21Object.searchParentByAttr method moduleBase.html
@@ -346,6 +360,7 @@ music21.common.sortModules function moduleCommon.html
 music21.meter.TimeSignature.setDisplay method moduleMeter.html
 music21.graph.PlotStream.process method moduleGraph.html
 music21.corpus.base.getVirtualPaths function moduleCorpus.html
+music21.base.DefinedContexts.getById method moduleBase.html
 music21.note.Note.isNote attribute moduleNote.html
 music21.chord.Chord.orderedPitchClassesString attribute moduleChord.html
 music21.stream.Stream.makeBeams method moduleStream.html
@@ -366,6 +381,7 @@ music21.chord.Chord.sortFrequencyAscending method moduleChord.html
 music21.common.stripAddresses function moduleCommon.html
 music21.node.Node.loadAttrs method moduleNode.html
 music21.environment.Environment.printDebug method moduleEnvironment.html
+music21.stream.Stream.getClefs method moduleStream.html
 music21.base.ElementWrapper.id attribute moduleBase.html
 music21.converter.freeze function moduleConverter.html
 music21.base.DefinedContexts.unwrapWeakref method moduleBase.html
@@ -382,10 +398,11 @@ music21.stream.Stream class moduleStream.html
 music21.stream.System class moduleStream.html
 music21.base.Music21Object.duration attribute moduleBase.html
 music21.meter.slashMixedToFraction function moduleMeter.html
+music21.expressions.HalfStepInvertedMordent class moduleExpressions.html
 music21.interval.Interval.intervalClass attribute moduleInterval.html
 music21.serial.RowBergLyricSuite class moduleSerial.html
 music21.stream.Stream.extendDuration method moduleStream.html
-music21.pitch.Pitch class modulePitch.html
+music21.interval.DiatonicInterval.invert method moduleInterval.html
 music21.chord.Chord.forteClassTnI attribute moduleChord.html
 music21.key.KeySignature.pitchAndMode attribute moduleKey.html
 music21.duration.ZeroDuration class moduleDuration.html
@@ -411,6 +428,7 @@ music21.instrument.Instrument.mx attribute moduleInstrument.html
 music21.interval.convertSemitoneToSpecifierGeneric function moduleInterval.html
 music21.chord.Chord.sortChromaticAscending method moduleChord.html
 music21.chord.Chord.hasScaleX method moduleChord.html
+music21.expressions.WholeStepInvertedMordent class moduleExpressions.html
 music21.stream.Measure.keyIsNew attribute moduleStream.html
 music21.interval.generateNote function moduleInterval.html
 music21.converter.StreamFreezer.openPickle method moduleConverter.html
@@ -430,9 +448,10 @@ music21.interval.getAbsoluteLowerNote function moduleInterval.html
 music21.chord.Chord.primeForm attribute moduleChord.html
 music21.chord.Chord.sortAscending method moduleChord.html
 music21.note.Rest.lily attribute moduleNote.html
+music21.expressions.Ornament class moduleExpressions.html
 music21.chord.Chord.forteClassNumber attribute moduleChord.html
 music21.stream.Staff class moduleStream.html
-music21.note.GeneralNote.clearDurations method moduleNote.html
+music21.expressions.Mordent class moduleExpressions.html
 music21.corpus.base.getComposerDir function moduleCorpus.html
 music21.graph.Plot3DBarsPitchSpaceQuarterLength class moduleGraph.html
 music21.meter.MeterTerminal.numerator attribute moduleMeter.html
@@ -464,6 +483,7 @@ music21.note.Tie.mx attribute moduleNote.html
 music21.stream.Page class moduleStream.html
 music21.duration.Tuplet.setRatio method moduleDuration.html
 music21.stream.Stream.isGapless attribute moduleStream.html
+music21.expressions.Trill.mx attribute moduleExpressions.html
 music21.chord.Chord.semiClosedPosition method moduleChord.html
 music21.graph.Plot3DBars class moduleGraph.html
 music21.key.Key.generateKey method moduleKey.html
@@ -552,6 +572,7 @@ music21.serial.RowWebernOp27 class moduleSerial.html
 music21.clef.FClef class moduleClef.html
 music21.serial.RowWebernOp25 class moduleSerial.html
 music21.pitch.convertPsToFq function modulePitch.html
+music21.expressions.GeneralMordent class moduleExpressions.html
 music21.stream.Stream.splitByClass method moduleStream.html
 music21.duration.roundDuration function moduleDuration.html
 music21.duration.typeToMusicXMLType function moduleDuration.html
@@ -612,6 +633,7 @@ music21.meter.TimeSignature.getBeatDepth method moduleMeter.html
 music21.stream.Stream.pitches attribute moduleStream.html
 music21.serial.HistoricalTwelveToneRow.opus attribute moduleSerial.html
 music21.graph.PlotStream.ticksQuarterLength method moduleGraph.html
+music21.pitch.Pitch class modulePitch.html
 music21.duration.Duration.expand method moduleDuration.html
 music21.node.Node.merge method moduleNode.html
 music21.duration.nextLargerType function moduleDuration.html
@@ -666,8 +688,8 @@ music21.stream.Stream.teardownPickleScaffold method moduleStream.html
 music21.converter.Converter.parseURL method moduleConverter.html
 music21.common.greaterThanOrEqual function moduleCommon.html
 music21.common.sortFilesRecent function moduleCommon.html
-music21.stream.Stream.makeAccidentals method moduleStream.html
 music21.note.GeneralNote.tie attribute moduleNote.html
+music21.pitch.Pitch.inheritDisplay method modulePitch.html
 music21.interval.getWrittenHigherNote function moduleInterval.html
 music21.note.Note.mx attribute moduleNote.html
 music21.chord.Chord class moduleChord.html
@@ -690,7 +712,7 @@ music21.meter.MeterSequence.denominator attribute moduleMeter.html
 music21.stream.Stream.findGaps method moduleStream.html
 music21.pitch.Accidental.set method modulePitch.html
 music21.clef.CClef class moduleClef.html
-music21.stream.Stream.getOverlaps method moduleStream.html
+music21.expressions.Trill class moduleExpressions.html
 music21.stream.Stream.mx attribute moduleStream.html
 music21.graph.GraphHistogram class moduleGraph.html
 music21.graph.PlotStream class moduleGraph.html
@@ -699,11 +721,13 @@ music21.meter.TimeSignature.quarterLengthToBeatLengthRatio attribute moduleMeter
 music21.note.Note.isRest attribute moduleNote.html
 music21.serial.RowSchoenbergOp27No3 class moduleSerial.html
 music21.note.Note.frequency attribute moduleNote.html
+music21.key.pitchToSharps function moduleKey.html
 music21.meter.MeterSequence.numerator attribute moduleMeter.html
 music21.clef.MezzoSopranoClef class moduleClef.html
 music21.stream.Stream.duration attribute moduleStream.html
 music21.environment.Environment.getTempFile method moduleEnvironment.html
 music21.chord.Chord.intervalVector attribute moduleChord.html
+music21.expressions.HalfStepTrill class moduleExpressions.html
 music21.tinyNotation.TinyNotationNote.customNotationMatch method moduleTinyNotation.html
 music21.base.Music21Object class moduleBase.html
 music21.base.Music21Object.getContextAttr method moduleBase.html
@@ -716,12 +740,14 @@ music21.common.Scalar.toInt method moduleCommon.html
 music21.stream.Measure.clef attribute moduleStream.html
 music21.node.Node.toxml method moduleNode.html
 music21.tempo.MetronomeMark class moduleTempo.html
+music21.stream.Stream.setAccidentalVisibility method moduleStream.html
 music21.pitch.Pitch.frequency attribute modulePitch.html
 music21.converter.Converter.parseData method moduleConverter.html
 music21.chord.Chord.hasZRelation attribute moduleChord.html
 music21.base.DefinedContexts.freezeIds method moduleBase.html
 music21.chord.Chord.multisetCardinality attribute moduleChord.html
 music21.base.Music21Object.write method moduleBase.html
+music21.expressions.WholeStepMordent class moduleExpressions.html
 music21.chord.Chord.isAugmentedTriad method moduleChord.html
 music21.interval.Interval class moduleInterval.html
 music21.chord.Chord.beams attribute moduleChord.html
@@ -810,6 +836,7 @@ music21.stream.Stream.allPlayingWhileSounding method moduleStream.html
 music21.base.DefinedContexts.getByClass method moduleBase.html
 music21.clef.Bass8vbClef class moduleClef.html
 music21.pitch.Pitch.accidental attribute modulePitch.html
+music21.expressions.Turn class moduleExpressions.html
 music21.note.Note.beams attribute moduleNote.html
 music21.note.Beams.setAll method moduleNote.html
 music21.converter.parseURL function moduleConverter.html

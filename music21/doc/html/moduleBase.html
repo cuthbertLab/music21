@@ -97,8 +97,7 @@
 <dt id="music21.base.Music21Object">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset.</p>
-<p>Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+<dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
 <p><strong>Music21Object</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -249,7 +248,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <tt class="descname">getContextByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextByClass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Search both DefinedContexts as well as associated objects to find a matching class. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search.</p>
+<p>Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search.</p>
 <dl class="method">
 <dt id="music21.base.Music21Object.getOffsetBySite">
 <tt class="descname">getOffsetBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
@@ -583,6 +582,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </pre></div>
 </div>
 <dl class="method">
+<dt id="music21.base.DefinedContexts.getById">
+<tt class="descname">getById</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getById" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Return the object specified by an id. Used for testing and debugging.</p>
+<dl class="method">
 <dt id="music21.base.DefinedContexts.getOffsetByObjectMatch">
 <tt class="descname">getOffsetByObjectMatch</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getOffsetByObjectMatch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -897,7 +902,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 15, 2010.
+      Last updated on Apr 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

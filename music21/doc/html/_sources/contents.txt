@@ -41,6 +41,7 @@ Module Reference
    moduleDynamics
    moduleEditorial
    moduleEnvironment
+   moduleExpressions
    moduleGraph
    moduleKey
    moduleInstrument
