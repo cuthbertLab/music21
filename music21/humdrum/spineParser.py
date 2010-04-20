@@ -21,7 +21,7 @@ from music21 import duration
 import music21.key
 import music21.measure
 import music21.note
-import music21.notationMod
+import music21.expressions
 import music21.tempo
 import music21.meter
 import music21.clef
@@ -833,25 +833,25 @@ def hdStringToNote(contents):
     
     ## 3.2.3 Ornaments    
     if contents.count('t'):
-        thisObject.notations.append(music21.notationMod.HalfStepTrill())
+        thisObject.notations.append(music21.expressions.HalfStepTrill())
     elif contents.count('T'):
-        thisObject.notations.append(music21.notationMod.WholeStepTrill())
+        thisObject.notations.append(music21.expressions.WholeStepTrill())
     
     if contents.count('w'):
-        thisObject.notations.append(music21.notationMod.HalfStepInvertedMordent())
+        thisObject.notations.append(music21.expressions.HalfStepInvertedMordent())
     elif contents.count('W'):
-        thisObject.notations.append(music21.notationMod.WholeStepInvertedMordent())
+        thisObject.notations.append(music21.expressions.WholeStepInvertedMordent())
     elif contents.count('m'):
-        thisObject.notations.append(music21.notationMod.HalfStepMordent())
+        thisObject.notations.append(music21.expressions.HalfStepMordent())
     elif contents.count('M'):
-        thisObject.notations.append(music21.notationMod.WholeStepMordent())
+        thisObject.notations.append(music21.expressions.WholeStepMordent())
 
     if contents.count('S'):
-        thisObject.notations.append(music21.notationMod.Turn())
+        thisObject.notations.append(music21.expressions.Turn())
     elif contents.count('$'):
-        thisObject.notations.append(music21.notationMod.InvertedTurn())
+        thisObject.notations.append(music21.expressions.InvertedTurn())
     elif contents.count('R'):
-        t1 = music21.notationMod.Turn()
+        t1 = music21.expressions.Turn()
         t1.connectedToPrevious = True  ## true by default, but explicitly
         thisObject.notations.append(t1)
     
@@ -860,7 +860,7 @@ def hdStringToNote(contents):
         pass
     
     if contents.count("O"):
-        thisObject.notations.append(music21.notationMod.Ornament())  # generic ornament
+        thisObject.notations.append(music21.expressions.Ornament())  # generic ornament
     
     # 3.2.4 Articulation Marks
     if contents.count('\''):
@@ -1008,7 +1008,7 @@ def hdStringToMeasure(contents):
                 ("Cannot import a double bar visually rendered as a single bar")
     
     if contents.count(';'):
-        m1.rightbarline.pause = music21.notationMod.Fermata()
+        m1.rightbarline.pause = music21.expressions.Fermata()
 
     return m1
 
@@ -1151,7 +1151,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.rightbarline.style, "regular")
         self.assertEqual(m1.rightbarline.repeat_dots, "both")
         assert m1.rightbarline.pause is not None
-        assert isinstance(m1.rightbarline.pause, music21.notationMod.Fermata)
+        assert isinstance(m1.rightbarline.pause, music21.expressions.Fermata)
 
     def testSpineMazurka(self):    
 #        hf1 = HumdrumFile("d:/web/eclipse/music21misc/mazurka06-2.krn")    

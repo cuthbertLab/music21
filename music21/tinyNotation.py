@@ -22,7 +22,7 @@ import music21.duration
 
 from music21 import common
 from music21 import stream
-from music21 import notationMod
+from music21 import expressions
 from music21 import meter
 
 class TinyNotationStream(stream.Stream):
@@ -181,7 +181,7 @@ class TinyNotationNote(object):
             typeNum = self.TYPE.search(stringRep).group(1)
             if (typeNum == "0"): ## special case = full measure + fermata
                 noteObj.duration = storedDict['barDuration']
-                newFerm = notationMod.Fermata()
+                newFerm = expressions.Fermata()
                 noteObj.notations.append(newFerm)
             else:
                 noteObj.duration.type = music21.duration.typeFromNumDict[int(typeNum)]

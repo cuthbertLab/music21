@@ -12,7 +12,7 @@ from music21 import note
 from music21.note import Note
 from music21.duration import Duration, DurationException
 from music21 import stream
-from music21 import notationMod
+from music21 import expressions
 from music21 import meter
 from music21.lily import LilyString
 import random

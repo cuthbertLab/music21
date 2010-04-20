@@ -28,7 +28,7 @@ from music21 import editorial
 from music21.lily import LilyString
 from music21 import musicxml
 musicxmlMod = musicxml # alias
-from music21 import notationMod
+from music21 import expressions
 from music21 import pitch
 from music21.pitch import Pitch, Accidental
 
@@ -804,7 +804,7 @@ class GeneralNote(music21.Music21Object):
             elif self.duration.tuplets[0].type == "stop":
                 ret += " (in fact STOPS the tuplet)"
         if len(self.notations) > 0:
-            if (isinstance(self.notations[0], music21.notationMod.Fermata)):
+            if (isinstance(self.notations[0], music21.expressions.Fermata)):
                 ret += " has Fermata"
         return ret
 
@@ -1340,7 +1340,7 @@ class Note(NotRest):
             # get any fermatas, store on notations
             mxFermataList = mxNotations.getFermatas()
             for mxObj in mxFermataList:
-                fermataObj = notationMod.Fermata()
+                fermataObj = expressions.Fermata()
                 fermataObj.mx = mxObj
                 # placing this as an articulation for now
                 self.notations.append(fermataObj)
@@ -1501,7 +1501,7 @@ def sendNoteInfo(music21noteObject):
         elif a.duration.tuplets[0].type == "stop":
             retstr += "   in fact STOPS the tuplet group\n"
     if len(a.notations) > 0:
-        if (isinstance(a.notations[0], music21.notationMod.Fermata)):
+        if (isinstance(a.notations[0], music21.expressions.Fermata)):
             retstr += "Has a fermata on it\n"
     return retstr
 
@@ -1649,7 +1649,7 @@ class Test(unittest.TestCase):
         found = []
         for n in a.flat.notes:
             for obj in n.notations:
-                if isinstance(obj, notationMod.Fermata):
+                if isinstance(obj, expressions.Fermata):
                     found.append(obj)
         self.assertEqual(len(found), 6)
 

@@ -10,7 +10,7 @@ music21.note
 contains classes and functions for creating and manipulating individual notes
 '''
 
-import notationMod
+import expressions
 import copy
 import string
 import editorial
@@ -41,6 +41,7 @@ class GeneralNote(object):
 
     def __init__(self, *shortcut, **arguments):
         if len(shortcut) == 0:
+
             self.duration = Duration()
             self.notations = []
             self.articulations = []

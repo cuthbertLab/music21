@@ -38,7 +38,7 @@ from music21 import key
 from music21 import meter
 from music21 import musicxml
 from music21 import note
-from music21 import notationMod
+from music21 import expressions
 from music21 import stream
 
 

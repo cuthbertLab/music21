@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         notationMod.py
+# Name:         expressions.py
 # Purpose:      notation mods
 #
 # Authors:      Michael Scott Cuthbert
@@ -18,7 +18,7 @@ import music21.interval
 from music21 import musicxml
 
 
-_MOD = 'notationMod'
+_MOD = 'expressions'
 
 
 

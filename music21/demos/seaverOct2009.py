@@ -405,7 +405,7 @@ def js_q1():
     '''
     give all cadential arrivals on a first inversion chord, 6 or 65. 
     '''
-    from music21 import notationMod
+    from music21 import expressions
 
     allChorales = Chorales().all()
     returnStream = stream.Stream()
@@ -422,7 +422,7 @@ def js_q1():
             
             isCadence = False
             for thisEditorial in thisChord.editorial:
-                if isinstance(thisEditorial, notationMod.Fermata):
+                if isinstance(thisEditorial, expressions.Fermata):
                     isCadence = True
             
             if isCadence is True and thisChord.inversion == 1:

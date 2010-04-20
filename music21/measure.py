@@ -32,7 +32,7 @@ class Barline(music21.Music21Object):
     valid_repeats = ["right","left","both"]
     repeat_dots = None
     style = None
-    pause = None  # can be music21.notationMod.Fermata object
+    pause = None  # can be music21.expressions.Fermata object
     
     def __init__(self, blStyle = None):
         if blStyle == "final":

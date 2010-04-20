@@ -46,7 +46,7 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus", \
            "graph", \
            "interval", "instrument", "key", \
            "measure", "meter", \
-           "notationMod", "note", \
+           "expressions", "note", \
            "pitch", "ratios", \
            "scale", "serial", "stream", 
            "tempo", "text", "tinyNotation", \
