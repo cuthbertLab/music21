@@ -9,12 +9,14 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 import doctest, unittest
+import copy
 
 import music21
 from music21 import pitch
 from music21 import note
 from music21 import interval
 from music21 import musicxml
+from music21 import common
 
 
 #-------------------------------------------------------------------------------
@@ -44,11 +46,68 @@ def sharpsToPitch(sharpCount):
     else:
         return pitchInit # C
 
-    intervalObj = interval.generateIntervalFromString(intervalStr)
+    intervalObj = interval.Interval(intervalStr)
     for x in range(abs(sharpCount)):
-        pitchInit = interval.generatePitch(pitchInit, intervalObj)    
+        pitchInit = intervalObj.transposePitch(pitchInit)    
     pitchInit.octave = None
     return pitchInit
+
+
+
+def pitchToSharps(value, mode=None):
+    '''Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key.
+
+    The `mode` parameter can be None, 'major', or 'minor'.
+
+    >>> pitchToSharps('c')
+    0
+    >>> pitchToSharps('c', 'minor')
+    -3
+    >>> pitchToSharps('a', 'minor')
+    0
+    >>> pitchToSharps('d')
+    2
+    >>> pitchToSharps('e-')
+    -3
+    >>> pitchToSharps('a')
+    3
+    >>> pitchToSharps('e', 'minor')
+    1
+    >>> pitchToSharps('f#', 'major')
+    6
+    >>> pitchToSharps('g-', 'major')
+    -6
+    >>> pitchToSharps('c#')
+    7
+    >>> pitchToSharps('g#')
+    8
+    '''
+    if common.isStr(value):
+        p = pitch.Pitch(value)
+    else:
+        p = value
+    # start at C and continue in both directions
+    sharpSource = [0]
+    for i in range(1,13):
+        sharpSource.append(i)
+        sharpSource.append(-i)
+
+    minorShift = interval.Interval('-m3')
+
+    # NOTE: this may not be the fastest approach
+    match = None
+    for i in sharpSource:
+        pCandidate = sharpsToPitch(i)
+        if mode in [None, 'major']:
+            if pCandidate.name == p.name:
+                match = i
+                break
+        else: # match minor pitch
+            pMinor = pCandidate.transpose(minorShift)
+            if pMinor.name == p.name:
+                match = i
+                break
+    return match
 
 
 class KeySignatureException(Exception):
@@ -189,6 +248,84 @@ class KeySignature(music21.Music21Object):
         return "<music21.key.KeySignature of %s>" % self._strDescription()
         
 
+    def _getPitchAndMode(self):
+        '''Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`.
+       
+        >>> keyArray = [KeySignature(x) for x in range(-7,8)]
+        >>> keyArray[0].pitchAndMode
+        (C-, None)
+        >>> keyArray[1].pitchAndMode
+        (G-, None)
+        >>> keyArray[2].pitchAndMode
+        (D-, None)
+        >>> keyArray[3].pitchAndMode
+        (A-, None)
+        >>> keyArray[4].pitchAndMode
+        (E-, None)
+        >>> keyArray[5].pitchAndMode
+        (B-, None)
+        >>> keyArray[6].pitchAndMode
+        (F, None)
+        >>> keyArray[7].pitchAndMode
+        (C, None)
+        >>> keyArray[8].pitchAndMode
+        (G, None)
+        '''
+        # this works but returns sharps
+        # keyPc = (self.sharps * 7) % 12
+        pitchObj = sharpsToPitch(self.sharps)
+        return pitchObj, self.mode
+
+    pitchAndMode = property(_getPitchAndMode)
+
+
+
+    #---------------------------------------------------------------------------
+    # properties
+    def transpose(self, value, inPlace=False):
+        '''Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied.
+
+        >>> a = KeySignature(2)
+        >>> a.pitchAndMode
+        (D, None)
+        >>> b = a.transpose('p5')
+        >>> b.pitchAndMode
+        (A, None)
+        >>> b.sharps
+        3
+        >>> c = b.transpose('-m2')
+        >>> c.pitchAndMode
+        (G#, None)
+        >>> c.sharps
+        8
+        
+        >>> d = c.transpose('-a3')
+        >>> d.pitchAndMode
+        (E-, None)
+        >>> d.sharps
+        -3
+        '''
+        if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        else: # try to process
+            intervalObj = interval.Interval(value)
+
+        if not inPlace:
+            post = copy.deepcopy(self)
+        else:
+            post = self
+
+        p1, mode = post._getPitchAndMode()
+        p2 = p1.transpose(intervalObj)
+        
+        post.sharps = pitchToSharps(p2, mode)
+        # mode is already set
+        if not inPlace:
+            return post
+        else:
+            return None
+
+
     #---------------------------------------------------------------------------
     # properties
 
@@ -229,36 +366,6 @@ class KeySignature(music21.Music21Object):
 
     mx = property(_getMX, _setMX)
 
-
-    def _getPitchAndMode(self):
-        '''Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`.
-       
-        >>> keyArray = [KeySignature(x) for x in range(-7,8)]
-        >>> keyArray[0].pitchAndMode
-        (C-, None)
-        >>> keyArray[1].pitchAndMode
-        (G-, None)
-        >>> keyArray[2].pitchAndMode
-        (D-, None)
-        >>> keyArray[3].pitchAndMode
-        (A-, None)
-        >>> keyArray[4].pitchAndMode
-        (E-, None)
-        >>> keyArray[5].pitchAndMode
-        (B-, None)
-        >>> keyArray[6].pitchAndMode
-        (F, None)
-        >>> keyArray[7].pitchAndMode
-        (C, None)
-        >>> keyArray[8].pitchAndMode
-        (G, None)
-        '''
-        # this works but returns sharps
-        # keyPc = (self.sharps * 7) % 12
-        pitchObj = sharpsToPitch(self.sharps)
-        return pitchObj, self.mode
-
-    pitchAndMode = property(_getPitchAndMode)
 
 
 

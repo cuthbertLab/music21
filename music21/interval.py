@@ -847,7 +847,7 @@ def generateGeneric(n1, n2):
     <music21.interval.GenericInterval 12>
 
     '''
-    # TODO: rename genericIntervalFromNotes
+    # TODO: rename notesToGeneric
     staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
     genDist = convertStaffDistanceToInterval(staffDist)
     return GenericInterval(genDist)
@@ -861,7 +861,7 @@ def generateChromatic(n1, n2):
     >>> generateChromatic(aNote, bNote)
     <music21.interval.ChromaticInterval 20>
     '''
-    # TODO: rename chromaticIntervalFromNotes
+    # TODO: rename notesToChromatic
     return ChromaticInterval(n2.midi - n1.midi)
 
 
@@ -895,7 +895,7 @@ def generateDiatonic(gInt, cInt):
     <music21.interval.DiatonicInterval P5>
     '''
 
-    # TODO: rename diatonicIntervalFromIntervals
+    # TODO: rename intervalsToDiatonic
     specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
     return DiatonicInterval(specifier, gInt)
     
@@ -1362,7 +1362,7 @@ def generatePitch(pitch1, interval1):
     >>> cPitch
     F3
     ''' 
-    # TODO: rename pitchFromInterval
+    # TODO: rename transposePitch
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary

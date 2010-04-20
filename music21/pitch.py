@@ -867,6 +867,9 @@ class Pitch(music21.Music21Object):
         >>> a = Pitch('a3')
         >>> a._getPitchClassString()
         '9'
+        >>> a = Pitch('a#3')
+        >>> a._getPitchClassString()
+        'A'
         '''
         return convertPitchClassToStr(self._getPitchClass())
 
@@ -1172,7 +1175,7 @@ class Pitch(music21.Music21Object):
 
                                     
     def transpose(self, value, inPlace=False):
-        '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+        '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied.
 
         >>> aPitch = Pitch('g4')
         >>> bPitch = aPitch.transpose('m3')
