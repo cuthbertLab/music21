@@ -178,6 +178,18 @@ class Violoncello(StringInstrument):
 
 
 
+#-------------------------------------------------------------------------------
+class WoodwindInstrument(Instrument):
+    def __init__(self):
+        Instrument.__init__(self)
+
+
+class Bassoon(WoodwindInstrument):
+    def __init__(self):
+        WoodwindInstrument.__init__(self)
+
+
+
 
 
 #-------------------------------------------------------------------------------

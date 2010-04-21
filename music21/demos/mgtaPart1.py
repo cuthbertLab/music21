@@ -257,6 +257,7 @@ def ch1_writing_I_A_1(show=True, *arguments, **keywords):
     '''
     from music21 import converter, clef
 
+    # Purcell, "Music for a While"
     humdata = '''
 **kern
 8C
@@ -308,25 +309,14 @@ def ch1_writing_I_A_2(show=True, *arguments, **keywords):
 
 
 def ch1_writing_I_B_1(show=True, *arguments, **keywords):
-    from music21 import converter, clef
-
     '''
     p.6 
-    Transcript these melodies into the clef specified without changing octaves.
+    Transcribe these melodies into the clef specified without changing octaves.
     '''
+    from music21 import converter, clef, tinyNotation
 
     # camptown races
-    humdata = '''
-**kern
-*M2/4
-8g
-8g
-8e
-8g
-*-
-'''
-    # this notation excerpt is incomplete
-    ex = converter.parseData(humdata)
+    ex = tinyNotation.TinyNotationStream("g8 g e g", "2/4")
     ex.insert(0, clef.AltoClef()) # maintain clef
     if show:
         ex.show()
@@ -334,7 +324,27 @@ def ch1_writing_I_B_1(show=True, *arguments, **keywords):
 
 
 def ch1_writing_I_B_2(show=True, *arguments, **keywords):
-    pass
+    '''
+    Transcribe the melody into treble clef
+    '''
+    # Mozart no. 41, 4th movement
+    humdata = '''
+**kern
+*clefC3 
+4g
+4g
+4G
+4G
+*-
+'''
+    # this notation excerpt is incomplete
+    ex = converter.parseData(humdata)
+    clefOld = ex.flat.getElementsByClass(clef.Clef)[0]
+    # remove the clef from the first Stream in ex
+    ex[0].pop(ex[0].index(clefOld))
+    ex.insert(0, clef.TrebleClef()) # add desired clef
+    if show:
+        ex.show()
 
 
 def ch1_writing_I_B_3(show=True, *arguments, **keywords):
@@ -344,13 +354,52 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
     >>> a = True
     '''
-    purcellScore = music21.parseData("Music_for_a_while.musicxml")
-    thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
-    thisClef.__class__ = clef.TenorClef
-    purcellScore.insert(0, instrument.Instrument('bassoon'))
-    assert purcellScore.allInRange() is True
-    purcellScore.playMidi()   ## will play on bassoon
-    purcellScore.show() 
+
+    from music21 import converter, clef, parse
+
+    # Purcell, "Music for a While"
+    humdata = '''
+**kern
+*clefF4 
+8C
+8D
+8E
+8EE
+8AA
+8E
+8F
+8AA
+8BB
+8F#
+8G
+8BB
+8C
+8G#
+8A
+8C#
+*-
+'''
+    ex = converter.parseData(humdata)
+
+    clefOld = ex.flat.getElementsByClass(clef.Clef)[0]
+    # remove the clef from the first Stream in ex
+    ex[0].pop(ex[0].index(clefOld))
+
+    ex.insert(0, clef.TenorClef())
+    ex.insert(0, instrument.Bassoon())
+
+    if show:
+        ex.show()
+
+
+
+#     purcellScore = music21.parseData("Music_for_a_while.musicxml")
+#     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
+#     thisClef.__class__ = clef.TenorClef
+#     purcellScore.insert(0, instrument.Instrument('bassoon'))
+#     assert purcellScore.allInRange() is True
+#     purcellScore.playMidi()   ## will play on bassoon
+#     purcellScore.show() 
 
 
 #-----------------------------------------------------------------||||||||||||--
@@ -383,6 +432,7 @@ class Test(unittest.TestCase):
             ch1_writing_I_A_2,
             ch1_writing_I_B_1,
             ch1_writing_I_B_2,
+            ch1_writing_I_B_3,
             ]:
             func(show=False, play=False)
 
@@ -399,5 +449,6 @@ if __name__ == "__main__":
         #t = Test()
         #t.testImportClefAssign()
 
-
-        ch1_writing_I_B_1(show=True)
+        #ch1_writing_I_B_1(show=True)
+        #ch1_writing_I_B_2(show=True)
+        ch1_writing_I_B_3(show=True)
