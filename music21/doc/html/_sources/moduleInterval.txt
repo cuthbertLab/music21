@@ -12,34 +12,34 @@ Interval.py is a module for creating and manipulating interval objects. Included
 
 
 
-.. function:: generateChromatic(n1, n2)
+.. function:: notesToChromatic(n1, n2)
 
 Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object. 
 
 >>> from music21 import note
 >>> aNote = note.Note('c4')
 >>> bNote = note.Note('g#5')
->>> generateChromatic(aNote, bNote)
+>>> notesToChromatic(aNote, bNote)
 <music21.interval.ChromaticInterval 20> 
 
-.. function:: generateDiatonic(gInt, cInt)
+.. function:: intervalsToDiatonic(gInt, cInt)
 
 Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`. 
 
 >>> aInterval = GenericInterval('descending fifth')
 >>> bInterval = ChromaticInterval(-7)
->>> cInterval = generateDiatonic(aInterval, bInterval)
+>>> cInterval = intervalsToDiatonic(aInterval, bInterval)
 >>> cInterval
 <music21.interval.DiatonicInterval P5> 
 
-.. function:: generateInterval(n1, n2=None)
+.. function:: notesToInterval(n1, n2=None)
 
 Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments. 
 
 >>> from music21 import note
 >>> aNote = note.Note('c4')
 >>> bNote = note.Note('g5')
->>> aInterval = generateInterval(aNote, bNote)
+>>> aInterval = notesToInterval(aNote, bNote)
 >>> aInterval
 <music21.interval.Interval P12> 
 >>> bInterval = Interval(note1=aNote, note2=bNote)
@@ -143,61 +143,6 @@ Returns the interval number from the given staff distance.
 >>> convertStaffDistanceToInterval(7)
 8 
 
-.. function:: generateGeneric(n1, n2)
-
-Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object. 
-
->>> from music21 import note
->>> aNote = note.Note('c4')
->>> bNote = note.Note('g5')
->>> aInterval = generateGeneric(aNote, bNote)
->>> aInterval
-<music21.interval.GenericInterval 12> 
-
-
-
-.. function:: generateIntervalFromString(string)
-
-Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object. 
-
->>> aInterval = generateIntervalFromString('P5')
->>> aInterval
-<music21.interval.Interval P5> 
->>> aInterval = generateIntervalFromString('m3')
->>> aInterval
-<music21.interval.Interval m3> 
-
-.. function:: generateNote(note1, intervalString)
-
-Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
-
->>> from music21 import note
->>> aNote = note.Note('c4')
->>> bNote = generateNote(aNote, 'p5')
->>> bNote
-<music21.note.Note G> 
->>> aNote = note.Note('f#4')
->>> bNote = generateNote(aNote, 'm2')
->>> bNote
-<music21.note.Note G> 
-
-
-
-.. function:: generatePitch(pitch1, interval1)
-
-Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
-
->>> from music21 import pitch
->>> aPitch = pitch.Pitch('C4')
->>> aInterval = Interval('P5')
->>> bPitch = generatePitch(aPitch, aInterval)
->>> bPitch
-G4 
->>> bInterval = generateIntervalFromString('P-5')
->>> cPitch = generatePitch(aPitch, bInterval)
->>> cPitch
-F3 
-
 .. function:: getAbsoluteHigherNote(note1, note2)
 
 Given two :class:`~music21.note.Note` objects, returns the higher note based on actual pitch. If both pitches are the same, returns the first note given. 
@@ -254,6 +199,61 @@ Given two :class:`~music21.note.Note` objects, returns the lower note based on d
 >>> bNote = note.Note('d-3')
 >>> getWrittenLowerNote(aNote, bNote)
 <music21.note.Note C#> 
+
+.. function:: notesToGeneric(n1, n2)
+
+Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object. 
+
+>>> from music21 import note
+>>> aNote = note.Note('c4')
+>>> bNote = note.Note('g5')
+>>> aInterval = notesToGeneric(aNote, bNote)
+>>> aInterval
+<music21.interval.GenericInterval 12> 
+
+
+
+.. function:: stringToInterval(string)
+
+Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object. 
+
+>>> aInterval = stringToInterval('P5')
+>>> aInterval
+<music21.interval.Interval P5> 
+>>> aInterval = stringToInterval('m3')
+>>> aInterval
+<music21.interval.Interval m3> 
+
+.. function:: transposeNote(note1, intervalString)
+
+Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
+
+>>> from music21 import note
+>>> aNote = note.Note('c4')
+>>> bNote = transposeNote(aNote, 'p5')
+>>> bNote
+<music21.note.Note G> 
+>>> aNote = note.Note('f#4')
+>>> bNote = transposeNote(aNote, 'm2')
+>>> bNote
+<music21.note.Note G> 
+
+
+
+.. function:: transposePitch(pitch1, interval1)
+
+Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
+
+>>> from music21 import pitch
+>>> aPitch = pitch.Pitch('C4')
+>>> aInterval = Interval('P5')
+>>> bPitch = transposePitch(aPitch, aInterval)
+>>> bPitch
+G4 
+>>> bInterval = stringToInterval('P-5')
+>>> cPitch = transposePitch(aPitch, bInterval)
+>>> cPitch
+F3 
 
 Interval
 --------

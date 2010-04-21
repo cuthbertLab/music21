@@ -2692,7 +2692,7 @@ class Stream(music21.Music21Object):
         >>> qf[24].offset
         44.0
 
-        
+        OMIT_FROM_DOCS
         >>> r = Stream()
         >>> for j in range(5):
         ...   q = Stream()
@@ -2753,16 +2753,18 @@ class Stream(music21.Music21Object):
         return self._cache["HighestOffset"]
 
     highestOffset = property(_getHighestOffset, doc='''
-        Get start time of element with the highest offset in the Stream
+        Get start time of element with the highest offset in the Stream.
+        Note the difference between this property and highestTime
+        which gets the end time of the highestOffset
 
         >>> stream1 = Stream()
-        >>> for x in [3, 4]:
-        ...     n = note.Note('G#')
-        ...     n.offset = x * 3.0
-        ...     stream1.insert(n)
+        >>> for offset in [0, 4, 8]:
+        ...     n = note.WholeNote('G#')
+        ...     stream1.insert(offset, n)
         >>> stream1.highestOffset
+        8.0
+        >>> stream1.highestTime
         12.0
-
         ''')
 
     def _getHighestTime(self):
@@ -2862,18 +2864,24 @@ class Stream(music21.Music21Object):
         return self._cache["LowestOffset"]
 
     lowestOffset = property(_getLowestOffset, doc='''
-        Get the start time of the Element with the lowest offset in the Stream.
+        Get the start time of the Element with the lowest offset in the Stream.        
 
         >>> stream1 = Stream()
-        >>> stream1.lowestOffset
-        0.0
         >>> for x in range(3,5):
         ...     n = note.Note('G#')
-        ...     n.offset = x * 3.0
-        ...     stream1.insert(n)
+        ...     stream1.insert(x, n)
         ...
         >>> stream1.lowestOffset
-        9.0
+        3.0
+
+        
+        If the Stream is empty, then the lowest offset is 0.0:
+        
+        
+        >>> stream2 = Stream()
+        >>> stream2.lowestOffset
+        0.0
+
 
         ''')
 
@@ -3356,13 +3364,21 @@ class Stream(music21.Music21Object):
         >>> voiceOnePitches[0:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
         
+        
+        
         Note that the pitches returned above are 
         objects, not text:
+        
+        
         >>> voiceOnePitches[0].octave
         4
         
+        
         Since pitches are found from internal objects,
         flattening the stream is not required:
+        
+        
+        
         >>> len(a.pitches)
         104
 

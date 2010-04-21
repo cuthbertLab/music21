@@ -92,41 +92,41 @@
 <span id="moduleinterval"></span><h1>music21.interval<a class="headerlink" href="#module-music21.interval" title="Permalink to this headline">¶</a></h1>
 <p>Interval.py is a module for creating and manipulating interval objects. Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval. There are also a number of useful lists included in the module.</p>
 <dl class="function">
-<dt id="music21.interval.generateChromatic">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateChromatic</tt><big>(</big><em>n1</em>, <em>n2</em><big>)</big><a class="headerlink" href="#music21.interval.generateChromatic" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.interval.notesToChromatic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">notesToChromatic</tt><big>(</big><em>n1</em>, <em>n2</em><big>)</big><a class="headerlink" href="#music21.interval.notesToChromatic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given two <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects, returns a <a title="music21.interval.ChromaticInterval" class="reference internal" href="#music21.interval.ChromaticInterval"><tt class="xref docutils literal"><span class="pre">ChromaticInterval</span></tt></a> object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g#5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">generateChromatic</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">notesToChromatic</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
 <span class="go">&lt;music21.interval.ChromaticInterval 20&gt;</span>
 </pre></div>
 </div>
 <dl class="function">
-<dt id="music21.interval.generateDiatonic">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateDiatonic</tt><big>(</big><em>gInt</em>, <em>cInt</em><big>)</big><a class="headerlink" href="#music21.interval.generateDiatonic" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.interval.intervalsToDiatonic">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">intervalsToDiatonic</tt><big>(</big><em>gInt</em>, <em>cInt</em><big>)</big><a class="headerlink" href="#music21.interval.intervalsToDiatonic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a> and a <a title="music21.interval.ChromaticInterval" class="reference internal" href="#music21.interval.ChromaticInterval"><tt class="xref docutils literal"><span class="pre">ChromaticInterval</span></tt></a> object, return a <a title="music21.interval.DiatonicInterval" class="reference internal" href="#music21.interval.DiatonicInterval"><tt class="xref docutils literal"><span class="pre">DiatonicInterval</span></tt></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="s">&#39;descending fifth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="o">-</span><span class="mf">7</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cInterval</span> <span class="o">=</span> <span class="n">generateDiatonic</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cInterval</span> <span class="o">=</span> <span class="n">intervalsToDiatonic</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cInterval</span>
 <span class="go">&lt;music21.interval.DiatonicInterval P5&gt;</span>
 </pre></div>
 </div>
 <dl class="function">
-<dt id="music21.interval.generateInterval">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateInterval</tt><big>(</big><em>n1</em>, <em>n2=None</em><big>)</big><a class="headerlink" href="#music21.interval.generateInterval" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.interval.notesToInterval">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">notesToInterval</tt><big>(</big><em>n1</em>, <em>n2=None</em><big>)</big><a class="headerlink" href="#music21.interval.notesToInterval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Given two <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects, returns an <a title="music21.interval.Interval" class="reference internal" href="#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object. The same functionality is available by calling the Interval class with two Notes as arguments.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateInterval</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">notesToInterval</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
 <span class="go">&lt;music21.interval.Interval P12&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="n">note1</span><span class="o">=</span><span class="n">aNote</span><span class="p">,</span> <span class="n">note2</span><span class="o">=</span><span class="n">bNote</span><span class="p">)</span>
@@ -247,69 +247,6 @@
 </pre></div>
 </div>
 <dl class="function">
-<dt id="music21.interval.generateGeneric">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateGeneric</tt><big>(</big><em>n1</em>, <em>n2</em><big>)</big><a class="headerlink" href="#music21.interval.generateGeneric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given two <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects, returns a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a> object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateGeneric</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.GenericInterval 12&gt;</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.interval.generateIntervalFromString">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateIntervalFromString</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#music21.interval.generateIntervalFromString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given an interval string (such as &#8220;P5&#8221;, &#8220;m3&#8221;, &#8220;A2&#8221;) return a <a title="music21.interval.Interval" class="reference internal" href="#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.Interval P5&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
-<span class="go">&lt;music21.interval.Interval m3&gt;</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.interval.generateNote">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generateNote</tt><big>(</big><em>note1</em>, <em>intervalString</em><big>)</big><a class="headerlink" href="#music21.interval.generateNote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and a interval string (such as &#8216;P5&#8217;) or an Interval object, return a new Note object at the appropriate pitch level.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">generateNote</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="s">&#39;p5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span>
-<span class="go">&lt;music21.note.Note G&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;f#4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">generateNote</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="s">&#39;m2&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span>
-<span class="go">&lt;music21.note.Note G&gt;</span>
-</pre></div>
-</div>
-<dl class="function">
-<dt id="music21.interval.generatePitch">
-<tt class="descclassname">music21.interval.</tt><tt class="descname">generatePitch</tt><big>(</big><em>pitch1</em>, <em>interval1</em><big>)</big><a class="headerlink" href="#music21.interval.generatePitch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> and a <a title="music21.interval.Interval" class="reference internal" href="#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object, return a new Pitch object at the appropriate pitch level.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">generatePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">aInterval</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
-<span class="go">G4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">generateIntervalFromString</span><span class="p">(</span><span class="s">&#39;P-5&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span> <span class="o">=</span> <span class="n">generatePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span>
-<span class="go">F3</span>
-</pre></div>
-</div>
-<dl class="function">
 <dt id="music21.interval.getAbsoluteHigherNote">
 <tt class="descclassname">music21.interval.</tt><tt class="descname">getAbsoluteHigherNote</tt><big>(</big><em>note1</em>, <em>note2</em><big>)</big><a class="headerlink" href="#music21.interval.getAbsoluteHigherNote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -374,6 +311,69 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;d-3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getWrittenLowerNote</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
 <span class="go">&lt;music21.note.Note C#&gt;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.interval.notesToGeneric">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">notesToGeneric</tt><big>(</big><em>n1</em>, <em>n2</em><big>)</big><a class="headerlink" href="#music21.interval.notesToGeneric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given two <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects, returns a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">notesToGeneric</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="n">bNote</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.GenericInterval 12&gt;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.interval.stringToInterval">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">stringToInterval</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#music21.interval.stringToInterval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given an interval string (such as &#8220;P5&#8221;, &#8220;m3&#8221;, &#8220;A2&#8221;) return a <a title="music21.interval.Interval" class="reference internal" href="#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">stringToInterval</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval P5&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">stringToInterval</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span>
+<span class="go">&lt;music21.interval.Interval m3&gt;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.interval.transposeNote">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">transposeNote</tt><big>(</big><em>note1</em>, <em>intervalString</em><big>)</big><a class="headerlink" href="#music21.interval.transposeNote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and a interval string (such as &#8216;P5&#8217;) or an Interval object, return a new Note object at the appropriate pitch level.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">transposeNote</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="s">&#39;p5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span>
+<span class="go">&lt;music21.note.Note G&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;f#4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span> <span class="o">=</span> <span class="n">transposeNote</span><span class="p">(</span><span class="n">aNote</span><span class="p">,</span> <span class="s">&#39;m2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bNote</span>
+<span class="go">&lt;music21.note.Note G&gt;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="music21.interval.transposePitch">
+<tt class="descclassname">music21.interval.</tt><tt class="descname">transposePitch</tt><big>(</big><em>pitch1</em>, <em>interval1</em><big>)</big><a class="headerlink" href="#music21.interval.transposePitch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> and a <a title="music21.interval.Interval" class="reference internal" href="#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object, return a new Pitch object at the appropriate pitch level.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">pitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="s">&#39;P5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">transposePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">aInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
+<span class="go">G4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bInterval</span> <span class="o">=</span> <span class="n">stringToInterval</span><span class="p">(</span><span class="s">&#39;P-5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span> <span class="o">=</span> <span class="n">transposePitch</span><span class="p">(</span><span class="n">aPitch</span><span class="p">,</span> <span class="n">bInterval</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cPitch</span>
+<span class="go">F3</span>
 </pre></div>
 </div>
 <div class="section" id="interval">
@@ -860,7 +860,7 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 20, 2010.
+      Last updated on Apr 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
