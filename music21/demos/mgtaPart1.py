@@ -228,7 +228,7 @@ def ch1_basic_II_B_1(show=True, *arguments, **keywords):
 def ch1_basic_II_B_2(show=True, *arguments, **keywords):
     '''
     p4.
-    For each of the five bass clef pitches on the left, write the tenord-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
+    For each of the five bass clef pitches on the left, write the tenor-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
     '''
     from music21 import clef, converter
     humdata = '**kern\n1F#1e-\n1B\n1D-\n1c\n*-'
@@ -249,19 +249,93 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
 
 
 def ch1_writing_I_A_1(show=True, *arguments, **keywords):
-    pass
+    '''
+    p. 5
+    Rewrite these melodies from music literature, placing the pitches one octave higher or lower as specified, by using ledger lines. Do not change to a new clef.
+
+    Rewrite one active higher 
+    '''
+    from music21 import converter, clef
+
+    humdata = '''
+**kern
+8C
+8D
+8E
+8EE
+8AA
+8E
+8F
+8AA
+8BB
+8F#
+8G
+8BB
+8C
+8G#
+8A
+8C#
+*-
+'''
+    ex = converter.parseData(humdata)
+    ex = ex.transpose('p8')
+    ex.insert(0, clef.BassClef()) # maintain clef
+    if show:
+        ex.show()
+
 
 def ch1_writing_I_A_2(show=True, *arguments, **keywords):
-    pass
-
+    '''
+    p. 5 
+    Rewrite one octave higher
+    '''
+    humdata = '''
+**kern
+6e
+6e
+6e
+6e
+6f
+6g
+*-
+'''
+    # this notation excerpt is incomplete
+    ex = converter.parseData(humdata)
+    ex = ex.transpose('p8')
+    ex.insert(0, clef.TrebleClef()) # maintain clef
+    if show:
+        ex.show()
 
 
 def ch1_writing_I_B_1(show=True, *arguments, **keywords):
-    pass
+    from music21 import converter, clef
+
+    '''
+    p.6 
+    Transcript these melodies into the clef specified without changing octaves.
+    '''
+
+    # camptown races
+    humdata = '''
+**kern
+*M2/4
+8g
+8g
+8e
+8g
+*-
+'''
+    # this notation excerpt is incomplete
+    ex = converter.parseData(humdata)
+    ex.insert(0, clef.AltoClef()) # maintain clef
+    if show:
+        ex.show()
+
 
 
 def ch1_writing_I_B_2(show=True, *arguments, **keywords):
     pass
+
 
 def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     '''
@@ -304,6 +378,11 @@ class Test(unittest.TestCase):
             ch1_basic_II_A_2,
             ch1_basic_II_B_1,
             ch1_basic_II_B_2,
+
+            ch1_writing_I_A_1,
+            ch1_writing_I_A_2,
+            ch1_writing_I_B_1,
+            ch1_writing_I_B_2,
             ]:
             func(show=False, play=False)
 
@@ -316,10 +395,9 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         music21.mainTest(Test)
     else:
-        ch1_basic_II_B_1(show=True)
-        ch1_basic_II_B_2(show=True)
 
         #t = Test()
         #t.testImportClefAssign()
 
 
+        ch1_writing_I_B_1(show=True)
