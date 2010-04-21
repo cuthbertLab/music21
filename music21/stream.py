@@ -3312,9 +3312,18 @@ class Stream(music21.Music21Object):
         25
         >>> len(a.pitches)
         104
+
+        >>> from music21 import pitch
+        >>> pitch1 = pitch.Pitch()
+        >>> st1 = Stream()
+        >>> st1.append(pitch1)
+        >>> foundPitches = st1.pitches
+        >>> len(foundPitches)
+        1
+        >>> foundPitches[0] is pitch1
+        True
         
         '''  
-        # TODO: Get Pitches found directly in a stream
         returnPitches = []
         for thisEl in self.elements:
             if hasattr(thisEl, "pitch"):
@@ -3323,6 +3332,8 @@ class Stream(music21.Music21Object):
             elif hasattr(thisEl, "pitches"):
                 for thisPitch in thisEl.pitches:
                     returnPitches.append(thisPitch)
+            elif isinstance(thisEl, music21.pitch.Pitch):
+                returnPitches.append(thisEl)
         return returnPitches
     
     pitches = property(getPitches, doc='''

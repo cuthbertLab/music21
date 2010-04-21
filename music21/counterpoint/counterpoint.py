@@ -379,7 +379,7 @@ class ModalCounterpoint(object):
                    interval.generateNote(firstNote, "P8")]
         note1 = random.choice(choices)
         note1.duration = firstNote.duration
-        stream2.notes.append(note1)
+        stream2.append(note1)
         afterLeap = False
         for i in range(1, len(stream1.notes)):
             prevFirmus = stream1.notes[i-1]
@@ -390,7 +390,7 @@ class ModalCounterpoint(object):
                 raise ModalCounterpointException("Sorry, please try again")
             newNote = random.choice(choices)
             newNote.duration = currFirmus.duration
-            stream2.notes.append(newNote)
+            stream2.append(newNote)
             int = interval.generateInterval(prevNote, newNote)
             if int.generic.undirected > 3: afterLeap = True
             else: afterLeap = False
@@ -917,4 +917,4 @@ def twoStreamLily(st1, st2):
     return lilyOut
     
 if (__name__ == "__main__"):
-    music21.mainTest() #TestExternal
+    music21.mainTest(TestExternal) #TestExternal

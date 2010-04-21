@@ -71,9 +71,29 @@ class TrecentoSheet(object):
         self.iterIndex += 1
         return work
 
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.makeWork(key)
+    
+        elif isinstance(key, slice): # get a slice of index values
+            found = []
+            start = key.start
+            if start is None:
+                start = 0
+            stop = key.stop
+            if stop is None:
+                stop = self.totalRows + 1
+            step = key.step
+            if step is None:
+                step = 1
+            for i in range(start, stop, step):
+                found.append(self.makeWork(i))
+            return found
+
     def makeWork(self, rownumber = 2):
         '''
         Returns the TrecentoCadenceWork at the given row number
+        Same as using getItem above, but without slices...
         
         We use Excel Row numbers, NOT Python row numbers: 
         in other words, makeWork(1) = Excel row 1 (python row 0)
