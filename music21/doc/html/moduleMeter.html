@@ -95,9 +95,7 @@
 <dl class="function">
 <dt id="music21.meter.fractionSum">
 <tt class="descclassname">music21.meter.</tt><tt class="descname">fractionSum</tt><big>(</big><em>fList</em><big>)</big><a class="headerlink" href="#music21.meter.fractionSum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a list of fractions represented as a list, find the sum</p>
+<dd><p>Given a list of fractions represented as a list, find the sum</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span><span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">5</span><span class="p">,</span><span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">8</span><span class="p">)])</span>
 <span class="go">(9, 8)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fractionSum</span><span class="p">([(</span><span class="mf">1</span><span class="p">,</span><span class="mf">6</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">)])</span>
@@ -108,22 +106,22 @@
 <span class="go">(43, 221)</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="function">
 <dt id="music21.meter.fractionToSlashMixed">
 <tt class="descclassname">music21.meter.</tt><tt class="descname">fractionToSlashMixed</tt><big>(</big><em>fList</em><big>)</big><a class="headerlink" href="#music21.meter.fractionToSlashMixed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a list of fraction values, compact numerators by sum if denominators are the same</p>
+<dd><p>Given a list of fraction values, compact numerators by sum if denominators are the same</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fractionToSlashMixed</span><span class="p">([(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">8</span><span class="p">),</span> <span class="p">(</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">),</span> <span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">16</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">16</span><span class="p">)])</span>
 <span class="go">[(&#39;3+2+5&#39;, 8), (&#39;3&#39;, 4), (&#39;2+1+4&#39;, 16)]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="function">
 <dt id="music21.meter.slashCompoundToFraction">
 <tt class="descclassname">music21.meter.</tt><tt class="descname">slashCompoundToFraction</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.meter.slashCompoundToFraction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;3/8+2/8&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;3/8+2/8&#39;</span><span class="p">)</span>
 <span class="go">[(3, 8), (2, 8)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slashCompoundToFraction</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">)</span>
 <span class="go">[(5, 8)]</span>
@@ -131,12 +129,12 @@
 <span class="go">[(5, 8), (2, 4), (6, 8)]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="function">
 <dt id="music21.meter.slashMixedToFraction">
 <tt class="descclassname">music21.meter.</tt><tt class="descname">slashMixedToFraction</tt><big>(</big><em>valueSrc</em><big>)</big><a class="headerlink" href="#music21.meter.slashMixedToFraction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a mixture if possible meter fraction representations, return a list of pairs. If originally given as a summed numerator; break into separate fractions.</p>
+<dd><p>Given a mixture if possible meter fraction representations, return a list of pairs. If originally given as a summed numerator; break into separate fractions.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3/8+2/8&#39;</span><span class="p">)</span>
 <span class="go">([(3, 8), (2, 8)], False)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slashMixedToFraction</span><span class="p">(</span><span class="s">&#39;3+2/8&#39;</span><span class="p">)</span>
@@ -152,17 +150,19 @@
 <span class="go">MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="function">
 <dt id="music21.meter.slashToFraction">
 <tt class="descclassname">music21.meter.</tt><tt class="descname">slashToFraction</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.meter.slashToFraction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashToFraction</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">slashToFraction</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
 <span class="go">(3, 8)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slashToFraction</span><span class="p">(</span><span class="s">&#39;7/32&#39;</span><span class="p">)</span>
 <span class="go">(7, 32)</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <div class="section" id="timesignature">
 <h2>TimeSignature<a class="headerlink" href="#timesignature" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -175,27 +175,23 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.display">
 <tt class="descname">display</tt><a class="headerlink" href="#music21.meter.TimeSignature.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A meter sequence is a list of MeterTerminals, or other MeterSequences</dd></dl>
 
-<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.beat">
 <tt class="descname">beat</tt><a class="headerlink" href="#music21.meter.TimeSignature.beat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A meter sequence is a list of MeterTerminals, or other MeterSequences</dd></dl>
 
-<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.accent">
 <tt class="descname">accent</tt><a class="headerlink" href="#music21.meter.TimeSignature.accent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A meter sequence is a list of MeterTerminals, or other MeterSequences</dd></dl>
 
-<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.beam">
 <tt class="descname">beam</tt><a class="headerlink" href="#music21.meter.TimeSignature.beam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A meter sequence is a list of MeterTerminals, or other MeterSequences</dd></dl>
 
-<p>A meter sequence is a list of MeterTerminals, or other MeterSequences</p>
 <p>Attributes without Documentation: <cite>symbolizeDenominator</cite>, <cite>symbol</cite>, <cite>summedNumerator</cite>, <cite>inherited</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
@@ -204,9 +200,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.barDuration">
 <tt class="descname">barDuration</tt><a class="headerlink" href="#music21.meter.TimeSignature.barDuration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
+<dd><p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">barDuration</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
@@ -217,69 +211,66 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">1.5</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.beatLengthToQuarterLengthRatio">
 <tt class="descname">beatLengthToQuarterLengthRatio</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatLengthToQuarterLengthRatio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/2&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/2&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beatLengthToQuarterLengthRatio</span>
 <span class="go">2.0</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.denominator">
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.TimeSignature.denominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.meter.TimeSignature.lily" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>returns the lilypond representation of the timeSignature</p>
+<dd><p>returns the lilypond representation of the timeSignature</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/16&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lily</span>
 <span class="go">\time 3/16</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.musicxml">
 <tt class="descname">musicxml</tt><a class="headerlink" href="#music21.meter.TimeSignature.musicxml" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Return a complete MusicXML string</dd></dl>
 
-<p>Return a complete MusicXML string</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.meter.TimeSignature.mx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements</p>
+<dd><p>Returns a list of one mxTime object. Compound meters are represented as multiple pairs of beat and beat-type elements</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4+2/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.numerator">
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.TimeSignature.numerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.quarterLengthToBeatLengthRatio">
 <tt class="descname">quarterLengthToBeatLengthRatio</tt><a class="headerlink" href="#music21.meter.TimeSignature.quarterLengthToBeatLengthRatio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.totalLength">
 <tt class="descname">totalLength</tt><a class="headerlink" href="#music21.meter.TimeSignature.totalLength" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>TimeSignature</strong> <strong>methods</strong></p>
@@ -287,9 +278,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getAccent">
 <tt class="descname">getAccent</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getAccent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Return true or false if the qLenPos is at the start of an accent division</p>
+<dd><p>Return true or false if the qLenPos is at the start of an accent division</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span>
@@ -302,18 +291,17 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">True</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getAccentWeight">
 <tt class="descname">getAccentWeight</tt><big>(</big><em>qLenPos</em>, <em>level=0</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getAccentWeight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Given a qLenPos,  return an accent level.</dd></dl>
 
-<p>Given a qLenPos,  return an accent level.</p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeams">
 <tt class="descname">getBeams</tt><big>(</big><em>srcList</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations.</p>
+<dd><p>Given a qLen position and a list of Duration objects, return a list of Beams object. Can alternatively provide a flat stream, from which Durations are extracted. Duration objects are assumed to be adjoining; offsets are not used. This can be modified to take lists of rests and notes Must process a list at  time, because we cannot tell when a beam ends unless we see the context of adjoining durations.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -332,12 +320,12 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">[&lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/start&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/continue&gt;&gt;, &lt;music21.note.Beams &lt;music21.note.Beam 1/stop&gt;&gt;]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeat">
 <tt class="descname">getBeat</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a quarterLenght position, get the beat, where beats count from 1</p>
+<dd><p>Given a quarterLenght position, get the beat, where beats count from 1</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">1</span>
@@ -348,12 +336,12 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">2</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeatDepth">
 <tt class="descname">getBeatDepth</tt><big>(</big><em>qLenPos</em>, <em>align=quantize</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeatDepth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
@@ -373,12 +361,12 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">2</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeatProgress">
 <tt class="descname">getBeatProgress</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeatProgress" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is.</p>
+<dd><p>Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">(1, 0)</span>
@@ -391,36 +379,32 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">(2, 1.0)</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.load">
 <tt class="descname">load</tt><big>(</big><em>value</em>, <em>partitionRequest=None</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.load" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Loading a meter destroys all internal representations</dd></dl>
 
-<p>Loading a meter destroys all internal representations</p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.loadRatio">
 <tt class="descname">loadRatio</tt><big>(</big><em>numerator</em>, <em>denominator</em>, <em>partitionRequest=None</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.loadRatio" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Convenience method</dd></dl>
 
-<p>Convenience method</p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.quarterPositionToBeat">
 <tt class="descname">quarterPositionToBeat</tt><big>(</big><em>currentQtrPosition=0</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.quarterPositionToBeat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>For backward compatibility. Ultimately, remove.</dd></dl>
 
-<p>For backward compatibility. Ultimately, remove.</p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.ratioEqual">
 <tt class="descname">ratioEqual</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.ratioEqual" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio.</dd></dl>
 
-<p>A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio.</p>
 <dl class="method">
 <dt id="music21.meter.TimeSignature.setAccentWeight">
 <tt class="descname">setAccentWeight</tt><big>(</big><em>weightList</em>, <em>level=0</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.setAccentWeight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.</p>
+<dd><p>Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used. If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">accent</span><span class="p">)</span>
 <span class="go">4</span>
@@ -437,12 +421,12 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">0.200...</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.TimeSignature.setDisplay">
 <tt class="descname">setDisplay</tt><big>(</big><em>value</em>, <em>partitionRequest=None</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.setDisplay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Set an indendent display value</p>
+<dd><p>Set an indendent display value</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDisplay</span><span class="p">(</span><span class="s">&#39;2/8+2/8+2/8&#39;</span><span class="p">)</span>
@@ -457,6 +441,8 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="go">&lt;MeterSequence {3/4}&gt;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
@@ -498,21 +484,17 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.denominator">
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.MeterSequence.denominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.depth">
 <tt class="descname">depth</tt><a class="headerlink" href="#music21.meter.MeterSequence.depth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Return how many unique levels deep this part is This should be optimized to store values unless the structure has changed.</dd></dl>
 
-<p>Return how many unique levels deep this part is This should be optimized to store values unless the structure has changed.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.flat">
 <tt class="descname">flat</tt><a class="headerlink" href="#music21.meter.MeterSequence.flat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Retrun a new MeterSequence composed of the flattend representation.</p>
+<dd><p>Retrun a new MeterSequence composed of the flattend representation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">flat</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
@@ -529,24 +511,22 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">9</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.flatWeight">
 <tt class="descname">flatWeight</tt><a class="headerlink" href="#music21.meter.MeterSequence.flatWeight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Retrun a list of flat weight valuess</dd></dl>
 
-<p>Retrun a list of flat weight valuess</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.numerator">
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.MeterSequence.numerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterSequence.weight">
 <tt class="descname">weight</tt><a class="headerlink" href="#music21.meter.MeterSequence.weight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="mf">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span>
@@ -558,6 +538,8 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">0.5</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <p>Properties inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a>: <a title="music21.meter.MeterTerminal.duration" class="reference internal" href="#music21.meter.MeterTerminal.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a></p>
 </blockquote>
 <p><strong>MeterSequence</strong> <strong>methods</strong></p>
@@ -565,9 +547,7 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <dl class="method">
 <dt id="music21.meter.MeterSequence.getLevel">
 <tt class="descname">getLevel</tt><big>(</big><em>level=0</em>, <em>flat=True</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.getLevel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth.</p>
+<dd><p>Return a complete MeterSequence with the same numerator/denominator reationship but that represents any partitions found at the rquested level. A sort of flatness with variable depth.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -582,12 +562,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">&lt;MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}&gt;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.getLevelSpan">
 <tt class="descname">getLevelSpan</tt><big>(</big><em>level=0</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.getLevelSpan" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>For a given level, return the time span of each terminal or sequnece</p>
+<dd><p>For a given level, return the time span of each terminal or sequnece</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -602,12 +582,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">[(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.getLevelWeight">
 <tt class="descname">getLevelWeight</tt><big>(</big><em>level=0</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.getLevelWeight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here</p>
+<dd><p>The weightList is an array of weights found in the components. The MeterSequence has a ._weight attribute, but it is not used here</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">()</span>
 <span class="go">[0.25, 0.25, 0.25, 0.25]</span>
@@ -629,12 +609,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">[0.25, 0.125, 0.125, 0.25, 0.0625, 0.0625, 0.125]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.load">
 <tt class="descname">load</tt><big>(</big><em>value</em>, <em>partitionRequest=None</em>, <em>autoWeight=False</em>, <em>targetWeight=None</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.load" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight</p>
+<dd><p>This method is called when a MeterSequence is created, or if a MeterSequece is re-set. User can enter a list of values or an abbreviated slash notation. autoWeight, if True, will attempt to set weights. tragetWeight, if given, will be used instead of self.weight</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -650,12 +630,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">&#39;{5/8+4/4}&#39;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partition">
 <tt class="descname">partition</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther().</p>
+<dd><p>Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther().</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;5/4+3/8&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">2</span>
@@ -670,12 +650,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">13</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partitionByCount">
 <tt class="descname">partitionByCount</tt><big>(</big><em>countRequest</em>, <em>loadDefault=True</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partitionByCount" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>This will destroy any struct in the _partition</p>
+<dd><p>This will destroy any struct in the _partition</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByCount</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -685,12 +665,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">&#39;{1/4+1/4+1/4+1/4}&#39;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partitionByList">
 <tt class="descname">partitionByList</tt><big>(</big><em>numeratorList</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partitionByList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a numerator list, partition MeterSequence inot a new list of MeterTerminals</p>
+<dd><p>Given a numerator list, partition MeterSequence inot a new list of MeterTerminals</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByList</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -703,12 +683,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="nc">MeterException</span>: <span class="n-Identifier">Cannot set partition by [&#39;3/4&#39;, &#39;1/8&#39;, &#39;5/8&#39;]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partitionByOther">
 <tt class="descname">partitionByOther</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partitionByOther" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Set partition to that found in another object</p>
+<dd><p>Set partition to that found in another object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByOther</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
@@ -716,12 +696,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">2</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.positionToAddress">
 <tt class="descname">positionToAddress</tt><big>(</big><em>qLenPos</em>, <em>includeCoincidentBoundaries=False</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.positionToAddress" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen.</p>
+<dd><p>Give a list of values that show all indices necessary to access the exact terminal at a given qLenPos. The len of the returned list also provides the depth at the specified qLen.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
@@ -744,12 +724,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">[2]</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.positionToDepth">
 <tt class="descname">positionToDepth</tt><big>(</big><em>qLenPos</em>, <em>align=quantize</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.positionToDepth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a qLenPos, return the maximum available depth at this position</p>
+<dd><p>Given a qLenPos, return the maximum available depth at this position</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -766,12 +746,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">2</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.positionToIndex">
 <tt class="descname">positionToIndex</tt><big>(</big><em>qLenPos</em>, <em>includeCoincidentBoundaries=False</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.positionToIndex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence</p>
+<dd><p>Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
 <span class="gp">...</span>
@@ -793,12 +773,12 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">1</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterSequence.positionToSpan">
 <tt class="descname">positionToSpan</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.positionToSpan" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Given a lenPos, return the span of the active region. Only applies to the top most level of partitions</p>
+<dd><p>Given a lenPos, return the span of the active region. Only applies to the top most level of partitions</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
 <span class="go">(0, 1.0)</span>
@@ -806,6 +786,8 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <span class="go">(1.0, 2.0)</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <p>Methods inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a>: <a title="music21.meter.MeterTerminal.ratioEqual" class="reference internal" href="#music21.meter.MeterTerminal.ratioEqual"><tt class="xref docutils literal"><span class="pre">ratioEqual()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivide" class="reference internal" href="#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivideByCount" class="reference internal" href="#music21.meter.MeterTerminal.subdivideByCount"><tt class="xref docutils literal"><span class="pre">subdivideByCount()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivideByList" class="reference internal" href="#music21.meter.MeterTerminal.subdivideByList"><tt class="xref docutils literal"><span class="pre">subdivideByList()</span></tt></a></p>
 </blockquote>
 </dd></dl>
@@ -834,21 +816,17 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.denominator">
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.MeterTerminal.denominator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.depth">
 <tt class="descname">depth</tt><a class="headerlink" href="#music21.meter.MeterTerminal.depth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Return how many levels deep this part is. Depth of a terminal is always 1</dd></dl>
 
-<p>Return how many levels deep this part is. Depth of a terminal is always 1</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.meter.MeterTerminal.duration" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
+<dd><p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">numerator</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">denominator</span> <span class="o">=</span> <span class="mf">8</span>
@@ -861,39 +839,35 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <span class="go">1.5</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.numerator">
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.MeterTerminal.numerator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="attribute">
 <dt id="music21.meter.MeterTerminal.weight">
 <tt class="descname">weight</tt><a class="headerlink" href="#music21.meter.MeterTerminal.weight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 </blockquote>
 <p><strong>MeterTerminal</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
 <dt id="music21.meter.MeterTerminal.ratioEqual">
 <tt class="descname">ratioEqual</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.meter.MeterTerminal.ratioEqual" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8</dd></dl>
 
-<p>Compare the numerator and denominator of another object. Note that these have to be exact matches; 3/4 is not the same as 6/8</p>
 <dl class="method">
 <dt id="music21.meter.MeterTerminal.subdivide">
 <tt class="descname">subdivide</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.meter.MeterTerminal.subdivide" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count</dd></dl>
 
-<p>Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence. This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object. If an integer is provided, assume it is a partition count</p>
 <dl class="method">
 <dt id="music21.meter.MeterTerminal.subdivideByCount">
 <tt class="descname">subdivideByCount</tt><big>(</big><em>countRequest=None</em><big>)</big><a class="headerlink" href="#music21.meter.MeterTerminal.subdivideByCount" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>retrun a MeterSequence</p>
+<dd><p>retrun a MeterSequence</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">subdivideByCount</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">MeterSequence</span><span class="p">)</span>
@@ -902,18 +876,20 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Met
 <span class="go">3</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.meter.MeterTerminal.subdivideByList">
 <tt class="descname">subdivideByList</tt><big>(</big><em>numeratorList</em><big>)</big><a class="headerlink" href="#music21.meter.MeterTerminal.subdivideByList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>Return a MeterSequence countRequest is within the context of the beatIndex</p>
+<dd><p>Return a MeterSequence countRequest is within the context of the beatIndex</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">subdivideByList</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 <span class="go">3</span>
 </pre></div>
 </div>
+</dd></dl>
+
 </blockquote>
 </dd></dl>
 
@@ -955,7 +931,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Non
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 22, 2010.
+      Last updated on Apr 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

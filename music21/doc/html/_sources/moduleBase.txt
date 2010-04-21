@@ -25,204 +25,204 @@ Music21Object
 
         .. attribute:: id
 
-        Unique identification string. 
+            Unique identification string. 
 
         .. attribute:: groups
 
-        An instance of a Group object. 
+            An instance of a Group object. 
 
     **Music21Object** **properties**
 
         .. attribute:: duration
 
-        Get and set the duration of this object as a Duration object. 
+            Get and set the duration of this object as a Duration object. 
 
         .. attribute:: offset
 
-        The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths. 
+            The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths. 
 
         .. attribute:: parent
 
-        A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
+            A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
 
         .. attribute:: priority
 
-        Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
+            Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
 
-        >>> a = Music21Object()
-        >>> a.priority = 3
-        >>> a.priority = 'high'
-        Traceback (most recent call last): 
-        ElementException: priority values must be integers. 
+            >>> a = Music21Object()
+            >>> a.priority = 3
+            >>> a.priority = 'high'
+            Traceback (most recent call last): 
+            ElementException: priority values must be integers. 
 
     **Music21Object** **methods**
 
         .. method:: searchParentByAttr(attrName)
 
-        If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward. 
+            If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward. 
 
         .. method:: getContextAttr(attr)
 
-        Given the name of an attribute, search Conctexts and return the best match. 
+            Given the name of an attribute, search Conctexts and return the best match. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
-        >>> a.addContext(aObj)
-        >>> a.getContextAttr('attr1')
-        'test' 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 'test'
+            >>> a = Music21Object()
+            >>> a.addContext(aObj)
+            >>> a.getContextAttr('attr1')
+            'test' 
 
         .. method:: setContextAttr(attrName, value)
 
-        Given the name of an attribute, search Conctexts and return the best match. 
+            Given the name of an attribute, search Conctexts and return the best match. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
-        >>> a.addContext(aObj)
-        >>> a.getContextAttr('attr1')
-        'test' 
-        >>> a.setContextAttr('attr1', 3000)
-        >>> a.getContextAttr('attr1')
-        3000 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 'test'
+            >>> a = Music21Object()
+            >>> a.addContext(aObj)
+            >>> a.getContextAttr('attr1')
+            'test' 
+            >>> a.setContextAttr('attr1', 3000)
+            >>> a.getContextAttr('attr1')
+            3000 
 
         .. method:: addContext(obj)
 
-        Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
+            Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
-        >>> a.addContext(aObj)
-        >>> a.getContextAttr('attr1')
-        'test' 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 'test'
+            >>> a = Music21Object()
+            >>> a.addContext(aObj)
+            >>> a.getContextAttr('attr1')
+            'test' 
 
         .. method:: addLocationAndParent(offset, parent, parentWeakRef=None)
 
-        ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
+            ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
 
-        >>> from stream import Stream
-        >>> st1 = Stream()
-        >>> o1 = Music21Object()
-        >>> st1_wr = common.wrapWeakref(st1)
-        >>> offset = 20.0
-        >>> st1._elements = [o1]
-        >>> o1.addLocationAndParent(offset, st1, st1_wr)
-        >>> o1.parent is st1
-        True 
-        >>> o1.getOffsetBySite(st1)
-        20.0 
+            >>> from stream import Stream
+            >>> st1 = Stream()
+            >>> o1 = Music21Object()
+            >>> st1_wr = common.wrapWeakref(st1)
+            >>> offset = 20.0
+            >>> st1._elements = [o1]
+            >>> o1.addLocationAndParent(offset, st1, st1_wr)
+            >>> o1.parent is st1
+            True 
+            >>> o1.getOffsetBySite(st1)
+            20.0 
 
         .. method:: freezeIds()
 
-        Temporarily replace are stored keys with a different value. 
+            Temporarily replace are stored keys with a different value. 
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0 
-        >>> bM21Obj.addLocationAndParent(50, aM21Obj)
-        >>> bM21Obj.parent != None
-        True 
-        >>> oldParentId = bM21Obj._currentParentId
-        >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._currentParentId
-        >>> oldParentId == newParentId
-        False 
+            >>> aM21Obj = Music21Object()
+            >>> bM21Obj = Music21Object()
+            >>> aM21Obj.offset = 30
+            >>> aM21Obj.getOffsetBySite(None)
+            30.0 
+            >>> bM21Obj.addLocationAndParent(50, aM21Obj)
+            >>> bM21Obj.parent != None
+            True 
+            >>> oldParentId = bM21Obj._currentParentId
+            >>> bM21Obj.freezeIds()
+            >>> newParentId = bM21Obj._currentParentId
+            >>> oldParentId == newParentId
+            False 
 
         .. method:: getContextByClass(className, serialReverseSearch=True, callerFirst=None, memo=None)
 
-        Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+            Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
         .. method:: getOffsetBySite(site)
 
-        If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
+            If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
 
-        >>> a = Music21Object()
-        >>> a.offset = 30
-        >>> a.getOffsetBySite(None)
-        30.0 
+            >>> a = Music21Object()
+            >>> a.offset = 30
+            >>> a.getOffsetBySite(None)
+            30.0 
 
         .. method:: hasContext(obj)
 
-        Return a Boolean if an object reference is stored in the object's DefinedContexts object. 
+            Return a Boolean if an object reference is stored in the object's DefinedContexts object. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
-        >>> a.addContext(aObj)
-        >>> a.hasContext(aObj)
-        True 
-        >>> a.hasContext(None)
-        True 
-        >>> a.hasContext(45)
-        False 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 'test'
+            >>> a = Music21Object()
+            >>> a.addContext(aObj)
+            >>> a.hasContext(aObj)
+            True 
+            >>> a.hasContext(None)
+            True 
+            >>> a.hasContext(45)
+            False 
 
         .. method:: isClass(className)
 
-        returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
+            returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
         .. method:: show(fmt=None)
 
-        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
+            Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
 
         .. method:: unfreezeIds()
 
-        Restore keys to be the id() of the object they contain 
+            Restore keys to be the id() of the object they contain 
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0 
-        >>> bM21Obj.addLocationAndParent(50, aM21Obj)
-        >>> bM21Obj.parent != None
-        True 
-        >>> oldParentId = bM21Obj._currentParentId
-        >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._currentParentId
-        >>> oldParentId == newParentId
-        False 
-        >>> bM21Obj.unfreezeIds()
-        >>> postParentId = bM21Obj._currentParentId
-        >>> oldParentId == postParentId
-        True 
+            >>> aM21Obj = Music21Object()
+            >>> bM21Obj = Music21Object()
+            >>> aM21Obj.offset = 30
+            >>> aM21Obj.getOffsetBySite(None)
+            30.0 
+            >>> bM21Obj.addLocationAndParent(50, aM21Obj)
+            >>> bM21Obj.parent != None
+            True 
+            >>> oldParentId = bM21Obj._currentParentId
+            >>> bM21Obj.freezeIds()
+            >>> newParentId = bM21Obj._currentParentId
+            >>> oldParentId == newParentId
+            False 
+            >>> bM21Obj.unfreezeIds()
+            >>> postParentId = bM21Obj._currentParentId
+            >>> oldParentId == postParentId
+            True 
 
         .. method:: unwrapWeakref()
 
-        Public interface to operation on DefinedContexts. 
+            Public interface to operation on DefinedContexts. 
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0 
-        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
-        >>> aM21Obj.unwrapWeakref()
+            >>> aM21Obj = Music21Object()
+            >>> bM21Obj = Music21Object()
+            >>> aM21Obj.offset = 30
+            >>> aM21Obj.getOffsetBySite(None)
+            30.0 
+            >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+            >>> aM21Obj.unwrapWeakref()
 
-        
+            
 
         .. method:: wrapWeakref()
 
-        Public interface to operation on DefinedContexts. 
+            Public interface to operation on DefinedContexts. 
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0 
-        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
-        >>> aM21Obj.unwrapWeakref()
-        >>> aM21Obj.wrapWeakref()
+            >>> aM21Obj = Music21Object()
+            >>> bM21Obj = Music21Object()
+            >>> aM21Obj.offset = 30
+            >>> aM21Obj.getOffsetBySite(None)
+            30.0 
+            >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+            >>> aM21Obj.unwrapWeakref()
+            >>> aM21Obj.wrapWeakref()
 
         .. method:: write(fmt=None, fp=None)
 
-        Write a file. A None file path will result in temporary file 
+            Write a file. A None file path will result in temporary file 
 
 
 ElementWrapper
@@ -244,40 +244,40 @@ ElementWrapper
 
         .. attribute:: duration
 
-        Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None. 
+            Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None. 
 
-        >>> import note
-        >>> n = note.Note('F#')
-        >>> n.quarterLength = 2.0
-        >>> n.duration.quarterLength
-        2.0 
-        >>> el1 = ElementWrapper(n)
-        >>> el1.duration.quarterLength
-        2.0 
-        ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY 
-        >>> class KindaStupid(object):
-        ...     pass 
-        >>> ks1 = ElementWrapper(KindaStupid())
-        >>> ks1.obj.duration
-        Traceback (most recent call last): 
-        AttributeError: 'KindaStupid' object has no attribute 'duration' 
-        >>> import duration
-        >>> ks1.duration = duration.Duration("whole")
-        >>> ks1.duration.quarterLength
-        4.0 
-        >>> ks1.obj.duration  # still not defined
-        Traceback (most recent call last): 
-        AttributeError: 'KindaStupid' object has no attribute 'duration' 
+            >>> import note
+            >>> n = note.Note('F#')
+            >>> n.quarterLength = 2.0
+            >>> n.duration.quarterLength
+            2.0 
+            >>> el1 = ElementWrapper(n)
+            >>> el1.duration.quarterLength
+            2.0 
+            ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY 
+            >>> class KindaStupid(object):
+            ...     pass 
+            >>> ks1 = ElementWrapper(KindaStupid())
+            >>> ks1.obj.duration
+            Traceback (most recent call last): 
+            AttributeError: 'KindaStupid' object has no attribute 'duration' 
+            >>> import duration
+            >>> ks1.duration = duration.Duration("whole")
+            >>> ks1.duration.quarterLength
+            4.0 
+            >>> ks1.obj.duration  # still not defined
+            Traceback (most recent call last): 
+            AttributeError: 'KindaStupid' object has no attribute 'duration' 
 
         .. attribute:: id
 
-        Unique identification string. 
+            Unique identification string. 
 
         .. attribute:: offset
 
-        Get the offset for the set the parent object. 
+            Get the offset for the set the parent object. 
 
-        
+            
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -285,51 +285,51 @@ ElementWrapper
 
         .. method:: getId()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: isClass(className)
 
-        Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
+            Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
 
-        >>> import note
-        >>> a = ElementWrapper(None)
-        >>> a.isClass(note.Note)
-        False 
-        >>> a.isClass(types.NoneType)
-        True 
-        >>> b = ElementWrapper(note.Note('A4'))
-        >>> b.isClass(note.Note)
-        True 
-        >>> b.isClass(types.NoneType)
-        False 
+            >>> import note
+            >>> a = ElementWrapper(None)
+            >>> a.isClass(note.Note)
+            False 
+            >>> a.isClass(types.NoneType)
+            True 
+            >>> b = ElementWrapper(note.Note('A4'))
+            >>> b.isClass(note.Note)
+            True 
+            >>> b.isClass(types.NoneType)
+            False 
 
         .. method:: isTwin(other)
 
-        a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
+            a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
 
-        >>> import note
-        >>> aE = ElementWrapper(obj = note.Note("A-"))
-        >>> aE.id = "aflat-Note"
-        >>> aE.groups.append("out-of-range")
-        >>> aE.offset = 4.0
-        >>> aE.priority = 4
-        >>> bE = copy.copy(aE)
-        >>> aE is bE
-        False 
-        >>> aE == bE
-        True 
-        >>> aE.isTwin(bE)
-        True 
-        >>> bE.offset = 14.0
-        >>> bE.priority = -4
-        >>> aE == bE
-        False 
-        >>> aE.isTwin(bE)
-        True 
+            >>> import note
+            >>> aE = ElementWrapper(obj = note.Note("A-"))
+            >>> aE.id = "aflat-Note"
+            >>> aE.groups.append("out-of-range")
+            >>> aE.offset = 4.0
+            >>> aE.priority = 4
+            >>> bE = copy.copy(aE)
+            >>> aE is bE
+            False 
+            >>> aE == bE
+            True 
+            >>> aE.isTwin(bE)
+            True 
+            >>> bE.offset = 14.0
+            >>> bE.priority = -4
+            >>> aE == bE
+            False 
+            >>> aE.isTwin(bE)
+            True 
 
         .. method:: setId(newId)
 
-        No documentation. 
+            No documentation. 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -349,305 +349,305 @@ DefinedContexts
 
         .. method:: add(obj, offset=None, name=None, timeValue=None, idKey=None)
 
-        Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
+            Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
 
         .. method:: clear()
 
-        Clear all stored data. 
+            Clear all stored data. 
 
         .. method:: freezeIds()
 
-        Temporarily replace are stored keys with a different value. 
+            Temporarily replace are stored keys with a different value. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> oldKeys = aContexts._definedContexts.keys()
-        >>> aContexts.freezeIds()
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> oldKeys = aContexts._definedContexts.keys()
+            >>> aContexts.freezeIds()
+            >>> newKeys = aContexts._definedContexts.keys()
+            >>> oldKeys == newKeys
+            False 
 
         .. method:: get(locationsTrail=False)
 
-        Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The locationsTrail option forces locations to come after all other defined contexts. 
+            Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The locationsTrail option forces locations to come after all other defined contexts. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(cObj, 345)
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.get() == [cObj, aObj, bObj]
-        True 
-        >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> cObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(cObj, 345)
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> aContexts.get() == [cObj, aObj, bObj]
+            True 
+            >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
+            True 
 
         .. method:: getAttrByName(attrName)
 
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+            Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 234
-        >>> bObj = Mock()
-        >>> bObj.attr1 = 98
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> len(aContexts)
-        1 
-        >>> aContexts.getAttrByName('attr1') == 234
-        True 
-        >>> aContexts.removeById(id(aObj))
-        >>> aContexts.add(bObj)
-        >>> aContexts.getAttrByName('attr1') == 98
-        True 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 234
+            >>> bObj = Mock()
+            >>> bObj.attr1 = 98
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> len(aContexts)
+            1 
+            >>> aContexts.getAttrByName('attr1') == 234
+            True 
+            >>> aContexts.removeById(id(aObj))
+            >>> aContexts.add(bObj)
+            >>> aContexts.getAttrByName('attr1') == 98
+            True 
 
         .. method:: getByClass(className, callerFirst=None, memo=None)
 
-        Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
+            Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.getByClass('mock') == aObj
-        True 
-        >>> aContexts.getByClass(Mock) == aObj
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> aContexts.getByClass('mock') == aObj
+            True 
+            >>> aContexts.getByClass(Mock) == aObj
+            True 
 
         .. method:: getById(id)
 
-        Return the object specified by an id. Used for testing and debugging. 
+            Return the object specified by an id. Used for testing and debugging. 
 
         .. method:: getOffsetByObjectMatch(obj)
 
-        For a given object return the offset using a direct object match. 
+            For a given object return the offset using a direct object match. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.getOffsetBySite(aSite)
-        23 
-        >>> aLocations.getOffsetBySite(bSite)
-        121.5 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cParent = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.getOffsetBySite(aSite)
+            23 
+            >>> aLocations.getOffsetBySite(bSite)
+            121.5 
 
         .. method:: getOffsetBySite(site)
 
-        For a given site return its offset. 
+            For a given site return its offset. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.getOffsetBySite(aSite)
-        23 
-        >>> aLocations.getOffsetBySite(bSite)
-        121.5 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cParent = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.getOffsetBySite(aSite)
+            23 
+            >>> aLocations.getOffsetBySite(bSite)
+            121.5 
 
         .. method:: getOffsetBySiteId(siteId)
 
-        For a given site id, return its offset. 
+            For a given site id, return its offset. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.getOffsetBySiteId(id(aSite))
-        23 
-        >>> aLocations.getOffsetBySiteId(id(bSite))
-        121.5 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cParent = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.getOffsetBySiteId(id(aSite))
+            23 
+            >>> aLocations.getOffsetBySiteId(id(bSite))
+            121.5 
 
         .. method:: getOffsets()
 
-        Return a list of all offsets. 
+            Return a list of all offsets. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cSite = Mock()
-        >>> dSite = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 0)
-        >>> aLocations.add(cSite) # a context
-        >>> aLocations.add(bSite, 234) # can add at same offset or another
-        >>> aLocations.add(dSite) # a context
-        >>> aLocations.getOffsets()
-        [0, 234] 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> dSite = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 0)
+            >>> aLocations.add(cSite) # a context
+            >>> aLocations.add(bSite, 234) # can add at same offset or another
+            >>> aLocations.add(dSite) # a context
+            >>> aLocations.getOffsets()
+            [0, 234] 
 
         .. method:: getSiteByOffset(offset)
 
-        For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
+            For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cSite = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 23121.5)
-        >>> aSite == aLocations.getSiteByOffset(23)
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 23121.5)
+            >>> aSite == aLocations.getSiteByOffset(23)
+            True 
 
         .. method:: getSites()
 
-        Get all defined contexts that are locations; unwrap from weakrefs 
+            Get all defined contexts that are locations; unwrap from weakrefs 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj, 234)
-        >>> aContexts.add(bObj, 3000)
-        >>> len(aContexts._locationKeys) == 2
-        True 
-        >>> len(aContexts.getSites()) == 2
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj, 234)
+            >>> aContexts.add(bObj, 3000)
+            >>> len(aContexts._locationKeys) == 2
+            True 
+            >>> len(aContexts.getSites()) == 2
+            True 
 
         .. method:: hasSiteId(site)
 
-        Return True or False if this DefinedContexts object already has this site defined as a location 
+            Return True or False if this DefinedContexts object already has this site defined as a location 
 
         .. method:: remove(site)
 
-        Remove the entry specified by sites 
+            Remove the entry specified by sites 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cSite = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aSite, 23)
-        >>> len(aContexts)
-        1 
-        >>> aContexts.add(bSite, 233)
-        >>> len(aContexts)
-        2 
-        >>> aContexts.add(cSite, 232223)
-        >>> len(aContexts)
-        3 
-        >>> aContexts.remove(aSite)
-        >>> len(aContexts)
-        2 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aSite, 23)
+            >>> len(aContexts)
+            1 
+            >>> aContexts.add(bSite, 233)
+            >>> len(aContexts)
+            2 
+            >>> aContexts.add(cSite, 232223)
+            >>> len(aContexts)
+            3 
+            >>> aContexts.remove(aSite)
+            >>> len(aContexts)
+            2 
 
         .. method:: removeById(idKey)
 
-        No documentation. 
+            No documentation. 
 
         .. method:: setAttrByName(attrName, value)
 
-        Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
+            Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-        >>> class Mock(Music21Object): attr1=234
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> bObj.attr1 = 98
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.setAttrByName('attr1', 'test')
-        >>> aContexts.getAttrByName('attr1') == 'test'
-        True 
+            >>> class Mock(Music21Object): attr1=234
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> bObj.attr1 = 98
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> aContexts.setAttrByName('attr1', 'test')
+            >>> aContexts.getAttrByName('attr1') == 'test'
+            True 
 
         .. method:: setOffsetBySite(site, value)
 
-        Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
+            Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cSite = Mock()
-        >>> aLocations = DefinedContexts()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.setOffsetBySite(aSite, 20)
-        >>> aLocations.getOffsetBySite(aSite)
-        20 
-        >>> aLocations.setOffsetBySite(cSite, 30)
-        Traceback (most recent call last): 
-        RelationsException: ... 
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.setOffsetBySite(aSite, 20)
+            >>> aLocations.getOffsetBySite(aSite)
+            20 
+            >>> aLocations.setOffsetBySite(cSite, 30)
+            Traceback (most recent call last): 
+            RelationsException: ... 
 
         .. method:: unfreezeIds()
 
-        Restore keys to be the id() of the object they contain 
+            Restore keys to be the id() of the object they contain 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.add(cObj, 200) # a location
-        >>> oldKeys = aContexts._definedContexts.keys()
-        >>> oldLocations = aContexts._locationKeys[:]
-        >>> aContexts.freezeIds()
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False 
-        >>> aContexts.unfreezeIds()
-        >>> postKeys = aContexts._definedContexts.keys()
-        >>> postKeys == newKeys
-        False 
-        >>> # restored original ids b/c objs are alive
-        >>> sorted(postKeys) == sorted(oldKeys)
-        True 
-        >>> oldLocations == aContexts._locationKeys
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> cObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> aContexts.add(cObj, 200) # a location
+            >>> oldKeys = aContexts._definedContexts.keys()
+            >>> oldLocations = aContexts._locationKeys[:]
+            >>> aContexts.freezeIds()
+            >>> newKeys = aContexts._definedContexts.keys()
+            >>> oldKeys == newKeys
+            False 
+            >>> aContexts.unfreezeIds()
+            >>> postKeys = aContexts._definedContexts.keys()
+            >>> postKeys == newKeys
+            False 
+            >>> # restored original ids b/c objs are alive
+            >>> sorted(postKeys) == sorted(oldKeys)
+            True 
+            >>> oldLocations == aContexts._locationKeys
+            True 
 
         .. method:: unwrapWeakref()
 
-        Unwrap any and all weakrefs stored. 
+            Unwrap any and all weakrefs stored. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> common.isWeakref(aContexts.get()[0]) # unwrapping happens
-        False 
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
-        True 
-        >>> aContexts.unwrapWeakref()
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
-        False 
-        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
-        False 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> common.isWeakref(aContexts.get()[0]) # unwrapping happens
+            False 
+            >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+            True 
+            >>> aContexts.unwrapWeakref()
+            >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+            False 
+            >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+            False 
 
         .. method:: wrapWeakref()
 
-        Wrap any and all weakrefs stored. 
+            Wrap any and all weakrefs stored. 
 
-        >>> class Mock(Music21Object): pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.unwrapWeakref()
-        >>> aContexts.wrapWeakref()
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
-        True 
-        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
-        True 
+            >>> class Mock(Music21Object): pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aContexts = DefinedContexts()
+            >>> aContexts.add(aObj)
+            >>> aContexts.add(bObj)
+            >>> aContexts.unwrapWeakref()
+            >>> aContexts.wrapWeakref()
+            >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+            True 
+            >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+            True 
 
 
 Groups

@@ -106,78 +106,66 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dl class="attribute">
 <dt id="music21.environment.Environment.modNameParent">
 <tt class="descname">modNameParent</tt><a class="headerlink" href="#music21.environment.Environment.modNameParent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>A string representation of the module that contains this Environment instance.</dd></dl>
 
-<p>A string representation of the module that contains this Environment instance.</p>
 <dl class="attribute">
 <dt id="music21.environment.Environment.ref">
 <tt class="descname">ref</tt><a class="headerlink" href="#music21.environment.Environment.ref" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>The Python dictionary used to store all internal settings.</dd></dl>
 
-<p>The Python dictionary used to store all internal settings.</p>
 </blockquote>
 <p><strong>Environment</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
 <dt id="music21.environment.Environment.read">
 <tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</dd></dl>
 
-<p>Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.write">
 <tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.</dd></dl>
 
-<p>Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.getSettingsPath">
 <tt class="descname">getSettingsPath</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getSettingsPath" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Return the path to the platform specific settings file.</dd></dl>
 
-<p>Return the path to the platform specific settings file.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.getTempDir">
 <tt class="descname">getTempDir</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getTempDir" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Get a temporary directory. Return the user preference if set.</dd></dl>
 
-<p>Get a temporary directory. Return the user preference if set.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.getTempFile">
 <tt class="descname">getTempFile</tt><big>(</big><em>suffix=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.getTempFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Return a file path to a temporary file with the specified suffix</dd></dl>
 
-<p>Return a file path to a temporary file with the specified suffix</p>
 <dl class="method">
 <dt id="music21.environment.Environment.keys">
 <tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.keys" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>No documentation.</dd></dl>
 
-<p>No documentation.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.launch">
 <tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Open a file with an either default or user-specified applications.</dd></dl>
 
-<p>Open a file with an either default or user-specified applications.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.loadDefaults">
 <tt class="descname">loadDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.loadDefaults" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Load defaults. All keys are derived from these defaults.</dd></dl>
 
-<p>Load defaults. All keys are derived from these defaults.</p>
 <dl class="method">
 <dt id="music21.environment.Environment.printDebug">
 <tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</dd></dl>
 
-<p>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</p>
 <dl class="method">
 <dt id="music21.environment.Environment.warn">
 <tt class="descname">warn</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.warn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>To print a warning to the user, send a list of strings to this method.</dd></dl>
 
-<p>To print a warning to the user, send a list of strings to this method.</p>
 </blockquote>
 </dd></dl>
 
@@ -236,7 +224,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 22, 2010.
+      Last updated on Apr 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

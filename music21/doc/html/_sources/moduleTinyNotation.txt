@@ -34,15 +34,15 @@ TinyNotationNote
 
         .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
 
-        No documentation. 
+            No documentation. 
 
         .. method:: customPitchMatch(stringRep, storedDict)
 
-        method to create a note object in sub classes of tiny notation. Should return a Note-like object or None 
+            method to create a note object in sub classes of tiny notation. Should return a Note-like object or None 
 
         .. method:: getDots(stringRep, noteObj)
 
-        subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
+            subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
 
 
 TinyNotationStream
@@ -80,7 +80,7 @@ TinyNotationStream
 
         .. method:: getNote(stringRep, storedDict={})
 
-        called out so as to be subclassable 
+            called out so as to be subclassable 
 
         Methods inherited from :class:`~music21.stream.Stream`: :meth:`~music21.stream.Stream.append`, :meth:`~music21.stream.Stream.insert`, :meth:`~music21.stream.Stream.addGroupForElements`, :meth:`~music21.stream.Stream.allPlayingWhileSounding`, :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`~music21.stream.Stream.attributeCount`, :meth:`~music21.stream.Stream.bestClef`, :meth:`~music21.stream.Stream.extendDuration`, :meth:`~music21.stream.Stream.extractContext`, :meth:`~music21.stream.Stream.findConsecutiveNotes`, :meth:`~music21.stream.Stream.findGaps`, :meth:`~music21.stream.Stream.getClefs`, :meth:`~music21.stream.Stream.getElementAfterElement`, :meth:`~music21.stream.Stream.getElementAfterOffset`, :meth:`~music21.stream.Stream.getElementAtOrAfter`, :meth:`~music21.stream.Stream.getElementAtOrBefore`, :meth:`~music21.stream.Stream.getElementBeforeElement`, :meth:`~music21.stream.Stream.getElementBeforeOffset`, :meth:`~music21.stream.Stream.getElementById`, :meth:`~music21.stream.Stream.getElementsByClass`, :meth:`~music21.stream.Stream.getElementsByGroup`, :meth:`~music21.stream.Stream.getElementsByOffset`, :meth:`~music21.stream.Stream.getInstrument`, :meth:`~music21.stream.Stream.getMeasure`, :meth:`~music21.stream.Stream.getMeasureRange`, :meth:`~music21.stream.Stream.getMeasures`, :meth:`~music21.stream.Stream.getOffsetByElement`, :meth:`~music21.stream.Stream.getOverlaps`, :meth:`~music21.stream.Stream.getSimultaneous`, :meth:`~music21.stream.Stream.getTimeSignatures`, :meth:`~music21.stream.Stream.groupCount`, :meth:`~music21.stream.Stream.groupElementsByOffset`, :meth:`~music21.stream.Stream.index`, :meth:`~music21.stream.Stream.insertAtIndex`, :meth:`~music21.stream.Stream.insertAtNativeOffset`, :meth:`~music21.stream.Stream.isClass`, :meth:`~music21.stream.Stream.isSequence`, :meth:`~music21.stream.Stream.makeBeams`, :meth:`~music21.stream.Stream.makeMeasures`, :meth:`~music21.stream.Stream.makeRests`, :meth:`~music21.stream.Stream.makeTies`, :meth:`~music21.stream.Stream.measureOffsetMap`, :meth:`~music21.stream.Stream.melodicIntervals`, :meth:`~music21.stream.Stream.pitchAttributeCount`, :meth:`~music21.stream.Stream.playingWhenAttacked`, :meth:`~music21.stream.Stream.plot`, :meth:`~music21.stream.Stream.pop`, :meth:`~music21.stream.Stream.repeatAppend`, :meth:`~music21.stream.Stream.repeatInsert`, :meth:`~music21.stream.Stream.setAccidentalVisibility`, :meth:`~music21.stream.Stream.setupPickleScaffold`, :meth:`~music21.stream.Stream.shiftElements`, :meth:`~music21.stream.Stream.simultaneousAttacks`, :meth:`~music21.stream.Stream.splitByClass`, :meth:`~music21.stream.Stream.stripTies`, :meth:`~music21.stream.Stream.teardownPickleScaffold`, :meth:`~music21.stream.Stream.transferOffsetToElements`, :meth:`~music21.stream.Stream.transpose`, :meth:`~music21.stream.Stream.trimPlayingWhileSounding`
 
@@ -129,7 +129,7 @@ HarmonyNote
 
         .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
 
-        checks to see if a note has markup in the form *TEXT* and if so, stores TEXT in the notes editorial.misc[] dictionary object See the demonstration in the docs for class HarmonyLine. 
+            checks to see if a note has markup in the form *TEXT* and if so, stores TEXT in the notes editorial.misc[] dictionary object See the demonstration in the docs for class HarmonyLine. 
 
         Methods inherited from :class:`~music21.tinyNotation.TinyNotationNote`: :meth:`~music21.tinyNotation.TinyNotationNote.customPitchMatch`, :meth:`~music21.tinyNotation.TinyNotationNote.getDots`
 

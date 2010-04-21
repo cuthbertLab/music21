@@ -24,19 +24,19 @@ Chord
 
         .. attribute:: isChord
 
-        Boolean read-only value describing if this object is a Chord. 
+            Boolean read-only value describing if this object is a Chord. 
 
         .. attribute:: isNote
 
-        Boolean read-only value describing if this object is a Chord. 
+            Boolean read-only value describing if this object is a Chord. 
 
         .. attribute:: isRest
 
-        Boolean read-only value describing if this is a Rest. 
+            Boolean read-only value describing if this is a Rest. 
 
         .. attribute:: beams
 
-        A :class:`music21.note.Beams` object. 
+            A :class:`music21.note.Beams` object. 
 
         Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
@@ -48,217 +48,217 @@ Chord
 
         .. attribute:: pitches
 
-        
+            
 
-        
+            
 
         .. attribute:: chordTablesAddress
 
-        
+            
 
-        >>> c = Chord(["C4", "E4", "G#4"])
-        >>> c.chordTablesAddress
-        (3, 12, 0) 
+            >>> c = Chord(["C4", "E4", "G#4"])
+            >>> c.chordTablesAddress
+            (3, 12, 0) 
 
         .. attribute:: commonName
 
-        Get the common name of the TN set class. Possible rename forteIndex 
+            Get the common name of the TN set class. Possible rename forteIndex 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.commonName
-        ['minor triad'] 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.commonName
-        ['major triad'] 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.commonName
+            ['minor triad'] 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.commonName
+            ['major triad'] 
 
         .. attribute:: forteClass
 
-        Return a forte class name 
+            Return a forte class name 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.forteClass
-        '3-11A' 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.forteClass
-        '3-11B' 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.forteClass
+            '3-11A' 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.forteClass
+            '3-11B' 
 
         .. attribute:: forteClassNumber
 
-        Get the Forte class index number. Possible rename forteIndex 
+            Get the Forte class index number. Possible rename forteIndex 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.forteClassNumber
-        11 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.forteClassNumber
-        11 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.forteClassNumber
+            11 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.forteClassNumber
+            11 
 
         .. attribute:: forteClassTn
 
-        Return a forte class name 
+            Return a forte class name 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.forteClass
-        '3-11A' 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.forteClass
-        '3-11B' 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.forteClass
+            '3-11A' 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.forteClass
+            '3-11B' 
 
         .. attribute:: forteClassTnI
 
-        Return a forte class name under TnI classification 
+            Return a forte class name under TnI classification 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.forteClassTnI
-        '3-11' 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.forteClassTnI
-        '3-11' 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.forteClassTnI
+            '3-11' 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.forteClassTnI
+            '3-11' 
 
         .. attribute:: hasZRelation
 
-        Get the Z-relation status 
+            Get the Z-relation status 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.hasZRelation
-        False 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.hasZRelation
-        False 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.hasZRelation
+            False 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.hasZRelation
+            False 
 
         .. attribute:: intervalVector
 
-        Get the Forte class index number. Possible rename forteIndex 
+            Get the Forte class index number. Possible rename forteIndex 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.intervalVector
-        [0, 0, 1, 1, 1, 0] 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.intervalVector
-        [0, 0, 1, 1, 1, 0] 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.intervalVector
+            [0, 0, 1, 1, 1, 0] 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.intervalVector
+            [0, 0, 1, 1, 1, 0] 
 
         .. attribute:: intervalVectorString
 
-        
+            
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.intervalVectorString
-        '<001110>' 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.intervalVectorString
+            '<001110>' 
 
         .. attribute:: isPrimeFormInversion
 
-        Get the Forte class index number. Possible rename forteIndex 
+            Get the Forte class index number. Possible rename forteIndex 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.isPrimeFormInversion
-        False 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.isPrimeFormInversion
-        True 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.isPrimeFormInversion
+            False 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.isPrimeFormInversion
+            True 
 
         .. attribute:: lily
 
-        The name of the note as it would appear in Lilypond format. 
+            The name of the note as it would appear in Lilypond format. 
 
         .. attribute:: multisetCardinality
 
-        Return the number of pitch classes, regardless of redundancy. 
+            Return the number of pitch classes, regardless of redundancy. 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.multisetCardinality
-        4 
+            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> c1.multisetCardinality
+            4 
 
         .. attribute:: mx
 
-        Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
+            Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
 
-        >>> a = Chord()
-        >>> a.quarterLength = 2
-        >>> b = pitch.Pitch('A-')
-        >>> c = pitch.Pitch('D-')
-        >>> d = pitch.Pitch('E-')
-        >>> e = a.pitches = [b, c, d]
-        >>> len(e)
-        3 
-        >>> mxNoteList = a.mx
-        >>> len(mxNoteList) # get three mxNotes
-        3 
-        >>> mxNoteList[0].get('chord')
-        False 
-        >>> mxNoteList[1].get('chord')
-        True 
-        >>> mxNoteList[2].get('chord')
-        True 
+            >>> a = Chord()
+            >>> a.quarterLength = 2
+            >>> b = pitch.Pitch('A-')
+            >>> c = pitch.Pitch('D-')
+            >>> d = pitch.Pitch('E-')
+            >>> e = a.pitches = [b, c, d]
+            >>> len(e)
+            3 
+            >>> mxNoteList = a.mx
+            >>> len(mxNoteList) # get three mxNotes
+            3 
+            >>> mxNoteList[0].get('chord')
+            False 
+            >>> mxNoteList[1].get('chord')
+            True 
+            >>> mxNoteList[2].get('chord')
+            True 
 
         .. attribute:: normalForm
 
-        
+            
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.normalForm
-        [0, 3, 7] 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.normalForm
-        [0, 4, 7] 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.normalForm
+            [0, 3, 7] 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.normalForm
+            [0, 4, 7] 
 
         .. attribute:: normalFormString
 
-        
+            
 
-        >>> c1 = Chord(['f#', 'e-', 'g'])
-        >>> c1.normalFormString
-        '<034>' 
+            >>> c1 = Chord(['f#', 'e-', 'g'])
+            >>> c1.normalFormString
+            '<034>' 
 
         .. attribute:: orderedPitchClasses
 
-        Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
+            Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.orderedPitchClasses
-        [2, 6, 9] 
+            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> c1.orderedPitchClasses
+            [2, 6, 9] 
 
         .. attribute:: orderedPitchClassesString
 
-        
+            
 
-        >>> c1 = Chord(['f#', 'e-', 'g'])
-        >>> c1.orderedPitchClassesString
-        '<367>' 
+            >>> c1 = Chord(['f#', 'e-', 'g'])
+            >>> c1.orderedPitchClassesString
+            '<367>' 
 
         .. attribute:: pitchClassCardinality
 
-        Return the number of unique pitch classes 
+            Return the number of unique pitch classes 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.pitchClassCardinality
-        3 
+            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> c1.pitchClassCardinality
+            3 
 
         .. attribute:: pitchClasses
 
-        Return a pitch class representation ordered as the original chord. 
+            Return a pitch class representation ordered as the original chord. 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.pitchClasses
-        [2, 9, 6, 2] 
+            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> c1.pitchClasses
+            [2, 9, 6, 2] 
 
         .. attribute:: pitchedCommonName
 
-        Get the common name of the TN set class. Possible rename forteIndex 
+            Get the common name of the TN set class. Possible rename forteIndex 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.pitchedCommonName
-        'C-minor triad' 
-        >>> c2 = Chord(['c', 'e', 'g'])
-        >>> c2.pitchedCommonName
-        'C-major triad' 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.pitchedCommonName
+            'C-minor triad' 
+            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2.pitchedCommonName
+            'C-major triad' 
 
         .. attribute:: primeForm
 
-        Return a representation of the Chord as a prime-form list of pitch class integers. 
+            Return a representation of the Chord as a prime-form list of pitch class integers. 
 
         .. attribute:: primeFormString
 
-        Return a representation of the Chord as a prime-form set class string. 
+            Return a representation of the Chord as a prime-form set class string. 
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`, :attr:`~music21.note.GeneralNote.quarterLength`
 
@@ -268,376 +268,376 @@ Chord
 
         .. method:: areZRelations(other)
 
-        Check of chord other is also a z relations 
+            Check of chord other is also a z relations 
 
-        >>> c1 = Chord(["C", "c#", "e", "f#"])
-        >>> c2 = Chord(["C", "c#", "e-", "g"])
-        >>> c3 = Chord(["C", "c#", "f#", "g"])
-        >>> c1.areZRelations(c2)
-        True 
-        >>> c1.areZRelations(c3)
-        False 
+            >>> c1 = Chord(["C", "c#", "e", "f#"])
+            >>> c2 = Chord(["C", "c#", "e-", "g"])
+            >>> c3 = Chord(["C", "c#", "f#", "g"])
+            >>> c1.areZRelations(c2)
+            True 
+            >>> c1.areZRelations(c3)
+            False 
 
         .. method:: bass(newbass=0)
 
-        returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example: 
+            returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example: 
 
-        >>> cmaj = Chord(['C', 'E', 'G'])
-        >>> cmaj.bass() # returns C
-        C 
+            >>> cmaj = Chord(['C', 'E', 'G'])
+            >>> cmaj.bass() # returns C
+            C 
 
         .. method:: canBeDominantV()
 
-        
+            
 
-        
+            
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
-        >>> a.canBeDominantV()
-        True 
+            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a.canBeDominantV()
+            True 
 
         .. method:: canBeTonic()
 
-        
+            
 
-        
+            
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
-        >>> a.canBeTonic()
-        False 
-        >>> a = Chord(['g', 'b', 'd'])
-        >>> a.canBeTonic()
-        True 
+            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a.canBeTonic()
+            False 
+            >>> a = Chord(['g', 'b', 'd'])
+            >>> a.canBeTonic()
+            True 
 
         .. method:: checkDurationSanity()
 
-        TO WRITE Checks to make sure all notes have the same duration Does not run automatically 
+            TO WRITE Checks to make sure all notes have the same duration Does not run automatically 
 
         .. method:: closedPosition()
 
-        returns a new Chord object with the same pitch classes, but now in closed position 
+            returns a new Chord object with the same pitch classes, but now in closed position 
 
-        >>> chord1 = Chord(["C#4", "G5", "E6"])
-        >>> chord2 = chord1.closedPosition()
-        >>> print(chord2.lily.value)
-        <cis' e' g'>4 
+            >>> chord1 = Chord(["C#4", "G5", "E6"])
+            >>> chord2 = chord1.closedPosition()
+            >>> print(chord2.lily.value)
+            <cis' e' g'>4 
 
         .. method:: containsSeventh()
 
-        returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can't be determined 
+            returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can't be determined 
 
-        >>> cchord = Chord (['C', 'E', 'G', 'B'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
-        >>> cchord.containsSeventh() # returns True
-        True 
-        >>> other.containsSeventh() # returns True
-        True 
+            >>> cchord = Chord (['C', 'E', 'G', 'B'])
+            >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+            >>> cchord.containsSeventh() # returns True
+            True 
+            >>> other.containsSeventh() # returns True
+            True 
 
         .. method:: containsTriad()
 
-        returns True or False if there is no triad above the root. "Contains vs. Is": A dominant-seventh chord contains a triad. example: 
+            returns True or False if there is no triad above the root. "Contains vs. Is": A dominant-seventh chord contains a triad. example: 
 
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
-        >>> cchord.containsTriad() #returns True
-        True 
-        >>> other.containsTriad() #returns True
-        True 
+            >>> cchord = Chord (['C', 'E', 'G'])
+            >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+            >>> cchord.containsTriad() #returns True
+            True 
+            >>> other.containsTriad() #returns True
+            True 
 
         .. method:: determineType()
 
-        returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? 
+            returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? 
 
-        >>> a = Chord(['a', 'c#', 'e'])
-        >>> a.determineType()
-        'Major Triad' 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
-        >>> a.determineType()
-        'Dominant Seventh' 
+            >>> a = Chord(['a', 'c#', 'e'])
+            >>> a.determineType()
+            'Major Triad' 
+            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a.determineType()
+            'Dominant Seventh' 
 
         .. method:: duration(newDur=0)
 
-        Duration of the chord can be defined here OR it should return the duration of the first note of the chord 
+            Duration of the chord can be defined here OR it should return the duration of the first note of the chord 
 
         .. method:: findBass()
 
-        Returns the lowest note in the chord The only time findBass should be called is by bass() when it is figuring out what the bass note of the chord is. Generally call bass() instead example: 
+            Returns the lowest note in the chord The only time findBass should be called is by bass() when it is figuring out what the bass note of the chord is. Generally call bass() instead example: 
 
-        >>> cmaj = Chord (['C4', 'E3', 'G4'])
-        >>> cmaj.findBass() # returns E3
-        E3 
+            >>> cmaj = Chord (['C4', 'E3', 'G4'])
+            >>> cmaj.findBass() # returns E3
+            E3 
 
         .. method:: findRoot()
 
-        Looks for the root by finding the note with the most 3rds above it Generally use root() instead, since if a chord doesn't know its root, root() will run findRoot() automatically. example: 
+            Looks for the root by finding the note with the most 3rds above it Generally use root() instead, since if a chord doesn't know its root, root() will run findRoot() automatically. example: 
 
-        >>> cmaj = Chord (['C', 'E', 'G'])
-        >>> cmaj.findRoot() # returns C
-        C 
+            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> cmaj.findRoot() # returns C
+            C 
 
         .. method:: hasAnyRepeatedScale(testRoot=None)
 
-        Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example: 
+            Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example: 
 
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
-        >>> other = Chord (['C', 'E', 'F-', 'G'])
-        >>> cchord.hasAnyRepeatedScale()
-        True 
-        >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
-        False 
+            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+            >>> other = Chord (['C', 'E', 'F-', 'G'])
+            >>> cchord.hasAnyRepeatedScale()
+            True 
+            >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
+            False 
 
         .. method:: hasFifth(testRoot=None)
 
-        Shortcut for hasScaleX(5) 
+            Shortcut for hasScaleX(5) 
 
         .. method:: hasRepeatedScaleX(scaleDeg, testRoot=None)
 
-        Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example: 
+            Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example: 
 
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
-        >>> cchord.hasRepeatedScaleX(3) # returns true
-        True 
+            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+            >>> cchord.hasRepeatedScaleX(3) # returns true
+            True 
 
         .. method:: hasScaleX(scaleDegree, testRoot=None)
 
-        Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., "c" => "e----"), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we're using "Scale" to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example: 
+            Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., "c" => "e----"), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we're using "Scale" to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example: 
 
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
-        >>> cchord.hasScaleX(3) #
-        4 
-        >>> cchord.hasScaleX(5) # will return 7
-        7 
-        >>> cchord.hasScaleX(6) # will return False
-        False 
+            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+            >>> cchord.hasScaleX(3) #
+            4 
+            >>> cchord.hasScaleX(5) # will return 7
+            7 
+            >>> cchord.hasScaleX(6) # will return False
+            False 
 
         .. method:: hasSeventh(testRoot=None)
 
-        Shortcut for hasScaleX(7) 
+            Shortcut for hasScaleX(7) 
 
         .. method:: hasSpecificX(scaleDegree, testRoot=None)
 
-        Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example: 
+            Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example: 
 
-        >>> cmaj = Chord (['C', 'E', 'G'])
-        >>> cmaj.hasScaleX(3) #will return the interval between C and E
-        4 
-        >>> cmaj.hasScaleX(5) #will return the interval between C and G
-        7 
-        >>> cmaj.hasScaleX(6) #will return False
-        False 
+            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> cmaj.hasScaleX(3) #will return the interval between C and E
+            4 
+            >>> cmaj.hasScaleX(5) #will return the interval between C and G
+            7 
+            >>> cmaj.hasScaleX(6) #will return False
+            False 
 
         .. method:: hasThird(testRoot=None)
 
-        Shortcut for hasScaleX(3) 
+            Shortcut for hasScaleX(3) 
 
         .. method:: inversion()
 
-        returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root. 
+            returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root. 
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
-        >>> a.inversion()
-        2 
+            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a.inversion()
+            2 
 
         .. method:: inversionName()
 
-        Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None. 
+            Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None. 
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
-        >>> a.inversionName()
-        43 
+            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a.inversionName()
+            43 
 
         .. method:: isAugmentedTriad()
 
-        Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. 
+            Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. 
 
-        >>> import music21.chord
-        >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
-        >>> c.isAugmentedTriad()
-        True 
-        >>> c = music21.chord.Chord(["C4", "E4", "G4"])
-        >>> c.isAugmentedTriad()
-        False 
-        Other spellings will give other roots! 
-        >>> c = music21.chord.Chord(["C4", "E4", "A-4"])
-        >>> c.isAugmentedTriad()
-        True 
-        >>> c.root()
-        A-4 
-        >>> c = music21.chord.Chord(["C4", "F-4", "A-4"])
-        >>> c.isAugmentedTriad()
-        True 
-        >>> c = music21.chord.Chord(["B#4", "F-4", "A-4"])
-        >>> c.isAugmentedTriad()
-        False 
+            >>> import music21.chord
+            >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
+            >>> c.isAugmentedTriad()
+            True 
+            >>> c = music21.chord.Chord(["C4", "E4", "G4"])
+            >>> c.isAugmentedTriad()
+            False 
+            Other spellings will give other roots! 
+            >>> c = music21.chord.Chord(["C4", "E4", "A-4"])
+            >>> c.isAugmentedTriad()
+            True 
+            >>> c.root()
+            A-4 
+            >>> c = music21.chord.Chord(["C4", "F-4", "A-4"])
+            >>> c.isAugmentedTriad()
+            True 
+            >>> c = music21.chord.Chord(["B#4", "F-4", "A-4"])
+            >>> c.isAugmentedTriad()
+            False 
 
         .. method:: isDiminishedSeventh()
 
-        Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
+            Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-        >>> a = Chord(['c', 'e-', 'g-', 'b--'])
-        >>> a.isDiminishedSeventh()
-        True 
+            >>> a = Chord(['c', 'e-', 'g-', 'b--'])
+            >>> a.isDiminishedSeventh()
+            True 
 
         .. method:: isDiminishedTriad()
 
-        Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
+            Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-        >>> cchord = Chord (['C', 'E-', 'G-'])
-        >>> other = Chord (['C', 'E-', 'F#'])
-        >>> cchord.isDiminishedTriad() #returns True
-        True 
-        >>> other.isDiminishedTriad() #returns False
-        False 
+            >>> cchord = Chord (['C', 'E-', 'G-'])
+            >>> other = Chord (['C', 'E-', 'F#'])
+            >>> cchord.isDiminishedTriad() #returns True
+            True 
+            >>> other.isDiminishedTriad() #returns False
+            False 
 
         .. method:: isDominantSeventh()
 
-        Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
+            Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-        >>> a = Chord(['b', 'g', 'd', 'f'])
-        >>> a.isDominantSeventh()
-        True 
+            >>> a = Chord(['b', 'g', 'd', 'f'])
+            >>> a.isDominantSeventh()
+            True 
 
         .. method:: isFalseDiminishedSeventh()
 
-        Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false. 
+            Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false. 
 
         .. method:: isHalfDiminishedSeventh()
 
-        Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root. Chord must be spelled correctly. Otherwise returns false. 
+            Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-        >>> c1 = Chord(['C4','E-4','G-4','B-4'])
-        >>> c1.isHalfDiminishedSeventh()
-        True 
-        Incorrectly spelled chords are not considered half-diminished sevenths 
-        >>> c2 = Chord(['C4','E-4','G-4','A#4'])
-        >>> c2.isHalfDiminishedSeventh()
-        False 
-        Nor are incomplete chords 
-        >>> c3 = Chord(['C4', 'G-4','B-4'])
-        >>> c3.isHalfDiminishedSeventh()
-        False 
+            >>> c1 = Chord(['C4','E-4','G-4','B-4'])
+            >>> c1.isHalfDiminishedSeventh()
+            True 
+            Incorrectly spelled chords are not considered half-diminished sevenths 
+            >>> c2 = Chord(['C4','E-4','G-4','A#4'])
+            >>> c2.isHalfDiminishedSeventh()
+            False 
+            Nor are incomplete chords 
+            >>> c3 = Chord(['C4', 'G-4','B-4'])
+            >>> c3.isHalfDiminishedSeventh()
+            False 
 
         .. method:: isMajorTriad()
 
-        Returns True if chord is a Major Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
+            Returns True if chord is a Major Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
 
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'G'])
-        >>> cchord.isMajorTriad() # returns True
-        True 
-        >>> other.isMajorTriad() # returns False
-        False 
+            >>> cchord = Chord (['C', 'E', 'G'])
+            >>> other = Chord (['C', 'G'])
+            >>> cchord.isMajorTriad() # returns True
+            True 
+            >>> other.isMajorTriad() # returns False
+            False 
 
         .. method:: isMinorTriad()
 
-        Returns True if chord is a Minor Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
+            Returns True if chord is a Minor Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
 
-        >>> cchord = Chord (['C', 'E-', 'G'])
-        >>> other = Chord (['C', 'E', 'G'])
-        >>> cchord.isMinorTriad() # returns True
-        True 
-        >>> other.isMinorTriad() # returns False
-        False 
+            >>> cchord = Chord (['C', 'E-', 'G'])
+            >>> other = Chord (['C', 'E', 'G'])
+            >>> cchord.isMinorTriad() # returns True
+            True 
+            >>> other.isMinorTriad() # returns False
+            False 
 
         .. method:: isSeventh()
 
-        Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example: 
+            Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example: 
 
-        >>> cchord = Chord (['C', 'E', 'G', 'B'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
-        >>> cchord.isSeventh() # returns True
-        True 
-        >>> other.isSeventh() # returns False
-        False 
+            >>> cchord = Chord (['C', 'E', 'G', 'B'])
+            >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+            >>> cchord.isSeventh() # returns True
+            True 
+            >>> other.isSeventh() # returns False
+            False 
 
         .. method:: isTriad()
 
-        returns True or False "Contains vs. Is:" A dominant-seventh chord is NOT a triad. returns True if the chord contains at least one Third and one Fifth and all notes are equivalent to either of those notes. Only returns True if triad is spelled correctly. example: 
+            returns True or False "Contains vs. Is:" A dominant-seventh chord is NOT a triad. returns True if the chord contains at least one Third and one Fifth and all notes are equivalent to either of those notes. Only returns True if triad is spelled correctly. example: 
 
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
-        >>> cchord.isTriad() # returns True
-        True 
-        >>> other.isTriad()
-        False 
+            >>> cchord = Chord (['C', 'E', 'G'])
+            >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+            >>> cchord.isTriad() # returns True
+            True 
+            >>> other.isTriad()
+            False 
 
         .. method:: numNotes()
 
-        Returns the number of notes in the chord 
+            Returns the number of notes in the chord 
 
         .. method:: root(newroot=False)
 
-        Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example: 
+            Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example: 
 
-        >>> cmaj = Chord (['C', 'E', 'G'])
-        >>> cmaj.root() # returns C
-        C 
+            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> cmaj.root() # returns C
+            C 
 
         .. method:: seekChordTablesAddress()
 
-        Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary. 
+            Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary. 
 
-        >>> c1 = Chord(['c3'])
-        >>> c1.orderedPitchClasses
-        [0] 
-        >>> c1.seekChordTablesAddress()
-        (1, 1, 0) 
-        >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
-        >>> c1.seekChordTablesAddress()
-        (11, 1, 0) 
-        >>> c1 = Chord(['c', 'e', 'g'])
-        >>> c1.seekChordTablesAddress()
-        (3, 11, -1) 
-        >>> c1 = Chord(['c', 'e-', 'g'])
-        >>> c1.seekChordTablesAddress()
-        (3, 11, 1) 
-        >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
-        >>> c1.seekChordTablesAddress()
-        (7, 34, 0) 
-        >>> c1 = Chord(['c', 'c#', 'd'])
-        >>> c1.seekChordTablesAddress()
-        (3, 1, 0) 
+            >>> c1 = Chord(['c3'])
+            >>> c1.orderedPitchClasses
+            [0] 
+            >>> c1.seekChordTablesAddress()
+            (1, 1, 0) 
+            >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
+            >>> c1.seekChordTablesAddress()
+            (11, 1, 0) 
+            >>> c1 = Chord(['c', 'e', 'g'])
+            >>> c1.seekChordTablesAddress()
+            (3, 11, -1) 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.seekChordTablesAddress()
+            (3, 11, 1) 
+            >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+            >>> c1.seekChordTablesAddress()
+            (7, 34, 0) 
+            >>> c1 = Chord(['c', 'c#', 'd'])
+            >>> c1.seekChordTablesAddress()
+            (3, 1, 0) 
 
         .. method:: semiClosedPosition()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: sortAscending()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: sortChromaticAscending()
 
-        Same as sortAscending but notes are sorted by midi number, so F## sorts above G-. 
+            Same as sortAscending but notes are sorted by midi number, so F## sorts above G-. 
 
         .. method:: sortDiatonicAscending()
 
-        After talking with Daniel Jackson, let's try to make the chord object as immutable as possible, so we return a new Chord object with the notes arranged from lowest to highest The notes are sorted by Scale degree and then by Offset (so F## sorts below G-). Notes that are the identical pitch retain their order 
+            After talking with Daniel Jackson, let's try to make the chord object as immutable as possible, so we return a new Chord object with the notes arranged from lowest to highest The notes are sorted by Scale degree and then by Offset (so F## sorts below G-). Notes that are the identical pitch retain their order 
 
-        >>> cMajUnsorted = Chord(['E4', 'C4', 'G4'])
-        >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
-        >>> cMajSorted.pitches[0].name
-        'C' 
+            >>> cMajUnsorted = Chord(['E4', 'C4', 'G4'])
+            >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
+            >>> cMajSorted.pitches[0].name
+            'C' 
 
         .. method:: sortFrequencyAscending()
 
-        Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
+            Same as above, but uses a note's frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types. 
 
         .. method:: transpose(value, inPlace=False)
 
-        Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
+            Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
-        >>> a = Chord(['g4', 'a3', 'c#6'])
-        >>> b = a.transpose('m3')
-        >>> b
-        <music21.chord.Chord B-4 C4 E6> 
-        >>> aInterval = interval.Interval(-6)
-        >>> b = a.transpose(aInterval)
-        >>> b
-        <music21.chord.Chord C#4 D#3 F##5> 
-        >>> a.transpose(aInterval, inPlace=True)
-        >>> a
-        <music21.chord.Chord C#4 D#3 F##5> 
+            >>> a = Chord(['g4', 'a3', 'c#6'])
+            >>> b = a.transpose('m3')
+            >>> b
+            <music21.chord.Chord B-4 C4 E6> 
+            >>> aInterval = interval.Interval(-6)
+            >>> b = a.transpose(aInterval)
+            >>> b
+            <music21.chord.Chord C#4 D#3 F##5> 
+            >>> a.transpose(aInterval, inPlace=True)
+            >>> a
+            <music21.chord.Chord C#4 D#3 F##5> 
 
         Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 

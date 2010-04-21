@@ -12,122 +12,122 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
 .. function:: convertFqToPs(fq)
 
-Utility conversion; does not process internals. Assumes A4 = 440 Hz 
+    Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
->>> convertFqToPs(440)
-69.0 
->>> convertFqToPs(261.62556530059862)
-60.0 
+    >>> convertFqToPs(440)
+    69.0 
+    >>> convertFqToPs(261.62556530059862)
+    60.0 
 
 .. function:: convertNameToPitchClass(pitchName)
 
-Utility conversion: from a pitch name to a pitch class integer between 0 and 11. 
+    Utility conversion: from a pitch name to a pitch class integer between 0 and 11. 
 
->>> convertNameToPitchClass('c4')
-0 
->>> convertNameToPitchClass('c#')
-1 
->>> convertNameToPitchClass('d-')
-1 
->>> convertNameToPitchClass('e--')
-2 
->>> convertNameToPitchClass('b2##')
-1 
+    >>> convertNameToPitchClass('c4')
+    0 
+    >>> convertNameToPitchClass('c#')
+    1 
+    >>> convertNameToPitchClass('d-')
+    1 
+    >>> convertNameToPitchClass('e--')
+    2 
+    >>> convertNameToPitchClass('b2##')
+    1 
 
 .. function:: convertNameToPs(pitchName)
 
-Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values). 
+    Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values). 
 
->>> convertNameToPs('c4')
-60 
->>> convertNameToPs('c2#')
-37.0 
->>> convertNameToPs('d7-')
-97.0 
->>> convertNameToPs('e1--')
-26.0 
->>> convertNameToPs('b2##')
-49.0 
+    >>> convertNameToPs('c4')
+    60 
+    >>> convertNameToPs('c2#')
+    37.0 
+    >>> convertNameToPs('d7-')
+    97.0 
+    >>> convertNameToPs('e1--')
+    26.0 
+    >>> convertNameToPs('b2##')
+    49.0 
 
 .. function:: convertPitchClassToNumber(ps)
 
-Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation. 
+    Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation. 
 
->>> convertPitchClassToNumber(3)
-3 
->>> convertPitchClassToNumber('a')
-10 
->>> convertPitchClassToNumber('B')
-11 
+    >>> convertPitchClassToNumber(3)
+    3 
+    >>> convertPitchClassToNumber('a')
+    10 
+    >>> convertPitchClassToNumber('B')
+    11 
 
 .. function:: convertPitchClassToStr(pc)
 
-Given a pitch class number, return a string. 
+    Given a pitch class number, return a string. 
 
->>> convertPitchClassToStr(3)
-'3' 
->>> convertPitchClassToStr(10)
-'A' 
+    >>> convertPitchClassToStr(3)
+    '3' 
+    >>> convertPitchClassToStr(10)
+    'A' 
 
 .. function:: convertPsToFq(ps)
 
-Utility conversion; does not process internals. Assumes A4 = 440 Hz 
+    Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
->>> convertPsToFq(69)
-440.0 
->>> convertPsToFq(60)
-261.62556530059862 
->>> convertPsToFq(2)
-9.1770239974189884 
->>> convertPsToFq(135)
-19912.126958213179 
+    >>> convertPsToFq(69)
+    440.0 
+    >>> convertPsToFq(60)
+    261.62556530059862 
+    >>> convertPsToFq(2)
+    9.1770239974189884 
+    >>> convertPsToFq(135)
+    19912.126958213179 
 
 .. function:: convertPsToOct(ps)
 
-Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
+    Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
 
->>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
-[3, 4, 4] 
->>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
-[0, -1, -2] 
->>> convertPsToOct(135)
-10 
+    >>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
+    [3, 4, 4] 
+    >>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
+    [0, -1, -2] 
+    >>> convertPsToOct(135)
+    10 
 
 .. function:: convertPsToStep(ps)
 
-Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
+    Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
 
->>> convertPsToStep(60)
-('C', <accidental natural>) 
->>> convertPsToStep(66)
-('F', <accidental sharp>) 
->>> convertPsToStep(67)
-('G', <accidental natural>) 
->>> convertPsToStep(68)
-('G', <accidental sharp>) 
->>> convertPsToStep(-2)
-('A', <accidental sharp>) 
->>> convertPsToStep(60.5)
-('C', <accidental half-sharp>) 
->>> convertPsToStep(61.5)
-('C', <accidental one-and-a-half-sharp>) 
->>> convertPsToStep(62)
-('D', <accidental natural>) 
->>> convertPsToStep(62.5)
-('D', <accidental half-sharp>) 
->>> convertPsToStep(135)
-('D', <accidental sharp>) 
+    >>> convertPsToStep(60)
+    ('C', <accidental natural>) 
+    >>> convertPsToStep(66)
+    ('F', <accidental sharp>) 
+    >>> convertPsToStep(67)
+    ('G', <accidental natural>) 
+    >>> convertPsToStep(68)
+    ('G', <accidental sharp>) 
+    >>> convertPsToStep(-2)
+    ('A', <accidental sharp>) 
+    >>> convertPsToStep(60.5)
+    ('C', <accidental half-sharp>) 
+    >>> convertPsToStep(61.5)
+    ('C', <accidental one-and-a-half-sharp>) 
+    >>> convertPsToStep(62)
+    ('D', <accidental natural>) 
+    >>> convertPsToStep(62.5)
+    ('D', <accidental half-sharp>) 
+    >>> convertPsToStep(135)
+    ('D', <accidental sharp>) 
 
 .. function:: convertStepToPs(step, oct, acc=None)
 
-Utility conversion; does not process internals. 
+    Utility conversion; does not process internals. 
 
->>> convertStepToPs('c', 4, 1)
-61 
->>> convertStepToPs('d', 2, -2)
-36 
->>> convertStepToPs('b', 3, 3)
-62 
+    >>> convertStepToPs('c', 4, 1)
+    61 
+    >>> convertStepToPs('d', 2, -2)
+    36 
+    >>> convertStepToPs('b', 3, 3)
+    62 
 
 Pitch
 -----
@@ -157,177 +157,177 @@ Pitch
 
         .. attribute:: name
 
-        Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
+            Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
 
-        >>> a = Pitch('G#')
-        >>> a.name
-        'G#' 
+            >>> a = Pitch('G#')
+            >>> a.name
+            'G#' 
 
         .. attribute:: nameWithOctave
 
-        Returns pitch name with octave Perhaps better default action for getName 
+            Returns pitch name with octave Perhaps better default action for getName 
 
-        >>> a = Pitch('G#4')
-        >>> a.nameWithOctave
-        'G#4' 
+            >>> a = Pitch('G#4')
+            >>> a.nameWithOctave
+            'G#4' 
 
         .. attribute:: step
 
-        
+            
 
-        >>> a = Pitch('C#3')
-        >>> a._getStep()
-        'C' 
+            >>> a = Pitch('C#3')
+            >>> a._getStep()
+            'C' 
 
         .. attribute:: pitchClass
 
-        
+            
 
-        >>> a = Pitch('a3')
-        >>> a._getPitchClass()
-        9 
-        >>> dis = Pitch('d3')
-        >>> dis.pitchClass
-        2 
-        >>> dis.accidental = Accidental("#")
-        >>> dis.pitchClass
-        3 
-        >>> dis.pitchClass = 11
-        >>> dis.pitchClass
-        11 
-        >>> dis.name
-        'B' 
+            >>> a = Pitch('a3')
+            >>> a._getPitchClass()
+            9 
+            >>> dis = Pitch('d3')
+            >>> dis.pitchClass
+            2 
+            >>> dis.accidental = Accidental("#")
+            >>> dis.pitchClass
+            3 
+            >>> dis.pitchClass = 11
+            >>> dis.pitchClass
+            11 
+            >>> dis.name
+            'B' 
 
         .. attribute:: octave
 
-        returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
+            returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
 
-        >>> a = Pitch('g')
-        >>> a.octave is None
-        True 
-        >>> a.implicitOctave
-        4 
-        >>> a.ps  ## will use implicitOctave
-        67 
-        >>> a.name
-        'G' 
-        >>> a.octave = 14
-        >>> a.implicitOctave
-        14 
-        >>> a.name
-        'G' 
-        >>> a.ps
-        187 
+            >>> a = Pitch('g')
+            >>> a.octave is None
+            True 
+            >>> a.implicitOctave
+            4 
+            >>> a.ps  ## will use implicitOctave
+            67 
+            >>> a.name
+            'G' 
+            >>> a.octave = 14
+            >>> a.implicitOctave
+            14 
+            >>> a.name
+            'G' 
+            >>> a.ps
+            187 
 
         .. attribute:: midi
 
-        midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
+            midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
 
         .. attribute:: accidental
 
-        
+            
 
-        >>> a = Pitch('D-2')
-        >>> a.accidental.alter
-        -1.0 
+            >>> a = Pitch('D-2')
+            >>> a.accidental.alter
+            -1.0 
 
         .. attribute:: diatonicNoteNum
 
-        Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
+            Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
 
-        >>> c = Pitch('c4')
-        >>> c.diatonicNoteNum
-        29 
-        >>> c = Pitch('c#4')
-        >>> c.diatonicNoteNum
-        29 
-        >>> d = Pitch('d--4')
-        >>> d.accidental.name
-        'double-flat' 
-        >>> d.diatonicNoteNum
-        30 
-        >>> b = Pitch()
-        >>> b.step = "B"
-        >>> b.octave = -1
-        >>> b.diatonicNoteNum
-        0 
-        >>> c = Pitch("C")
-        >>> c.diatonicNoteNum  #implicitOctave
-        29 
+            >>> c = Pitch('c4')
+            >>> c.diatonicNoteNum
+            29 
+            >>> c = Pitch('c#4')
+            >>> c.diatonicNoteNum
+            29 
+            >>> d = Pitch('d--4')
+            >>> d.accidental.name
+            'double-flat' 
+            >>> d.diatonicNoteNum
+            30 
+            >>> b = Pitch()
+            >>> b.step = "B"
+            >>> b.octave = -1
+            >>> b.diatonicNoteNum
+            0 
+            >>> c = Pitch("C")
+            >>> c.diatonicNoteNum  #implicitOctave
+            29 
 
         .. attribute:: freq440
 
-        
+            
 
-        >>> a = Pitch('A4')
-        >>> a.freq440
-        440.0 
+            >>> a = Pitch('A4')
+            >>> a.freq440
+            440.0 
 
         .. attribute:: frequency
 
-        The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
+            The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament 
 
         .. attribute:: german
 
-        returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
+            returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
 
-        >>> print Pitch('B-').german
-        B 
-        >>> print Pitch('B').german
-        H 
-        >>> print Pitch('E-').german
-        Es 
-        >>> print Pitch('C#').german
-        Cis 
-        >>> print Pitch('A--').german
-        Ases 
-        >>> p1 = Pitch('C')
-        >>> p1.accidental = Accidental('half-sharp')
-        >>> p1.german
-        Traceback (most recent call last): 
-        PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade! 
+            >>> print Pitch('B-').german
+            B 
+            >>> print Pitch('B').german
+            H 
+            >>> print Pitch('E-').german
+            Es 
+            >>> print Pitch('C#').german
+            Cis 
+            >>> print Pitch('A--').german
+            Ases 
+            >>> p1 = Pitch('C')
+            >>> p1.accidental = Accidental('half-sharp')
+            >>> p1.german
+            Traceback (most recent call last): 
+            PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade! 
 
         .. attribute:: implicitOctave
 
-        returns the octave of the Pitch, or defaultOctave if octave was never set 
+            returns the octave of the Pitch, or defaultOctave if octave was never set 
 
         .. attribute:: musicxml
 
-        Provide a complete MusicXML representation. Presently, this is based on 
+            Provide a complete MusicXML representation. Presently, this is based on 
 
         .. attribute:: mx
 
-        returns a musicxml.Note() object 
+            returns a musicxml.Note() object 
 
-        >>> a = Pitch('g#4')
-        >>> c = a.mx
-        >>> c.get('pitch').get('step')
-        'G' 
+            >>> a = Pitch('g#4')
+            >>> c = a.mx
+            >>> c.get('pitch').get('step')
+            'G' 
 
         .. attribute:: pitchClassString
 
-        Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
+            Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
 
-        >>> a = Pitch('a3')
-        >>> a.pitchClassString = 'B'
-        >>> a.pitchClass
-        11 
-        >>> a.pitchClassString
-        'B' 
+            >>> a = Pitch('a3')
+            >>> a.pitchClassString = 'B'
+            >>> a.pitchClass
+            11 
+            >>> a.pitchClassString
+            'B' 
 
         .. attribute:: ps
 
-        The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
+            The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
 
-        >>> a = Pitch()
-        >>> a.ps = 45
-        >>> a
-        A2 
-        >>> a.ps = 60
-        >>> a
-        C4 
+            >>> a = Pitch()
+            >>> a.ps = 45
+            >>> a
+            A2 
+            >>> a.ps = 60
+            >>> a
+            C4 
 
-        
+            
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -335,35 +335,35 @@ Pitch
 
         .. method:: inheritDisplay(other)
 
-        Inherit display properties from another Pitch, including those found on the Accidental object. 
+            Inherit display properties from another Pitch, including those found on the Accidental object. 
 
-        >>>
-        >>> a = Pitch('c#')
-        >>> a.accidental.displayType = 'always'
-        >>> b = Pitch('c-')
-        >>> b.inheritDisplay(a)
-        >>> b.accidental.displayType
-        'always' 
+            >>>
+            >>> a = Pitch('c#')
+            >>> a.accidental.displayType = 'always'
+            >>> b = Pitch('c-')
+            >>> b.inheritDisplay(a)
+            >>> b.accidental.displayType
+            'always' 
 
-        
+            
 
         .. method:: transpose(value, inPlace=False)
 
-        Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
+            Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
-        >>> aPitch = Pitch('g4')
-        >>> bPitch = aPitch.transpose('m3')
-        >>> bPitch
-        B-4 
-        >>> aInterval = interval.Interval(-6)
-        >>> bPitch = aPitch.transpose(aInterval)
-        >>> bPitch
-        C#4 
-        >>> aPitch
-        G4 
-        >>> aPitch.transpose(aInterval, inPlace=True)
-        >>> aPitch
-        C#4 
+            >>> aPitch = Pitch('g4')
+            >>> bPitch = aPitch.transpose('m3')
+            >>> bPitch
+            B-4 
+            >>> aInterval = interval.Interval(-6)
+            >>> bPitch = aPitch.transpose(aInterval)
+            >>> bPitch
+            C#4 
+            >>> aPitch
+            G4 
+            >>> aPitch.transpose(aInterval, inPlace=True)
+            >>> aPitch
+            C#4 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -381,11 +381,11 @@ Accidental
 
         .. attribute:: displaySize
 
-        Size in display: "cue", "large", or a percentage. 
+            Size in display: "cue", "large", or a percentage. 
 
         .. attribute:: displayStyle
 
-        Style of display: "parentheses", "bracket", "both". 
+            Style of display: "parentheses", "bracket", "both". 
 
         Attributes without Documentation: `displayEvaluated`, `displayLocation`, `displayType`, `modifier`, `name`, `alter`
 
@@ -395,19 +395,19 @@ Accidental
 
         .. attribute:: lily
 
-        No documentation. 
+            No documentation. 
 
         .. attribute:: mx
 
-        From music21 to MusicXML 
+            From music21 to MusicXML 
 
-        >>> a = Accidental()
-        >>> a.set('half-sharp')
-        >>> a.alter == .5
-        True 
-        >>> mxAccidental = a.mx
-        >>> mxAccidental.get('content')
-        'quarter-sharp' 
+            >>> a = Accidental()
+            >>> a.set('half-sharp')
+            >>> a.alter == .5
+            True 
+            >>> mxAccidental = a.mx
+            >>> mxAccidental.get('content')
+            'quarter-sharp' 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -415,34 +415,34 @@ Accidental
 
         .. method:: set(name)
 
-        Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
+            Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
 
-        >>> a = Accidental()
-        >>> a.set('sharp')
-        >>> a.alter == 1
-        True 
-        >>> a = Accidental()
-        >>> a.set(2)
-        >>> a.modifier == "##"
-        True 
-        >>> a = Accidental()
-        >>> a.set(2.0)
-        >>> a.modifier == "##"
-        True 
-        >>> a = Accidental('--')
-        >>> a.alter
-        -2.0 
+            >>> a = Accidental()
+            >>> a.set('sharp')
+            >>> a.alter == 1
+            True 
+            >>> a = Accidental()
+            >>> a.set(2)
+            >>> a.modifier == "##"
+            True 
+            >>> a = Accidental()
+            >>> a.set(2.0)
+            >>> a.modifier == "##"
+            True 
+            >>> a = Accidental('--')
+            >>> a.alter
+            -2.0 
 
         .. method:: inheritDisplay(other)
 
-        Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties. 
+            Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties. 
 
-        >>> a = Accidental('double-flat')
-        >>> a.displayType = 'always'
-        >>> b = Accidental('sharp')
-        >>> b.inheritDisplay(a)
-        >>> b.displayType
-        'always' 
+            >>> a = Accidental('double-flat')
+            >>> a.displayType = 'always'
+            >>> b = Accidental('sharp')
+            >>> b.inheritDisplay(a)
+            >>> b.displayType
+            'always' 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

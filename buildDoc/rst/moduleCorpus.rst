@@ -12,126 +12,126 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: parseWork(workName, movementNumber=None, extList=None, forceSource=False)
 
-Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
+    Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
 
->>> aStream = parseWork('opus74no1/movement3')
+    >>> aStream = parseWork('opus74no1/movement3')
 
 .. function:: getWork(workName, movementNumber=None, extList=None)
 
-Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+    Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
->>> import os
->>> a = getWork('opus74no2', 4)
->>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
-True 
->>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
->>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
-True 
+    >>> import os
+    >>> a = getWork('opus74no2', 4)
+    >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
+    True 
+    >>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
+    >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
+    True 
 
-
+    
 
 .. function:: getBachChorales(extList=None)
 
+    
 
-
->>> a = getBachChorales()
->>> len(a) > 10
-True 
->>> a = getBachChorales('krn')
->>> len(a) > 10
-False 
->>> a = getBachChorales('xml')
->>> len(a) > 400
-True 
+    >>> a = getBachChorales()
+    >>> len(a) > 10
+    True 
+    >>> a = getBachChorales('krn')
+    >>> len(a) > 10
+    False 
+    >>> a = getBachChorales('xml')
+    >>> len(a) > 400
+    True 
 
 .. function:: getBeethovenStringQuartets(extList=None)
 
+    
 
-
->>> a = getBeethovenStringQuartets()
->>> len(a) > 10
-True 
->>> a = getBeethovenStringQuartets('krn')
->>> len(a) < 10 and len(a) > 0
-True 
->>> a = getBeethovenStringQuartets('xml')
->>> len(a) > 400
-False 
+    >>> a = getBeethovenStringQuartets()
+    >>> len(a) > 10
+    True 
+    >>> a = getBeethovenStringQuartets('krn')
+    >>> len(a) < 10 and len(a) > 0
+    True 
+    >>> a = getBeethovenStringQuartets('xml')
+    >>> len(a) > 400
+    False 
 
 .. function:: getComposer(composerName, extList=None)
 
-Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
+    Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
 
->>> a = getComposer('beethoven')
->>> len(a) > 10
-True 
->>> a = getComposer('mozart')
->>> len(a) > 10
-True 
->>> a = getComposer('bach', 'krn')
->>> len(a) < 10
-True 
->>> a = getComposer('bach', 'xml')
->>> len(a) > 10
-True 
+    >>> a = getComposer('beethoven')
+    >>> len(a) > 10
+    True 
+    >>> a = getComposer('mozart')
+    >>> len(a) > 10
+    True 
+    >>> a = getComposer('bach', 'krn')
+    >>> len(a) < 10
+    True 
+    >>> a = getComposer('bach', 'xml')
+    >>> len(a) > 10
+    True 
 
 .. function:: getComposerDir(composerName)
 
-Given the name of a composer, get the path to the top-level directory of that composer 
+    Given the name of a composer, get the path to the top-level directory of that composer 
 
->>> import os
->>> a = getComposerDir('beethoven')
->>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
-True 
->>> a = getComposerDir('bach')
->>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
-True 
->>> a = getComposerDir('mozart')
->>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
-True 
->>> a = getComposerDir('luca')
->>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
-True 
+    >>> import os
+    >>> a = getComposerDir('beethoven')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
+    True 
+    >>> a = getComposerDir('bach')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
+    True 
+    >>> a = getComposerDir('mozart')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
+    True 
+    >>> a = getComposerDir('luca')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
+    True 
 
 .. function:: getPaths(extList=None)
 
-Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
+    Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
 
->>> a = getPaths()
->>> len(a) > 30
-True 
->>> a = getPaths('krn')
->>> len(a) >= 4
-True 
+    >>> a = getPaths()
+    >>> len(a) > 30
+    True 
+    >>> a = getPaths('krn')
+    >>> len(a) >= 4
+    True 
 
 .. function:: getVirtualPaths(extList=None)
 
-Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions. 
+    Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions. 
 
->>> len(getVirtualPaths()) > 6
-True 
+    >>> len(getVirtualPaths()) > 6
+    True 
 
 .. function:: getVirtualWorkList(workName, movementNumber=None, extList=None)
 
-Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs. 
+    Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs. 
 
->>> getVirtualWorkList('bach/bwv1007/prelude')
-['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 
->>> getVirtualWorkList('junk')
-[] 
+    >>> getVirtualWorkList('bach/bwv1007/prelude')
+    ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 
+    >>> getVirtualWorkList('junk')
+    [] 
 
 .. function:: getWorkList(workName, movementNumber=None, extList=None)
 
-Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned. 
+    Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned. 
 
->>> len(getWorkList('beethoven/opus18no1'))
-8 
->>> len(getWorkList('beethoven/opus18no1', 1))
-2 
->>> len(getWorkList('beethoven/opus18no1', 1, '.krn'))
-1 
->>> len(getWorkList('beethoven/opus18no1', 1, '.xml'))
-1 
->>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
-0 
+    >>> len(getWorkList('beethoven/opus18no1'))
+    8 
+    >>> len(getWorkList('beethoven/opus18no1', 1))
+    2 
+    >>> len(getWorkList('beethoven/opus18no1', 1, '.krn'))
+    1 
+    >>> len(getWorkList('beethoven/opus18no1', 1, '.xml'))
+    1 
+    >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
+    0 
 

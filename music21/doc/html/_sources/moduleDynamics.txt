@@ -11,7 +11,7 @@ music21.dynamics
 
 .. function:: unitIntervalToName(n)
 
-Given a unit interval value, map to a dynamic name. 
+    Given a unit interval value, map to a dynamic name. 
 
 Dynamic
 -------
@@ -32,19 +32,19 @@ Dynamic
 
         .. attribute:: musicxml
 
-        Provide a complete MusicXML representation. 
+            Provide a complete MusicXML representation. 
 
         .. attribute:: mx
 
-        returns a musicxml.Direction object 
+            returns a musicxml.Direction object 
 
-        >>> a = Dynamic('ppp')
-        >>> a.posRelativeY = -10
-        >>> b = a.mx
-        >>> b[0][0][0].get('tag')
-        'ppp' 
-        >>> b.get('placement')
-        'below' 
+            >>> a = Dynamic('ppp')
+            >>> a.posRelativeY = -10
+            >>> b = a.mx
+            >>> b[0][0][0].get('tag')
+            'ppp' 
+            >>> b.get('placement')
+            'below' 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -72,14 +72,14 @@ Wedge
 
         .. attribute:: mx
 
-        returns a musicxml.Direction object 
+            returns a musicxml.Direction object 
 
-        >>> a = Wedge()
-        >>> a.type = 'crescendo'
-        >>> mxDirection = a.mx
-        >>> mxWedge = mxDirection.getWedge()
-        >>> mxWedge.get('type')
-        'crescendo' 
+            >>> a = Wedge()
+            >>> a.type = 'crescendo'
+            >>> mxDirection = a.mx
+            >>> mxWedge = mxDirection.getWedge()
+            >>> mxWedge.get('type')
+            'crescendo' 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 

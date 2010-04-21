@@ -27,53 +27,53 @@ Environment
 
         .. attribute:: modNameParent
 
-        A string representation of the module that contains this Environment instance. 
+            A string representation of the module that contains this Environment instance. 
 
         .. attribute:: ref
 
-        The Python dictionary used to store all internal settings. 
+            The Python dictionary used to store all internal settings. 
 
     **Environment** **methods**
 
         .. method:: read(fp=None)
 
-        Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+            Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
 
         .. method:: write(fp=None)
 
-        Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
+            Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
 
         .. method:: getSettingsPath()
 
-        Return the path to the platform specific settings file. 
+            Return the path to the platform specific settings file. 
 
         .. method:: getTempDir()
 
-        Get a temporary directory. Return the user preference if set. 
+            Get a temporary directory. Return the user preference if set. 
 
         .. method:: getTempFile(suffix=)
 
-        Return a file path to a temporary file with the specified suffix 
+            Return a file path to a temporary file with the specified suffix 
 
         .. method:: keys()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: launch(fmt, fp, options=)
 
-        Open a file with an either default or user-specified applications. 
+            Open a file with an either default or user-specified applications. 
 
         .. method:: loadDefaults()
 
-        Load defaults. All keys are derived from these defaults. 
+            Load defaults. All keys are derived from these defaults. 
 
         .. method:: printDebug(msg, statusLevel=1)
 
-        Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+            Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
         .. method:: warn(msg)
 
-        To print a warning to the user, send a list of strings to this method. 
+            To print a warning to the user, send a list of strings to this method. 
 
 
 Preference

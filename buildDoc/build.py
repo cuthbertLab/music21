@@ -875,7 +875,7 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT*2, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*2))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3))
         return ''.join(msg)
 
     def _fmtRstMethod(self, name):
@@ -885,7 +885,7 @@ class ClassDoc(RestructuredWriter):
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         # do not need indent as doc is already formatted with indent
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*2))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3))
         return ''.join(msg)
 
 
@@ -1043,7 +1043,7 @@ class ModuleDoc(RestructuredWriter):
         msg = []
         msg.append('.. function:: %s%s\n\n' %  (name, signature))
         docRaw = self.partitionedModule.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*1))
         return ''.join(msg)
 
     def getRestructured(self):

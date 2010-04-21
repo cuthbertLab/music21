@@ -12,27 +12,27 @@ Public interface for importing file formats into music21.
 
 .. function:: parse(value, forceSource=False)
 
-Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+    Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
 .. function:: parseFile(fp, forceSource=False)
 
-Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream. 
 
 .. function:: parseData(dataStr)
 
-Given musical data represented within a Python string, attempt to parse the data into a Stream. 
+    Given musical data represented within a Python string, attempt to parse the data into a Stream. 
 
 .. function:: parseURL(url, forceSource=False)
 
-Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+    Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
 .. function:: freeze(streamObj, fp=None)
 
-Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream. 
 
 .. function:: unfreeze(fp)
 
-Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream. 
 
 Converter
 ---------
@@ -47,21 +47,21 @@ Converter
 
         .. attribute:: stream
 
-        No documentation. 
+            No documentation. 
 
     **Converter** **methods**
 
         .. method:: parseData(dataStr)
 
-        Given raw data, determine format and parse into a music21 Stream. 
+            Given raw data, determine format and parse into a music21 Stream. 
 
         .. method:: parseFile(fp, forceSource=False)
 
-        Given a file path, parse and store a music21 Stream. 
+            Given a file path, parse and store a music21 Stream. 
 
         .. method:: parseURL(url)
 
-        Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
+            Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
 
 
 ConverterMusicXML
@@ -76,25 +76,25 @@ ConverterMusicXML
 
         .. attribute:: stream
 
-        No documentation. 
+            No documentation. 
 
     **ConverterMusicXML** **methods**
 
         .. method:: getPartNames()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: load()
 
-        Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
+            Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
 
         .. method:: parseData(xmlString)
 
-        Open MusicXML data from a string. 
+            Open MusicXML data from a string. 
 
         .. method:: parseFile(fp)
 
-        Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
+            Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
 ConverterHumdrum
@@ -114,15 +114,15 @@ ConverterHumdrum
 
         .. method:: parseData(humdrumString)
 
-        Open Humdrum data from a string 
+            Open Humdrum data from a string 
 
-        >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
-        >>> c = ConverterHumdrum()
-        >>> s = c.parseData(humdata)
+            >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
+            >>> c = ConverterHumdrum()
+            >>> s = c.parseData(humdata)
 
         .. method:: parseFile(filepath)
 
-        Open Humdram data from a file path. 
+            Open Humdram data from a file path. 
 
 
 PickleFilter
@@ -140,7 +140,7 @@ PickleFilter
 
         .. method:: status()
 
-        Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
+            Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
 
 
 StreamFreezer
@@ -159,10 +159,10 @@ StreamFreezer
 
         .. method:: openPickle(fp)
 
-        No documentation. 
+            No documentation. 
 
         .. method:: writePickle(fp=None)
 
-        No documentation. 
+            No documentation. 
 
 

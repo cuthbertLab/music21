@@ -11,51 +11,51 @@ music21.key
 
 .. function:: keyFromString(strKey)
 
-Given a string representing a key, return the appropriate Key object. 
+    Given a string representing a key, return the appropriate Key object. 
 
 .. function:: pitchToSharps(value, mode=None)
 
-Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None, 'major', or 'minor'. 
+    Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None, 'major', or 'minor'. 
 
->>> pitchToSharps('c')
-0 
->>> pitchToSharps('c', 'minor')
--3 
->>> pitchToSharps('a', 'minor')
-0 
->>> pitchToSharps('d')
-2 
->>> pitchToSharps('e-')
--3 
->>> pitchToSharps('a')
-3 
->>> pitchToSharps('e', 'minor')
-1 
->>> pitchToSharps('f#', 'major')
-6 
->>> pitchToSharps('g-', 'major')
--6 
->>> pitchToSharps('c#')
-7 
->>> pitchToSharps('g#')
-8 
+    >>> pitchToSharps('c')
+    0 
+    >>> pitchToSharps('c', 'minor')
+    -3 
+    >>> pitchToSharps('a', 'minor')
+    0 
+    >>> pitchToSharps('d')
+    2 
+    >>> pitchToSharps('e-')
+    -3 
+    >>> pitchToSharps('a')
+    3 
+    >>> pitchToSharps('e', 'minor')
+    1 
+    >>> pitchToSharps('f#', 'major')
+    6 
+    >>> pitchToSharps('g-', 'major')
+    -6 
+    >>> pitchToSharps('c#')
+    7 
+    >>> pitchToSharps('g#')
+    8 
 
 .. function:: sharpsToPitch(sharpCount)
 
-Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value. 
+    Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value. 
 
->>> sharpsToPitch(1)
-G 
->>> sharpsToPitch(1)
-G 
->>> sharpsToPitch(2)
-D 
->>> sharpsToPitch(-2)
-B- 
->>> sharpsToPitch(-6)
-G- 
->>> sharpsToPitch(6)
-F# 
+    >>> sharpsToPitch(1)
+    G 
+    >>> sharpsToPitch(1)
+    G 
+    >>> sharpsToPitch(2)
+    D 
+    >>> sharpsToPitch(-2)
+    B- 
+    >>> sharpsToPitch(-6)
+    G- 
+    >>> sharpsToPitch(6)
+    F# 
 
 KeySignature
 ------------
@@ -81,37 +81,37 @@ KeySignature
 
         .. attribute:: mx
 
-        Returns a musicxml.KeySignature object 
+            Returns a musicxml.KeySignature object 
 
-        >>> a = KeySignature(3)
-        >>> a.sharps = -3
-        >>> mxKey = a.mx
-        >>> mxKey.get('fifths')
-        -3 
+            >>> a = KeySignature(3)
+            >>> a.sharps = -3
+            >>> mxKey = a.mx
+            >>> mxKey.get('fifths')
+            -3 
 
         .. attribute:: pitchAndMode
 
-        Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
+            Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
 
-        >>> keyArray = [KeySignature(x) for x in range(-7,8)]
-        >>> keyArray[0].pitchAndMode
-        (C-, None) 
-        >>> keyArray[1].pitchAndMode
-        (G-, None) 
-        >>> keyArray[2].pitchAndMode
-        (D-, None) 
-        >>> keyArray[3].pitchAndMode
-        (A-, None) 
-        >>> keyArray[4].pitchAndMode
-        (E-, None) 
-        >>> keyArray[5].pitchAndMode
-        (B-, None) 
-        >>> keyArray[6].pitchAndMode
-        (F, None) 
-        >>> keyArray[7].pitchAndMode
-        (C, None) 
-        >>> keyArray[8].pitchAndMode
-        (G, None) 
+            >>> keyArray = [KeySignature(x) for x in range(-7,8)]
+            >>> keyArray[0].pitchAndMode
+            (C-, None) 
+            >>> keyArray[1].pitchAndMode
+            (G-, None) 
+            >>> keyArray[2].pitchAndMode
+            (D-, None) 
+            >>> keyArray[3].pitchAndMode
+            (A-, None) 
+            >>> keyArray[4].pitchAndMode
+            (E-, None) 
+            >>> keyArray[5].pitchAndMode
+            (B-, None) 
+            >>> keyArray[6].pitchAndMode
+            (F, None) 
+            >>> keyArray[7].pitchAndMode
+            (C, None) 
+            >>> keyArray[8].pitchAndMode
+            (G, None) 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -119,26 +119,26 @@ KeySignature
 
         .. method:: transpose(value, inPlace=False)
 
-        Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
+            Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
-        >>> a = KeySignature(2)
-        >>> a.pitchAndMode
-        (D, None) 
-        >>> b = a.transpose('p5')
-        >>> b.pitchAndMode
-        (A, None) 
-        >>> b.sharps
-        3 
-        >>> c = b.transpose('-m2')
-        >>> c.pitchAndMode
-        (G#, None) 
-        >>> c.sharps
-        8 
-        >>> d = c.transpose('-a3')
-        >>> d.pitchAndMode
-        (E-, None) 
-        >>> d.sharps
-        -3 
+            >>> a = KeySignature(2)
+            >>> a.pitchAndMode
+            (D, None) 
+            >>> b = a.transpose('p5')
+            >>> b.pitchAndMode
+            (A, None) 
+            >>> b.sharps
+            3 
+            >>> c = b.transpose('-m2')
+            >>> c.pitchAndMode
+            (G#, None) 
+            >>> c.sharps
+            8 
+            >>> d = c.transpose('-a3')
+            >>> d.pitchAndMode
+            (E-, None) 
+            >>> d.sharps
+            -3 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -166,11 +166,11 @@ Key
 
         .. method:: generateKey()
 
-        No documentation. 
+            No documentation. 
 
         .. method:: setKey(name=C, accidental=None, type=major)
 
-        No documentation. 
+            No documentation. 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

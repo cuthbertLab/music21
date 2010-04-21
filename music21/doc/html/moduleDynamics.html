@@ -91,9 +91,8 @@
 <dl class="function">
 <dt id="music21.dynamics.unitIntervalToName">
 <tt class="descclassname">music21.dynamics.</tt><tt class="descname">unitIntervalToName</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#music21.dynamics.unitIntervalToName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Given a unit interval value, map to a dynamic name.</dd></dl>
 
-<p>Given a unit interval value, map to a dynamic name.</p>
 <div class="section" id="dynamic">
 <h2>Dynamic<a class="headerlink" href="#dynamic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -112,15 +111,12 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <dl class="attribute">
 <dt id="music21.dynamics.Dynamic.musicxml">
 <tt class="descname">musicxml</tt><a class="headerlink" href="#music21.dynamics.Dynamic.musicxml" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd>Provide a complete MusicXML representation.</dd></dl>
 
-<p>Provide a complete MusicXML representation.</p>
 <dl class="attribute">
 <dt id="music21.dynamics.Dynamic.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Dynamic.mx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>returns a musicxml.Direction object</p>
+<dd><p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">posRelativeY</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -130,6 +126,8 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="go">&#39;below&#39;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Dynamic</strong> <strong>methods</strong></p>
@@ -156,9 +154,7 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <dl class="attribute">
 <dt id="music21.dynamics.Wedge.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Wedge.mx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<p>returns a musicxml.Direction object</p>
+<dd><p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Wedge</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;crescendo&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mxDirection</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -167,6 +163,8 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="go">&#39;crescendo&#39;</span>
 </pre></div>
 </div>
+</dd></dl>
+
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Wedge</strong> <strong>methods</strong></p>
@@ -203,7 +201,7 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 22, 2010.
+      Last updated on Apr 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -11,7 +11,7 @@ music21.clef
 
 .. function:: standardClefFromXN(xnStr)
 
-Returns a Clef object given a string like "G2" or "F4" etc. 
+    Returns a Clef object given a string like "G2" or "F4" etc. 
 
 Clef
 ----
@@ -31,20 +31,20 @@ Clef
 
         .. attribute:: mx
 
-        Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
+            Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
 
-        >>> b = GClef()
-        >>> a = b.mx
-        >>> a.get('sign')
-        'G' 
-        >>> b = Treble8vbClef()
-        >>> b.octaveChange
-        -1 
-        >>> a = b.mx
-        >>> a.get('sign')
-        'G' 
-        >>> a.get('clefOctaveChange')
-        -1 
+            >>> b = GClef()
+            >>> a = b.mx
+            >>> a.get('sign')
+            'G' 
+            >>> b = Treble8vbClef()
+            >>> b.octaveChange
+            -1 
+            >>> a = b.mx
+            >>> a.get('sign')
+            'G' 
+            >>> a.get('clefOctaveChange')
+            -1 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -363,7 +363,7 @@ PitchClef
 
         .. attribute:: lily
 
-        No documentation. 
+            No documentation. 
 
         Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
