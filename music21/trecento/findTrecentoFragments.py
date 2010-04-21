@@ -114,7 +114,7 @@ def searchForIntervals(notesStr):
     
     interObjArr = []
     for i in range(len(noteObjArr) - 1):
-        int1 = interval.generateInterval(noteObjArr[i], noteObjArr[i+1])
+        int1 = interval.notesToInterval(noteObjArr[i], noteObjArr[i+1])
         interObjArr.append(int1)
     searcher1 = IntervalSearcher(interObjArr) 
     ballataObj  = cadencebook.BallataSheet()

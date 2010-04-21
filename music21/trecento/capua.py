@@ -4,7 +4,7 @@ import music21
 from music21.trecento import cadencebook
 from music21 import note
 from music21.note import Accidental
-from music21.interval import generateInterval
+from music21.interval import notesToInterval
 from music21 import lily
 
 debug = True
@@ -54,8 +54,8 @@ def capuaRuleOne(srcStream):
            n3.isRest:
             continue
         
-        i1 = generateInterval(n1,n2)
-        i2 = generateInterval(n2,n3)
+        i1 = notesToInterval(n1,n2)
+        i2 = notesToInterval(n2,n3)
 
         if n1.accidental is not None or \
            n3.accidental is not None:
@@ -111,9 +111,9 @@ def capuaRuleTwo(srcStream):
            n4.isRest:
             continue
 
-        i1 = generateInterval(n1,n2)
-        i2 = generateInterval(n2,n3)
-        i3 = generateInterval(n3,n4)
+        i1 = notesToInterval(n1,n2)
+        i2 = notesToInterval(n2,n3)
+        i3 = notesToInterval(n3,n4)
 
         if n1.accidental is not None or \
            n2.accidental is not None or \
@@ -175,8 +175,8 @@ def capuaRuleThree(srcStream):
            n3.isRest:
             continue
         
-        i1 = generateInterval(n1,n2)
-        i2 = generateInterval(n2,n3)
+        i1 = notesToInterval(n1,n2)
+        i2 = notesToInterval(n2,n3)
 
         if n1.accidental is not None or \
            n2.accidental is not None or \
@@ -223,8 +223,8 @@ def capuaRuleFourA(srcStream):
            n3.isRest:
             continue
         
-        i1 = generateInterval(n1,n2)
-        i2 = generateInterval(n2,n3)
+        i1 = notesToInterval(n1,n2)
+        i2 = notesToInterval(n2,n3)
 
         if n1.accidental is not None or \
            n2.accidental is not None or \
@@ -272,8 +272,8 @@ def capuaRuleFourB(srcStream):
            n3.isRest:
             continue
 
-        i1 = generateInterval(n1,n2)
-        i2 = generateInterval(n2,n3)
+        i1 = notesToInterval(n1,n2)
+        i2 = notesToInterval(n2,n3)
 
         if n1.accidental is not None or \
            n3.accidental is not None:

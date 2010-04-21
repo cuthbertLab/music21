@@ -62,7 +62,7 @@ class DiatonicScale(Scale):
         return self.tonic
 
     def getDominant(self):
-        interval1to5 = interval.generateInterval(self.tonic, self.pitchFromScaleDegree(5))
+        interval1to5 = interval.notesToInterval(self.tonic, self.pitchFromScaleDegree(5))
         if interval1to5.specificName != "Perfect":
             print(interval1to5.diatonicType)
             raise ScaleException("This scale has no Dominant (Locrian perhaps?)")
@@ -85,18 +85,18 @@ class ConcreteMajorScale(DiatonicScale, DirectionlessScale):
     
     def generateScaleList(self):
         n1 = self.tonic
-        n2 = interval.generatePitch(n1, "M2")
-        n3 = interval.generatePitch(n1, "M3")
-        n4 = interval.generatePitch(n1, "P4")
-        n5 = interval.generatePitch(n1, "P5")
-        n6 = interval.generatePitch(n1, "M6")
-        n7 = interval.generatePitch(n1, "M7")
+        n2 = interval.transposePitch(n1, "M2")
+        n3 = interval.transposePitch(n1, "M3")
+        n4 = interval.transposePitch(n1, "P4")
+        n5 = interval.transposePitch(n1, "P5")
+        n6 = interval.transposePitch(n1, "M6")
+        n7 = interval.transposePitch(n1, "M7")
         scaleList = [n1, n2, n3, n4, n5, n6, n7]
         return scaleList
 
     def getConcreteMajorScale(self):
         scale = self.scaleList[:]
-        scale.append(interval.generatePitch(self.tonic, "P8"))        
+        scale.append(interval.transposePitch(self.tonic, "P8"))        
         return scale
 
     def getAbstractMajorScale(self):
@@ -117,23 +117,23 @@ class ConcreteMinorScale(DiatonicScale, DirectionlessScale):
 
     def generateScaleList(self):
         n1 = self.tonic
-        n2 = interval.generatePitch(n1, "M2")
-        n3 = interval.generatePitch(n1, "m3")
-        n4 = interval.generatePitch(n1, "P4")
-        n5 = interval.generatePitch(n1, "P5")
-        n6 = interval.generatePitch(n1, "m6")
-        n7 = interval.generatePitch(n1, "m7")
+        n2 = interval.transposePitch(n1, "M2")
+        n3 = interval.transposePitch(n1, "m3")
+        n4 = interval.transposePitch(n1, "P4")
+        n5 = interval.transposePitch(n1, "P5")
+        n6 = interval.transposePitch(n1, "m6")
+        n7 = interval.transposePitch(n1, "m7")
         return [n1, n2, n3, n4, n5, n6, n7]
 
     def getConcreteHarmonicMinorScale(self):
         scale = self.scaleList[:]
         scale[6] = self.getLeadingTone()
-        scale.append(interval.generatePitch(self.tonic, "P8"))
+        scale.append(interval.transposePitch(self.tonic, "P8"))
         return scale
 
     def getConcreteMelodicMinorScale(self):
         scale = self.getConcreteHarmonicMinorScale()
-        scale[5] = interval.generatePitch(self.pitchFromScaleDegree(6), "A1")
+        scale[5] = interval.transposePitch(self.pitchFromScaleDegree(6), "A1")
         for n in range(0, 7):
             scale.append(self.pitchFromScaleDegree(7-n))
         return scale
@@ -163,7 +163,7 @@ class ConcreteMinorScale(DiatonicScale, DirectionlessScale):
         return self.pitchFromScaleDegree(5)
 
     def getLeadingTone(self):
-        return interval.generatePitch(self.pitchFromScaleDegree(7), "A1")
+        return interval.transposePitch(self.pitchFromScaleDegree(7), "A1")
 
     def getRelativeMajor(self):
         return ConcreteMajorScale(self.pitchFromScaleDegree(3))

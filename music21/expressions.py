@@ -34,22 +34,22 @@ class Mordent(GeneralMordent):
 
 class HalfStepMordent(Mordent):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("m2")
+        self.size = music21.interval.stringToInterval("m2")
 
 class WholeStepMordent(Mordent):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("M2")
+        self.size = music21.interval.stringToInterval("M2")
 
 class InvertedMordent(GeneralMordent):
     direction = "up"
 
 class HalfStepInvertedMordent(InvertedMordent):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("m2")
+        self.size = music21.interval.stringToInterval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("M2")
+        self.size = music21.interval.stringToInterval("M2")
 
 class Trill(Ornament):
     size = None
@@ -89,11 +89,11 @@ class Trill(Ornament):
 
 class HalfStepTrill(Trill):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("m2")
+        self.size = music21.interval.stringToInterval("m2")
 
 class WholeStepTrill(Trill):
     def __init__(self):
-        self.size = music21.interval.generateIntervalFromString("M2")
+        self.size = music21.interval.stringToInterval("M2")
 
 class Turn(Ornament):
     pass

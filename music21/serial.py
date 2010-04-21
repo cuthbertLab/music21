@@ -569,7 +569,7 @@ class Test(unittest.TestCase):
             if thisRow[0].pitchClass == 0:
                 cRows += 1
             
-#             if interval.generateInterval(thisRow[0], 
+#             if interval.notesToInterval(thisRow[0], 
 #                                    thisRow[6]).intervalClass == 6:
 #              # between element 1 and element 7 is there a TriTone?
 #              rowsWithTTRelations += 1

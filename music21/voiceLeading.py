@@ -28,9 +28,9 @@ class VoiceLeadingQuartet(music21.Music21Object):
     '''
     
     motionType = None
-    unison = interval.generateIntervalFromString("P1")
-    fifth  = interval.generateIntervalFromString("P5")
-    octave = interval.generateIntervalFromString("P8")
+    unison = interval.stringToInterval("P1")
+    fifth  = interval.stringToInterval("P5")
+    octave = interval.stringToInterval("P8")
         
     def __init__(self, v1n1, v1n2, v2n1, v2n2):
         self.v1n1 = v1n1
@@ -42,10 +42,10 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self._findIntervals()
     
     def _findIntervals(self):
-        self.vIntervals.append(interval.generateInterval(self.v1n1, self.v2n1))
-        self.vIntervals.append(interval.generateInterval(self.v1n2, self.v2n2))
-        self.hIntervals.append(interval.generateInterval(self.v1n1, self.v1n2))
-        self.hIntervals.append(interval.generateInterval(self.v2n1, self.v2n2))
+        self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
+        self.vIntervals.append(interval.notesToInterval(self.v1n2, self.v2n2))
+        self.hIntervals.append(interval.notesToInterval(self.v1n1, self.v1n2))
+        self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
     
     def noMotion(self):
         '''Returns true if no voice moves at this "voice-leading" moment'''
@@ -284,8 +284,8 @@ class Test(unittest.TestCase):
         assert a.parallelMotion() == True
         assert a.antiParallelMotion() == False
         assert a.obliqueMotion() == False
-        assert a.parallelInterval(interval.generateIntervalFromString("P5")) == True
-        assert a.parallelInterval(interval.generateIntervalFromString("M3")) == False
+        assert a.parallelInterval(interval.stringToInterval("P5")) == True
+        assert a.parallelInterval(interval.stringToInterval("M3")) == False
     
         b = VoiceLeadingQuartet(C4, C4, G4, G4)
         assert b.noMotion() == True
@@ -295,7 +295,7 @@ class Test(unittest.TestCase):
             
         c = VoiceLeadingQuartet(C4, G4, C5, G4)
         assert c.antiParallelMotion() == True
-        assert c.hiddenInterval(interval.generateIntervalFromString("P5")) == False
+        assert c.hiddenInterval(interval.stringToInterval("P5")) == False
     
         d = VoiceLeadingQuartet(C4, D4, E4, A4)
         assert d.hiddenInterval(Interval("P5")) == True

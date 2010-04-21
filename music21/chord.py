@@ -678,7 +678,7 @@ class Chord(note.NotRest):
                 raise ChordException("Cannot run hasScaleX without a root")
 
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(testRoot, thisPitch)
+            thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if (thisInterval.diatonic.generic.mod7 == scaleDegree):
                 return thisInterval.chromatic.semitones
 
@@ -703,7 +703,7 @@ class Chord(note.NotRest):
                 raise ChordException("Cannot run hasSpecificX without a root")
 
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(testRoot, thisPitch)
+            thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if (thisInterval.diatonic.generic.mod7 == scaleDegree):
                 return thisInterval
 
@@ -726,7 +726,7 @@ class Chord(note.NotRest):
 
         first = self.hasSpecificX(scaleDeg)
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(testRoot, thisPitch)
+            thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if (thisInterval.diatonic.generic.mod7 == scaleDeg):
                 if (thisInterval.chromatic.mod12 - first.chromatic.mod12 != 0):
                     return True
@@ -793,7 +793,7 @@ class Chord(note.NotRest):
             return False
         
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5):
                 return False
             if (self.hasAnyRepeatedScale() == True):
@@ -847,7 +847,7 @@ class Chord(note.NotRest):
         #unused??
         firstThird = self.hasSpecificX(3)
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5) and (thisInterval.diatonic.generic.mod7 != 7):
                 return False
             if self.hasAnyRepeatedScale():
@@ -877,7 +877,7 @@ class Chord(note.NotRest):
         ### TODO: rewrite so that [C,E+++,G---] does not return True
 
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4) and (thisInterval.chromatic.mod12 != 7):
                 return False
         
@@ -902,7 +902,7 @@ class Chord(note.NotRest):
         if (third is False or fifth is False):
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 7):
                 return False
         
@@ -929,7 +929,7 @@ class Chord(note.NotRest):
         if (third is False or fifth is False):
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 6):
                 return False
         
@@ -974,7 +974,7 @@ class Chord(note.NotRest):
             return False
                 
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4) and (thisInterval.chromatic.mod12 != 8):
                 return False
         return True
@@ -997,7 +997,7 @@ class Chord(note.NotRest):
         if (third is False or fifth is False or seventh is False):
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4) and (thisInterval.chromatic.mod12 != 7) and (thisInterval.chromatic.mod12 != 10):
                 return False
         
@@ -1020,7 +1020,7 @@ class Chord(note.NotRest):
         if (third is False or fifth is False or seventh is False):
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 6) and (thisInterval.chromatic.mod12 != 9):
                 return False
         return True
@@ -1053,7 +1053,7 @@ class Chord(note.NotRest):
         if (third is False or fifth is False or seventh is False):
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 6) and (thisInterval.chromatic.mod12 != 10):
                 return False
         
@@ -1072,7 +1072,7 @@ class Chord(note.NotRest):
         
         
         for thisPitch in self.pitches:
-            thisInterval = interval.generateInterval(self.root(), thisPitch)
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 6) and (thisInterval.chromatic.mod12 != 9):
                 return False
             elif (thisInterval.chromatic.mod12 == 3):
@@ -1167,7 +1167,7 @@ class Chord(note.NotRest):
         
         bassNote = self.bass()
         
-        bassToRoot = interval.generateInterval(bassNote, self.root()).generic.simpleDirected
+        bassToRoot = interval.notesToInterval(bassNote, self.root()).generic.simpleDirected
         
         if (bassToRoot == 1):
             return 0

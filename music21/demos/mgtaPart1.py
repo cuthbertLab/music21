@@ -71,7 +71,7 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
     for i,j in pitches:
         n1 = note.Note(i)
         n2 = note.Note(j)
-        i1 = interval.generateInterval(n1, n2)
+        i1 = interval.notesToInterval(n1, n2)
         if i1.intervalClass == 1: # by interval class
             mark = "H"
         elif i1.intervalClass == 2:

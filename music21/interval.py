@@ -836,13 +836,13 @@ def _stringToDiatonicChromatic(value):
 
 
 
-def generateGeneric(n1, n2):
+def notesToGeneric(n1, n2):
     '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
     
     >>> from music21 import note
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
-    >>> aInterval = generateGeneric(aNote, bNote)
+    >>> aInterval = notesToGeneric(aNote, bNote)
     >>> aInterval
     <music21.interval.GenericInterval 12>
 
@@ -852,13 +852,13 @@ def generateGeneric(n1, n2):
     genDist = convertStaffDistanceToInterval(staffDist)
     return GenericInterval(genDist)
 
-def generateChromatic(n1, n2):
+def notesToChromatic(n1, n2):
     '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
     
     >>> from music21 import note
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g#5')
-    >>> generateChromatic(aNote, bNote)
+    >>> notesToChromatic(aNote, bNote)
     <music21.interval.ChromaticInterval 20>
     '''
     # TODO: rename notesToChromatic
@@ -885,12 +885,12 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     return specifier    
 
     
-def generateDiatonic(gInt, cInt):
+def intervalsToDiatonic(gInt, cInt):
     '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
 
     >>> aInterval = GenericInterval('descending fifth')
     >>> bInterval = ChromaticInterval(-7)
-    >>> cInterval = generateDiatonic(aInterval, bInterval)
+    >>> cInterval = intervalsToDiatonic(aInterval, bInterval)
     >>> cInterval
     <music21.interval.DiatonicInterval P5>
     '''
@@ -1027,9 +1027,9 @@ class Interval(music21.Music21Object):
             raise IntervalException('two or zero Note classes must be defined')
 
         if self.note1 is not None and self.note2 is not None:
-            genericInterval = generateGeneric(self.note1, self.note2)
-            chromaticInterval = generateChromatic(self.note1, self.note2)
-            diatonicInterval = generateDiatonic(genericInterval, chromaticInterval)
+            genericInterval = notesToGeneric(self.note1, self.note2)
+            chromaticInterval = notesToChromatic(self.note1, self.note2)
+            diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
             self.diatonic = diatonicInterval
             self.chromatic = chromaticInterval
 
@@ -1119,7 +1119,7 @@ class Interval(music21.Music21Object):
         pitch2.accidental = None
 
         # have right note name but not accidental
-        interval2 = generateInterval(pitch1, pitch2)    
+        interval2 = notesToInterval(pitch1, pitch2)    
 
         if not reverse:
             halfStepsToFix = (self.chromatic.semitones -
@@ -1164,8 +1164,8 @@ class Interval(music21.Music21Object):
     def _setNoteStart(self, n):
         '''Assuming that this interval is defined, we can set a new start note (note1) and automatically have the end note (note2).
         '''
-        # this is based on the procedure found in generatePitch() and 
-        # generateNote() but offers a more object oriented approach
+        # this is based on the procedure found in transposePitch() and 
+        # transposeNote() but offers a more object oriented approach
 
         self.note1 = n
         pitch1 = n.pitch
@@ -1216,7 +1216,7 @@ class Interval(music21.Music21Object):
     def _setNoteEnd(self, n):
         '''Assuming that this interval is defined, we can set a new end note (note2) and automatically have the start note (note1).
         '''
-        # this is based on the procedure found in generatePitch() but offers
+        # this is based on the procedure found in transposePitch() but offers
         # a more object oriented approach
 
         self.note2 = n
@@ -1303,7 +1303,7 @@ def getAbsoluteHigherNote(note1, note2):
     <music21.note.Note C#>
 
     '''
-    chromatic = generateChromatic(note1, note2)
+    chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0: return note2
     elif semitones < 0: return note1
@@ -1342,23 +1342,23 @@ def getAbsoluteLowerNote(note1, note2):
     >>> getAbsoluteLowerNote(aNote, bNote)
     <music21.note.Note D-->
     '''
-    chromatic = generateChromatic(note1, note2)
+    chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0: return note1
     elif semitones < 0: return note2
     else: return note1
 
-def generatePitch(pitch1, interval1):
+def transposePitch(pitch1, interval1):
     '''Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
 
     >>> from music21 import pitch
     >>> aPitch = pitch.Pitch('C4')
     >>> aInterval = Interval('P5')
-    >>> bPitch = generatePitch(aPitch, aInterval)
+    >>> bPitch = transposePitch(aPitch, aInterval)
     >>> bPitch
     G4
-    >>> bInterval = generateIntervalFromString('P-5')
-    >>> cPitch = generatePitch(aPitch, bInterval)
+    >>> bInterval = stringToInterval('P-5')
+    >>> cPitch = transposePitch(aPitch, bInterval)
     >>> cPitch
     F3
     ''' 
@@ -1368,7 +1368,7 @@ def generatePitch(pitch1, interval1):
     # then convert it to interval object if necessary
     if common.isStr(interval1):
         #print interval1, "same name"
-        interval1 = generateIntervalFromString(interval1) 
+        interval1 = stringToInterval(interval1) 
         #print interval1.name, " int name" # del me
     else:
         pass # assuming it is an interval object
@@ -1383,41 +1383,41 @@ def generatePitch(pitch1, interval1):
     pitch2.accidental = None
     # at this point note2 has the right note name (step), but possibly
     # the wrong accidental.  We fix that below
-    interval2 = generateInterval(pitch1, pitch2)    
+    interval2 = notesToInterval(pitch1, pitch2)    
     halfStepsToFix = (interval1.chromatic.semitones -
                       interval2.chromatic.semitones)
     pitch2.accidental = halfStepsToFix
     return pitch2
 
-def generateNote(note1, intervalString):
+def transposeNote(note1, intervalString):
     '''Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
 
     >>> from music21 import note
     >>> aNote = note.Note('c4')
-    >>> bNote = generateNote(aNote, 'p5')
+    >>> bNote = transposeNote(aNote, 'p5')
     >>> bNote
     <music21.note.Note G>
 
     >>> aNote = note.Note('f#4')
-    >>> bNote = generateNote(aNote, 'm2')
+    >>> bNote = transposeNote(aNote, 'm2')
     >>> bNote
     <music21.note.Note G>
 
     '''
 
-    newPitch = generatePitch(note1, intervalString)
+    newPitch = transposePitch(note1, intervalString)
     newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
     return newNote
 
 
-def generateInterval(n1, n2 = None):  
+def notesToInterval(n1, n2 = None):  
     '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
 
     >>> from music21 import note
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
-    >>> aInterval = generateInterval(aNote, bNote)
+    >>> aInterval = notesToInterval(aNote, bNote)
     >>> aInterval
     <music21.interval.Interval P12>
 
@@ -1432,20 +1432,20 @@ def generateInterval(n1, n2 = None):
     if n2 is None: 
         n2 = music21.note.Note() 
         # this is not done in the constructor because of looping problems with tinyNotationNote
-    gInt = generateGeneric(n1, n2)
-    cInt = generateChromatic(n1, n2)
-    dInt = generateDiatonic(gInt, cInt)
+    gInt = notesToGeneric(n1, n2)
+    cInt = notesToChromatic(n1, n2)
+    dInt = intervalsToDiatonic(gInt, cInt)
     intObj = Interval(diatonic = dInt, chromatic = cInt,
                     note1 = n1, note2 = n2)
     return intObj
 
-def generateIntervalFromString(string):
+def stringToInterval(string):
     '''Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object.
 
-    >>> aInterval = generateIntervalFromString('P5')
+    >>> aInterval = stringToInterval('P5')
     >>> aInterval
     <music21.interval.Interval P5>
-    >>> aInterval = generateIntervalFromString('m3')
+    >>> aInterval = stringToInterval('m3')
     >>> aInterval
     <music21.interval.Interval m3>
     '''
@@ -1481,7 +1481,7 @@ class Test(unittest.TestCase):
         n2.octave = 5
         n2.accidental = Accidental("-")
         
-        #int1 = interval.generateInterval(n1, n2)   # returns music21.interval.Interval object
+        #int1 = interval.notesToInterval(n1, n2)   # returns music21.interval.Interval object
         int1  = Interval(note1 = n1, note2 = n2)
         dInt1 = int1.diatonic   # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
@@ -1493,7 +1493,7 @@ class Test(unittest.TestCase):
         n1.accidental = Accidental("#")
         int1.reinit()
         
-        cInt1 = generateChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
+        cInt1 = notesToChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
         cInt2 = int1.chromatic        # returns same as cInt1 -- just a different way of thinking of things
         self.assertEqual(cInt1.semitones, cInt2.semitones)
         
@@ -1518,7 +1518,7 @@ class Test(unittest.TestCase):
         n4.octave = 3
         n4.accidental = "-"
         
-        ##n3 = interval.generatePitch(n4, "AA8")
+        ##n3 = interval.transposePitch(n4, "AA8")
         ##if n3.accidental is not None:
         ##    print n3.step, n3.accidental.name, n3.octave
         ##else:
@@ -1538,7 +1538,7 @@ class Test(unittest.TestCase):
         highBb = Note()
         highBb.name = "B-"
         highBb.octave = 5
-        dimOct = generateInterval(lowB, highBb)
+        dimOct = notesToInterval(lowB, highBb)
         self.assertEqual(dimOct.niceName, "Diminished Octave")
     
         noteA1 = Note()
@@ -1547,24 +1547,24 @@ class Test(unittest.TestCase):
         noteA2 = Note()
         noteA2.name = "F#"
         noteA2.octave = 5
-        intervalA1 = generateInterval(noteA1, noteA2)
+        intervalA1 = notesToInterval(noteA1, noteA2)
     
         noteA3 = Note()
         noteA3.name = "D"
         noteA3.octave = 1
     
-        noteA4 = generatePitch(noteA3, intervalA1)
+        noteA4 = transposePitch(noteA3, intervalA1)
         self.assertEqual(noteA4.name, "E#")
         self.assertEqual(noteA4.octave, 2)
         
-        interval1 = generateIntervalFromString("P-5")
+        interval1 = stringToInterval("P-5")
         
-        n5 = generatePitch(n4, interval1)
-        n6 = generatePitch(n4, "P-5")
+        n5 = transposePitch(n4, interval1)
+        n6 = transposePitch(n4, "P-5")
         self.assertEqual(n5.name, "G-")
         self.assertEqual(n6.name, n5.name)
         n7 = Note()
-        n8 = generatePitch(n7, "P8")
+        n8 = transposePitch(n7, "P8")
         self.assertEqual(n8.name, "C")
         self.assertEqual(n8.octave, 5)
 
@@ -1572,20 +1572,20 @@ class Test(unittest.TestCase):
         
         interval1 = Interval("P-5")
         
-        n5 = generatePitch(n4, interval1)
-        n6 = generatePitch(n4, "P-5")
+        n5 = transposePitch(n4, interval1)
+        n6 = transposePitch(n4, "P-5")
         self.assertEqual(n5.name, "G-")
         self.assertEqual(n6.name, n5.name)
         n7 = Note()
-        n8 = generatePitch(n7, "P8")
+        n8 = transposePitch(n7, "P8")
         self.assertEqual(n8.name, "C")
         self.assertEqual(n8.octave, 5)
 
         
-        n9 = generatePitch(n7, "m7")  ## should be B-
+        n9 = transposePitch(n7, "m7")  ## should be B-
         self.assertEqual(n9.name, "B-")
         self.assertEqual(n9.octave, 4)
-        n10 = generatePitch(n7, "dd-2")  ## should be B##
+        n10 = transposePitch(n7, "dd-2")  ## should be B##
         self.assertEqual(n10.name, "B##")
         self.assertEqual(n10.octave, 3)
     
@@ -1635,7 +1635,7 @@ class Test(unittest.TestCase):
         middleC = Note()
         lowerC  = Note()
         lowerC.octave = 3
-        descendingOctave = generateInterval(middleC, lowerC)
+        descendingOctave = notesToInterval(middleC, lowerC)
         self.assertEqual(descendingOctave.generic.simpleDirected, 1)  # no descending unisons ever
         self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  # no descending unisons ever
         self.assertEqual(descendingOctave.directedName, "P-8")
@@ -1644,7 +1644,7 @@ class Test(unittest.TestCase):
         lowerG  = Note()
         lowerG.name = "G"
         lowerG.octave = 3
-        descendingFourth = generateInterval(middleC, lowerG)
+        descendingFourth = notesToInterval(middleC, lowerG)
         self.assertEqual(descendingFourth.diatonic.directedNiceName, "Descending Perfect Fourth")
         self.assertEqual(descendingFourth.diatonic.directedSimpleName, "P-4")
         self.assertEqual(descendingFourth.diatonic.simpleName, "P4")
@@ -1661,7 +1661,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [generateChromatic, generateDiatonic, generateInterval, Interval]
+_DOC_ORDER = [notesToChromatic, intervalsToDiatonic, notesToInterval, Interval]
 
 
 if __name__ == "__main__":

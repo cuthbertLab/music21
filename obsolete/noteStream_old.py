@@ -384,14 +384,14 @@ class NoteStream(object):
                 if n1.isRest == False:
                     n3 = self.noteFollowingNote(n2, allowRests = False)
                     if n3 is not None:
-                        int1 = interval.generateInterval(n1, n3)
+                        int1 = interval.notesToInterval(n1, n3)
                         n1.editorial.melodicIntervalOverRests = int1
                         iORL.append(int1)
             else:
                 try:
-                    int1 = interval.generateInterval(n1, n2)
+                    int1 = interval.notesToInterval(n1, n2)
                 except:
-                    int1 = interval.generateInterval(n1, n2)
+                    int1 = interval.notesToInterval(n1, n2)
                 iL.append(int1)
                 iORL.append(int1)
                 n1.editorial.melodicInterval = int1

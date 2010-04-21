@@ -80,8 +80,8 @@ class ModalCounterpoint(object):
         harmonic intervals are P5 and False otherwise.'''
         vlq = VoiceLeadingQuartet(note11, note12, note21, note22)
         return vlq.parallelFifth()
-#        interval1 = interval.generateInterval(note11, note21)
-#        interval2 = interval.generateInterval(note12, note22)
+#        interval1 = interval.notesToInterval(note11, note21)
+#        interval2 = interval.notesToInterval(note12, note22)
 #        if interval1.name == interval2.name == "P5": return True
 #        else: return False
 
@@ -89,10 +89,10 @@ class ModalCounterpoint(object):
         '''Given four notes, assuming the first pair sounds at the same time and
         the second pair sounds at the same time, returns True if there is a
         hidden fifth and false otherwise.'''
-        interval1 = interval.generateInterval(note11, note21)
-        interval2 = interval.generateInterval(note12, note22)
-        interval3 = interval.generateInterval(note11, note12)
-        interval4 = interval.generateInterval(note21, note22)
+        interval1 = interval.notesToInterval(note11, note21)
+        interval2 = interval.notesToInterval(note12, note22)
+        interval3 = interval.notesToInterval(note11, note12)
+        interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
             if interval2.name == "P5" and not interval1.name == "P5": return True
             else: return False
@@ -152,10 +152,10 @@ class ModalCounterpoint(object):
         '''Given four notes, assuming the first pair sounds at the same time and
         the second pair sounds at the same time, returns True if there is a
         hidden octave and false otherwise.'''
-        interval1 = interval.generateInterval(note11, note21)
-        interval2 = interval.generateInterval(note12, note22)
-        interval3 = interval.generateInterval(note11, note12)
-        interval4 = interval.generateInterval(note21, note22)
+        interval1 = interval.notesToInterval(note11, note21)
+        interval2 = interval.notesToInterval(note12, note22)
+        interval3 = interval.notesToInterval(note11, note12)
+        interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
             if interval2.name == "P8" and not interval1.name == "P8": return True
             else: return False
@@ -191,8 +191,8 @@ class ModalCounterpoint(object):
         '''Given four notes, assuming the first pair sounds at the same time and
         the second pair sounds at the same time, returns True if the two
         harmonic intervals are P8 and False otherwise.'''
-        interval1 = interval.generateInterval(note11, note21)
-        interval2 = interval.generateInterval(note12, note22)
+        interval1 = interval.notesToInterval(note11, note21)
+        interval2 = interval.notesToInterval(note12, note22)
         if interval1.name == interval2.name == "P8": return True
         else: return False
 
@@ -200,8 +200,8 @@ class ModalCounterpoint(object):
         '''Given four notes, assuming the first pair sounds at the same time and
         the second pair sounds at the same time, returns True if the two
         harmonic intervals are P8 and False otherwise.'''
-        interval1 = interval.generateInterval(note11, note21)
-        interval2 = interval.generateInterval(note12, note22)
+        interval1 = interval.notesToInterval(note11, note21)
+        interval2 = interval.notesToInterval(note12, note22)
         if interval1.name == interval2.name == "P1": return True
         else: return False
 
@@ -209,7 +209,7 @@ class ModalCounterpoint(object):
     def isValidHarmony(self, note11, note21):
         '''Determines if the harmonic interval between two given notes is
         "legal" according to 21M.301 rules of counterpoint.'''
-        interval1 = interval.generateInterval(note11, note21)
+        interval1 = interval.notesToInterval(note11, note21)
         if interval1.diatonic.name in self.legalHarmonicIntervals: return True
         else: return False
 
@@ -243,7 +243,7 @@ class ModalCounterpoint(object):
     def isValidStep(self, note11, note12):
         '''Determines if the melodic interval between two given notes is "legal"
         according to 21M.301 rules of counterpoint.'''
-        interval1 = interval.generateInterval(note11, note12)
+        interval1 = interval.notesToInterval(note11, note12)
         if interval1.diatonic.name in self.legalMelodicIntervals: return True
         else: return False
 
@@ -353,8 +353,8 @@ class ModalCounterpoint(object):
             note3 = stream1.notes[i+2]
             if note1 is not None and note2 is not None and note3 is not None:
                 if note1.name == sixth and note2.name == seventh and note3.name == tonic:
-                    newNote1 = interval.generateNote(note1, "A1")
-                    newNote2 = interval.generateNote(note2, "A1")
+                    newNote1 = interval.transposeNote(note1, "A1")
+                    newNote2 = interval.transposeNote(note2, "A1")
                     stream2.notes[i] = newNote1
                     stream2.notes[i+1] = newNote2
         for i in range(len(stream1.notes)-1):
@@ -362,7 +362,7 @@ class ModalCounterpoint(object):
             note2 = stream1.notes[i+1]
             if note1 is not None and note2 is not None:
                 if note1.name == seventh and note2.name == tonic:
-                    newNote = interval.generateNote(note1, "A1")
+                    newNote = interval.transposeNote(note1, "A1")
                     stream2.notes[i] = newNote
         return stream2
 
@@ -374,9 +374,9 @@ class ModalCounterpoint(object):
         # DOES NOT YET RAISE LEADING TONES, AND DOES NOT CHECK FOR NOODLING.
         stream2 = Stream([])
         firstNote = stream1.notes[0]
-        choices = [interval.generateNote(firstNote, "P1"),\
-                   interval.generateNote(firstNote, "P5"),\
-                   interval.generateNote(firstNote, "P8")]
+        choices = [interval.transposeNote(firstNote, "P1"),\
+                   interval.transposeNote(firstNote, "P5"),\
+                   interval.transposeNote(firstNote, "P8")]
         note1 = random.choice(choices)
         note1.duration = firstNote.duration
         stream2.append(note1)
@@ -391,7 +391,7 @@ class ModalCounterpoint(object):
             newNote = random.choice(choices)
             newNote.duration = currFirmus.duration
             stream2.append(newNote)
-            int = interval.generateInterval(prevNote, newNote)
+            int = interval.notesToInterval(prevNote, newNote)
             if int.generic.undirected > 3: afterLeap = True
             else: afterLeap = False
         return stream2
@@ -404,26 +404,26 @@ class ModalCounterpoint(object):
         contrary motion.'''
         print currFirmus.name
         valid = []
-        bottomInt = interval.generateInterval(prevFirmus, currFirmus)
+        bottomInt = interval.notesToInterval(prevFirmus, currFirmus)
         if bottomInt.direction < 0: ascending = True
         else: ascending = False
 
-        n1 = interval.generateNote(prevNote, "m2")
-        n2 = interval.generateNote(prevNote, "M2")
-        n3 = interval.generateNote(prevNote, "m3")
-        n4 = interval.generateNote(prevNote, "M3")
-        n5 = interval.generateNote(prevNote, "P4")
-        n6 = interval.generateNote(prevNote, "P5")
+        n1 = interval.transposeNote(prevNote, "m2")
+        n2 = interval.transposeNote(prevNote, "M2")
+        n3 = interval.transposeNote(prevNote, "m3")
+        n4 = interval.transposeNote(prevNote, "M3")
+        n5 = interval.transposeNote(prevNote, "P4")
+        n6 = interval.transposeNote(prevNote, "P5")
         if afterLeap: possible = [n1, n2, n3, n4]
         else: possible = [n1, n2, n3, n4, n5, n6]
         possible.extend(possible)
 
-        n7 = interval.generateNote(prevNote, "m-2")
-        n8 = interval.generateNote(prevNote, "M-2")
-        n9 = interval.generateNote(prevNote, "m-3")
-        n10 = interval.generateNote(prevNote, "M-3")
-        n11 = interval.generateNote(prevNote, "P-4")
-        n12 = interval.generateNote(prevNote, "P-5")
+        n7 = interval.transposeNote(prevNote, "m-2")
+        n8 = interval.transposeNote(prevNote, "M-2")
+        n9 = interval.transposeNote(prevNote, "m-3")
+        n10 = interval.transposeNote(prevNote, "M-3")
+        n11 = interval.transposeNote(prevNote, "P-4")
+        n12 = interval.transposeNote(prevNote, "P-5")
         if afterLeap: possible.extend([n7, n8, n9, n10])
         else: possible.extend([n7, n8, n9, n10, n11, n12])
         print "possible: ", [note1.name for note1 in possible]
@@ -450,7 +450,7 @@ class ModalCounterpoint(object):
             try: par1 = self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus)
             except: par1 = True
             try:
-                distance = interval.generateInterval(currFirmus, note1)
+                distance = interval.notesToInterval(currFirmus, note1)
                 if distance.direction < 0: crossing = True
                 else: crossing = False
             except: crossing = True
@@ -883,7 +883,7 @@ class TestExternal(unittest.TestCase):
                 goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
                 goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
     
-                lastInterval = interval.generateInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
                 if lastInterval.generic.undirected != 2:
                     goodMelody = False
                     print "rejected because lastInterval was not a second"

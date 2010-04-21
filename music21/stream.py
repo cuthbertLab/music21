@@ -3483,7 +3483,7 @@ class Stream(music21.Music21Object):
         
         See Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed.
         
-        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use generateInterval.
+        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use notesToInterval.
                 
         Returns None of there are not at least two elements found by findConsecutiveNotes.
 
@@ -3511,7 +3511,7 @@ class Stream(music21.Music21Object):
                 elif hasattr(secondNote, "pitches") and len(secondNote.pitches) > 0:
                     secondPitch = secondNote.pitches[0]
                 if firstPitch is not None and secondPitch is not None:
-                    returnInterval = interval.generateInterval(firstPitch, secondPitch)
+                    returnInterval = interval.notesToInterval(firstPitch, secondPitch)
                     returnInterval.offset = firstNote.offset + firstNote.duration.quarterLength
                     returnInterval.duration = duration.Duration(secondNote.offset - returnInterval.offset)
                     returnStream.insert(returnInterval)
@@ -3904,7 +3904,7 @@ class Stream(music21.Music21Object):
             if len(simultEls) > 0:
                 for simultNote in simultEls.notes:
                     if simultNote.isRest is False:
-                        interval1 = interval.generateInterval(thisNote, simultNote)
+                        interval1 = interval.notesToInterval(thisNote, simultNote)
                         thisNote.editorial.harmonicInterval = interval1
                         break
 
