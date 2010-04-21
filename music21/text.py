@@ -18,7 +18,7 @@ def assembleLyrics(streamIn):
     '''Concatenate text from a stream.
     '''
     word = []; words = []
-    noteStream = streamIn.flat.getNotes()
+    noteStream = streamIn.flat.notes
     for n in noteStream:
         for lyricObj in n.lyrics: # a list of lyric objs
             #print lyricObj, lyricObj.syllabic, lyricObj.text

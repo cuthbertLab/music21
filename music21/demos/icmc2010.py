@@ -68,7 +68,7 @@ def bergEx01(show=True):
    
 # TODO: what is the best way to do this now that 
 # this raises a TupletException for being frozen?
-#     for thisNote in score.flat.getNotes():
+#     for thisNote in score.flat.notes:
 #         thisNote.duration.tuplets[0].setRatio(12, 8)
 
     for thisMeasure in score.getElementsByClass(stream.Measure):

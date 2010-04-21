@@ -1308,9 +1308,7 @@ class Stream(music21.Music21Object):
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> r3 = note.Rest()
-        >>> st1.append(n1)
-        >>> st1.append(n2)
-        >>> st1.append(r3)
+        >>> st1.append([n1, n2, r3])
         >>> t2 = st1.getElementAfterElement(n1)
         >>> t2 is n2
         True
@@ -1382,7 +1380,7 @@ class Stream(music21.Music21Object):
 
     #--------------------------------------------------------------------------
     # routines for obtaining specific types of elements from a Stream
-    # getNotes and getPitches are found with the interval routines
+    # _getNotes and _getPitches are found with the interval routines
 
     def getMeasureRange(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
@@ -2334,7 +2332,7 @@ class Stream(music21.Music21Object):
                 raise StreamException('cannot proces beams in a Measure without a time signature')
     
             # environLocal.printDebug(['beaming with ts', ts])
-            noteStream = m.getNotes()
+            noteStream = m.notes
             if len(noteStream) <= 1: 
                 continue # nothing to beam
             durList = []
@@ -2944,7 +2942,16 @@ class Stream(music21.Music21Object):
     # transformations
 
     def transpose(self, value, inPlace=False):
-        '''Transpose all Notes and Chords in the Stream by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+        '''Transpose all Pitches, Notes, and Chords in the 
+        Stream by the 
+        user-provided value. If the value is an integer, the 
+        transposition is treated in half steps. If the value is 
+        a string, any Interval string specification can be 
+        provided.
+
+        returns a new Stream by default, but if the
+        optional "inPlace" key is set to True then
+        it modifies pitches in place.
 
         >>> aInterval = interval.Interval('d5')
         
@@ -3282,47 +3289,41 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    #------------ interval routines --------------------------------------------
-    def getNotes(self):
-        '''Return all :class:`~music21.note.Note`, :class:`~music21.chord.Chord`, :class:`~music21.note.Rest`, etc. objects in a Stream() as a new Stream.
-
-        >>> s1 = Stream()
-        >>> c = chord.Chord(['a', 'b'])
-        >>> s1.append(c)
-        >>> s2 = s1.getNotes()
-        >>> len(s2) == 1
-        True
+    def _getNotes(self):
+        '''
+        see property `notes`, below
         '''
         return self.getElementsByClass([note.GeneralNote, chord.Chord])
         # note: class names must be provided in one argument as a list
 
-    notes = property(getNotes, doc='''
-        Attribute for a Stream of all :class:`~music21.note.Note` objects found in the Stream.
+    notes = property(_getNotes, doc='''
+        The notes property of a Stream returns a new Stream object
+        that consists only of the notes (including 
+        :class:`~music21.note.Note`, 
+        :class:`~music21.chord.Chord`, 
+        :class:`~music21.note.Rest`, etc.) found 
+        in the stream.
+
+        >>> from music21 import *
+        >>> s1 = Stream()
+        >>> k1 = key.KeySignature(0) # key of C
+        >>> n1 = note.Note('B')
+        >>> c1 = chord.Chord(['A', 'B-'])
+        >>> s1.append([k1, n1, c1])
+        >>> s1.show('text')
+        {0.0} <music21.key.KeySignature of no sharps or flats>
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.chord.Chord A B->
+
+        >>> notes1 = s1.notes
+        >>> notes1.show('text')
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.chord.Chord A B->       
         ''')
 
-    def getPitches(self):
+    def _getPitches(self):
         '''
-        Return all :class:`~music21.pitch.Pitch` objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. 
-
-        Pitch objects are returned in a List, not a Stream.
-
-        >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> len(a[0].pitches)
-        25
-        >>> len(a.pitches)
-        104
-
-        >>> from music21 import pitch
-        >>> pitch1 = pitch.Pitch()
-        >>> st1 = Stream()
-        >>> st1.append(pitch1)
-        >>> foundPitches = st1.pitches
-        >>> len(foundPitches)
-        1
-        >>> foundPitches[0] is pitch1
-        True
-        
+        documented as part of property `pitches`, below.
         '''  
         returnPitches = []
         for thisEl in self.elements:
@@ -3336,8 +3337,47 @@ class Stream(music21.Music21Object):
                 returnPitches.append(thisEl)
         return returnPitches
     
-    pitches = property(getPitches, doc='''
-        Attribute for a List of all :class:`~music21.pitch.Pitch` objects found in any element in the Stream.
+    pitches = property(_getPitches, doc='''
+        Return all :class:`~music21.pitch.Pitch` objects found in any 
+        element in the Stream as a Python List. Elements such as 
+        Streams, and Chords will have their Pitch objects accumulated as 
+        well. For that reason, a flat representation may not be required. 
+
+        Pitch objects are returned in a List, not a Stream.  This usage
+        differs from the notes property, but makes sense since Pitch
+        objects are usually durationless.  (That's the main difference
+        between them and notes)
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> voiceOnePitches = a[0].pitches
+        >>> len(voiceOnePitches)
+        25
+        >>> voiceOnePitches[0:10]
+        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        
+        Note that the pitches returned above are 
+        objects, not text:
+        >>> voiceOnePitches[0].octave
+        4
+        
+        Since pitches are found from internal objects,
+        flattening the stream is not required:
+        >>> len(a.pitches)
+        104
+
+        OMIT_FROM_DOCS
+        Test to make sure that Pitch objects are
+        also being retrieved
+        >>> from music21 import pitch
+        >>> pitch1 = pitch.Pitch()
+        >>> st1 = Stream()
+        >>> st1.append(pitch1)
+        >>> foundPitches = st1.pitches
+        >>> len(foundPitches)
+        1
+        >>> foundPitches[0] is pitch1
+        True
         ''')
 
 
@@ -3354,7 +3394,7 @@ class Stream(music21.Music21Object):
         {u'E3': 4, u'G4': 2, u'F#4': 2, u'A2': 2, u'E2': 1, u'G2': 1, u'D3': 9, u'D#3': 1, u'B4': 7, u'A3': 5, u'F#3': 13, u'A4': 10, u'B2': 3, u'B3': 4, u'C3': 2, u'E4': 9, u'D4': 14, u'D5': 2, u'D#4': 2, u'C5': 1, u'G3': 10}
         '''
         post = {}
-        for p in self.getPitches():
+        for p in self.pitches:
             key = getattr(p, pitchAttr)
             if key not in post.keys():
                 post[key] = 0
@@ -3379,6 +3419,7 @@ class Stream(music21.Music21Object):
                 post[key] += 1
         return post
 
+    #------------ interval routines --------------------------------------------
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 
         skipUnisons = False, skipOctaves = False,

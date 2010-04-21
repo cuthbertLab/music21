@@ -18,7 +18,7 @@ class IntervalSearcher(object):
         self.intervalLength = len(intervalList)
 
     def compareToStream(self, stream):
-        streamLength = len(stream.getNotes())
+        streamLength = len(stream.notes)
         if streamLength < self.intervalLength: return False
         intervalListLength = len(stream.intervalOverRestsList)
         if self.intervalLength > intervalListLength: return False
@@ -44,7 +44,7 @@ class NoteSearcher(object):
         self.noteLength = len(noteList)
 
     def compareToStream(self, stream):
-        sN = stream.getNotes()
+        sN = stream.notes
         streamLength = len(sN)
         if streamLength < self.noteLength: return False
         for i in range(streamLength + 1 - self.noteLength):
@@ -86,7 +86,7 @@ def searchForNotes(notesStr):
             for i in range(len(thisCadence.streams)):
                 if searcher1.compareToStream(thisCadence.streams[i]) is True:
                     notesList = ""
-                    for thisNote in thisCadence.streams[i].getNotes():
+                    for thisNote in thisCadence.streams[i].notes:
                         #thisNote.editorial.color = "blue"
                         if hasattr(thisNote.lily, "value"):
                             notesList += thisNote.lily.value + " "

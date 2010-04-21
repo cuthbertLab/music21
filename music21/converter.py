@@ -663,7 +663,7 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.beams01
         a = parse(mxString)
         part = a[0]
-        notes = part.flat.getNotes()
+        notes = part.flat.notes
         beams = []
         for n in notes:
             if n.isClass(note.Note):
@@ -685,7 +685,7 @@ class Test(unittest.TestCase):
         part = a[0]
 
 
-        notes = part.flat.getNotes()
+        notes = part.flat.notes
         self.assertEqual(len(notes), 11)
 
 

@@ -2012,7 +2012,7 @@ class Test(unittest.TestCase):
         note1.type = "whole"
         stream1 = stream.Stream()
         stream1.append(note1)
-        subStream = stream1.getNotes()
+        subStream = stream1.notes
 
     def testLocationsRefs(self):
         aMock = TestMock()
