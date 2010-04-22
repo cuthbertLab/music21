@@ -6199,6 +6199,50 @@ class Test(unittest.TestCase):
         #s3.show()
 
 
+
+    def testMakeMeasuresMeterStream(self):
+        '''Testing making measures of various sizes with a supplied single element meter stream. This illustrate an approach to partitioning elements by various sized windows. 
+        '''
+        from music21 import meter, corpus
+        sBach = corpus.parseWork('bach/bwv324.xml')
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('2/4'))
+        # need to call make ties to allocate notes
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        self.assertEqual(len(sPartitioned), 18)
+
+
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('1/4'))
+        # need to call make ties to allocate notes
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        self.assertEqual(len(sPartitioned), 36)
+
+
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('3/4'))
+        # need to call make ties to allocate notes
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        self.assertEqual(len(sPartitioned), 12)
+
+
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('12/4'))
+        # need to call make ties to allocate notes
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        self.assertEqual(len(sPartitioned), 3)
+
+
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('36/4'))
+        # need to call make ties to allocate notes
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        self.assertEqual(len(sPartitioned), 1)
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -6222,5 +6266,5 @@ if __name__ == "__main__":
 
         #a.testContextNestedD()
 
-        b.testMxMeasures()
-
+        #b.testMxMeasures()
+        a.testMakeMeasuresMeterStream()
