@@ -476,17 +476,17 @@ class GenericInterval(music21.Music21Object):
         '''
         return GenericInterval(self.mod7inversion)
 
-    def invert(self):
+    def reverse(self):
         '''Returns a new GenericInterval object that is inverted. 
 
         >>> aInterval = GenericInterval('Third')
-        >>> aInterval.invert()
+        >>> aInterval.reverse()
         <music21.interval.GenericInterval -3>
 
         >>> aInterval = GenericInterval(-13)
         >>> aInterval.direction
         -1
-        >>> aInterval.invert()
+        >>> aInterval.reverse()
         <music21.interval.GenericInterval 13>
         '''
         return GenericInterval(self.undirected * (-1 * self.direction))
@@ -643,20 +643,20 @@ class DiatonicInterval(music21.Music21Object):
         return "<music21.interval.DiatonicInterval %s>" % self.name
 
 
-    def invert(self):
+    def reverse(self):
         '''Return a DiatonicInterval that is an inversion of this Interval.
 
         >>> aInterval = DiatonicInterval('major', 3)
-        >>> aInterval.invert().directedName
+        >>> aInterval.reverse().directedName
         'M-3'
 
         >>> aInterval = DiatonicInterval('augmented', 5)
-        >>> aInterval.invert().directedName
+        >>> aInterval.reverse().directedName
         'A-5'
         '''
         # self.invertedOrderedSpecifier gives a complement, not an inversion?
         return DiatonicInterval(self.specifier, 
-                                self.generic.invert())
+                                self.generic.reverse())
 
 
     def getChromatic(self):
@@ -747,15 +747,15 @@ class ChromaticInterval(music21.Music21Object):
     def __repr__(self):
         return "<music21.interval.ChromaticInterval %s>" % self.directed
 
-    def invert(self):
+    def reverse(self):
         '''Return an inverted interval, that is, reversing the direction.
 
         >>> aInterval = ChromaticInterval(-14)
-        >>> aInterval.invert()
+        >>> aInterval.reverse()
         <music21.interval.ChromaticInterval 14>
 
         >>> aInterval = ChromaticInterval(3)
-        >>> aInterval.invert()
+        >>> aInterval.reverse()
         <music21.interval.ChromaticInterval -3>
         '''
         return ChromaticInterval(self.undirected * (-1 * self.direction))
@@ -911,7 +911,7 @@ class Interval(music21.Music21Object):
     >>> from music21 import note
     >>> n1 = note.Note('c3')
     >>> n2 = note.Note('c5')
-    >>> aInterval = Interval(note1=n1, note2=n2)
+    >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
     >>> aInterval
     <music21.interval.Interval P15>
     '''
@@ -921,8 +921,8 @@ class Interval(music21.Music21Object):
 #        diatonic  = DiatonicInterval object
 #        chromatic = ChromaticInterval object
 #     (2b) or both of
-#        note1 = Pitch (or Note) object
-#        note2 = Pitch (or Note) object
+#        _noteStart = Pitch (or Note) object
+#        _noteEnd = Pitch (or Note) object
 #     in which case it figures out the diatonic and chromatic intervals itself
 
     diatonic = None
@@ -931,8 +931,8 @@ class Interval(music21.Music21Object):
     generic = None
 
     # these can be accessed through noteStart and noteEnd properties
-    note1 = None 
-    note2 = None 
+    _noteStart = None 
+    _noteEnd = None 
 
     type = "" # harmonic or melodic
     diatonicType = 0
@@ -943,11 +943,11 @@ class Interval(music21.Music21Object):
         >>> from music21 import note
         >>> n1 = note.Note('c3')
         >>> n2 = note.Note('g3')
-        >>> aInterval = Interval(note1=n1, note2=n2)
+        >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
         >>> aInterval
         <music21.interval.Interval P5>
 
-        >>> aInterval = Interval(note1=n1, note2=None)
+        >>> aInterval = Interval(noteStart=n1, noteEnd=None)
         Traceback (most recent call last):
         IntervalException: two or zero Note classes must be defined
 
@@ -1003,17 +1003,17 @@ class Interval(music21.Music21Object):
 
         elif (len(arguments) == 2 and arguments[0].isNote == True and 
             arguments[1].isNote == True):
-            self.note1 = arguments[0]
-            self.note2 = arguments[1]
+            self._noteStart = arguments[0]
+            self._noteEnd = arguments[1]
         else:
             if "diatonic" in keywords:
                 self.diatonic = keywords['diatonic']
             if "chromatic" in keywords:
                 self.chromatic = keywords['chromatic']
-            if "note1" in keywords:
-                self.note1 = keywords['note1']
-            if "note2" in keywords:
-                self.note2 = keywords['note2']
+            if "noteStart" in keywords:
+                self._noteStart = keywords['noteStart']
+            if "noteEnd" in keywords:
+                self._noteEnd = keywords['noteEnd']
 
         # this method will check for incorrectly defined attributes
         self.reinit()
@@ -1022,13 +1022,13 @@ class Interval(music21.Music21Object):
         '''Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes.
         '''
         # catch case where only one Note is provided
-        if (self.note1 != None and self.note2 == None or 
-            self.note2 != None and self.note1 == None):
+        if (self._noteStart != None and self._noteEnd == None or 
+            self._noteEnd != None and self._noteStart == None):
             raise IntervalException('two or zero Note classes must be defined')
 
-        if self.note1 is not None and self.note2 is not None:
-            genericInterval = notesToGeneric(self.note1, self.note2)
-            chromaticInterval = notesToChromatic(self.note1, self.note2)
+        if self._noteStart is not None and self._noteEnd is not None:
+            genericInterval = notesToGeneric(self._noteStart, self._noteEnd)
+            chromaticInterval = notesToChromatic(self._noteStart, self._noteEnd)
             diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
             self.diatonic = diatonicInterval
             self.chromatic = chromaticInterval
@@ -1135,49 +1135,49 @@ class Interval(music21.Music21Object):
         return pitch2
 
 
-    def invert(self):
-        '''Return an inverted version of this interval. If given Notes, these notes are reversed. 
+    def reverse(self):
+        '''Return an reversed version of this interval. If given Notes, these notes are reversed. 
 
         >>> from music21 import note
         >>> n1 = note.Note('c3')
         >>> n2 = note.Note('g3')
-        >>> aInterval = Interval(note1=n1, note2=n2)
+        >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
         >>> aInterval
         <music21.interval.Interval P5>
-        >>> bInterval = aInterval.invert()
+        >>> bInterval = aInterval.reverse()
         >>> bInterval
         <music21.interval.Interval P-5>
         >>> bInterval.noteStart == aInterval.noteEnd
         True
         
         >>> aInterval = Interval('m3')
-        >>> aInterval.invert()
+        >>> aInterval.reverse()
         <music21.interval.Interval m-3>
         '''
-        if self.note1 != None and self.note2 != None:
-            return Interval(note1=self.note2, note2=self.note1)
+        if self._noteStart != None and self._noteEnd != None:
+            return Interval(noteStart=self._noteEnd, noteEnd=self._noteStart)
         else:
-            return Interval(diatonic=self.diatonic.invert(),
-                            chromatic=self.chromatic.invert())
+            return Interval(diatonic=self.diatonic.reverse(),
+                            chromatic=self.chromatic.reverse())
 
 
     def _setNoteStart(self, n):
-        '''Assuming that this interval is defined, we can set a new start note (note1) and automatically have the end note (note2).
+        '''Assuming that this interval is defined, we can set a new start note (_noteStart) and automatically have the end note (_noteEnd).
         '''
         # this is based on the procedure found in transposePitch() and 
         # transposeNote() but offers a more object oriented approach
 
-        self.note1 = n
+        self._noteStart = n
         pitch1 = n.pitch
         pitch2 = self.transposePitch(pitch1)
-        self.note2 = copy.deepcopy(self.note1)
-        self.note2.pitch = pitch2
+        self._noteEnd = copy.deepcopy(self._noteStart)
+        self._noteEnd.pitch = pitch2
 
     def _getNoteStart(self):
-        return self.note1
+        return self._noteStart
 
     noteStart = property(_getNoteStart, _setNoteStart, 
-        doc = '''Assuming this Interval has been defined, set the start note (note1) to a new value; this will adjust the value of the end note (note2).
+        doc = '''Assuming this Interval has been defined, set the start note (_noteStart) to a new value; this will adjust the value of the end note (_noteEnd).
         
         >>> from music21 import note
         >>> aInterval = Interval('M3')
@@ -1214,22 +1214,22 @@ class Interval(music21.Music21Object):
         ''')
 
     def _setNoteEnd(self, n):
-        '''Assuming that this interval is defined, we can set a new end note (note2) and automatically have the start note (note1).
+        '''Assuming that this interval is defined, we can set a new end note (_noteEnd) and automatically have the start note (_noteStart).
         '''
         # this is based on the procedure found in transposePitch() but offers
         # a more object oriented approach
 
-        self.note2 = n
+        self._noteEnd = n
         pitch2 = n.pitch
         pitch1 = self.transposePitch(pitch2, reverse=True)
-        self.note1 = copy.deepcopy(self.note2)
-        self.note1.pitch = pitch1
+        self._noteStart = copy.deepcopy(self._noteEnd)
+        self._noteStart.pitch = pitch1
 
     def _getNoteEnd(self):
-        return self.note2
+        return self._noteEnd
 
     noteEnd = property(_getNoteEnd, _setNoteEnd, 
-        doc = '''Assuming this Interval has been defined, set the end note (note2) to a new value; this will adjust the value of the start note (note1).
+        doc = '''Assuming this Interval has been defined, set the end note (_noteEnd) to a new value; this will adjust the value of the start note (_noteStart).
 
         >>> from music21 import note
         >>> aInterval = Interval('M3')
@@ -1421,7 +1421,7 @@ def notesToInterval(n1, n2 = None):
     >>> aInterval
     <music21.interval.Interval P12>
 
-    >>> bInterval = Interval(note1=aNote, note2=bNote)
+    >>> bInterval = Interval(noteStart=aNote, noteEnd=bNote)
     >>> aInterval.niceName == bInterval.niceName
     True
     '''
@@ -1482,7 +1482,7 @@ class Test(unittest.TestCase):
         n2.accidental = Accidental("-")
         
         #int1 = interval.notesToInterval(n1, n2)   # returns music21.interval.Interval object
-        int1  = Interval(note1 = n1, note2 = n2)
+        int1  = Interval(noteStart = n1, noteEnd = n2)
         dInt1 = int1.diatonic   # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
     
