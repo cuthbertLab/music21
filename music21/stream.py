@@ -735,13 +735,34 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # searching and replacing routines
 
-    def replace(self, target, replacement, firstMatchOnly=False):
+    def replace(self, target, replacement, firstMatchOnly=False,
+                 allTargetSites=True):
         '''Given a `target` object, replace all references of that object with references to the supplied `replacement` object.
+
+        If `allTargetSites` is True, all sites that have a reference for the relacement will be similarly changed. This is useful altering both a flat and nested representation.         
         '''
-        # could use index() but need to possibly do more than one replacement
+        # get all indices in this Stream that match
+        iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+        for i in iMatch:
+            # replace all index target with the replacement
+            self._elements[i] = replacement
+            # place the replacement at the old objects offset for this site
 
+            # NOTE: an alternative way to do this would be to look at all the 
+            # sites defined by the target and add them to the replacement
+            # this would not put them in those locations elements, however
 
+            replacement.addLocation(self, target.getOffsetBySite(self))
+            # remove this location from old; this will also adjust the parent
+            # assignment if necessary
+            target.removeLocation(self)
 
+        if allTargetSites:
+            for site in target.getSites():
+                # each site must be a Stream
+                if site == None or site == self:
+                    continue
+                site.replace(target, replacement, firstMatchOnly=firstMatchOnly)
 
 
     #---------------------------------------------------------------------------
@@ -6326,6 +6347,47 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.parent, None)
 
 
+    def testReplace(self):
+        '''Test replacing components from a Stream.
+        '''
+        s = Stream()
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+        n3 = note.Note('a')
+        n4 = note.Note('c')
+
+        s.insert(0, n1)
+        s.insert(5, n2)
+
+        self.assertEqual(len(s), 2)
+
+        s.replace(n1, n3)
+        self.assertEqual([s[0], s[1]], [n3, n2])
+
+        s.replace(n2, n4)
+        self.assertEqual([s[0], s[1]], [n3, n4])
+
+        s.replace(n4, n1)
+        self.assertEqual([s[0], s[1]], [n3, n1])
+
+
+        from music21 import corpus
+        sBach = corpus.parseWork('bach/bwv324.xml')
+        partSoprano = sBach[0]
+
+        c1 = partSoprano.flat.getElementsByClass(clef.Clef)[0]
+        self.assertEqual(isinstance(c1, clef.TrebleClef), True)
+
+        # now, replace with a different clef
+        c2 = clef.AltoClef()
+        partSoprano.flat.replace(c1, c2)
+
+        # all views of the Stream have been updated
+        cTest = sBach[0].flat.getElementsByClass(clef.Clef)[0]
+        self.assertEqual(isinstance(cTest, clef.AltoClef), True)
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -6353,4 +6415,4 @@ if __name__ == "__main__":
         #a.testMakeMeasuresMeterStream()
 
 
-        a.testRemove()
+        a.testReplace()

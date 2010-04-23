@@ -1160,6 +1160,22 @@ class Music21Object(object):
         '''
         self._definedContexts.add(site, offset)
 
+    def getSites(self):
+        '''Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder. 
+
+        >>> from music21 import note, stream
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> n = note.Note()
+        >>> s1.append(n)
+        >>> s2.append(n)
+        >>> n.getSites() == [s1, s2]
+        True
+        '''
+        post = self._definedContexts.getSites()
+        post.remove(None) # remove None
+        return post
+
     def removeLocation(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
 

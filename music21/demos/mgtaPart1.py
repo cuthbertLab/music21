@@ -340,9 +340,7 @@ def ch1_writing_I_B_2(show=True, *arguments, **keywords):
     # this notation excerpt is incomplete
     ex = converter.parseData(humdata)
     clefOld = ex.flat.getElementsByClass(clef.Clef)[0]
-    # remove the clef from the first Stream in ex
-    ex[0].pop(ex[0].index(clefOld))
-    ex.insert(0, clef.TrebleClef()) # add desired clef
+    ex.flat.replace(clefOld, clef.TrebleClef())
     if show:
         ex.show()
 
@@ -382,10 +380,8 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     ex = converter.parseData(humdata)
 
     clefOld = ex.flat.getElementsByClass(clef.Clef)[0]
-    # remove the clef from the first Stream in ex
-    ex[0].pop(ex[0].index(clefOld))
-
-    ex.insert(0, clef.TenorClef())
+    # replace the old clef
+    ex.flat.replace(clefOld, clef.TenorClef())
     ex.insert(0, instrument.Bassoon())
 
     if show:
@@ -450,5 +446,5 @@ if __name__ == "__main__":
         #t.testImportClefAssign()
 
         #ch1_writing_I_B_1(show=True)
-        #ch1_writing_I_B_2(show=True)
-        ch1_writing_I_B_3(show=True)
+        ch1_writing_I_B_2(show=True)
+        #ch1_writing_I_B_3(show=True)
