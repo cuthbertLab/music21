@@ -6388,6 +6388,24 @@ class Test(unittest.TestCase):
 
 
 
+        s1 = Stream()
+        s1.insert(10, n1)
+        s2 = Stream()
+        s2.insert(20, n1)
+        s3 = Stream()
+        s3.insert(30, n1)
+        
+        s1.replace(n1, n2)
+        self.assertEqual(s1[0], n2)
+        self.assertEqual(s1[0].getOffsetBySite(s1), 10)
+        
+        self.assertEqual(s2[0], n2)
+        self.assertEqual(s2[0].getOffsetBySite(s2), 20)
+        
+        self.assertEqual(s3[0], n2)
+        self.assertEqual(s3[0].getOffsetBySite(s3), 30)
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
