@@ -360,14 +360,13 @@ class Stream(music21.Music21Object):
         >>> n2 = note.Note('g#')
 
         >>> s.insert(0, n1)
-        >>> s.insert(10, n1)
         >>> s.insert(5, n2)
         >>> len(s)
-        3
+        2
         >>> s.indexList(n1)
-        [0, 1]
+        [0]
         >>> s.indexList(n2)
-        [2]
+        [1]
 
         '''
         iMatch = []
@@ -477,7 +476,8 @@ class Stream(music21.Music21Object):
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
                     # user here to provide new offset
-                    new.insert(e.getOffsetBySite(old), newElement, ignoreSort = True)
+                    new.insert(e.getOffsetBySite(old), newElement, 
+                               ignoreSort = True)
                 # the elements, formerly had their stream as parent     
                 # they will still have that site in locations
                 # need to set new stream as parent 
@@ -551,6 +551,7 @@ class Stream(music21.Music21Object):
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
                 item = offsetOrItemOrList[i+1]
+                # recursively calling insert() here
                 self.insert(offset, item, ignoreSort = ignoreSort)
                 i += 2
             return
@@ -563,13 +564,23 @@ class Stream(music21.Music21Object):
             raise StreamException("this Stream cannot be contained within itself")
         if not common.isNum(offset):
             raise StreamException("offset %s must be a number", offset)
-        
-        # if not an element, embed
+
+        # if not a Music21Object, embed
         if not isinstance(item, music21.Music21Object): 
             element = music21.ElementWrapper(item)
         else:
             element = item
+
+        # if we do not purge locations here, we may have ids() for 
+        # Stream that no longer exist stored in the locations entry
+        element.purgeLocations()
         
+#         if id(self) in element.getSiteIds():
+#             environLocal.printDebug(['element site ids', element, element.getSiteIds()])
+#             environLocal.printDebug(['self id', self, id(self)])
+#             #self.show('t')
+#             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+
         offset = float(offset)
         element.addLocation(self, offset)
         # need to explicitly set the parent of the element
@@ -643,7 +654,8 @@ class Stream(music21.Music21Object):
             # back into a list for list processing if single
             others = [others]
 
-        for item in others:
+        for item in others:    
+
             # using id() here b/c we do not want to get __eq__ comparisons
             if id(item) == id(self): # cannot add this Stream into itself
                 raise StreamException("this object (%s) cannot be added to this Stream (%s)" % (item, self))
@@ -654,6 +666,13 @@ class Stream(music21.Music21Object):
             else:
                 element = item
 
+            # if we do not purge locations here, we may have ids() for 
+            # Stream that no longer exist stored in the locations entry
+            element.purgeLocations()
+
+#             if id(self) in element.getSiteIds():
+#                 raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+    
             element.addLocation(self, highestTime)
             # need to explicitly set the parent of the element
             element.parent = self 
@@ -1447,7 +1466,6 @@ class Stream(music21.Music21Object):
         OMIT_FROM_DOCS
         TODO: this probably needs to deepcopy the new first measure.
         '''
-        # create new part (or whatever object is necessary) for each embedded part. copy measures numbered 15 - 20 inclusive (not necessary measures[14:21]) add at the beginning of new measure 15 at least the correct clef, key signature, instrument, and time signature, and metronome mark. Optionally should also get the TempoMark ("Allegro"), current dynamic, etc.  (actually, the clef and key signature, etc. should be able to be disabled as well in case it's going to be integrated into another score; so maybe make the third, optional argument have a number of different settings).
         
         # create a dictionary of measure number, list of Meaures
         # there may be more than one Measure with the same Measure number
@@ -1766,7 +1784,7 @@ class Stream(music21.Music21Object):
         '''
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
-        environLocal.printDebug(['getClefs(); count of local', len(post), post])
+        #environLocal.printDebug(['getClefs(); count of local', len(post), post])
 
 # do not do this: this returns the default before the context search is complete
 #         if len(post) == 0 and searchParent:
@@ -2658,20 +2676,22 @@ class Stream(music21.Music21Object):
     
     sorted = property(_getSorted)        
 
-
-
         
     def _getFlatOrSemiFlat(self, retainContainers):
+
+        # if already flat, could just return a shallow copy?
+#         if self.isFlat == True:
+#             return self
+
         # this copy will have a shared locations object
         sNew = copy.copy(self)
-
-        # could manually provide an independent _definedContexts object
-        # deepcopy of defind contexts does not copy references
-        # this does not solve problem of fiding contexts in a flat stream
-        #sNew._definedContexts = copy.deepcopy(self._definedContexts)
+        #sNew = self.__class__()
 
         sNew._elements = []
         sNew._elementsChanged()
+
+        #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
+        # Note: for e in self.elements creates a new Stream
         for e in self.elements:
             # check for stream instance instead
             # if this element is a stream
@@ -2690,7 +2710,7 @@ class Stream(music21.Music21Object):
                     oldOffset = subEl._definedContexts.getOffsetBySite(
                                 recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
-                    #environLocal.printDebug("newOffset: " + str(subEl.id) + " " + str(newOffset))
+                    #environLocal.printDebug(["newOffset: ", subEl.id, newOffset])
                     sNew.insert(newOffset, subEl)
             # if element not a stream
             else:
@@ -2758,7 +2778,9 @@ class Stream(music21.Music21Object):
         '''
         return self._getFlatOrSemiFlat(retainContainers = False)
 
-    flat = property(_getFlat)
+    flat = property(_getFlat, 
+        doc='''Return a new Stream that has all sub-container flattened within.
+        ''')
 
 
     def _getSemiFlat(self):
@@ -5358,14 +5380,20 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
         thisWork = corpus.getWork('haydn/opus74no2/movement4.xml')
         a = converter.parse(thisWork)
-        b = a[3][10:20]
-        c = a[3][20:30]
-        d = a[3][30:40]
 
-        s = Stream()
-        s.insert(b)
-        s.insert(c)
-        s.insert(d)
+        b = a[3][10:20]
+        environLocal.printDebug(['b', b, b.getSiteIds()])
+        c = a[3][20:30]
+        environLocal.printDebug(['c', c, c.getSiteIds()])
+        d = a[3][30:40]
+        environLocal.printDebug(['d', d, d.getSiteIds()])
+
+        s2 = Stream()
+        environLocal.printDebug(['s2', s2, id(s2)])
+
+        s2.insert(b)
+        s2.insert(c)
+        s2.insert(d)
 
 
 
@@ -6286,29 +6314,6 @@ class Test(unittest.TestCase):
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
         self.assertEqual(len(sPartitioned), 1)
 
-
-
-
-    def testMultipleReferencesOneStream(self):
-        '''Test having multiple references of the same element in a single Stream.
-        '''
-        s = Stream()
-        n1 = note.Note('g')
-        n2 = note.Note('g#')
-
-        # TODO: this is a problem as presently an object can only have one 
-        # offset for one site
-        s.insert(0, n1)
-        s.insert(10, n1)
-        s.insert(5, n2)
-
-        self.assertEqual(len(s), 3)
-        self.assertEqual(s.indexList(n1), [0, 1])
-        self.assertEqual(s.indexList(n2), [2])
-        self.assertEqual(s.indexList(n1, firstMatchOnly=True), [0])
-
-
-
     def testRemove(self):
         '''Test removing components from a Stream.
         '''
@@ -6369,8 +6374,6 @@ class Test(unittest.TestCase):
         cTest = sBach[0].flat.getElementsByClass(clef.Clef)[0]
         self.assertEqual(isinstance(cTest, clef.AltoClef), True)
 
-
-
         s1 = Stream()
         s1.insert(10, n1)
         s2 = Stream()
@@ -6389,6 +6392,51 @@ class Test(unittest.TestCase):
         self.assertEqual(s3[0].getOffsetBySite(s3), 30)
 
 
+
+    def testDoubleStreamPlacement(self):
+        from music21 import note
+        n1 = note.Note()
+        s1 = Stream()
+        s1.insert(n1)
+
+        environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.getSiteIds()])
+
+
+        s2 = Stream()
+        s2.insert(s1)
+
+        environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.getSiteIds()])
+
+        s2Flat = s2.flat
+
+        environLocal.printDebug(['s1', s1, id(s1)])    
+        environLocal.printDebug(['s2', s2, id(s2)])    
+        environLocal.printDebug(['s2flat', s2Flat, id(s2Flat)])
+
+        environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.getSiteIds()])
+
+        # previously, one of these raised an error
+        s3 = copy.deepcopy(s2Flat)
+        s3 = copy.deepcopy(s2.flat)
+        s3Measures = s3.makeMeasures()
+
+
+    def xtestMultipleReferencesOneStream(self):
+        '''Test having multiple references of the same element in a single Stream.
+        '''
+        s = Stream()
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+
+        # TODO: this is a problem as presently an object can only have one 
+        # offset for one site
+        s.insert(0, n1)
+
+        self.assertRaises(StreamException,  s.insert, 10, n1)
+
+       
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -6402,18 +6450,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         a = Test()
         b = TestExternal()
-        #a.testMeasureOffsetMapPostTie()    
-        #a.testStripTies()
-        #a.xtestStripTiesImported()
 
-        #a.testContextNestedA()
-        #a.testContextNestedB()
-        #a.testContextNestedC()
+        # a.testMeasureRange()
 
-        #a.testContextNestedD()
-
-        #b.testMxMeasures()
-        #a.testMakeMeasuresMeterStream()
-
-
-        a.testReplace()
+        a.testMultipartStream()

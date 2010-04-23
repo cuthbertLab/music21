@@ -446,7 +446,10 @@ class DefinedContexts(object):
         if siteId in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(siteId))
 
+
     def removeById(self, idKey):
+        if idKey == None:
+            raise Exception('trying to remove None idKey')
         del self._definedContexts[idKey]
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
@@ -559,6 +562,53 @@ class DefinedContexts(object):
         else:
             return False
 
+    def getSiteIds(self):
+        '''Return a list of all site Ids.
+        '''
+        # may want to convert to tuple to avoid user editing?
+        return self._locationKeys
+
+
+    def purgeLocations(self):
+        '''Clean all locations that refer to objects that no longer exist.
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> dSite = Mock()
+        >>> aLocations = DefinedContexts()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(cSite) # a context
+        >>> del aSite
+        >>> len(aLocations)
+        2
+        >>> aLocations.purgeLocations()
+        >>> len(aLocations)
+        1
+        '''
+        match = []
+        for idKey in self._locationKeys:
+            if idKey == None: 
+                continue
+            if WEAKREF_ACTIVE:
+                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+            else:
+                obj = self._definedContexts[idKey]['obj']
+            if obj == None: # if None, it no longer exists
+                match.append(idKey)
+        for id in match:
+            self.removeById(id)
+
+
+#     def clearLocations(self):
+#         '''Remove all locations.
+#         '''
+#         for idKey in self._locationKeys:
+#             if idKey == None: 
+#                 continue
+#             self.removeById(idKey)
+
 
     def getOffsets(self):
         '''Return a list of all offsets.
@@ -602,7 +652,7 @@ class DefinedContexts(object):
         raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
 
     def getOffsetBySite(self, site):
-        '''For a given site return its offset.
+        '''For a given site return its offset. The None site is permitted.
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
@@ -1174,12 +1224,15 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> s1.append(n)
         >>> s2.append(n)
-        >>> n.getSites() == [s1, s2]
+        >>> n.getSites() == [None, s1, s2]
         True
         '''
-        post = self._definedContexts.getSites()
-        post.remove(None) # remove None
-        return post
+        return self._definedContexts.getSites()
+
+    def getSiteIds(self):
+        '''Return a lost of all site Ids, or the id() value of the sites of this object. 
+        '''
+        return self._definedContexts.getSiteIds()
 
     def removeLocation(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
@@ -1206,6 +1259,16 @@ class Music21Object(object):
         if self._getParent() == site:
             self._setParent(None)
 
+
+    def purgeLocations(self):
+        '''Remove references to all locations in objects that no longer exist.
+        '''
+        self._definedContexts.purgeLocations()
+
+#     def clearLocations(self):
+#         '''Clear all locations stored by this object.
+#         '''
+#         self._definedContexts.clearLocations()
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
@@ -1246,8 +1309,10 @@ class Music21Object(object):
                 # to this Stream; it may only be available within a flat
                 # representaiton
 
-                # alternative method:
+                # alternative method may not work in all cases
+                # and raises an exception on error
                 #offsetOfCaller = callerFirst.getOffsetBySite(self.flat)
+
                 # most error tolerant: returns None
                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
 
