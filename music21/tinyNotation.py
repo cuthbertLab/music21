@@ -2,13 +2,56 @@
 
 '''tinyNotation -- a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer 
-examples.  Originally developed to notate trecento (medieval Italian)
-music, but it's pretty useful for a lot of short examples.  
+options.  It was originally developed to notate trecento (medieval Italian)
+music, but it is pretty useful for a lot of short examples, so we have
+made it a generally supported music21 format
 
-tinyNotation is not meant to expand to cover every single case.  Instead
+N.B.: TinyNotation is not meant to expand to cover every single case.  Instead
 it is meant to be subclassable to extend to the cases *your* project needs.
-See for instance the harmony examples in HarmonyNotationLine and HarmonyNotationNote
+See for instance the harmony examples in HarmonyStream and HarmonyNote
 or the Trecento specific examples in trecento/cadencebook.py
+
+Here are the most important rules:
+
+Note names are: a,b,c,d,e,f,g and r for rest
+
+Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
+If the accidental is above the staff (i.e., editorial), enclose it in 
+parentheses: (#), etc.  Make sure that flats in the key signatures are
+explicitly specified.  
+
+Note octaves are specified as follows:
+
+    CC to BB = from C below bass clef to second-line B in bass clef
+
+    C to B = from bass clef C to B below middle C.
+
+    c  to b = from middle C to the middle of treble clef
+
+    c' to b' = from C in treble clef to B above treble clef
+
+After the note name, a number may be placed indicating the note 
+length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
+etc.  If the number is omitted then it is assumed to be the same 
+as the previous note.  I.e., c8 B c d  is a string of eighth notes.
+
+After the number, a ~ can be placed to show a tie to the next note.  
+A "." indicates a dotted note.  (If you are entering
+data via Excel or other spreadsheet, be sure that "capitalize the 
+first letter of sentences" is turned off under "Tools->AutoCorrect,"
+otherwise the next letter will be capitalized, and the octave will
+be screwed up.
+
+For triplets use this notation:  trip{c4 d8}  indicating that these 
+two notes both have "3s" over them.  For 4 in the place of 3, 
+use quad{c16 d e8}.  No other tuplets are supported.
+
+Again, see the HarmonyStream (below) and trecento.cadencebook examples
+to see how to make TinyNotation useful for your own needs.
+
+(Currently, final notes with fermatas (or any very long final note), 
+take 0 for the note length.  But expect this to disappear from the
+TinyNotation specification soon, as it's too Trecento specific.)
 '''
 
 import unittest, doctest
