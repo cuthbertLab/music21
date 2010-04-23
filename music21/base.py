@@ -122,7 +122,7 @@ class Groups(list):
 
 #-------------------------------------------------------------------------------
 class DefinedContexts(object):
-    '''An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant.
+    '''An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant.
 
     Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. 
 
@@ -353,7 +353,7 @@ class DefinedContexts(object):
         return objRef
 
     def add(self, obj, offset=None, name=None, timeValue=None, idKey=None):
-        '''Add a reference
+        '''Add a reference to the DefinedContexts collection. 
         if offset is None, it is interpreted as a context
         if offset is a value, it is intereted as location
 
@@ -405,7 +405,7 @@ class DefinedContexts(object):
             self._definedContexts[idKey].update(dict)
 
     def remove(self, site):
-        '''Remove the entry specified by sites
+        '''Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
@@ -437,16 +437,14 @@ class DefinedContexts(object):
             del self._definedContexts[siteId]
         except:    
             raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
-        
+        # also delete from location keys
         if siteId in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(siteId))
-
 
     def removeById(self, idKey):
         del self._definedContexts[idKey]
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
-
 
     def getById(self, id):
         '''Return the object specified by an id.
@@ -528,10 +526,30 @@ class DefinedContexts(object):
                 post.append(common.unwrapWeakref(s1))
         return post
     
-    def hasSiteId(self, site):
-        '''Return True or False if this DefinedContexts object already has this site defined as a location
+
+    def isSite(self, obj):
+        '''Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocations = DefinedContexts()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(bSite) # a context
+        >>> aLocations.isSite(aSite)
+        True
+        >>> aLocations.isSite(bSite)
+        False
         '''
-        if site in self._locationKeys:
+        if id(obj) in self._locationKeys:
+            return True
+        else:
+            return False
+
+    def hasSiteId(self, siteId):
+        '''Return True or False if this DefinedContexts object already has this site id defined as a location
+        '''
+        if siteId in self._locationKeys:
             return True
         else:
             return False
@@ -656,12 +674,6 @@ class DefinedContexts(object):
         except KeyError:
             raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
             
-
-#         if siteId in self._definedContexts.keys(): 
-#             #environLocal.printDebug(['site already defined in this DefinedContexts object', site])
-#             # order is the same as in coordinates
-#             
-#         else:
 
     def getSiteByOffset(self, offset):
         '''For a given offset return the parent
@@ -997,12 +1009,20 @@ class Music21Object(object):
 
     def isClass(self, className):
         '''
-        returns bool depending on if the object is a particular class or not
+        Returns a boolean value depending on if the object is a particular class or not.
         
-        here, it just returns isinstance, but for Elements it will return true
-        if the embedded object is of the given class.  Thus, best to use it throughout
-        music21 and only use isinstance if you really want to see if something is
-        an ElementWrapper or not.
+        In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.
+
+        >>> from music21 import note
+        >>> n = note.Note()
+        >>> n.isClass(note.Note)
+        True
+        >>> e = ElementWrapper(3.2)
+        >>> e.isClass(note.Note)
+        False
+        >>> e.isClass(float)
+        True
+
         '''
         if isinstance(self, className):
             return True
@@ -1095,7 +1115,7 @@ class Music21Object(object):
         return self._definedContexts.setAttrByName(attrName, value)
 
     def addContext(self, obj):
-        '''Add an ojbect as a context reference, placed with the object's DefinedContexts object.
+        '''Add an ojbect to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
 
         >>> class Mock(Music21Object): attr1=234
         >>> aObj = Mock()
@@ -1127,6 +1147,44 @@ class Music21Object(object):
                 return True
         else:
             return False
+
+    def addLocation(self, site, offset):
+        '''Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object. 
+
+        This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream. 
+
+        >>> from music21 import note, stream
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> n.addLocation(s, 10)
+        '''
+        self._definedContexts.add(site, offset)
+
+    def removeLocation(self, site):
+        '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
+
+        This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
+
+        >>> from music21 import note, stream
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> n.addLocation(s, 10)
+        >>> n.parent = s
+        >>> n.removeLocation(s)
+        >>> n.parent == None
+        True
+        '''
+        if not self._definedContexts.isSite(site):
+            raise Music21ObjectException('supplied object (%s) is not a site in this object.')
+        self._definedContexts.remove(site)
+        # if parent is set to that site, reassign to None
+
+        # TODO: when multiple offsets for a single site are permitted
+        # need to only set parent to none when there are no further 
+        # offsets
+        if self._getParent() == site:
+            self._setParent(None)
+
 
 
     def getContextByClass(self, className, serialReverseSearch=True,

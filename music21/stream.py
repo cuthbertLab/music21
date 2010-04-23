@@ -347,8 +347,84 @@ class Stream(music21.Music21Object):
         s._elementsChanged()
         return s
 
+
+    def indexList(self, obj, firstMatchOnly=False):
+        '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
+
+        To just return the first matched index, set `firstMatchOnly` to True.
+
+        No matches are found, an empty list is returned.
+
+        >>> s = Stream()
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('g#')
+
+        >>> s.insert(0, n1)
+        >>> s.insert(10, n1)
+        >>> s.insert(5, n2)
+        >>> len(s)
+        3
+        >>> s.indexList(n1)
+        [0, 1]
+        >>> s.indexList(n2)
+        [2]
+
+        '''
+        iMatch = []
+        for i in range(len(self._elements)):
+            if self._elements[i] == obj:
+                iMatch.append(i)
+            elif (hasattr(self._elements[i], "obj") and \
+                     obj == self._elements[i].obj):
+                iMatch.append(i)
+            if firstMatchOnly and len(iMatch) > 0:
+                break
+        return iMatch
+
+    def index(self, obj):
+        '''Return the first matched index for the specified object.
+
+        >>> a = Stream()
+        >>> fSharp = note.Note("F#")
+        >>> a.repeatInsert(note.Note("A#"), range(10))
+        >>> a.append(fSharp)
+        >>> a.index(fSharp)
+        10
+        '''
+        iMatch = self.indexList(obj, firstMatchOnly=True)
+        if len(iMatch) == 0:
+            raise ValueError("Could not find object in index")
+        else:
+            return iMatch[0] # only need first returned index
+
+    def remove(self, target, firstMatchOnly=True):
+        '''Remove an object from this Stream. Additionally, this Stream is removed from the object's sites in :class:`~music21.base.DefinedContexts`.
+
+        By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters. 
+
+        >>> s = Stream()
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('g#')
+        >>> s.insert(10, n1)
+        >>> s.insert(5, n2)
+        >>> s.remove(n1)
+        >>> len(s)
+        1
+        '''
+        iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+        match = []
+        for i in iMatch:
+            # remove from stream with pop with index
+            match.append(self._elements.pop(i))
+        # after removing, need to remove self from locations reference 
+        # and from parent reference, if set; this is taken care of with the 
+        # Music21Object method
+        for obj in match:
+            obj.removeLocation(self)
+
+
     def pop(self, index):
-        '''return the matched object from the list. 
+        '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
 
         >>> a = Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
@@ -358,31 +434,14 @@ class Stream(music21.Music21Object):
         '''
         post = self._elements.pop(index)
         self._elementsChanged()
+
+        # remove self from locations here only if
+        # there are no further locations
+        post.removeLocation(self)
+
         return post
 
 
-    def index(self, obj):
-        '''return the index for the specified object 
-
-        >>> a = Stream()
-        >>> fSharp = note.Note("F#")
-        >>> a.repeatInsert(note.Note("A#"), range(10))
-        >>> a.append(fSharp)
-        >>> a.index(fSharp)
-        10
-        '''
-        try:
-            match = self._elements.index(obj)
-        except ValueError: # if not found
-            # access object inside of element
-            match = None
-            for i in range(len(self._elements)):
-                if hasattr(self._elements[i], "obj") and \
-                     obj == self._elements[i].obj:
-                    match = i
-                    break
-            raise ValueError("Could not find object in index")
-        return match
 
 
     def __deepcopy__(self, memo=None):
@@ -435,7 +494,6 @@ class Stream(music21.Music21Object):
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
-
                 
         return new
 
@@ -492,7 +550,7 @@ class Stream(music21.Music21Object):
             i = 0
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
-                item   = offsetOrItemOrList[i+1]
+                item = offsetOrItemOrList[i+1]
                 self.insert(offset, item, ignoreSort = ignoreSort)
                 i += 2
             return
@@ -501,23 +559,19 @@ class Stream(music21.Music21Object):
             offset = item.offset
         
         # if not an element, embed
-#        if not isinstance(item, music21.Music21Object): 
-#            environLocal.printDebug(['insert called with non Music21Object', item])
-#            element = music21.ElementWrapper(item)
-#        else:
-#            element = item
-
-        element = item
+        if not isinstance(item, music21.Music21Object): 
+            element = music21.ElementWrapper(item)
+        else:
+            element = item
 
         if not common.isNum(offset):
             raise StreamException("offset %s must be a number", offset)
         
         offset = float(offset)
-        element._definedContexts.add(self, offset)
+        element.addLocation(self, offset)
         # need to explicitly set the parent of the element
         element.parent = self 
 #        element.addLocationAndParent(offset, self)
-
 
         if ignoreSort is False:
             if self.isSorted is True and self.highestTime <= offset:
@@ -622,22 +676,16 @@ class Stream(music21.Music21Object):
         >>> a[0].name == 'B'
         True
         '''
-# locations attribute no longer exists
-# probably a better way to determine if object is a 
-# Music21Object
-#         if not hasattr(item, "locations"):
-#             raise StreamException("Cannot insert and item that does not have a location; wrap in an ElementWrapper() first")
-
         # NOTE: this may have unexpected side effects, as the None location
         # may have been set much later in this objects life.
         # optionally, could use last assigned site to get the offset        
         # or, use zero
-        item._definedContexts.add(self, item.getOffsetBySite(None))
+        item.addLocation(self, item.getOffsetBySite(None))
         # need to explicitly set the parent of the element
         item.parent = self 
-
         self._elements.insert(pos, item)
         self._elementsChanged()
+
 
     def insertAtNativeOffset(self, item):
         '''
@@ -662,8 +710,7 @@ class Stream(music21.Music21Object):
         self.insert(item.getOffsetBySite(None), item)
 
     def isClass(self, className):
-        '''
-        Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
+        '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
 
         Used by getElementsByClass in Stream
 
@@ -686,7 +733,18 @@ class Stream(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
+    # searching and replacing routines
 
+    def replace(self, target, replacement, firstMatchOnly=False):
+        '''Given a `target` object, replace all references of that object with references to the supplied `replacement` object.
+        '''
+        # could use index() but need to possibly do more than one replacement
+
+
+
+
+
+    #---------------------------------------------------------------------------
     def _recurseRepr(self, thisStream, prefixSpaces=0, 
                     addBreaks=True, addIndent=True):
         '''
@@ -738,19 +796,6 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # temporary storage
-
-#     def _printDefinedContexts(self):
-#         '''Debugging tool: show all defined contexts
-#         '''
-#         print('\nraw defind contexts')
-#         print(self._definedContexts._definedContexts)
-#         print(self.parent)
-#         for element in self.elements:
-#             if hasattr(element, "elements"): # recurse time:
-#                 print(element._definedContexts._definedContexts)   
-#                 element._printDefinedContexts() # proc defined contexts stored herein     
-#             elif isinstance(element, music21.Music21Object):
-#                 print(element._definedContexts._definedContexts)        
 
     def setupPickleScaffold(self):
         '''Prepare this stream and all of its contents for pickling.
@@ -1970,7 +2015,7 @@ class Stream(music21.Music21Object):
         # should be contained
 
 
-        environLocal.printDebug(['makeMeasures(): first clef found before copying and flattening', self.getClefs()[0]])
+        #environLocal.printDebug(['makeMeasures(): first clef found before copying and flattening', self.getClefs()[0]])
 
         # TODO: make inPlace an option
         srcObj = copy.deepcopy(self.flat)
@@ -1985,8 +2030,7 @@ class Stream(music21.Music21Object):
         clefStream = srcObj.getClefs()
         clefObj = clefStream[0]
 
-
-        environLocal.printDebug(['makeMeasures(): first clef found after copying and flattening', clefObj])
+        #environLocal.printDebug(['makeMeasures(): first clef found after copying and flattening', clefObj])
     
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
@@ -3533,8 +3577,7 @@ class Stream(music21.Music21Object):
         return returnList
     
     def melodicIntervals(self, *skipArgs, **skipKeywords):
-        '''
-        returns a Stream of :class:`~music21.interval.Interval` objects between Notes (and by default, Chords) that follow each other in a stream.
+        '''Returns a Stream of :class:`~music21.interval.Interval` objects between Notes (and by default, Chords) that follow each other in a stream.
         the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, 
         then it is equal to the offset of the second note)
         
@@ -6242,6 +6285,46 @@ class Test(unittest.TestCase):
 
 
 
+    def testMultipleReferencesOneStream(self):
+        '''Test having multiple references of the same element in a single Stream.
+        '''
+        s = Stream()
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+
+        # TODO: this is a problem as presently an object can only have one 
+        # offset for one site
+        s.insert(0, n1)
+        s.insert(10, n1)
+        s.insert(5, n2)
+
+        self.assertEqual(len(s), 3)
+        self.assertEqual(s.indexList(n1), [0, 1])
+        self.assertEqual(s.indexList(n2), [2])
+        self.assertEqual(s.indexList(n1, firstMatchOnly=True), [0])
+
+
+
+    def testRemove(self):
+        '''Test removing components from a Stream.
+        '''
+        s = Stream()
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+        n3 = note.Note('a')
+
+        s.insert(0, n1)
+        s.insert(10, n3)
+        s.insert(5, n2)
+
+        self.assertEqual(len(s), 3)
+
+        self.assertEqual(n1.parent, s)
+        s.remove(n1)
+        self.assertEqual(len(s), 2)
+        # parent is Now sent to Nonte
+        self.assertEqual(n1.parent, None)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -6267,4 +6350,7 @@ if __name__ == "__main__":
         #a.testContextNestedD()
 
         #b.testMxMeasures()
-        a.testMakeMeasuresMeterStream()
+        #a.testMakeMeasuresMeterStream()
+
+
+        a.testRemove()
