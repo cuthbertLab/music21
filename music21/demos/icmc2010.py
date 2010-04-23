@@ -72,7 +72,7 @@ def bergEx01(show=True):
 #         thisNote.duration.tuplets[0].setRatio(12, 8)
 
     for thisMeasure in score.getElementsByClass(stream.Measure):
-        thisMeasure.insertAtIndex(0, deepcopy(ts))
+        thisMeasure.clef = deepcopy(ts)
         thisMeasure.makeBeams()
 
     if show:
@@ -194,5 +194,7 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+
+    bergEx01()
+    #music21.mainTest(Test)
 

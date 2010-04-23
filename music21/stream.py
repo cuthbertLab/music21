@@ -557,21 +557,24 @@ class Stream(music21.Music21Object):
         else:
             item = offsetOrItemOrList
             offset = item.offset
+
+        # using id() here b/c we do not want to get __eq__ comparisons
+        if id(item) == id(self): # cannot add this Stream into itself
+            raise StreamException("this Stream cannot be contained within itself")
+        if not common.isNum(offset):
+            raise StreamException("offset %s must be a number", offset)
         
         # if not an element, embed
         if not isinstance(item, music21.Music21Object): 
             element = music21.ElementWrapper(item)
         else:
             element = item
-
-        if not common.isNum(offset):
-            raise StreamException("offset %s must be a number", offset)
         
         offset = float(offset)
         element.addLocation(self, offset)
         # need to explicitly set the parent of the element
         element.parent = self 
-#        element.addLocationAndParent(offset, self)
+        # element.addLocationAndParent(offset, self)
 
         if ignoreSort is False:
             if self.isSorted is True and self.highestTime <= offset:
@@ -641,17 +644,20 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:
+            # using id() here b/c we do not want to get __eq__ comparisons
+            if id(item) == id(self): # cannot add this Stream into itself
+                raise StreamException("this object (%s) cannot be added to this Stream (%s)" % (item, self))
+    
             # if not an element, embed
             if not isinstance(item, music21.Music21Object): 
                 element = music21.ElementWrapper(item)
             else:
                 element = item
 
-            element._definedContexts.add(self, highestTime)
+            element.addLocation(self, highestTime)
             # need to explicitly set the parent of the element
             element.parent = self 
             self._elements.append(element)  
-
 
             # this should look to the contained object duration
             if (hasattr(element, "duration") and 
@@ -662,29 +668,6 @@ class Stream(music21.Music21Object):
         storeSorted = self.isSorted    
         self._elementsChanged()         
         self.isSorted = storeSorted
-
-
-
-    def insertAtIndex(self, pos, item):
-        '''Insert in elements by index position.
-
-        >>> a = Stream()
-        >>> a.repeatAppend(note.Note('A-'), 30)
-        >>> a[0].name == 'A-'
-        True
-        >>> a.insertAtIndex(0, note.Note('B'))
-        >>> a[0].name == 'B'
-        True
-        '''
-        # NOTE: this may have unexpected side effects, as the None location
-        # may have been set much later in this objects life.
-        # optionally, could use last assigned site to get the offset        
-        # or, use zero
-        item.addLocation(self, item.getOffsetBySite(None))
-        # need to explicitly set the parent of the element
-        item.parent = self 
-        self._elements.insert(pos, item)
-        self._elementsChanged()
 
 
     def insertAtNativeOffset(self, item):
@@ -4213,7 +4196,7 @@ class Measure(Stream):
         # inherits from prev measure or is default for group
         # inherits from next measure or is default for group
 
-        # these need to but on, and obtained from .elements
+        # these need to be put on, and obtained from .elements
         self.leftbarline = None  
         self.rightbarline = None 
 

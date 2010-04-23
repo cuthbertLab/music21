@@ -359,8 +359,10 @@ class DefinedContexts(object):
 
         NOTE: offset follows obj here, unlike with add() in old DefinedContexts
         '''
-        if offset == None: domain = 'contexts'
-        else: domain = 'locations'
+        if offset == None: 
+            domain = 'contexts'
+        else: 
+            domain = 'locations'
 
         # note: if we want both context and locations to exists
         # for the same object, may need to append character code to id
@@ -383,8 +385,11 @@ class DefinedContexts(object):
         if domain == 'locations': # the dictionary may already be a context
             if add: # already know that it is new
                 self._locationKeys.append(idKey)
-            elif idKey not in self._locationKeys: # check 
+            # this may be a context that is now a location
+            elif idKey not in self._locationKeys: 
                 self._locationKeys.append(idKey)
+            # otherwise, this is attempting to define a new offset for 
+            # a known location
 
         dict = {}
         dict['obj'] = objRef
