@@ -204,10 +204,17 @@ class Stream(music21.Music21Object):
             return returnEl
     
         elif isinstance(key, slice): # get a slice of index values
-            found = copy.copy(self) # return a stream of elements
+            # NOTE: this copy may return locations references that are 
+            # not desirable
+            #found = copy.copy(self) # return a stream of elements
+            found = self.__class__()
             found.elements = self.elements[key]
-            for element in found:
-                pass ## sufficient to set parent properly
+            found._elementsChanged()
+
+            # NOTE: this used to iterate over the Stream: probably not needed
+            # all tests pass without
+            #for element in found:
+            #    pass ## sufficient to set parent properly
             return found
 
         elif common.isStr(key):
