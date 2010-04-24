@@ -30,11 +30,8 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 # CHAPTER 1 
-
-
 #-------------------------------------------------------------------------------
 # Basic Elements
-
 #-------------------------------------------------------------------------------
 # I. Using keyboard diagrams
 
@@ -302,7 +299,7 @@ def ch1_basic_II_C_4(show=True, *arguments, **keywords):
 # Writing Exercises
 
 #-------------------------------------------------------------------------------
-# !. Arranging
+# I. Arranging
 
 
 def ch1_writing_I_A_1(show=True, *arguments, **keywords):
@@ -454,9 +451,294 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
 
 #-------------------------------------------------------------------------------
-# !I. Composing melodies
+# II. Composing melodies
+
+def ch1_writing_II_A(show=True, *arguments, **keywords):
+    '''p. 7
+
+    Compose a melody using whole and half steps in any musical style.
+
+    This technique uses a random walk of whole or half steps with direction choices determined by wether the present note is above or below the target end.
+    '''
+    import copy, random
+    from music21 import interval, stream, expressions
+
+    dirWeight = [-1, 1] # start with an even distribution
+    s = stream.Stream()
+
+    nStart = note.Note('g4')
+    n = copy.deepcopy(nStart)
+
+    while True:
+        n.quarterLength = random.choice([.25, .5, 1])
+        s.append(n)
+        # if we have more than three and match the pitch class, end
+        if len(s) > 3 and n.pitch.pitchClass == nStart.pitch.pitchClass:
+            n.notations.append(expressions.Fermata())
+            break
+        if len(s) > 15: # emergency break
+            break
+        dir = random.choice(dirWeight)
+        if dir == 1:
+            i = random.choice(['w', 'h'])
+        else:
+            i = random.choice(['w-', 'h-'])
+        n = n.transpose(i)
+        
+        iSpread = interval.notesToInterval(nStart, n)
+        if iSpread.direction == -1: # we are below our target, favor upward
+            dirWeight = [-1, 1, 1]
+        if iSpread.direction == 1: # we are above our target, favor down
+            dirWeight = [-1, -1, 1]
+
+    if show:
+        s.show()
 
 
+def ch1_writing_II_B(show=True, *arguments, **keywords):
+    '''p. 7
+    '''
+    pass
+    # see ch1_writing_II_A
+
+
+
+#-------------------------------------------------------------------------------
+# Analysis
+
+def ch1_analysis_A_1(show=True, *arguments, **keywords):
+    '''p. 8
+
+    Circle all pitches written on ledger lines, identify pitch name and octave
+    '''
+    pass
+
+
+def ch1_analysis_A_2(show=True, *arguments, **keywords):
+    '''p. 8
+    '''
+    pass
+
+
+def ch1_analysis_B_1(show=True, *arguments, **keywords):
+    '''p. 9
+
+    Circle each whole step, but a box around each half step. 
+    '''
+    pass
+
+def ch1_analysis_B_2(show=True, *arguments, **keywords):
+    '''p. 9
+    '''
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# CHAPTER 2 
+#-------------------------------------------------------------------------------
+# Basic Elements
+#-------------------------------------------------------------------------------
+# I. Meter Signatures
+
+def ch2_basic_I_A_1(show=True, *arguments, **keywords):
+    '''p. 11
+    For each of the melodies below, provide the correct meter signature.
+    Next to the signature, write in the meter type.
+    '''
+    pass
+
+def ch2_basic_I_A_2(show=True, *arguments, **keywords):
+    '''p. 11
+    '''
+    pass
+
+def ch2_basic_I_A_3(show=True, *arguments, **keywords):
+    '''p. 12
+    '''
+    pass
+
+def ch2_basic_I_A_4(show=True, *arguments, **keywords):
+    '''p. 12
+    '''
+    pass
+
+
+def ch2_basic_I_B(show=True, *arguments, **keywords):
+    '''p. 12
+    '''
+    pass
+
+def ch2_basic_I_C(show=True, *arguments, **keywords):
+    '''p. 13
+    '''
+    pass
+
+
+def ch2_basic_II(show=True, *arguments, **keywords):
+    '''p. 13
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Writing
+
+#-------------------------------------------------------------------------------
+# I Incomplete measures
+
+
+def ch2_writing_I_A_1(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_A_2(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_A_3(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_A_4(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_A_5(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+
+
+def ch2_writing_I_B_1(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_B_2(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_B_3(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_B_4(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+def ch2_writing_I_B_5(show=True, *arguments, **keywords):
+    '''p. 14
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# II Anacrusis notation
+
+def ch2_writing_II_A(show=True, *arguments, **keywords):
+    '''p. 15
+    '''
+    pass
+
+def ch2_writing_II_B(show=True, *arguments, **keywords):
+    '''p. 15
+    '''
+    pass
+
+def ch2_writing_II_C(show=True, *arguments, **keywords):
+    '''p. 15
+    '''
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# III Dots and ties
+
+def ch2_writing_III_A_1(show=True, *arguments, **keywords):
+    '''p. 16
+    '''
+    pass
+
+
+def ch2_writing_III_A_2(show=True, *arguments, **keywords):
+    '''p. 16
+    '''
+    pass
+
+def ch2_writing_III_A_3(show=True, *arguments, **keywords):
+    '''p. 16
+    '''
+    pass
+
+
+def ch2_writing_III_B_1(show=True, *arguments, **keywords):
+    '''p. 17
+    '''
+    pass
+
+def ch2_writing_III_B_2(show=True, *arguments, **keywords):
+    '''p. 17
+    '''
+    pass
+
+def ch2_writing_III_B_3(show=True, *arguments, **keywords):
+    '''p. 17
+    '''
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# IV Beaming to reflect meter
+
+
+def ch2_writing_IV_A(show=True, *arguments, **keywords):
+    '''p. 17
+    '''
+    pass
+
+def ch2_writing_IV_B(show=True, *arguments, **keywords):
+    '''p. 18
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# V Inserting bar lines
+
+def ch2_writing_V_A(show=True, *arguments, **keywords):
+    '''p. 18
+    '''
+    pass
+
+def ch2_writing_V_B(show=True, *arguments, **keywords):
+    '''p. 18
+    '''
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# VI Rhythmic compositions
+
+def ch2_writing_VI(show=True, *arguments, **keywords):
+    '''p. 19
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Analysis
 
 
 
@@ -472,8 +754,8 @@ class Test(unittest.TestCase):
             ch1_basic_I_A, 
             ch1_basic_I_B,
             ch1_basic_I_C_1,
-            ch1_basic_II_A_1,
             ch1_basic_I_C_2,
+
             ch1_basic_II_A_1,
             ch1_basic_II_A_2,
             ch1_basic_II_B_1,
@@ -489,8 +771,15 @@ class Test(unittest.TestCase):
             ch1_writing_I_B_1,
             ch1_writing_I_B_2,
             ch1_writing_I_B_3,
+
+            ch1_writing_II_A,
+            ch1_writing_II_B,
+
             ]:
             func(show=False, play=False)
+
+
+
 
 
 
@@ -508,4 +797,6 @@ if __name__ == "__main__":
         #ch1_writing_I_B_1(show=True)
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
-        ch1_basic_II_C_2(show=True)
+        #ch1_basic_II_C_2(show=True)
+
+        ch1_writing_II_A(show=True)
