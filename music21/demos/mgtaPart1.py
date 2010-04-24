@@ -258,6 +258,7 @@ def ch1_basic_II_C_1(show=True, *arguments, **keywords):
             if common.isStr(e):
                 n = note.Note(e)
                 n.quarterLength = 4
+                n.transpose('w')
                 m.append(n)
             else:
                 m.append(e)
