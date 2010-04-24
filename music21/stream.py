@@ -505,6 +505,27 @@ class Stream(music21.Music21Object):
         return new
 
 
+    def _addElementPreProcess(self, element):
+        '''Before adding an element, this method provides important checks to the element.
+
+        Used by both insert() and append()
+        '''
+        # using id() here b/c we do not want to get __eq__ comparisons
+        if id(element) == id(self): # cannot add this Stream into itself
+            raise StreamException("this Stream cannot be contained within itself")
+
+        # if we do not purge locations here, we may have ids() for 
+        # Stream that no longer exist stored in the locations entry
+        element.purgeLocations()
+        
+        # temporarily removed
+
+#         if id(self) in element.getSiteIds():
+#             environLocal.printDebug(['element site ids', element, element.getSiteIds()])
+#             environLocal.printDebug(['self id', self, id(self)])
+#             #self.show('t')
+#             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+
 
     def insert(self, offsetOrItemOrList, itemOrNone = None, ignoreSort = False):
         '''
@@ -566,9 +587,6 @@ class Stream(music21.Music21Object):
             item = offsetOrItemOrList
             offset = item.offset
 
-        # using id() here b/c we do not want to get __eq__ comparisons
-        if id(item) == id(self): # cannot add this Stream into itself
-            raise StreamException("this Stream cannot be contained within itself")
         if not common.isNum(offset):
             raise StreamException("offset %s must be a number", offset)
 
@@ -578,15 +596,7 @@ class Stream(music21.Music21Object):
         else:
             element = item
 
-        # if we do not purge locations here, we may have ids() for 
-        # Stream that no longer exist stored in the locations entry
-        element.purgeLocations()
-        
-#         if id(self) in element.getSiteIds():
-#             environLocal.printDebug(['element site ids', element, element.getSiteIds()])
-#             environLocal.printDebug(['self id', self, id(self)])
-#             #self.show('t')
-#             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+        self._addElementPreProcess(element)
 
         offset = float(offset)
         element.addLocation(self, offset)
@@ -662,23 +672,14 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:    
-
-            # using id() here b/c we do not want to get __eq__ comparisons
-            if id(item) == id(self): # cannot add this Stream into itself
-                raise StreamException("this object (%s) cannot be added to this Stream (%s)" % (item, self))
     
             # if not an element, embed
             if not isinstance(item, music21.Music21Object): 
                 element = music21.ElementWrapper(item)
             else:
                 element = item
-
-            # if we do not purge locations here, we may have ids() for 
-            # Stream that no longer exist stored in the locations entry
-            element.purgeLocations()
-
-#             if id(self) in element.getSiteIds():
-#                 raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+    
+            self._addElementPreProcess(element)
     
             element.addLocation(self, highestTime)
             # need to explicitly set the parent of the element
@@ -2115,7 +2116,7 @@ class Stream(music21.Music21Object):
             # creating Measures; this clef is from getClefs, called above
             if measureCount == 0: 
                 m.clef = clefObj
-                environLocal.printDebug(['assigned clef to measure', measureCount, m.clef])    
+                #environLocal.printDebug(['assigned clef to measure', measureCount, m.clef])    
 
             # avoid an infinite loop
             if thisTimeSignature.barDuration.quarterLength == 0:
