@@ -241,6 +241,43 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
 
 
 
+def ch1_basic_II_C_1(show=True, *arguments, **keywords):
+    '''
+    p. 4
+    Practice writing whole and half steps. Watch for changes in clef.
+    Write hole steps
+    '''
+    from music21 import stream, clef, common
+    ex = stream.Stream()
+    data = [[clef.TrebleClef(), 'g#4', 'b-4', 'd-4'], 
+            [clef.BassClef(), 'e3', 'a-2'], 
+            [clef.TenorClef(), 'c#']]
+    for chunk in data:
+        m = stream.Measure()    
+        for e in chunk:
+            if common.isStr(e):
+                n = note.Note(e)
+                n.quarterLength = 4
+                m.append(n)
+            else:
+                m.append(e)
+        m.timeSignature = m.bestTimeSignature()
+        ex.append(m)
+    #ex.show('t')
+    ex.show()
+
+def ch1_basic_II_C_2(show=True, *arguments, **keywords):
+    pass
+
+def ch1_basic_II_C_3(show=True, *arguments, **keywords):
+    pass
+
+
+def ch1_basic_II_C_4(show=True, *arguments, **keywords):
+    pass
+
+
+
 #-----------------------------------------------------------------||||||||||||--
 # Writing Exercises
 
@@ -387,8 +424,6 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
 
-
-
 #     purcellScore = music21.parseData("Music_for_a_while.musicxml")
 #     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
 #     thisClef.__class__ = clef.TenorClef
@@ -446,5 +481,6 @@ if __name__ == "__main__":
         #t.testImportClefAssign()
 
         #ch1_writing_I_B_1(show=True)
-        ch1_writing_I_B_2(show=True)
+        #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
+        ch1_basic_II_C_1(show=True)

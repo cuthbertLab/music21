@@ -1702,9 +1702,6 @@ class Stream(music21.Music21Object):
     def bestClef(self, allowTreble8vb = False):
         '''Returns the clef that is the best fit for notes and chords found in thisStream.
 
-        Perhaps rename 'getClef'; providing best clef if not clef is defined in this stream; otherwise, return a stream of clefs with offsets
-
-
         >>> a = Stream()
         >>> for x in range(30):
         ...    n = note.Note()
@@ -4270,6 +4267,68 @@ class Measure(Stream):
         return "<music21.stream.%s %s offset=%s>" % \
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
+    #---------------------------------------------------------------------------
+    def bestTimeSignature(self):
+        '''Given a Measure with elements in it, get a TimeSignature that contains all elements.
+
+        Note: this does not yet accommodate triplets. 
+        '''
+        minDurQL = 4 # smallest denominator
+        minDurDotted = False
+        sumDurQL = 0
+        for e in self.notes:
+            sumDurQL += e.quarterLength
+            if e.quarterLength < minDurQL:
+                minDurQL = e.quarterLength
+                if e.duration.dots > 0:
+                    minDurDotted = True
+
+        # first, we need to evenly divide min dur into total
+        minDurTest = minDurQL
+        while True:
+            partsFloor = int(sumDurQL / minDurTest)
+            partsReal = sumDurQL / float(minDurTest)
+            if (common.almostEquals(partsFloor, partsReal) or 
+            minDurTest <= duration.typeToDuration[meter.MIN_DENOMINATOR_TYPE]):
+                break
+            # need to break down minDur until we can get a match
+            else:
+                if minDurDotted:
+                    minDurTest = minDurTest / 3.
+                else:
+                    minDurTest = minDurTest / 2.
+                    
+        # see if we can get a type for the denominator      
+        # if we do not have a match; we need to break down this value
+        match = False
+        while True:
+            dType, match = duration.quarterLengthToClosestType(minDurTest) 
+            if match or dType == meter.MIN_DENOMINATOR_TYPE:
+                break
+            if minDurDotted:
+                minDurTest = minDurTest / 3.
+            else:
+                minDurTest = minDurTest / 2.
+
+        minDurQL = minDurTest
+        dType, match = duration.quarterLengthToClosestType(minDurQL) 
+        if not match: # cant find a type for a denominator
+            raise StreamException('cannot find a type for denominator %s' % minDurQL)
+
+        # denominator is the numerical representation of the min type
+        # e.g., quarter is 4, whole is 1
+        for num, typeName in duration.typeFromNumDict.items():
+            if typeName == dType:
+                denominator = num
+        # numerator is the count of min parts in the sum
+        numerator = int(sumDurQL / minDurQL)
+
+        #environLocal.printDebug(['n/d', numerator, denominator])
+
+        ts = meter.TimeSignature()
+        ts.loadRatio(numerator, denominator)
+        return ts
+
 
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list 
@@ -6429,6 +6488,38 @@ class Test(unittest.TestCase):
         s3Measures = s3.makeMeasures()
 
 
+    def testBestTimeSignature(self):
+        '''Get a time signature based on components in a measure.
+        '''
+        from music21 import note
+        m = Measure()
+        for ql in [2,3,2]:
+            n = note.Note()
+            n.quarterLength = ql
+            m.append(n)
+        ts = m.bestTimeSignature()
+        self.assertEqual(ts.numerator, 7)
+        self.assertEqual(ts.denominator, 4)
+
+        m = Measure()
+        for ql in [1.5, 1.5]:
+            n = note.Note()
+            n.quarterLength = ql
+            m.append(n)
+        ts = m.bestTimeSignature()
+        self.assertEqual(ts.numerator, 6)
+        self.assertEqual(ts.denominator, 8)
+
+        m = Measure()
+        for ql in [.25, 1.5]:
+            n = note.Note()
+            n.quarterLength = ql
+            m.append(n)
+        ts = m.bestTimeSignature()
+        self.assertEqual(ts.numerator, 7)
+        self.assertEqual(ts.denominator, 16)
+
+
     def xtestMultipleReferencesOneStream(self):
         '''Test having multiple references of the same element in a single Stream.
         '''
@@ -6461,4 +6552,6 @@ if __name__ == "__main__":
 
         # a.testMeasureRange()
 
-        a.testMultipartStream()
+        #a.testMultipartStream()
+
+        a.testBestTimeSignature()

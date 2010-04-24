@@ -29,7 +29,7 @@ environLocal = environment.Environment(_MOD)
 
 validDenominators = [1,2,4,8,16,32,64,128] # in order
 # also [pow(2,x) for x in range(8)]
-
+MIN_DENOMINATOR_TYPE = '128th'
 
 def slashToFraction(value):
     '''
