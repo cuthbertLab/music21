@@ -240,6 +240,24 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
         exercise.show()
 
 
+def ch1_basic_II_C(data, intervalShift):
+    '''Function for C1, C2, C3, and C4
+    '''
+    from music21 import stream, clef, common, chord
+    ex = stream.Stream()
+    for chunk in data:
+        m = stream.Measure()    
+        for e in chunk:
+            if common.isStr(e):
+                n1 = note.Note(e)
+                n1.quarterLength = 4
+                n2 = n1.transpose(intervalShift)
+                m.append(chord.Chord([n1, n2])) # chord to show both
+            else:
+                m.append(e)
+        m.timeSignature = m.bestTimeSignature()
+        ex.append(m)
+    return ex
 
 def ch1_basic_II_C_1(show=True, *arguments, **keywords):
     '''
@@ -247,42 +265,43 @@ def ch1_basic_II_C_1(show=True, *arguments, **keywords):
     Practice writing whole and half steps. Watch for changes in clef.
     Write hole steps
     '''
-    from music21 import stream, clef, common
-    ex = stream.Stream()
     data = [[clef.TrebleClef(), 'g#4', 'b-4', 'd-4'], 
             [clef.BassClef(), 'e3', 'a-2'], 
             [clef.TenorClef(), 'c#']]
-    for chunk in data:
-        m = stream.Measure()    
-        for e in chunk:
-            if common.isStr(e):
-                n = note.Note(e)
-                n.quarterLength = 4
-                n.transpose('w')
-                m.append(n)
-            else:
-                m.append(e)
-        m.timeSignature = m.bestTimeSignature()
-        ex.append(m)
-    #ex.show('t')
-    ex.show()
+    ex = ch1_basic_II_C(data, 'w')
+    if show: 
+        ex.show()
 
 def ch1_basic_II_C_2(show=True, *arguments, **keywords):
-    pass
+    data = [[clef.BassClef(), 'c3', 'f#3'], 
+            [clef.AltoClef(), 'f4', 'c-4'], 
+            [clef.TrebleClef(), 'a-4', 'b--4']]
+    ex = ch1_basic_II_C(data, '-w')
+    if show: 
+        ex.show()
 
 def ch1_basic_II_C_3(show=True, *arguments, **keywords):
-    pass
-
+    data = [[clef.BassClef(), 'f#2', 'c-3'], 
+            [clef.TrebleClef(), 'e4', 'b-5', 'a#4'], 
+            [clef.AltoClef(), 'f-3']]
+    ex = ch1_basic_II_C(data, 'h')
+    if show: 
+        ex.show()
 
 def ch1_basic_II_C_4(show=True, *arguments, **keywords):
-    pass
+    data = [[clef.TrebleClef(), 'b#4', 'e4', 'd#5'], 
+            [clef.AltoClef(), 'c-4'], 
+            [clef.BassClef(), 'f#3', 'c3']]
+    ex = ch1_basic_II_C(data, '-h')
+    if show: 
+        ex.show()
 
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # Writing Exercises
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # !. Arranging
 
 
@@ -434,7 +453,7 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 #     purcellScore.show() 
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # !I. Composing melodies
 
 
@@ -442,7 +461,7 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
 
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
     def runTest(self):
@@ -460,6 +479,11 @@ class Test(unittest.TestCase):
             ch1_basic_II_B_1,
             ch1_basic_II_B_2,
 
+            ch1_basic_II_C_1,
+            ch1_basic_II_C_2,
+            ch1_basic_II_C_3,
+            ch1_basic_II_C_4,
+
             ch1_writing_I_A_1,
             ch1_writing_I_A_2,
             ch1_writing_I_B_1,
@@ -472,7 +496,7 @@ class Test(unittest.TestCase):
 
         
 
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         music21.mainTest(Test)
@@ -484,4 +508,4 @@ if __name__ == "__main__":
         #ch1_writing_I_B_1(show=True)
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
-        ch1_basic_II_C_1(show=True)
+        ch1_basic_II_C_2(show=True)
