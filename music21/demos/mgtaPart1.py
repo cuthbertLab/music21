@@ -458,7 +458,9 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
 
     Compose a melody using whole and half steps in any musical style.
 
-    This technique uses a random walk of whole or half steps with direction choices determined by wether the present note is above or below the target end.
+    This technique uses a random walk of whole or half steps with direction 
+    choices determined by whether the present note is above or below the 
+    target end.
     '''
     import copy, random
     from music21 import interval, stream, expressions
@@ -472,11 +474,12 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     while True:
         n.quarterLength = random.choice([.25, .5, 1])
         s.append(n)
-        # if we have more than three and match the pitch class, end
-        if len(s) > 3 and n.pitch.pitchClass == nStart.pitch.pitchClass:
+        # if we have written more than fifteen notes 
+        # and the last notes matches the first pitch class, then end.
+        if len(s) > 4 and n.pitch.pitchClass == nStart.pitch.pitchClass:
             n.notations.append(expressions.Fermata())
             break
-        if len(s) > 15: # emergency break
+        if len(s) > 30: # emergency break in case the piece is too long
             break
         dir = random.choice(dirWeight)
         if dir == 1:
@@ -789,6 +792,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         music21.mainTest(Test)
+        ch1_writing_II_A(show=True)
     else:
 
         #t = Test()
@@ -798,5 +802,5 @@ if __name__ == "__main__":
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
-
         ch1_writing_II_A(show=True)
+
