@@ -246,7 +246,6 @@ class PitchException(Exception):
 
 #-------------------------------------------------------------------------------
 class Accidental(music21.Music21Object):
-    
     '''Accidental class.
     '''
     displayType = "normal"  
@@ -261,12 +260,12 @@ class Accidental(music21.Music21Object):
     _DOC_ORDER = ['set']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'displayType': '''display if first in measure; other valid terms:
+    'displayType': '''Display if first in measure; other valid terms:
         "always", "never", "unless-repeated" (show always unless
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
         previous note)''',
-    'displayEvaluated': '''given the displayType, should 
+    'displayEvaluated': '''Given the displayType, should 
         this accidental be displayed?
         can be "yes", "no" or "" for unsure.  For contexts where
         the next program down the line cannot evaluate displayType

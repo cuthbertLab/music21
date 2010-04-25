@@ -514,11 +514,11 @@ class Stream(music21.Music21Object):
         if id(element) == id(self): # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
 
+        # temporarily removed
+
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
-        element.purgeLocations()
-        
-        # temporarily removed
+        #element.purgeLocations()
 
 #         if id(self) in element.getSiteIds():
 #             environLocal.printDebug(['element site ids', element, element.getSiteIds()])
@@ -2424,10 +2424,16 @@ class Stream(music21.Music21Object):
 
 
 
-    def setAccidentalVisibility(self): 
-        '''To be renamed. A method to set and provide accidentals given varous conditions and contexts.
+    def accidentalDisplay(self): 
+        '''A method to set and provide accidentals given varous conditions and contexts.
         '''
-        pass
+        pitchMap = self.pitchAttributeCount('nameWithOctave')
+        # need to move through notes in order
+        noteStream = self.sorted.notes
+        # get chords, notes, and rests
+        # this may or may have sub-streams that are not being examined
+        for e in noteStream:
+            pass
 
 
     def extendDuration(self, objName, inPlace=True):
@@ -3061,11 +3067,6 @@ class Stream(music21.Music21Object):
             post = copy.deepcopy(self)
         else:
             post = self
-#         for n in post.notes: # includes chords
-#             if not n.isRest:
-#                 # do inplace transpositions on the deepcopy
-#                 n.transpose(value, inPlace=True)            
-
         for p in post.pitches: # includes chords
             # do inplace transpositions on the deepcopy
             p.transpose(value, inPlace=True)            
@@ -3074,6 +3075,23 @@ class Stream(music21.Music21Object):
             return post
         else:       
             return None
+
+
+    def offsetScale(self, scalar):
+        '''Scale all offsets by a provided scalar.
+        '''
+        pass
+
+    def durationScale(self, scalar):
+        '''Scale all durations by a provided scalar.
+        '''
+        pass
+
+    def augmentOrDiminish(self, scalar):
+        '''Scale this Stream by a provided scalar. 
+        '''
+        pass
+
 
     #---------------------------------------------------------------------------
     def _getLily(self):
@@ -6520,6 +6538,19 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.denominator, 16)
 
 
+    def testAccidentalDisplay(self):
+        '''Test accidental display setting
+        '''
+        s = Stream()
+        n1 = note.Note('a#')
+        n2 = note.Note('a')
+        s.append(n1)
+        s.append(n2)
+        s.accidentalDisplay()
+
+        
+
+
     def xtestMultipleReferencesOneStream(self):
         '''Test having multiple references of the same element in a single Stream.
         '''
@@ -6554,4 +6585,6 @@ if __name__ == "__main__":
 
         #a.testMultipartStream()
 
-        a.testBestTimeSignature()
+        #a.testBestTimeSignature()
+
+        a.testAccidentalDisplay()
