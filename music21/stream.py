@@ -2424,16 +2424,26 @@ class Stream(music21.Music21Object):
 
 
 
-    def accidentalDisplay(self): 
+    def makeAccidentals(self, ): 
         '''A method to set and provide accidentals given varous conditions and contexts.
+
+        This will assume that the complete Stream is the context of evaluation. For smaller context ranges, call this on Measure objects. 
         '''
+        # use this to get a key for all pitches in pitch space in this stream
         pitchMap = self.pitchAttributeCount('nameWithOctave')
+        environLocal.printDebug([pitchMap])
         # need to move through notes in order
         noteStream = self.sorted.notes
         # get chords, notes, and rests
         # this may or may have sub-streams that are not being examined
-        for e in noteStream:
-            pass
+        for i in range(len(noteStream)):
+            e = noteStream[i]
+            if isinstance(e, note.Rest):
+                pass
+            elif isinstance(e, note.Note):
+                pass
+            elif isinstance(e, chord.Chord):
+                pass
 
 
     def extendDuration(self, objName, inPlace=True):
@@ -6538,15 +6548,20 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.denominator, 16)
 
 
-    def testAccidentalDisplay(self):
+    def testMakeAccidentals(self):
         '''Test accidental display setting
         '''
         s = Stream()
         n1 = note.Note('a#')
         n2 = note.Note('a')
+        r1 = note.Rest()
+        c1 = chord.Chord(['a#2', 'a4', 'a5'])
+
         s.append(n1)
+        s.append(r1)
         s.append(n2)
-        s.accidentalDisplay()
+        s.append(c1)
+        s.makeAccidentals()
 
         
 
@@ -6587,4 +6602,4 @@ if __name__ == "__main__":
 
         #a.testBestTimeSignature()
 
-        a.testAccidentalDisplay()
+        a.testMakeAccidentals()
