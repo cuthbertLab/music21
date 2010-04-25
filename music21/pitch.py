@@ -250,15 +250,7 @@ class Accidental(music21.Music21Object):
     '''Accidental class.
     '''
     displayType = "normal"  
-    # display if first in measure; other valid terms:
-    # "always", "never", "unless-repeated" (show always unless
-    # the immediately preceding note is the same), "even-tied"
-    # (stronger than always: shows even if it is tied to the
-    # previous note
     displayEvaluated = ""   
-    # given the displayType, should this accidental be displayed?
-    # can be "yes", "no" or "" for unsure.  For contexts where
-    # the next program down the line cannot evaluate displayType
     displayStyle = "normal" # "parentheses", "bracket", "both"
     displaySize  = "full"   # "cue", "large", or a percentage
 
@@ -269,6 +261,16 @@ class Accidental(music21.Music21Object):
     _DOC_ORDER = ['set']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
+    'displayType': '''display if first in measure; other valid terms:
+        "always", "never", "unless-repeated" (show always unless
+        the immediately preceding note is the same), "even-tied"
+        (stronger than always: shows even if it is tied to the
+        previous note)''',
+    'displayEvaluated': '''given the displayType, should 
+        this accidental be displayed?
+        can be "yes", "no" or "" for unsure.  For contexts where
+        the next program down the line cannot evaluate displayType
+        ''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
     'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
     }
