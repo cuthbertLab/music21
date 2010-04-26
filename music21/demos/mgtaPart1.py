@@ -804,5 +804,5 @@ if __name__ == "__main__":
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
-        #ch1_writing_II_A(show=True)
+        ch1_writing_II_A(show=True)
 

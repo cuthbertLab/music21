@@ -2223,7 +2223,8 @@ class Stream(music21.Music21Object):
         return returnObj.sorted
 
 
-    def makeTies(self, meterStream=None, inPlace=True):
+    def makeTies(self, meterStream=None, inPlace=True, 
+        displayTiedAccidentals=False):
         '''Given a stream containing measures, examine each element in the stream 
         if the elements duration extends beyond the measures bound, create a tied  entity.
     
@@ -2242,15 +2243,11 @@ class Stream(music21.Music21Object):
         OMIT_FROM_DOCS
         TODO: take a list of clases to act as filter on what elements are tied.
         '''
-
         #environLocal.printDebug(['calling Stream.makeTies()'])
-
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
             returnObj = self
-
-
         if len(returnObj) == 0:
             raise StreamException('cannot process an empty stream')        
     
@@ -2328,16 +2325,23 @@ class Stream(music21.Music21Object):
                         # create and place new element
                         eRemain = deepcopy(e)
                         eRemain.duration.quarterLength = qLenRemain
-    
+
                         # set ties
                         if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
                             #environLocal.printDebug(['tieing in makeTies', e])
                             e.tie = note.Tie('start')
-                            # we can set eRamin to be a stop on this iteration
+                            # we can set eRamain to be a stop on this iteration
                             # if it needs to be tied to something on next
                             # iteration, the tie object will be re-created
                             eRemain.tie = note.Tie('stop')
     
+                        # hide accidentals on tied notes where previous note
+                        # had an accidental that was shown
+                        if not displayTiedAccidentals:
+                            if (hasattr(e, 'accidental') 
+                                and e.accidental != None):
+                                eRemain.accidental.displayEvaluated = 'no'
+
                         # TODO: not sure this is the best way to make sure
                         # eRamin comes first 
                         # NOTE: must set parent here b/c otherwise offset
@@ -3217,11 +3221,15 @@ class Stream(music21.Music21Object):
             measureStream = self.makeMeasures(meterStream, refStream)
             #environLocal.printDebug(['Stream._getMXPart: post makeMeasures, length', len(measureStream)])
 
-            # for now, calling makeAccidentals only once per measures       
-            # ultimately, we might take more than one measure into account
+            # for now, calling makeAccidentals once per measures       
+            # pitches from last measure are passed
             # this needs to be called before makeTies
-            for m in measureStream:
-                m.makeAccidentals()
+            for i in range(len(measureStream)):
+                m = measureStream[i]
+                if i > 0:
+                    m.makeAccidentals(measureStream[i-1].pitches)
+                else:
+                    m.makeAccidentals()
 
             measureStream = measureStream.makeTies(meterStream)
             measureStream = measureStream.makeBeams()
