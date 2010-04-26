@@ -799,7 +799,9 @@ class Pitch(music21.Music21Object):
         else:
             return self.name + str(self.octave)
 
-    nameWithOctave = property(_getNameWithOctave)
+    nameWithOctave = property(_getNameWithOctave, 
+        doc = '''The pitch name with an octave designation. If no octave as been set, no octave value is returned. 
+        ''')
 
     def _getStep(self):
         '''
@@ -820,6 +822,25 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
 
     step = property(_getStep, _setStep)
+
+
+    def _getStepWithOctave(self):
+        if self.octave is None:
+            return self.step
+        else:
+            return self.step + str(self.octave)
+
+    stepWithOctave = property(_getStepWithOctave, 
+        doc = '''Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned. 
+
+        >>> a = Pitch('G#4')
+        >>> a.stepWithOctave
+        'G4'
+
+        >>> a = Pitch('A#')
+        >>> a.stepWithOctave
+        'A'
+        ''')
 
 
     def _getPitchClass(self):
@@ -1228,6 +1249,99 @@ class Pitch(music21.Music21Object):
             self._accidental.inheritDisplay(other.accidental)
 
 
+    def updateAccidentalDisplay(self, pitchPast=[],     
+            cautionaryPitchClass=True, cautionaryAll=False):
+        '''Given a list of Pitch objects, determine if this pitch's Accidental object needs to be updated with a natural or other cautionary accidental.
+
+        Changes to this Pitch object's Accidental object are made in-place.
+
+        >>> a = Pitch('a')
+        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+        >>> a.accidental, a.accidental.displayEvaluated
+        (<accidental natural>, 'yes')
+
+        >>> b = Pitch('a')
+        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> b.updateAccidentalDisplay(past) # should add a natural
+        >>> b.accidental, b.accidental.displayEvaluated
+        (<accidental natural>, 'yes')
+
+        >>> c = Pitch('a4')
+        >>> past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
+        >>> # will not add a natural because match is pitchSpace
+        >>> c.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+        >>> c.accidental == None
+        True
+
+        '''
+        # need to step through pitchPast in reverse
+        for i in reversed(range(len(pitchPast))): 
+
+            # create pitch objects for comparison; remove pitch space
+            # information if we are only doing a pitch class comparison
+            if cautionaryPitchClass: # no octave; create new without oct
+                pPast = Pitch(pitchPast[i].name)
+                pSelf = Pitch(self.name)
+                # must manually assign reference to the same accidentals
+                # as name alone will not transfer display status
+                pPast.accidental = pitchPast[i].accidental
+                pSelf.accidental = self.accidental
+            else:
+                pPast = pitchPast[i]
+                pSelf = self
+
+            #environLocal.printDebug(['updateAccidentalDisplay() comparing', pPast, pSelf, pPast.nameWithOctave, pSelf.nameWithOctave, pPast.stepWithOctave, pSelf.stepWithOctave, pPast.accidental, pSelf.accidental, pPast.accidental != None, pSelf.accidental == None])
+
+            # if we have a previous identical match
+            # A# to A# or A3 to A4
+            if cautionaryAll: # show all no matter
+                if self.accidental == None:
+                    self.accidental = Accidental('natural')
+                # show all accidentals, even if past encountered
+                self.accidental.displayEvaluated = 'yes'
+                break
+
+            # if An to A: do not need another natural
+            # we use stepWithOctave though not necessarily a ps comparison
+            elif (pPast.stepWithOctave == pSelf.stepWithOctave and 
+                pPast.accidental != None and 
+                pPast.accidental.name == 'natural' and
+                    (pSelf.accidental == None or 
+                     pSelf.accidental.name == 'natural')):
+                if (self.accidental != None and  
+                    self.accidental.displayEvaluated == 'yes'):
+                    self.accidental.displayEvaluated = 'no'
+                #environLocal.printDebug(['match previous natural'])
+                break
+
+            # if A# to A, or A- to A, but not A# to A#
+            # we use stepWithOctave though not necessarily a ps comparison
+            elif (pPast.stepWithOctave == pSelf.stepWithOctave and 
+                pPast.accidental != None and 
+                pPast.accidental.name != 'natural' and
+                    (pSelf.accidental == None or 
+                     pSelf.accidental.displayEvaluated == 'no')):
+                if self.accidental == None:
+                    self.accidental = Accidental('natural')
+                self.accidental.displayEvaluated = 'yes'
+                #environLocal.printDebug(['match previous mark'])
+                break
+
+            # going from a natural to an accidental, we should already be
+            # showing the accidental, but just to check
+            # we use stepWithOctave though not necessarily a ps comparison
+            # if A to A#, or A to A-, but not A# to A
+            elif (pPast.stepWithOctave == pSelf.stepWithOctave and 
+                pPast.accidental == None and 
+                pSelf.accidental != None):
+                self.accidental.displayEvaluated = 'yes'
+                #environLocal.printDebug(['match previous no mark'])
+                break
+            else:
+                pass
+                #environLocal.printDebug(['no match'])
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
@@ -1290,6 +1404,21 @@ class Test(unittest.TestCase):
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertEqual(pAltered.accidental.displayEvaluated, 'yes')
 
+
+    def testUpdateAccidentalDisplay(self):
+        '''Test updating accidental display.
+        '''
+
+        past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
+
+        a = Pitch('c')
+        a.accidental = Accidental('natural')
+        a.accidental.displayEvaluated = 'no' # hide
+        self.assertEqual(a.name, 'C')
+        self.assertEqual(a.accidental.displayEvaluated, 'no')
+
+        a.updateAccidentalDisplay(past)
+        self.assertEqual(a.accidental.displayEvaluated, 'yes')
 
 
 #-------------------------------------------------------------------------------

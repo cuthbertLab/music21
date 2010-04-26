@@ -2424,26 +2424,51 @@ class Stream(music21.Music21Object):
 
 
 
-    def makeAccidentals(self, ): 
+    def makeAccidentals(self, pitchPrevious=[], cautionaryPitchClass=True,     
+            cautionaryAll=False, inPlace=True): 
         '''A method to set and provide accidentals given varous conditions and contexts.
+
+        If `cautionaryPitchClass` is True, all pitch classes are used in comparison; if false, only pitch space is used.
+
+        Optional `pcPast` and `psPast` permit passing in pitches from pervious groupings, taken as part of the present context.
+
+        The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
 
         This will assume that the complete Stream is the context of evaluation. For smaller context ranges, call this on Measure objects. 
         '''
-        # use this to get a key for all pitches in pitch space in this stream
-        pitchMap = self.pitchAttributeCount('nameWithOctave')
-        environLocal.printDebug([pitchMap])
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        pitchPast = [] # store a list of pc's encountered
+        pitchPast += pitchPrevious
+
         # need to move through notes in order
-        noteStream = self.sorted.notes
+        # NOTE: this may or may have sub-streams that are not being examined
+        noteStream = returnObj.sorted.notes
+
         # get chords, notes, and rests
-        # this may or may have sub-streams that are not being examined
         for i in range(len(noteStream)):
             e = noteStream[i]
-            if isinstance(e, note.Rest):
-                pass
-            elif isinstance(e, note.Note):
-                pass
+            if isinstance(e, note.Note):
+                e.pitch.updateAccidentalDisplay(pitchPast, 
+                    cautionaryPitchClass=cautionaryPitchClass,
+                    cautionaryAll=cautionaryAll)
+                pitchPast.append(e.pitch)
             elif isinstance(e, chord.Chord):
-                pass
+                pGroup = e.pitches
+                # add all chord elements to past first
+                # when reading a chord, this will apply an accidental 
+                # if pitches in the chord suggest an accidental
+                for p in pGroup:
+                    p.updateAccidentalDisplay(pitchPast, 
+                        cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll)
+                pitchPast += pGroup
+
+        return returnObj
+
+
 
 
     def extendDuration(self, objName, inPlace=True):
@@ -3191,6 +3216,12 @@ class Stream(music21.Music21Object):
 
             measureStream = self.makeMeasures(meterStream, refStream)
             #environLocal.printDebug(['Stream._getMXPart: post makeMeasures, length', len(measureStream)])
+
+            # for now, calling makeAccidentals only once per measures       
+            # ultimately, we might take more than one measure into account
+            # this needs to be called before makeTies
+            for m in measureStream:
+                m.makeAccidentals()
 
             measureStream = measureStream.makeTies(meterStream)
             measureStream = measureStream.makeBeams()
@@ -6553,19 +6584,44 @@ class Test(unittest.TestCase):
         '''
         s = Stream()
         n1 = note.Note('a#')
-        n2 = note.Note('a')
+        n2 = note.Note('a4')
         r1 = note.Rest()
         c1 = chord.Chord(['a#2', 'a4', 'a5'])
-
+        n3 = note.Note('a4')
         s.append(n1)
         s.append(r1)
         s.append(n2)
         s.append(c1)
+        s.append(n3)
         s.makeAccidentals()
 
+        self.assertEqual(n2.accidental.displayEvaluated, 'yes')
+        # both a's in the chord now have naturals but are hidden
+        self.assertEqual(c1.pitches[1].accidental, None)
+        #self.assertEqual(c1.pitches[2].accidental.displayEvaluated, 'yes')
+        # need a natural here
+        self.assertEqual(n3.accidental.displayEvaluated, 'yes')
+
+        #s.show()
+
+        s = Stream()
+        n1 = note.Note('a#')
+        n2 = note.Note('a')
+        r1 = note.Rest()
+        c1 = chord.Chord(['a#2', 'a4', 'a5'])
+        s.append(n1)
+        s.append(r1)
+        s.append(n2)
+        s.append(c1)
+        s.makeAccidentals(cautionaryPitchClass=False)
+
+        # a's in the chord do not have naturals
+        self.assertEqual(c1.pitches[1].accidental, None)
+        self.assertEqual(c1.pitches[2].accidental, None)
+
+
+
         
-
-
     def xtestMultipleReferencesOneStream(self):
         '''Test having multiple references of the same element in a single Stream.
         '''

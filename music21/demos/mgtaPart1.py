@@ -747,14 +747,7 @@ def ch2_writing_VI(show=True, *arguments, **keywords):
 
 
 #-------------------------------------------------------------------------------
-class Test(unittest.TestCase):
-    
-    def runTest(self):
-        pass
-
-    def testBasic(self):
-        for func in [
-            ch1_basic_I_A, 
+FUNCTIONS = [ch1_basic_I_A, 
             ch1_basic_I_B,
             ch1_basic_I_C_1,
             ch1_basic_I_C_2,
@@ -777,13 +770,24 @@ class Test(unittest.TestCase):
 
             ch1_writing_II_A,
             ch1_writing_II_B,
+            ]
 
-            ]:
+class TestExternal(unittest.TestCase):
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        for func in FUNCTIONS:
+            func(show=True, play=False)
+    
+
+class Test(unittest.TestCase):
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        for func in FUNCTIONS:
             func(show=False, play=False)
-
-
-
-
 
 
         
@@ -792,15 +796,13 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         music21.mainTest(Test)
-        ch1_writing_II_A(show=True)
     else:
-
-        #t = Test()
-        #t.testImportClefAssign()
+        #b = TestExternal()
+        #b.testBasic()
 
         #ch1_writing_I_B_1(show=True)
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
-        ch1_writing_II_A(show=True)
+        #ch1_writing_II_A(show=True)
 
