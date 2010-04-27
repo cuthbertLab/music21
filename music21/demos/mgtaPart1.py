@@ -743,6 +743,602 @@ def ch2_writing_VI(show=True, *arguments, **keywords):
 #-------------------------------------------------------------------------------
 # Analysis
 
+def ch2_analysis_A_1(show=True, *arguments, **keywords):
+    '''p. 20
+    '''
+    pass
+
+
+def ch2_analysis_A_2(show=True, *arguments, **keywords):
+    '''p. 21
+    '''
+    pass
+
+
+def ch2_analysis_A_3(show=True, *arguments, **keywords):
+    '''p. 21
+    '''
+    pass
+
+
+def ch2_analysis_B_1(show=True, *arguments, **keywords):
+    '''p. 22
+    '''
+    pass
+
+
+def ch2_analysis_B_2(show=True, *arguments, **keywords):
+    '''p. 22
+    '''
+    pass
+
+def ch2_analysis_B_3(show=True, *arguments, **keywords):
+    '''p. 22
+    '''
+    pass
+
+
+
+
+#-------------------------------------------------------------------------------
+# CHAPTER 3
+#-------------------------------------------------------------------------------
+# Pitch Collections, Scales, and Major Keys
+#-------------------------------------------------------------------------------
+# Basic Elements
+
+# I. Writing scales
+
+
+def ch3_basic_I_A(show=True, *arguments, **keywords):
+    '''p. 23
+
+    Write a chromatic scale beginning and ending with the given pitches. Use sharps in ascending chromatic and flats in descending.
+    '''
+    pass
+
+
+
+def ch3_basic_I_B(show=True, *arguments, **keywords):
+    '''p. 23
+
+    Creating major scales.
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# II. Key signatures
+
+def ch3_basic_II_A(show=True, *arguments, **keywords):
+    '''p. 24
+
+    Writing seven sharps and flats in order; say the name of the major key that goes with the signature. 
+    '''
+    pass
+
+
+
+def ch3_basic_II_B(show=True, *arguments, **keywords):
+    '''p. 24
+
+    Write correct key signature for each major key indicated.
+    '''
+    pass
+
+
+def ch3_basic_II_C(show=True, *arguments, **keywords):
+    '''p. 24
+
+    Identify the name of the major key associated with each of the key signatures below. 
+    '''
+    pass
+
+#-------------------------------------------------------------------------------
+# III. Scale degrees
+
+def ch3_basic_III_A(show=True, *arguments, **keywords):
+    '''p. 25
+
+    Given the scale degree, write the rest of the scale. Begin by writing whole notes on the lines and spaces adove and below the given pitch, then fill in the necessary accidentals. 
+    '''
+    pass
+
+
+def ch3_basic_III_B(show=True, *arguments, **keywords):
+    '''p. 25-26
+
+    For each key listed, write the pitch-class name of the scale degree requested. 
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# IV. At your instrument
+
+def ch3_basic_IV_A(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Play a chromatic scale starting with the lowest pitch of your instrument and ending with the highest pitch you can play. 
+    '''
+    pass
+
+
+def ch3_basic_IV_B(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Play a major scale starting on these pitches: E-, G, B-, E, F, B
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Writing Exercises
+#-------------------------------------------------------------------------------
+# I. Writing melodies from scale degrees
+
+def ch3_writing_I_A(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Writing melodies from scale degrees. 
+    '''
+    pass
+
+def ch3_writing_I_B(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Writing melodies from scale degrees. 
+    '''
+    pass
+
+
+def ch3_writing_I_C(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Writing melodies from scale degrees. 
+    '''
+    pass
+
+def ch3_writing_I_D(show=True, *arguments, **keywords):
+    '''p. 26
+
+    Writing melodies from scale degrees. 
+    '''
+    pass
+
+#-------------------------------------------------------------------------------
+# I. Composing your own melody in a major key. 
+
+
+def ch3_writing_II(show=True, *arguments, **keywords):
+    '''p. 27
+
+    Compose a folk-like melody in a major key, using the melodies given above as examples. 
+    '''
+    pass
+
+
+
+
+#-------------------------------------------------------------------------------
+# Analysis
+#-------------------------------------------------------------------------------
+# I. Brief analysis
+
+
+def ch3_analysis_I_A_1(show=True, *arguments, **keywords):
+    '''p. 28
+    '''
+    pass
+
+def ch3_analysis_I_A_2(show=True, *arguments, **keywords):
+    '''p. 29
+    '''
+    pass
+
+def ch3_analysis_I_A_3(show=True, *arguments, **keywords):
+    '''p. 29
+    '''
+    pass
+
+def ch3_analysis_I_B_1(show=True, *arguments, **keywords):
+    '''p. 30
+    '''
+    pass
+
+def ch3_analysis_I_B_2(show=True, *arguments, **keywords):
+    '''p. 30
+    '''
+    pass
+
+def ch3_analysis_I_B_3(show=True, *arguments, **keywords):
+    '''p. 30
+    '''
+    pass
+
+#-------------------------------------------------------------------------------
+# II. Extended analysis
+
+def ch3_analysis_II_A(show=True, *arguments, **keywords):
+    '''p. 31
+    '''
+    pass
+
+def ch3_analysis_II_B(show=True, *arguments, **keywords):
+    '''p. 31
+    '''
+    pass
+
+
+
+
+
+#-------------------------------------------------------------------------------
+# CHAPTER 4
+#-------------------------------------------------------------------------------
+# Minor Keys and Diatonic Modes
+#-------------------------------------------------------------------------------
+# Basic Elements
+
+# I. Writing minor scales
+
+
+def ch4_basic_I_A(show=True, *arguments, **keywords):
+    '''p. 33
+
+    For each major key, write out the scale. Circle degree 6. Write out a new scale that begins ont he pitch class you circled. Write the name of this relative-minor scale on the line indicated. 
+    '''
+    pass
+
+
+def ch4_basic_I_B(show=True, *arguments, **keywords):
+    '''p. 34
+    '''
+    pass
+
+
+def ch4_basic_I_C(show=True, *arguments, **keywords):
+    '''p. 34
+    '''
+    pass
+
+
+
+def ch4_basic_I_D(show=True, *arguments, **keywords):
+    '''p. 35
+    '''
+    pass
+
+
+# II. Forms of the minor scale
+
+def ch4_basic_II(show=True, *arguments, **keywords):
+    '''p. 35
+    '''
+    pass
+
+
+# II. Writing the diatonic modes
+
+def ch4_basic_III_A(show=True, *arguments, **keywords):
+    '''p. 36
+    '''
+    pass
+
+def ch4_basic_III_B(show=True, *arguments, **keywords):
+    '''p. 36
+    '''
+    pass
+
+# IV. Scale degrees in minor
+
+
+def ch4_basic_IV_A(show=True, *arguments, **keywords):
+    '''p. 37
+    '''
+    pass
+
+
+def ch4_basic_IV_B(show=True, *arguments, **keywords):
+    '''p. 37
+    '''
+    pass
+
+
+
+def ch4_basic_IV_B(show=True, *arguments, **keywords):
+    '''p. 37
+    '''
+    pass
+
+
+# V. Playing and singing minor scales
+
+def ch4_basic_V_A(show=True, *arguments, **keywords):
+    '''p. 38
+    '''
+    pass
+
+def ch4_basic_V_B(show=True, *arguments, **keywords):
+    '''p. 38
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Writing Exercises
+# I. Writing melodies from scale degrees
+
+def ch4_writing_I_A(show=True, *arguments, **keywords):
+    '''p. 38
+    '''
+    pass
+
+def ch4_writing_I_B(show=True, *arguments, **keywords):
+    '''p. 39
+    '''
+    pass
+
+def ch4_writing_I_C(show=True, *arguments, **keywords):
+    '''p. 39
+    '''
+    pass
+
+
+# II. Composing your own melodies
+
+def ch4_writing_II(show=True, *arguments, **keywords):
+    '''p. 39
+    '''
+    pass
+
+
+
+
+
+#-------------------------------------------------------------------------------
+# Analysis
+# I. Brief analysis
+
+def ch4_analysis_I_A_1(show=True, *arguments, **keywords):
+    '''p. 40
+    '''
+    pass
+
+def ch4_analysis_I_A_2(show=True, *arguments, **keywords):
+    '''p. 40
+    '''
+    pass
+
+def ch4_analysis_I_A_3(show=True, *arguments, **keywords):
+    '''p. 40
+    '''
+    pass
+
+
+def ch4_analysis_I_B_1(show=True, *arguments, **keywords):
+    '''p. 41
+    '''
+    pass
+
+def ch4_analysis_I_B_2(show=True, *arguments, **keywords):
+    '''p. 41
+    '''
+    pass
+
+def ch4_analysis_I_B_3(show=True, *arguments, **keywords):
+    '''p. 41
+    '''
+    pass
+
+def ch4_analysis_I_B_4(show=True, *arguments, **keywords):
+    '''p. 41
+    '''
+    pass
+
+
+
+#-------------------------------------------------------------------------------
+# II. Extended analysis
+
+
+def ch4_analysis_II_A(show=True, *arguments, **keywords):
+    '''p. 42
+    '''
+    pass
+
+def ch4_analysis_II_B(show=True, *arguments, **keywords):
+    '''p. 42
+    '''
+    pass
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+# CHAPTER 5
+#-------------------------------------------------------------------------------
+# Beat, Meter, and Rhythm: Compound Meters
+#-------------------------------------------------------------------------------
+# Basic Elements
+
+# I. Meter signatures
+
+
+def ch5_basic_I_A_1(show=True, *arguments, **keywords):
+    '''p. 43
+    '''
+    pass
+
+
+def ch5_basic_I_A_2(show=True, *arguments, **keywords):
+    '''p. 44
+    '''
+    pass
+
+def ch5_basic_I_A_3(show=True, *arguments, **keywords):
+    '''p. 44
+    '''
+    pass
+
+def ch5_basic_I_A_4(show=True, *arguments, **keywords):
+    '''p. 44
+    '''
+    pass
+
+
+def ch5_basic_I_B(show=True, *arguments, **keywords):
+    '''p. 45
+    '''
+    pass
+
+
+def ch5_basic_I_C(show=True, *arguments, **keywords):
+    '''p. 45
+    '''
+    pass
+
+
+
+# II. Divisions and subdivisions with different beat units
+
+def ch5_basic_II(show=True, *arguments, **keywords):
+    '''p. 45
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Writing Exercises
+
+# I. Incomplete measures
+
+
+def ch5_writing_I_A(show=True, *arguments, **keywords):
+    '''p. 46
+    '''
+    pass
+
+
+def ch5_writing_I_B(show=True, *arguments, **keywords):
+    '''p. 47
+    '''
+    pass
+
+
+# II. Anacrusis notation
+
+
+def ch5_writing_II_A(show=True, *arguments, **keywords):
+    '''p. 47
+    '''
+    pass
+
+def ch5_writing_II_B(show=True, *arguments, **keywords):
+    '''p. 48
+    '''
+    pass
+
+
+def ch5_writing_II_C(show=True, *arguments, **keywords):
+    '''p. 48
+    '''
+    pass
+
+
+# III. Beaming to reflect the meter
+
+
+def ch5_writing_III_A(show=True, *arguments, **keywords):
+    '''p. 49
+
+    Beam by syllables of the sung text by meter, not text.
+    '''
+    pass
+
+
+def ch5_writing_III_B(show=True, *arguments, **keywords):
+    '''p. 49
+    '''
+    pass
+
+
+# IV. Inserting bar lines: Simple and compound meters
+
+def ch5_writing_IV_A(show=True, *arguments, **keywords):
+    '''p. 50
+
+    Note the meter signature, then add bar lines. 
+    '''
+    from music21 import stream, clef, note, meter, key
+    ex = stream.Stream()
+
+    ex.insert(clef.BassClef())
+    ex.insert(meter.TimeSignature('6/4'))
+    ex.insert(key.KeySignature(3))
+
+    # TODO: this example shows that accidentals need to be filtered by 
+    # key signature
+
+    for p, d in [('f3',1),('g#3',1),('a3',4),
+                 ('g#3',.5),('a#3',.5),('b3',2),
+                 ('a#3',.5),('g#3',.5),('a#3',.5),('b#3',.5),
+                 ('c4',1.5),('b3',.5),('a3',.5),('c#4',.5),('b3',.5),('a3',.5),
+                 ('g#3',2),('f#3',3), (None,.5), ('c#4',.5),('c#4',.5),
+                 ('b3',.5),('b3',.5),('a#3',.5)]:
+        if p == None: 
+            n = note.Rest()
+        else:
+            n = note.Note(p)
+        n.quarterLength = d
+        ex.append(n)
+
+    if show:
+        # calling show creates measures and allocates notes for the time sig
+        ex.show()
+
+
+
+def ch5_writing_IV_B(show=True, *arguments, **keywords):
+    '''p. 50
+    '''
+    pass
+
+
+def ch5_writing_IV_C(show=True, *arguments, **keywords):
+    '''p. 50
+    '''
+    pass
+
+
+# V. Rhythmic compositions
+
+def ch5_writing_V(show=True, *arguments, **keywords):
+    '''p. 50
+    '''
+    pass
+
+
+#-------------------------------------------------------------------------------
+# Analysis
+
+def ch5_analysis_A(show=True, *arguments, **keywords):
+    '''p. 51
+    '''
+    pass
+
+def ch5_analysis_B(show=True, *arguments, **keywords):
+    '''p. 52
+    '''
+    pass
+
+def ch5_analysis_C(show=True, *arguments, **keywords):
+    '''p. 53
+    '''
+    pass
 
 
 
@@ -804,5 +1400,8 @@ if __name__ == "__main__":
         #ch1_writing_I_B_2(show=True)
         #ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
-        ch1_writing_II_A(show=True)
+        #ch1_writing_II_A(show=True)
+
+        ch5_writing_IV_A(show=True)
+
 
