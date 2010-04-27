@@ -90,7 +90,7 @@ Music21Object
 
         .. method:: addContext(obj)
 
-            Add an ojbect as a context reference, placed with the object's DefinedContexts object. 
+            Add an ojbect to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`. 
 
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
@@ -99,6 +99,15 @@ Music21Object
             >>> a.addContext(aObj)
             >>> a.getContextAttr('attr1')
             'test' 
+
+        .. method:: addLocation(site, offset)
+
+            Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object. This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream. 
+
+            >>> from music21 import note, stream
+            >>> s = stream.Stream()
+            >>> n = note.Note()
+            >>> n.addLocation(s, 10)
 
         .. method:: addLocationAndParent(offset, parent, parentWeakRef=None)
 
@@ -147,6 +156,23 @@ Music21Object
             >>> a.getOffsetBySite(None)
             30.0 
 
+        .. method:: getSiteIds()
+
+            Return a lost of all site Ids, or the id() value of the sites of this object. 
+
+        .. method:: getSites()
+
+            Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder. 
+
+            >>> from music21 import note, stream
+            >>> s1 = stream.Stream()
+            >>> s2 = stream.Stream()
+            >>> n = note.Note()
+            >>> s1.append(n)
+            >>> s2.append(n)
+            >>> n.getSites() == [None, s1, s2]
+            True 
+
         .. method:: hasContext(obj)
 
             Return a Boolean if an object reference is stored in the object's DefinedContexts object. 
@@ -165,7 +191,36 @@ Music21Object
 
         .. method:: isClass(className)
 
-            returns bool depending on if the object is a particular class or not here, it just returns isinstance, but for Elements it will return true if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
+            Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
+
+            >>> from music21 import note
+            >>> n = note.Note()
+            >>> n.isClass(note.Note)
+            True 
+            >>> e = ElementWrapper(3.2)
+            >>> e.isClass(note.Note)
+            False 
+            >>> e.isClass(float)
+            True 
+
+            
+
+        .. method:: purgeLocations()
+
+            Remove references to all locations in objects that no longer exist. 
+
+        .. method:: removeLocation(site)
+
+            Remove a location in the :class:`~music21.base.DefinedContexts` object. This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
+
+            >>> from music21 import note, stream
+            >>> s = stream.Stream()
+            >>> n = note.Note()
+            >>> n.addLocation(s, 10)
+            >>> n.parent = s
+            >>> n.removeLocation(s)
+            >>> n.parent == None
+            True 
 
         .. method:: show(fmt=None)
 
@@ -331,7 +386,7 @@ ElementWrapper
 
             No documentation. 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 DefinedContexts
@@ -339,7 +394,7 @@ DefinedContexts
 
 .. class:: DefinedContexts()
 
-    An object, stored within a Music21Object, that provides a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
+    An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
 
     
 
@@ -349,7 +404,7 @@ DefinedContexts
 
         .. method:: add(obj, offset=None, name=None, timeValue=None, idKey=None)
 
-            Add a reference if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
+            Add a reference to the DefinedContexts collection. if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts 
 
         .. method:: clear()
 
@@ -445,7 +500,7 @@ DefinedContexts
 
         .. method:: getOffsetBySite(site)
 
-            For a given site return its offset. 
+            For a given site return its offset. The None site is permitted. 
 
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
@@ -506,6 +561,10 @@ DefinedContexts
             >>> aSite == aLocations.getSiteByOffset(23)
             True 
 
+        .. method:: getSiteIds()
+
+            Return a list of all site Ids. 
+
         .. method:: getSites()
 
             Get all defined contexts that are locations; unwrap from weakrefs 
@@ -521,13 +580,47 @@ DefinedContexts
             >>> len(aContexts.getSites()) == 2
             True 
 
-        .. method:: hasSiteId(site)
+        .. method:: hasSiteId(siteId)
 
-            Return True or False if this DefinedContexts object already has this site defined as a location 
+            Return True or False if this DefinedContexts object already has this site id defined as a location 
+
+        .. method:: isSite(obj)
+
+            Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location 
+
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 0)
+            >>> aLocations.add(bSite) # a context
+            >>> aLocations.isSite(aSite)
+            True 
+            >>> aLocations.isSite(bSite)
+            False 
+
+        .. method:: purgeLocations()
+
+            Clean all locations that refer to objects that no longer exist. 
+
+            >>> class Mock(Music21Object): pass
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> dSite = Mock()
+            >>> aLocations = DefinedContexts()
+            >>> aLocations.add(aSite, 0)
+            >>> aLocations.add(cSite) # a context
+            >>> del aSite
+            >>> len(aLocations)
+            2 
+            >>> aLocations.purgeLocations()
+            >>> len(aLocations)
+            1 
 
         .. method:: remove(site)
 
-            Remove the entry specified by sites 
+            Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>music21.pitch &mdash; music21 v0.2.4b1 documentation</title>
+    <title>music21.pitch &mdash; music21 v0.2.4a1 documentation</title>
     <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.4b1',
+        VERSION:     '0.2.4a1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="top" title="music21 v0.2.4b1 documentation" href="index.html" />
+    <link rel="top" title="music21 v0.2.4a1 documentation" href="index.html" />
     <link rel="next" title="music21.stream" href="moduleStream.html" />
     <link rel="prev" title="music21.node" href="moduleNode.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="moduleNode.html" title="music21.node"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -273,13 +273,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.nameWithOctave">
 <tt class="descname">nameWithOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.nameWithOctave" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns pitch name with octave Perhaps better default action for getName</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#4&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">nameWithOctave</span>
-<span class="go">&#39;G#4&#39;</span>
-</pre></div>
-</div>
-</dd></dl>
+<dd>The pitch name with an octave designation. If no octave as been set, no octave value is returned.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.step">
@@ -467,6 +461,20 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 </div>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="music21.pitch.Pitch.stepWithOctave">
+<tt class="descname">stepWithOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.stepWithOctave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">stepWithOctave</span>
+<span class="go">&#39;G4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">stepWithOctave</span>
+<span class="go">&#39;A&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Pitch</strong> <strong>methods</strong></p>
@@ -507,7 +515,31 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 </div>
 </dd></dl>
 
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+<dl class="method">
+<dt id="music21.pitch.Pitch.updateAccidentalDisplay">
+<tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of Pitch objects, determine if this pitch&#8217;s Accidental object needs to be updated with a natural or other cautionary accidental. Changes to this Pitch object&#8217;s Accidental object are made in-place.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryAll</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayEvaluated</span>
+<span class="go">(&lt;accidental natural&gt;, &#39;yes&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">)</span> <span class="c"># should add a natural</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayEvaluated</span>
+<span class="go">(&lt;accidental natural&gt;, &#39;yes&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># will not add a natural because match is pitchSpace</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryPitchClass</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">accidental</span> <span class="o">==</span> <span class="bp">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocation"><tt class="xref docutils literal"><span class="pre">removeLocation()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -523,6 +555,11 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <p><strong>Accidental</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
+<dt id="music21.pitch.Accidental.displayEvaluated">
+<tt class="descname">displayEvaluated</tt><a class="headerlink" href="#music21.pitch.Accidental.displayEvaluated" title="Permalink to this definition">¶</a></dt>
+<dd>Given the displayType, should this accidental be displayed? can be &#8220;yes&#8221;, &#8220;no&#8221; or &#8220;&#8221; for unsure.  For contexts where the next program down the line cannot evaluate displayType</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.pitch.Accidental.displaySize">
 <tt class="descname">displaySize</tt><a class="headerlink" href="#music21.pitch.Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
 <dd>Size in display: &#8220;cue&#8221;, &#8220;large&#8221;, or a percentage.</dd></dl>
@@ -532,7 +569,12 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <tt class="descname">displayStyle</tt><a class="headerlink" href="#music21.pitch.Accidental.displayStyle" title="Permalink to this definition">¶</a></dt>
 <dd>Style of display: &#8220;parentheses&#8221;, &#8220;bracket&#8221;, &#8220;both&#8221;.</dd></dl>
 
-<p>Attributes without Documentation: <cite>displayEvaluated</cite>, <cite>displayLocation</cite>, <cite>displayType</cite>, <cite>modifier</cite>, <cite>name</cite>, <cite>alter</cite></p>
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displayType">
+<tt class="descname">displayType</tt><a class="headerlink" href="#music21.pitch.Accidental.displayType" title="Permalink to this definition">¶</a></dt>
+<dd>Display if first in measure; other valid terms: &#8220;always&#8221;, &#8220;never&#8221;, &#8220;unless-repeated&#8221; (show always unless the immediately preceding note is the same), &#8220;even-tied&#8221; (stronger than always: shows even if it is tied to the previous note)</dd></dl>
+
+<p>Attributes without Documentation: <cite>displayLocation</cite>, <cite>modifier</cite>, <cite>name</cite>, <cite>alter</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
 </blockquote>
 <p><strong>Accidental</strong> <strong>properties</strong></p>
@@ -598,7 +640,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 </div>
 </dd></dl>
 
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocation"><tt class="xref docutils literal"><span class="pre">removeLocation()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -626,12 +668,12 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
         <li class="right" >
           <a href="moduleNode.html" title="music21.node"
              >previous</a> |</li>
-        <li><a href="contents.html">music21 v0.2.4b1 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">music21 v0.2.4a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 21, 2010.
+      Last updated on Apr 27, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

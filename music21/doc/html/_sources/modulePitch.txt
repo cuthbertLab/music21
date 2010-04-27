@@ -165,11 +165,7 @@ Pitch
 
         .. attribute:: nameWithOctave
 
-            Returns pitch name with octave Perhaps better default action for getName 
-
-            >>> a = Pitch('G#4')
-            >>> a.nameWithOctave
-            'G#4' 
+            The pitch name with an octave designation. If no octave as been set, no octave value is returned. 
 
         .. attribute:: step
 
@@ -329,6 +325,17 @@ Pitch
 
             
 
+        .. attribute:: stepWithOctave
+
+            Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned. 
+
+            >>> a = Pitch('G#4')
+            >>> a.stepWithOctave
+            'G4' 
+            >>> a = Pitch('A#')
+            >>> a.stepWithOctave
+            'A' 
+
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Pitch** **methods**
@@ -365,7 +372,30 @@ Pitch
             >>> aPitch
             C#4 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        .. method:: updateAccidentalDisplay(pitchPast=[], cautionaryPitchClass=True, cautionaryAll=False)
+
+            Given a list of Pitch objects, determine if this pitch's Accidental object needs to be updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. 
+
+            >>> a = Pitch('a')
+            >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+            >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+            >>> a.accidental, a.accidental.displayEvaluated
+            (<accidental natural>, 'yes') 
+            >>> b = Pitch('a')
+            >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+            >>> b.updateAccidentalDisplay(past) # should add a natural
+            >>> b.accidental, b.accidental.displayEvaluated
+            (<accidental natural>, 'yes') 
+            >>> c = Pitch('a4')
+            >>> past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
+            >>> # will not add a natural because match is pitchSpace
+            >>> c.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+            >>> c.accidental == None
+            True 
+
+            
+
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 Accidental
@@ -379,6 +409,10 @@ Accidental
 
     **Accidental** **attributes**
 
+        .. attribute:: displayEvaluated
+
+            Given the displayType, should this accidental be displayed? can be "yes", "no" or "" for unsure.  For contexts where the next program down the line cannot evaluate displayType 
+
         .. attribute:: displaySize
 
             Size in display: "cue", "large", or a percentage. 
@@ -387,7 +421,11 @@ Accidental
 
             Style of display: "parentheses", "bracket", "both". 
 
-        Attributes without Documentation: `displayEvaluated`, `displayLocation`, `displayType`, `modifier`, `name`, `alter`
+        .. attribute:: displayType
+
+            Display if first in measure; other valid terms: "always", "never", "unless-repeated" (show always unless the immediately preceding note is the same), "even-tied" (stronger than always: shows even if it is tied to the previous note) 
+
+        Attributes without Documentation: `displayLocation`, `modifier`, `name`, `alter`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 
@@ -444,6 +482,6 @@ Accidental
             >>> b.displayType
             'always' 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
