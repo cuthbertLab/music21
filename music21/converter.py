@@ -485,6 +485,8 @@ def parseFile(fp, forceSource=False):
 def parseData(dataStr):
     '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
     '''
+#     if common.isListLike(dataStr):
+#         environLocal.printDebug(['parseData dataStr', dataStr])
     v = Converter()
     v.parseData(dataStr)
     return v.stream
@@ -500,14 +502,15 @@ def parse(value, *args, **keywords):
     '''Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
     >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
-    >>> s = parse(["E8 f# g#' G f g# g G#", "2/4"]).show()
-
+    >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
 
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords.keys():
         forceSource = keywords['forceSource']
+    else:   
+        forceSource = False
 
     if common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a lost

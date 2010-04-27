@@ -375,7 +375,7 @@ def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
     else: # greater than zero:
         fp = post[0] # get first
       
-    return converter.parse(fp, forceSource)
+    return converter.parse(fp, forceSource=forceSource)
 
 
 
