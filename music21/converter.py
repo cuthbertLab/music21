@@ -40,6 +40,7 @@ from music21 import musicxml
 from music21 import note
 from music21 import expressions
 from music21 import stream
+from music21 import tinyNotation
 
 
 from music21 import environment
@@ -216,6 +217,44 @@ class ConverterHumdrum(object):
 
 
 
+#-------------------------------------------------------------------------------
+class ConverterTinyNotation(object):
+    '''Simple class wrapper for parsing TinyNotation data provided in a file or in a string.
+    '''
+
+    def __init__(self):
+        self.stream = None
+
+    #---------------------------------------------------------------------------
+    def parseData(self, tnData):
+        '''Open TinyNotation data from a string or list
+
+        >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
+        >>> c = ConverterTinyNotation()
+        >>> s = c.parseData(tnData)
+        '''
+        if common.isStr(tnData):
+            tnStr = tnData
+            tnTs = None
+        else: # assume a 2 element sequence
+            tnStr = tnData[0]
+            tnTs = tnData[1]
+    
+        self.stream = tinyNotation.TinyNotationStream(tnStr, tnTs)
+
+    def parseFile(self, fp):
+        '''Open TinyNotation data from a file path.'''
+
+        f = open(fp)
+        tnStr = f.read()
+        f.close()
+        self.stream = tinyNotation.TinyNotationStream(tnStr)
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class ConverterMusicXML(object):
@@ -337,9 +376,11 @@ class Converter(object):
         # assume for now tt pickled files are alwasy musicxml
         # this may change in the future
         if format in ['musicxml', 'pickle']: 
-            self._converter = ConverterMusicXML(forceSource)
+            self._converter = ConverterMusicXML(forceSource=forceSource)
         elif format == 'humdrum':
             self._converter = ConverterHumdrum()
+        elif format == 'tinyNotation':
+            self._converter = ConverterTinyNotation()
         else:
             raise ConverterException('no such format: %s' % format)
 
@@ -354,20 +395,26 @@ class Converter(object):
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
+        # TODO: no extension matching for tinyNotation
         format = common.findFormatFile(fp) 
-        self._setConverter(format, forceSource)
+        self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp)
 
     def parseData(self, dataStr):
         '''Given raw data, determine format and parse into a music21 Stream.
         '''
-        dataStr = dataStr.lstrip()
-        if dataStr.startswith('<?xml'):
-            format = 'musicxml'
-        elif dataStr.startswith('!!!') or dataStr.startswith('**'):
-            format = 'humdrum'
-        else:
-            raise ConverterException('no such format found for: %s' % dataStr)
+        format = None
+        if common.isListLike(dataStr):
+            format = 'tinyNotation'
+        
+        if format == None: # its a string
+            dataStr = dataStr.lstrip()
+            if dataStr.startswith('<?xml'):
+                format = 'musicxml'
+            elif dataStr.startswith('!!!') or dataStr.startswith('**'):
+                format = 'humdrum'
+            else:
+                raise ConverterException('no such format found for: %s' % dataStr)
 
         self._setConverter(format)
         self._converter.parseData(dataStr)
@@ -432,7 +479,7 @@ def parseFile(fp, forceSource=False):
     '''Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
-    v.parseFile(fp, forceSource)
+    v.parseFile(fp, forceSource=forceSource)
     return v.stream
 
 def parseData(dataStr):
@@ -449,16 +496,28 @@ def parseURL(url, forceSource=False):
     v.parseURL(url)
     return v.stream
 
-def parse(value, forceSource=False):
+def parse(value, *args, **keywords):
     '''Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
-    '''
-    #environLocal.printDebug(['attempting to parse()', value])
 
-    if os.path.exists(value):
-        return parseFile(value, forceSource)
+    >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
+    >>> s = parse(["E8 f# g#' G f g# g G#", "2/4"]).show()
+
+
+    '''
+
+    #environLocal.printDebug(['attempting to parse()', value])
+    if 'forceSource' in keywords.keys():
+        forceSource = keywords['forceSource']
+
+    if common.isListLike(value) or len(args) > 0: # tiny notation list
+        if len(args) > 0: # add additional args to a lost
+            value = [value] + list(args)
+        return parseData(value)
+    elif os.path.exists(value):
+        return parseFile(value, forceSource=forceSource)
     elif value.startswith('http://'): 
         # its a url; may need to broaden these criteria
-        return parseURL(value, forceSource)
+        return parseURL(value, forceSource=forceSource)
     else:
         return parseData(value)
 

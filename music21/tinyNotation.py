@@ -1,4 +1,14 @@
 #!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         tinyNotation.py
+# Purpose:      A simply notation input format.
+#
+# Authors:      Michael Scott Cuthbert
+#
+# Copyright:    (c) 2009-2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 
 '''tinyNotation -- a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer 
