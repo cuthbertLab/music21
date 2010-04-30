@@ -700,48 +700,48 @@ class GeneralNote(music21.Music21Object):
     #---------------------------------------------------------------------------
     # duration
 
-    def appendDuration(self, durationObject):
-        '''
-        Sets the duration of the note to the supplied duration.Duration object
+#     def appendDuration(self, durationObject):
+#         '''
+#         Sets the duration of the note to the supplied duration.Duration object
+# 
+#         >>> a = Note()
+#         >>> a.duration.clear() # remove default
+#         >>> a.appendDuration(duration.Duration('half'))
+#         >>> a.duration.quarterLength
+#         2.0
+#         >>> a.appendDuration(duration.Duration('whole'))
+#         >>> a.duration.quarterLength
+#         6.0
+# 
+#         '''
+#         # note: the lower level interface has changed here
+#         self.duration.addDurationUnit(durationObject)
+# 
 
-        >>> a = Note()
-        >>> a.duration.clear() # remove default
-        >>> a.appendDuration(duration.Duration('half'))
-        >>> a.duration.quarterLength
-        2.0
-        >>> a.appendDuration(duration.Duration('whole'))
-        >>> a.duration.quarterLength
-        6.0
-
-        '''
-        # note: the lower level interface has changed here
-        self.duration.addDuration(durationObject)
-
-
-    def clearDurations(self):
-        '''
-        clears all the durations stored in the note.
-        After performing this, it's probably not wise to print the note until 
-        at least one duration.Duration is added
-        '''
-        #self.componentDurations = []
-        #self.durationLinkages = []
-        #self.duration = ComplexDuration(components = self.componentDurations,
-        #                                linkages = self.durationLinkages)
-        self.duration = duration.Duration(components=[], linkages=[])
+#     def clearDurations(self):
+#         '''
+#         clears all the durations stored in the note.
+#         After performing this, it's probably not wise to print the note until 
+#         at least one duration.Duration is added
+#         '''
+#         #self.componentDurations = []
+#         #self.durationLinkages = []
+#         #self.duration = ComplexDuration(components = self.componentDurations,
+#         #                                linkages = self.durationLinkages)
+#         self.duration = duration.Duration(components=[], linkages=[])
 
 
     def splitAtDurations(self):
         '''
         Takes a Note and returns a list of notes with only a single
-        duration.Duration each.
+        duration.DurationUnit in each.
 
         >>> a = Note()
         >>> a.duration.clear() # remove defaults
-        >>> a.appendDuration(duration.Duration('half'))
+        >>> a.duration.addDurationUnit(duration.Duration('half'))
         >>> a.duration.quarterLength
         2.0
-        >>> a.appendDuration(duration.Duration('whole'))
+        >>> a.duration.addDurationUnit(duration.Duration('whole'))
         >>> a.duration.quarterLength
         6.0
         >>> b = a.splitAtDurations()
@@ -757,7 +757,6 @@ class GeneralNote(music21.Music21Object):
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
                 tempNote = copy.deepcopy(self)
-                tempNote.clearDurations()
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
                     tempNote.tie = self.duration.linkages[i]                
@@ -766,7 +765,6 @@ class GeneralNote(music21.Music21Object):
         else: 
             for i in range(len(self.duration.components)):
                 tempNote = copy.deepcopy(self)
-                tempNote.clearDurations()
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
                     tempNote.tie = Tie()
@@ -1573,8 +1571,8 @@ class Test(unittest.TestCase):
         d1.type = "whole"
         d2 = duration.Duration()
         d2.type = "quarter"
-        note1.appendDuration(d1)
-        note1.appendDuration(d2)
+        note1.duration.components.append(d1)
+        note1.duration.components.append(d2)
         self.assertEqual(note1.duration.quarterLength, 5.0)
         self.assertEqual(note1.duration.componentIndexAtQtrPosition(2), 0)    
         self.assertEqual(note1.duration.componentIndexAtQtrPosition(4), 1)    

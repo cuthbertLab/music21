@@ -6407,8 +6407,6 @@ class Test(unittest.TestCase):
 
         #s3.show()
 
-
-
     def testMakeMeasuresMeterStream(self):
         '''Testing making measures of various sizes with a supplied single element meter stream. This illustrate an approach to partitioning elements by various sized windows. 
         '''

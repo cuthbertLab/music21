@@ -848,6 +848,44 @@ class DurationUnit(DurationCommon):
         self.linkStatus = False
 
 
+    def augmentOrDiminish(self, scalar, inPlace=True):
+        '''Given a scalar greater than one, return a scaled version of this duration.
+
+        >>> bDur = DurationUnit('16th') 
+        >>> bDur.augmentOrDiminish(2)
+        >>> bDur.quarterLength
+        0.5
+        >>> bDur.type
+        'eighth'
+        >>> bDur.augmentOrDiminish(4)
+        >>> bDur.type
+        'half'
+        >>> bDur.augmentOrDiminish(.125)
+        >>> bDur.type
+        '16th'
+
+        >>> cDur = bDur.augmentOrDiminish(16, inPlace=False)
+        >>> cDur, bDur
+        (<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>)
+        '''
+        if not scalar > 0:
+            raise DurationException('scalar must be greater than zero')
+
+        if inPlace:
+            post = self
+        else:
+            post = DurationUnit()
+            
+        # possible look for convenient optimizations for easy scaling
+        # not sure if linkStatus should be altered?
+        post.quarterLength = self.quarterLength * scalar
+
+        if not inPlace:
+            return post
+        else:
+            return None
+
+
     #---------------------------------------------------------------------------
     def _getQuarterLength(self):
         '''determine the length in quarter notes from current information'''
@@ -1442,19 +1480,19 @@ class Duration(DurationCommon):
             if common.isNum(arguments[0]):
                 self.quarterLength = arguments[0]
             else:
-                self.addDuration(DurationUnit(arguments[0]))
+                self.addDurationUnit(DurationUnit(arguments[0]))
         
         if "components" in keywords:
             self.components = keywords["components"]
             self._quarterLengthNeedsUpdating = True
         if 'type' in keywords:
-            self.addDuration(DurationUnit(keywords['type']))
+            self.addDurationUnit(DurationUnit(keywords['type']))
       
         # only apply default if components are empty
         # looking at private _components so as not to trigger
         # _updateComponents
         if self.quarterLength == 0 and len(self._components) == 0:
-            self.addDuration(DurationUnit('quarter'))
+            self.addDurationUnit(DurationUnit('quarter'))
 
         # linkages are a list of things used to connect durations.  
         # If undefined, Ties are used.  Other sorts of things could be 
@@ -1464,24 +1502,19 @@ class Duration(DurationCommon):
         else:
             self.linkages = []
         
-#     def clone(self):
-#         return copy.deepcopy(self)
-
     def __repr__(self):
         '''Provide a representation.
         '''
         return '<music21.duration.Duration %s>' % self.quarterLength
 
     def updateQuarterLength(self):
-        '''
-        Look to components and determine quarter length.
+        '''Look to components and determine quarter length.
         '''
         self._qtrLength = 0.0
         for dur in self.components:
             # if components quarterLength needs to be updated, it will
             # be updated when this property is called
             self._qtrLength += dur.quarterLength
-
         self._quarterLengthNeedsUpdating = False
 
     def _getComponents(self):
@@ -1538,8 +1571,8 @@ class Duration(DurationCommon):
         >>> len(aDur.components)
         1
         ''')
-#
-#
+
+
     def _getQuarterLength(self):
         '''Can be the same as the base class.'''
         if self._quarterLengthNeedsUpdating:
@@ -1623,7 +1656,7 @@ class Duration(DurationCommon):
             self.components[0].type = value
             self._quarterLengthNeedsUpdating = True
         else: # permit creating a new comoponent
-            self.addDuration(DurationUnit(value)) # updates
+            self.addDurationUnit(DurationUnit(value)) # updates
             self._quarterLengthNeedsUpdating = True
 
     type = property(_getType, _setType)
@@ -1671,8 +1704,6 @@ class Duration(DurationCommon):
 
     dots = property(_getDots, _setDots)
 
-
-
     def _getTuplets(self):
         if self._componentsNeedUpdating == True:
             self._updateComponents()
@@ -1702,8 +1733,8 @@ class Duration(DurationCommon):
 
 
 
-#-------------------------------------------------------------------------------
-# output formats
+    #---------------------------------------------------------------------------
+    # output formats
 
     def _getLily(self):
         '''
@@ -1933,13 +1964,6 @@ class Duration(DurationCommon):
         mxScore.append(mxPart)
         return mxScore.xmlStr()
 
-#    def _setMusicXML(self, mxNote):
-#        '''
-#        '''
-#        pass
-
-
-
     musicxml = property(_getMusicXML)
 
     def write(self, fmt='musicxml', fp=None):
@@ -1969,8 +1993,8 @@ class Duration(DurationCommon):
         environLocal.launch(format, self.write(format))
 
 
-#-------------------------------------------------------------------------------
-# methods for manipulating components
+    #---------------------------------------------------------------------------
+    # methods for manipulating components
 
     def clear(self):
         ''' 
@@ -1990,13 +2014,13 @@ class Duration(DurationCommon):
         self.components = [] 
         self._quarterLengthNeedsUpdating = True
 
-    def addDuration(self, dur):
+    def addDurationUnit(self, dur):
         ''' 
         Add a DurationUnit or a Duration's components to this Duration.
 
         >>> a = Duration('quarter')
         >>> b = Duration('quarter')
-        >>> a.addDuration(b)
+        >>> a.addDurationUnit(b)
         >>> a.quarterLength
         2.0
         >>> a.type
@@ -2016,7 +2040,7 @@ class Duration(DurationCommon):
         Duration. This can only be based on quarterLength; this is 
         destructive: information is lost from coponents.
 
-        This cannot be done for all Durations.
+        This cannot be done for all Durations, as DurationUnits cannot express all durations
 
         >>> a = Duration()
         >>> a.fill(['quarter', 'half', 'quarter'])
@@ -2053,45 +2077,58 @@ class Duration(DurationCommon):
         self._componentsNeedUpdating = False
 
 
-#     def transferDurationToComponent0(self):
-#         '''transfers all the relevant information from the main 
-        # ComplexDuration
-#         object to the first component object.  Necessary before the duration
-#         can be sliced up.
-# 
-#         A potential problems is that, if the ComplexDurations components are 
-#         changed, this may not be represented in the .type attribute.
-#         
-#         >>> a = ComplexDuration()
-#         >>> a.type = 'half'
-#         >>> a.dots = 1
-#         >>> a.updateQuarterLength()
-#         >>> a._getQuarterLength()
-#         3.0
-#         >>> a.components
-#         []
-#         >>> a.transferDurationToComponent0()
-#         >>> a.components[0].type
-#         'half'
-#         >>> a.type  # it is odd that this still represent the value
-#         'half'
-#         >>> a.sliceComponentAtPosition(2)
-#         >>> a.components[0].type == 'half'
-#         True
-#         >>> a.components[1].type == 'quarter'
-#         True
-#         '''
-#         
-#         del(self.components[:]) # keeps linkage in any notes that use 
-        # this duration
-#         newDur = Duration()
-#         newDur._type = self._type
-#         newDur._dots = copy.copy(self._dots)
-#         #newDur.dotGroups = copy.copy(self.dotGroups)
-#         newDur.tuplets = copy.deepcopy(self.tuplets)
-#         newDur.timeInfo = copy.deepcopy(self.timeInfo)
-#         self.components.append(newDur)
-    
+
+    def augmentOrDiminish(self, scalar, retainComponents=False, inPlace=True):
+        '''Given a scalar greater than one, return a scaled version of this duration.
+
+        >>> aDur = Duration()
+        >>> aDur.quarterLength = 1.5 # dotted quarter
+        >>> aDur.augmentOrDiminish(2)
+        >>> aDur.quarterLength
+        3.0
+        >>> aDur.type
+        'half'
+        >>> aDur.dots
+        1
+
+        >>> bDur = Duration()
+        >>> bDur.quarterLength = 2.125 # requires components
+        >>> len(bDur.components)
+        2
+        >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True, inPlace=False)
+        >>> cDur.quarterLength
+        4.25
+        >>> cDur.components
+        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
+
+        >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False, inPlace=False)
+        >>> dDur.components
+        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
+
+
+        '''
+        if not scalar > 0:
+            raise DurationException('scalar must be greater than zero')
+
+        if inPlace:
+            post = self
+        else:
+            post = copy.deepcopy(self)
+
+        if retainComponents:
+            for d in post.components:
+                d.augmentOrDiminish(scalar, inPlace=True)
+            self._typeNeedsUpdating = True
+            self._quarterLengthNeedsUpdating = True
+        else:
+            post.quarterLength = post.quarterLength * scalar
+
+        if not inPlace:
+            return post
+        else:
+            return None
+
+
 
     def componentIndexAtQtrPosition(self, quarterPosition):
         '''returns the index number of the duration component sounding at
@@ -2206,9 +2243,9 @@ class Duration(DurationCommon):
         >>> a.clear() # need to remove default
         >>> components = []
 
-        >>> a.addDuration(Duration('quarter'))
-        >>> a.addDuration(Duration('quarter'))
-        >>> a.addDuration(Duration('quarter'))
+        >>> a.addDurationUnit(Duration('quarter'))
+        >>> a.addDurationUnit(Duration('quarter'))
+        >>> a.addDurationUnit(Duration('quarter'))
 
         >>> a.quarterLength
         3.0
@@ -2264,7 +2301,7 @@ class Duration(DurationCommon):
         '''
         self.components = []
         for x in quarterLengthList:
-            self.addDuration(Duration(x))
+            self.addDurationUnit(Duration(x))
 
 
 class GraceDuration(Duration):
