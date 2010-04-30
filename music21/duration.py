@@ -695,9 +695,357 @@ def updateTupletType(durationList):
 
 
 
+
+#-------------------------------------------------------------------------------
+class TupletException(Exception):
+    pass
+
+class Tuplet(object):
+    '''A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.
+
+    Note that this is a duration modifier.  We should also have a tupletGroup
+    object that groups note objects into larger groups.
+
+    >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+    >>> print(myTup.tupletMultiplier())
+    0.8
+    >>> myTup2 = Tuplet(8, 5)
+    >>> print(myTup2.tupletMultiplier())
+    0.625
+    >>> myTup2 = Tuplet(6, 4, "16th")
+    >>> print(myTup2.durationActual.type)
+    16th
+    >>> print(myTup2.tupletMultiplier())
+    0.666...
+    
+    Tuplets may be frozen, in which case they become immutable. Tuplets
+    which are attached to Durations are automatically frozen
+    
+    >>> myTup.frozen = True
+    >>> myTup.tupletActual = [3, 2]
+    Traceback (most recent call last):
+    ...
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    
+    >>> myHalf = Duration("half")
+    >>> myHalf.appendTuplet(myTup2)
+    >>> myTup2.tupletActual = [5, 4]
+    Traceback (most recent call last):
+    ...
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    
+    OMIT_FROM_DOCS
+    # TODO: use __setattr__ to freeze all properties, and make a metaclass
+    # exceptions: tuplet type, tuplet id: things that don't affect length
+
+    '''
+
+    frozen = False
+
+    def __init__(self, *arguments, **keywords):
+        #environLocal.printDebug(['creating Tuplet instance'])
+
+        # necessary for some complex tuplets, interrupted, for instance
+
+        if len(arguments) == 3:
+            keywords['numberNotesActual'] = arguments[0]
+            keywords['numberNotesNormal'] = arguments[1]
+            keywords['durationActual'] = arguments[2]
+            keywords['durationNormal'] = arguments[2]
+        elif len(arguments) == 2:
+            keywords['numberNotesActual'] = arguments[0]
+            keywords['numberNotesNormal'] = arguments[1]
+        
+        if 'tupletId' in keywords:
+            self.tupletId = keywords['tupletId']
+        else:
+            self.tupletId = 0
+
+        if 'nestedLevel' in keywords:
+            self.nestedLevel = keywords['nestedLevel']
+        else:
+            self.nestedLevel = 1
+
+        # actual is the count of notes that happen in this space
+        # this it not the real duration of notes that happen
+        if 'numberNotesActual' in keywords:
+            self.numberNotesActual = keywords['numberNotesActual']
+        else:
+            self.numberNotesActual = 3.0
+        
+        # this previously stored a Duration, not a DurationUnit
+        if 'durationActual' in keywords:
+            if isinstance(keywords['durationActual'], basestring):
+                self.durationActual = DurationUnit(keywords['durationActual'])
+            else:
+                self.durationActual = keywords['durationActual']
+        else:
+            self.durationActual = DurationUnit("eighth") 
+
+        # normal is the space that would normally be occupied
+        if 'numberNotesNormal' in keywords:
+            self.numberNotesNormal = keywords['numberNotesNormal']
+        else:
+            self.numberNotesNormal = 2.0
+        
+        # this previously stored a Duration, not a DurationUnit
+        if 'durationNormal' in keywords:
+            if isinstance(keywords['durationNormal'], basestring):
+                self.durationNormal = DurationUnit(keywords['durationNormal'])
+            else:
+                self.durationNormal = keywords['durationNormal']
+        else:
+            self.durationNormal = DurationUnit("eighth") 
+
+        # type needs to be set at the start/stop of each group
+        # if set to None, will not be included
+        self.type = None # start/stop: for mxl bracket/group drawing 
+        self.bracket = True # true or false
+        self.placement = "above" # above or below
+        self.tupletActualShow = "number" # could be "number","type", or "none"
+        self.tupletNormalShow = None
+
+        # this attribute is not yet used anywhere
+        #self.nestedInside = ""  # could be a tuplet object
+
+
+    def __repr__(self):
+        return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, self.numberNotesNormal, self.durationNormal.type))
+
+
+    #---------------------------------------------------------------------------
+    # properties
+
+    def _setTupletActual(self, tupList=[]):
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        self.numberNotesActual, self.durationActual = tupList
+ 
+    def _getTupletActual(self):
+        return [self.numberNotesActual, self.durationActual]
+
+    tupletActual = property(_getTupletActual, _setTupletActual, 
+        doc = '''Get or set a two element list of number notes actual and duration actual. 
+        ''')
+
+
+    def _setTupletNormal(self, tupList=[]):
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        self.numberNotesNormal, self.durationNormal = tupList   
+ 
+    def _getTupletNormal(self):
+        return self.numberNotesNormal, self.durationNormal
+
+    tupletNormal = property(_getTupletNormal, _setTupletNormal,
+        doc = '''Get or set a two element list of number notes actual and duration normal. 
+        ''')
+
+    #---------------------------------------------------------------------------
+    def tupletMultiplier(self):
+        '''Get a floating point value by which to scale the duration that 
+        this Tuplet is associated with.
+
+        >>> myTuplet = Tuplet()
+        >>> print(round(myTuplet.tupletMultiplier(), 3))
+        0.667
+        >>> myTuplet.tupletActual = [5, Duration('eighth')]
+        >>> myTuplet.numberNotesActual
+        5
+        >>> myTuplet.durationActual.type
+        'eighth'
+        >>> print(myTuplet.tupletMultiplier())
+        0.4
+        '''
+        lengthActual = self.durationActual.quarterLength
+        return (self.totalTupletLength() / (
+                self.numberNotesActual * lengthActual))
+
+    def totalTupletLength(self):
+        '''
+        The total length in quarters of the tuplet as defined, assuming that
+        enough notes existed to fill all entire tuplet as defined.
+
+        For instance, 3 quarters in the place of 2 quarters = 2.0
+        5 half notes in the place of a 2 dotted half notes = 6.0
+        (In the end it's only the denominator that matters) 
+
+        >>> a = Tuplet()
+        >>> a.totalTupletLength()
+        1.0
+        >>> a.numberNotesActual = 3
+        >>> a.durationActual = Duration('half')
+        >>> a.numberNotesNormal = 2 
+        >>> a.durationNormal = Duration('half')
+        >>> a.totalTupletLength()
+        4.0
+        >>> a.setRatio(5,4)
+        >>> a.totalTupletLength()
+        8.0
+        >>> a.setRatio(5,2)
+        >>> a.totalTupletLength()
+        4.0
+        '''
+        return self.numberNotesNormal * self.durationNormal.quarterLength
+
+
+    def setRatio(self, actual, normal):
+        '''Set the ratio of actual divisions to represented in normal divisions.
+        A triplet is 3 actual in the time of 2 normal.
+
+        >>> a = Tuplet()
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.setRatio(6,2)
+        >>> a.tupletMultiplier()
+        0.333...
+
+        One way of expressing 6/4-ish triplets without numbers:
+        >>> a = Tuplet()
+        >>> a.setRatio(3,1)
+        >>> a.durationActual = DurationUnit('quarter')
+        >>> a.durationNormal = DurationUnit('half')
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.totalTupletLength()
+        2.0
+        '''
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
+        self.numberNotesActual = actual
+        self.numberNotesNormal = normal
+
+    def setDurationType(self, type):
+        '''Set the Duration for both actual and normal.
+
+        >>> a = Tuplet()
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.totalTupletLength()
+        1.0
+        >>> a.setDurationType('half')
+        >>> a.tupletMultiplier()
+        0.6666...
+        >>> a.totalTupletLength()
+        4.0
+        '''
+        # these used to be Duration; now using DurationUnits
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        self.durationActual = DurationUnit(type) 
+        self.durationNormal = DurationUnit(type)        
+
+
+    def augmentOrDiminish(self, scalar, inPlace=True):
+        '''
+        >>> a = Tuplet()
+        >>> a.setRatio(6,2)
+        >>> a.tupletMultiplier()
+        0.333...
+        >>> a.durationActual
+        <music21.duration.DurationUnit 0.5>
+        >>> a.augmentOrDiminish(.5)
+        >>> a.durationActual
+        <music21.duration.DurationUnit 0.25>
+        >>> a.tupletMultiplier()
+        0.333...
+        '''
+        if not scalar > 0:
+            raise DurationException('scalar must be greater than zero')
+        # TODO: scale the triplet in the same manner as Durations
+
+        if inPlace:
+            post = self
+            self.frozen = False # have to unfreeze
+        else:
+            post = copy.deepcopy()
+
+        # duration units scale
+        post.durationActual.augmentOrDiminish(scalar, inPlace=True)
+        post.durationNormal.augmentOrDiminish(scalar, inPlace=True)
+
+        # ratios stay the same
+        #self.numberNotesActual = actual
+        #self.numberNotesNormal = normal
+
+
+    #---------------------------------------------------------------------------
+    def _getMX(self):
+        '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
+        mxTuplet needs to be on the Notes mxNotations field
+
+        >>> a = Tuplet()
+        >>> a.bracket = True
+        >>> b, c = a.mx
+        '''
+        mxTimeModification = musicxmlMod.TimeModification()
+        mxTimeModification.set('actual-notes', self.numberNotesActual)
+        mxTimeModification.set('normal-notes', self.numberNotesNormal)
+        mxTimeModification.set('normal-type', self.durationNormal.type)
+
+        if self.type != None and self.type != "":
+            if self.type not in ["start", "stop"]:
+                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
+            mxTuplet = musicxmlMod.Tuplet()
+            # start/stop; needs to bet set by group
+            mxTuplet.set('type', self.type) 
+            # only provide other parameters if this tuplet is a start
+            if self.type == 'start':
+                mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
+                             self.bracket)) 
+                mxTuplet.set('placement', self.placement) 
+        else: # cannot provide an empty tuplet; return None
+            mxTuplet = None 
+
+        return mxTimeModification, mxTuplet
+
+    def _setMX(self, mxNote):
+        '''Given an mxNote, based on mxTimeModification and mxTuplet objects, return a Tuplet object
+        ''' 
+        if self.frozen == True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
+        mxTimeModification = mxNote.get('timemodification')
+        #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
+
+        self.numberNotesActual = int(mxTimeModification.get('actual-notes'))
+        self.numberNotesNormal = int(mxTimeModification.get('normal-notes'))
+        mxNormalType = mxTimeModification.get('normal-type')
+        # TODO: implement dot
+        mxNormalDot = mxTimeModification.get('normal-dot')
+
+        if mxNormalType != None:
+            # this value does not seem to frequently be supplied by mxl
+            # encodings, unless it is different from the main duration
+            # this sets both actual and noraml types to the same type
+            self.setDurationType(musicXMLTypeToType(
+                mxTimeModification.get('normal-type')))
+        else: # set to type of duration
+            self.setDurationType(musicXMLTypeToType(mxNote.get('type')))
+
+        mxNotations = mxNote.get('notations')
+        #environLocal.printDebug(['got mxNotations', mxNotations])
+
+        if mxNotations != None and len(mxNotations.getTuplets()) > 0:
+            mxTuplet = mxNotations.getTuplets()[0] # a list, but only use first
+            #environLocal.printDebug(['got mxTuplet', mxTuplet])
+
+            self.type = mxTuplet.get('type') 
+            self.bracket = musicxmlMod.yesNoToBoolean(mxTuplet.get('bracket'))
+            #environLocal.printDebug(['got bracket', self.bracket])
+
+            self.placement = mxTuplet.get('placement') 
+
+    mx = property(_getMX, _setMX)
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class DurationCommon(object):
-    '''A base class for all Duration objects. Used by both Duration and DurationUnit objects.
+    '''A base class for both Duration and DurationUnit objects.
     '''
 
     def aggregateTupletRatio(self):
@@ -876,6 +1224,13 @@ class DurationUnit(DurationCommon):
         else:
             post = DurationUnit()
             
+        # note: this is not yet necessary, as changes are configured
+        # by quarterLength, and this process generates new tuplets
+        # if altnerative scaling methods are used for performance, this
+        # method can be used. 
+#         for tup in post._tuplets:
+#             tup.augmentOrDiminish(scalar, inPlace=True)
+
         # possible look for convenient optimizations for easy scaling
         # not sure if linkStatus should be altered?
         post.quarterLength = self.quarterLength * scalar
@@ -1129,336 +1484,6 @@ class DurationUnit(DurationCommon):
     lily = property(_getLily)
 
 
-
-#-------------------------------------------------------------------------------
-class Tuplet(object):
-    '''A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.
-
-    Note that this is a duration modifier.  We should also have a tupletGroup
-    object that groups note objects into larger groups.
-
-    >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
-    >>> print(myTup.tupletMultiplier())
-    0.8
-    >>> myTup2 = Tuplet(8, 5)
-    >>> print(myTup2.tupletMultiplier())
-    0.625
-    >>> myTup2 = Tuplet(6, 4, "16th")
-    >>> print(myTup2.durationActual.type)
-    16th
-    >>> print(myTup2.tupletMultiplier())
-    0.666...
-    
-    Tuplets may be frozen, in which case they become immutable. Tuplets
-    which are attached to Durations are automatically frozen
-    
-    >>> myTup.frozen = True
-    >>> myTup.tupletActual = [3, 2]
-    Traceback (most recent call last):
-    ...
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
-    
-    >>> myHalf = Duration("half")
-    >>> myHalf.appendTuplet(myTup2)
-    >>> myTup2.tupletActual = [5, 4]
-    Traceback (most recent call last):
-    ...
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
-    
-    OMIT_FROM_DOCS
-    # TODO: use __setattr__ to freeze all properties, and make a metaclass
-    # exceptions: tuplet type, tuplet id: things that don't affect length
-
-    '''
-
-    frozen = False
-
-    def __init__(self, *arguments, **keywords):
-        #environLocal.printDebug(['creating Tuplet instance'])
-
-        # necessary for some complex tuplets, interrupted, for instance
-
-        if len(arguments) == 3:
-            keywords['numberNotesActual'] = arguments[0]
-            keywords['numberNotesNormal'] = arguments[1]
-            keywords['durationActual'] = arguments[2]
-            keywords['durationNormal'] = arguments[2]
-        elif len(arguments) == 2:
-            keywords['numberNotesActual'] = arguments[0]
-            keywords['numberNotesNormal'] = arguments[1]
-        
-        if 'tupletId' in keywords:
-            self.tupletId = keywords['tupletId']
-        else:
-            self.tupletId = 0
-
-        if 'nestedLevel' in keywords:
-            self.nestedLevel = keywords['nestedLevel']
-        else:
-            self.nestedLevel = 1
-
-        # actual is the count of notes that happen in this space
-        # this it not the real duration of notes that happen
-        if 'numberNotesActual' in keywords:
-            self.numberNotesActual = keywords['numberNotesActual']
-        else:
-            self.numberNotesActual = 3.0
-        
-        # this previously stored a Duration, not a DurationUnit
-        if 'durationActual' in keywords:
-            if isinstance(keywords['durationActual'], basestring):
-                self.durationActual = DurationUnit(keywords['durationActual'])
-            else:
-                self.durationActual = keywords['durationActual']
-        else:
-            self.durationActual = DurationUnit("eighth") 
-
-        # normal is the space that would normally be occupied
-        if 'numberNotesNormal' in keywords:
-            self.numberNotesNormal = keywords['numberNotesNormal']
-        else:
-            self.numberNotesNormal = 2.0
-        
-        # this previously stored a Duration, not a DurationUnit
-        if 'durationNormal' in keywords:
-            if isinstance(keywords['durationNormal'], basestring):
-                self.durationNormal = DurationUnit(keywords['durationNormal'])
-            else:
-                self.durationNormal = keywords['durationNormal']
-        else:
-            self.durationNormal = DurationUnit("eighth") 
-
-        # type needs to be set at the start/stop of each group
-        # if set to None, will not be included
-        self.type = None # start/stop: for mxl bracket/group drawing 
-        self.bracket = True # true or false
-        self.placement = "above" # above or below
-        self.tupletActualShow = "number" # could be "number","type", or "none"
-        self.tupletNormalShow = None
-
-        # this attribute is not yet used anywhere
-        #self.nestedInside = ""  # could be a tuplet object
-
-
-    def __repr__(self):
-        return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, self.numberNotesNormal, self.durationNormal.type))
-
-
-    #---------------------------------------------------------------------------
-    # properties
-
-    def _setTupletActual(self, tupList=[]):
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-        self.numberNotesActual, self.durationActual = tupList
- 
-    def _getTupletActual(self):
-        return [self.numberNotesActual, self.durationActual]
-
-    tupletActual = property(_getTupletActual, _setTupletActual, 
-        doc = '''Get or set a two element list of number notes actual and duration actual. 
-        ''')
-
-
-    def _setTupletNormal(self, tupList=[]):
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-        self.numberNotesNormal, self.durationNormal = tupList   
- 
-    def _getTupletNormal(self):
-        return self.numberNotesNormal, self.durationNormal
-
-    tupletNormal = property(_getTupletNormal, _setTupletNormal,
-        doc = '''Get or set a two element list of number notes actual and duration normal. 
-        ''')
-
-    #---------------------------------------------------------------------------
-    def tupletMultiplier(self):
-        '''Get a floating point value by which to scale the duration that 
-        this Tuplet is associated with.
-
-        >>> myTuplet = Tuplet()
-        >>> print(round(myTuplet.tupletMultiplier(), 3))
-        0.667
-        >>> myTuplet.tupletActual = [5, Duration('eighth')]
-        >>> myTuplet.numberNotesActual
-        5
-        >>> myTuplet.durationActual.type
-        'eighth'
-        >>> print(myTuplet.tupletMultiplier())
-        0.4
-        '''
-        lengthActual = self.durationActual.quarterLength
-        return (self.totalTupletLength() / (
-                self.numberNotesActual * lengthActual))
-
-    def totalTupletLength(self):
-        '''
-        The total length in quarters of the tuplet as defined, assuming that
-        enough notes existed to fill all entire tuplet as defined.
-
-        For instance, 3 quarters in the place of 2 quarters = 2.0
-        5 half notes in the place of a 2 dotted half notes = 6.0
-        (In the end it's only the denominator that matters) 
-
-        >>> a = Tuplet()
-        >>> a.totalTupletLength()
-        1.0
-        >>> a.numberNotesActual = 3
-        >>> a.durationActual = Duration('half')
-        >>> a.numberNotesNormal = 2 
-        >>> a.durationNormal = Duration('half')
-        >>> a.totalTupletLength()
-        4.0
-        >>> a.setRatio(5,4)
-        >>> a.totalTupletLength()
-        8.0
-        >>> a.setRatio(5,2)
-        >>> a.totalTupletLength()
-        4.0
-        '''
-        return self.numberNotesNormal * self.durationNormal.quarterLength
-
-
-    def setRatio(self, actual, normal):
-        '''Set the ratio of actual divisions to represented in normal divisions.
-        A triplet is 3 actual in the time of 2 normal.
-
-        >>> a = Tuplet()
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.setRatio(6,2)
-        >>> a.tupletMultiplier()
-        0.333...
-
-        One way of expressing 6/4-ish triplets without numbers:
-        >>> a = Tuplet()
-        >>> a.setRatio(3,1)
-        >>> a.durationActual = DurationUnit('quarter')
-        >>> a.durationNormal = DurationUnit('half')
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.totalTupletLength()
-        2.0
-        '''
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-
-        self.numberNotesActual = actual
-        self.numberNotesNormal = normal
-
-    def setDurationType(self, type):
-        '''Set the Duration for both actual and normal.
-
-        >>> a = Tuplet()
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.totalTupletLength()
-        1.0
-        >>> a.setDurationType('half')
-        >>> a.tupletMultiplier()
-        0.6666...
-        >>> a.totalTupletLength()
-        4.0
-        '''
-        # these used to be Duration; now using DurationUnits
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-        self.durationActual = DurationUnit(type) 
-        self.durationNormal = DurationUnit(type)        
-
-
-    def augmentOrDiminish(self, scalar):
-        if not scalar > 0:
-            raise DurationException('scalar must be greater than zero')
-        # TODO: scale the triplet in the same manner as Durations
-
-        if inPlace:
-            post = self
-            self.frozen = False # have to unfreeze
-        else:
-            post = copy.deepcopy()
-
-        # duration units scale
-        post.durationActual.augmentOrDiminish(scalar, inPlace=True)
-        post.durationNormal.augmentOrDiminish(scalar, inPlace=True)
-
-        # ratios stay the same
-        #self.numberNotesActual = actual
-        #self.numberNotesNormal = normal
-
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
-        mxTuplet needs to be on the Notes mxNotations field
-
-        >>> a = Tuplet()
-        >>> a.bracket = True
-        >>> b, c = a.mx
-        '''
-        mxTimeModification = musicxmlMod.TimeModification()
-        mxTimeModification.set('actual-notes', self.numberNotesActual)
-        mxTimeModification.set('normal-notes', self.numberNotesNormal)
-        mxTimeModification.set('normal-type', self.durationNormal.type)
-
-        if self.type != None and self.type != "":
-            if self.type not in ["start", "stop"]:
-                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
-            mxTuplet = musicxmlMod.Tuplet()
-            # start/stop; needs to bet set by group
-            mxTuplet.set('type', self.type) 
-            # only provide other parameters if this tuplet is a start
-            if self.type == 'start':
-                mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
-                             self.bracket)) 
-                mxTuplet.set('placement', self.placement) 
-        else: # cannot provide an empty tuplet; return None
-            mxTuplet = None 
-
-        return mxTimeModification, mxTuplet
-
-    def _setMX(self, mxNote):
-        '''Given an mxNote, based on mxTimeModification and mxTuplet objects, return a Tuplet object
-        ''' 
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-
-        mxTimeModification = mxNote.get('timemodification')
-        #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
-
-        self.numberNotesActual = int(mxTimeModification.get('actual-notes'))
-        self.numberNotesNormal = int(mxTimeModification.get('normal-notes'))
-        mxNormalType = mxTimeModification.get('normal-type')
-        # TODO: implement dot
-        mxNormalDot = mxTimeModification.get('normal-dot')
-
-        if mxNormalType != None:
-            # this value does not seem to frequently be supplied by mxl
-            # encodings, unless it is different from the main duration
-            # this sets both actual and noraml types to the same type
-            self.setDurationType(musicXMLTypeToType(
-                mxTimeModification.get('normal-type')))
-        else: # set to type of duration
-            self.setDurationType(musicXMLTypeToType(mxNote.get('type')))
-
-        mxNotations = mxNote.get('notations')
-        #environLocal.printDebug(['got mxNotations', mxNotations])
-
-        if mxNotations != None and len(mxNotations.getTuplets()) > 0:
-            mxTuplet = mxNotations.getTuplets()[0] # a list, but only use first
-            #environLocal.printDebug(['got mxTuplet', mxTuplet])
-
-            self.type = mxTuplet.get('type') 
-            self.bracket = musicxmlMod.yesNoToBoolean(mxTuplet.get('bracket'))
-            #environLocal.printDebug(['got bracket', self.bracket])
-
-            self.placement = mxTuplet.get('placement') 
-
-    mx = property(_getMX, _setMX)
-
-class TupletException(Exception):
-    pass
 
 #-------------------------------------------------------------------------------
 class ZeroDuration(DurationUnit):
@@ -2552,6 +2577,52 @@ class Test(unittest.TestCase):
         self.assertEqual(output, match)
 
 
+    def testAugmentOrDiminish(self):
+
+        # test halfs and doubles
+
+        for ql, half, double in [(2,1,4), (.5,.25,1), (1.5, .75, 3), 
+                                 (.6666666, .3333333, 1.3333333)]:
+        
+            d = Duration()
+            d.quarterLength = ql
+            a = d.augmentOrDiminish(.5, inPlace=False)
+            self.assertAlmostEquals(a.quarterLength, half, 5)
+
+            b = d.augmentOrDiminish(2, inPlace=False)
+            self.assertAlmostEquals(b.quarterLength, double, 5)
+
+
+        # testing tuplets in duration units
+
+        a = DurationUnit()
+        a.quarterLength = .3333333
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
+
+        a.augmentOrDiminish(2)
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 1.0>')
+
+        a.augmentOrDiminish(.25)
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
+
+
+        # testing tuplets on Durations
+        a = Duration()
+        a.quarterLength = .3333333
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
+
+        a.augmentOrDiminish(2)
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 1.0>')
+
+        a.augmentOrDiminish(.25)
+        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
+
 
 
 #-------------------------------------------------------------------------------
@@ -2559,6 +2630,13 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
 
 if __name__ == "__main__":
+    import sys
     import music21
     #music21.mainTest(Test, TestExternal)
-    music21.mainTest(Test)
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+
+        a = Test()
+        a.testAugmentOrDiminish()
