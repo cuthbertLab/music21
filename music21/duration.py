@@ -1132,8 +1132,7 @@ class DurationUnit(DurationCommon):
 
 #-------------------------------------------------------------------------------
 class Tuplet(object):
-    '''A tuplet object is a representation of one 
-    or more ratios that modify duration values and are stored in Duration objects.
+    '''A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.
 
     Note that this is a duration modifier.  We should also have a tupletGroup
     object that groups note objects into larger groups.
@@ -1256,7 +1255,9 @@ class Tuplet(object):
     def _getTupletActual(self):
         return [self.numberNotesActual, self.durationActual]
 
-    tupletActual = property(_getTupletActual, _setTupletActual)
+    tupletActual = property(_getTupletActual, _setTupletActual, 
+        doc = '''Get or set a two element list of number notes actual and duration actual. 
+        ''')
 
 
     def _setTupletNormal(self, tupList=[]):
@@ -1267,7 +1268,9 @@ class Tuplet(object):
     def _getTupletNormal(self):
         return self.numberNotesNormal, self.durationNormal
 
-    tupletNormal = property(_getTupletNormal, _setTupletNormal)
+    tupletNormal = property(_getTupletNormal, _setTupletNormal,
+        doc = '''Get or set a two element list of number notes actual and duration normal. 
+        ''')
 
     #---------------------------------------------------------------------------
     def tupletMultiplier(self):
@@ -1363,6 +1366,27 @@ class Tuplet(object):
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.durationActual = DurationUnit(type) 
         self.durationNormal = DurationUnit(type)        
+
+
+    def augmentOrDiminish(self, scalar):
+        if not scalar > 0:
+            raise DurationException('scalar must be greater than zero')
+        # TODO: scale the triplet in the same manner as Durations
+
+        if inPlace:
+            post = self
+            self.frozen = False # have to unfreeze
+        else:
+            post = copy.deepcopy()
+
+        # duration units scale
+        post.durationActual.augmentOrDiminish(scalar, inPlace=True)
+        post.durationNormal.augmentOrDiminish(scalar, inPlace=True)
+
+        # ratios stay the same
+        #self.numberNotesActual = actual
+        #self.numberNotesNormal = normal
+
 
     #---------------------------------------------------------------------------
     def _getMX(self):
