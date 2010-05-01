@@ -23,25 +23,34 @@ class Distributor(object):
         self.fpEgg = None
         self.fpWin = None
         self.fpTar = None
-        self._initPaths()
         self.version = base.VERSION_STR
+
+        self._initPaths()
 
     def _initPaths(self):
 
         # must be in the dist dir
-        self.dir = os.getcwd()
-        self.parentDir = os.path.dirname(self.dir)
-        parentContents = os.listdir(self.parentDir)
+        dir = os.getcwd()
+        parentDir = os.path.dirname(dir)
+        parentContents = os.listdir(parentDir)
         # make sure we are in the the proper directory
-        if (not self.dir.endswith("dist") or 
+        if (not dir.endswith("dist") or 
             'music21' not in parentContents):
-            raise Exception("not in the music21%dist directory: %s" % (os.sep, self.dir))
+            raise Exception("not in the music21%dist directory: %s" % (os.sep, dir))
     
-        self.fpDistDir = self.dir
-        
+        self.fpDistDir = dir
+        self.fpPackageDir = parentDir # dir with setup.py
+
+        self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
+        self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
+
+
+        for fp in [self.fpDistDir, self.fpPackageDir, self.fpBuildDir]:
+            environLocal.warn(fp)
+
 
     def _updatePaths(self):
-        '''get most recently produced distributions.
+        '''Process output of build scripts. Get most recently produced distributions.
         '''
         contents = os.listdir(self.fpDistDir)
         for fn in contents:
@@ -58,13 +67,18 @@ class Distributor(object):
         for fn in [self.fpEgg, self.fpWin, self.fpTar]:
             if fn == None:
                 environLocal.warn('missing fn path')
-            environLocal.warn(fn)
+            else:
+                environLocal.warn(fn)
 
 
     def build(self):
-        os.system('cd %s; python setup.py sdist' % fpPackageDir)
+        #os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self._updatePaths()
 
+
+    def _uploadPyPi(self):
+        os.system('cd %s; python setup.py bdist_egg upload' % 
+                athenaObj.fpPackageDir)
 
     def _uploadGoogleCode(self, fp):
         summary = self.version
@@ -73,18 +87,24 @@ class Distributor(object):
 
         if fp.endswith('.tar.gz'):
             labels = ['OpSys-All', 'Featured', 'Type-Archive']
-    
+        elif fp.endswith('.exe'):
+            labels = ['OpSys-Windows', 'Featured', 'Type-Installer']
+        elif fp.endswith('.egg'):
+            labels = ['OpSys-All', 'Featured', 'Type-Archive']
+        
         print(['starting GoogleCode upload of:', fp])
         status, reason, url = googlecode_upload.upload_find_auth(fp, 
                         project, summary, labels, user)
         print([status, reason])
 
+
     def upload(self):    
-        for fp in [self.fpTar]:
+        self._uploadPyPi()
+        for fp in [self.fpTar, self.fpEgg, self.fpWin]:
             self._uploadGoogleCode(fp)
 
 
 if __name__ == '__main__':
     a = Distributor()
     a.build()
-    a.upload()
+    #a.upload()
