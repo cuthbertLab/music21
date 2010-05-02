@@ -23,14 +23,14 @@ DESCRIPTION_LONG = 'Framework for Computer-Aided Musical Analysis and Manipulati
 def _getPackagesList():
     """List of all packages, delimited by period, with relative path names. Assigned to setup.py's `packages` argument.
     """
-#     pkg = (  'music21', 
-#              'music21.analysis', 
-#              'music21.composition', 
-#              'music21.corpus', 
-#              'music21.corpus.bach', 
-#              'music21.corpus.beethoven', 
-#              'music21.corpus.beethoven.opus18no1', 
-#              'music21.corpus.beethoven.opus59no1', 
+    # example data
+    #     pkg = (  'music21', 
+    #              'music21.analysis', 
+    #              'music21.composition', 
+    #              'music21.corpus', 
+    #              'music21.corpus.bach', 
+    #              'music21.corpus.beethoven', 
+    #              'music21.corpus.beethoven.opus18no1', 
 
     pkg = common.getPackageDir()
     for dir in pkg:
@@ -42,19 +42,16 @@ def _getPackageData():
 
     This list will be assigned to dictionary with the package name.
     '''
-#     pkgData = ['corpus/bach/*.xml',
-#              'corpus/bach/*.krn',
-#              'corpus/beethoven/*.xml',
-#              'corpus/beethoven/opus18no1/*.xml',
-#              'corpus/beethoven/opus18no1/*.krn',
-# 
-#              'doc/*.html',
-#              'doc/html/*.html',
-#              'doc/html/_images/*.png',
-#              'doc/html/_static/*.css',
-#              'doc/html/_static/*.png',
-#              'doc/html/_static/*.js',
-#     ] 
+    # example data
+    #     pkgData = ['corpus/bach/*.xml',
+    #              'corpus/bach/*.krn',
+    #              'corpus/beethoven/*.xml',
+    #              'corpus/beethoven/opus18no1/*.xml',
+     
+    #              'doc/*.html',
+    #              'doc/html/*.html',
+    #              'doc/html/_images/*.png',
+    #              'doc/html/_static/*.css',
 
     # get all possible combinations
     pkgData = common.getPackageData()
