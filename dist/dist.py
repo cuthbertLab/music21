@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # Name:          dist.py
 # Purpose:       Distribution and uploading script
 #
@@ -6,11 +6,10 @@
 #
 # Copyright:     (c) 2010 Christopher Ariza
 # License:       GPL
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 
 import os, sys
 from music21 import base
-import googlecode_upload # placed in site-packages
 
 from music21 import environment
 _MOD = 'dist.py'
@@ -40,10 +39,8 @@ class Distributor(object):
     
         self.fpDistDir = dir
         self.fpPackageDir = parentDir # dir with setup.py
-
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
         self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
-
 
         for fp in [self.fpDistDir, self.fpPackageDir, self.fpBuildDir]:
             environLocal.warn(fp)
@@ -72,15 +69,39 @@ class Distributor(object):
 
 
     def build(self):
+        '''Build all distributions. Update and rename file paths if necessary; remove extract build produts.
+        '''
+        # call setup.py
+        os.system('cd %s; python setup.py bdist_egg' % self.fpPackageDir)
+        os.system('cd %s; python setup.py bdist_wininst' % 
+                    self.fpPackageDir)
+        os.system('cd %s; python setup.py sdist' % 
+                    self.fpPackageDir)
+
         #os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self._updatePaths()
 
+        # remove build dir, egg-info dir
+        environLocal.warn('removing %s' % self.fpEggInfo)
+        os.system('rm -r %s' % self.fpEggInfo)
+        environLocal.warn('removing %s' % self.fpBuildDir)
+        os.system('rm -r %s' % self.fpBuildDir)
+
+
+
 
     def _uploadPyPi(self):
+        '''Upload source package to PyPI
+        '''
         os.system('cd %s; python setup.py bdist_egg upload' % 
                 athenaObj.fpPackageDir)
 
     def _uploadGoogleCode(self, fp):
+        '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
+        http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
+        '''
+        import googlecode_upload # placed in site-packages
+
         summary = self.version
         project = 'music21'
         user = 'christopher.ariza'
@@ -98,12 +119,16 @@ class Distributor(object):
         print([status, reason])
 
 
-    def upload(self):    
+    def upload(self):
+        '''Perform all uploads.
+        '''
         self._uploadPyPi()
         for fp in [self.fpTar, self.fpEgg, self.fpWin]:
             self._uploadGoogleCode(fp)
 
 
+
+#-------------------------------------------------------------------------------
 if __name__ == '__main__':
     a = Distributor()
     a.build()

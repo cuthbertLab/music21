@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 # Name:          setup.py
 # Purpose:       install
 #
@@ -8,10 +8,14 @@
 #
 # Copyright:     (c) 2009-2010 The music21 Project
 # License:       GPL
-#-----------------------------------------------------------------||||||||||||--
+#-------------------------------------------------------------------------------
 
 import sys, os
 import music21
+
+
+DESCRIPTION = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
+DESCRIPTION_LONG = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
 
 
 def _getPackagesList():
@@ -74,18 +78,20 @@ def _getPackageData():
              'doc/html/_static/*.css',
              'doc/html/_static/*.png',
              'doc/html/_static/*.js',
-
     ] 
     return pkgData
 
 
 def _getClassifiers():
+    # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers = [
-            # 'Development Status :: 5 - Production/Stable',
-            # 'Environment :: Console',
+            'Development Status :: 3 - Alpha',
+            'Environment :: Console',
              'Intended Audience :: End Users/Desktop',
              'Intended Audience :: Developers',
-            # 'License :: OSI Approved :: GNU General Public License (GPL)',
+             'Intended Audience :: Education',
+             'Intended Audience :: Science/Research',
+             'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
              'Natural Language :: English', 
              'Operating System :: MacOS',
              'Operating System :: Microsoft :: Windows',
@@ -98,10 +104,11 @@ def _getClassifiers():
     return classifiers
      
 
-
+#-------------------------------------------------------------------------------
 def writeManifestTemplate(fpPackageDir):
     dst = os.path.join(fpPackageDir, 'MANIFEST.in')
     msg = []
+    # remove dist and buildDoc dirctories
     msg.append('prune dist\n')
     msg.append('prune buildDoc\n')
     msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png\n')
@@ -122,12 +129,12 @@ def runDisutils(bdistType):
     pkgData = _getPackageData()
     setup(name = 'music21', 
         version = music21.VERSION_STR,
-        description = 'A toolkit for computer-aided musicology.', 
-        long_description =  'A toolkit for computer-aided musicology.',
+        description = DESCRIPTION, 
+        long_description = DESCRIPTION_LONG,
         author = 'Michael Scott Cuthbert, Christopher Ariza, others',
         #author_email = '',
         license = 'LGPL', 
-        #url = '',
+        url = 'http://code.google.com/p/music21/',
         classifiers = _getClassifiers(),
         download_url = 'http://music21.googlecode.com/files/music21-%s.tar.gz' % music21.VERSION_STR,
         packages = _getPackagesList(), 
