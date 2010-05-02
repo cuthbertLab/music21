@@ -640,11 +640,91 @@ def dirPartitioned(obj, skipLeading=['__']):
             attributes.append(name)
     return methods, attributes, properties
 
+
+
+#-------------------------------------------------------------------------------
+# tools for setup.py
+
+def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
+     packageOnly=True):
+    '''Manually get all directories in the music21 package, including the top level directory. This is used in setup.py.
+    
+    If `relative` is True, relative paths will be returned. 
+
+    If `remapSep` is set to anything other than None, the path separator will be replaced. 
+
+    If `packageOnly` is true, only directories with __init__.py files are colllected. 
+    '''
+    if fpMusic21 == None:
+        import music21
+        fpMusic21 = music21.__path__[0] # list, get first item
+
+    # a test if this is the correct directory
+    if 'corpus' not in os.listdir(fpMusic21):
+        raise Exception('cannot find corpus within %s' % fpMusic21)
+
+    #fpCorpus = os.path.join(fpMusic21, 'corpus')
+    fpParent = os.path.dirname(fpMusic21)
+
+    match = []
+    for dirpath, dirnames, filenames in os.walk(fpMusic21):
+        # remove hidden directories
+        if ('%s.' % os.sep) in dirpath:
+            continue
+        elif '.svn' in dirpath:
+            continue
+
+        if packageOnly:
+            if '__init__.py' not in filenames: # must be to be a package
+                continue
+        # make relative
+        if relative:
+            fp = dirpath.replace(fpParent, '')
+            if fp.startswith(os.sep):
+                fp = fp[fp.find(os.sep)+len(os.sep):]
+        else:
+            fp = dirpath
+
+        # replace os.sep
+        if remapSep != None:
+            fp = fp.replace(os.sep, remapSep)
+
+        match.append(fp)
+
+    return match
+
+
+def getPackageData():
+    '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
+    '''
+    # include these extensions for all directories, even if they are not normally there.
+    ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 'css', 'js', 'pdf']
+
+    # need all dirs, not just packages, and relative to music21
+    fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,
+                            packageOnly=False)
+
+    stub = 'music21%s' % os.sep
+
+    match = []
+    for fp in fpList:
+        # these are relative to music21 package, so remove music21
+        if fp == 'music21':
+            continue
+        elif fp.startswith(stub):
+            fp = fp[fp.find(stub)+len(stub):]
+
+        for e in ext:
+            target = fp + os.sep + '*.%s' % e
+            match.append(target)
+
+    return match
+
+
 #-------------------------------------------------------------------------------
 
     
-'''
-the following are a set of objects with more relaxed behaviors for quicker writing.
+'''The following are a set of objects with more relaxed behaviors for quicker writing.
 
 Most of these objects behave more like perl; for Python converts.
 

@@ -12,73 +12,52 @@
 
 import sys, os
 import music21
+from music21 import common
 
 
 DESCRIPTION = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
 DESCRIPTION_LONG = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
 
 
+
 def _getPackagesList():
-    """list of all packages, delimited by period"""
-    pkg = (  'music21', 
-             'music21.analysis', 
-             'music21.composition', 
-             'music21.corpus', 
-             'music21.corpus.bach', 
-             'music21.corpus.beethoven', 
-             'music21.corpus.beethoven.opus18no1', 
-             'music21.corpus.beethoven.opus59no1', 
-             'music21.corpus.beethoven.opus59no2', 
-             'music21.corpus.beethoven.opus59no3', 
-             'music21.corpus.haydn', 
-             'music21.corpus.haydn.opus74no1', 
-             'music21.corpus.haydn.opus74no2', 
-             'music21.corpus.luca', 
-             'music21.corpus.mozart', 
-             'music21.corpus.mozart.k80', 
-             'music21.corpus.mozart.k155', 
-             'music21.corpus.mozart.k156', 
-             'music21.corpus.mozart.k458', 
-             'music21.corpus.schumann', 
-             'music21.corpus.schumann.opus41no1', 
-             'music21.counterpoint', 
-             'music21.demos', 
-             'music21.doc', 
-             'music21.humdrum', 
-             'music21.lily', 
-             'music21.musicxml', 
-             'music21.test', 
-             'music21.trecento', 
-             'music21.trecento.xlrd', 
-             )
+    """List of all packages, delimited by period, with relative path names. Assigned to setup.py's `packages` argument.
+    """
+#     pkg = (  'music21', 
+#              'music21.analysis', 
+#              'music21.composition', 
+#              'music21.corpus', 
+#              'music21.corpus.bach', 
+#              'music21.corpus.beethoven', 
+#              'music21.corpus.beethoven.opus18no1', 
+#              'music21.corpus.beethoven.opus59no1', 
+
+    pkg = common.getPackageDir()
+    for dir in pkg:
+        print('found package: %s' % dir)
     return pkg
 
 def _getPackageData():
-    pkgData = ['corpus/bach/*.xml',
-             'corpus/bach/*.krn',
-             'corpus/beethoven/*.xml',
-             'corpus/beethoven/opus18no1/*.xml',
-             'corpus/beethoven/opus18no1/*.krn',
-             'corpus/beethoven/opus18no1/*.xml',
-             'corpus/beethoven/opus59no1/*.xml',
-             'corpus/beethoven/opus59no2/*.xml',
-             'corpus/beethoven/opus59no3/*.xml',
-             'corpus/haydn/opus74no1/*.xml',
-             'corpus/haydn/opus74no2/*.xml',
-             'corpus/luca/*.xml',
-             'corpus/luca/*.mxl',
-             'corpus/mozart/k80/*.xml',
-             'corpus/mozart/k155/*.xml',
-             'corpus/mozart/k156/*.xml',
-             'corpus/mozart/k458/*.xml',
-             'corpus/schumann/opus41no1/*.xml',
-             'doc/*.html',
-             'doc/html/*.html',
-             'doc/html/_images/*.png',
-             'doc/html/_static/*.css',
-             'doc/html/_static/*.png',
-             'doc/html/_static/*.js',
-    ] 
+    '''Assigned to setup.py's `package_data` argument. This is not used in the sdist distribution, but is used in Windows and EGGs.
+
+    This list will be assigned to dictionary with the package name.
+    '''
+#     pkgData = ['corpus/bach/*.xml',
+#              'corpus/bach/*.krn',
+#              'corpus/beethoven/*.xml',
+#              'corpus/beethoven/opus18no1/*.xml',
+#              'corpus/beethoven/opus18no1/*.krn',
+# 
+#              'doc/*.html',
+#              'doc/html/*.html',
+#              'doc/html/_images/*.png',
+#              'doc/html/_static/*.css',
+#              'doc/html/_static/*.png',
+#              'doc/html/_static/*.js',
+#     ] 
+
+    # get all possible combinations
+    pkgData = common.getPackageData()
     return pkgData
 
 
@@ -106,12 +85,16 @@ def _getClassifiers():
 
 #-------------------------------------------------------------------------------
 def writeManifestTemplate(fpPackageDir):
+    '''The manifest input file is used by distutils to make the 'sdist' distribution. This is not used in the creation of EGG files. 
+    '''
     dst = os.path.join(fpPackageDir, 'MANIFEST.in')
     msg = []
-    # remove dist and buildDoc dirctories
+    
+    msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png\n')
+    # order matters: remove dist and buildDoc directories
     msg.append('prune dist\n')
     msg.append('prune buildDoc\n')
-    msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png\n')
+
 
     f = open(dst, 'w')
     f.writelines(msg)
@@ -125,8 +108,7 @@ def runDisutils(bdistType):
         from setuptools import setup
     else:
         from distutils.core import setup
-    # store object for later examination
-    pkgData = _getPackageData()
+
     setup(name = 'music21', 
         version = music21.VERSION_STR,
         description = DESCRIPTION, 
@@ -138,7 +120,7 @@ def runDisutils(bdistType):
         classifiers = _getClassifiers(),
         download_url = 'http://music21.googlecode.com/files/music21-%s.tar.gz' % music21.VERSION_STR,
         packages = _getPackagesList(), 
-        package_data = {'music21' : pkgData}
+        package_data = {'music21': _getPackageData()},
     ) # close setup args
     
         
