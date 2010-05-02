@@ -113,7 +113,7 @@ def runDisutils(bdistType):
         author = 'Michael Scott Cuthbert, Christopher Ariza, others',
         #author_email = '',
         license = 'LGPL', 
-        url = 'http://code.google.com/p/music21/',
+        url = 'http://code.google.com/p/music21',
         classifiers = _getClassifiers(),
         download_url = 'http://music21.googlecode.com/files/music21-%s.tar.gz' % music21.VERSION_STR,
         packages = _getPackagesList(), 
