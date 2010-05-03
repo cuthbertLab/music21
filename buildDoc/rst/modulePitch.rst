@@ -379,13 +379,13 @@ Pitch
             >>> a = Pitch('a')
             >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
             >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
-            >>> a.accidental, a.accidental.displayEvaluated
-            (<accidental natural>, 'yes') 
+            >>> a.accidental, a.accidental.displayStatus
+            (<accidental natural>, True) 
             >>> b = Pitch('a')
             >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
             >>> b.updateAccidentalDisplay(past) # should add a natural
-            >>> b.accidental, b.accidental.displayEvaluated
-            (<accidental natural>, 'yes') 
+            >>> b.accidental, b.accidental.displayStatus
+            (<accidental natural>, True) 
             >>> c = Pitch('a4')
             >>> past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
             >>> # will not add a natural because match is pitchSpace
@@ -409,13 +409,13 @@ Accidental
 
     **Accidental** **attributes**
 
-        .. attribute:: displayEvaluated
-
-            Given the displayType, should this accidental be displayed? can be "yes", "no" or "" for unsure.  For contexts where the next program down the line cannot evaluate displayType 
-
         .. attribute:: displaySize
 
             Size in display: "cue", "large", or a percentage. 
+
+        .. attribute:: displayStatus
+
+            Given the displayType, should this accidental be displayed? Can be True, False, or None if not defined. For contexts where the next program down the line cannot evaluate displayType 
 
         .. attribute:: displayStyle
 

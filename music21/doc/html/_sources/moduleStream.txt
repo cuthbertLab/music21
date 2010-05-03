@@ -28,7 +28,7 @@ Stream
 
         .. attribute:: flattenedRepresentationOf
 
-            Boolean describing if this is a Stream that was created by another Stream's .flat property. 
+            When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here. 
 
         .. attribute:: isFlat
 
@@ -620,7 +620,14 @@ Stream
 
         .. method:: getElementsByOffset(offsetStart, offsetEnd=None, includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True)
 
-            Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding 
+            Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in. The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding 
+
+            
+
+            .. image:: images/getElementsByOffset.* 
+                :width: 600 
+
+            
 
             >>> st1 = Stream()
             >>> n0 = note.Note("C")

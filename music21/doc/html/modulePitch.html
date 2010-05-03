@@ -522,13 +522,13 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryAll</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayEvaluated</span>
-<span class="go">(&lt;accidental natural&gt;, &#39;yes&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayStatus</span>
+<span class="go">(&lt;accidental natural&gt;, True)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">)</span> <span class="c"># should add a natural</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayEvaluated</span>
-<span class="go">(&lt;accidental natural&gt;, &#39;yes&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayStatus</span>
+<span class="go">(&lt;accidental natural&gt;, True)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># will not add a natural because match is pitchSpace</span>
@@ -555,14 +555,14 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <p><strong>Accidental</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.pitch.Accidental.displayEvaluated">
-<tt class="descname">displayEvaluated</tt><a class="headerlink" href="#music21.pitch.Accidental.displayEvaluated" title="Permalink to this definition">¶</a></dt>
-<dd>Given the displayType, should this accidental be displayed? can be &#8220;yes&#8221;, &#8220;no&#8221; or &#8220;&#8221; for unsure.  For contexts where the next program down the line cannot evaluate displayType</dd></dl>
-
-<dl class="attribute">
 <dt id="music21.pitch.Accidental.displaySize">
 <tt class="descname">displaySize</tt><a class="headerlink" href="#music21.pitch.Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
 <dd>Size in display: &#8220;cue&#8221;, &#8220;large&#8221;, or a percentage.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.displayStatus">
+<tt class="descname">displayStatus</tt><a class="headerlink" href="#music21.pitch.Accidental.displayStatus" title="Permalink to this definition">¶</a></dt>
+<dd>Given the displayType, should this accidental be displayed? Can be True, False, or None if not defined. For contexts where the next program down the line cannot evaluate displayType</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.pitch.Accidental.displayStyle">
@@ -673,7 +673,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 27, 2010.
+      Last updated on May 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

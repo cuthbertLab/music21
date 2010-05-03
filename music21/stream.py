@@ -97,7 +97,7 @@ class Stream(music21.Music21Object):
     _DOC_ATTR = {
     'isSorted': 'Boolean describing whether the Stream is sorted or not.',
     'isFlat': 'Boolean describing whether the Stream is flat.',
-    'flattenedRepresentationOf': 'Boolean describing if this is a Stream that was created by another Stream\'s .flat property.',
+    'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
     }
 
     def __init__(self, givenElements = None):
@@ -1150,19 +1150,19 @@ class Stream(music21.Music21Object):
 
     def getElementsByOffset(self, offsetStart, offsetEnd = None,
                     includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
-        '''
-        Return a Stream of all Elements that are found at a certain offset or within a 
-        certain offset time range, specified as start and stop values.
+        '''Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values.
 
-        If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends
-        after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: 
+        If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
 
-        The includeEndBoundary option determines if an element begun just at offsetEnd 
-        should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan
-        is set to True is probably NOT what you ever want to do.
+        The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do.
         
         Setting mustBeginInSpan to False is a good way of finding 
         
+
+            .. image:: images/getElementsByOffset.*
+                :width: 600
+
+
         >>> st1 = Stream()
         >>> n0 = note.Note("C")
         >>> n0.duration.type = "half"
@@ -1172,58 +1172,47 @@ class Stream(music21.Music21Object):
         >>> n2.duration.type = "half"
         >>> n2.offset = 2
         >>> st1.insert(n2)
-        
         >>> out1 = st1.getElementsByOffset(2)
         >>> len(out1)
         1
         >>> out1[0].step
         'D'
-        
         >>> out2 = st1.getElementsByOffset(1, 3)
         >>> len(out2)
         1
         >>> out2[0].step
         'D'
-        
         >>> out3 = st1.getElementsByOffset(1, 3, mustFinishInSpan = True)
         >>> len(out3)
         0
-        
         >>> out4 = st1.getElementsByOffset(1, 2)
         >>> len(out4)
         1
         >>> out4[0].step
         'D'
-        
         >>> out5 = st1.getElementsByOffset(1, 2, includeEndBoundary = False)
         >>> len(out5)
-        0
-        
+        0        
         >>> out6 = st1.getElementsByOffset(1, 2, includeEndBoundary = False, mustBeginInSpan = False)
         >>> len(out6)
         1
         >>> out6[0].step
         'C'
-        
         >>> out7 = st1.getElementsByOffset(1, 3, mustBeginInSpan = False)
         >>> len(out7)
         2
         >>> [el.step for el in out7]
         ['C', 'D']
-
         >>> a = Stream()
         >>> n = note.Note('G')
         >>> n.quarterLength = .5
         >>> a.repeatInsert(n, range(8))
-
         >>> b = Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
-
         >>> c = b.getElementsByOffset(2,6.9)
         >>> len(c)
         2
-        
-         >>> c = b.flat.getElementsByOffset(2,6.9)
+        >>> c = b.flat.getElementsByOffset(2,6.9)
         >>> len(c)
         10
         '''

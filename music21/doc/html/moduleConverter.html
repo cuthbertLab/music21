@@ -51,6 +51,7 @@
 <li><a class="reference external" href="#converter">Converter</a></li>
 <li><a class="reference external" href="#convertermusicxml">ConverterMusicXML</a></li>
 <li><a class="reference external" href="#converterhumdrum">ConverterHumdrum</a></li>
+<li><a class="reference external" href="#convertertinynotation">ConverterTinyNotation</a></li>
 <li><a class="reference external" href="#picklefilter">PickleFilter</a></li>
 <li><a class="reference external" href="#streamfreezer">StreamFreezer</a></li>
 </ul>
@@ -94,8 +95,13 @@
 <p>Public interface for importing file formats into music21.</p>
 <dl class="function">
 <dt id="music21.converter.parse">
-<tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><em>value</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
-<dd>Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment &#8220;autoDownload&#8221; preference to &#8220;allow&#8221;.</dd></dl>
+<tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><em>value</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment &#8220;autoDownload&#8221; preference to &#8220;allow&#8221;.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">parse</span><span class="p">([</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="s">&quot;E8 f# g#&#39; G f g# g G#&quot;</span><span class="p">,</span> <span class="s">&quot;2/4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.converter.parseFile">
@@ -230,6 +236,38 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
 </dd></dl>
 
 </div>
+<div class="section" id="convertertinynotation">
+<h2>ConverterTinyNotation<a class="headerlink" href="#convertertinynotation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.converter.ConverterTinyNotation">
+<em class="property">
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterTinyNotation</tt><a class="headerlink" href="#music21.converter.ConverterTinyNotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple class wrapper for parsing TinyNotation data provided in a file or in a string.</p>
+<p><strong>ConverterTinyNotation</strong> <strong>attributes</strong></p>
+<blockquote>
+Attributes without Documentation: <cite>stream</cite></blockquote>
+<p><strong>ConverterTinyNotation</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.converter.ConverterTinyNotation.parseData">
+<tt class="descname">parseData</tt><big>(</big><em>tnData</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterTinyNotation.parseData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open TinyNotation data from a string or list</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tnData</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">ConverterTinyNotation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">parseData</span><span class="p">(</span><span class="n">tnData</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.converter.ConverterTinyNotation.parseFile">
+<tt class="descname">parseFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterTinyNotation.parseFile" title="Permalink to this definition">¶</a></dt>
+<dd>Open TinyNotation data from a file path.</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
 <div class="section" id="picklefilter">
 <h2>PickleFilter<a class="headerlink" href="#picklefilter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -302,7 +340,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 27, 2010.
+      Last updated on May 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -504,12 +504,12 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <p><strong>Duration</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="music21.duration.Duration.addDuration">
-<tt class="descname">addDuration</tt><big>(</big><em>dur</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.addDuration" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.duration.Duration.addDurationUnit">
+<tt class="descname">addDurationUnit</tt><big>(</big><em>dur</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.addDurationUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a DurationUnit or a Duration&#8217;s components to this Duration.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
@@ -522,6 +522,35 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dt id="music21.duration.Duration.appendTuplet">
 <tt class="descname">appendTuplet</tt><big>(</big><em>newTuplet</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.appendTuplet" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
+
+<dl class="method">
+<dt id="music21.duration.Duration.augmentOrDiminish">
+<tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>retainComponents=False</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a scalar greater than one, return a scaled version of this duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c"># dotted quarter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;half&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">dots</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.125</span> <span class="c"># requires components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">bDur</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="n">retainComponents</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="o">.</span><span class="n">components</span>
+<span class="go">[&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="n">retainComponents</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dDur</span><span class="o">.</span><span class="n">components</span>
+<span class="go">[&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.clear">
@@ -595,7 +624,7 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dl class="method">
 <dt id="music21.duration.Duration.consolidate">
 <tt class="descname">consolidate</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Duration.consolidate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations.</p>
+<dd><p>Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations, as DurationUnits cannot express all durations</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="s">&#39;quarter&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -636,9 +665,9 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c"># need to remove default</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDuration</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">3.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sliceComponentAtPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
@@ -732,16 +761,34 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletActual">
 <tt class="descname">tupletActual</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletActual" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Get or set a two element list of number notes actual and duration actual.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.tupletNormal">
 <tt class="descname">tupletNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.tupletNormal" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Get or set a two element list of number notes actual and duration normal.</dd></dl>
 
 </blockquote>
 <p><strong>Tuplet</strong> <strong>methods</strong></p>
 <blockquote>
+<dl class="method">
+<dt id="music21.duration.Tuplet.augmentOrDiminish">
+<tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.333...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationActual</span>
+<span class="go">&lt;music21.duration.DurationUnit 0.5&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationActual</span>
+<span class="go">&lt;music21.duration.DurationUnit 0.25&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.333...</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="method">
 <dt id="music21.duration.Tuplet.setDurationType">
 <tt class="descname">setDurationType</tt><big>(</big><em>type</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.setDurationType" title="Permalink to this definition">¶</a></dt>
@@ -856,7 +903,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dt id="music21.duration.DurationCommon">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">DurationCommon</tt><a class="headerlink" href="#music21.duration.DurationCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>A base class for all Duration objects. Used by both Duration and DurationUnit objects.</p>
+<dd><p>A base class for both Duration and DurationUnit objects.</p>
 <p>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</p>
 <p><strong>DurationCommon</strong> <strong>methods</strong></p>
 <blockquote>
@@ -981,6 +1028,29 @@ Attributes without Documentation: <cite>linkStatus</cite></blockquote>
 <dd>No documentation.</dd></dl>
 
 <dl class="method">
+<dt id="music21.duration.DurationUnit.augmentOrDiminish">
+<tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a scalar greater than one, return a scaled version of this duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;half&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;16th&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="p">,</span> <span class="n">bDur</span>
+<span class="go">(&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="music21.duration.DurationUnit.link">
 <tt class="descname">link</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.link" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
@@ -1081,7 +1151,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 27, 2010.
+      Last updated on May 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

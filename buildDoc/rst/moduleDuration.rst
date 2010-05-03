@@ -372,13 +372,13 @@ Duration
 
     **Duration** **methods**
 
-        .. method:: addDuration(dur)
+        .. method:: addDurationUnit(dur)
 
             Add a DurationUnit or a Duration's components to this Duration. 
 
             >>> a = Duration('quarter')
             >>> b = Duration('quarter')
-            >>> a.addDuration(b)
+            >>> a.addDurationUnit(b)
             >>> a.quarterLength
             2.0 
             >>> a.type
@@ -387,6 +387,36 @@ Duration
         .. method:: appendTuplet(newTuplet)
 
             No documentation. 
+
+        .. method:: augmentOrDiminish(scalar, retainComponents=False, inPlace=True)
+
+            Given a scalar greater than one, return a scaled version of this duration. 
+
+            >>> aDur = Duration()
+            >>> aDur.quarterLength = 1.5 # dotted quarter
+            >>> aDur.augmentOrDiminish(2)
+            >>> aDur.quarterLength
+            3.0 
+            >>> aDur.type
+            'half' 
+            >>> aDur.dots
+            1 
+            >>> bDur = Duration()
+            >>> bDur.quarterLength = 2.125 # requires components
+            >>> len(bDur.components)
+            2 
+            >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True, inPlace=False)
+            >>> cDur.quarterLength
+            4.25 
+            >>> cDur.components
+            [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>] 
+            >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False, inPlace=False)
+            >>> dDur.components
+            [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>] 
+
+            
+
+            
 
         .. method:: clear()
 
@@ -450,7 +480,7 @@ Duration
 
         .. method:: consolidate()
 
-            Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations. 
+            Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations, as DurationUnits cannot express all durations 
 
             >>> a = Duration()
             >>> a.fill(['quarter', 'half', 'quarter'])
@@ -486,9 +516,9 @@ Duration
             >>> a = Duration()
             >>> a.clear() # need to remove default
             >>> components = []
-            >>> a.addDuration(Duration('quarter'))
-            >>> a.addDuration(Duration('quarter'))
-            >>> a.addDuration(Duration('quarter'))
+            >>> a.addDurationUnit(Duration('quarter'))
+            >>> a.addDurationUnit(Duration('quarter'))
+            >>> a.addDurationUnit(Duration('quarter'))
             >>> a.quarterLength
             3.0 
             >>> a.sliceComponentAtPosition(.5)
@@ -572,13 +602,29 @@ Tuplet
 
         .. attribute:: tupletActual
 
-            No documentation. 
+            Get or set a two element list of number notes actual and duration actual. 
 
         .. attribute:: tupletNormal
 
-            No documentation. 
+            Get or set a two element list of number notes actual and duration normal. 
 
     **Tuplet** **methods**
+
+        .. method:: augmentOrDiminish(scalar, inPlace=True)
+
+            
+
+            >>> a = Tuplet()
+            >>> a.setRatio(6,2)
+            >>> a.tupletMultiplier()
+            0.333... 
+            >>> a.durationActual
+            <music21.duration.DurationUnit 0.5> 
+            >>> a.augmentOrDiminish(.5)
+            >>> a.durationActual
+            <music21.duration.DurationUnit 0.25> 
+            >>> a.tupletMultiplier()
+            0.333... 
 
         .. method:: setDurationType(type)
 
@@ -678,7 +724,7 @@ DurationCommon
 
 .. class:: DurationCommon
 
-    A base class for all Duration objects. Used by both Duration and DurationUnit objects. 
+    A base class for both Duration and DurationUnit objects. 
 
     x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
 
@@ -789,6 +835,26 @@ DurationUnit
         .. method:: appendTuplet(newTuplet)
 
             No documentation. 
+
+        .. method:: augmentOrDiminish(scalar, inPlace=True)
+
+            Given a scalar greater than one, return a scaled version of this duration. 
+
+            >>> bDur = DurationUnit('16th')
+            >>> bDur.augmentOrDiminish(2)
+            >>> bDur.quarterLength
+            0.5 
+            >>> bDur.type
+            'eighth' 
+            >>> bDur.augmentOrDiminish(4)
+            >>> bDur.type
+            'half' 
+            >>> bDur.augmentOrDiminish(.125)
+            >>> bDur.type
+            '16th' 
+            >>> cDur = bDur.augmentOrDiminish(16, inPlace=False)
+            >>> cDur, bDur
+            (<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>) 
 
         .. method:: link()
 

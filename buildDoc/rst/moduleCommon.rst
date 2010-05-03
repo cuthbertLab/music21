@@ -190,6 +190,14 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
     >>> getNumFromStr('')
     ('', '') 
 
+.. function:: getPackageData()
+
+    Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
+
+.. function:: getPackageDir(fpMusic21=None, relative=True, remapSep=., packageOnly=True)
+
+    Manually get all directories in the music21 package, including the top level directory. This is used in setup.py. If `relative` is True, relative paths will be returned. If `remapSep` is set to anything other than None, the path separator will be replaced. If `packageOnly` is true, only directories with __init__.py files are colllected. 
+
 .. function:: getPlatform()
 
     Shared function to get platform names. 

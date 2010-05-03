@@ -314,6 +314,16 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="music21.common.getPackageData">
+<tt class="descclassname">music21.common.</tt><tt class="descname">getPackageData</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.getPackageData" title="Permalink to this definition">¶</a></dt>
+<dd>Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types.</dd></dl>
+
+<dl class="function">
+<dt id="music21.common.getPackageDir">
+<tt class="descclassname">music21.common.</tt><tt class="descname">getPackageDir</tt><big>(</big><em>fpMusic21=None</em>, <em>relative=True</em>, <em>remapSep=.</em>, <em>packageOnly=True</em><big>)</big><a class="headerlink" href="#music21.common.getPackageDir" title="Permalink to this definition">¶</a></dt>
+<dd>Manually get all directories in the music21 package, including the top level directory. This is used in setup.py. If <cite>relative</cite> is True, relative paths will be returned. If <cite>remapSep</cite> is set to anything other than None, the path separator will be replaced. If <cite>packageOnly</cite> is true, only directories with __init__.py files are colllected.</dd></dl>
+
+<dl class="function">
 <dt id="music21.common.getPlatform">
 <tt class="descclassname">music21.common.</tt><tt class="descname">getPlatform</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.getPlatform" title="Permalink to this definition">¶</a></dt>
 <dd>Shared function to get platform names.</dd></dl>
@@ -644,7 +654,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 27, 2010.
+      Last updated on May 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -108,7 +108,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt id="music21.stream.Stream.flattenedRepresentationOf">
 <tt class="descname">flattenedRepresentationOf</tt><a class="headerlink" href="#music21.stream.Stream.flattenedRepresentationOf" title="Permalink to this definition">¶</a></dt>
-<dd>Boolean describing if this is a Stream that was created by another Stream&#8217;s .flat property.</dd></dl>
+<dd>When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.stream.Stream.isFlat">
@@ -750,7 +750,8 @@ flattening the stream is not required:</p>
 <dl class="method">
 <dt id="music21.stream.Stream.getElementsByOffset">
 <tt class="descname">getElementsByOffset</tt><big>(</big><em>offsetStart</em>, <em>offsetEnd=None</em>, <em>includeEndBoundary=True</em>, <em>mustFinishInSpan=False</em>, <em>mustBeginInSpan=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByOffset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in: The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</p>
+<dd><p>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in. The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</p>
+<img alt="_images/getElementsByOffset.png" src="_images/getElementsByOffset.png" style="width: 600px;" />
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;half&quot;</span>
@@ -1747,7 +1748,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Apr 27, 2010.
+      Last updated on May 03, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

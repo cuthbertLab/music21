@@ -10,9 +10,14 @@ music21.converter
 Public interface for importing file formats into music21. 
 
 
-.. function:: parse(value, forceSource=False)
+.. function:: parse(value, *args, **keywords)
 
     Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+
+    >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
+    >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
+
+    
 
 .. function:: parseFile(fp, forceSource=False)
 
@@ -123,6 +128,34 @@ ConverterHumdrum
         .. method:: parseFile(filepath)
 
             Open Humdram data from a file path. 
+
+
+ConverterTinyNotation
+---------------------
+
+.. class:: ConverterTinyNotation()
+
+    Simple class wrapper for parsing TinyNotation data provided in a file or in a string. 
+
+    
+
+    **ConverterTinyNotation** **attributes**
+
+        Attributes without Documentation: `stream`
+
+    **ConverterTinyNotation** **methods**
+
+        .. method:: parseData(tnData)
+
+            Open TinyNotation data from a string or list 
+
+            >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
+            >>> c = ConverterTinyNotation()
+            >>> s = c.parseData(tnData)
+
+        .. method:: parseFile(fp)
+
+            Open TinyNotation data from a file path. 
 
 
 PickleFilter
