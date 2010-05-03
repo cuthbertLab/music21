@@ -65,7 +65,7 @@ class XML_SimpleNote_Factory(object):
         for thisDot in dotNodes:
             noteEl.appendChild(thisDot)
 
-        if (note.accidental and note.accidental.displayEvaluated != "no"):
+        if (note.accidental and note.accidental.displayStatus != False):
             accidentalEl = noteDoc.createElement("accidental")
             accidentalNode = noteDoc.createTextNode(note.accidental.name)
             accidentalEl.appendChild(accidentalNode)

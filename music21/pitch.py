@@ -248,11 +248,10 @@ class PitchException(Exception):
 class Accidental(music21.Music21Object):
     '''Accidental class.
     '''
-    displayType = "normal"  
-    displayEvaluated = ""   
+    displayType = "normal" # always, never, unless-repeated, even-tied
+    displayStatus = None
     displayStyle = "normal" # "parentheses", "bracket", "both"
     displaySize  = "full"   # "cue", "large", or a percentage
-
     displayLocation = "normal" # "normal", "above" = ficta, "below"
     # above and below could also be useful for gruppetti, etc.
 
@@ -265,9 +264,9 @@ class Accidental(music21.Music21Object):
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
         previous note)''',
-    'displayEvaluated': '''Given the displayType, should 
+    'displayStatus': '''Given the displayType, should 
         this accidental be displayed?
-        can be "yes", "no" or "" for unsure.  For contexts where
+        Can be True, False, or None if not defined. For contexts where
         the next program down the line cannot evaluate displayType
         ''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
@@ -431,7 +430,7 @@ class Accidental(music21.Music21Object):
         'always'
         '''        
         if other != None: # empty accidental attributes are None
-            for attr in ['displayType', 'displayEvaluated', 
+            for attr in ['displayType', 'displayStatus', 
                         'displayStyle', 'displaySize', 'displayLocation']:
                 value = getattr(other, attr)
                 setattr(self, attr, value)
@@ -448,7 +447,7 @@ class Accidental(music21.Music21Object):
         if (self.name == "half-flat"): lilyRet = "eh"
         if (self.name == "one-and-a-half-flat"): lilyRet = "eseh"
         
-        if self.displayEvaluated == "yes" or self.displayType == "always" \
+        if self.displayStatus == True or self.displayType == "always" \
            or self.displayType == "even-tied":
             lilyRet += "!"
         
@@ -500,7 +499,7 @@ class Accidental(music21.Music21Object):
 
         mxAccidental = musicxmlMod.Accidental()
 
-#         if self.displayEvaluated == "yes" or self.displayType == "always" \
+#         if self.displayStatus == "yes" or self.displayType == "always" \
 #             or self.displayType == "even-tied":
             
         mxAccidental.set('content', mxName)
@@ -1071,7 +1070,7 @@ class Pitch(music21.Music21Object):
         mxNote.set('pitch', mxPitch)
 
         if (self.accidental is not None and 
-            self.accidental.displayEvaluated in ['yes', '']):
+            self.accidental.displayStatus in [True, None]):
             mxNote.set('accidental', self.accidental.mx)
         # should this also return an xml accidental object
         return mxNote # return element object
@@ -1106,12 +1105,12 @@ class Pitch(music21.Music21Object):
             #self.accidental = Accidental(float(acc))
             # better to use accObj if possible
                 self.accidental = accObj
-                self.accidental.displayEvaluated = 'yes'
+                self.accidental.displayStatus = True
             else:
                 # here we generate an accidental object from the alter value
                 # but in the source, there was not a defined accidental
                 self.accidental = Accidental(float(acc))
-                self.accidental.displayEvaluated = 'no'
+                self.accidental.displayStatus = False
         self.octave = int(mxPitch.get('octave'))
         self._pitchSpaceNeedsUpdating = True
 
@@ -1258,14 +1257,14 @@ class Pitch(music21.Music21Object):
         >>> a = Pitch('a')
         >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
         >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
-        >>> a.accidental, a.accidental.displayEvaluated
-        (<accidental natural>, 'yes')
+        >>> a.accidental, a.accidental.displayStatus
+        (<accidental natural>, True)
 
         >>> b = Pitch('a')
         >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
         >>> b.updateAccidentalDisplay(past) # should add a natural
-        >>> b.accidental, b.accidental.displayEvaluated
-        (<accidental natural>, 'yes')
+        >>> b.accidental, b.accidental.displayStatus
+        (<accidental natural>, True)
 
         >>> c = Pitch('a4')
         >>> past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
@@ -1299,7 +1298,7 @@ class Pitch(music21.Music21Object):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 # show all accidentals, even if past encountered
-                self.accidental.displayEvaluated = 'yes'
+                self.accidental.displayStatus = True
                 break
 
             # if An to A: do not need another natural
@@ -1310,8 +1309,8 @@ class Pitch(music21.Music21Object):
                     (pSelf.accidental == None or 
                      pSelf.accidental.name == 'natural')):
                 if (self.accidental != None and  
-                    self.accidental.displayEvaluated == 'yes'):
-                    self.accidental.displayEvaluated = 'no'
+                    self.accidental.displayStatus == True):
+                    self.accidental.displayStatus = False
                 #environLocal.printDebug(['match previous natural'])
                 break
 
@@ -1321,10 +1320,10 @@ class Pitch(music21.Music21Object):
                 pPast.accidental != None and 
                 pPast.accidental.name != 'natural' and
                     (pSelf.accidental == None or 
-                     pSelf.accidental.displayEvaluated == 'no')):
+                     pSelf.accidental.displayStatus == False)):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
-                self.accidental.displayEvaluated = 'yes'
+                self.accidental.displayStatus = True
                 #environLocal.printDebug(['match previous mark'])
                 break
 
@@ -1335,7 +1334,7 @@ class Pitch(music21.Music21Object):
             elif (pPast.stepWithOctave == pSelf.stepWithOctave and 
                 pPast.accidental == None and 
                 pSelf.accidental != None):
-                self.accidental.displayEvaluated = 'yes'
+                self.accidental.displayStatus = True
                 #environLocal.printDebug(['match previous no mark'])
                 break
             else:
@@ -1397,12 +1396,12 @@ class Test(unittest.TestCase):
         self.assertEqual(pAltered.accidental.name, 'flat')
         self.assertEqual(pAltered.accidental.displayType, 'normal')
         # in key signature, so shuold not be shown
-        self.assertEqual(pAltered.accidental.displayEvaluated, 'no')
+        self.assertEqual(pAltered.accidental.displayStatus, False)
 
         altoMeasures = s[1].measures
         pAltered = altoMeasures[6].pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
-        self.assertEqual(pAltered.accidental.displayEvaluated, 'yes')
+        self.assertEqual(pAltered.accidental.displayStatus, True)
 
 
     def testUpdateAccidentalDisplay(self):
@@ -1413,12 +1412,12 @@ class Test(unittest.TestCase):
 
         a = Pitch('c')
         a.accidental = Accidental('natural')
-        a.accidental.displayEvaluated = 'no' # hide
+        a.accidental.displayStatus = False # hide
         self.assertEqual(a.name, 'C')
-        self.assertEqual(a.accidental.displayEvaluated, 'no')
+        self.assertEqual(a.accidental.displayStatus, False)
 
         a.updateAccidentalDisplay(past)
-        self.assertEqual(a.accidental.displayEvaluated, 'yes')
+        self.assertEqual(a.accidental.displayStatus, True)
 
 
 #-------------------------------------------------------------------------------

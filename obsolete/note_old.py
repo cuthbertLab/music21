@@ -447,7 +447,7 @@ class Accidental(object):
                             # the immedately preceding note is the same), "even-tied"
                             # (stronger than always: shows even if it is tied to the
                             # previous note
-    displayEvaluated = ""   # given the displayType, should this accidental be displayed?
+    displayStatus = ""   # given the displayType, should this accidental be displayed?
                             # can be "yes", "no" or "" for unsure.  For contexts where
                             # the next program down the line cannot evaluate displayType
     displayStyle = "normal" # "parentheses", "bracket", "both"
@@ -509,7 +509,7 @@ class Accidental(object):
         if (self.name == "half-flat"): lilyRet = "eh"
         if (self.name == "one-and-a-half-flat"): lilyRet = "eseh"
         
-        if self.displayEvaluated == "yes" or self.displayType == "always" \
+        if self.displayStatus == "yes" or self.displayType == "always" \
            or self.displayType == "even-tied":
             lilyRet += "!"
         

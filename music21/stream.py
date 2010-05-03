@@ -2337,10 +2337,15 @@ class Stream(music21.Music21Object):
     
                         # hide accidentals on tied notes where previous note
                         # had an accidental that was shown
-                        if not displayTiedAccidentals:
-                            if (hasattr(e, 'accidental') 
-                                and e.accidental != None):
-                                eRemain.accidental.displayEvaluated = 'no'
+                        if hasattr(e, 'accidental') and e.accidental != None:
+                            if not displayTiedAccidentals: # if False
+                                if (e.accidental.displayType not in     
+                                    ['even-tied']):
+                                    eRemain.accidental.displayStatus = False
+                            else: # display tied accidentals
+                                eRemain.accidental.displayType = 'even-tied'
+                                eRemain.accidental.displayStatus = True
+
 
                         # TODO: not sure this is the best way to make sure
                         # eRamin comes first 
@@ -6601,12 +6606,12 @@ class Test(unittest.TestCase):
         s.append(n3)
         s.makeAccidentals()
 
-        self.assertEqual(n2.accidental.displayEvaluated, 'yes')
+        self.assertEqual(n2.accidental.displayStatus, True)
         # both a's in the chord now have naturals but are hidden
         self.assertEqual(c1.pitches[1].accidental, None)
-        #self.assertEqual(c1.pitches[2].accidental.displayEvaluated, 'yes')
+        #self.assertEqual(c1.pitches[2].accidental.displayStatus, True)
         # need a natural here
-        self.assertEqual(n3.accidental.displayEvaluated, 'yes')
+        self.assertEqual(n3.accidental.displayStatus, True)
 
         #s.show()
 
