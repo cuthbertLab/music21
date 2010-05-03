@@ -499,8 +499,9 @@ class Accidental(music21.Music21Object):
 
         mxAccidental = musicxmlMod.Accidental()
 
-#         if self.displayStatus == "yes" or self.displayType == "always" \
-#             or self.displayType == "even-tied":
+# need to remove display in this case and return None
+#         if self.displayStatus == False:
+#             pass
             
         mxAccidental.set('content', mxName)
 
@@ -1249,10 +1250,13 @@ class Pitch(music21.Music21Object):
 
 
     def updateAccidentalDisplay(self, pitchPast=[],     
-            cautionaryPitchClass=True, cautionaryAll=False):
-        '''Given a list of Pitch objects, determine if this pitch's Accidental object needs to be updated with a natural or other cautionary accidental.
+            cautionaryPitchClass=True, cautionaryAll=False, 
+            overrideStatus=False):
+        '''Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental.
 
         Changes to this Pitch object's Accidental object are made in-place.
+
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the accidental. By default this does not happen.
 
         >>> a = Pitch('a')
         >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
@@ -1274,6 +1278,17 @@ class Pitch(music21.Music21Object):
         True
 
         '''
+        if overrideStatus == False: # go with what we have defined
+            if self.accidental == None:
+                pass # no accidental defined; we may need to add one
+            elif (self.accidental != None and 
+            self.accidental.displayStatus == None): # not set; need to set  
+                # configure based on displayStatus alone, continue w/ normal
+                pass
+            elif (self.accidental != None and 
+            self.accidental.displayStatus in [True, False]): 
+                return # exit: already set, do not override
+
         # need to step through pitchPast in reverse
         for i in reversed(range(len(pitchPast))): 
 
@@ -1286,7 +1301,7 @@ class Pitch(music21.Music21Object):
                 # as name alone will not transfer display status
                 pPast.accidental = pitchPast[i].accidental
                 pSelf.accidental = self.accidental
-            else:
+            else: # cautionary in terms of pitch space
                 pPast = pitchPast[i]
                 pSelf = self
 
@@ -1294,7 +1309,9 @@ class Pitch(music21.Music21Object):
 
             # if we have a previous identical match
             # A# to A# or A3 to A4
-            if cautionaryAll: # show all no matter
+            if cautionaryAll or (self.accidental != None 
+            and self.accidental.displayType == 'even-tied'): 
+                # show all no matter
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 # show all accidentals, even if past encountered
@@ -1416,7 +1433,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.name, 'C')
         self.assertEqual(a.accidental.displayStatus, False)
 
-        a.updateAccidentalDisplay(past)
+        a.updateAccidentalDisplay(past, overrideStatus=True)
         self.assertEqual(a.accidental.displayStatus, True)
 
 
