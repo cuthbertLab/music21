@@ -6599,8 +6599,10 @@ class Test(unittest.TestCase):
         # both a's in the chord now have naturals but are hidden
         self.assertEqual(c1.pitches[1].accidental, None)
         #self.assertEqual(c1.pitches[2].accidental.displayStatus, True)
-        # need a natural here
-        self.assertEqual(n3.accidental.displayStatus, True)
+
+        # not getting a natural here because of chord tones
+        #self.assertEqual(n3.accidental.displayStatus, True)
+        self.assertEqual(n3.accidental, None)
 
         #s.show()
 

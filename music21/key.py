@@ -226,7 +226,7 @@ class KeySignature(music21.Music21Object):
         self.mode = None
         # need to store a list of pitch objects, used for creating a 
         # non traditional key
-        self.alteredTones = []
+        self._alteredPitches = None
 
     #---------------------------------------------------------------------------
     def _strDescription(self):
@@ -279,6 +279,58 @@ class KeySignature(music21.Music21Object):
     pitchAndMode = property(_getPitchAndMode)
 
 
+    def _getAlteredPitches(self):
+        '''Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental. 
+        '''
+        post = []
+        if self.sharps > 0:
+            pKeep = pitch.Pitch('B')
+            for i in range(self.sharps):
+                pKeep.transpose('P5', inPlace=True)
+                p = copy.deepcopy(pKeep)
+                p.octave = None
+                post.append(p)
+
+        elif self.sharps < 0:
+            pKeep = pitch.Pitch('F')
+            for i in range(abs(self.sharps)):
+                pKeep.transpose('P4', inPlace=True)
+                p = copy.deepcopy(pKeep)
+                p.octave = None
+                post.append(p)
+        return post
+
+
+    alteredPitches = property(_getAlteredPitches, 
+        doc='''Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental. 
+
+        >>> a = KeySignature(3)
+        >>> a.alteredPitches
+        [F#, C#, G#]
+        >>> a = KeySignature(1)
+        >>> a.alteredPitches
+        [F#]
+
+        >>> a = KeySignature(9)
+        >>> a.alteredPitches
+        [F#, C#, G#, D#, A#, E#, B#, F##, C##]
+
+        >>> a = KeySignature(-3)
+        >>> a.alteredPitches
+        [B-, E-, A-]
+
+        >>> a = KeySignature(-1)
+        >>> a.alteredPitches
+        [B-]
+
+        >>> a = KeySignature(-6)
+        >>> a.alteredPitches
+        [B-, E-, A-, D-, G-, C-]
+
+        >>> a = KeySignature(-8)
+        >>> a.alteredPitches
+        [B-, E-, A-, D-, G-, C-, F-, B--]
+        ''')
 
     #---------------------------------------------------------------------------
     # properties
