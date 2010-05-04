@@ -22,8 +22,11 @@ from music21 import converter
 from music21 import corpus
 from music21 import pitch
 from music21 import note
+from music21 import meter
+from music21 import stream
 from music21.note import Note
 from music21.pitch import Pitch
+from music21.stream import Stream
 from pylab import *
 
 
@@ -35,6 +38,8 @@ environLocal = environment.Environment(_MOD)
 
 #------------------------------------------------------------------------------
 # utility functions
+
+
 
 def getWeights(isMajor): 
     ''' Returns either the major or minor key profile as described by Sapp
@@ -115,7 +120,6 @@ def getLikelyKeys(keyResults, differences):
     
     
 def getDifference(keyResults, pcDistribution, isMajor=True):
-#def getDifference(self, pcDistribution, isMajor=True):
     ''' Takes in a list of numerical probably key results and returns the
         difference of the top two keys
     '''
@@ -124,9 +128,6 @@ def getDifference(keyResults, pcDistribution, isMajor=True):
     top = [0]*12
     bottomRight = [0]*12
     bottomLeft = [0]*12
-        
-    #a = sorted(keyResults)
-    #a.reverse()
         
     if isMajor:
         toneWeights = getWeights(True)
@@ -138,63 +139,84 @@ def getDifference(keyResults, pcDistribution, isMajor=True):
         
     for i in range(len(soln)):
         for j in range(len(toneWeights)):
-            #print "BLAH"
             top[i] = top[i] + ((toneWeights[(j - i) % 12]-profileAverage) * (pcDistribution[j]-histogramAverage))
-            #print top[i]
             bottomRight[i] = bottomRight[i] + ((toneWeights[(j-i)%12]-profileAverage)**2)
-            #print bottomRight[i]
             bottomLeft[i] = bottomLeft[i] + ((pcDistribution[j]-histogramAverage)**2)
-            #print bottomLeft[i]
-            soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
-            #print soln[i]
-        
-    #print soln
+            if (bottomRight[i] == 0 or bottomLeft[i] == 0):
+                soln[i] = 0
+            else:
+                soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
+            
     return soln
 
 #------------------------------------------------------------------------------
 
-class KeyDetectException(Exception):
+class KeyAnalysisException(Exception):
     pass
 
 
 #------------------------------------------------------------------------------
 
-class KeyDetect(object):
+class KeyAnalysis(object):
     
     def __init__(self, streamObj):
         if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyDetectException, 'non-stream provided as argument'
+            raise KeyAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
+    
+    def doKeyAnalysis(self, sStream, module):
+        if (module=="krumhanslSchmuckler"):
+            a = KrumhanslSchmuckler(sStream)
+            a.runKeyAnalysis(sStream, 1)
+        elif (module=="chew"):
+            a = Chew(sStream)
+            a.runKeyAnalysis(sStream, 1)
+        else:
+            raise KeyAnalysisException, 'unrecognized key analysis module name provided as argument'
 
 
-    def runKeyDetect(self, sStream, minWindow):
+
+class KrumhanslSchmuckler(object):
+    
+    def __init__(self, streamObj):
+        if not isinstance(streamObj, music21.stream.Stream):
+            raise KeyAnalysisException, 'non-stream provided as argument'
+        self.streamObj = streamObj
+        
+    def runKeyAnalysis(self, sStream, minWindow):
         # names = [x.id for x in sStream]
         
-        max = len(sStream[0].measures)
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('1/4'))
+        sWindowMeasures = sStream.makeMeasures(meterStream).makeTies()
+        
+        #max = len(sStream[0].measures)
+        max = len(sWindowMeasures)
         
         solutionMatrix = [0]*(max-minWindow+1)
         
         print("-----WORKING... window-----")
         for i in range(minWindow, max+1):
             print(i)
-            solutionMatrix[i-minWindow] = self.windowKeyDetect(i, sStream) 
+            solutionMatrix[i-minWindow] = self.windowKeyAnalysis(i, sWindowMeasures) 
         
         
-        print solutionMatrix
+        return solutionMatrix
 
 
-    def windowKeyDetect(self, windowSize, work):
+    def windowKeyAnalysis(self, windowSize, work):
         
-        max = len(work[0].measures)
+        #max = len(work[0].measures)
+        max = len(work.measures)
         key = [0] * (max - windowSize + 1)                
         
         for i in range(max-windowSize + 1):    
-            key[i] = self.singleKeyDetect(getPitchClassDistribution(work, i, windowSize))
+            key[i] = self.singleKeyAnalysis(getPitchClassDistribution(work, i, windowSize))
              
         return key
  
     
-    def singleKeyDetect(self, pcDistribution):    
+    def singleKeyAnalysis(self, pcDistribution):    
         ''' Takes in a pitch class distribution and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
         '''
@@ -209,32 +231,27 @@ class KeyDetect(object):
         differenceMajor = getDifference(keyResultsMajor, pcDistribution, True)
         likelyKeysMajor = getLikelyKeys(keyResultsMajor, differenceMajor)
         
-        
         keyResultsMinor = convoluteDistribution(pcDistribution, False)   
         differenceMinor = getDifference(keyResultsMinor, pcDistribution, False)
         likelyKeysMinor = getLikelyKeys(keyResultsMinor, differenceMinor)
         
 
-        ''' find the largest correlation value to use for a key
+        ''' find the largest correlation value to use to select major or minor as the resulting key
         '''
         if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
-            likelyKey = (likelyKeysMajor[0][0], "Major", likelyKeysMajor[0][1])
+            likelyKey = (str(likelyKeysMajor[0][0]), "Major", likelyKeysMajor[0][1])
         else:
-            likelyKey = (likelyKeysMinor[0][0], "Minor", likelyKeysMinor[0][1])
+            likelyKey = (str(likelyKeysMinor[0][0]), "Minor", likelyKeysMinor[0][1])
         
-        '''
-        print keyResultsMajor
-        print likelyKeysMajor
-        print differenceMajor
-        
-        print keyResultsMinor
-        print likelyKeysMinor
-        print differenceMinor
-        
-        print likelyKey
-        '''
-        
-        return likelyKey
+        return likelyKey        
+    
+    
+class Chew(object):
+    
+    def __init__(self, streamObj):
+        if not isinstance(streamObj, music21.stream.Stream):
+            raise KeyAnalysisException, 'non-stream provided as argument'
+        self.streamObj = streamObj
 
 
 #------------------------------------------------------------------------------
@@ -254,8 +271,8 @@ class Test(unittest.TestCase):
     def testKeyDetect(self):
         sStream = corpus.parseWork('schubert/d576-2')
         #sStream = corpus.parseWork('bach/bwv17.7')
-        a = KeyDetect(sStream)
-        a.runKeyDetect(sStream, 1)
+        a = KeyAnalysis(sStream)
+        a.runKeyAnalysis(sStream, 1)
     '''    
 
 

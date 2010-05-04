@@ -355,8 +355,96 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
-class GraphSappKeyAnalysis(Graph):
-    pass
+class GraphKeyAnalysis(Graph):
+    def __init__(self, *args, **keywords):
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+    def getColor(self, key, modality):
+        majorKeyColors = {'Eb':'#D60000',
+                 'E':'#FF0000',
+                 'E#':'#FF2B00',
+                 'Bb':'#FF5600',
+                 'B':'#FF8000',
+                 'B#':'#FFAB00',
+                 'Fb':'#FFFD600',
+                 'F':'#FFFF00',
+                 'F#':'#AAFF00',
+                 'Cb':'#55FF00',
+                 'C':'#00FF00',
+                 'C#':'#00AA55',
+                 'Gb':'#0055AA',
+                 'G':'#0000FF',
+                 'G#':'#2B00FF',
+                 'Db':'#5600FF',
+                 'D':'#8000FF',
+                 'D#':'#AB00FF',
+                 'Ab':'#D600FF',
+                 'A':'#FF00FF',
+                 'A#':'#FF55FF'}
+        minorKeyColors = {'Eb':'#720000',
+                 'E':'#9b0000',
+                 'E#':'#9b0000',
+                 'Bb':'#9b0000',
+                 'B':'#9b2400',
+                 'B#':'#9b4700',
+                 'Fb':'#9b7200',
+                 'F':'#9b9b00',
+                 'F#':'#469b00',
+                 'Cb':'#009b00',
+                 'C':'#009b00',
+                 'C#':'#004600',
+                 'Gb':'#000046',
+                 'G':'#00009B',
+                 'G#':'#00009B',
+                 'Db':'#00009b',
+                 'D':'#24009b',
+                 'D#':'#47009b',
+                 'Ab':'#72009b',
+                 'A':'#9b009b',
+                 'A#':'#9b009b'}
+
+        if modality == "Major":
+            return majorKeyColors[str(key)]
+        else:
+            return minorKeyColors[str(key)]
+
+    def process(self):
+        '''
+        '''
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+        
+        axTop = self.fig.add_subplot(111)
+        plt.ylabel('Window Size: from 1 quarter note to entire work')
+        plt.xlabel('Progression of piece: from beginning to end')
+        #plt.legend(('E', 'B', 'F', 'C', 'G', 'D'), 'upper-left')
+        
+        for i in range(len(self.data)):
+            positions = []
+            correlations = []
+            heights = []
+            colors = []
+            
+            for j in range(len(self.data[i])):
+                positions.append((1/2)+j)
+                colors.append(self.getColor(self.data[i][j][0], self.data[i][j][1]))
+                correlations.append(float(self.data[i][j][2]))
+                heights.append(1)
+            ax = self.fig.add_subplot(len(self.data), 1, len(self.data)-i)
+            ax.bar(positions, heights, 1, color=colors)
+            
+            for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
+                line.set_visible(False)
+            ax.set_yticklabels([""]*len(ax.get_yticklabels()))
+            ax.set_xticklabels([""]*len(ax.get_xticklabels()))
+            ax.set_xlim([0,len(self.data[i])])
+            
+        self.setAxisRange('x', range(len(self.data)), 0)
+        self._adjustAxisSpines(axTop)
+        self._applyFormatting(axTop)
+        self.done()
 
 
 class GraphHorizontalBar(Graph):
