@@ -1538,6 +1538,8 @@ class Test(unittest.TestCase):
         compare(pList, result)
 
 
+        #TODO: repeats of the same with 'unless-repeated' set
+
         #TODO: test passing getting past pitches from a key signatures .alteredPitches parameter; then applying to a pitch sequence
 
 

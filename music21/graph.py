@@ -42,7 +42,7 @@ try:
     import numpy
 
 except ImportError:
-    environLocal.warn('no matplotlib available')
+    environLocal.warn('no matplotlib available; graphing classes will raise exceptions.')
 
 
 
@@ -355,6 +355,9 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
+
+
+#-------------------------------------------------------------------------------
 class GraphKeyAnalysis(Graph):
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
