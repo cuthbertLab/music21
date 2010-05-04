@@ -86,8 +86,7 @@ def ex03(show=True, *arguments, **keywords):
     
     # This examples graphs the usage of pitch classes in the first and second violin parts. 
     
-    from music21 import corpus
-    from music21.analysis import correlate
+    from music21 import corpus, graph
     if 'op133' in keywords.keys():
         sStream = keywords['op133']
     else:
@@ -95,12 +94,10 @@ def ex03(show=True, *arguments, **keywords):
 
     # Create a graph of pitch class for the first and second part
     for part in [sStream[0], sStream[1]]:
-        na = correlate.NoteAnalysis(part.flat)
-        fx = lambda n: n.pitchClass # x values will be pitch classes
-        fxTick = lambda n: n.name # x ticks will be pitch names
+        g = graph.PlotHistogramPitchClass(part, title=part.getInstrument().partName)
         if show:
-            na.noteAttributeHistogram(fx, title=part.getInstrument().partName,
-                                  fxTick=fxTick)
+            g.process()
+
     
 
 
@@ -116,12 +113,21 @@ def ex04(show=True, *arguments, **keywords):
     else:
         sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
 
-    na = correlate.NoteAnalysis(sStream[3].flat)
-    fy = lambda n: n.pitchClass # y values will be pitch classes
-    fx = lambda n: n.offset # x values will be offsets in quarter notes
-    if show:
-        na.noteAttributeScatter(fx, fy, yTicks=correlate.ticksPitchClass())
+#     na = correlate.NoteAnalysis(sStream[3].flat)
+#     fy = lambda n: n.pitchClass # y values will be pitch classes
+#     fx = lambda n: n.offset # x values will be offsets in quarter notes
+#     if show:
+#         na.noteAttributeScatter(fx, fy, yTicks=correlate.ticksPitchClass())
 
+
+
+    # note: measure numbers are not being shown correcntly
+    # need to investigate
+    part = sStream[3]
+    g = graph.PlotScatterPitchClassOffset(part.flat,
+                 title=part.getInstrument().partName)
+    if show:
+        g.process()
 
 
 

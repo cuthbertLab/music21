@@ -8,6 +8,7 @@ from music21 import clef
 from music21 import common
 from music21 import corpus
 from music21 import converter
+from music21 import graph
 from music21 import instrument
 from music21 import lily
 from music21 import meter
@@ -23,13 +24,18 @@ def simple1():
     
     for work in ['opus18no1', 'opus59no3']:
         movementNumber = 3
-        score = corpus.parseWork(work, movementNumber)
+        score = corpus.parseWork(work, movementNumber, extList=['xml'])
     
         for part in score:
-            instrumentName = part.getElementsByClass(instrument.Instrument)[0].bestName()
-            grapher = correlate.NoteAnalysis(part.flat.sorted)    
-            grapher.pitchToLengthScatter(title='%s, Movement %s, %s' % (work, movementNumber, instrumentName))
+            instrumentName = part.flat.getElementsByClass(
+                instrument.Instrument)[0].bestName()
+            title='%s, Movement %s, %s' % (work, movementNumber, instrumentName)
 
+            #grapher = correlate.NoteAnalysis(part.flat.sorted)    
+            #grapher.pitchToLengthScatter(title=title)
+            g = graph.PlotScatterPitchSpaceQuarterLength(part.flat.sorted, 
+                title=title)
+            g.process()
 #
 #  longer version -- reuse for something less common than quarterLength to pitch
 #            
@@ -295,8 +301,11 @@ def threeDimChopin():
 #    streamObject.append(n2)
     
     stream2 = streamObject.stripTies()
-    correlated = correlate.NoteAnalysis(stream2)  
-    correlated.noteAttributeCount()
+    #correlated = correlate.NoteAnalysis(stream2)  
+    #correlated.noteAttributeCount()
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(stream2)
+    g.process()
+
 
 def threeDimMozart():
     from music21 import converter
@@ -305,8 +314,12 @@ def threeDimMozart():
 
     streamObject = converter.parse(testFiles.mozartTrioK581Excerpt)
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
-    correlated = correlate.NoteAnalysis(streamObject.flat)  
-    correlated.noteAttributeCount(colors=['b'], barWidth = 0.2)
+#     correlated = correlate.NoteAnalysis(streamObject.flat)  
+#     correlated.noteAttributeCount(colors=['b'], barWidth = 0.2)
+
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
+    g.process()
+
 
 
 def threeDimBoth():
@@ -316,12 +329,18 @@ def threeDimBoth():
     from music21.analysis import correlate
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
-    correlated1 = correlate.NoteAnalysis(mozartStream.flat)  
-    correlated1.noteAttributeCount()
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
+    g.process()
+
+#     correlated1 = correlate.NoteAnalysis(mozartStream.flat)  
+#     correlated1.noteAttributeCount()
     
     chopinStream = converter.parse(kernTest.mazurka6) 
-    correlated2 = correlate.NoteAnalysis(chopinStream.flat)  
-    correlated2.noteAttributeCount()
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.flat)
+    g.process()
+
+#     correlated2 = correlate.NoteAnalysis(chopinStream.flat)  
+#     correlated2.noteAttributeCount()
 
 
 def januaryThankYou():
