@@ -42,7 +42,7 @@ try:
     import numpy
 
 except ImportError:
-    environLocal.warn('no matplotlib available; graphing classes will raise exceptions.')
+    environLocal.warn('no matplotlib available')
 
 
 
@@ -355,63 +355,11 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
-
-
-#-------------------------------------------------------------------------------
-class GraphKeyAnalysis(Graph):
+class GraphColorGrid(Graph):
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
-
-    def getColor(self, key, modality):
-        majorKeyColors = {'Eb':'#D60000',
-                 'E':'#FF0000',
-                 'E#':'#FF2B00',
-                 'Bb':'#FF5600',
-                 'B':'#FF8000',
-                 'B#':'#FFAB00',
-                 'Fb':'#FFFD600',
-                 'F':'#FFFF00',
-                 'F#':'#AAFF00',
-                 'Cb':'#55FF00',
-                 'C':'#00FF00',
-                 'C#':'#00AA55',
-                 'Gb':'#0055AA',
-                 'G':'#0000FF',
-                 'G#':'#2B00FF',
-                 'Db':'#5600FF',
-                 'D':'#8000FF',
-                 'D#':'#AB00FF',
-                 'Ab':'#D600FF',
-                 'A':'#FF00FF',
-                 'A#':'#FF55FF'}
-        minorKeyColors = {'Eb':'#720000',
-                 'E':'#9b0000',
-                 'E#':'#9b0000',
-                 'Bb':'#9b0000',
-                 'B':'#9b2400',
-                 'B#':'#9b4700',
-                 'Fb':'#9b7200',
-                 'F':'#9b9b00',
-                 'F#':'#469b00',
-                 'Cb':'#009b00',
-                 'C':'#009b00',
-                 'C#':'#004600',
-                 'Gb':'#000046',
-                 'G':'#00009B',
-                 'G#':'#00009B',
-                 'Db':'#00009b',
-                 'D':'#24009b',
-                 'D#':'#47009b',
-                 'Ab':'#72009b',
-                 'A':'#9b009b',
-                 'A#':'#9b009b'}
-
-        if modality == "Major":
-            return majorKeyColors[str(key)]
-        else:
-            return minorKeyColors[str(key)]
 
     def process(self):
         '''
@@ -432,7 +380,7 @@ class GraphKeyAnalysis(Graph):
             
             for j in range(len(self.data[i])):
                 positions.append((1/2)+j)
-                colors.append(self.getColor(self.data[i][j][0], self.data[i][j][1]))
+                colors.append(self.resultsToColor(self.data[i][j][0], self.data[i][j][1]))
                 correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
             ax = self.fig.add_subplot(len(self.data), 1, len(self.data)-i)
@@ -1301,6 +1249,18 @@ class PlotStream(object):
 
 #-------------------------------------------------------------------------------
 # stream plotting
+
+class PlotKeyAnalysis(PlotStream):
+    '''Class for plotting key analysis routines
+    '''
+    format = ''
+    
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+    
+    def _extractData(self, dataValueLegit=True):
+        pass
+    
 
 class PlotHistogram(PlotStream):
     '''Base class for Stream plotting classes.

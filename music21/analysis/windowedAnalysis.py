@@ -68,6 +68,43 @@ class WindowedAnalysis(object):
             raise KeyAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
 
+    def _getWindow(self, sStream):
+        meterStream = Stream()
+        meterStream.insert(0, meter.TimeSignature('1/4'))
+        
+        return sStream.makeMeasures(meterStream).makeTies()
+        
+    def process(self, sStream, minWindow):
+        # names = [x.id for x in sStream]
+        
+        windowedStream = self.getWindow(sStream)
+        
+        #max = len(sStream[0].measures)
+        max = len(windowedStream)
+        
+        solutionMatrix = [0]*(max-minWindow+1)
+        
+        print("-----WORKING... window-----")
+        for i in range(minWindow, max+1):
+            print(i)
+            solutionMatrix[i-minWindow] = self.windowKeyAnalysis(i, windowedStream) 
+        
+        
+        return solutionMatrix
+
+
+    def windowKeyAnalysis(self, windowSize, windowedStream):
+        
+        max = len(windowedStream.measures)
+        key = [0] * (max - windowSize + 1)                
+        
+        for i in range(max-windowSize + 1):    
+            key[i] = self.processWindow(windowedStream, i, windowSize)
+             
+        return key
+
+
+#------------------------------------------------------------------------------
 
 class DiscreteAnalysis(object):
     def __init__(self, streamObj):
@@ -81,7 +118,9 @@ class DiscreteAnalysis(object):
     
     def process(self, subStream):
         pass
-    
+
+
+#------------------------------------------------------------------------------    
 
 class PitchAnalysis(object):
     
@@ -93,6 +132,8 @@ class PitchAnalysis(object):
     def doPitchAnalysis(self, sStream, module):
         pass
 
+
+#------------------------------------------------------------------------------
 
 class KrumhanslSchmuckler(DiscreteAnalysis):
     
@@ -197,40 +238,60 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                 
         return soln    
         
-    def runKeyAnalysis(self, sStream, minWindow):
-        # names = [x.id for x in sStream]
-        
-        meterStream = Stream()
-        meterStream.insert(0, meter.TimeSignature('1/4'))
-        sWindowMeasures = sStream.makeMeasures(meterStream).makeTies()
-        
-        #max = len(sStream[0].measures)
-        max = len(sWindowMeasures)
-        
-        solutionMatrix = [0]*(max-minWindow+1)
-        
-        print("-----WORKING... window-----")
-        for i in range(minWindow, max+1):
-            print(i)
-            solutionMatrix[i-minWindow] = self.windowKeyAnalysis(i, sWindowMeasures) 
-        
-        
-        return solutionMatrix
+    def possibleResults(self):
+        pass
+    
+    def resultsToColor(self, key, modality):
+        majorKeyColors = {'Eb':'#D60000',
+                 'E':'#FF0000',
+                 'E#':'#FF2B00',
+                 'Bb':'#FF5600',
+                 'B':'#FF8000',
+                 'B#':'#FFAB00',
+                 'Fb':'#FFFD600',
+                 'F':'#FFFF00',
+                 'F#':'#AAFF00',
+                 'Cb':'#55FF00',
+                 'C':'#00FF00',
+                 'C#':'#00AA55',
+                 'Gb':'#0055AA',
+                 'G':'#0000FF',
+                 'G#':'#2B00FF',
+                 'Db':'#5600FF',
+                 'D':'#8000FF',
+                 'D#':'#AB00FF',
+                 'Ab':'#D600FF',
+                 'A':'#FF00FF',
+                 'A#':'#FF55FF'}
+        minorKeyColors = {'Eb':'#720000',
+                 'E':'#9b0000',
+                 'E#':'#9b0000',
+                 'Bb':'#9b0000',
+                 'B':'#9b2400',
+                 'B#':'#9b4700',
+                 'Fb':'#9b7200',
+                 'F':'#9b9b00',
+                 'F#':'#469b00',
+                 'Cb':'#009b00',
+                 'C':'#009b00',
+                 'C#':'#004600',
+                 'Gb':'#000046',
+                 'G':'#00009B',
+                 'G#':'#00009B',
+                 'Db':'#00009b',
+                 'D':'#24009b',
+                 'D#':'#47009b',
+                 'Ab':'#72009b',
+                 'A':'#9b009b',
+                 'A#':'#9b009b'}
 
-
-    def windowKeyAnalysis(self, windowSize, work):
-        
-        #max = len(work[0].measures)
-        max = len(work.measures)
-        key = [0] * (max - windowSize + 1)                
-        
-        for i in range(max-windowSize + 1):    
-            key[i] = self.singleKeyAnalysis(self.getPitchClassDistribution(work, i, windowSize))
-             
-        return key
+        if modality == "Major":
+            return majorKeyColors[str(key)]
+        else:
+            return minorKeyColors[str(key)]
  
     
-    def singleKeyAnalysis(self, pcDistribution):    
+    def processWindow(self, windowedStream, i, windowSize):    
         ''' Takes in a pitch class distribution and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
         '''
@@ -240,6 +301,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         # this is the distribution for the melody of "happy birthday"
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
+    
+        pcDistribution = self.getPitchClassDistribution(windowedStream, i, windowSize)
     
         keyResultsMajor = self.convoluteDistribution(pcDistribution, True)
         differenceMajor = self.getDifference(keyResultsMajor, pcDistribution, True)
@@ -260,12 +323,19 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return likelyKey        
     
     
-class SadoianAmbitus(object):
+class SadoianAmbitus(DiscreteAnalysis):
     
     def __init__(self, streamObj):
+        DiscreteAnalysis.init(self, streamObj)
         if not isinstance(streamObj, music21.stream.Stream):
             raise KeyAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
+        
+    def resultsToColor(self, result):
+        pass
+    
+    def process(self, subStream):
+        pass
 
 
 #------------------------------------------------------------------------------
@@ -286,7 +356,7 @@ class Test(unittest.TestCase):
         sStream = corpus.parseWork('schubert/d576-2')
         #sStream = corpus.parseWork('bach/bwv17.7')
         a = KeyAnalysis(sStream)
-        a.runKeyAnalysis(sStream, 1)
+        a.runWindowedAnalysis(sStream, 1)
     '''    
 
 
