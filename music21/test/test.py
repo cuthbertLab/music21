@@ -42,9 +42,10 @@ class ModuleGather(object):
             'timePerformance.py',
             '__init__.py', 
             'timeGraphs.py',
+            'exceldiff.py', 
 
-            'exceldiff.py',  
-            'keyDetectSketch.py',          
+            # temporary 
+            'windowedAnalysis.py',          
             ]
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 'xlrd']

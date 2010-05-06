@@ -94,7 +94,7 @@ class Distributor(object):
         '''Upload source package to PyPI
         '''
         os.system('cd %s; python setup.py bdist_egg upload' % 
-                athenaObj.fpPackageDir)
+                self.fpPackageDir)
 
     def _uploadGoogleCode(self, fp):
         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
@@ -132,4 +132,4 @@ class Distributor(object):
 if __name__ == '__main__':
     a = Distributor()
     a.build()
-    #a.upload()
+    a.upload()

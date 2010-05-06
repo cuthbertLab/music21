@@ -486,7 +486,10 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
             i = random.choice(['w', 'h'])
         else:
             i = random.choice(['w-', 'h-'])
-        n = n.transpose(i)
+        try:
+            n = n.transpose(i)
+        except AccidentalException:
+            break # end b/c our transposition have exceeded accidental range
         
         iSpread = interval.notesToInterval(nStart, n)
         if iSpread.direction == -1: # we are below our target, favor upward

@@ -15,8 +15,8 @@ import music21
 from music21 import common
 
 
-DESCRIPTION = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
-DESCRIPTION_LONG = 'Framework for Computer-Aided Musical Analysis and Manipulation.'
+DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation.'
+DESCRIPTION_LONG = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation. Developed at MIT. Michael Scott Cuthbert, Principal Investigator, Christopher Ariza, Lead Programmer.'
 
 
 
@@ -88,7 +88,7 @@ def writeManifestTemplate(fpPackageDir):
     msg = []
     
     msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png\n')
-    # order matters: remove dist and buildDoc directories
+    # order matters: remove dist and buildDoc directories after global include
     msg.append('prune dist\n')
     msg.append('prune buildDoc\n')
 
