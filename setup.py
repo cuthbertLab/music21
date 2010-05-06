@@ -16,7 +16,7 @@ from music21 import common
 
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation.'
-DESCRIPTION_LONG = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation. Developed at MIT. Michael Scott Cuthbert, Principal Investigator, Christopher Ariza, Lead Programmer.'
+DESCRIPTION_LONG = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation. Developed at MIT. Michael Scott Cuthbert, Principal Investigator, Christopher Ariza, Lead Programmer. The development of music21 is supported by the generosity of the Seaver Institute.'
 
 
 
