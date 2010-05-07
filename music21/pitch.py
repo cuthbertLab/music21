@@ -1287,7 +1287,7 @@ class Pitch(music21.Music21Object):
         '''
         # TODO: this presently deals with chords as simply a list
         # we might permit pitch Past to contain a list of pitches, to represent
-        # a simultaneity
+        # a simultaneity?
 
 
         if overrideStatus == False: # go with what we have defined
@@ -1307,7 +1307,22 @@ class Pitch(music21.Music21Object):
                 self.accidental.displayStatus in [False, None]):
                 self.accidental.displayStatus = True
 
+        # here tied and always are treated the same; we assume that
+        # making ties sets the displayStatus, and thus we would not be 
+        # overriding that display status here
+        if cautionaryAll or (self.accidental != None 
+        and self.accidental.displayType in ['even-tied', 'always']): 
+            # show all no matter
+            if self.accidental == None:
+                self.accidental = Accidental('natural')
+            # show all accidentals, even if past encountered
+            self.accidental.displayStatus = True
+            return # do not search past
+
+
         # need to step through pitchPast in reverse
+        # comparing this pitch to the past pitches; if we find a match
+        # in terms of name, then decide what to do
         for i in reversed(range(len(pitchPast))): 
 
             # create pitch objects for comparison; remove pitch space
@@ -1323,30 +1338,19 @@ class Pitch(music21.Music21Object):
                 pPast = pitchPast[i]
                 pSelf = self
 
-            #environLocal.printDebug(['updateAccidentalDisplay() comparing', pPast, pSelf, pPast.nameWithOctave, pSelf.nameWithOctave, pPast.stepWithOctave, pSelf.stepWithOctave, pPast.accidental, pSelf.accidental, pPast.accidental != None, pSelf.accidental == None])
+            #environLocal.printDebug(['updateAccidentalDisplay() comparing', pPast, pSelf, pPast.nameWithOctave, pSelf.nameWithOctave, pPast.stepWithOctave, pSelf.stepWithOctave, pPast.accidental, pSelf.accidental, pPast.accidental != None, pSelf.accidental == None])            
 
-            # if we have a previous identical match
-            # A# to A# or A3 to A4
-            # here tied and always are treated the same; we assume that
-            # making ties sets the displayStatus, and thus we would not be 
-            # overriding that display status here
-            if cautionaryAll or (self.accidental != None 
-            and self.accidental.displayType in ['even-tied', 'always']): 
-                # show all no matter
-                if self.accidental == None:
-                    self.accidental = Accidental('natural')
-                # show all accidentals, even if past encountered
-                self.accidental.displayStatus = True
-                break
-
-            # if we do not patch names, we can get a new pitch for comparison
+            # if we do not patch names, we can continue
+            # with a new pitch for comparison
             if pPast.stepWithOctave != pSelf.stepWithOctave:
                 continue
 
-            # repeats of the same immediately following
+            # repeats of the same accidentally immediately following
             # if An to An or A# to A#: do not need unless repeats requested
+            # regardless of if 'unless-repeated' is set, this will catch 
+            # a repeated case
             if (i == len(pitchPast) - 1 and pPast.accidental != None and pSelf.accidental != None and pPast.accidental.name == pSelf.accidental.name):
-                environLocal.printDebug(['match exact past accidental'])
+                #environLocal.printDebug(['match exact past accidental'])
                 # both are not None, we are immediately following w same name
                 if self.accidental.displayStatus in [None, True]:
                     self.accidental.displayStatus = False
@@ -1397,9 +1401,21 @@ class Pitch(music21.Music21Object):
                 self.accidental.displayStatus = True
                 #environLocal.printDebug(['match previous no mark'])
                 break
+
             else:
                 pass
                 environLocal.printDebug(['no match'])
+
+        # TODO: need a test case for this
+        # last possibility: we have not matched any conditions, but the
+        # accidental should be displayed b/c it is a always 
+        # 'unless-repeated' case; there was not a repeat immediately
+        # preceding, b/c that case would have matched already.
+#         if (self.accidental != None and self.accidental.displayStatus == None 
+#         and self.accidental.displayType in ['unless-repeated']):
+#             self.accidental.displayStatus = True
+# 
+
 
 
 #-------------------------------------------------------------------------------
@@ -1504,7 +1520,7 @@ class Test(unittest.TestCase):
                 targetName = result[i][0]
                 targetDisplayStatus = result[i][1]
 
-                environLocal.printDebug(['accidental test', p, pName, pDisplayStatus, targetName, targetDisplayStatus]) # test
+                environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
                 self.assertEqual(pName, targetName)
                 #self.assertEqual(pDisplayStatus, targetDisplayStatus)
 
@@ -1514,7 +1530,7 @@ class Test(unittest.TestCase):
         # pairs of accidental, displayStatus
         result = [('sharp', True), ('natural', True), ('sharp', True), 
         ('natural', True), ('sharp', True)]
-        proc(pList)        
+        proc(pList, [])        
         compare(pList, result)
 
         # alternating, in a sequence, different pitch space
@@ -1523,7 +1539,7 @@ class Test(unittest.TestCase):
         # pairs of accidental, displayStatus
         result = [('sharp', True), ('natural', True), ('sharp', True), 
         ('natural', True), ('sharp', True)]
-        proc(pList)        
+        proc(pList, [])        
         compare(pList, result)
 
         # alternating, after gaps
@@ -1532,7 +1548,7 @@ class Test(unittest.TestCase):
         # pairs of accidental, displayStatus
         result = [('flat', True), (None, None), ('natural', True), 
         ('sharp', True), ('flat', True), ('natural', True)]
-        proc(pList)        
+        proc(pList, [])        
         compare(pList, result)
 
         # repeats of the same
@@ -1541,11 +1557,36 @@ class Test(unittest.TestCase):
         # pairs of accidental, displayStatus
         result = [('flat', True), ('flat', False), ('flat', False), 
         ('sharp', True), ('sharp', False), ('natural', True), (None, None)]
-        proc(pList)        
+        proc(pList, [])        
         compare(pList, result)
 
 
-        #TODO: repeats of the same with 'unless-repeated' set
+        #the always- 'unless-repeated' setting 
+        # first, with no modification, repeated accidentals are not shown
+        pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
+        # pairs of accidental, displayStatus
+        result = [('flat', True), ('sharp', True), ('sharp', False)]
+        proc(pList, [])        
+        compare(pList, result)
+
+        # second, with status set to always 
+        pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
+        # pairs of accidental, displayStatus
+        pList[2].accidental.displayType = 'always'
+        result = [('flat', True), ('sharp', True), ('sharp', True)]
+        proc(pList, [])        
+        compare(pList, result)
+
+        # status set to always 
+        pList = [Pitch('a2'), Pitch('a3'), Pitch('a5')]
+        # pairs of accidental, displayStatus
+        #pList[2].accidental = Accidental('natural')
+        #pList[2].accidental.displayType = 'always'
+        result = [(None, None), (None, None), (None, None)]
+        proc(pList, [])        
+        compare(pList, result)
+
+
 
         #TODO: test passing getting past pitches from a key signatures .alteredPitches parameter; then applying to a pitch sequence
 
