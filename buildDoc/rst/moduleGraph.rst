@@ -447,6 +447,15 @@ Graph3DPolygonBars
         Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
+GraphColorGrid
+--------------
+
+.. class:: GraphColorGrid(*args, **keywords)
+
+
+    inherits from: :class:`~music21.graph.Graph`
+
+
 GraphHistogram
 --------------
 
@@ -485,20 +494,6 @@ GraphHorizontalBar
     >>> a.process()
 
     
-
-    inherits from: :class:`~music21.graph.Graph`
-
-
-GraphSappKeyAnalysis
---------------------
-
-.. class:: GraphSappKeyAnalysis(*args, **keywords)
-
-
-    Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
-
-    >>> a = Graph()
-    >>> a = Graph(title='green')
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -616,6 +611,30 @@ PlotHorizontalBar
         Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
 
     **PlotHorizontalBar** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
+PlotKeyAnalysis
+---------------
+
+.. class:: PlotKeyAnalysis(streamObj, *args, **keywords)
+
+    Class for plotting key analysis routines 
+
+    inherits from: :class:`~music21.graph.PlotStream`
+
+    **PlotKeyAnalysis** **attributes**
+
+        Attributes without Documentation: `format`
+
+        Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
+
+    **PlotKeyAnalysis** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotKeyAnalysis** **methods**
 
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 

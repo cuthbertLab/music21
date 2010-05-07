@@ -256,9 +256,16 @@ class Accidental(music21.Music21Object):
     # above and below could also be useful for gruppetti, etc.
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['set']
+    _DOC_ORDER = ['name', 'modifier', 'alter', 
+        'set']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
+    'name': '''A string name of the Accidental, such as "sharp" or 
+        "double-flat".''',
+    'modifier': '''A string symbol used to modify the pitch name, such as "#" or 
+        "-" for sharp and flat, respectively.''',
+    'alter': '''A signed decimal representing the number of half-steps shifted
+         by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
     'displayType': '''Display if first in measure; other valid terms:
         "always", "never", "unless-repeated" (show always unless
         the immediately preceding note is the same), "even-tied"

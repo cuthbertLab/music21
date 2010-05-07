@@ -73,11 +73,37 @@ KeySignature
 
     **KeySignature** **attributes**
 
-        Attributes without Documentation: `sharps`, `mode`, `alteredTones`
+        Attributes without Documentation: `sharps`, `mode`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **KeySignature** **properties**
+
+        .. attribute:: alteredPitches
+
+            Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental. 
+
+            >>> a = KeySignature(3)
+            >>> a.alteredPitches
+            [F#, C#, G#] 
+            >>> a = KeySignature(1)
+            >>> a.alteredPitches
+            [F#] 
+            >>> a = KeySignature(9)
+            >>> a.alteredPitches
+            [F#, C#, G#, D#, A#, E#, B#, F##, C##] 
+            >>> a = KeySignature(-3)
+            >>> a.alteredPitches
+            [B-, E-, A-] 
+            >>> a = KeySignature(-1)
+            >>> a.alteredPitches
+            [B-] 
+            >>> a = KeySignature(-6)
+            >>> a.alteredPitches
+            [B-, E-, A-, D-, G-, C-] 
+            >>> a = KeySignature(-8)
+            >>> a.alteredPitches
+            [B-, E-, A-, D-, G-, C-, F-, B--] 
 
         .. attribute:: mx
 

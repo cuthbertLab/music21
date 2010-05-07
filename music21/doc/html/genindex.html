@@ -91,7 +91,9 @@
 <dt><a href="moduleDuration.html#music21.duration.DurationCommon.aggregateTupletRatio">aggregateTupletRatio() (music21.duration.DurationCommon method)</a></dt>
 <dt><a href="moduleStream.html#music21.stream.Stream.allPlayingWhileSounding">allPlayingWhileSounding() (music21.stream.Stream method)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.almostEqual">almostEqual() (in module music21.common)</a></dt>
-<dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleCommon.html#music21.common.almostEquals">almostEquals() (in module music21.common)</a></dt>
+<dt><a href="modulePitch.html#music21.pitch.Accidental.alter">alter (music21.pitch.Accidental attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleKey.html#music21.key.KeySignature.alteredPitches">alteredPitches (music21.key.KeySignature attribute)</a></dt>
 <dt><a href="moduleClef.html#music21.clef.AltoClef">AltoClef (class in music21.clef)</a></dt>
 <dt><a href="moduleNode.html#music21.node.NodeList.append">append() (music21.node.NodeList method)</a></dt>
   <dd><dl>
@@ -428,9 +430,9 @@
 <dt><a href="moduleDuration.html#music21.duration.GraceDuration">GraceDuration (class in music21.duration)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph">Graph (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.Graph3DPolygonBars">Graph3DPolygonBars (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.GraphColorGrid">GraphColorGrid (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.GraphHistogram">GraphHistogram (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.GraphHorizontalBar">GraphHorizontalBar (class in music21.graph)</a></dt>
-<dt><a href="moduleGraph.html#music21.graph.GraphSappKeyAnalysis">GraphSappKeyAnalysis (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.GraphScatter">GraphScatter (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.GraphScatterWeighted">GraphScatterWeighted (class in music21.graph)</a></dt>
 <dt><a href="moduleCommon.html#music21.common.greaterThan">greaterThan() (in module music21.common)</a></dt>
@@ -629,6 +631,7 @@
     <dt><a href="modulePitch.html#music21.pitch.Pitch.midi">(music21.pitch.Pitch attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleEditorial.html#music21.editorial.NoteEditorial.misc">misc (music21.editorial.NoteEditorial attribute)</a></dt>
+<dt><a href="modulePitch.html#music21.pitch.Accidental.modifier">modifier (music21.pitch.Accidental attribute)</a></dt>
 <dt><a href="moduleEnvironment.html#music21.environment.Environment.modNameParent">modNameParent (music21.environment.Environment attribute)</a></dt>
 <dt><a href="moduleExpressions.html#music21.expressions.Mordent">Mordent (class in music21.expressions)</a></dt>
 <dt><a href="moduleChord.html#music21.chord.Chord.multisetCardinality">multisetCardinality (music21.chord.Chord attribute)</a></dt>
@@ -645,8 +648,8 @@
 <dt><a href="moduleExpressions.html#module-music21.expressions">music21.expressions (module)</a></dt>
 <dt><a href="moduleGraph.html#module-music21.graph">music21.graph (module)</a></dt>
 <dt><a href="moduleInstrument.html#module-music21.instrument">music21.instrument (module)</a></dt>
-<dt><a href="moduleInterval.html#module-music21.interval">music21.interval (module)</a></dt>
-<dt><a href="moduleKey.html#module-music21.key">music21.key (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleInterval.html#module-music21.interval">music21.interval (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="moduleKey.html#module-music21.key">music21.key (module)</a></dt>
 <dt><a href="moduleMeter.html#module-music21.meter">music21.meter (module)</a></dt>
 <dt><a href="moduleNode.html#module-music21.node">music21.node (module)</a></dt>
 <dt><a href="moduleNote.html#module-music21.note">music21.note (module)</a></dt>
@@ -697,6 +700,7 @@
 
 <dt><a href="moduleNote.html#music21.note.Note.name">name (music21.note.Note attribute)</a></dt>
   <dd><dl>
+    <dt><a href="modulePitch.html#music21.pitch.Accidental.name">(music21.pitch.Accidental attribute)</a></dt>
     <dt><a href="modulePitch.html#music21.pitch.Pitch.name">(music21.pitch.Pitch attribute)</a></dt>
   </dl></dd>
 <dt><a href="moduleNote.html#music21.note.Note.nameWithOctave">nameWithOctave (music21.note.Note attribute)</a></dt>
@@ -825,6 +829,7 @@
 <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBar">PlotHorizontalBar (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset">PlotHorizontalBarPitchClassOffset (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset">PlotHorizontalBarPitchSpaceOffset (class in music21.graph)</a></dt>
+<dt><a href="moduleGraph.html#music21.graph.PlotKeyAnalysis">PlotKeyAnalysis (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatter">PlotScatter (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassOffset">PlotScatterPitchClassOffset (class in music21.graph)</a></dt>
 <dt><a href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength">PlotScatterPitchClassQuarterLength (class in music21.graph)</a></dt>
@@ -1249,7 +1254,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 03, 2010.
+      Last updated on May 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

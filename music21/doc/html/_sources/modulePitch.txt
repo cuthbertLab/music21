@@ -372,9 +372,9 @@ Pitch
             >>> aPitch
             C#4 
 
-        .. method:: updateAccidentalDisplay(pitchPast=[], cautionaryPitchClass=True, cautionaryAll=False)
+        .. method:: updateAccidentalDisplay(pitchPast=[], cautionaryPitchClass=True, cautionaryAll=False, overrideStatus=False)
 
-            Given a list of Pitch objects, determine if this pitch's Accidental object needs to be updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. 
+            Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the accidental. By default this does not happen. 
 
             >>> a = Pitch('a')
             >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
@@ -409,6 +409,18 @@ Accidental
 
     **Accidental** **attributes**
 
+        .. attribute:: name
+
+            A string name of the Accidental, such as "sharp" or "double-flat". 
+
+        .. attribute:: modifier
+
+            A string symbol used to modify the pitch name, such as "#" or "-" for sharp and flat, respectively. 
+
+        .. attribute:: alter
+
+            A signed decimal representing the number of half-steps shifted by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat. 
+
         .. attribute:: displaySize
 
             Size in display: "cue", "large", or a percentage. 
@@ -425,7 +437,7 @@ Accidental
 
             Display if first in measure; other valid terms: "always", "never", "unless-repeated" (show always unless the immediately preceding note is the same), "even-tied" (stronger than always: shows even if it is tied to the previous note) 
 
-        Attributes without Documentation: `displayLocation`, `modifier`, `name`, `alter`
+        Attributes without Documentation: `displayLocation`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
 

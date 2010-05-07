@@ -157,11 +157,40 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>KeySignature</strong> <strong>attributes</strong></p>
 <blockquote>
-<p>Attributes without Documentation: <cite>sharps</cite>, <cite>mode</cite>, <cite>alteredTones</cite></p>
+<p>Attributes without Documentation: <cite>sharps</cite>, <cite>mode</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>KeySignature</strong> <strong>properties</strong></p>
 <blockquote>
+<dl class="attribute">
+<dt id="music21.key.KeySignature.alteredPitches">
+<tt class="descname">alteredPitches</tt><a class="headerlink" href="#music21.key.KeySignature.alteredPitches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[F#, C#, G#]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[F#]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[F#, C#, G#, D#, A#, E#, B#, F##, C##]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[B-, E-, A-]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[B-]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[B-, E-, A-, D-, G-, C-]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
+<span class="go">[B-, E-, A-, D-, G-, C-, F-, B--]</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.key.KeySignature.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.key.KeySignature.mx" title="Permalink to this definition">¶</a></dt>
@@ -298,7 +327,7 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 03, 2010.
+      Last updated on May 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

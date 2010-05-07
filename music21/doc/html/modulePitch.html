@@ -517,8 +517,8 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 
 <dl class="method">
 <dt id="music21.pitch.Pitch.updateAccidentalDisplay">
-<tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a list of Pitch objects, determine if this pitch&#8217;s Accidental object needs to be updated with a natural or other cautionary accidental. Changes to this Pitch object&#8217;s Accidental object are made in-place.</p>
+<tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em>, <em>overrideStatus=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch&#8217;s Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object&#8217;s Accidental object are made in-place. If <cite>overrideStatus</cite> is True, this method will ignore any current <cite>displayStatus</cite> stetting found on the accidental. By default this does not happen.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryAll</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -555,6 +555,21 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <p><strong>Accidental</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
+<dt id="music21.pitch.Accidental.name">
+<tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.Accidental.name" title="Permalink to this definition">¶</a></dt>
+<dd>A string name of the Accidental, such as &#8220;sharp&#8221; or &#8220;double-flat&#8221;.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.modifier">
+<tt class="descname">modifier</tt><a class="headerlink" href="#music21.pitch.Accidental.modifier" title="Permalink to this definition">¶</a></dt>
+<dd>A string symbol used to modify the pitch name, such as &#8220;#&#8221; or &#8220;-&#8221; for sharp and flat, respectively.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.pitch.Accidental.alter">
+<tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.Accidental.alter" title="Permalink to this definition">¶</a></dt>
+<dd>A signed decimal representing the number of half-steps shifted by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.pitch.Accidental.displaySize">
 <tt class="descname">displaySize</tt><a class="headerlink" href="#music21.pitch.Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
 <dd>Size in display: &#8220;cue&#8221;, &#8220;large&#8221;, or a percentage.</dd></dl>
@@ -574,7 +589,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <tt class="descname">displayType</tt><a class="headerlink" href="#music21.pitch.Accidental.displayType" title="Permalink to this definition">¶</a></dt>
 <dd>Display if first in measure; other valid terms: &#8220;always&#8221;, &#8220;never&#8221;, &#8220;unless-repeated&#8221; (show always unless the immediately preceding note is the same), &#8220;even-tied&#8221; (stronger than always: shows even if it is tied to the previous note)</dd></dl>
 
-<p>Attributes without Documentation: <cite>displayLocation</cite>, <cite>modifier</cite>, <cite>name</cite>, <cite>alter</cite></p>
+<p>Attributes without Documentation: <cite>displayLocation</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
 </blockquote>
 <p><strong>Accidental</strong> <strong>properties</strong></p>
@@ -673,7 +688,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 03, 2010.
+      Last updated on May 07, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
