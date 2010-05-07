@@ -582,6 +582,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     '''
     import copy
     from music21 import meter
+
     # create a template row
     chartRow = {'meter':None, 
                 'meter type':None, 
