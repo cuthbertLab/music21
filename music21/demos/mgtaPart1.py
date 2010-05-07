@@ -463,7 +463,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     target end.
     '''
     import copy, random
-    from music21 import interval, stream, expressions
+    from music21 import interval, stream, expressions, pitch
 
     dirWeight = [-1, 1] # start with an even distribution
     s = stream.Stream()
@@ -488,7 +488,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
             i = random.choice(['w-', 'h-'])
         try:
             n = n.transpose(i)
-        except AccidentalException:
+        except pitch.AccidentalException:
             break # end b/c our transposition have exceeded accidental range
         
         iSpread = interval.notesToInterval(nStart, n)
@@ -550,7 +550,7 @@ def ch1_analysis_B_2(show=True, *arguments, **keywords):
 def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     '''p. 11
     For each of the melodies below, provide the correct meter signature.
-    Next to the signature, write in the meter type.
+    Next to the signature, write in the meter type (e.g. simple triple).
     '''
     pass
 
@@ -572,13 +572,27 @@ def ch2_basic_I_A_4(show=True, *arguments, **keywords):
 
 def ch2_basic_I_B(show=True, *arguments, **keywords):
     '''p. 12
+    Using the information given, complete the chart below.
     '''
     pass
 
 def ch2_basic_I_C(show=True, *arguments, **keywords):
     '''p. 13
+    Complete the chart below.
     '''
-    pass
+    import copy
+    from music21 import meter
+    # create a template row
+    chartRow = {'meter':None, 
+                'meter type':None, 
+                'beat unit':None, 
+                'beat division':None, 
+                'beat subdivision': None}
+    chart = []
+    for tsStr in ['2/4', '3/16', '4/4', '3/8', '2/2', '4/8']:
+        ts = meter.TimeSignature(tsStr)
+        row = copy.deepcopy(chartRow)
+        row['meter'] = ts
 
 
 def ch2_basic_II(show=True, *arguments, **keywords):
@@ -1369,6 +1383,9 @@ FUNCTIONS = [ch1_basic_I_A,
 
             ch1_writing_II_A,
             ch1_writing_II_B,
+
+            ch2_basic_I_C,
+
             ]
 
 class TestExternal(unittest.TestCase):
