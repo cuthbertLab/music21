@@ -1257,47 +1257,85 @@ class Pitch(music21.Music21Object):
 
 
 
-    def updateAccidentalKeySignature(self, pitchKeySignature=[], 
-        overrideStatus=False):
-        '''Given the pitches in a key signature, find adjust the display of
-        this accidental. To get the pitches from a :class:`music21.key.KeySignature`, use the :attr:`~music21.key.KeySignature.alteredPitches` property.
+#     def updateAccidentalKeySignature(self, alteredPitches=[], 
+#         overrideStatus=False):
+#         '''Given the pitches in a key signature, adjust the display of
+#         this accidental. To get the pitches from a :class:`music21.key.KeySignature`, use the :attr:`~music21.key.KeySignature.alteredPitches` property.
+# 
+#         Note: this will only set the status of the present Accidental; this will not provide cautionary Accidentals. for that, use updateAccidentalDisplay() method.
+#         '''
+#         if overrideStatus == False: # go with what we have defined
+#             if self.accidental == None:
+#                 pass # no accidental defined; we may need to add one
+#             elif (self.accidental != None and 
+#             self.accidental.displayStatus == None): # not set; need to set  
+#                 # configure based on displayStatus alone, continue w/ normal
+#                 pass
+#             elif (self.accidental != None and 
+#             self.accidental.displayStatus in [True, False]): 
+#                 return # exit: already set, do not override
+# 
+#         for p in alteredPitches: # all are altered tones, must have acc
+#             if p.step == self.step: # A# to A or A# to A-, etc
+#                 # we have an altered tone in key sig but none here;
+#                 # we need a natural 
+#                 if self.accidental == None: 
+#                     self.accidental = Accidental('natural')
+#                     self.accidental.displayStatus = True 
+#                 # a different accidental, do need to show
+#                 elif self.accidental.name != p.accidental.name: 
+#                     self.accidental.displayStatus = True 
+#                 # the same accidental, do not need to show
+#                 elif self.accidental.name == p.accidental.name: 
+#                     self.accidental.displayStatus = False
+#                 break # only looking for one match
+#                 
 
-        Note: this will only set the status of the present Accidental; this will not provide cautionary Accidentals. for that, use updateAccidentalDisplay() after using this method.
-        '''
-        if overrideStatus == False: # go with what we have defined
-            if self.accidental == None:
-                pass # no accidental defined; we may need to add one
-            elif (self.accidental != None and 
-            self.accidental.displayStatus == None): # not set; need to set  
-                # configure based on displayStatus alone, continue w/ normal
-                pass
-            elif (self.accidental != None and 
-            self.accidental.displayStatus in [True, False]): 
-                return # exit: already set, do not override
+    def _nameInKeySignature(self, alteredPitches):
+        '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
 
-        for p in pitchKeySignature: # all are altered tones, must have acc
+        >>> from music21 import key
+        >>> a = Pitch('c#')
+        >>> b = Pitch('g#')
+        >>> ks = key.KeySignature(2)
+        >>> a._nameInKeySignature(ks.alteredPitches)
+        True
+        >>> b._nameInKeySignature(ks.alteredPitches)
+        False
+        ''' 
+        for p in alteredPitches: # all are altered tones, must have acc
             if p.step == self.step: # A# to A or A# to A-, etc
-                # we have an altered tone in key sig but none here;
-                # we need a natural 
-                if self.accidental == None: 
-                    self.accidental = Accidental('natural')
-                    self.accidental.displayStatus = True 
-                # a different accidental, do need to show
-                elif self.accidental.name != p.accidental.name: 
-                    self.accidental.displayStatus = True 
-                # the same accidental, do not need to show
-                elif self.accidental.name == p.accidental.name: 
-                    self.accidental.displayStatus = False
-                break # only looking for one match
-                
+                if p.accidental.name == self.accidental.name:
+                    return True
+        return False
+
+    def _stepInKeySignature(self, alteredPitches):
+        '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
+
+        >>> from music21 import key
+        >>> a = Pitch('c')
+        >>> b = Pitch('g')
+        >>> ks = key.KeySignature(2)
+        >>> a._stepInKeySignature(ks.alteredPitches)
+        True
+        >>> b._stepInKeySignature(ks.alteredPitches)
+        False
+        ''' 
+        for p in alteredPitches: # all are altered tones, must have acc
+            if p.step == self.step: # A# to A or A# to A-, etc
+                return True
+        return False
 
 
-    def updateAccidentalDisplay(self, pitchPast=[],    
+
+    def updateAccidentalDisplay(self, pitchPast=[], alteredPitches=[],
             cautionaryPitchClass=True, cautionaryAll=False, 
             overrideStatus=False, cautionaryNotImmediateRepeat=True):
         '''Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental.
 
         Changes to this Pitch object's Accidental object are made in-place.
+
+        The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
         If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found in two octaves above a present natural, a natural sign is still displayed. 
 
@@ -1326,7 +1364,7 @@ class Pitch(music21.Music21Object):
 
         '''
         # TODO: this presently deals with chords as simply a list
-        # we might permit pitch Past to contain a list of pitches, to represent
+        # we might permit pitchPast to contain a list of pitches, to represent
         # a simultaneity?
 
 
@@ -1342,10 +1380,30 @@ class Pitch(music21.Music21Object):
                 return # exit: already set, do not override
 
         if len(pitchPast) == 0:
-            # if we have no past, we always need to show the accidental 
-            if (self.accidental != None and  
-                self.accidental.displayStatus in [False, None]):
+            # if we have no past, we always need to show the accidental, 
+            # unless this accidental is in the alteredPitches list
+            if (self.accidental != None 
+            and self.accidental.displayStatus in [False, None]):
+                if not self._nameInKeySignature(alteredPitches):
+                    self.accidental.displayStatus = True
+                else:
+                    self.accidental.displayStatus = False
+
+            # in case display set to True and in alteredPitches, makeFalse
+            elif (self.accidental != None and 
+            self.accidental.displayStatus == True and
+            self._nameInKeySignature(alteredPitches)):
+                self.accidental.displayStatus = False
+
+            # if no accidental or natural but matches step in key sig
+            # we need to show or add or an accidental
+            elif ((self.accidental == None or self.accidental.name == 'natural')
+            and self._stepInKeySignature(alteredPitches)):
+                if self.accidental == None:
+                    self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
+
+            return # do not search past
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be 
@@ -1359,13 +1417,16 @@ class Pitch(music21.Music21Object):
             self.accidental.displayStatus = True
             return # do not search past
 
+        iNearest = len(pitchPast) - 1
+        # store if a match was found and display set from past pitches
+        setFromPitchPast = False 
 
         # need to step through pitchPast in reverse
         # comparing this pitch to the past pitches; if we find a match
         # in terms of name, then decide what to do
         for i in reversed(range(len(pitchPast))): 
 
-            # create pitch objects for comparison; remove pitch space
+            # create Pitch objects for comparison; remove pitch space
             # information if we are only doing a pitch class comparison
             if cautionaryPitchClass: # no octave; create new without oct
                 pPast = Pitch(pitchPast[i].name)
@@ -1378,10 +1439,7 @@ class Pitch(music21.Music21Object):
                 pPast = pitchPast[i]
                 pSelf = self
 
-            #environLocal.printDebug(['updateAccidentalDisplay() comparing', pPast, pSelf, pPast.nameWithOctave, pSelf.nameWithOctave, pPast.stepWithOctave, pSelf.stepWithOctave, pPast.accidental, pSelf.accidental, pPast.accidental != None, pSelf.accidental == None])            
-
-            # if we do not match names, we can continue
-            # with a new pitch for comparison
+            # if we do not match steps (A and A#), we can continue
             if pPast.stepWithOctave != pSelf.stepWithOctave:
                 continue
 
@@ -1389,79 +1447,94 @@ class Pitch(music21.Music21Object):
             # if An to An or A# to A#: do not need unless repeats requested
             # regardless of if 'unless-repeated' is set, this will catch 
             # a repeated case
-            if (i == len(pitchPast) - 1 and pPast.accidental != None and pSelf.accidental != None and pPast.accidental.name == pSelf.accidental.name):
-                #environLocal.printDebug(['match exact past accidental'])
-                # both are not None, we are immediately following w same name
-                if self.accidental.displayStatus in [None, True]:
-                    self.accidental.displayStatus = False
-                    break
+            if (i == iNearest and pPast.accidental != None 
+            and pSelf.accidental != None 
+            and pPast.accidental.name == pSelf.accidental.name):
+                self.accidental.displayStatus = False
+                setFromPitchPast = True
+                break
 
             # if An to A: do not need another natural
             # we use stepWithOctave though not necessarily a ps comparison
-            elif (pPast.accidental != None and 
-                pPast.accidental.name == 'natural' and
-                    (pSelf.accidental == None or 
-                     pSelf.accidental.name == 'natural')):
-                if (self.accidental != None and  
-                    self.accidental.displayStatus == True):
+            elif (pPast.accidental != None 
+            and pPast.accidental.name == 'natural' 
+            and (pSelf.accidental == None 
+            or pSelf.accidental.name == 'natural')):
+                if self.accidental != None:
                     self.accidental.displayStatus = False
-                #environLocal.printDebug(['match previous natural'])
+                setFromPitchPast = True
                 break
 
             # if A# to A, or A- to A, but not A# to A#
             # we use stepWithOctave though not necessarily a ps comparison
-            elif (pPast.accidental != None and 
-                pPast.accidental.name != 'natural' and
-                    (pSelf.accidental == None or 
-                     pSelf.accidental.displayStatus == False)):
+            elif (pPast.accidental != None 
+            and pPast.accidental.name != 'natural' 
+            and (pSelf.accidental == None 
+            or pSelf.accidental.displayStatus == False)):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
-                #environLocal.printDebug(['match previous mark'])
+                setFromPitchPast = True
                 break
 
             # if An or A or to A#: need to make sure display is set
-            elif ((pPast.accidental == None or 
-                pPast.accidental.name == 'natural') and pSelf.accidental != None and pSelf.accidental.name != 'natural'):
-                if (self.accidental != None and  
-                    self.accidental.displayStatus in [False, None]):
-                    self.accidental.displayStatus = True
+            elif ((pPast.accidental == None 
+            or pPast.accidental.name == 'natural') and pSelf.accidental != None 
+            and pSelf.accidental.name != 'natural'):
+                self.accidental.displayStatus = True
+                setFromPitchPast = True
                 break
-
 
             # if A- or An to A#: need to make sure display is set
             elif (pPast.accidental != None and pSelf.accidental != None 
-                and pPast.accidental.name != pSelf.accidental.name):
-                if self.accidental.displayStatus in [False, None]:
-                    self.accidental.displayStatus = True
+            and pPast.accidental.name != pSelf.accidental.name):
+                self.accidental.displayStatus = True
+                setFromPitchPast = True
                 break
 
             # going from a natural to an accidental, we should already be
             # showing the accidental, but just to check
             # if A to A#, or A to A-, but not A# to A
-            elif (pPast.accidental == None and 
-                pSelf.accidental != None):
+            elif (pPast.accidental == None and pSelf.accidental != None):
                 self.accidental.displayStatus = True
                 #environLocal.printDebug(['match previous no mark'])
+                setFromPitchPast = True
                 break
 
             # if A# to A# and not immediately repeated:
-            # default is not to show if in the same register only?
-            elif (i != len(pitchPast) - 1 and pPast.accidental != None and
+            # default is to show accidental
+            # if cautionaryNotImmediateRepeat is False, will not be shown
+            elif (i != iNearest and pPast.accidental != None and
                 pSelf.accidental != None and pPast.accidental.name == 
                 pSelf.accidental.name):
-                # when this condition is met the default is to not show the acc
-                if not cautionaryNotImmediateRepeat:
+                if not cautionaryNotImmediateRepeat: # do not show
+                    # result will be False, do not need to check altered tones
                     if self.accidental.displayStatus in [True, None]:
                         self.accidental.displayStatus = False
                 else:
-                    if self.accidental.displayStatus in [False, None]:
+                    if not self._nameInKeySignature(alteredPitches):
                         self.accidental.displayStatus = True
+                    else:
+                        self.accidental.displayStatus = False
+                setFromPitchPast = True
                 break
-
             else:
                 pass
-               # environLocal.printDebug(['no match'])
+
+        # if we have no previous matches for this pitch and there is 
+        # an accidental: show, unless in alteredPitches
+        # cases of displayAlways and related are matched above
+        if not setFromPitchPast and self.accidental != None:
+            if not self._nameInKeySignature(alteredPitches):
+                self.accidental.displayStatus = True
+            else:
+                self.accidental.displayStatus = False
+
+        # if we have natural that alters the key sig, create a natural
+        elif not setFromPitchPast and self.accidental == None:
+            if self._stepInKeySignature(alteredPitches):
+                self.accidental = Accidental('natural')
+                self.accidental.displayStatus = True
 
         # TODO: need a test case for this
         # last possibility: we have not matched any conditions, but the
@@ -1584,7 +1657,6 @@ class Test(unittest.TestCase):
         # alternating, in a sequence, same pitch space
         pList = [Pitch('a#3'), Pitch('a3'), Pitch('a#3'), 
         Pitch('a3'), Pitch('a#3')]
-        # pairs of accidental, displayStatus
         result = [('sharp', True), ('natural', True), ('sharp', True), 
         ('natural', True), ('sharp', True)]
         proc(pList, [])        
@@ -1593,7 +1665,6 @@ class Test(unittest.TestCase):
         # alternating, in a sequence, different pitch space
         pList = [Pitch('a#2'), Pitch('a6'), Pitch('a#1'), 
         Pitch('a5'), Pitch('a#3')]
-        # pairs of accidental, displayStatus
         result = [('sharp', True), ('natural', True), ('sharp', True), 
         ('natural', True), ('sharp', True)]
         proc(pList, [])        
@@ -1602,7 +1673,6 @@ class Test(unittest.TestCase):
         # alternating, after gaps
         pList = [Pitch('a-2'), Pitch('g3'), Pitch('a5'), 
         Pitch('a#5'), Pitch('g-3'), Pitch('a3')]
-        # pairs of accidental, displayStatus
         result = [('flat', True), (None, None), ('natural', True), 
         ('sharp', True), ('flat', True), ('natural', True)]
         proc(pList, [])        
@@ -1611,7 +1681,6 @@ class Test(unittest.TestCase):
         # repeats of the same
         pList = [Pitch('a-2'), Pitch('a-3'), Pitch('a-5'), 
         Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
-        # pairs of accidental, displayStatus
         result = [('flat', True), ('flat', False), ('flat', False), 
         ('sharp', True), ('sharp', False), ('natural', True), (None, None)]
         proc(pList, [])        
@@ -1620,14 +1689,12 @@ class Test(unittest.TestCase):
         #the always- 'unless-repeated' setting 
         # first, with no modification, repeated accidentals are not shown
         pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
-        # pairs of accidental, displayStatus
         result = [('flat', True), ('sharp', True), ('sharp', False)]
         proc(pList, [])        
         compare(pList, result)
 
         # second, with status set to always 
         pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
-        # pairs of accidental, displayStatus
         pList[2].accidental.displayType = 'always'
         result = [('flat', True), ('sharp', True), ('sharp', True)]
         proc(pList, [])        
@@ -1635,7 +1702,6 @@ class Test(unittest.TestCase):
 
         # status set to always 
         pList = [Pitch('a2'), Pitch('a3'), Pitch('a5')]
-        # pairs of accidental, displayStatus
         pList[2].accidental = Accidental('natural')
         pList[2].accidental.displayType = 'always'
         result = [(None, None), (None, None), ('natural', True)]
@@ -1645,7 +1711,6 @@ class Test(unittest.TestCase):
         # first use after other pitches in different register
         # note: this will force the display of the accidental
         pList = [Pitch('a-2'), Pitch('g3'), Pitch('a-5')]
-        # pairs of accidental, displayStatus
         result = [('flat', True), (None, None), ('flat', True)]
         proc(pList, [])        
         compare(pList, result)
@@ -1659,15 +1724,23 @@ class Test(unittest.TestCase):
         compare(pList, result)
 
 
+        # accidentals, first usage, not first pitch
+        pList = [Pitch('a2'), Pitch('g#3'), Pitch('d-2')]
+        result = [(None, None), ('sharp', True), ('flat', True)]
+        proc(pList, [])        
+        compare(pList, result)
 
-    def testUpdateAccidentalKey(self):
+
+
+    def testUpdateAccidentalDisplaySeriesKeySignature(self):
         '''Test updating accidental display.
         '''
         from music21 import key
 
-        def proc(pList, ks=[]):
+        def proc(pList, past=[], alteredPitches=[]):
             for p in pList:
-                p.updateAccidentalKeySignature(ks)
+                p.updateAccidentalDisplay(past, alteredPitches=alteredPitches)
+                past.append(p)
 
         def compare(past, result):
             environLocal.printDebug(['accidental compare'])
@@ -1687,34 +1760,132 @@ class Test(unittest.TestCase):
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
 
-        # a scale
-        pList = [Pitch('f#3'), Pitch('c#3'), Pitch('g#3'), 
-        Pitch('d#3'), Pitch('a#3')]
-        result = [('sharp', False), ('sharp', False), ('sharp', False), 
-        ('sharp', False), ('sharp', False)]
-        ks = key.KeySignature(9)
-        # supply the key's altered pitches
-        proc(pList, ks.alteredPitches)        
+        # chromatic alteration of key
+        pList = [Pitch('f#3'), Pitch('f#2'), Pitch('f3'), 
+            Pitch('f#3'), Pitch('f#3'), Pitch('g3'), Pitch('f#3')]
+        result = [('sharp', False), ('sharp', False), ('natural', True), 
+            ('sharp', True), ('sharp', False), (None, None), ('sharp', False)]
+        ks = key.KeySignature(1) # f3
+        proc(pList, [], ks.alteredPitches)        
         compare(pList, result)
 
-        pList = [Pitch('f#3'), Pitch('c3'), Pitch('g3'), 
-        Pitch('c#3'), Pitch('g#5') ]
-        result = [('sharp', False), ('natural', True), ('natural', True), 
-        ('sharp', False), ('sharp', False)]
-        ks = key.KeySignature(3)
-        # supply the key's altered pitches
-        proc(pList, ks.alteredPitches)        
+        # non initial scale tones
+        pList = [Pitch('a3'), Pitch('b2'), Pitch('c#3'), 
+            Pitch('f#3'), Pitch('g#3'), Pitch('f#3'), Pitch('a4')]
+        result = [(None, None), (None, None), ('sharp', False), 
+            ('sharp', False), ('sharp', False), ('sharp', False), (None, None)]
+        ks = key.KeySignature(3) 
+        proc(pList, [], ks.alteredPitches)        
+        compare(pList, result)
+
+        # non initial scale tones with chromatic alteration
+        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'), 
+        Pitch('g3'), Pitch('c#4'), Pitch('g#4')]
+        result = [(None, None), ('sharp', False), ('sharp', False), 
+            ('natural', True), ('sharp', False), ('sharp', True)]
+        ks = key.KeySignature(3) 
+        proc(pList, [], ks.alteredPitches)        
+        compare(pList, result)
+
+        # non initial scale tones with chromatic alteration
+        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'), 
+        Pitch('g3'), Pitch('c#4'), Pitch('g#4')]
+        result = [(None, None), ('sharp', False), ('sharp', False), 
+            ('natural', True), ('sharp', False), ('sharp', True)]
+        ks = key.KeySignature(3) 
+        proc(pList, [], ks.alteredPitches)        
+        compare(pList, result)
+
+        # initial scale tones with chromatic alteration, repeated tones
+        pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'), 
+        Pitch('g3'), Pitch('f#4'), Pitch('f#4')]
+        result = [('sharp', False), ('natural', True), ('sharp', True), 
+            (None, None), ('sharp', False), ('sharp', False)]
+        ks = key.KeySignature(1) 
+        proc(pList, [], ks.alteredPitches)        
+        compare(pList, result)
+
+        # initial scale tones with chromatic alteration, repeated tones
+        pList = [Pitch('d3'), Pitch('e3'), Pitch('f#3'), 
+        Pitch('g3'), Pitch('f4'), Pitch('g#4'),
+        Pitch('c#3'), Pitch('f#4'), Pitch('c#4')]
+        result = [(None, None), (None, None), ('sharp', False), 
+            (None, None), ('natural', True), ('sharp', True),
+            ('sharp', False), ('sharp', True), ('sharp', False)]
+        ks = key.KeySignature(2) 
+        proc(pList, [], ks.alteredPitches)        
+        compare(pList, result)
+
+        # altered tones outside of key
+        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'), 
+        Pitch('b-3'), Pitch('a-3'), Pitch('e-3'), 
+        Pitch('b-3'), Pitch('a-3'), Pitch('e-3'),
+        Pitch('b-3'), Pitch('a-3'), Pitch('e-3')]
+        result = [('natural', True), ('natural', True), ('natural', True), 
+            ('flat', True), ('flat', True), ('flat', True),
+            ('flat', False), ('flat', False), ('flat', False),
+            ('flat', False), ('flat', False), ('flat', False),]
+        ks = key.KeySignature(-3) # b-, e-, a- 
+        proc(pList, [], ks.alteredPitches)        
         compare(pList, result)
 
 
-        pList = [Pitch('b3'), Pitch('b-3'), Pitch('a3'), 
-        Pitch('c#3'), Pitch('g#5'), Pitch('d-3')]
-        result = [('natural', True), ('flat', False), ('natural', True), 
-        ('sharp', None), ('sharp', None), ('flat', None)]
-        ks = key.KeySignature(-3)
-        # supply the key's altered pitches
-        proc(pList, ks.alteredPitches)        
-        compare(pList, result)
+
+#     def testUpdateAccidentalKeySignature(self):
+#         '''Test updating accidental display.
+#         '''
+#         from music21 import key
+# 
+#         def proc(pList, ks=[]):
+#             for p in pList:
+#                 p.updateAccidentalKeySignature(ks)
+# 
+#         def compare(past, result):
+#             #environLocal.printDebug(['accidental compare'])
+#             for i in range(len(result)):
+#                 p = past[i]
+#                 if p.accidental == None:
+#                     pName = None
+#                     pDisplayStatus = None
+#                 else:
+#                     pName = p.accidental.name
+#                     pDisplayStatus = p.accidental.displayStatus
+# 
+#                 targetName = result[i][0]
+#                 targetDisplayStatus = result[i][1]
+# 
+#                 #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
+#                 self.assertEqual(pName, targetName)
+#                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
+# 
+#         # a scale
+#         pList = [Pitch('f#3'), Pitch('c#3'), Pitch('g#3'), 
+#         Pitch('d#3'), Pitch('a#3')]
+#         result = [('sharp', False), ('sharp', False), ('sharp', False), 
+#         ('sharp', False), ('sharp', False)]
+#         ks = key.KeySignature(9)
+#         # supply the key's altered pitches
+#         proc(pList, ks.alteredPitches)        
+#         compare(pList, result)
+# 
+#         pList = [Pitch('f#3'), Pitch('c3'), Pitch('g3'), 
+#         Pitch('c#3'), Pitch('g#5') ]
+#         result = [('sharp', False), ('natural', True), ('natural', True), 
+#         ('sharp', False), ('sharp', False)]
+#         ks = key.KeySignature(3)
+#         # supply the key's altered pitches
+#         proc(pList, ks.alteredPitches)        
+#         compare(pList, result)
+# 
+# 
+#         pList = [Pitch('b3'), Pitch('b-3'), Pitch('a3'), 
+#         Pitch('c#3'), Pitch('g#5'), Pitch('d-3')]
+#         result = [('natural', True), ('flat', False), ('natural', True), 
+#         ('sharp', None), ('sharp', None), ('flat', None)]
+#         ks = key.KeySignature(-3)
+#         # supply the key's altered pitches
+#         proc(pList, ks.alteredPitches)        
+#         compare(pList, result)
 
 
 
