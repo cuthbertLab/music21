@@ -248,16 +248,18 @@ class PitchException(Exception):
 class Accidental(music21.Music21Object):
     '''Accidental class.
     '''
-    displayType = "normal" # always, never, unless-repeated, even-tied
-    displayStatus = None
+    # manager by properties
+    _displayType = "normal" # always, never, unless-repeated, even-tied
+    _displayStatus = None
+
+    # not yet managed by properties: TODO
     displayStyle = "normal" # "parentheses", "bracket", "both"
     displaySize  = "full"   # "cue", "large", or a percentage
     displayLocation = "normal" # "normal", "above" = ficta, "below"
     # above and below could also be useful for gruppetti, etc.
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'modifier', 'alter', 
-        'set']
+    _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'name': '''A string name of the Accidental, such as "sharp" or 
@@ -266,16 +268,6 @@ class Accidental(music21.Music21Object):
         "-" for sharp and flat, respectively.''',
     'alter': '''A signed decimal representing the number of half-steps shifted
          by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
-    'displayType': '''Display if first in measure; other valid terms:
-        "always", "never", "unless-repeated" (show always unless
-        the immediately preceding note is the same), "even-tied"
-        (stronger than always: shows even if it is tied to the
-        previous note)''',
-    'displayStatus': '''Given the displayType, should 
-        this accidental be displayed?
-        Can be True, False, or None if not defined. For contexts where
-        the next program down the line cannot evaluate displayType
-        ''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
     'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
     }
@@ -422,7 +414,47 @@ class Accidental(music21.Music21Object):
             self.alter = -1.5
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
+
+
+    #---------------------------------------------------------------------------
+    # main properties
+
+    def _getDisplayType(self):
+        return self._displayType
+
+    def _setDisplayType(self, value):
+        if value not in ['normal', 'always', 'never', 
+            'unless-repeated', 'even-tied']:
+            raise AccidentalException('supplied display type is not supported: %s' % value)
+        self._displayType = value
+    
+    displayType = property(_getDisplayType, _setDisplayType, 
+        doc = '''Display if first in measure; other valid terms:
+        "always", "never", "unless-repeated" (show always unless
+        the immediately preceding note is the same), "even-tied"
+        (stronger than always: shows even if it is tied to the
+        previous note)
+        ''')
+
+
+    def _getDisplayStatus(self):
+        return self._displayStatus
+
+    def _setDisplayStatus(self, value):
+        if value not in [True, False, None]:
+            raise AccidentalException('supplied display status is not supported: %s' % value)
+        self._displayStatus = value
+    
+    displayStatus = property(_getDisplayStatus, _setDisplayStatus, 
+        doc = '''Given the displayType, should 
+        this accidental be displayed?
+        Can be True, False, or None if not defined. For contexts where
+        the next program down the line cannot evaluate displayType
+        ''')
+
         
+
+    #---------------------------------------------------------------------------
     def inheritDisplay(self, other):
         '''Given another Accidental object, inherit all the display properites
         of that object. 
