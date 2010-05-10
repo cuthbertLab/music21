@@ -1293,18 +1293,15 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
     '''
     from music21 import stream, clef, note, meter, key
     ex = stream.Stream()
-
+    
     ex.insert(clef.BassClef())
     ex.insert(meter.TimeSignature('6/4'))
     ex.insert(key.KeySignature(3))
-
-    # TODO: this example shows that accidentals need to be filtered by 
-    # key signature
-
-    for p, d in [('f3',1),('g#3',1),('a3',4),
+    
+    for p, d in [(None,1), ('f#3',1),('g#3',1),('a3',4),
                  ('g#3',.5),('a#3',.5),('b3',2),
                  ('a#3',.5),('g#3',.5),('a#3',.5),('b#3',.5),
-                 ('c4',1.5),('b3',.5),('a3',.5),('c#4',.5),('b3',.5),('a3',.5),
+                 ('c#4',1.5),('b3',.5),('a3',.5),('c#4',.5),('b3',.5),('a3',.5),
                  ('g#3',2),('f#3',3), (None,.5), ('c#4',.5),('c#4',.5),
                  ('b3',.5),('b3',.5),('a#3',.5)]:
         if p == None: 
@@ -1313,7 +1310,7 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
             n = note.Note(p)
         n.quarterLength = d
         ex.append(n)
-
+    
     if show:
         # calling show creates measures and allocates notes for the time sig
         ex.show()

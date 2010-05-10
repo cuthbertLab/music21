@@ -1457,7 +1457,6 @@ class Pitch(music21.Music21Object):
         # comparing this pitch to the past pitches; if we find a match
         # in terms of name, then decide what to do
         for i in reversed(range(len(pitchPast))): 
-
             # create Pitch objects for comparison; remove pitch space
             # information if we are only doing a pitch class comparison
             if cautionaryPitchClass: # no octave; create new without oct
@@ -1475,25 +1474,60 @@ class Pitch(music21.Music21Object):
             if pPast.stepWithOctave != pSelf.stepWithOctave:
                 continue
 
+            # store whether these match at the same octave; needed for some
+            # comparisons even if not matching pitchSpace
+            if self.octave == pitchPast[i].octave:
+                octaveMatch = True
+            else:
+                octaveMatch = False
+
             # repeats of the same accidentally immediately following
             # if An to An or A# to A#: do not need unless repeats requested
             # regardless of if 'unless-repeated' is set, this will catch 
             # a repeated case
+            
             if (i == iNearest and pPast.accidental != None 
             and pSelf.accidental != None 
             and pPast.accidental.name == pSelf.accidental.name):
-                self.accidental.displayStatus = False
+                # if not in the same octave, and not in the key sig, do show accidental
+                if (not self._nameInKeySignature(alteredPitches) 
+                and not octaveMatch):
+                    self.accidental.displayStatus = True
+                else:
+                    self.accidental.displayStatus = False
                 setFromPitchPast = True
                 break
 
             # if An to A: do not need another natural
-            # we use stepWithOctave though not necessarily a ps comparison
+            # yet, if we are against the key sig, then we need another natural
+            # this may or may not be an immediate repeat of the same pitch
             elif (pPast.accidental != None 
             and pPast.accidental.name == 'natural' 
             and (pSelf.accidental == None 
             or pSelf.accidental.name == 'natural')):
-                if self.accidental != None:
-                    self.accidental.displayStatus = False
+                if i == iNearest: # an immediate repeat; do not show
+                    # unless we are altering the key signature and in 
+                    # a different register
+                    if (self._stepInKeySignature(alteredPitches) 
+                    and not octaveMatch):
+                        if self.accidental == None:
+                            self.accidental = Accidental('natural')
+                        self.accidental.displayStatus = True
+                    else:
+                        if self.accidental != None:
+                            self.accidental.displayStatus = False
+                # if we match the step in a key signature and we want 
+                # cautionary not immediate repeated
+                elif (self._stepInKeySignature(alteredPitches) 
+                and cautionaryNotImmediateRepeat):
+                    if self.accidental == None:
+                        self.accidental = Accidental('natural')
+                    self.accidental.displayStatus = True
+                # other cases: already natural in past usage, do not need 
+                # natural again (and not in key sig)
+                else:
+                    if self.accidental != None:
+                        self.accidental.displayStatus = False
                 setFromPitchPast = True
                 break
 
@@ -1541,8 +1575,7 @@ class Pitch(music21.Music21Object):
                 pSelf.accidental.name):
                 if not cautionaryNotImmediateRepeat: # do not show
                     # result will be False, do not need to check altered tones
-                    if self.accidental.displayStatus in [True, None]:
-                        self.accidental.displayStatus = False
+                    self.accidental.displayStatus = False
                 else:
                     if not self._nameInKeySignature(alteredPitches):
                         self.accidental.displayStatus = True
@@ -1567,16 +1600,6 @@ class Pitch(music21.Music21Object):
             if self._stepInKeySignature(alteredPitches):
                 self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
-
-        # TODO: need a test case for this
-        # last possibility: we have not matched any conditions, but the
-        # accidental should be displayed b/c it is a always 
-        # 'unless-repeated' case; there was not a repeat immediately
-        # preceding, b/c that case would have matched already.
-#         if (self.accidental != None and self.accidental.displayStatus == None 
-#         and self.accidental.displayType in ['unless-repeated']):
-#             self.accidental.displayStatus = True
-# 
 
 
 
@@ -1669,7 +1692,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            #environLocal.printDebug(['accidental compare'])
+            environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental == None:
@@ -1682,7 +1705,7 @@ class Test(unittest.TestCase):
                 targetName = result[i][0]
                 targetDisplayStatus = result[i][1]
 
-                #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
+                environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
 
@@ -1710,23 +1733,23 @@ class Test(unittest.TestCase):
         proc(pList, [])        
         compare(pList, result)
 
-        # repeats of the same
-        pList = [Pitch('a-2'), Pitch('a-3'), Pitch('a-5'), 
+        # repeats of the same: show at different registers
+        pList = [Pitch('a-2'), Pitch('a-2'), Pitch('a-5'), 
         Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
-        result = [('flat', True), ('flat', False), ('flat', False), 
-        ('sharp', True), ('sharp', False), ('natural', True), (None, None)]
+        result = [('flat', True), ('flat', False), ('flat', True), 
+        ('sharp', True), ('sharp', True), ('natural', True), (None, None)]
         proc(pList, [])        
         compare(pList, result)
 
         #the always- 'unless-repeated' setting 
         # first, with no modification, repeated accidentals are not shown
         pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
-        result = [('flat', True), ('sharp', True), ('sharp', False)]
+        result = [('flat', True), ('sharp', True), ('sharp', True)]
         proc(pList, [])        
         compare(pList, result)
 
         # second, with status set to always 
-        pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
+        pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#3')]
         pList[2].accidental.displayType = 'always'
         result = [('flat', True), ('sharp', True), ('sharp', True)]
         proc(pList, [])        
@@ -1867,12 +1890,11 @@ class Test(unittest.TestCase):
         Pitch('b4'), Pitch('a-3'), Pitch('e-3'), 
         Pitch('b3'), Pitch('a3'), Pitch('e3')]
         result = [('natural', True), ('natural', True), ('natural', True), 
-            ('natural', True), ('flat', False), ('flat', False),
+            ('natural', True), ('flat', True), ('flat', True),
             ('natural', True), ('natural', True), ('natural', True)]
         ks = key.KeySignature(-3) # b-, e-, a- 
         proc(pList, [], ks.alteredPitches)        
-        # TODO
-        #compare(pList, result)
+        compare(pList, result)
 
 
 

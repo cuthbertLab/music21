@@ -6770,13 +6770,13 @@ class Test(unittest.TestCase):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
         scale2 = ['c', 'd', 'e-', 'f', 'g', 'a-', 'b-', 'c5']
         scale3 = ['c#', 'd#', 'e#', 'f#', 'g#', 'a#', 'b#', 'c#5']
-
+    
         s = Stream()
         for scale in [scale1, scale2, scale3]:
             for ks in [key.KeySignature(0), key.KeySignature(2),
                 key.KeySignature(4), key.KeySignature(7), key.KeySignature(-1),
                 key.KeySignature(-3)]:
-
+    
                 m = Measure()
                 m.timeSignature = meter.TimeSignature('4/4')
                 m.keySignature = ks
@@ -6788,7 +6788,8 @@ class Test(unittest.TestCase):
                 m.makeBeams(inPlace=True)
                 m.makeAccidentals(inPlace=True)
                 s.append(m)
-        s.show()
+        # TODO: add tests
+        #s.show()
 
         
     def xtestMultipleReferencesOneStream(self):
