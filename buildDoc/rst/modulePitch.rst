@@ -372,9 +372,9 @@ Pitch
             >>> aPitch
             C#4 
 
-        .. method:: updateAccidentalDisplay(pitchPast=[], cautionaryPitchClass=True, cautionaryAll=False, overrideStatus=False)
+        .. method:: updateAccidentalDisplay(pitchPast=[], alteredPitches=[], cautionaryPitchClass=True, cautionaryAll=False, overrideStatus=False, cautionaryNotImmediateRepeat=True)
 
-            Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the accidental. By default this does not happen. 
+            Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found in two octaves above a present natural, a natural sign is still displayed. If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the accidental. By default this does not happen. If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
             >>> a = Pitch('a')
             >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]

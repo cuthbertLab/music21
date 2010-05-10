@@ -28,11 +28,17 @@ and papers on algorithmic composition and generative music systems.  Ariza recei
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
 
+
+
+
+
+
+
 Acknowledgements  
 ----------------
 
 Funding
--------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The music21 project was made possible by generous research funding from the **Seaver Institute**.
 
@@ -44,7 +50,7 @@ In addition, we acknowledge consistent support from `M.I.T.`_, the
 .. _Music and Theater Arts: http://web.mit.edu/mta/
 
 Colleagues and Institutions
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Music21 is unthinkable without our colleagues and friends working on other music and technology
 projects, in particular:
@@ -59,7 +65,7 @@ projects, in particular:
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
 
 Contributors
-------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Additionally, the following individuals have contributed materials or knowledge to this project.  
 They are all greatly appreciated.
@@ -85,6 +91,13 @@ They are all greatly appreciated.
 .. _Craig Sapp: https://ccrma.stanford.edu/~craig/
 .. _Bryen Travis: http://www.bachcentral.com/
 
+
+
+
+
+
+
+
 How to Contribute
 -----------------
 
@@ -99,8 +112,16 @@ You can contact the larger music21 community through the `music21 list`_, or ema
 In particular, if you are interested in contributing documentation, tests, or new features to music21, 
 please contact the authors. 
 
-Licensing
----------
+
+
+
+
+Licensing and Copyright
+---------------------------------
+
+
+The music21 Toolkit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Music21 is Copyright (c) 2010, the music21 Group (Michael Scott Cuthbert, Principal Investigator).  However, 
 it is also free and open-source software.  It is licensed under the Lesser GNU Public License (LGPL).
@@ -122,3 +143,27 @@ the version of music21 distributed with your software must be editable by users.
 sound for a closed-source demonstration, I should be able to hack the version of music21 used by your demo to change 
 the base tuning, etc.  In sum: linking to music21 in closed-source applications = good.  embedding/altering music21 
 itself in closed-source apps = illegal.
+
+
+The music21 Corpus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The music21 corpus contains works that to the best of our knowledge are freely
+distributable according to US copyright law. These works (along with the
+freely-available works linked to in the virtual corpus) may or may not be free
+works in your jurisdiction. If you believe this message to be in error
+regarding one or more works please contact Michael Cuthbert at the address
+provided on the contact page.
+
+
+
+
+
+
+
+
+
+
+
+
+
