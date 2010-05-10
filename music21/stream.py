@@ -2422,13 +2422,22 @@ class Stream(music21.Music21Object):
 
 
 
-    def makeAccidentals(self, pitchPrevious=[], cautionaryPitchClass=True,     
-            cautionaryAll=False, inPlace=True): 
+    def makeAccidentals(self, pitchPast=[], useKeySignature=True, 
+        alteredPitches=[],         
+        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, overrideStatus=False, cautionaryNotImmediateRepeat=True): 
         '''A method to set and provide accidentals given varous conditions and contexts.
 
-        If `cautionaryPitchClass` is True, all pitch classes are used in comparison; if false, only pitch space is used.
+        If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched for in this Stream or this Stream's defined contexts. An alternative KeySignature can be supplied with this object and used for temporary pitch processing. 
 
-        Optional `pcPast` and `psPast` permit passing in pitches from pervious groupings, taken as part of the present context.
+        If `alteredPitches` is a list of modified pitches (Pitches with Accidentals) that can be directly supplied to Accidental processing. These are the same values obtained from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
+
+        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
+
+        If `cautionaryAll` is True, all accidentals are shown.
+
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
+
+        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
         The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
 
@@ -2439,8 +2448,17 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        pitchPast = [] # store a list of pc's encountered
-        pitchPast += pitchPrevious
+        pitchPast = pitchPast # store a list of pc's encountered
+
+        # see if there is any key signatures to add to altered pitches
+        addAlteredPitches = []
+        if isinstance(useKeySignature, key.KeySignature):
+            addAlteredPitches = useKeySignature.alteredPitches
+        elif useKeySignature == True: # get from defined contexts
+            ks = None # search here
+            if ks != None:
+                addAlteredPitches = ks.alteredPitches
+        alteredPitches += addAlteredPitches
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
@@ -2450,9 +2468,11 @@ class Stream(music21.Music21Object):
         for i in range(len(noteStream)):
             e = noteStream[i]
             if isinstance(e, note.Note):
-                e.pitch.updateAccidentalDisplay(pitchPast, 
+                e.pitch.updateAccidentalDisplay(pitchPast, alteredPitches,
                     cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll)
+                    cautionaryAll=cautionaryAll,
+                    overrideStatus=overrideStatus,
+                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
                 pitchPast.append(e.pitch)
             elif isinstance(e, chord.Chord):
                 pGroup = e.pitches
@@ -2460,8 +2480,10 @@ class Stream(music21.Music21Object):
                 # when reading a chord, this will apply an accidental 
                 # if pitches in the chord suggest an accidental
                 for p in pGroup:
-                    p.updateAccidentalDisplay(pitchPast, 
-                        cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll)
+                    p.updateAccidentalDisplay(pitchPast, alteredPitches, 
+                        cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
                 pitchPast += pGroup
 
         return returnObj
