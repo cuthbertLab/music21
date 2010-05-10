@@ -1369,9 +1369,9 @@ class Pitch(music21.Music21Object):
 
         The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
-        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found in two octaves above a present natural, a natural sign is still displayed. 
+        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
 
-        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the accidental. By default this does not happen.
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
@@ -1862,6 +1862,21 @@ class Test(unittest.TestCase):
         compare(pList, result)
 
 
+        # naturals against the key signature are required for each and every use
+        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'), 
+        Pitch('b4'), Pitch('a-3'), Pitch('e-3'), 
+        Pitch('b3'), Pitch('a3'), Pitch('e3')]
+        result = [('natural', True), ('natural', True), ('natural', True), 
+            ('natural', True), ('flat', False), ('flat', False),
+            ('natural', True), ('natural', True), ('natural', True)]
+        ks = key.KeySignature(-3) # b-, e-, a- 
+        proc(pList, [], ks.alteredPitches)        
+        # TODO
+        #compare(pList, result)
+
+
+
+
 
 #     def testUpdateAccidentalKeySignature(self):
 #         '''Test updating accidental display.
@@ -1937,3 +1952,6 @@ if __name__ == "__main__":
         b = TestExternal()
 
         a.testUpdateAccidentalDisplayComplete()
+
+        a.testUpdateAccidentalDisplaySeriesKeySignature()
+

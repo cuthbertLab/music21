@@ -1641,6 +1641,7 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
+        # TODO: this presently does not search parent Streams through contexts
         post = self.getElementsByClass(meter.TimeSignature)
     
         # get a default and/or place default at zero if nothing at zero
@@ -1778,15 +1779,7 @@ class Stream(music21.Music21Object):
         '''
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
-        #environLocal.printDebug(['getClefs(); count of local', len(post), post])
-
-# do not do this: this returns the default before the context search is complete
-#         if len(post) == 0 and searchParent:
-#             if isinstance(self.parent, Stream) and self.parent != self:
-#                 environLocal.printDebug(['getClefs() searching parent Stream', 
-#                     self, self.parent])
-#                 post = self.parent.getClefs(searchParent=searchParent)  
-       
+        #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
         if len(post) == 0 and searchContext:
             # returns a single value
             post = Stream()
@@ -1800,6 +1793,37 @@ class Stream(music21.Music21Object):
             environLocal.printDebug(['getClefs(): using bestClef()'])
             post.insert(0, self.bestClef())
         return post
+
+
+
+    def getKeySignatures(self, searchParent=True, searchContext=True):
+        '''Collect all :class:`~music21.key.KeySignature` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
+
+        If no KeySignature objects are defined, returns an empty Stream 
+        
+        >>> from music21 import clef
+        >>> a = Stream()
+        >>> b = key.KeySignature(3)
+        >>> a.insert(0, b)
+        >>> a.repeatInsert(note.Note("C#"), range(10)) 
+        >>> c = a.getKeySignatures()
+        >>> len(c) == 1
+        True
+        '''
+        # this may not be useful unless a stream is flat
+        post = self.getElementsByClass(key.KeySignature)
+        if len(post) == 0 and searchContext:
+            # returns a single value
+            post = Stream()
+            obj = self.getContextByClass(key.KeySignature)
+            if obj != None:
+                post.append(obj)
+
+        # do nothing if empty
+        if len(post) == 0 or post[0].offset > 0: 
+            pass
+        return post
+
 
 
 
@@ -2422,8 +2446,8 @@ class Stream(music21.Music21Object):
 
 
 
-    def makeAccidentals(self, pitchPast=[], useKeySignature=True, 
-        alteredPitches=[],         
+    def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
+        alteredPitches=None,         
         cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, overrideStatus=False, cautionaryNotImmediateRepeat=True): 
         '''A method to set and provide accidentals given varous conditions and contexts.
 
@@ -2448,17 +2472,24 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        pitchPast = pitchPast # store a list of pc's encountered
-
+        # need to reset these lists unless values explicitly provided
+        if pitchPast == None:
+            pitchPast = []
         # see if there is any key signatures to add to altered pitches
+        if alteredPitches == None:
+            alteredPitches = []
+
         addAlteredPitches = []
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
         elif useKeySignature == True: # get from defined contexts
-            ks = None # search here
-            if ks != None:
-                addAlteredPitches = ks.alteredPitches
+            ksStream = self.getKeySignatures() # will search local, then parent
+            if len(ksStream) > 0:
+                # assume we want the first found; in some cases it is possible
+                # that this may not be true
+                addAlteredPitches = ksStream[0].alteredPitches
         alteredPitches += addAlteredPitches
+        environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
@@ -4487,7 +4518,7 @@ class Measure(Stream):
     timeSignature = property(_getTimeSignature, _setTimeSignature)   
 
 
-    def _getKey(self):
+    def _getKeySignature(self):
         '''
         >>> a = Measure()
         >>> a.keySignature = key.KeySignature(0)
@@ -4502,7 +4533,7 @@ class Measure(Stream):
         else:
             return keyList[0]    
     
-    def _setKey(self, keyObj):
+    def _setKeySignature(self, keyObj):
         '''
         >>> a = Measure()
         >>> a.keySignature = key.KeySignature(3)
@@ -4512,13 +4543,13 @@ class Measure(Stream):
         >>> a.keySignature.sharps
         6
         '''
-        oldKey = self._getKey()
+        oldKey = self._getKeySignature()
         if oldKey is not None:
-            environLocal.printDebug(['removing key', oldKey])
+            #environLocal.printDebug(['removing key', oldKey])
             junk = self.pop(self.index(oldKey))
         self.insert(0, keyObj)
 
-    keySignature = property(_getKey, _setKey)   
+    keySignature = property(_getKeySignature, _setKeySignature)   
 
     #---------------------------------------------------------------------------
     def _getMX(self):
@@ -6601,6 +6632,97 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.denominator, 16)
 
 
+
+    def testGetKeySignatures(self):
+        '''Searching contexts for key signatures
+        '''
+        s = Stream()
+        ks1 = key.KeySignature(3)        
+        ks2 = key.KeySignature(-3)        
+        s.append(ks1)
+        s.append(ks2)
+        post = s.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+        self.assertEqual(post[1], ks2)
+
+
+        # try creating a key signature in one of two measures
+        # try to get last active key signature
+        ks1 = key.KeySignature(3)        
+        m1 = Measure()
+        n1 = note.Note()
+        n1.quarterLength = 4
+        m1.append(n1)
+        m1.keySignature = ks1 # assign to measure via property
+
+        m2 = Measure()
+        n2 = note.Note()
+        n2.quarterLength = 4
+        m2.append(n2)
+
+        s = Stream()
+        s.append(m1)
+        s.append(m2)
+
+        # can get from measure
+        post = m1.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+
+        # we can get from the Stream by flattening
+        post = s.flat.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+
+        # we can get the key signature in m1 from m2
+        post = m2.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+
+
+
+    def testGetKeySignaturesThreeMeasures(self):
+        '''Searching contexts for key signatures
+        '''
+
+        ks1 = key.KeySignature(3)        
+        ks2 = key.KeySignature(-3)        
+        ks3 = key.KeySignature(5)        
+
+        m1 = Measure()
+        n1 = note.Note()
+        n1.quarterLength = 4
+        m1.append(n1)
+        m1.keySignature = ks1 # assign to measure via property
+
+        m2 = Measure()
+        n2 = note.Note()
+        n2.quarterLength = 4
+        m2.append(n2)
+
+        m3 = Measure()
+        n3 = note.Note()
+        n3.quarterLength = 4
+        m3.append(n3)
+        m3.keySignature = ks3 # assign to measure via property
+
+        s = Stream()
+        s.append(m1)
+        s.append(m2)
+        s.append(m3)
+
+        # can get from measure
+        post = m1.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+
+        # we can get the key signature in m1 from m2
+        post = m2.getKeySignatures()
+        self.assertEqual(post[0], ks1)
+
+        # if we search m3, we get the key signature in m3
+        post = m3.getKeySignatures()
+        self.assertEqual(post[0], ks3)
+
+
+
+
     def testMakeAccidentals(self):
         '''Test accidental display setting
         '''
@@ -6625,7 +6747,6 @@ class Test(unittest.TestCase):
         # not getting a natural here because of chord tones
         #self.assertEqual(n3.accidental.displayStatus, True)
         #self.assertEqual(n3.accidental, None)
-
         #s.show()
 
         s = Stream()
@@ -6644,6 +6765,30 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.pitches[2].accidental, None)
 
 
+
+    def testMakeAccidentalsWithKeysInMeasures(self):
+        scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
+        scale2 = ['c', 'd', 'e-', 'f', 'g', 'a-', 'b-', 'c5']
+        scale3 = ['c#', 'd#', 'e#', 'f#', 'g#', 'a#', 'b#', 'c#5']
+
+        s = Stream()
+        for scale in [scale1, scale2, scale3]:
+            for ks in [key.KeySignature(0), key.KeySignature(2),
+                key.KeySignature(4), key.KeySignature(7), key.KeySignature(-1),
+                key.KeySignature(-3)]:
+
+                m = Measure()
+                m.timeSignature = meter.TimeSignature('4/4')
+                m.keySignature = ks
+                for p in scale*2:
+                    n = note.Note(p)
+                    n.quarterLength = .25
+                    n.addLyric(n.pitch.name)
+                    m.append(n)
+                m.makeBeams(inPlace=True)
+                m.makeAccidentals(inPlace=True)
+                s.append(m)
+        s.show()
 
         
     def xtestMultipleReferencesOneStream(self):
@@ -6682,4 +6827,9 @@ if __name__ == "__main__":
 
         #a.testBestTimeSignature()
 
+        a.testGetKeySignatures()
+        a.testGetKeySignaturesThreeMeasures()
         a.testMakeAccidentals()
+
+        a.testMakeAccidentalsWithKeysInMeasures()
+
