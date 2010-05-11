@@ -65,8 +65,6 @@ class WindowedAnalysis(object):
             print(i)
             solutionMatrix[i-minWindow], color[i-minWindow] = self._windowKeyAnalysis(i, windowedStream) 
         
-        
-        print solutionMatrix, color
         return solutionMatrix, color
 
 
@@ -292,7 +290,7 @@ class SadoianAmbitus(DiscreteAnalysis):
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         
-        pitchSpanColors = {0:'#FF0000',
+        self.pitchSpanColors = {0:'#FF0000',
                  1:'#FF8000',
                  2:'#FFFF00',
                  3:'#00FF00',
@@ -324,14 +322,17 @@ class SadoianAmbitus(DiscreteAnalysis):
                         min = n.midi
         
         soln = math.floor((max - min) / 12)
-        return soln
+        return int(soln)
 
     
     def resultsToColor(self, result):
-        return self.pitchSpanColors[str(result)]
+        return self.pitchSpanColors[result]
     
     def process(self, subStream):
-        return self._getPitchSpan(subStream)
+        soln = self._getPitchSpan(subStream)
+        color = self.resultsToColor(soln)
+        
+        return soln, color
 
 
 #------------------------------------------------------------------------------

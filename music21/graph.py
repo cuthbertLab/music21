@@ -361,7 +361,9 @@ class GraphColorGrid(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
-        self.colors = []
+        
+    def setColors(self, colors):
+        self.colors = colors
 
     def process(self):
         '''
@@ -376,16 +378,18 @@ class GraphColorGrid(Graph):
         
         for i in range(len(self.data)):
             positions = []
-            correlations = []
+            #correlations = []
             heights = []
+            subColors = []
             
             for j in range(len(self.data[i])):
                 positions.append((1/2)+j)
-                #colors.append(self.resultsToColor(self.data[i][j][0], self.data[i][j][1]))
-                correlations.append(float(self.data[i][j][2]))
+                subColors.append(self.colors[i][j])
+                #correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
+                
             ax = self.fig.add_subplot(len(self.data), 1, len(self.data)-i)
-            ax.bar(positions, heights, 1, color=self.colors)
+            ax.bar(positions, heights, 1, color=subColors)
             
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
@@ -1257,9 +1261,11 @@ class PlotColorGrid(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         
+        
     def _extractData(self, dataValueLegit=True):
         data = {}
         dataTick = {}
+        
         
         return data
     
@@ -1270,28 +1276,56 @@ class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
     format = ''
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        PlotColorGrid.__init__(self, streamObj, *args, **keywords)
         
-        #data, xTicks, yTicks = self._extractData()
-        
-        b = windowedAnalysis.KrumhanslSchmuckler()
-        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
-        soln = a.process(self.streamObj, 1)
-        data = soln[0]
-        self.colors = soln[1]
+        #data, xTicks, yTicks = self._extractData()        
+        data, colors = self._extractData()
         
         self.graph = GraphColorGrid(*args, **keywords)
         self.graph.setData(data)
+        self.graph.setColors(colors)
 
         #self.graph.setTicks('x', xTicks)
         #self.graph.setTicks('y', yTicks)
 
         self.graph.setAxisLabel('y', 'Count')
         self.graph.setAxisLabel('x', 'Pitch')
+        
+    def _extractData(self, dataValueLegit=True):
+        b = windowedAnalysis.KrumhanslSchmuckler()
+        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
+        soln = a.process(self.streamObj, 1)
+        
+        return soln[0], soln[1]
     
     
 class PlotColorGridSadoianAmbitus(PlotColorGrid):
-    pass
+    '''Class for plotting basic pitch span over a windowed analysis
+    '''
+    format = ''
+    
+    def __init__(self, streamObj, *args, **keywords):
+        PlotColorGrid.__init__(self, streamObj, *args, **keywords)
+        
+        #data, xTicks, yTicks = self._extractData()        
+        data, colors = self._extractData()
+        
+        self.graph = GraphColorGrid(*args, **keywords)
+        self.graph.setData(data)
+        self.graph.setColors(colors)
+
+        #self.graph.setTicks('x', xTicks)
+        #self.graph.setTicks('y', yTicks)
+
+        self.graph.setAxisLabel('y', 'Count')
+        self.graph.setAxisLabel('x', 'Pitch')
+        
+    def _extractData(self, dataValueLegit=True):
+        b = windowedAnalysis.SadoianAmbitus()
+        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
+        soln = a.process(self.streamObj, 1)
+        
+        return soln[0], soln[1]
     
 
 class PlotHistogram(PlotStream):
