@@ -199,9 +199,9 @@ class Stream(music21.Music21Object):
         '''
 
         if common.isNum(key):
-            returnEl = self.elements[key]
-            returnEl.parent = self
-            return returnEl
+            e = self.elements[key]
+            e.parent = self
+            return e
     
         elif isinstance(key, slice): # get a slice of index values
             # NOTE: this copy may return locations references that are 
@@ -3163,12 +3163,12 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def offsetScale(self, scalar):
+    def scaleOffset(self, scalar):
         '''Scale all offsets by a provided scalar.
         '''
         pass
 
-    def durationScale(self, scalar):
+    def scaleDuration(self, scalar):
         '''Scale all durations by a provided scalar.
         '''
         pass
@@ -4387,8 +4387,12 @@ class Measure(Stream):
 
         Note: this does not yet accommodate triplets. 
         '''
-        minDurQL = 4 # smallest denominator
-        minDurDotted = False
+
+        minDurQL = 4 # smallest denominator; start with a whole note
+
+        # find sum of all durations in quarter length
+        # find if there are any dotted durations
+        minDurDotted = False        
         sumDurQL = 0
         for e in self.notes:
             sumDurQL += e.quarterLength

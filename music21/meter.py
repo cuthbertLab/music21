@@ -1585,18 +1585,35 @@ class TimeSignature(music21.Music21Object):
     def _getTotalLength(self):
         return self.beam.duration.quarterLength
  
-    totalLength = property(_getTotalLength)
+    totalLength = property(_getTotalLength, 
+        doc = '''Total length of the TimeSignature, in Quarter Lengths.
+
+        >>> ts = TimeSignature('6/8')
+        >>> ts.totalLength
+        3.0
+        ''')
 
     def _getNumerator(self):
         return self.beam.numerator
 
-    numerator = property(_getNumerator)
+    numerator = property(_getNumerator, 
+        doc = '''Return the numerator of the TimeSignature as a number.
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.numerator
+        3
+        ''')
 
     def _getDenominator(self):
         return self.beam.denominator
 
-    denominator = property(_getDenominator)
+    denominator = property(_getDenominator,
+        doc = '''Return the denominator of the TimeSignature as a number
 
+        >>> ts = TimeSignature('3/4')
+        >>> ts.denominator
+        4
+        ''')
 
 
     def _getBarDuration(self):
@@ -1623,7 +1640,14 @@ class TimeSignature(music21.Music21Object):
     def _setBarDuration(self, value):
         self._overriddenBarDuration = value
 
-    barDuration = property(_getBarDuration, _setBarDuration)
+    barDuration = property(_getBarDuration, _setBarDuration, 
+        doc = '''Return a :class:`~music21.duration.Duration` object equal to the total length of this TimeSignature. 
+
+        >>> ts = TimeSignature('5/16')
+        >>> ts.barDuration
+        <music21.duration.Duration 1.25>
+
+        ''')
 
 
     def _getBeatLengthToQuarterLengthRatio(self):
@@ -1643,6 +1667,23 @@ class TimeSignature(music21.Music21Object):
 
     quarterLengthToBeatLengthRatio = property(
                                     _getQuarterLengthToBeatLengthRatio)
+
+
+
+
+    #---------------------------------------------------------------------------
+    # meter classifications
+
+    def _getBeatUnitCount(self):
+        return len(self.beat)
+
+    beatUnitCount = property(_getBeatUnitCount,
+        doc = '''Return the count of beat units, or the number of beats in this TimeSignature
+
+        >>> ts = TimeSignature('3/4', 3)
+        >>> ts.beatUnitCount
+        3
+        ''')
 
 
 
@@ -1888,8 +1929,8 @@ class TimeSignature(music21.Music21Object):
 
 
     def getAccent(self, qLenPos):
-        '''Return true or false if the qLenPos is at the start of an accent
-        division
+        '''Return True or False if the qLenPos is at the start of an accent
+        division.
 
         >>> a = TimeSignature('3/4', 3)
         >>> a.accent.partition([2,1])
@@ -1944,7 +1985,7 @@ class TimeSignature(music21.Music21Object):
         return msLevel[msLevel.positionToIndex(qLenPos)].weight
 
     def getBeat(self, qLenPos):
-        '''Given a quarterLenght position, get the beat, where beats count from 1
+        '''Given a quarterLength position, get the beat, where beats count from 1
 
         >>> a = TimeSignature('3/4', 3)
         >>> a.getBeat(0)
@@ -1959,7 +2000,7 @@ class TimeSignature(music21.Music21Object):
 
 
     def getBeatProgress(self, qLenPos):
-        '''Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos
+        '''Given a quarterLength position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos
         is. 
 
         >>> a = TimeSignature('3/4', 3)

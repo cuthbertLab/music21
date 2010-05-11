@@ -529,7 +529,7 @@ def ch1_analysis_A_2(show=True, *arguments, **keywords):
 def ch1_analysis_B_1(show=True, *arguments, **keywords):
     '''p. 9
 
-    Circle each whole step, but a box around each half step. 
+    Circle each whole step, put a box around each half step. 
     '''
     pass
 
@@ -552,7 +552,44 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     For each of the melodies below, provide the correct meter signature.
     Next to the signature, write in the meter type (e.g. simple triple).
     '''
-    pass
+    from music21 import stream, clef, note, meter, key
+    ex = stream.Stream()
+    ex.insert(key.KeySignature(1))    
+
+    data = [[('d6',1.5)], 
+            [('d6',1.5)],
+            [('d6',.5),('c6',.5),('b5',.5)],
+            [(None,.5),('b5',.25),('c6',.25),('d6',.5)],
+           ]
+
+    for mData in data:
+        m = stream.Measure()
+        for p, d in mData:
+            if p == None: 
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = d
+            m.append(n)
+        ex.append(m)
+    
+    # get the best time signature; make sure it agrees with the next
+    # time signature, just to be sure
+    ts1 = ex.measures[0].bestTimeSignature()
+    ts2 = ex.measures[1].bestTimeSignature()
+
+    # make sure these time signatures agree
+    assert ts1.ratioEqual(ts2)
+    for m in ex.measures:
+        m.insert(0, ts1)
+    # append answers to first note
+    ex.flat.notes[0].addLyric('Meter: %s' % ts1)
+    ex.flat.notes[0].addLyric('Meter type: %s' % ts1)
+
+    if show:
+        ex.show()
+       
+
 
 def ch2_basic_I_A_2(show=True, *arguments, **keywords):
     '''p. 11
@@ -757,7 +794,7 @@ def ch2_writing_VI(show=True, *arguments, **keywords):
     '''
     pass
 
-
+ 
 #-------------------------------------------------------------------------------
 # Analysis
 
@@ -1382,6 +1419,11 @@ FUNCTIONS = [ch1_basic_I_A,
             ch1_writing_II_A,
             ch1_writing_II_B,
 
+
+
+
+            ch2_basic_I_A_1,
+
             ch2_basic_I_C,
 
             ]
@@ -1420,6 +1462,7 @@ if __name__ == "__main__":
         #ch1_basic_II_C_2(show=True)
         #ch1_writing_II_A(show=True)
 
-        ch5_writing_IV_A(show=True)
+        #ch5_writing_IV_A(show=True)
 
 
+        ch2_basic_I_A_1(show=True)
