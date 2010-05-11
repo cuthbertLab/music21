@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         keyAnalysis.py
+# Name:         windowedAnalysis.py
 # Purpose:      
 #
 # Authors:      Jared Sadoian
@@ -11,61 +11,33 @@
 
 import unittest, doctest, random
 import sys
+import math
 
 import music21
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
 
-from music21 import common
-from music21 import converter
-from music21 import corpus
-from music21 import pitch
-from music21 import note
 from music21 import meter
-from music21 import stream
-from music21.note import Note
 from music21.pitch import Pitch
 from music21.stream import Stream
-from pylab import *
 
 
 from music21 import environment
 _MOD = 'keyAnalysis.py'
 environLocal = environment.Environment(_MOD)
-#environLocal['directoryScratch'] = 'C:/Users/Jared/Desktop'
-#environLocal.write()
-
-#------------------------------------------------------------------------------
-# utility functions
-
-
-#def findLongestPart(sStream):
-#    ''' temporary function to find the longest part (based on the number
-#        of pitches) in a parsed work.
-#    '''
-#    max = 0
-#    for i in range(len(sStream)):
-#        check = len(sStream[i].pitches)
-#        if check > max:
-#            max = check
-#    return max
-    
-    
-
 
 #------------------------------------------------------------------------------
 
-class KeyAnalysisException(Exception):
+class WindowedAnalysisException(Exception):
     pass
 
 
 #------------------------------------------------------------------------------
 
 class WindowedAnalysis(object):
-    def __init__(self, streamObj):
+    def __init__(self, streamObj, analysisProcessor):
+        self.processor = analysisProcessor
+        print self.processor
         if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyAnalysisException, 'non-stream provided as argument'
+            raise WindowedAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
 
     def _getWindow(self, sStream):
@@ -73,43 +45,50 @@ class WindowedAnalysis(object):
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
         return sStream.makeMeasures(meterStream).makeTies()
+
         
-    def process(self, sStream, minWindow):
+    def process(self, sStream, minWindow, rawData=False):
         # names = [x.id for x in sStream]
         
-        windowedStream = self.getWindow(sStream)
+        windowedStream = self._getWindow(sStream)
         
         #max = len(sStream[0].measures)
         max = len(windowedStream)
         
+        ''' array set to the size of the expected resulting set
+        '''
         solutionMatrix = [0]*(max-minWindow+1)
+        color = [0]*(max-minWindow+1)
         
         print("-----WORKING... window-----")
         for i in range(minWindow, max+1):
             print(i)
-            solutionMatrix[i-minWindow] = self.windowKeyAnalysis(i, windowedStream) 
+            solutionMatrix[i-minWindow], color[i-minWindow] = self._windowKeyAnalysis(i, windowedStream) 
         
         
-        return solutionMatrix
+        print solutionMatrix, color
+        return solutionMatrix, color
 
 
-    def windowKeyAnalysis(self, windowSize, windowedStream):
+    def _windowKeyAnalysis(self, windowSize, windowedStream):
         
         max = len(windowedStream.measures)
-        key = [0] * (max - windowSize + 1)                
+        key = [0] * (max - windowSize + 1)
+        color = [0] * (max - windowSize + 1)               
         
-        for i in range(max-windowSize + 1):    
-            key[i] = self.processWindow(windowedStream, i, windowSize)
+        for i in range(max-windowSize + 1):
+            current = windowedStream.getMeasureRange(i, i+windowSize).flat
+            key[i], color[i] = self.processor.process(current)
              
-        return key
+        return key, color
 
 
 #------------------------------------------------------------------------------
 
 class DiscreteAnalysis(object):
-    def __init__(self, streamObj):
-        if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyAnalysisException, 'non-stream provided as argument'
+    def __init__(self):
+        pass
+    
     def possibleResults(self):
         pass
     
@@ -119,36 +98,62 @@ class DiscreteAnalysis(object):
     def process(self, subStream):
         pass
 
-
-#------------------------------------------------------------------------------    
-
-class PitchAnalysis(object):
-    
-    def __init__(self, streamObj):
-        if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyAnalysisException, 'non-stream provided as argument'
-        self.streamObj = streamObj
-    
-    def doPitchAnalysis(self, sStream, module):
-        pass
-
-
 #------------------------------------------------------------------------------
 
 class KrumhanslSchmuckler(DiscreteAnalysis):
     
-    def __init__(self, streamObj):
-        DiscreteAnalysis.init(self, streamObj)
-        if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyAnalysisException, 'non-stream provided as argument'
-        self.streamObj = streamObj
+    def __init__(self):
+        DiscreteAnalysis.__init__(self)
+        
+        self.majorKeyColors = {'Eb':'#D60000',
+                 'E':'#FF0000',
+                 'E#':'#FF2B00',
+                 'B-':'#FF5600',
+                 'B':'#FF8000',
+                 'B#':'#FFAB00',
+                 'F-':'#FFFD600',
+                 'F':'#FFFF00',
+                 'F#':'#AAFF00',
+                 'C-':'#55FF00',
+                 'C':'#00FF00',
+                 'C#':'#00AA55',
+                 'G-':'#0055AA',
+                 'G':'#0000FF',
+                 'G#':'#2B00FF',
+                 'D-':'#5600FF',
+                 'D':'#8000FF',
+                 'D#':'#AB00FF',
+                 'A-':'#D600FF',
+                 'A':'#FF00FF',
+                 'A#':'#FF55FF'}
+        self.minorKeyColors = {'Eb':'#720000',
+                 'E':'#9b0000',
+                 'E#':'#9b0000',
+                 'B-':'#9b0000',
+                 'B':'#9b2400',
+                 'B#':'#9b4700',
+                 'F-':'#9b7200',
+                 'F':'#9b9b00',
+                 'F#':'#469b00',
+                 'C-':'#009b00',
+                 'C':'#009b00',
+                 'C#':'#004600',
+                 'G-':'#000046',
+                 'G':'#00009B',
+                 'G#':'#00009B',
+                 'D-':'#00009b',
+                 'D':'#24009b',
+                 'D#':'#47009b',
+                 'A-':'#72009b',
+                 'A':'#9b009b',
+                 'A#':'#9b009b'}
     
     def _getWeights(self, isMajor): 
         ''' Returns either the major or minor key profile as described by Sapp
             
-        >>> getWeights(True)
+        >>> _getWeights(True)
         [6.3499999999999996, 2.3300000000000001, 3.48, 2.3300000000000001, 4.3799999999999999, 4.0899999999999999, 2.52, 5.1900000000000004, 2.3900000000000001, 3.6600000000000001, 2.29, 2.8799999999999999]
-        >>> getWeights(False)
+        >>> _getWeights(False)
         [6.3300000000000001, 2.6800000000000002, 3.52, 5.3799999999999999, 2.6000000000000001, 3.5299999999999998, 2.54, 4.75, 3.98, 2.6899999999999999, 3.3399999999999999, 3.1699999999999999]
             
         '''
@@ -159,11 +164,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]    
 
 
-    def _getPitchClassDistribution(self, work, start, windowSize):
-        current = work.getMeasureRange(start, start+windowSize).flat
+    def _getPitchClassDistribution(self, work):
         pcDist = [0]*12
         
-        for n in current.notes:        
+        for n in work.notes:        
             if not n.isRest:
                 length = n.quarterLength
                 if n.isChord:
@@ -182,9 +186,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         soln = [0] * 12
         
         if isMajor:
-            toneWeights = self.getWeights(True)
+            toneWeights = self._getWeights(True)
         else:
-            toneWeights = self.getWeights(False)
+            toneWeights = self._getWeights(False)
                 
         for i in range(len(soln)):
             for j in range(len(pcDistribution)):
@@ -219,9 +223,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         bottomLeft = [0]*12
             
         if isMajor:
-            toneWeights = self.getWeights(True)
+            toneWeights = self._getWeights(True)
         else:
-            toneWeights = self.getWeights(False)
+            toneWeights = self._getWeights(False)
             
         profileAverage = float(sum(toneWeights))/len(toneWeights)
         histogramAverage = float(sum(pcDistribution))/len(pcDistribution) 
@@ -242,56 +246,14 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         pass
     
     def resultsToColor(self, key, modality):
-        majorKeyColors = {'Eb':'#D60000',
-                 'E':'#FF0000',
-                 'E#':'#FF2B00',
-                 'Bb':'#FF5600',
-                 'B':'#FF8000',
-                 'B#':'#FFAB00',
-                 'Fb':'#FFFD600',
-                 'F':'#FFFF00',
-                 'F#':'#AAFF00',
-                 'Cb':'#55FF00',
-                 'C':'#00FF00',
-                 'C#':'#00AA55',
-                 'Gb':'#0055AA',
-                 'G':'#0000FF',
-                 'G#':'#2B00FF',
-                 'Db':'#5600FF',
-                 'D':'#8000FF',
-                 'D#':'#AB00FF',
-                 'Ab':'#D600FF',
-                 'A':'#FF00FF',
-                 'A#':'#FF55FF'}
-        minorKeyColors = {'Eb':'#720000',
-                 'E':'#9b0000',
-                 'E#':'#9b0000',
-                 'Bb':'#9b0000',
-                 'B':'#9b2400',
-                 'B#':'#9b4700',
-                 'Fb':'#9b7200',
-                 'F':'#9b9b00',
-                 'F#':'#469b00',
-                 'Cb':'#009b00',
-                 'C':'#009b00',
-                 'C#':'#004600',
-                 'Gb':'#000046',
-                 'G':'#00009B',
-                 'G#':'#00009B',
-                 'Db':'#00009b',
-                 'D':'#24009b',
-                 'D#':'#47009b',
-                 'Ab':'#72009b',
-                 'A':'#9b009b',
-                 'A#':'#9b009b'}
 
         if modality == "Major":
-            return majorKeyColors[str(key)]
+            return self.majorKeyColors[str(key)]
         else:
-            return minorKeyColors[str(key)]
- 
+            return self.minorKeyColors[str(key)]
+        
     
-    def processWindow(self, windowedStream, i, windowSize):    
+    def process(self, windowedStream):    
         ''' Takes in a pitch class distribution and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
         '''
@@ -302,15 +264,15 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         # this is the distribution for the melody of "happy birthday"
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
     
-        pcDistribution = self.getPitchClassDistribution(windowedStream, i, windowSize)
+        pcDistribution = self._getPitchClassDistribution(windowedStream)
     
-        keyResultsMajor = self.convoluteDistribution(pcDistribution, True)
-        differenceMajor = self.getDifference(keyResultsMajor, pcDistribution, True)
-        likelyKeysMajor = self.getLikelyKeys(keyResultsMajor, differenceMajor)
+        keyResultsMajor = self._convoluteDistribution(pcDistribution, True)
+        differenceMajor = self._getDifference(keyResultsMajor, pcDistribution, True)
+        likelyKeysMajor = self._getLikelyKeys(keyResultsMajor, differenceMajor)
         
-        keyResultsMinor = self.convoluteDistribution(pcDistribution, False)   
-        differenceMinor = self.getDifference(keyResultsMinor, pcDistribution, False)
-        likelyKeysMinor = self.getLikelyKeys(keyResultsMinor, differenceMinor)
+        keyResultsMinor = self._convoluteDistribution(pcDistribution, False)   
+        differenceMinor = self._getDifference(keyResultsMinor, pcDistribution, False)
+        likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
         
 
         ''' find the largest correlation value to use to select major or minor as the resulting key
@@ -319,23 +281,57 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             likelyKey = (str(likelyKeysMajor[0][0]), "Major", likelyKeysMajor[0][1])
         else:
             likelyKey = (str(likelyKeysMinor[0][0]), "Minor", likelyKeysMinor[0][1])
-        
-        return likelyKey        
+            
+            
+        color = self.resultsToColor(likelyKey[0], likelyKey[1])
+        return likelyKey, color        
     
     
 class SadoianAmbitus(DiscreteAnalysis):
     
-    def __init__(self, streamObj):
-        DiscreteAnalysis.init(self, streamObj)
-        if not isinstance(streamObj, music21.stream.Stream):
-            raise KeyAnalysisException, 'non-stream provided as argument'
-        self.streamObj = streamObj
+    def __init__(self):
+        DiscreteAnalysis.__init__(self)
         
+        pitchSpanColors = {0:'#FF0000',
+                 1:'#FF8000',
+                 2:'#FFFF00',
+                 3:'#00FF00',
+                 4:'#0000FF',
+                 5:'#5600FF',
+                 6:'#8000FF',
+                 7:'#AB00FF',
+                 8:'#D600FF',
+                 9:'#FF00FF',
+                 10:'#FF55FF'}
+        
+    def _getPitchSpan(self, work):
+        soln = 0
+        max = 0
+        min = 10000000000
+        
+        for n in work.notes:        
+            if not n.isRest:
+                if n.isChord:
+                    for m in n.pitches:
+                        if m.midi > max:
+                            max = m.midi
+                        elif m.midi < min:
+                            min = m.midi
+                else:
+                    if n.midi > max:
+                        max = n.midi
+                    elif n.midi < min:
+                        min = n.midi
+        
+        soln = math.floor((max - min) / 12)
+        return soln
+
+    
     def resultsToColor(self, result):
-        pass
+        return self.pitchSpanColors[str(result)]
     
     def process(self, subStream):
-        pass
+        return self._getPitchSpan(subStream)
 
 
 #------------------------------------------------------------------------------

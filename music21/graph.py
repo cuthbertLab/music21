@@ -21,6 +21,7 @@ from music21 import duration
 from music21 import pitch
 from music21 import common
 from music21 import chord
+from music21.analysis import windowedAnalysis
 
 from music21 import environment
 _MOD = 'graph.py'
@@ -360,6 +361,7 @@ class GraphColorGrid(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
+        self.colors = []
 
     def process(self):
         '''
@@ -376,15 +378,14 @@ class GraphColorGrid(Graph):
             positions = []
             correlations = []
             heights = []
-            colors = []
             
             for j in range(len(self.data[i])):
                 positions.append((1/2)+j)
-                colors.append(self.resultsToColor(self.data[i][j][0], self.data[i][j][1]))
+                #colors.append(self.resultsToColor(self.data[i][j][0], self.data[i][j][1]))
                 correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
             ax = self.fig.add_subplot(len(self.data), 1, len(self.data)-i)
-            ax.bar(positions, heights, 1, color=colors)
+            ax.bar(positions, heights, 1, color=self.colors)
             
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
@@ -903,7 +904,7 @@ class PlotStream(object):
             return 'Offset'
 
     def _axisLabelQuarterLength(self, remap):
-        '''Return an axis label for quarter length, showing whether or not values are remaped.
+        '''Return an axis label for quarter length, showing whether or not values are remapped.
         '''
         if remap:
             return 'Quarter Length ($log_2$)'
@@ -913,7 +914,7 @@ class PlotStream(object):
 
     #---------------------------------------------------------------------------
     def _filterPitchLabel(self, ticks):
-        '''Given a list of ticks, replace all labels with alternative/unicode symbols wehre necessary.
+        '''Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
 
         '''
         #TODO: this is not yet working!
@@ -1248,18 +1249,49 @@ class PlotStream(object):
 
 
 #-------------------------------------------------------------------------------
-# stream plotting
+# stream plotting    
 
-class PlotKeyAnalysis(PlotStream):
-    '''Class for plotting key analysis routines
+class PlotColorGrid(PlotStream):
+    format = ''
+    
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+        
+    def _extractData(self, dataValueLegit=True):
+        data = {}
+        dataTick = {}
+        
+        return data
+    
+    
+class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
+    '''Class for plotting Krumhansl-Schmuckler analysis routine
     '''
     format = ''
     
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
+        
+        #data, xTicks, yTicks = self._extractData()
+        
+        b = windowedAnalysis.KrumhanslSchmuckler()
+        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
+        soln = a.process(self.streamObj, 1)
+        data = soln[0]
+        self.colors = soln[1]
+        
+        self.graph = GraphColorGrid(*args, **keywords)
+        self.graph.setData(data)
+
+        #self.graph.setTicks('x', xTicks)
+        #self.graph.setTicks('y', yTicks)
+
+        self.graph.setAxisLabel('y', 'Count')
+        self.graph.setAxisLabel('x', 'Pitch')
     
-    def _extractData(self, dataValueLegit=True):
-        pass
+    
+class PlotColorGridSadoianAmbitus(PlotColorGrid):
+    pass
     
 
 class PlotHistogram(PlotStream):
