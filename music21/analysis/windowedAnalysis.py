@@ -21,7 +21,7 @@ from music21.stream import Stream
 
 
 from music21 import environment
-_MOD = 'keyAnalysis.py'
+_MOD = 'windowedAnalysis.py'
 environLocal = environment.Environment(_MOD)
 
 #------------------------------------------------------------------------------
@@ -40,32 +40,13 @@ class WindowedAnalysis(object):
             raise WindowedAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
 
-    def _getWindow(self, sStream):
+    def _prepWindow(self):
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
-        return sStream.makeMeasures(meterStream).makeTies()
-
-        
-    def process(self, sStream, minWindow, rawData=False):
-        # names = [x.id for x in sStream]
-        
-        windowedStream = self._getWindow(sStream)
-        
-        #max = len(sStream[0].measures)
-        max = len(windowedStream)
-        
-        ''' array set to the size of the expected resulting set
+        ''' comment here, split the durations into appropriate measure boundaries
         '''
-        solutionMatrix = [0]*(max-minWindow+1)
-        color = [0]*(max-minWindow+1)
-        
-        print("-----WORKING... window-----")
-        for i in range(minWindow, max+1):
-            print(i)
-            solutionMatrix[i-minWindow], color[i-minWindow] = self._windowKeyAnalysis(i, windowedStream) 
-        
-        return solutionMatrix, color
+        return self.streamObj.makeMeasures(meterStream).makeTies()
 
 
     def _windowKeyAnalysis(self, windowSize, windowedStream):
@@ -79,6 +60,35 @@ class WindowedAnalysis(object):
             key[i], color[i] = self.processor.process(current)
              
         return key, color
+
+        
+    def process(self, minWindow, maxWindow, windowStepSize, rawData=False):
+        # names = [x.id for x in sStream]
+        
+        windowedStream = self._prepWindow()
+        
+        #max = len(sStream[0].measures)
+        if maxWindow < 1:
+            max = len(windowedStream)
+        else:
+            max = maxWindow
+        
+        ''' array set to the size of the expected resulting set
+        '''
+        print max, minWindow, windowStepSize
+        print ((max-minWindow+1)/windowStepSize)
+        solutionMatrix = [0]*((max-minWindow+1)/windowStepSize)
+        color = [0]*((max-minWindow+1)/windowStepSize)
+        
+        print("-----WORKING... window-----")
+        for i in range(minWindow, max+1, windowStepSize):
+            print(i)
+            solutionMatrix[(i-minWindow)/windowStepSize], color[(i-minWindow)/windowStepSize] = self._windowKeyAnalysis(i, windowedStream) 
+        
+        return solutionMatrix, color
+
+
+    
 
 
 #------------------------------------------------------------------------------
@@ -251,7 +261,12 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             return self.minorKeyColors[str(key)]
         
     
-    def process(self, windowedStream):    
+    def getKey(self, sStream):
+        soln = self.process(sStream)
+        return soln[0]
+    
+    
+    def process(self, sStream):    
         ''' Takes in a pitch class distribution and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
         '''
@@ -262,7 +277,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         # this is the distribution for the melody of "happy birthday"
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
     
-        pcDistribution = self._getPitchClassDistribution(windowedStream)
+        pcDistribution = self._getPitchClassDistribution(sStream)
     
         keyResultsMajor = self._convoluteDistribution(pcDistribution, True)
         differenceMajor = self._getDifference(keyResultsMajor, pcDistribution, True)
@@ -290,18 +305,22 @@ class SadoianAmbitus(DiscreteAnalysis):
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         
-        self.pitchSpanColors = {0:'#FF0000',
-                 1:'#FF8000',
-                 2:'#FFFF00',
-                 3:'#00FF00',
-                 4:'#0000FF',
-                 5:'#5600FF',
-                 6:'#8000FF',
-                 7:'#AB00FF',
-                 8:'#D600FF',
-                 9:'#FF00FF',
-                 10:'#FF55FF'}
+        self.pitchSpanColors = {}
+        self._generateColors(40)
+
+
+    def _rgb_to_hex(self, rgb):
+        return '#%02x%02x%02x' % rgb
+    
+    
+    def _generateColors(self, numColors):
         
+        for i in range(numColors):
+            val = 0
+            val = (255.0/numColors)*i
+            self.pitchSpanColors[i] = self._rgb_to_hex((val, val, val))
+            
+    
     def _getPitchSpan(self, work):
         soln = 0
         max = 0
@@ -311,25 +330,25 @@ class SadoianAmbitus(DiscreteAnalysis):
             if not n.isRest:
                 if n.isChord:
                     for m in n.pitches:
-                        if m.midi > max:
-                            max = m.midi
-                        elif m.midi < min:
-                            min = m.midi
+                        if m.ps > max:
+                            max = m.ps
+                        elif m.ps < min:
+                            min = m.ps
                 else:
-                    if n.midi > max:
-                        max = n.midi
-                    elif n.midi < min:
-                        min = n.midi
+                    if n.ps > max:
+                        max = n.ps
+                    elif n.ps < min:
+                        min = n.ps
         
-        soln = math.floor((max - min) / 12)
-        return int(soln)
+        return (max - min)
 
     
     def resultsToColor(self, result):
         return self.pitchSpanColors[result]
     
-    def process(self, subStream):
-        soln = self._getPitchSpan(subStream)
+    
+    def process(self, sStream):
+        soln = self._getPitchSpan(sStream)
         color = self.resultsToColor(soln)
         
         return soln, color
@@ -347,14 +366,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
-    '''
-    def testKeyDetect(self):
-        sStream = corpus.parseWork('schubert/d576-2')
-        #sStream = corpus.parseWork('bach/bwv17.7')
-        a = KeyAnalysis(sStream)
-        a.runWindowedAnalysis(sStream, 1)
-    '''    
 
 
 #------------------------------------------------------------------------------

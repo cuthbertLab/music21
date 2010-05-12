@@ -356,18 +356,52 @@ class Graph(object):
         environLocal.launch('png', fp)
 
 
+
 class GraphColorGrid(Graph):
+    ''' Grid of discrete colored "blocks" to visualize results of a windowed analysis routine.
+    
+        Data is provided as a list of lists of colors, based on analysis-specific mapping of colors to results
+        
+        
+        >>> a = GraphColorGrid(doneAction=None)
+        >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+        >>> a.setData(data)
+        >>> a.process()
+    '''
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
         
+        
+        if 'minWindow' in keywords:
+            self.minWindow = keywords['minWindow']
+        else:
+            self.minWindow = 5
+        if 'maxWindow' in keywords:
+            self.maxWindow = keywords['maxWindow']
+        else:
+            # if maxWindow is negative it will revert to maximum number of quarterNote lengths
+            self.maxWindow = -1
+        if 'windowStep' in keywords:
+            self.windowStep = keywords['windowStep']
+        else:
+            self.windowStep = 3
+        
+        
     def setColors(self, colors):
         self.colors = colors
+    
+    def setMinWindow(self, minWindow):
+        self.minWindow = minWindow
+    
+    def setMaxWindow(self, maxWindow):
+        self.maxWindow = maxWindow
+        
+    def setWindowStep(self, windowStep):
+        self.windowStep = windowStep
 
     def process(self):
-        '''
-        '''
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         
@@ -384,7 +418,7 @@ class GraphColorGrid(Graph):
             
             for j in range(len(self.data[i])):
                 positions.append((1/2)+j)
-                subColors.append(self.colors[i][j])
+                subColors.append(self.data[i][j])
                 #correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
                 
@@ -1246,87 +1280,70 @@ class PlotStream(object):
         for i in range(len(dynamics.shortNames)):
             ticks.append([i, dynamics.shortNames[i]])
         return ticks
-   
-
-
-
+    
+    
+    
+    
+    
 
 
 #-------------------------------------------------------------------------------
-# stream plotting    
+# color grids    
 
 class PlotColorGrid(PlotStream):
     format = ''
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj, AnalysisProcessor, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         
+        self.graph = GraphColorGrid(*args, **keywords)
         
-    def _extractData(self, dataValueLegit=True):
-        data = {}
-        dataTick = {}
+        '''
+        if 'minWindow' not in keywords:
+            self.graph.setMinWindow(1)
+        if 'maxWindow' not in keywords:
+            self.graph.setMaxWindow(-1)
+        if 'windowStep' not in keywords:
+            self.graph.setWindowStep(3)
+        '''
+        
+        data = self._extractData(AnalysisProcessor)
+        
+        self.graph.setData(data)
+        #self.graph.setColors(colors)
+        
+        self.graph.setAxisLabel('y', 'Window Size')
+        self.graph.setAxisLabel('x', 'Time')
         
         
-        return data
+    def _extractData(self, AnalysisProcessor, dataValueLegit=True):
+        b = AnalysisProcessor
+        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
+        soln = a.process(self.graph.minWindow, self.graph.maxWindow, self.graph.windowStep)
+        
+        return soln[1]
     
     
 class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
-    '''Class for plotting Krumhansl-Schmuckler analysis routine
+    '''Subclass for plotting Krumhansl-Schmuckler analysis routine
     '''
     format = ''
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotColorGrid.__init__(self, streamObj, *args, **keywords)
-        
-        #data, xTicks, yTicks = self._extractData()        
-        data, colors = self._extractData()
-        
-        self.graph = GraphColorGrid(*args, **keywords)
-        self.graph.setData(data)
-        self.graph.setColors(colors)
-
-        #self.graph.setTicks('x', xTicks)
-        #self.graph.setTicks('y', yTicks)
-
-        self.graph.setAxisLabel('y', 'Count')
-        self.graph.setAxisLabel('x', 'Pitch')
-        
-    def _extractData(self, dataValueLegit=True):
-        b = windowedAnalysis.KrumhanslSchmuckler()
-        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
-        soln = a.process(self.streamObj, 1)
-        
-        return soln[0], soln[1]
+        PlotColorGrid.__init__(self, streamObj, windowedAnalysis.KrumhanslSchmuckler(), *args, **keywords)
     
     
 class PlotColorGridSadoianAmbitus(PlotColorGrid):
-    '''Class for plotting basic pitch span over a windowed analysis
+    '''Subclass for plotting basic pitch span over a windowed analysis
     '''
     format = ''
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotColorGrid.__init__(self, streamObj, *args, **keywords)
+        PlotColorGrid.__init__(self, streamObj, windowedAnalysis.SadoianAmbitus(), *args, **keywords)
         
-        #data, xTicks, yTicks = self._extractData()        
-        data, colors = self._extractData()
-        
-        self.graph = GraphColorGrid(*args, **keywords)
-        self.graph.setData(data)
-        self.graph.setColors(colors)
 
-        #self.graph.setTicks('x', xTicks)
-        #self.graph.setTicks('y', yTicks)
-
-        self.graph.setAxisLabel('y', 'Count')
-        self.graph.setAxisLabel('x', 'Pitch')
-        
-    def _extractData(self, dataValueLegit=True):
-        b = windowedAnalysis.SadoianAmbitus()
-        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
-        soln = a.process(self.streamObj, 1)
-        
-        return soln[0], soln[1]
-    
+#-------------------------------------------------------------------------------
+# histograms
 
 class PlotHistogram(PlotStream):
     '''Base class for Stream plotting classes.
@@ -1381,9 +1398,6 @@ class PlotHistogram(PlotStream):
         yTicks.sort()
         return data, xTicks, yTicks
 
-
-#-------------------------------------------------------------------------------
-# histograms
 
 class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
@@ -2549,6 +2563,12 @@ class Test(unittest.TestCase):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b.process()
+        
+    def testPlotColorGridSadoianAmbitus(self):
+        from music21 import corpus
+        a = corpus.parseWork('bach/bwv57.8')
+        b = PlotColorGridSadoianAmbitus(a, doneAction=None, title='Bach')
         b.process()
 
 
