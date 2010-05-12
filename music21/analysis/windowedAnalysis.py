@@ -1,7 +1,8 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         windowedAnalysis.py
-# Purpose:      
+# Purpose:      Framework for modular, windowed analysis, as well as individual
+#               classes of analytical procedures
 #
 # Authors:      Jared Sadoian
 #
@@ -35,34 +36,40 @@ class WindowedAnalysisException(Exception):
 class WindowedAnalysis(object):
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
-        print self.processor
+        #environLocal.printDebug(self.processor)
         if not isinstance(streamObj, music21.stream.Stream):
             raise WindowedAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
 
     def _prepWindow(self):
+        ''' Take the loaded stream and restructure it into measures of 1 quarter note duration
+        '''
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
-        ''' comment here, split the durations into appropriate measure boundaries
+        ''' makeTies() splits the durations into proper measure boundaries for analysis
         '''
         return self.streamObj.makeMeasures(meterStream).makeTies()
 
 
-    def _windowKeyAnalysis(self, windowSize, windowedStream):
-        
+    def _singleWindowAnalysis(self, windowSize, windowedStream):
+        ''' Handles calling single window analysis method for each window of a particular window size
+        '''
         max = len(windowedStream.measures)
         key = [0] * (max - windowSize + 1)
         color = [0] * (max - windowSize + 1)               
         
         for i in range(max-windowSize + 1):
-            current = windowedStream.getMeasureRange(i, i+windowSize).flat
+            current = windowedStream.getMeasureRange(i, i+windowSize, collect=[]).flat
             key[i], color[i] = self.processor.process(current)
              
         return key, color
 
         
     def process(self, minWindow, maxWindow, windowStepSize, rawData=False):
+        ''' Main function call to start windowed analysis routine.
+            Calls _singleWindowAnalysis for the number of different window sizes to be analyzed.
+        '''
         # names = [x.id for x in sStream]
         
         windowedStream = self._prepWindow()
@@ -75,15 +82,13 @@ class WindowedAnalysis(object):
         
         ''' array set to the size of the expected resulting set
         '''
-        print max, minWindow, windowStepSize
-        print ((max-minWindow+1)/windowStepSize)
         solutionMatrix = [0]*((max-minWindow+1)/windowStepSize)
         color = [0]*((max-minWindow+1)/windowStepSize)
         
-        print("-----WORKING... window-----")
+        #environLocal.printDebug("-----WORKING... window-----")
         for i in range(minWindow, max+1, windowStepSize):
-            print(i)
-            solutionMatrix[(i-minWindow)/windowStepSize], color[(i-minWindow)/windowStepSize] = self._windowKeyAnalysis(i, windowedStream) 
+            #environLocal.printDebug(i)
+            solutionMatrix[(i-minWindow)/windowStepSize], color[(i-minWindow)/windowStepSize] = self._singleWindowAnalysis(i, windowedStream) 
         
         return solutionMatrix, color
 
@@ -94,6 +99,8 @@ class WindowedAnalysis(object):
 #------------------------------------------------------------------------------
 
 class DiscreteAnalysis(object):
+    ''' Parent class for single analytical methods
+    '''
     def __init__(self):
         pass
     
@@ -109,10 +116,13 @@ class DiscreteAnalysis(object):
 #------------------------------------------------------------------------------
 
 class KrumhanslSchmuckler(DiscreteAnalysis):
-    
+    ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
+    '''
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         
+        ''' store color grid information to associate particular keys to colors
+        '''
         self.majorKeyColors = {'Eb':'#D60000',
                  'E':'#FF0000',
                  'E#':'#FF2B00',
@@ -251,23 +261,28 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return soln    
         
     def possibleResults(self):
+        ''' TODO: returns a list of possible results for the creation of a legend
+        '''
         pass
     
     def resultsToColor(self, key, modality):
-
+        ''' use the stored color information in the __init__ method to assign a color for a given result
+        '''
         if modality == "Major":
             return self.majorKeyColors[str(key)]
         else:
             return self.minorKeyColors[str(key)]
         
     
-    def getKey(self, sStream):
+    def getResult(self, sStream):
+        ''' procedure to only return a text solution
+        '''
         soln = self.process(sStream)
         return soln[0]
     
     
     def process(self, sStream):    
-        ''' Takes in a pitch class distribution and algorithmically detects
+        ''' Takes in a Stream and algorithmically detects
             probable keys using convoluteDistribution() and getLikelyKeys()
         '''
     
@@ -306,7 +321,8 @@ class SadoianAmbitus(DiscreteAnalysis):
         DiscreteAnalysis.__init__(self)
         
         self.pitchSpanColors = {}
-        self._generateColors(40)
+        
+        self._generateColors(130)
 
 
     def _rgb_to_hex(self, rgb):

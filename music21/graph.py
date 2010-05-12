@@ -1298,22 +1298,14 @@ class PlotColorGrid(PlotStream):
         
         self.graph = GraphColorGrid(*args, **keywords)
         
-        '''
-        if 'minWindow' not in keywords:
-            self.graph.setMinWindow(1)
-        if 'maxWindow' not in keywords:
-            self.graph.setMaxWindow(-1)
-        if 'windowStep' not in keywords:
-            self.graph.setWindowStep(3)
-        '''
-        
-        data = self._extractData(AnalysisProcessor)
+        data, yTicks = self._extractData(AnalysisProcessor)
         
         self.graph.setData(data)
-        #self.graph.setColors(colors)
         
         self.graph.setAxisLabel('y', 'Window Size')
         self.graph.setAxisLabel('x', 'Time')
+        
+        self.graph.setTicks('y', yTicks)
         
         
     def _extractData(self, AnalysisProcessor, dataValueLegit=True):
@@ -1321,7 +1313,13 @@ class PlotColorGrid(PlotStream):
         a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
         soln = a.process(self.graph.minWindow, self.graph.maxWindow, self.graph.windowStep)
         
-        return soln[1]
+        
+        yTicks = []
+        for y in range(self.graph.minWindow, len(soln[1]), ((len(soln[1])-self.graph.minWindow)/10)+1):
+            yTicks.append([y, '%s' % y])
+        
+        print yTicks
+        return soln[1], yTicks
     
     
 class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
