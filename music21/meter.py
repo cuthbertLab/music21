@@ -1519,6 +1519,7 @@ class TimeSignature(music21.Music21Object):
     def _setDefaultBeatPartitions(self):
         '''Set default beat partitions based on numerator and denominator.
         '''
+        # create toplevel partitions
         if self.numerator in [2, 6]: # duple meters
             self.beat.partition(2)
         elif self.numerator in [3]: # triple meters
@@ -1534,8 +1535,18 @@ class TimeSignature(music21.Music21Object):
         # skip 6 numerators; covered above
         elif self.numerator in [18]: # sextuple meters
             self.beat.partition([3,3,3,3,3,3])
-        elif self.numerator != None: # partition by numerator      
-            self.beat.partition(self.numerator)
+
+#         elif self.numerator != None: # partition by numerator      
+#             self.beat.partition(self.numerator)
+
+        # create subdivisions, and thus define compound/simple distinction
+        if len(self.beat) > 1: # if partitioned
+            for i in range(len(self.beat)): # either 2 or 3
+                if self.beat[i].numerator == 3:
+                    self.beat[i] = self.beat[i].subdivide(3)
+                elif self.beat[i].numerator == 1:
+                    self.beat[i] = self.beat[i].subdivide(2)
+
 
     def _setDefaultBeamPartitions(self):
         '''This sets default beam partitions when partitionRequest is None.
@@ -1695,7 +1706,8 @@ class TimeSignature(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # meter classifications
+    # meter classifications used for classifying meters such as 
+    # duple triple, etc.
 
     def _getBeatUnitCount(self):
         return len(self.beat)
@@ -1711,15 +1723,15 @@ class TimeSignature(music21.Music21Object):
     def _getBeatUnitCountName(self):
         buc = self._getBeatUnitCount()
         if buc == 2:
-            return 'duple'
+            return 'Duple'
         elif buc == 3:
-            return 'triple'
+            return 'Triple'
         elif buc == 4:
-            return 'quadruple'
+            return 'Quadruple'
         elif buc == 5:
-            return 'quintuple'
+            return 'Quintuple'
         elif buc == 6:
-            return 'sextuple'
+            return 'Sextuple'
         else:
             return None
 
@@ -1728,12 +1740,51 @@ class TimeSignature(music21.Music21Object):
 
         >>> ts = TimeSignature('3/4')
         >>> ts.beatUnitCountName
-        'triple'
+        'Triple'
 
         >>> ts = TimeSignature('6/8')
         >>> ts.beatUnitCountName
-        'duple'
+        'Duple'
 
+        ''')
+
+
+    def _getBeatBackgroundUnitCount(self):
+        post = []
+        if len(self.beat) == 1:
+            raise TimeSignatureException('cannot determine beat background for an unpartitioned beat')
+        for ms in self.beat:
+            post.append(len(ms))
+        # convert this to a set; if length is 1, then all are uniform
+        if len(set(post)) == 1:
+            return len(self.beat[0]) # all are the same
+        else:
+            raise TimeSignatureException('non uniform beat background: %s' % post)
+
+    beatBackgroundUnitCount = property(_getBeatBackgroundUnitCount,
+        doc = '''Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature.
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.beatBackgroundUnitCount
+        2
+
+        >>> ts = TimeSignature('6/8')
+        >>> ts.beatBackgroundUnitCount
+        3
+
+        >>> ts = TimeSignature('15/8')
+        >>> ts.beatBackgroundUnitCount
+        3
+
+        >>> ts = TimeSignature('3/8')
+        >>> ts.beatBackgroundUnitCount
+        2
+
+        >>> ts = TimeSignature('13/8')
+        >>> ts.beatBackgroundUnitCount
+        Traceback (most recent call last):
+        TimeSignatureException: cannot determine beat background for an unpartitioned beat
+    
         ''')
 
 
@@ -1963,7 +2014,7 @@ class TimeSignature(music21.Music21Object):
         >>> a.beam
         <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.beat
-        <MeterSequence {1/4+1/4+1/4}>
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.setDisplay('3/4')
         >>> a.display
         <MeterSequence {3/4}>
@@ -2441,32 +2492,59 @@ class Test(unittest.TestCase):
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beat), 2)
-            self.assertEqual(ts.beatUnitCountName, 'duple')
+            self.assertEqual(ts.beatUnitCountName, 'Duple')
+            if ts.numerator == 2:
+                for ms in ts.beat: # should be divided in two
+                    self.assertEqual(len(ms), 2)
+            elif ts.numerator == 6:
+                for ms in ts.beat: # should be divided in three
+                    self.assertEqual(len(ms), 3)
 
         src = [('3/2'), ('3/4'), ('3/8'), ('9/4'), ('9/8'), ('9/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beat), 3)
-            self.assertEqual(ts.beatUnitCountName, 'triple')
+            self.assertEqual(ts.beatUnitCountName, 'Triple')
+            if ts.numerator == 3:
+                for ms in ts.beat: # should be divided in two
+                    self.assertEqual(len(ms), 2)
+            elif ts.numerator == 9:
+                for ms in ts.beat: # should be divided in three
+                    self.assertEqual(len(ms), 3)
 
 
         src = [('4/2'), ('4/4'), ('4/8'), ('12/4'), ('12/8'), ('12/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beat), 4)
-            self.assertEqual(ts.beatUnitCountName, 'quadruple')
+            self.assertEqual(ts.beatUnitCountName, 'Quadruple')
+            if ts.numerator == 4:
+                for ms in ts.beat: # should be divided in two
+                    self.assertEqual(len(ms), 2)
+            elif ts.numerator == 12:
+                for ms in ts.beat: # should be divided in three
+                    self.assertEqual(len(ms), 3)
 
         src = [('5/2'), ('5/4'), ('5/8'), ('15/4'), ('15/8'), ('15/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beat), 5)
-            self.assertEqual(ts.beatUnitCountName, 'quintuple')
+            self.assertEqual(ts.beatUnitCountName, 'Quintuple')
+            if ts.numerator == 5:
+                for ms in ts.beat: # should be divided in two
+                    self.assertEqual(len(ms), 2)
+            elif ts.numerator == 15:
+                for ms in ts.beat: # should be divided in three
+                    self.assertEqual(len(ms), 3)
 
         src = [('18/4'), ('18/8'), ('18/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beat), 6)
-            self.assertEqual(ts.beatUnitCountName, 'sextuple')
+            self.assertEqual(ts.beatUnitCountName, 'Sextuple')
+            if ts.numerator == 18:
+                for ms in ts.beat: # should be divided in three
+                    self.assertEqual(len(ms), 3)
 
         # odd or unusual partitions
         src = [('13/4'), ('19/8'), ('7/16')]
