@@ -584,7 +584,7 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
         m.insert(0, ts1)
     # append answers to first note
     ex.flat.notes[0].addLyric('Meter: %s' % ts1)
-    ex.flat.notes[0].addLyric('Meter type: %s' % ts1)
+    ex.flat.notes[0].addLyric('Meter type: %s' % ts1.classification)
 
     if show:
         ex.show()
@@ -617,20 +617,74 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     '''p. 13
     Complete the chart below.
     '''
-    import copy
-    from music21 import meter
+    from music21 import meter, stream
 
-    # create a template row
-    chartRow = {'meter':None, 
-                'meter type':None, 
-                'beat unit':None, 
-                'beat division':None, 
-                'beat subdivision': None}
-    chart = []
-    for tsStr in ['2/4', '3/16', '4/4', '3/8', '2/2', '4/8']:
+    def prepareMeter(ts):
+        m = stream.Measure()
+        m.timeSignature = ts
+        n = note.Note()
+        n.lyric = str(ts)
+        n.duration = ts.beat.duration
+        m.append(n)
+        return m
+
+    def prepareMeterType(ts):
+        m = stream.Measure()
+        m.timeSignature = ts
+        n = note.Note()
+        n.lyric = ts.classification
+        n.duration = ts.beat.duration
+        m.append(n)
+        return m
+
+    def prepareBeatUnit(ts):
+        m = stream.Measure()
+        m.timeSignature = ts
+        n = note.Note()
+        n.lyric = 'Beat Unit'
+        n.duration = ts.beatUnit
+        m.append(n)
+        return m
+
+    def prepareBeatDivision(ts):
+        m = stream.Measure()
+        m.timeSignature = ts
+        for i in range(len(ts.beatDivision)):
+            d = ts.beatDivision[i]
+            n = note.Note()
+            if i == 0:
+                n.lyric = 'Beat Division'
+            n.duration = d
+            m.append(n)
+        m = m.makeBeams()
+        return m
+
+    def prepareBeatSubDivision(ts):
+        m = stream.Measure()
+        m.timeSignature = ts
+        for i in range(len(ts.beatSubDivision)):
+            d = ts.beatSubDivision[i]
+            n = note.Note()
+            if i == 0:
+                n.lyric = 'Beat Subdivision'
+            n.duration = d
+            m.append(n)
+        m = m.makeBeams()
+        return m
+
+    ex = stream.Stream()
+    for tsStr in ['2/4', '3/16', '4/4', '3/8', '2/2', '4/8', '6/8', '9/16', '15/4']:
         ts = meter.TimeSignature(tsStr)
-        row = copy.deepcopy(chartRow)
-        row['meter'] = ts
+
+        ex.append(prepareMeter(ts))
+        ex.append(prepareMeterType(ts))
+        ex.append(prepareBeatUnit(ts))
+        ex.append(prepareBeatDivision(ts))
+        ex.append(prepareBeatSubDivision(ts))
+        
+    if show:
+        ex.show()
+       
 
 
 def ch2_basic_II(show=True, *arguments, **keywords):
@@ -1465,4 +1519,7 @@ if __name__ == "__main__":
         #ch5_writing_IV_A(show=True)
 
 
-        ch2_basic_I_A_1(show=True)
+        #ch2_basic_I_A_1(show=True)
+
+
+        ch2_basic_I_C(show=True)

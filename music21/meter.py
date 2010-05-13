@@ -1748,6 +1748,35 @@ class TimeSignature(music21.Music21Object):
 
         ''')
 
+    def _getBeatUnit(self):
+        '''Return a Duration object for the beat unit of this TimeSignature if the beat unit is constant; otherwise, return None
+        '''
+        post = []
+        if len(self.beat) == 1:
+            raise TimeSignatureException('cannot determine beat unit for an unpartitioned beat')
+        for ms in self.beat:
+            post.append(ms.duration.quarterLength)
+        if len(set(post)) == 1:
+            return self.beat[0].duration # all are the same
+        else:
+            raise TimeSignatureException('non uniform beat unit: %s' % post)
+
+    beatUnit = property(_getBeatUnit, 
+        doc = '''Return a :class:`~music21.duration.Duration` object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit.
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.beatUnit
+        <music21.duration.Duration 1.0>
+        >>> ts = TimeSignature('6/8')
+        >>> ts.beatUnit
+        <music21.duration.Duration 1.5>
+
+        >>> ts = TimeSignature('7/8')
+        >>> ts.beatUnit
+        Traceback (most recent call last):
+        TimeSignatureException: cannot determine beat unit for an unpartitioned beat
+        ''')
+
 
     def _getBeatBackgroundUnitCount(self):
         post = []
@@ -1787,6 +1816,101 @@ class TimeSignature(music21.Music21Object):
     
         ''')
 
+    def _getBeatBackgroundUnitCountName(self):
+        bbuc = self._getBeatBackgroundUnitCount()
+        if bbuc == 2:
+            return 'Simple'
+        elif bbuc == 3:
+            return 'Compound'
+        else:
+            return None
+
+    beatBackgroundUnitCountName = property(_getBeatBackgroundUnitCountName,
+        doc = '''Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.beatBackgroundUnitCountName
+        'Simple'
+
+        >>> ts = TimeSignature('6/8')
+        >>> ts.beatBackgroundUnitCountName
+        'Compound'
+
+        ''')
+
+
+    def _getBeatDivision(self):
+        post = []
+        if len(self.beat) == 1:
+            raise TimeSignatureException('cannot determine beat division for an unpartitioned beat')
+        for mt in self.beat:
+            for subMt in mt:
+                post.append(subMt.duration.quarterLength)
+        if len(set(post)) == 1: # all the same 
+            out = [] # could be a Stream, but stream.py imports meter.py
+            for subMt in self.beat[0]:
+                out.append(subMt.duration)
+            return out
+        else:
+            raise TimeSignatureException('non uniform beat division: %s' % post)
+
+
+    beatDivision = property(_getBeatDivision, 
+        doc = '''Return the beat division as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.beatDivision
+        [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
+
+        >>> ts = TimeSignature('6/8')
+        >>> ts.beatDivision
+        [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
+        ''')
+
+
+
+    def _getBeatSubDivision(self):
+        '''Subdivide each beat division in two. 
+        '''
+        post = []
+        src = self._getBeatDivision()
+        for d in src:
+            post.append(d.augmentOrDiminish(.5, inPlace=False))
+            post.append(d.augmentOrDiminish(.5, inPlace=False))
+        return post
+
+    beatSubDivision = property(_getBeatSubDivision, 
+        doc = '''Return a subdivision of the beat division, or a list of :class:`~music21.duration.Duration` objects representing each beat division divided by two. 
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.beatSubDivision
+        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
+
+        >>> ts = TimeSignature('6/8')
+        >>> ts.beatSubDivision
+        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
+        '''
+        )
+
+
+
+    def _getClassification(self):
+        return '%s %s' % (self._getBeatBackgroundUnitCountName(),
+                          self._getBeatUnitCountName())
+
+    classification = property(_getClassification, 
+        doc = '''Return the classification of this TimeSignature, such as Simple Triple or Compound Quadruple.
+
+        >>> ts = TimeSignature('3/4')
+        >>> ts.classification
+        'Simple Triple'
+        >>> ts = TimeSignature('6/8')
+        >>> ts.classification
+        'Compound Duple'
+        >>> ts = TimeSignature('4/32')
+        >>> ts.classification
+        'Simple Quadruple'
+        ''')
 
 
     #---------------------------------------------------------------------------
