@@ -1842,9 +1842,9 @@ class Stream(music21.Music21Object):
         >>> a.lowestOffset
         20.0
         '''
-        for e in self:
-            e._definedContexts.setOffsetBySite(self, 
-                e._definedContexts.getOffsetBySite(self) + offset)
+        #for e in self:
+        for e in self._elements:
+            e.setOffsetBySite(self, e.getOffsetBySite(self) + offset)
         self._elementsChanged() 
         
     def transferOffsetToElements(self):
@@ -3163,12 +3163,63 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def scaleOffset(self, scalar):
+    def scaleOffsets(self, scalar, anchorZero='lowest', inPlace=True):
         '''Scale all offsets by a provided scalar.
-        '''
-        pass
 
-    def scaleDuration(self, scalar):
+        The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
+
+        To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
+
+        >>> from music21 import note
+        >>> n = note.Note()
+        >>> n.quarterLength = 2
+        >>> s = Stream()
+        >>> s.repeatAppend(n, 20)
+        '''
+
+        # if we have offsets at 0, 2, 4
+        # we scale by 2, getting offsets at 0, 4, 8
+
+        # compare to offsets at 10, 12, 14
+        # we scale by 2; if we do not anchor at lower, we get 20, 24, 28
+        # if we anchor, we get 10, 14, 18
+
+        if not scalar > 0:
+            raise StreamException('scalar must be greater than zero')
+
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        # first, get the offset shift requested
+        if anchorZero in ['lowest']:
+            offsetShift = returnObj.lowestOffset
+        elif anchorZero in ['highest']:
+            offsetShift = returnObj.highestOffset        
+        elif anchorZero in [None]:
+            offsetShift = 0
+        else:
+            raise StreamException('an achorZero value of %s is not accepted' % anchorZero)
+
+        for e in returnObj._elements:
+            # specifically provide returnObj as the site
+            # subtract the offset shift (and lowestOffset of 80 becomes 0)
+            # then apply the scalar
+            o = (returnObj.getOffsetBySite(returnObj) - offsetShift) * scalar
+            # after scaling, return the shift
+            o += offsetShift
+            returnObj.setOffsetBySite(returnObj, o)
+
+            # need to look for embedded Streams, and call this method
+            # on them, with inPlace == True
+
+
+        returnObj._elementsChanged() 
+
+
+
+    def scaleDurations(self, scalar):
         '''Scale all durations by a provided scalar.
         '''
         pass

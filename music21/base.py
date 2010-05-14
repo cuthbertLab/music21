@@ -701,8 +701,7 @@ class DefinedContexts(object):
 
 
     def setOffsetBySite(self, site, value):
-        '''
-        Changes the offset of the site specified.  Note that this can also be
+        '''Changes the offset of the site specified.  Note that this can also be
         done with add, but the difference is that if the site is not in 
         DefinedContexts, it will raise an exception.
         
@@ -1134,9 +1133,20 @@ class Music21Object(object):
         >>> a.getOffsetBySite(None)
         30.0
         '''
-#         if site == self:
-#             site = None # shortcut
         return self._definedContexts.getOffsetBySite(site)
+
+
+    def setOffsetBySite(self, site, value):
+        '''Direct access to the DefinedContexts setOffsetBySite() method. This should only be used for advanced processing of known site that already has been added.
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> a = Music21Object()
+        >>> a.addLocation(aSite, 20)
+        >>> a.setOffsetBySite(aSite, 30)
+        '''
+        return self._definedContexts.setOffsetBySite(site, value)
+
 
     def getContextAttr(self, attr):
         '''Given the name of an attribute, search Conctexts and return 
