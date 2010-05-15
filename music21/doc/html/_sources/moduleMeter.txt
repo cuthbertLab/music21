@@ -106,16 +106,60 @@ TimeSignature
 
         .. attribute:: barDuration
 
-            barDuration gets or sets a duration value that is equal in length to the totalLength 
+            Return a :class:`~music21.duration.Duration` object equal to the total length of this TimeSignature. 
 
-            >>> a = TimeSignature('3/8')
-            >>> d = a.barDuration
-            >>> d.type
-            'quarter' 
-            >>> d.dots
-            1 
-            >>> d.quarterLength
-            1.5 
+            >>> ts = TimeSignature('5/16')
+            >>> ts.barDuration
+            <music21.duration.Duration 1.25> 
+
+            
+
+        .. attribute:: beatBackgroundUnitCount
+
+            Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatBackgroundUnitCount
+            2 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatBackgroundUnitCount
+            3 
+            >>> ts = TimeSignature('15/8')
+            >>> ts.beatBackgroundUnitCount
+            3 
+            >>> ts = TimeSignature('3/8')
+            >>> ts.beatBackgroundUnitCount
+            2 
+            >>> ts = TimeSignature('13/8')
+            >>> ts.beatBackgroundUnitCount
+            Traceback (most recent call last): 
+            TimeSignatureException: cannot determine beat background for an unpartitioned beat 
+
+            
+
+        .. attribute:: beatBackgroundUnitCountName
+
+            Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatBackgroundUnitCountName
+            'Simple' 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatBackgroundUnitCountName
+            'Compound' 
+
+            
+
+        .. attribute:: beatDivision
+
+            Return the beat division as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatDivision
+            [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>] 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatDivision
+            [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>] 
 
         .. attribute:: beatLengthToQuarterLengthRatio
 
@@ -125,9 +169,74 @@ TimeSignature
             >>> a.beatLengthToQuarterLengthRatio
             2.0 
 
+        .. attribute:: beatSubDivision
+
+            Return a subdivision of the beat division, or a list of :class:`~music21.duration.Duration` objects representing each beat division divided by two. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatSubDivision
+            [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>] 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatSubDivision
+            [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>] 
+
+        .. attribute:: beatUnit
+
+            Return a :class:`~music21.duration.Duration` object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatUnit
+            <music21.duration.Duration 1.0> 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatUnit
+            <music21.duration.Duration 1.5> 
+            >>> ts = TimeSignature('7/8')
+            >>> ts.beatUnit
+            Traceback (most recent call last): 
+            TimeSignatureException: cannot determine beat unit for an unpartitioned beat 
+
+        .. attribute:: beatUnitCount
+
+            Return the count of beat units, or the number of beats in this TimeSignature 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatUnitCount
+            3 
+
+        .. attribute:: beatUnitCountName
+
+            Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.beatUnitCountName
+            'Triple' 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.beatUnitCountName
+            'Duple' 
+
+            
+
+        .. attribute:: classification
+
+            Return the classification of this TimeSignature, such as Simple Triple or Compound Quadruple. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.classification
+            'Simple Triple' 
+            >>> ts = TimeSignature('6/8')
+            >>> ts.classification
+            'Compound Duple' 
+            >>> ts = TimeSignature('4/32')
+            >>> ts.classification
+            'Simple Quadruple' 
+
         .. attribute:: denominator
 
-            No documentation. 
+            Return the denominator of the TimeSignature as a number 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.denominator
+            4 
 
         .. attribute:: lily
 
@@ -154,7 +263,11 @@ TimeSignature
 
         .. attribute:: numerator
 
-            No documentation. 
+            Return the numerator of the TimeSignature as a number. 
+
+            >>> ts = TimeSignature('3/4')
+            >>> ts.numerator
+            3 
 
         .. attribute:: quarterLengthToBeatLengthRatio
 
@@ -162,7 +275,11 @@ TimeSignature
 
         .. attribute:: totalLength
 
-            No documentation. 
+            Total length of the TimeSignature, in Quarter Lengths. 
+
+            >>> ts = TimeSignature('6/8')
+            >>> ts.totalLength
+            3.0 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -170,7 +287,7 @@ TimeSignature
 
         .. method:: getAccent(qLenPos)
 
-            Return true or false if the qLenPos is at the start of an accent division 
+            Return True or False if the qLenPos is at the start of an accent division. 
 
             >>> a = TimeSignature('3/4', 3)
             >>> a.accent.partition([2,1])
@@ -210,7 +327,7 @@ TimeSignature
 
         .. method:: getBeat(qLenPos)
 
-            Given a quarterLenght position, get the beat, where beats count from 1 
+            Given a quarterLength position, get the beat, where beats count from 1 
 
             >>> a = TimeSignature('3/4', 3)
             >>> a.getBeat(0)
@@ -246,7 +363,7 @@ TimeSignature
 
         .. method:: getBeatProgress(qLenPos)
 
-            Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is. 
+            Given a quarterLength position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is. 
 
             >>> a = TimeSignature('3/4', 3)
             >>> a.getBeatProgress(0)
@@ -306,12 +423,12 @@ TimeSignature
             >>> a.beam
             <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}> 
             >>> a.beat
-            <MeterSequence {3/4}> 
-            >>> a.setDisplay(a.beat)
+            <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}> 
+            >>> a.setDisplay('3/4')
             >>> a.display
             <MeterSequence {3/4}> 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 CompoundTimeSignature
@@ -486,7 +603,7 @@ MeterSequence
 
         .. method:: partition(value)
 
-            Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
+            Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on argument time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther(). 
 
             >>> a = MeterSequence('5/4+3/8')
             >>> len(a)
@@ -503,7 +620,7 @@ MeterSequence
 
         .. method:: partitionByCount(countRequest, loadDefault=True)
 
-            This will destroy any struct in the _partition 
+            This will destroy any structure in the _partition 
 
             >>> a = MeterSequence('4/4')
             >>> a.partitionByCount(2)

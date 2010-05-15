@@ -452,8 +452,46 @@ GraphColorGrid
 
 .. class:: GraphColorGrid(*args, **keywords)
 
+    Grid of discrete colored "blocks" to visualize results of a windowed analysis routine. Data is provided as a list of lists of colors, based on analysis-specific mapping of colors to results 
+
+    
+
+    >>> a = GraphColorGrid(doneAction=None)
+    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+    >>> a.setData(data)
+    >>> a.process()
 
     inherits from: :class:`~music21.graph.Graph`
+
+    **GraphColorGrid** **attributes**
+
+        Attributes without Documentation: `windowStep`, `maxWindow`, `minWindow`
+
+        Attributes inherited from :class:`~music21.graph.Graph`: :attr:`~music21.graph.Graph.fontFamily`, :attr:`~music21.graph.Graph.doneAction`, :attr:`~music21.graph.Graph.title`, :attr:`~music21.graph.Graph.colorBackgroundFigure`, :attr:`~music21.graph.Graph.colors`, :attr:`~music21.graph.Graph.tickFontSize`, :attr:`~music21.graph.Graph.colorGrid`, :attr:`~music21.graph.Graph.figureSize`, :attr:`~music21.graph.Graph.colorBackgroundData`, :attr:`~music21.graph.Graph.axisKeys`, :attr:`~music21.graph.Graph.grid`, :attr:`~music21.graph.Graph.titleFontSize`, :attr:`~music21.graph.Graph.alpha`, :attr:`~music21.graph.Graph.labelFontSize`, :attr:`~music21.graph.Graph.data`, :attr:`~music21.graph.Graph.axis`
+
+    **GraphColorGrid** **methods**
+
+        .. method:: process()
+
+            No documentation. 
+
+        .. method:: setColors(colors)
+
+            No documentation. 
+
+        .. method:: setMaxWindow(maxWindow)
+
+            No documentation. 
+
+        .. method:: setMinWindow(minWindow)
+
+            No documentation. 
+
+        .. method:: setWindowStep(windowStep)
+
+            No documentation. 
+
+        Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
 
 GraphHistogram
@@ -565,6 +603,77 @@ Plot3DBars
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
+PlotColorGrid
+-------------
+
+.. class:: PlotColorGrid(streamObj, AnalysisProcessor, *args, **keywords)
+
+
+    inherits from: :class:`~music21.graph.PlotStream`
+
+    **PlotColorGrid** **attributes**
+
+        Attributes without Documentation: `format`
+
+        Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
+
+    **PlotColorGrid** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotColorGrid** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
+PlotColorGridKrumhanslSchmuckler
+--------------------------------
+
+.. class:: PlotColorGridKrumhanslSchmuckler(streamObj, *args, **keywords)
+
+    Subclass for plotting Krumhansl-Schmuckler analysis routine 
+
+    inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
+
+    **PlotColorGridKrumhanslSchmuckler** **attributes**
+
+        Attributes without Documentation: `format`
+
+        Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
+
+    **PlotColorGridKrumhanslSchmuckler** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotColorGridKrumhanslSchmuckler** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
+PlotColorGridSadoianAmbitus
+---------------------------
+
+.. class:: PlotColorGridSadoianAmbitus(streamObj, *args, **keywords)
+
+    Subclass for plotting basic pitch span over a windowed analysis 
+
+    inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
+
+    **PlotColorGridSadoianAmbitus** **attributes**
+
+        Attributes without Documentation: `format`
+
+        Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
+
+    **PlotColorGridSadoianAmbitus** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotColorGridSadoianAmbitus** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
 PlotHistogram
 -------------
 
@@ -611,30 +720,6 @@ PlotHorizontalBar
         Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
 
     **PlotHorizontalBar** **methods**
-
-        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
-
-
-PlotKeyAnalysis
----------------
-
-.. class:: PlotKeyAnalysis(streamObj, *args, **keywords)
-
-    Class for plotting key analysis routines 
-
-    inherits from: :class:`~music21.graph.PlotStream`
-
-    **PlotKeyAnalysis** **attributes**
-
-        Attributes without Documentation: `format`
-
-        Attributes inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.values`
-
-    **PlotKeyAnalysis** **properties**
-
-        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
-
-    **PlotKeyAnalysis** **methods**
 
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 

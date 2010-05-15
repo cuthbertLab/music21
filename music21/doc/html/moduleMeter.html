@@ -200,15 +200,62 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.barDuration">
 <tt class="descname">barDuration</tt><a class="headerlink" href="#music21.meter.TimeSignature.barDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>barDuration gets or sets a duration value that is equal in length to the totalLength</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">barDuration</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
-<span class="go">&#39;quarter&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">dots</span>
-<span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
-<span class="go">1.5</span>
+<dd><p>Return a <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> object equal to the total length of this TimeSignature.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;5/16&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">barDuration</span>
+<span class="go">&lt;music21.duration.Duration 1.25&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatBackgroundUnitCount">
+<tt class="descname">beatBackgroundUnitCount</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatBackgroundUnitCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;15/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;13/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">TimeSignatureException</span>: <span class="n-Identifier">cannot determine beat background for an unpartitioned beat</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatBackgroundUnitCountName">
+<tt class="descname">beatBackgroundUnitCountName</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatBackgroundUnitCountName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCountName</span>
+<span class="go">&#39;Simple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCountName</span>
+<span class="go">&#39;Compound&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatDivision">
+<tt class="descname">beatDivision</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatDivision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the beat division as a Stream of <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects, if and only if the TimeSignature has a uniform beat division for all beats.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatDivision</span>
+<span class="go">[&lt;music21.duration.Duration 0.5&gt;, &lt;music21.duration.Duration 0.5&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatDivision</span>
+<span class="go">[&lt;music21.duration.Duration 0.5&gt;, &lt;music21.duration.Duration 0.5&gt;, &lt;music21.duration.Duration 0.5&gt;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -224,9 +271,89 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 </dd></dl>
 
 <dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatSubDivision">
+<tt class="descname">beatSubDivision</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatSubDivision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a subdivision of the beat division, or a list of <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects representing each beat division divided by two.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatSubDivision</span>
+<span class="go">[&lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatSubDivision</span>
+<span class="go">[&lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;, &lt;music21.duration.Duration 0.25&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatUnit">
+<tt class="descname">beatUnit</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnit</span>
+<span class="go">&lt;music21.duration.Duration 1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnit</span>
+<span class="go">&lt;music21.duration.Duration 1.5&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;7/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnit</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">TimeSignatureException</span>: <span class="n-Identifier">cannot determine beat unit for an unpartitioned beat</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatUnitCount">
+<tt class="descname">beatUnitCount</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatUnitCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the count of beat units, or the number of beats in this TimeSignature</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCount</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.beatUnitCountName">
+<tt class="descname">beatUnitCountName</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatUnitCountName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCountName</span>
+<span class="go">&#39;Triple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCountName</span>
+<span class="go">&#39;Duple&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.meter.TimeSignature.classification">
+<tt class="descname">classification</tt><a class="headerlink" href="#music21.meter.TimeSignature.classification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the classification of this TimeSignature, such as Simple Triple or Compound Quadruple.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">classification</span>
+<span class="go">&#39;Simple Triple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">classification</span>
+<span class="go">&#39;Compound Duple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/32&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">classification</span>
+<span class="go">&#39;Simple Quadruple&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.meter.TimeSignature.denominator">
 <tt class="descname">denominator</tt><a class="headerlink" href="#music21.meter.TimeSignature.denominator" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd><p>Return the denominator of the TimeSignature as a number</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">denominator</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.lily">
@@ -259,7 +386,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.numerator">
 <tt class="descname">numerator</tt><a class="headerlink" href="#music21.meter.TimeSignature.numerator" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd><p>Return the numerator of the TimeSignature as a number.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">numerator</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.quarterLengthToBeatLengthRatio">
@@ -269,7 +402,13 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.totalLength">
 <tt class="descname">totalLength</tt><a class="headerlink" href="#music21.meter.TimeSignature.totalLength" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd><p>Total length of the TimeSignature, in Quarter Lengths.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;6/8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">totalLength</span>
+<span class="go">3.0</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
@@ -278,7 +417,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getAccent">
 <tt class="descname">getAccent</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getAccent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return true or false if the qLenPos is at the start of an accent division</p>
+<dd><p>Return True or False if the qLenPos is at the start of an accent division.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accent</span>
@@ -325,7 +464,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeat">
 <tt class="descname">getBeat</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a quarterLenght position, get the beat, where beats count from 1</p>
+<dd><p>Given a quarterLength position, get the beat, where beats count from 1</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">1</span>
@@ -366,7 +505,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="method">
 <dt id="music21.meter.TimeSignature.getBeatProgress">
 <tt class="descname">getBeatProgress</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.TimeSignature.getBeatProgress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a quarterLenght position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is.</p>
+<dd><p>Given a quarterLength position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos is.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">(1, 0)</span>
@@ -435,15 +574,15 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beam</span>
 <span class="go">&lt;MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beat</span>
-<span class="go">&lt;MeterSequence {3/4}&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDisplay</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setDisplay</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">display</span>
 <span class="go">&lt;MeterSequence {3/4}&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocation"><tt class="xref docutils literal"><span class="pre">removeLocation()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocation"><tt class="xref docutils literal"><span class="pre">removeLocation()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -635,7 +774,7 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partition">
 <tt class="descname">partition</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partition" title="Permalink to this definition">¶</a></dt>
-<dd><p>Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on arguement time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther().</p>
+<dd><p>Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence. A simple way to partition based on argument time. Single integers are treated as beat counts; lists are treated as numerator lists; MeterSequence objects are call partitionByOther().</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;5/4+3/8&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">2</span>
@@ -655,7 +794,7 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 <dl class="method">
 <dt id="music21.meter.MeterSequence.partitionByCount">
 <tt class="descname">partitionByCount</tt><big>(</big><em>countRequest</em>, <em>loadDefault=True</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.partitionByCount" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will destroy any struct in the _partition</p>
+<dd><p>This will destroy any structure in the _partition</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">partitionByCount</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -931,7 +1070,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Non
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 10, 2010.
+      Last updated on May 15, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
