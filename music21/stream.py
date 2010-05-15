@@ -3206,13 +3206,20 @@ class Stream(music21.Music21Object):
             # specifically provide returnObj as the site
             # subtract the offset shift (and lowestOffset of 80 becomes 0)
             # then apply the scalar
-            o = (returnObj.getOffsetBySite(returnObj) - offsetShift) * scalar
+            #o = (returnObj.getOffsetBySite(returnObj) - offsetShift) * scalar
+
+            oInit = e.offset
+            o = (oInit - offsetShift) * scalar
             # after scaling, return the shift
             o += offsetShift
-            returnObj.setOffsetBySite(returnObj, o)
+            #returnObj.setOffsetBySite(returnObj, o)
+            e.offset = o
 
             # need to look for embedded Streams, and call this method
             # on them, with inPlace == True
+
+            environLocal.printDebug(['scaleOffsets()', e, oInit, e.offset])
+
 
 
         returnObj._elementsChanged() 
@@ -6846,6 +6853,28 @@ class Test(unittest.TestCase):
         # TODO: add tests
         #s.show()
 
+
+
+
+    def testScaleOffsetsBasic(self):
+        '''
+        '''
+        from music21 import note, stream
+
+        n = note.Note()
+        n.quarterLength = 2
+        s = stream.Stream()
+        s.repeatAppend(n, 20)
+        s.scaleOffsets(2)
+
+
+        n = note.Note()
+        n.quarterLength = 1
+        s = stream.Stream()
+        s.repeatInsert(n, range(100, 130))
+        s.scaleOffsets(4)
+
+
         
     def xtestMultipleReferencesOneStream(self):
         '''Test having multiple references of the same element in a single Stream.
@@ -6883,9 +6912,10 @@ if __name__ == "__main__":
 
         #a.testBestTimeSignature()
 
-        a.testGetKeySignatures()
-        a.testGetKeySignaturesThreeMeasures()
-        a.testMakeAccidentals()
+        #a.testGetKeySignatures()
+        #a.testGetKeySignaturesThreeMeasures()
+        #a.testMakeAccidentals()
 
-        a.testMakeAccidentalsWithKeysInMeasures()
+        #a.testMakeAccidentalsWithKeysInMeasures()
 
+        a.testScaleOffsetsBasic()
