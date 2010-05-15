@@ -868,7 +868,7 @@ class Stream(music21.Music21Object):
                 element.teardownPickleScaffold()
             elif hasattr(element, "unwrapWeakref"): # recurse time:
             #elif isinstance(element, music21.Music21Object):
-                #environLocal.printDebug(['processing music21 obj', element])
+                environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()
                 element.unfreezeIds()
 
@@ -3203,27 +3203,21 @@ class Stream(music21.Music21Object):
             raise StreamException('an achorZero value of %s is not accepted' % anchorZero)
 
         for e in returnObj._elements:
-            # specifically provide returnObj as the site
             # subtract the offset shift (and lowestOffset of 80 becomes 0)
             # then apply the scalar
-            #o = (returnObj.getOffsetBySite(returnObj) - offsetShift) * scalar
-
-            oInit = e.offset
-            o = (oInit - offsetShift) * scalar
-            # after scaling, return the shift
+            o = (e.offset - offsetShift) * scalar
+            # after scaling, return the shift taken away
             o += offsetShift
-            #returnObj.setOffsetBySite(returnObj, o)
-            e.offset = o
+            e.offset = o # reassing
 
             # need to look for embedded Streams, and call this method
-            # on them, with inPlace == True
-
-            environLocal.printDebug(['scaleOffsets()', e, oInit, e.offset])
-
-
+            # on them, with inPlace == True, as already copied if 
+            # inPlace is != True
+            if hasattr(e, "elements"): # recurse time:
+                e.scaleOffsets(scalar, anchorZero=anchorZero, inPlace=True)
 
         returnObj._elementsChanged() 
-
+        return returnObj
 
 
     def scaleDurations(self, scalar):
@@ -6861,18 +6855,123 @@ class Test(unittest.TestCase):
         '''
         from music21 import note, stream
 
+        def procCompare(s, scalar, match):
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            sNew = s.scaleOffsets(scalar, inPlace=False)
+            oListPost = [e.offset for e in sNew]
+            oListPost.sort()
+
+            #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+        # test equally spaced half notes starting at zero
         n = note.Note()
         n.quarterLength = 2
         s = stream.Stream()
-        s.repeatAppend(n, 20)
-        s.scaleOffsets(2)
+        s.repeatAppend(n, 10)
 
+        # provide start of resulting values
+        # half not spacing becomes whole note spacing
+        procCompare(s, 2, [0.0, 4.0, 8.0])
+        procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
+        procCompare(s, 3, [0.0, 6.0, 12.0, 18.0])
+        procCompare(s, .5, [0.0, 1.0, 2.0, 3.0])
+        procCompare(s, .25, [0.0, 0.5, 1.0, 1.5])
 
+        # test equally spaced quarter notes start at non-zero
         n = note.Note()
         n.quarterLength = 1
         s = stream.Stream()
-        s.repeatInsert(n, range(100, 130))
-        s.scaleOffsets(4)
+        s.repeatInsert(n, range(100, 110))
+
+        procCompare(s, 1, [100, 101, 102, 103])
+        procCompare(s, 2, [100, 102, 104, 106])
+        procCompare(s, 4, [100, 104, 108, 112])
+        procCompare(s, 1.5, [100, 101.5, 103.0, 104.5])
+        procCompare(s, .5, [100, 100.5, 101.0, 101.5])
+        procCompare(s, .25, [100, 100.25, 100.5, 100.75])
+
+        # test non equally spaced notes starting at zero
+        s = stream.Stream()
+        n1 = note.Note()
+        n1.quarterLength = 1
+        s.repeatInsert(n, range(0, 30, 3))
+        n2 = note.Note()
+        n2.quarterLength = 2
+        s.repeatInsert(n, range(1, 30, 3))
+        # procCompare will  sort offsets; this test non sorted operation
+        procCompare(s, 1, [0.0, 1.0, 3.0, 4.0, 6.0, 7.0])
+        procCompare(s, .5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
+        procCompare(s, 2, [0.0, 2.0, 6.0, 8.0, 12.0, 14.0])
+
+        # test non equally spaced notes starting at non-zero
+        s = stream.Stream()
+        n1 = note.Note()
+        n1.quarterLength = 1
+        s.repeatInsert(n, range(100, 130, 3))
+        n2 = note.Note()
+        n2.quarterLength = 2
+        s.repeatInsert(n, range(101, 130, 3))
+        # procCompare will  sort offsets; this test non sorted operation
+        procCompare(s, 1, [100.0, 101.0, 103.0, 104.0, 106.0, 107.0])
+        procCompare(s, .5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
+        procCompare(s, 2, [100.0, 102.0, 106.0, 108.0, 112.0, 114.0])
+        procCompare(s, 6, [100.0, 106.0, 118.0, 124.0, 136.0, 142.0])
+
+
+
+
+    def testScaleOffsetsNested(self):
+        '''
+        '''
+        from music21 import note, stream
+
+
+        def offsetMap(s): # lists of offsets, with lists of lists
+            post = []
+            for e in s:
+                sub = []
+                sub.append(e.offset)
+                if hasattr(e, 'elements'):
+                    sub.append(offsetMap(e))
+                post.append(sub)
+            return post
+            
+
+        def procCompare(s, scalar, match):
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            sNew = s.scaleOffsets(scalar, inPlace=False)
+            oListPost = [e.offset for e in sNew]
+            oListPost.sort()
+
+            environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+
+        # test equally spaced half notes starting at zero
+        n1 = note.Note()
+        n1.quarterLength = 2
+        s1 = stream.Stream()
+        s1.repeatAppend(n1, 4)
+
+        n2 = note.Note()
+        n2.quarterLength = .5
+        s2 = stream.Stream()
+        s2.repeatAppend(n2, 4)
+        s1.append(s2)
+
+        # offset map gives us a nested list presentation of all offsets
+        # usefulfor testing
+        self.assertEquals(offsetMap(s1), [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
+
+        # provide start of resulting values
+        # half not spacing becomes whole note spacing
+        #procCompare(s, 2, [0.0, 4.0, 8.0])
+        #procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
+
+
 
 
         
@@ -6919,3 +7018,4 @@ if __name__ == "__main__":
         #a.testMakeAccidentalsWithKeysInMeasures()
 
         a.testScaleOffsetsBasic()
+        a.testScaleOffsetsNested()
