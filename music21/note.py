@@ -641,7 +641,40 @@ class GeneralNote(music21.Music21Object):
     quarterLength = property(_getQuarterLength, _setQuarterLength)
 
 
+    def augmentOrDiminish(self, scalar, inPlace=True):
+        '''Given a scalar greater than zero, return a Note with a scaled Duration. 
 
+        >>> n = Note('g#')
+        >>> n.quarterLength = 3
+        >>> n.augmentOrDiminish(2)
+        >>> n.quarterLength
+        6
+
+        >>> from music21 import chord
+        >>> c = chord.Chord(['g#','A#','d'])
+        >>> n.quarterLength = 2
+        >>> n.augmentOrDiminish(.25)
+        >>> n.quarterLength
+        0.5
+        '''
+        if not scalar > 0:
+            raise DurationException('scalar must be greater than zero')
+
+        if inPlace:
+            post = self
+        else:
+            post = copy.deepcopy(self)
+
+        # inPlace always True b/c we have already made a copy if necessary
+        post.duration.augmentOrDiminish(scalar, inPlace=True)
+
+        if not inPlace:
+            return post
+        else:
+            return None
+
+
+    #---------------------------------------------------------------------------
     def _getMusicXML(self):
         '''This must call _getMX to get basic mxNote objects
         '''

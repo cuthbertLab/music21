@@ -938,7 +938,8 @@ class Tuplet(object):
 
 
     def augmentOrDiminish(self, scalar, inPlace=True):
-        '''
+        '''Given a scalar greater than zero, return a scaled version of this Duration.
+
         >>> a = Tuplet()
         >>> a.setRatio(6,2)
         >>> a.tupletMultiplier()
@@ -959,7 +960,7 @@ class Tuplet(object):
             post = self
             self.frozen = False # have to unfreeze
         else:
-            post = copy.deepcopy()
+            post = copy.deepcopy(self)
 
         # duration units scale
         post.durationActual.augmentOrDiminish(scalar, inPlace=True)
@@ -2128,7 +2129,7 @@ class Duration(DurationCommon):
 
 
     def augmentOrDiminish(self, scalar, retainComponents=False, inPlace=True):
-        '''Given a scalar greater than one, return a scaled version of this duration.
+        '''Given a scalar greater than zero, return a scaled version of this duration.
 
         >>> aDur = Duration()
         >>> aDur.quarterLength = 1.5 # dotted quarter

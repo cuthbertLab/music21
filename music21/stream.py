@@ -3169,6 +3169,8 @@ class Stream(music21.Music21Object):
 
         The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
 
+        The `anchorZeroRecurse` parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to 'lowest' will not alter the space between the start of that Stream and the first element to be scaled. 
+
         To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
 
         >>> from music21 import note
@@ -3209,8 +3211,7 @@ class Stream(music21.Music21Object):
             o = (e.offset - offsetShift) * scalar
             # after scaling, return the shift taken away
             o += offsetShift
-            e.offset = o # reassing
-
+            e.offset = o # reassign
             # need to look for embedded Streams, and call this method
             # on them, with inPlace == True, as already copied if 
             # inPlace is != True
@@ -3225,7 +3226,16 @@ class Stream(music21.Music21Object):
     def scaleDurations(self, scalar):
         '''Scale all durations by a provided scalar.
         '''
-        pass
+        for e in returnObj._elements:
+            if hasattr(e, 'duration'):
+                # check if its a Stream, first, as duration is dependent
+                # and do not want to override
+                if hasattr(e, "elements"): # recurse time:
+                    e.scaleDurations(scalar)
+                else:            
+                    if e.duration != None:
+                        e.duration.augmentOrDiminish(scalar)
+
 
     def augmentOrDiminish(self, scalar):
         '''Scale this Stream by a provided scalar. 
@@ -6996,7 +7006,6 @@ class Test(unittest.TestCase):
         s1.append(copy.deepcopy(s2))
         s1.append(copy.deepcopy(s2))
 
-
         # note that, with these nested streams, 
         # the first value of an embeded stream stays in the same 
         # position relative to that stream. 
@@ -7038,7 +7047,6 @@ class Test(unittest.TestCase):
 
         # if anchorZeroRecurse is None, embedded stream that do not
         # start at zero are scaled proportionally
-
         procCompare(s1, .25, None, 
         [[10.0], [11.0], [11.25], [11.75], 
             [12.0, [[10.0], [10.125], [10.25], [10.375]]], 
@@ -7046,7 +7054,17 @@ class Test(unittest.TestCase):
             [33.0, [[10.0], [10.125], [10.25], [10.375]]]] 
         )
 
-        
+
+    def testScaleDurationsBasic(self, x):
+        '''Scale some durations, independent of offsets. 
+        '''
+        import note
+        n1 = note.Note()
+        n1.quarterLength = 3
+        n1
+
+
+
     def xtestMultipleReferencesOneStream(self):
         '''Test having multiple references of the same element in a single Stream.
         '''
