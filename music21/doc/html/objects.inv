@@ -833,6 +833,7 @@ music21.stream.Stream.lowestOffset attribute moduleStream.html
 music21.chord.Chord.isMajorTriad method moduleChord.html
 music21.serial.RowBergViolinConcerto class moduleSerial.html
 music21.base.Music21Object.priority attribute moduleBase.html
+music21.note.GeneralNote.augmentOrDiminish method moduleNote.html
 music21.chord.Chord.pitchedCommonName attribute moduleChord.html
 music21.stream.Stream.isSequence method moduleStream.html
 music21.base.DefinedContexts.get method moduleBase.html

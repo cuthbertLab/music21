@@ -526,7 +526,7 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dl class="method">
 <dt id="music21.duration.Duration.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>retainComponents=False</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a scalar greater than one, return a scaled version of this duration.</p>
+<dd><p>Given a scalar greater than zero, return a scaled version of this duration.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c"># dotted quarter</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -774,7 +774,8 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dl class="method">
 <dt id="music21.duration.Tuplet.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<dd><p>Given a scalar greater than zero, return a scaled version of this Duration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
 <span class="go">0.333...</span>
@@ -1151,7 +1152,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 15, 2010.
+      Last updated on May 17, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

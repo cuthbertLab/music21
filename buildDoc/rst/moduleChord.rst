@@ -641,7 +641,7 @@ Chord
 
         Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

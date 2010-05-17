@@ -367,7 +367,7 @@ Stream
             >>> a[0].flat.attributeCount(note.Note, 'quarterLength')
             {1.0: 12, 2.0: 11, 4.0: 2} 
 
-        .. method:: augmentOrDiminish(scalar)
+        .. method:: augmentOrDiminish(scalar, inPlace=True)
 
             Scale this Stream by a provided scalar. 
 
@@ -953,9 +953,9 @@ Stream
             >>> sMeasures[0].timeSignature
             <music21.meter.TimeSignature 4/4> 
 
-        .. method:: makeRests(refStream=None, inPlace=True)
+        .. method:: makeRests(refStreamOrTimeRange=None, inPlace=True)
 
-            Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream. 
+            Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. 
 
             >>> a = Stream()
             >>> a.insert(20, note.Note())
@@ -1099,13 +1099,13 @@ Stream
 
             Given a `target` object, replace all references of that object with references to the supplied `replacement` object. If `allTargetSites` is True, all sites that have a reference for the relacement will be similarly changed. This is useful altering both a flat and nested representation. 
 
-        .. method:: scaleDurations(scalar)
+        .. method:: scaleDurations(scalar, inPlace=True)
 
             Scale all durations by a provided scalar. 
 
-        .. method:: scaleOffsets(scalar, anchorZero=lowest, inPlace=True)
+        .. method:: scaleOffsets(scalar, anchorZero=lowest, anchorZeroRecurse=None, inPlace=True)
 
-            Scale all offsets by a provided scalar. The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
+            Scale all offsets by a provided scalar. The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". The `anchorZeroRecurse` parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to 'lowest' will not alter the space between the start of that Stream and the first element to be scaled. To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
 
             >>> from music21 import note
             >>> n = note.Note()

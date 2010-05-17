@@ -470,7 +470,7 @@ flattening the stream is not required:</p>
 
 <dl class="method">
 <dt id="music21.stream.Stream.augmentOrDiminish">
-<tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
 <dd>Scale this Stream by a provided scalar.</dd></dl>
 
 <dl class="method">
@@ -1129,8 +1129,8 @@ flattening the stream is not required:</p>
 
 <dl class="method">
 <dt id="music21.stream.Stream.makeRests">
-<tt class="descname">makeRests</tt><big>(</big><em>refStream=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeRests" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a streamObj with an  with an offset not equal to zero, fill with one Rest preeceding this offset. If refStream is provided, this is used to get min and max offsets. Rests will be added to fill all time defined within refStream.</p>
+<tt class="descname">makeRests</tt><big>(</big><em>refStreamOrTimeRange=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeRests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If <cite>refStreamOrTimeRange</cite> is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1307,13 +1307,13 @@ flattening the stream is not required:</p>
 
 <dl class="method">
 <dt id="music21.stream.Stream.scaleDurations">
-<tt class="descname">scaleDurations</tt><big>(</big><em>scalar</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.scaleDurations" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">scaleDurations</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.scaleDurations" title="Permalink to this definition">¶</a></dt>
 <dd>Scale all durations by a provided scalar.</dd></dl>
 
 <dl class="method">
 <dt id="music21.stream.Stream.scaleOffsets">
-<tt class="descname">scaleOffsets</tt><big>(</big><em>scalar</em>, <em>anchorZero=lowest</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.scaleOffsets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scale all offsets by a provided scalar. The <cite>anchorZero</cite> parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), &#8220;lowest&#8221;, or &#8220;highest&#8221;. To shift all the elements in a Stream, see the <a title="music21.stream.Stream.shiftElements" class="reference internal" href="#music21.stream.Stream.shiftElements"><tt class="xref docutils literal"><span class="pre">shiftElements()</span></tt></a> method.</p>
+<tt class="descname">scaleOffsets</tt><big>(</big><em>scalar</em>, <em>anchorZero=lowest</em>, <em>anchorZeroRecurse=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.scaleOffsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale all offsets by a provided scalar. The <cite>anchorZero</cite> parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), &#8220;lowest&#8221;, or &#8220;highest&#8221;. The <cite>anchorZeroRecurse</cite> parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to &#8216;lowest&#8217; will not alter the space between the start of that Stream and the first element to be scaled. To shift all the elements in a Stream, see the <a title="music21.stream.Stream.shiftElements" class="reference internal" href="#music21.stream.Stream.shiftElements"><tt class="xref docutils literal"><span class="pre">shiftElements()</span></tt></a> method.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
@@ -1772,7 +1772,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 15, 2010.
+      Last updated on May 17, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
