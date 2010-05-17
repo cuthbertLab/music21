@@ -3163,7 +3163,8 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def scaleOffsets(self, scalar, anchorZero='lowest', inPlace=True):
+    def scaleOffsets(self, scalar, anchorZero='lowest', 
+            anchorZeroRecurse=None, inPlace=True):
         '''Scale all offsets by a provided scalar.
 
         The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
@@ -3214,7 +3215,8 @@ class Stream(music21.Music21Object):
             # on them, with inPlace == True, as already copied if 
             # inPlace is != True
             if hasattr(e, "elements"): # recurse time:
-                e.scaleOffsets(scalar, anchorZero=anchorZero, inPlace=True)
+                e.scaleOffsets(scalar, anchorZero=anchorZeroRecurse, anchorZeroRecurse=anchorZeroRecurse,
+                inPlace=True)
 
         returnObj._elementsChanged() 
         return returnObj
@@ -6939,11 +6941,12 @@ class Test(unittest.TestCase):
             return post
             
 
-        def procCompare(s, scalar, match):
-            oListSrc = [e.offset for e in s]
+        def procCompare(s, scalar, anchorZeroRecurse, match):
+            oListSrc = offsetMap(s)
             oListSrc.sort()
-            sNew = s.scaleOffsets(scalar, inPlace=False)
-            oListPost = [e.offset for e in sNew]
+            sNew = s.scaleOffsets(scalar, anchorZeroRecurse=anchorZeroRecurse, 
+                                  inPlace=False)
+            oListPost = offsetMap(sNew)
             oListPost.sort()
 
             environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
@@ -6964,15 +6967,84 @@ class Test(unittest.TestCase):
 
         # offset map gives us a nested list presentation of all offsets
         # usefulfor testing
-        self.assertEquals(offsetMap(s1), [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
+        self.assertEquals(offsetMap(s1),
+        [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
 
         # provide start of resulting values
         # half not spacing becomes whole note spacing
-        #procCompare(s, 2, [0.0, 4.0, 8.0])
-        #procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
+        procCompare(s1, 2, 'lowest', 
+        [[0.0], [4.0], [8.0], [12.0], [16.0, [[0.0], [1.0], [2.0], [3.0]]]]
+        )
+        procCompare(s1, 4, 'lowest', 
+        [[0.0], [8.0], [16.0], [24.0], [32.0, [[0.0], [2.0], [4.0], [6.0]]]] 
+        )
+        procCompare(s1, .25, 'lowest', 
+        [[0.0], [0.5], [1.0], [1.5], [2.0, [[0.0], [0.125], [0.25], [0.375]]]]
+        )
+
+        # test unequally spaced notes starting at non-zero
+        n1 = note.Note()
+        n1.quarterLength = 1
+        s1 = stream.Stream()
+        s1.repeatInsert(n1, [10,14,15,17])
+
+        n2 = note.Note()
+        n2.quarterLength = .5
+        s2 = stream.Stream()
+        s2.repeatInsert(n2, [40,40.5,41,41.5])
+        s1.append(s2)
+        s1.append(copy.deepcopy(s2))
+        s1.append(copy.deepcopy(s2))
 
 
+        # note that, with these nested streams, 
+        # the first value of an embeded stream stays in the same 
+        # position relative to that stream. 
 
+        # it might be necessary, in this case, to scale the start
+        # time of the first elemen
+        # that is, it should have no shift
+
+        # provide anchorZeroRecurse value
+        self.assertEquals(offsetMap(s1),
+        [[10.0], [14.0], [15.0], [17.0], 
+            [18.0, [[40.0], [40.5], [41.0], [41.5]]], 
+            [60.0, [[40.0], [40.5], [41.0], [41.5]]], 
+            [102.0, [[40.0], [40.5], [41.0], [41.5]]]]
+        )
+
+        procCompare(s1, 2, 'lowest', 
+        [[10.0], [18.0], [20.0], [24.0], 
+            [26.0, [[40.0], [41.0], [42.0], [43.0]]], 
+            [110.0, [[40.0], [41.0], [42.0], [43.0]]], 
+            [194.0, [[40.0], [41.0], [42.0], [43.0]]]]
+        )
+
+        # if anchorZeroRecurse is None, embedded stream that do not
+        # start at zero are scaled proportionally
+        procCompare(s1, 2, None, 
+        [[10.0], [18.0], [20.0], [24.0], 
+            [26.0, [[80.0], [81.0], [82.0], [83.0]]], 
+            [110.0, [[80.0], [81.0], [82.0], [83.0]]], 
+            [194.0, [[80.0], [81.0], [82.0], [83.0]]]] 
+        )
+
+        procCompare(s1, .25, 'lowest', 
+        [[10.0], [11.0], [11.25], [11.75], 
+            [12.0, [[40.0], [40.125], [40.25], [40.375]]], 
+            [22.5, [[40.0], [40.125], [40.25], [40.375]]], 
+            [33.0, [[40.0], [40.125], [40.25], [40.375]]]] 
+        )
+
+        # if anchorZeroRecurse is None, embedded stream that do not
+        # start at zero are scaled proportionally
+
+        procCompare(s1, .25, None, 
+        [[10.0], [11.0], [11.25], [11.75], 
+            [12.0, [[10.0], [10.125], [10.25], [10.375]]], 
+            [22.5, [[10.0], [10.125], [10.25], [10.375]]], 
+            [33.0, [[10.0], [10.125], [10.25], [10.375]]]] 
+        )
 
         
     def xtestMultipleReferencesOneStream(self):
