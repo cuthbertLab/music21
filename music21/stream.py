@@ -2180,12 +2180,11 @@ class Stream(music21.Music21Object):
         return post # returns a new stream populated w/ new measure streams
 
 
-    def makeRests(self, refStream=None, inPlace=True):
-        '''Given a streamObj with an  with an offset not equal to zero, 
+    def makeRests(self, refStreamOrTimeRange=None, inPlace=True):
+        '''Given a Stream with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
     
-        If refStream is provided, this is used to get min and max offsets. Rests 
-        will be added to fill all time defined within refStream.
+        If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream.
         
         >>> a = Stream()
         >>> a.insert(20, note.Note())
@@ -2211,14 +2210,22 @@ class Stream(music21.Music21Object):
     
         oLow = returnObj.lowestOffset
         oHigh = returnObj.highestTime
-        if refStream is not None:
-            oLowTarget = refStream.lowestOffset
-            oHighTarget = refStream.highestTime
-            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStream)])
-        else:
+
+
+        if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
             oHighTarget = returnObj.highestTime
-            
+
+        elif isinstance(refStreamOrTimeRange, Stream):
+            oLowTarget = refStreamOrTimeRange.lowestOffset
+            oHighTarget = refStreamOrTimeRange.highestTime
+            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
+        # treat as a list
+        elif common.isListLike(refStreamOrTimeRange):
+            oLowTarget = min(refStreamOrTimeRange)
+            oHighTarget = max(refStreamOrTimeRange)
+            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
+
         qLen = oLow - oLowTarget
         if qLen > 0:
             r = note.Rest()
@@ -3223,24 +3230,47 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def scaleDurations(self, scalar):
+    def scaleDurations(self, scalar, inPlace=True):
         '''Scale all durations by a provided scalar.
         '''
+        if not scalar > 0:
+            raise StreamException('scalar must be greater than zero')
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
         for e in returnObj._elements:
-            if hasattr(e, 'duration'):
-                # check if its a Stream, first, as duration is dependent
-                # and do not want to override
-                if hasattr(e, "elements"): # recurse time:
-                    e.scaleDurations(scalar)
-                else:            
-                    if e.duration != None:
-                        e.duration.augmentOrDiminish(scalar)
+            # check if its a Stream, first, as duration is dependent
+            # and do not want to override
+            if hasattr(e, "elements"): # recurse time:
+                e.scaleDurations(scalar)
+            elif hasattr(e, 'duration'):
+                if e.duration != None:
+                    # inPlace is True as a  copy has already been made if nec
+                    e.duration.augmentOrDiminish(scalar, inPlace=True)
+
+        returnObj._elementsChanged() 
+        return returnObj
 
 
-    def augmentOrDiminish(self, scalar):
+    def augmentOrDiminish(self, scalar, inPlace=True):
         '''Scale this Stream by a provided scalar. 
         '''
-        pass
+        if not scalar > 0:
+            raise StreamException('scalar must be greater than zero')
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        # inPlace is True as a copy has already been made if nec
+        returnObj.scaleOffsets(scalar=scalar, anchorZero='lowest', 
+            anchorZeroRecurse=None, inPlace=True)
+        returnObj.scaleDurations(scalar=scalar, inPlace=True)
+    
+        # do not need to call elements changed, as called in sub mmethod
+        return returnObj
 
 
     #---------------------------------------------------------------------------
@@ -7055,30 +7085,115 @@ class Test(unittest.TestCase):
         )
 
 
-    def testScaleDurationsBasic(self, x):
+    def testScaleDurationsBasic(self):
         '''Scale some durations, independent of offsets. 
         '''
         import note
+
+        def procCompare(s, scalar, match):
+            oListSrc = [e.quarterLength for e in s]
+            sNew = s.scaleDurations(scalar, inPlace=False)
+            oListPost = [e.quarterLength for e in sNew]
+            self.assertEqual(oListPost[:len(match)], match)
+
         n1 = note.Note()
-        n1.quarterLength = 3
-        n1
+        n1.quarterLength = .5
+        s1 = Stream()
+        s1.repeatInsert(n1, range(6))
+
+        # test inPlace v/ not inPlace
+        sNew = s1.scaleDurations(2, inPlace=False)
+        self.assertEqual([e.duration.quarterLength for e in s1], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+        self.assertEqual([e.duration.quarterLength for e in sNew], [1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+        # basic test
+        procCompare(s1, .5, [0.25, 0.25, 0.25])
+        procCompare(s1, 3, [1.5, 1.5, 1.5])
+
+        # a sequence of Durations of different values
+        s1 = Stream()
+        for ql in [.5, 1.5, 2, 3, .25, .25, .5]:
+            n = note.Note('g')
+            n.quarterLength = ql
+            s1.append(n)
+
+        procCompare(s1, .5, [0.25, 0.75, 1.0, 1.5, 0.125, 0.125, 0.25] )
+        procCompare(s1, .25, [0.125, 0.375, 0.5, 0.75, 0.0625, 0.0625, 0.125] )
+        procCompare(s1, 4, [2.0, 6.0, 8, 12, 1.0, 1.0, 2.0])
+         
 
 
 
-    def xtestMultipleReferencesOneStream(self):
-        '''Test having multiple references of the same element in a single Stream.
+    def testAugmentOrDiminishBasic(self):
+
+        def procCompare(s, scalar, matchOffset, matchDuration):
+            oListSrc = [e.offset for e in s]
+            qlListSrc = [e.quarterLength for e in s]
+
+            sNew = s.augmentOrDiminish(scalar, inPlace=False)
+            oListPost = [e.offset for e in sNew]
+            qlListPost = [e.quarterLength for e in sNew]
+
+            self.assertEqual(oListPost[:len(matchOffset)], matchOffset)
+            self.assertEqual(qlListPost[:len(matchDuration)], matchDuration)
+
+            # test making measures on this 
+            post = sNew.makeMeasures()
+            #sNew.show()
+
+        # a sequence of Durations of different values
+        s1 = Stream()
+        for ql in [.5, 1.5, 2, 3, .25, .25, .5]:
+            n = note.Note('g')
+            n.quarterLength = ql
+            s1.append(n)
+
+        # provide offsets, then durations
+        procCompare(s1, .5, 
+            [0.0, 0.25, 1.0, 2.0, 3.5, 3.625, 3.75] ,
+            [0.25, 0.75, 1.0, 1.5, 0.125, 0.125, 0.25] )
+
+        procCompare(s1, 1.5, 
+            [0.0, 0.75, 3.0, 6.0, 10.5, 10.875, 11.25]  ,
+            [0.75, 2.25, 3.0, 4.5, 0.375, 0.375, 0.75] )
+
+        procCompare(s1, 3, 
+            [0.0, 1.5, 6.0, 12.0, 21.0, 21.75, 22.5]  ,
+            [1.5, 4.5, 6, 9, 0.75, 0.75, 1.5]  )
+
+
+
+    def testAugmentOrDiminishCorpus(self):
+        '''Extact phrases from the corpus and use for testing 
         '''
+
+        from music21 import corpus
+
+        src = corpus.parseWork('bach/bwv324.xml')
+        # get some measures of the soprano; just get the notes
+        ex = src[0].flat.notes[0:30]
+
+        ex.show('t')
+
+        # attach a couple of transoformations
+
         s = Stream()
-        n1 = note.Note('g')
-        n2 = note.Note('g#')
+        for scalar in [.5, 1.5, 2, .25]:
+            #n = note.Note()
+            part = Part()
+            #part.append(n)
 
-        # TODO: this is a problem as presently an object can only have one 
-        # offset for one site
-        s.insert(0, n1)
+            # for some reason must iterate through notes and re-assing
+            # direct use of the output stream is not working yet
+            for n in ex.augmentOrDiminish(scalar, inPlace=False):
+                part.append(n)
+            part.offset = 0
+            s.insert(part)
+        
+        #s.show()
+        
 
-        self.assertRaises(StreamException,  s.insert, 10, n1)
 
-       
 
 
 #-------------------------------------------------------------------------------
@@ -7107,5 +7222,11 @@ if __name__ == "__main__":
 
         #a.testMakeAccidentalsWithKeysInMeasures()
 
-        a.testScaleOffsetsBasic()
-        a.testScaleOffsetsNested()
+        #a.testScaleOffsetsBasic()
+        #a.testScaleOffsetsNested()
+
+        #a.testScaleDurationsBasic()
+
+        a.testAugmentOrDiminishBasic()
+        a.testAugmentOrDiminishCorpus()
+
