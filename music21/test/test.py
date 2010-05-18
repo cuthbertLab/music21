@@ -44,8 +44,6 @@ class ModuleGather(object):
             'timeGraphs.py',
             'exceldiff.py', 
 
-            # temporary 
-            'windowedAnalysis.py',          
             ]
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 'xlrd']

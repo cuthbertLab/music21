@@ -43,12 +43,24 @@ class WindowedAnalysis(object):
 
     def _prepWindow(self):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv324')
+        >>> p = SadoianAmbitus()
+        >>> # placing one part into analysis
+        >>> wa = WindowedAnalysis(s[0], p)
+        >>> post = wa._prepWindow()
+        >>> len(post.measures)
+        36
+        >>> len(post.measures[0])
+        6
+        >>> len(post.measures[1])
+        1
         '''
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
-        ''' makeTies() splits the durations into proper measure boundaries for analysis
-        '''
+        # makeTies() splits the durations into proper measure boundaries for analysis
         return self.streamObj.makeMeasures(meterStream).makeTies()
 
 
@@ -132,8 +144,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         
-        ''' store color grid information to associate particular keys to colors
-        '''
+        # store color grid information to associate particular keys to colors
+        
         self.majorKeyColors = {'Eb':'#D60000',
                  'E':'#FF0000',
                  'E#':'#FF2B00',
@@ -180,9 +192,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     def _getWeights(self, isMajor): 
         ''' Returns either the major or minor key profile as described by Sapp
             
-        >>> _getWeights(True)
+        >>> a = KrumhanslSchmuckler()
+        >>> a._getWeights(True)
         [6.3499999999999996, 2.3300000000000001, 3.48, 2.3300000000000001, 4.3799999999999999, 4.0899999999999999, 2.52, 5.1900000000000004, 2.3900000000000001, 3.6600000000000001, 2.29, 2.8799999999999999]
-        >>> _getWeights(False)
+        >>> a._getWeights(False)
         [6.3300000000000001, 2.6800000000000002, 3.52, 5.3799999999999999, 2.6000000000000001, 3.5299999999999998, 2.54, 4.75, 3.98, 2.6899999999999999, 3.3399999999999999, 3.1699999999999999]
             
         '''
