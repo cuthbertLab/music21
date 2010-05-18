@@ -2536,6 +2536,36 @@ class Stream(music21.Music21Object):
 
 
 
+    def prepareNotation(self, meterStream=None, refStream=None, inPlace=False):
+        '''Call a sequence of methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, etc. 
+        '''
+
+        # only use inPlace arg on first usage
+        measureStream = self.makeMeasures(meterStream=meterStream,
+            refStream=refStream, inPlace=inPlace)
+
+        #environLocal.printDebug(['Stream.prepareNotation(): post makeMeasures, length', len(measureStream)])
+
+        # for now, calling makeAccidentals once per measures       
+        # pitches from last measure are passed
+        # this needs to be called before makeTies
+        for i in range(len(measureStream)):
+            m = measureStream[i]
+            if i > 0:
+                m.makeAccidentals(measureStream[i-1].pitches)
+            else:
+                m.makeAccidentals()
+
+        measureStream.makeTies(meterStream, inPlace=True)
+        measureStream.makeBeams(inPlace=True)
+
+        if len(measureStream) == 0:            
+            raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
+        environLocal.printDebug(['Stream.prepareNotation(): created measures:', len(measureStream)])
+
+        return measureStream
+
+
 
     def extendDuration(self, objName, inPlace=True):
         '''Given a Stream and an object class name, go through the Stream and find each instance of the desired object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to extend to the end of the Stream.
@@ -2936,8 +2966,8 @@ class Stream(music21.Music21Object):
             self._cache["HighestOffset"] = max
         return self._cache["HighestOffset"]
 
-    highestOffset = property(_getHighestOffset, doc='''
-        Get start time of element with the highest offset in the Stream.
+    highestOffset = property(_getHighestOffset, 
+        doc='''Get start time of element with the highest offset in the Stream.
         Note the difference between this property and highestTime
         which gets the end time of the highestOffset
 
@@ -3365,33 +3395,11 @@ class Stream(music21.Music21Object):
         if len(measureStream) == 0:
             # try to add measures if none defined
             # returns a new stream w/ new Measures but the same objects
-
-            #environLocal.printDebug('\nStream._getMXPart: pre makeMeasures')
-            #environLocal.printDebug([self.getClefs()[0]])
-
-            measureStream = self.makeMeasures(meterStream, refStream)
-            #environLocal.printDebug(['Stream._getMXPart: post makeMeasures, length', len(measureStream)])
-
-            # for now, calling makeAccidentals once per measures       
-            # pitches from last measure are passed
-            # this needs to be called before makeTies
-            for i in range(len(measureStream)):
-                m = measureStream[i]
-                if i > 0:
-                    m.makeAccidentals(measureStream[i-1].pitches)
-                else:
-                    m.makeAccidentals()
-
-            measureStream = measureStream.makeTies(meterStream)
-            measureStream = measureStream.makeBeams()
-
-            if len(measureStream) == 0:            
-                raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
-            environLocal.printDebug(['created measures:', len(measureStream)])
+            measureStream = self.prepareNotation(meterStream=meterStream,
+                            refStream=refStream)
+            #environLocal.printDebug(['Stream._getMXPart: post prepareNotation, length', len(measureStream)])
         else: # there are measures
-            # this will override beams already set
             pass
-            # measureStream = makeBeams(measureStream)
 
         # for each measure, call .mx to get the musicxml representation
         for obj in measureStream:
@@ -3476,7 +3484,7 @@ class Stream(music21.Music21Object):
                 # used to move into a final Stream: no longer necessary
                 #finalStream.insert(obj)
 
-            environLocal.printDebug(['handling multi-part Stream of length:',
+            environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:',
                                     len(partStream)])
             count = 0
             for obj in partStream.getElementsByClass(Stream):
@@ -3495,7 +3503,7 @@ class Stream(music21.Music21Object):
                                 refStream))
 
         else: # assume this is the only part
-            environLocal.printDebug('handling single-part Stream')
+            environLocal.printDebug('Stream._getMX(): handling single-part Stream')
             # if no instrument is provided it will be obtained through self
             # when _getMxPart is called
             mxComponents.append(self._getMXPart(None, meterStream))
@@ -7147,6 +7155,12 @@ class Test(unittest.TestCase):
             self.assertEqual(oListPost[:len(matchOffset)], matchOffset)
             self.assertEqual(qlListPost[:len(matchDuration)], matchDuration)
 
+            # test that the last offset is the highest offset
+            self.assertEqual(matchOffset[-1], sNew.highestOffset)
+            self.assertEqual(matchOffset[-1]+matchDuration[-1], 
+                sNew.highestTime)
+
+
             # test making measures on this 
             post = sNew.makeMeasures()
             #sNew.show()
@@ -7173,6 +7187,30 @@ class Test(unittest.TestCase):
 
 
 
+
+    def testAugmentOrDiminishHighestTimes(self):
+        '''Need to make sure that highest offset and time are properly updated
+        '''
+        from music21 import corpus
+        src = corpus.parseWork('bach/bwv324.xml')
+        # get some measures of the soprano; just get the notes
+        ex = src[0].flat.notes[0:30]
+
+        self.assertEqual(ex.highestOffset, 32.0)
+        self.assertEqual(ex.highestTime, 36.0)
+
+        # try first when doing this not in place
+        newEx = ex.augmentOrDiminish(2, inPlace=False)
+        self.assertEqual(newEx.highestOffset, 64.0)
+        self.assertEqual(newEx.highestTime, 72.0)
+
+        # try in place
+        ex.augmentOrDiminish(2, inPlace=True)
+        self.assertEqual(ex.highestOffset, 64.0)
+        self.assertEqual(ex.highestTime, 72.0)
+
+        
+
     def testAugmentOrDiminishCorpus(self):
         '''Extact phrases from the corpus and use for testing 
         '''
@@ -7185,8 +7223,7 @@ class Test(unittest.TestCase):
 
         ex.show('t')
 
-        # attach a couple of transoformations
-
+        # attach a couple of transformations
         s = Stream()
         for scalar in [.5, 1.5, 2, .25]:
             #n = note.Note()
@@ -7238,5 +7275,6 @@ if __name__ == "__main__":
         #a.testScaleDurationsBasic()
 
         a.testAugmentOrDiminishBasic()
+        a.testAugmentOrDiminishHighestTimes()
         a.testAugmentOrDiminishCorpus()
 

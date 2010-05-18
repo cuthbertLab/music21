@@ -80,15 +80,26 @@ class WindowedAnalysis(object):
         else:
             max = maxWindow
         
-        ''' array set to the size of the expected resulting set
-        '''
-        solutionMatrix = [0]*((max-minWindow+1)/windowStepSize)
-        color = [0]*((max-minWindow+1)/windowStepSize)
+        #array set to the size of the expected resulting set
+        solutionSize = (max-minWindow+1) / windowStepSize
+
+        solutionMatrix = [0] * solutionSize
+        color = [0] * solutionSize
         
-        #environLocal.printDebug("-----WORKING... window-----")
+
         for i in range(minWindow, max+1, windowStepSize):
-            #environLocal.printDebug(i)
-            solutionMatrix[(i-minWindow)/windowStepSize], color[(i-minWindow)/windowStepSize] = self._singleWindowAnalysis(i, windowedStream) 
+            # where to add data
+            pos = (i-minWindow)/windowStepSize
+
+            environLocal.printDebug(['processing window:', i, 'storing data:', pos])
+
+            soln, colorn = self._singleWindowAnalysis(i, windowedStream) 
+
+            if pos >= solutionSize:
+                environLocal.printDebug(['cannot fit data; position, solutionSize', pos, solutionSize])
+            else:
+                solutionMatrix[pos] = soln
+                color[pos] = colorn
         
         return solutionMatrix, color
 
@@ -303,8 +314,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
         
 
-        ''' find the largest correlation value to use to select major or minor as the resulting key
-        '''
+        #find the largest correlation value to use to select major or minor as the resulting key
         if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
             likelyKey = (str(likelyKeysMajor[0][0]), "Major", likelyKeysMajor[0][1])
         else:
@@ -314,9 +324,13 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         color = self.resultsToColor(likelyKey[0], likelyKey[1])
         return likelyKey, color        
     
-    
+
+
+
+
 class SadoianAmbitus(DiscreteAnalysis):
-    
+    '''An basic analysis method for measuring register. 
+    '''
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         

@@ -1325,7 +1325,7 @@ class PlotColorGrid(PlotStream):
 class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
     '''Subclass for plotting Krumhansl-Schmuckler analysis routine
     '''
-    format = ''
+    format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
         PlotColorGrid.__init__(self, streamObj, windowedAnalysis.KrumhanslSchmuckler(), *args, **keywords)
@@ -1334,7 +1334,7 @@ class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
 class PlotColorGridSadoianAmbitus(PlotColorGrid):
     '''Subclass for plotting basic pitch span over a windowed analysis
     '''
-    format = ''
+    format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
         PlotColorGrid.__init__(self, streamObj, windowedAnalysis.SadoianAmbitus(), *args, **keywords)
