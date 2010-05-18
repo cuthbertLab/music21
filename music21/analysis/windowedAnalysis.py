@@ -18,7 +18,7 @@ import music21
 
 from music21 import meter
 from music21.pitch import Pitch
-from music21.stream import Stream
+from music21 import stream 
 
 
 from music21 import environment
@@ -57,30 +57,57 @@ class WindowedAnalysis(object):
         >>> len(post.measures[1])
         1
         '''
-        meterStream = Stream()
+        meterStream = stream.Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
         # makeTies() splits the durations into proper measure boundaries for analysis
-        return self.streamObj.makeMeasures(meterStream).makeTies()
+        return self.streamObj.makeMeasures(meterStream).makeTies(inPlace=True)
 
 
     def _singleWindowAnalysis(self, windowSize, windowedStream):
-        ''' Handles calling single window analysis method for each window of a particular window size
+        ''' Handles calling single window analysis method for each window of a particular window size. 
+
+        Windows are assumed to be partitioned by :class:`music21.stream.Measure` objects.
         '''
         max = len(windowedStream.measures)
-        key = [0] * (max - windowSize + 1)
+        data = [0] * (max - windowSize + 1)
         color = [0] * (max - windowSize + 1)               
         
         for i in range(max-windowSize + 1):
-            current = windowedStream.getMeasureRange(i, i+windowSize, collect=[]).flat
-            key[i], color[i] = self.processor.process(current)
+            # getting a range of Measures to be used as windows
+            # collect is set to [] so that clefs, timesignatures, and other
+            # objects are not gathered. 
+            # a flat representation removes all Streams, returning only 
+            # Notes, Chords, etc.
+            current = windowedStream.getMeasureRange(i, 
+                      i+windowSize, collect=[]).flat
+            # current is a Stream for analysis
+            data[i], color[i] = self.processor.process(current)
              
-        return key, color
+        return data, color
 
         
-    def process(self, minWindow, maxWindow, windowStepSize, rawData=False):
-        ''' Main function call to start windowed analysis routine.
-            Calls _singleWindowAnalysis for the number of different window sizes to be analyzed.
+    def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
+        rawData=False):
+        ''' Main function call to start windowed analysis routine. Calls :meth:`~music21.WindowedAnalysis.GeneralNote._singleWindowAnalysis` for the number of different window sizes to be analyzed.
+
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv324')
+        >>> p = KrumhanslSchmuckler()
+        >>> # placing one part into analysis
+        >>> wa = WindowedAnalysis(s[0], p)
+        >>> x, y = wa.process(1, 1)
+        >>> len(x) # we only have one series of windows
+        1
+        >>> x, y = wa.process(1, 2)
+        >>> len(x) # we have two series of windows
+        2
+        >>> x[0][0] # the data returned is processor dependent; here we get
+        ('B', 'Major', 0.6868258874056411)
+        >>> y[0][0] # a color is returned for each matching data position
+        '#FF8000'
         '''
         # names = [x.id for x in sStream]
         
@@ -95,18 +122,17 @@ class WindowedAnalysis(object):
         #array set to the size of the expected resulting set
         solutionSize = (max-minWindow+1) / windowStepSize
 
+        # create empty arrays for storage
         solutionMatrix = [0] * solutionSize
         color = [0] * solutionSize
-        
-
         for i in range(minWindow, max+1, windowStepSize):
-            # where to add data
+            # where to add data in the solution vectors
             pos = (i-minWindow)/windowStepSize
 
-            environLocal.printDebug(['processing window:', i, 'storing data:', pos])
+            environLocal.printDebug(['processing window:', i, 
+                                     'storing data:', pos])
 
             soln, colorn = self._singleWindowAnalysis(i, windowedStream) 
-
             if pos >= solutionSize:
                 environLocal.printDebug(['cannot fit data; position, solutionSize', pos, solutionSize])
             else:
@@ -146,6 +172,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         # store color grid information to associate particular keys to colors
         
+        # note: these colors were manually selected to optimize distinguishing
+        # characteristics. do not change without good reason
         self.majorKeyColors = {'Eb':'#D60000',
                  'E':'#FF0000',
                  'E#':'#FF2B00',
@@ -206,10 +234,29 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]    
 
 
-    def _getPitchClassDistribution(self, work):
+    def _getPitchClassDistribution(self, streamObj):
+        '''Given a flat Stream, obtain a pitch class distribution. The value of each pitch class is scaled by its duration in quarter lengths.
+
+        >>> from music21 import note, stream, chord
+        >>> a = KrumhanslSchmuckler()
+        >>> s = stream.Stream()
+        >>> n1 = note.Note('c')
+        >>> n1.quarterLength = 3
+        >>> n2 = note.Note('f#')
+        >>> n2.quarterLength = 2
+        >>> s.append(n1)
+        >>> s.append(n2)
+        >>> a._getPitchClassDistribution(s)
+        [3, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0]
+        >>> c1 = chord.Chord(['d', 'e', 'b-'])
+        >>> c1.quarterLength = 1.5
+        >>> s.append(c1)
+        >>> a._getPitchClassDistribution(s)
+        [3, 0, 1.5, 0, 1.5, 0, 2, 0, 0, 0, 1.5, 0]
+        '''
         pcDist = [0]*12
         
-        for n in work.notes:        
+        for n in streamObj.notes:        
             if not n.isRest:
                 length = n.quarterLength
                 if n.isChord:
@@ -246,8 +293,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         a = sorted(keyResults)
         a.reverse()
         
-        ''' Return pairs, the pitch class and the correlation value, in order by point value
-        '''
+        #Return pairs, the pitch class and the correlation value, in order by point value
         for i in range(len(a)):
             likelyKeys[i] = (Pitch(keyResults.index(a[i])), differences[keyResults.index(a[i])])
         
@@ -319,20 +365,20 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         pcDistribution = self._getPitchClassDistribution(sStream)
     
         keyResultsMajor = self._convoluteDistribution(pcDistribution, True)
-        differenceMajor = self._getDifference(keyResultsMajor, pcDistribution, True)
+        differenceMajor = self._getDifference(keyResultsMajor, 
+                         pcDistribution, True)
         likelyKeysMajor = self._getLikelyKeys(keyResultsMajor, differenceMajor)
         
         keyResultsMinor = self._convoluteDistribution(pcDistribution, False)   
-        differenceMinor = self._getDifference(keyResultsMinor, pcDistribution, False)
+        differenceMinor = self._getDifference(keyResultsMinor, 
+                          pcDistribution, False)
         likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
         
-
         #find the largest correlation value to use to select major or minor as the resulting key
         if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
             likelyKey = (str(likelyKeysMajor[0][0]), "Major", likelyKeysMajor[0][1])
         else:
             likelyKey = (str(likelyKeysMinor[0][0]), "Minor", likelyKeysMinor[0][1])
-            
             
         color = self.resultsToColor(likelyKey[0], likelyKey[1])
         return likelyKey, color        
@@ -346,15 +392,12 @@ class SadoianAmbitus(DiscreteAnalysis):
     '''
     def __init__(self):
         DiscreteAnalysis.__init__(self)
-        
         self.pitchSpanColors = {}
-        
         self._generateColors(130)
 
 
     def _rgb_to_hex(self, rgb):
-        return '#%02x%02x%02x' % rgb
-    
+        return '#%02x%02x%02x' % rgb    
     
     def _generateColors(self, numColors):
         
