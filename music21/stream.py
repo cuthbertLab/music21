@@ -2011,17 +2011,19 @@ class Stream(music21.Music21Object):
             
 
 
-    def makeMeasures(self, meterStream=None, refStream=None):
+    def makeMeasures(self, meterStream=None, refStream=None, inPlace=False):
         '''Take a stream and partition all elements into measures based on 
         one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used.
 
         This always creates a new stream with Measures, though objects are not
         copied from self stream. 
     
-        If a meterStream is provided, this is used instead of the meterStream
+        If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any 
         found in the Stream.
     
-        If a refStream is provided, this is used to provide max offset values, necessary to fill empty rests and similar.
+        If `refStream` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar.
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
         >>> sSrc = Stream()
         >>> sSrc.repeatAppend(note.Rest(), 3)
@@ -2185,6 +2187,8 @@ class Stream(music21.Music21Object):
         fill with one Rest preeceding this offset. 
     
         If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream.
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
         >>> a = Stream()
         >>> a.insert(20, note.Note())
@@ -2248,10 +2252,8 @@ class Stream(music21.Music21Object):
         '''Given a stream containing measures, examine each element in the stream 
         if the elements duration extends beyond the measures bound, create a tied  entity.
     
-        Edits the current stream in-place by default.  This can be changed by setting the inPlace keyword to false
-            
-        configure ".previous" and ".next" attributes
-    
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+                
         >>> d = Stream()
         >>> n = note.Note()
         >>> n.quarterLength = 12
@@ -2262,6 +2264,9 @@ class Stream(music21.Music21Object):
     
         OMIT_FROM_DOCS
         TODO: take a list of clases to act as filter on what elements are tied.
+
+        configure ".previous" and ".next" attributes
+
         '''
         #environLocal.printDebug(['calling Stream.makeTies()'])
         if not inPlace: # make a copy
@@ -2393,9 +2398,9 @@ class Stream(music21.Music21Object):
     def makeBeams(self, inPlace=True):
         '''Return a new measure with beams applied to all notes. 
 
-        if inPlace is false, this creates a new, independent copy of the source.
+        In the process of making Beams, this method also updates tuplet types. This is destructive and thus changes an attribute of Durations in Notes.
 
-        In the process of making Beams, this method also updates tuplet types. this is destructive and thus changes an attribute of Durations in Notes.
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
 
         >>> aMeasure = Measure()
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
@@ -2473,6 +2478,9 @@ class Stream(music21.Music21Object):
         The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
 
         This will assume that the complete Stream is the context of evaluation. For smaller context ranges, call this on Measure objects. 
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
         '''
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
@@ -2531,6 +2539,8 @@ class Stream(music21.Music21Object):
 
     def extendDuration(self, objName, inPlace=True):
         '''Given a Stream and an object class name, go through the Stream and find each instance of the desired object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to extend to the end of the Stream.
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
         >>> import music21.dynamics
         >>> stream1 = Stream()
