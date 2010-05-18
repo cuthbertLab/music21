@@ -1588,7 +1588,7 @@ class Stream(music21.Music21Object):
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> sorted(a[0].measureOffsetMap().keys())
-        [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]
+        [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
 
         OMIT_FROM_DOCS
         see important examples in testMeasureOffsetMap() andtestMeasureOffsetMapPostTie()
@@ -1790,7 +1790,7 @@ class Stream(music21.Music21Object):
 
         # get a default and/or place default at zero if nothing at zero
         if len(post) == 0 or post[0].offset > 0: 
-            environLocal.printDebug(['getClefs(): using bestClef()'])
+            #environLocal.printDebug(['getClefs(): using bestClef()'])
             post.insert(0, self.bestClef())
         return post
 
@@ -2011,7 +2011,8 @@ class Stream(music21.Music21Object):
             
 
 
-    def makeMeasures(self, meterStream=None, refStream=None, inPlace=False):
+    def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
+        inPlace=False):
         '''Take a stream and partition all elements into measures based on 
         one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used.
 
@@ -2021,7 +2022,7 @@ class Stream(music21.Music21Object):
         If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any 
         found in the Stream.
     
-        If `refStream` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar.
+        If `refStreamOrTimeRange` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar.
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
@@ -2103,9 +2104,14 @@ class Stream(music21.Music21Object):
     
         # if a ref stream is provided, get highst time from there
         # only if it is greater thant the highest time yet encountered
-        if refStream is not None:
-            if refStream.highestTime > oMax:
-                oMax = refStream.highestTime
+
+        if refStreamOrTimeRange != None:
+            if isinstance(refStreamOrTimeRange, Stream):
+                refStreamHighestTime = refStream.highestTime
+            else: # assume its a list
+                refStreamHighestTime = max(refStreamOrTimeRange)    
+            if refStreamHighestTime > oMax:
+                oMax = refStreamHighestTime
     
         # create a stream of measures to contain the offsets range defined
         # create as many measures as needed to fit in oMax
@@ -2536,13 +2542,25 @@ class Stream(music21.Music21Object):
 
 
 
-    def prepareNotation(self, meterStream=None, refStream=None, inPlace=False):
-        '''Call a sequence of methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, etc. 
+    def prepareNotation(self, meterStream=None, 
+        refStreamOrTimeRange=None, inPlace=False):
+        '''This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
+        >>> from music21 import stream, note
+        >>> s = stream.Stream()
+        >>> n = note.Note('g')
+        >>> n.quarterLength = 1.5
+        >>> s.repeatAppend(n, 10)
+        >>> sMeasures = s.prepareNotation()
+        >>> len(sMeasures.measures)
+        4
         '''
 
         # only use inPlace arg on first usage
         measureStream = self.makeMeasures(meterStream=meterStream,
-            refStream=refStream, inPlace=inPlace)
+            refStreamOrTimeRange=refStreamOrTimeRange, inPlace=inPlace)
 
         #environLocal.printDebug(['Stream.prepareNotation(): post makeMeasures, length', len(measureStream)])
 
@@ -3365,7 +3383,8 @@ class Stream(music21.Music21Object):
 
 
 
-    def _getMXPart(self, instObj=None, meterStream=None, refStream=None):
+    def _getMXPart(self, instObj=None, meterStream=None, 
+        refStreamOrTimeRange=None):
         '''If there are Measures within this stream, use them to create and
         return an MX Part and ScorePart. 
 
@@ -3396,7 +3415,7 @@ class Stream(music21.Music21Object):
             # try to add measures if none defined
             # returns a new stream w/ new Measures but the same objects
             measureStream = self.prepareNotation(meterStream=meterStream,
-                            refStream=refStream)
+                            refStreamOrTimeRange=refStreamOrTimeRange)
             #environLocal.printDebug(['Stream._getMXPart: post prepareNotation, length', len(measureStream)])
         else: # there are measures
             pass
@@ -3473,19 +3492,20 @@ class Stream(music21.Music21Object):
                 # used to place in intermediary stram
                 #midStream.insert(obj)
 
-            refStream = Stream()
-            refStream.insert(0, music21.Music21Object()) # placeholder at 0
-            refStream.insert(highestTime, music21.Music21Object()) 
+            #refStream = Stream()
+            #refStream.insert(0, music21.Music21Object()) # placeholder at 0
+            #refStream.insert(highestTime, music21.Music21Object()) 
+
+            refStreamOrTimeRange = [0, highestTime]
 
             # would like to do something like this but cannot
             # replace object inside of the stream
             for obj in partStream.getElementsByClass(Stream):
-                obj.makeRests(refStream, inPlace=True)
+                obj.makeRests(refStreamOrTimeRange, inPlace=True)
                 # used to move into a final Stream: no longer necessary
                 #finalStream.insert(obj)
 
-            environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:',
-                                    len(partStream)])
+            environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
             count = 0
             for obj in partStream.getElementsByClass(Stream):
                 count += 1
@@ -3500,7 +3520,7 @@ class Stream(music21.Music21Object):
                 instList.append(inst)
 
                 mxComponents.append(obj._getMXPart(inst, meterStream,
-                                refStream))
+                                refStreamOrTimeRange))
 
         else: # assume this is the only part
             environLocal.printDebug('Stream._getMX(): handling single-part Stream')
@@ -3564,8 +3584,18 @@ class Stream(music21.Music21Object):
                 lastTimeSignature = ts
             # add measure to stream at current offset for this measure
             streamPart.insert(oMeasure, m)
-            # increment measure offset for next time around
-            oMeasure += lastTimeSignature.barDuration.quarterLength 
+
+            # note: we cannot assume that the time signature properly
+            # describes the offsets w/n this bar. need to look at 
+            # offsets within measure; if the .highestTime value is greater
+            # use this as the next offset
+
+            if m.highestTime > lastTimeSignature.barDuration.quarterLength:
+                mOffsetShift = m.highestTime
+            else: # use time signature
+                mOffsetShift = lastTimeSignature.barDuration.quarterLength 
+            oMeasure += mOffsetShift
+
 
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
@@ -6211,14 +6241,14 @@ class Test(unittest.TestCase):
         mOffsetMap = a[0].measureOffsetMap()
 
         self.assertEqual(sorted(mOffsetMap.keys()), 
-            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0] )
+            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         # try on a complete score
         a = corpus.parseWork('bach/bwv324.xml')
         mOffsetMap = a.measureOffsetMap()
         #environLocal.printDebug([mOffsetMap])
         self.assertEqual(sorted(mOffsetMap.keys()), 
-            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0] )
+            [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         for key, value in mOffsetMap.items():
             # each key contains 4 measures
@@ -6231,7 +6261,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
 
         mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
-        self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
+        self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]   )
 
         # this should work but does not yet
         # it seems that the flat score does not work as the flat part
@@ -6579,32 +6609,32 @@ class Test(unittest.TestCase):
         meterStream.insert(0, meter.TimeSignature('2/4'))
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
-        self.assertEqual(len(sPartitioned), 18)
+        self.assertEqual(len(sPartitioned), 21)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
-        self.assertEqual(len(sPartitioned), 36)
+        self.assertEqual(len(sPartitioned), 42)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('3/4'))
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
-        self.assertEqual(len(sPartitioned), 12)
+        self.assertEqual(len(sPartitioned), 14)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('12/4'))
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
-        self.assertEqual(len(sPartitioned), 3)
+        self.assertEqual(len(sPartitioned), 4)
 
 
         meterStream = Stream()
-        meterStream.insert(0, meter.TimeSignature('36/4'))
+        meterStream.insert(0, meter.TimeSignature('48/4'))
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
         self.assertEqual(len(sPartitioned), 1)
@@ -7196,21 +7226,20 @@ class Test(unittest.TestCase):
         # get some measures of the soprano; just get the notes
         ex = src[0].flat.notes[0:30]
 
-        self.assertEqual(ex.highestOffset, 32.0)
-        self.assertEqual(ex.highestTime, 36.0)
+        self.assertEqual(ex.highestOffset, 38.0)
+        self.assertEqual(ex.highestTime, 42.0)
 
         # try first when doing this not in place
         newEx = ex.augmentOrDiminish(2, inPlace=False)
-        self.assertEqual(newEx.highestOffset, 64.0)
-        self.assertEqual(newEx.highestTime, 72.0)
+        self.assertEqual(newEx.highestOffset, 76.0)
+        self.assertEqual(newEx.highestTime, 84.0)
 
         # try in place
         ex.augmentOrDiminish(2, inPlace=True)
-        self.assertEqual(ex.highestOffset, 64.0)
-        self.assertEqual(ex.highestTime, 72.0)
+        self.assertEqual(ex.highestOffset, 76.0)
+        self.assertEqual(ex.highestTime, 84.0)
 
         
-
     def testAugmentOrDiminishCorpus(self):
         '''Extact phrases from the corpus and use for testing 
         '''
