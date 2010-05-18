@@ -51,7 +51,7 @@ class WindowedAnalysis(object):
         >>> wa = WindowedAnalysis(s[0], p)
         >>> post = wa._prepWindow()
         >>> len(post.measures)
-        36
+        42
         >>> len(post.measures[0])
         6
         >>> len(post.measures[1])

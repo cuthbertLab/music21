@@ -1414,7 +1414,8 @@ class MeterSequence(MeterTerminal):
 
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+            environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
+            raise MeterException('cannot access qLenPos %s when total duration is %s' % (qLenPos, self.duration.quarterLength))
         
         iMatch = self.positionToIndex(qLenPos)
         

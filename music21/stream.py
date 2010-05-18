@@ -71,6 +71,7 @@ class StreamIterator():
 
 
 #-------------------------------------------------------------------------------
+
 class Stream(music21.Music21Object):
     '''
     This is the fundamental container for Music21Objects; objects may be ordered and/or placed in time based on offsets from the start of this container's offset. 
@@ -100,11 +101,13 @@ class Stream(music21.Music21Object):
     'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
     }
 
+
     def __init__(self, givenElements = None):
         '''
         
         '''
         music21.Music21Object.__init__(self)
+        self.classNames = (Stream, music21.stream.Stream)
 
         # self._elements stores ElementWrapper objects. These are not ordered.
         # this should have a public attribute/property self.elements
@@ -1017,7 +1020,8 @@ class Stream(music21.Music21Object):
             for myCl in classFilterList:
                 if appendedAlready is False and myEl.isClass(myCl):
                     appendedAlready = True
-                    found.insert(myEl.getOffsetBySite(self), myEl, ignoreSort = True)
+                    found.insert(myEl.getOffsetBySite(self), myEl, 
+                                 ignoreSort = True)
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
         return found
@@ -3312,7 +3316,7 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def augmentOrDiminish(self, scalar, inPlace=True):
+    def augmentOrDiminish(self, scalar, inPlace=False):
         '''Scale this Stream by a provided scalar. 
         '''
         if not scalar > 0:
@@ -3327,7 +3331,7 @@ class Stream(music21.Music21Object):
             anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(scalar=scalar, inPlace=True)
     
-        # do not need to call elements changed, as called in sub mmethod
+        # do not need to call elements changed, as called in sub methods
         return returnObj
 
 
@@ -3440,6 +3444,9 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug('calling Stream._getMX')
 
+        # need to do class matching by both of these names
+        sTemplate = Stream()
+
         mxComponents = []
         instList = []
         multiPart = False
@@ -3449,6 +3456,7 @@ class Stream(music21.Music21Object):
         highestTime = 0
 
         for obj in self:
+    
             # if obj is a Part, we have multi-parts
             if isinstance(obj, Part):
                 multiPart = True
@@ -3459,11 +3467,12 @@ class Stream(music21.Music21Object):
                 break # only need one
             # if components are streams of Notes or Measures, 
             # than assume this is like a Part
-            elif isinstance(obj, Stream) and (len(obj.measures) > 0 
-                or len(obj.notes) > 0):
+            elif isinstance(obj, sTemplate.classNames) and (
+                len(obj.measures) > 0 or len(obj.notes) > 0):
                 multiPart = True
                 break # only need one
 
+        environLocal.printDebug(['results of part determination; multiPart', multiPart, obj, 'result of getElementsByClass', len(self.getElementsByClass(music21.stream.Stream))])
 
         if multiPart:
             #environLocal.printDebug('Stream._getMX: interpreting multipart')
@@ -3477,7 +3486,7 @@ class Stream(music21.Music21Object):
             # TODO: now making a deepcopy, as we are going to edit internal objs
             partStream = copy.deepcopy(self)
 
-            for obj in partStream.getElementsByClass(Stream):
+            for obj in partStream.getElementsByClass(sTemplate.classNames):
                 # may need to copy element here
                 # apply this streams offset to elements
                 obj.transferOffsetToElements() 
@@ -3500,14 +3509,14 @@ class Stream(music21.Music21Object):
 
             # would like to do something like this but cannot
             # replace object inside of the stream
-            for obj in partStream.getElementsByClass(Stream):
+            for obj in partStream.getElementsByClass(sTemplate.classNames):
                 obj.makeRests(refStreamOrTimeRange, inPlace=True)
                 # used to move into a final Stream: no longer necessary
                 #finalStream.insert(obj)
 
             environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
             count = 0
-            for obj in partStream.getElementsByClass(Stream):
+            for obj in partStream.getElementsByClass(sTemplate.classNames):
                 count += 1
                 if count > len(partStream):
                     raise StreamException('infinite stream encountered')
@@ -4439,7 +4448,6 @@ class Stream(music21.Music21Object):
             thisEl.offset = thisEl.offset - elOffset
         
         return otherElements
-
 
 
 
@@ -7244,31 +7252,37 @@ class Test(unittest.TestCase):
         '''Extact phrases from the corpus and use for testing 
         '''
 
+        # note: see sTemplate.classNames in _getMX to see why matching
+        # class is sometimes a problem
+
         from music21 import corpus
 
+        # first method: iterating through notes
         src = corpus.parseWork('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         ex = src[0].flat.notes[0:30]
-
-        ex.show('t')
-
         # attach a couple of transformations
         s = Stream()
         for scalar in [.5, 1.5, 2, .25]:
             #n = note.Note()
             part = Part()
-            #part.append(n)
-
-            # for some reason must iterate through notes and re-assing
-            # direct use of the output stream is not working yet
             for n in ex.augmentOrDiminish(scalar, inPlace=False):
                 part.append(n)
-            part.offset = 0
-            s.insert(part)
-        
+            s.insert(0, part)
+        junkTest = s._getMX()
         #s.show()
+    
+        # second method: getting flattened stream
+        src = corpus.parseWork('bach/bwv323.xml')
+        # get notes from one part
+        ex = src[0].flat.notes
+        s = Score()
+        for scalar in [1, 2, .5, 1.5]:
+            part = ex.augmentOrDiminish(scalar, inPlace=False)
+            s.insert(0, part)
         
-
+        junkTest = s._getMX()
+        #s.show()
 
 
 
@@ -7303,7 +7317,7 @@ if __name__ == "__main__":
 
         #a.testScaleDurationsBasic()
 
-        a.testAugmentOrDiminishBasic()
-        a.testAugmentOrDiminishHighestTimes()
+        #a.testAugmentOrDiminishBasic()
+        #a.testAugmentOrDiminishHighestTimes()
         a.testAugmentOrDiminishCorpus()
 
