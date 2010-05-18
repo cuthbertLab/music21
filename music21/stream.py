@@ -3472,8 +3472,6 @@ class Stream(music21.Music21Object):
                 multiPart = True
                 break # only need one
 
-        environLocal.printDebug(['results of part determination; multiPart', multiPart, obj, 'result of getElementsByClass', len(self.getElementsByClass(music21.stream.Stream))])
-
         if multiPart:
             #environLocal.printDebug('Stream._getMX: interpreting multipart')
             # need to edit streams contained within streams
