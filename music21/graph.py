@@ -2390,7 +2390,7 @@ class TestExternal(unittest.TestCase):
             obj.setData(data) # add data here
             obj.process()
             fn = obj.__class__.__name__ + '.png'
-            fp = os.path.join(environLocal.getTempDir(), fn)
+            fp = os.path.join(environLocal.getRootTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
@@ -2420,7 +2420,7 @@ class TestExternal(unittest.TestCase):
             obj = plotClassName(a, doneAction=None)
             obj.process()
             fn = obj.__class__.__name__ + '.png'
-            fp = os.path.join(environLocal.getTempDir(), fn)
+            fp = os.path.join(environLocal.getRootTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
@@ -2464,7 +2464,7 @@ class TestExternal(unittest.TestCase):
         for obj, name in post:
             obj.process()
             fn = name + '.png'
-            fp = os.path.join(environLocal.getTempDir(), fn)
+            fp = os.path.join(environLocal.getRootTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 

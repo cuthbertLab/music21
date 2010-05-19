@@ -461,7 +461,6 @@ class Chord(note.NotRest):
         [60, 64, 68]
         ''')
 
-
     def _getChordTablesAddress(self):
         '''
         >>> c = Chord(["C4", "E4", "G#4"])

@@ -380,8 +380,7 @@ def getNumFromStr(usrStr):
 
 
 def getPlatform():
-    '''
-    Shared function to get platform names.
+    '''Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
     '''
     # possible os.name values: 'posix', 'nt', 'mac', 'os2', 'ce', 
     # 'java', 'riscos'.

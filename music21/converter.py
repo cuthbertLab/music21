@@ -70,6 +70,7 @@ class ArchiveFilter(object):
 
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
+
     def __init__(self, fp, format='zip'):
         self.fp = fp
         self.format = format
@@ -137,7 +138,7 @@ class PickleFilter(object):
 
         Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.
         '''
-        fpScratch = environLocal.getTempDir()
+        fpScratch = environLocal.getRootTempDir()
         format = common.findFormatFile(self.fp)
 
         if format == 'pickle': # do not pickle a pickle
@@ -194,12 +195,12 @@ class StreamFreezer(object):
         '''For a supplied Stream, write a pickled version.
         '''
         if fp == None:
-            dir = environLocal.getTempDir()
+            dir = environLocal.getRootTempDir()
             fp = self._getPickleFp(dir)
         elif os.sep in fp: # assume its a complete path
             fp = fp
         else:
-            dir = environLocal.getTempDir()
+            dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
         #self.stream._printDefinedContexts()
@@ -222,7 +223,7 @@ class StreamFreezer(object):
         if os.sep in fp: # assume its a complete path
             fp = fp
         else:
-            dir = environLocal.getTempDir()
+            dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
         environLocal.printDebug(['opening fp', fp])
@@ -495,7 +496,7 @@ class Converter(object):
         format, ext = common.findFormatExtURL(url)
         if format == None: # cannot figure out what it is
             raise ConverterException('cannot determine file format of url: %s' % url)
-        dir = environLocal.getTempDir()
+        dir = environLocal.getRootTempDir()
         #dst = environLocal.getTempFile(ext)
 
         dst = self._getDownloadFp(dir, ext, url)

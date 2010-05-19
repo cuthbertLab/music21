@@ -256,7 +256,7 @@ class Environment(object):
 
     #---------------------------------------------------------------------------
     def read(self, fp=None):
-        '''Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+        '''Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None.
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -288,7 +288,7 @@ class Environment(object):
                 self.ref[name] = value
 
     def write(self, fp=None):
-        '''Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used.
+        '''Write an XML file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used.
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -316,66 +316,65 @@ class Environment(object):
     #---------------------------------------------------------------------------
     # utility methods for commonly needed OS services
 
-    def getTempFile(self, suffix=''):
-        '''Return a file path to a temporary file with the specified suffix
+    def getDefaultRootTempDir(self):
+        '''Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new 'music21' directory, and then return this directory.
+
+        This method is only called if the no scratch directory preference has been set. 
+
+        If not able to create a 'music21' directory, the standard default is returned.
         '''
-        if self.ref['directoryScratch'] == None:
-            if common.getPlatform() != 'win':
-                fd, fp = tempfile.mkstemp(suffix=suffix) 
-                if isinstance(fd, int):
-                    pass # see comment below
-                else:
-                    fd.close()
-            else:
-                if sys.hexversion < 0x02030000:
-                    raise EnvironmentException("Need at least Version 2.3 on Windows to" +
-                                               "create temporary files!")
-                else:
-                    tf = tempfile.NamedTemporaryFile(suffix=suffix)
-                    fp = tf.name
-                    tf.close()
+        # this returns the root temp dir; this does not create a new dir
+        dstDir = os.path.join(tempfile.gettempdir(), 'music21')
+        # if this path already exists, we have nothing more to do
+        if os.path.exists(dstDir): 
+            return dstDir
         else:
-            if not os.path.exists(self.ref['directoryScratch']):    
-                raise EnvironmentException('user-specified scratch directory (%s) does not exists.' % self.ref['directoryScratch'])
-            if common.getPlatform() != 'win':
-                fd, fp = tempfile.mkstemp(dir=self.ref['directoryScratch'], 
-                                          suffix=suffix)
-                if isinstance(fd, int):
-                    # on MacOS, fd returns an int, like 3, when this is called
-                    # in some context (specifically, programmatically in a 
-                    # TestExternal class. the fp is still valid and works
-                    pass
-                else:
-                    fd.close() 
-            else: # win
-                if sys.hexversion < 0x02030000:
-                    raise EnvironmentException("Need at least Version 2.3 on Windows to" +
-                                               "create temporary files!")
-                else:
-                    tf = tempfile.NamedTemporaryFile(
-                                dir=self.ref['directoryScratch'], 
-                                suffix=suffix)
-                    fp = tf.name
-                    tf.close()
-
-        self.printDebug([_MOD, 'temporary file:', fp])
-        return fp
+            # make this directory as a temp directory
+            try:
+                os.mkdir(dstDir)
+            except OSError: # cannot make the directory
+                dstDir = tempfile.gettempdir()
+            self.printDebug([_MOD, 'using temporary directory:', dstDir])
+            return dstDir
 
 
-    def getTempDir(self):
-        '''Get a temporary directory. Return the user preference if set.
+    def getRootTempDir(self):
+        '''Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible).
         '''
         if self.ref['directoryScratch'] == None:
-            # get a system specified scratch dir
-            dir = tempfile.gettempdir()
-            self.printDebug(['using system specified scratch dir: %s' % dir])
-            return dir
-
+            return self.getDefaultRootTempDir()
+        # check that the user-specified directory exists
         elif not os.path.exists(self.ref['directoryScratch']):    
-            raise EnvironmentException('user-specified scratch directory (%s) does not exists.' % self.ref['directoryScratch'])
+            raise EnvironmentException('user-specified scratch directory (%s) does not exist; remove preference file or reset Environment' % self.ref['directoryScratch'])
         else:
             return self.ref['directoryScratch']
 
+
+    def getTempFile(self, suffix=''):
+        '''Return a file path to a temporary file with the specified suffix
+        '''
+        # get the root dir, which may be the user-specified dir
+        rootDir = self.getRootTempDir()
+
+        if common.getPlatform() != 'win':
+            fd, fp = tempfile.mkstemp(dir=rootDir, suffix=suffix)
+            if isinstance(fd, int):
+                # on MacOS, fd returns an int, like 3, when this is called
+                # in some context (specifically, programmatically in a 
+                # TestExternal class. the fp is still valid and works
+                pass
+            else:
+                fd.close() 
+        else: # win
+            if sys.hexversion < 0x02030000:
+                raise EnvironmentException("Need at least Version 2.3 on Windows to create temporary files!")
+            else:
+                tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
+                fp = tf.name
+                tf.close()
+
+        self.printDebug([_MOD, 'temporary file:', fp])
+        return fp
 
     
     def launch(self, fmt, fp, options=''):
@@ -386,7 +385,6 @@ class Environment(object):
         Optionally, can add additional command to erase files, if necessary 
         Erase could be called from os or command-line arguemtns after opening
         the file and then a short time delay.
-
 
         TODO: Move showImageDirectfrom lilyString.py ; add MIDI
         '''
