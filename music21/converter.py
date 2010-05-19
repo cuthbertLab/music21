@@ -67,6 +67,9 @@ class ConverterFileException(Exception):
 class ArchiveFilter(object):
     '''Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
     '''
+
+    # for info on mxl files, see
+    # http://www.recordare.com/xml/compressed-mxl.html
     def __init__(self, fp, format='zip'):
         self.fp = fp
         self.format = format
