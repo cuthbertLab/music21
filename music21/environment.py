@@ -337,7 +337,6 @@ class Environment(object):
             self.printDebug([_MOD, 'using temporary directory:', dstDir])
             return dstDir
 
-
     def getRootTempDir(self):
         '''Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible).
         '''
@@ -348,7 +347,6 @@ class Environment(object):
             raise EnvironmentException('user-specified scratch directory (%s) does not exist; remove preference file or reset Environment' % self.ref['directoryScratch'])
         else:
             return self.ref['directoryScratch']
-
 
     def getTempFile(self, suffix=''):
         '''Return a file path to a temporary file with the specified suffix
@@ -376,7 +374,6 @@ class Environment(object):
         self.printDebug([_MOD, 'temporary file:', fp])
         return fp
 
-    
     def launch(self, fmt, fp, options=''):
         '''Open a file with an either default or user-specified applications.
         
@@ -396,7 +393,6 @@ class Environment(object):
             fpApp = self.ref['graphicsPath']   
         elif format == 'musicxml':
             fpApp = self.ref['musicxmlPath']   
-
 
         platform = common.getPlatform()
         if fpApp is None and platform != 'win':
