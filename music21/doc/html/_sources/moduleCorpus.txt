@@ -32,7 +32,7 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: getBachChorales(extList=None)
 
-    
+    Return all Bach chorales. 
 
     >>> a = getBachChorales()
     >>> len(a) > 10
@@ -46,7 +46,7 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: getBeethovenStringQuartets(extList=None)
 
-    
+    Return all Beethoven String Quartets. 
 
     >>> a = getBeethovenStringQuartets()
     >>> len(a) > 10

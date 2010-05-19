@@ -372,7 +372,7 @@ GeneralNote
 
 .. class:: GeneralNote(*arguments, **keywords)
 
-    A GeneralNote object is the parent object for the Note, Rest, Chird, and related objects. 
+    A GeneralNote object is the parent object for the :class:`music21.note.Note`, :class:`music21.note.Rest`, :class:`music21.note.Chord`, and related objects. 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -406,7 +406,7 @@ GeneralNote
 
         .. attribute:: quarterLength
 
-            Return quarter length 
+            Return the Duration as represented in Quarter Length. 
 
             >>> n = Note()
             >>> n.quarterLength = 2.0
@@ -419,7 +419,7 @@ GeneralNote
 
         .. attribute:: lyric
 
-            returns the first Lyric's text todo: should return a \n separated string of lyrics 
+            The lyric property can be used to get and set a lyric for this Note, Chord, or Rest. In most cases the :meth:`~music21.note.GeneralNote.addLyric` method should be used. 
 
         .. attribute:: musicxml
 
@@ -431,7 +431,7 @@ GeneralNote
 
         .. method:: addLyric(text, lyricNumber=None)
 
-            adds another lyric to the note's lyric list optionally with a certain lyric number 
+            Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
             >>> n1 = Note()
             >>> n1.addLyric("hello")
@@ -439,13 +439,13 @@ GeneralNote
             'hello' 
             >>> n1.lyrics[0].number
             1 
-            ## note that the option number specified gives the lyric number, not the list position 
+            # note that the option number specified gives the lyric number, not the list position 
             >>> n1.addLyric("bye", 3)
             >>> n1.lyrics[1].text
             'bye' 
             >>> n1.lyrics[1].number
             3 
-            ## replace existing lyric 
+            # replace existing lyric 
             >>> n1.addLyric("ciao", 3)
             >>> n1.lyrics[1].text
             'ciao' 
@@ -454,7 +454,7 @@ GeneralNote
 
         .. method:: augmentOrDiminish(scalar, inPlace=True)
 
-            Given a scalar greater than zero, return a Note with a scaled Duration. 
+            Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy. 
 
             >>> n = Note('g#')
             >>> n.quarterLength = 3

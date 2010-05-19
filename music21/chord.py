@@ -436,7 +436,6 @@ class Chord(note.NotRest):
 
     def _getPitches(self):
         '''
-
         OMIT_FROM_DOCS
 
         TODO: presently, whenever pitches are accessed, it sets
@@ -452,7 +451,15 @@ class Chord(note.NotRest):
             self._chordTablesAddressNeedsUpdating = True
         self._pitches = value
 
-    pitches = property(_getPitches, _setPitches)
+    pitches = property(_getPitches, _setPitches, 
+        doc = '''Return a list of all Pitch objects in this Chord.
+
+        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c.pitches
+        [C4, E4, G#4]
+        >>> [p.midi for p in c.pitches]
+        [60, 64, 68]
+        ''')
 
 
     def _getChordTablesAddress(self):
@@ -464,7 +471,13 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return self._chordTablesAddress
 
-    chordTablesAddress = property(_getChordTablesAddress)
+    chordTablesAddress = property(_getChordTablesAddress, 
+        doc = '''Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).
+
+        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c.chordTablesAddress
+        (3, 12, 0)
+        ''')
 
 
 
@@ -1277,11 +1290,17 @@ class Chord(note.NotRest):
             pcGroup.append(p.pitchClass)
         return pcGroup            
         
-    pitchClasses = property(_getPitchClasses)    
+    pitchClasses = property(_getPitchClasses, 
+        doc = '''Return a list of all pitch classes in the chord as integers.
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.pitchClasses
+        [2, 9, 6, 2]
+        ''')    
 
 
     def _getMultisetCardinality(self):
-        '''Return the number of pitch classes, regardless of redundancy.
+        '''Return the number of pitches, regardless of redundancy.
 
         >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.multisetCardinality
@@ -1289,7 +1308,13 @@ class Chord(note.NotRest):
         '''            
         return len(self._getPitchClasses())
 
-    multisetCardinality = property(_getMultisetCardinality)   
+    multisetCardinality = property(_getMultisetCardinality, 
+        doc = '''Return an integer representing the cardinality of the mutliset, or the number of pitch values. 
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.multisetCardinality
+        4
+        ''')   
 
 
     def _getOrderedPitchClasses(self):
@@ -1308,7 +1333,13 @@ class Chord(note.NotRest):
         pcGroup.sort()
         return pcGroup            
         
-    orderedPitchClasses = property(_getOrderedPitchClasses)    
+    orderedPitchClasses = property(_getOrderedPitchClasses, 
+        doc = '''Return an list of pitch class integers, ordered form lowest to highest. 
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.orderedPitchClasses
+        [2, 6, 9]
+        ''')    
 
 
     def _getOrderedPitchClassesString(self):        
@@ -1319,7 +1350,13 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getOrderedPitchClasses())
 
-    orderedPitchClassesString = property(_getOrderedPitchClassesString)    
+    orderedPitchClassesString = property(_getOrderedPitchClassesString, 
+        doc = '''Return a string representation of the pitch class values. 
+
+        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> c1.orderedPitchClassesString
+        '<367>'
+        ''')    
 
 
 
@@ -1332,7 +1369,13 @@ class Chord(note.NotRest):
         '''            
         return len(self._getOrderedPitchClasses())
 
-    pitchClassCardinality = property(_getPitchClassCardinality)    
+    pitchClassCardinality = property(_getPitchClassCardinality, 
+        doc = '''Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord.
+
+        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.pitchClassCardinality
+        3
+        ''')    
 
 
     def _getForteClass(self):
@@ -1349,9 +1392,21 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return chordTables.addressToForteName(self._chordTablesAddress, 'tn')
 
-    forteClass = property(_getForteClass)    
+    forteClass = property(_getForteClass, 
+        doc = '''Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented. 
 
-    forteClassTn = property(_getForteClass)    
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClass
+        '3-11B'
+        ''')    
+
+    forteClassTn = property(_getForteClass, 
+        doc = '''Return the Forte Tn set class name, where inversion distinctions are represented.
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClassTn
+        '3-11B'
+        ''')    
 
     def _getForteClassTnI(self):
         '''Return a forte class name under TnI classification
@@ -1367,7 +1422,13 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return chordTables.addressToForteName(self._chordTablesAddress, 'tni')
 
-    forteClassTnI = property(_getForteClassTnI)    
+    forteClassTnI = property(_getForteClassTnI, 
+        doc = '''Return the Forte TnI class name, where inversion distinctions are not represented.
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClassTnI
+        '3-11'
+        ''')    
 
 
     def _getNormalForm(self):
@@ -1383,8 +1444,13 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return list(chordTables.addressToNormalForm(self._chordTablesAddress))
         
-    normalForm = property(_getNormalForm)    
+    normalForm = property(_getNormalForm, 
+        doc = '''Return the normal form of the Chord represented as a list of integers. 
 
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.normalForm
+        [0, 4, 7]
+        ''')    
 
     def _getNormalFormString(self):        
         '''
@@ -1394,7 +1460,13 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getNormalForm())
 
-    normalFormString = property(_getNormalFormString)    
+    normalFormString = property(_getNormalFormString, 
+        doc = '''Return a string representation of the normal form of the Chord.
+
+        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> c1.normalFormString
+        '<034>'
+        ''')    
 
     def _getForteClassNumber(self):
         '''Get the Forte class index number.
@@ -1411,8 +1483,13 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return self._chordTablesAddress[1] # the second value
         
-    forteClassNumber = property(_getForteClassNumber)    
+    forteClassNumber = property(_getForteClassNumber, 
+        doc = '''Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11.
 
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.forteClassNumber
+        11
+        ''')    
 
     def _getPrimeForm(self):
         '''Get the Forte class index number.
@@ -1427,8 +1504,12 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return list(chordTables.addressToPrimeForm(self._chordTablesAddress))
         
-    primeForm = property(_getPrimeForm, doc='''
-       Return a representation of the Chord as a prime-form list of pitch class integers.
+    primeForm = property(_getPrimeForm, 
+        doc='''Return a representation of the Chord as a prime-form list of pitch class integers.
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.primeForm
+        [0, 3, 7]
        ''')    
 
     def _getPrimeFormString(self):        
@@ -1439,8 +1520,12 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getPrimeForm())
 
-    primeFormString = property(_getPrimeFormString, doc='''
-        Return a representation of the Chord as a prime-form set class string.
+    primeFormString = property(_getPrimeFormString, 
+        doc='''Return a representation of the Chord as a prime-form set class string.
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.primeFormString
+        '<037>'
         ''')    
 
 
@@ -1460,7 +1545,13 @@ class Chord(note.NotRest):
         return list(chordTables.addressToIntervalVector(
                self._chordTablesAddress))
         
-    intervalVector = property(_getIntervalVector)    
+    intervalVector = property(_getIntervalVector, 
+        doc = '''Return the interval vector for this Chord as a list of integers.
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.intervalVector
+        [0, 0, 1, 1, 1, 0]
+        ''')    
 
     def _getIntervalVectorString(self):        
         '''
@@ -1470,14 +1561,17 @@ class Chord(note.NotRest):
         '''
         return self._formatVectorString(self._getIntervalVector())
 
-    intervalVectorString = property(_getIntervalVectorString)    
+    intervalVectorString = property(_getIntervalVectorString, 
+        doc = '''Return the interval vector as a string representation.
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.intervalVectorString
+        '<001110>'
+        ''')    
 
 
     def _isPrimeFormInversion(self):
-        '''Get the Forte class index number.
-
-        Possible rename forteIndex
-
+        '''
         >>> c1 = Chord(['c', 'e-', 'g'])
         >>> c1.isPrimeFormInversion
         False
@@ -1491,7 +1585,16 @@ class Chord(note.NotRest):
         else:
             return False
         
-    isPrimeFormInversion = property(_isPrimeFormInversion)    
+    isPrimeFormInversion = property(_isPrimeFormInversion, 
+        doc = '''Return True or False if the Chord represents a set class inversion. 
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.isPrimeFormInversion
+        False
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.isPrimeFormInversion
+        True
+        ''')    
 
 
     def _hasZRelation(self):
@@ -1512,7 +1615,13 @@ class Chord(note.NotRest):
         else:
             return True
         
-    hasZRelation = property(_hasZRelation)    
+    hasZRelation = property(_hasZRelation, 
+        doc = '''Return True or False if the Chord has a Z-relation.
+
+        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1.hasZRelation
+        False
+        ''')    
 
 # c2.getZRelation()  # returns a list in non-ET12 space...
 # <music21.chord.ForteSet at 0x234892>
@@ -1556,13 +1665,17 @@ class Chord(note.NotRest):
         self._updateChordTablesAddress()
         return chordTables.addressToCommonNames(self._chordTablesAddress)
         
-    commonName = property(_getCommonName)    
+    commonName = property(_getCommonName, 
+        doc = '''Return a list of common names as strings that are associated with this Chord.
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.commonName
+        ['major triad']
+        ''')    
 
 
     def _getPitchedCommonName(self):
         '''Get the common name of the TN set class.
-
-        Possible rename forteIndex
 
         >>> c1 = Chord(['c', 'e-', 'g'])
         >>> c1.pitchedCommonName
@@ -1585,7 +1698,14 @@ class Chord(note.NotRest):
             root = self.pitches[0]
 
         return '%s-%s' % (self.root(), nameStr)
-    pitchedCommonName = property(_getPitchedCommonName)    
+
+    pitchedCommonName = property(_getPitchedCommonName, 
+        doc = '''Return the common name of this Chord preceded by its root, if a root is available.
+
+        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2.pitchedCommonName
+        'C-major triad'
+        ''')    
 
 
 

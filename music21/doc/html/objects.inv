@@ -257,7 +257,7 @@ music21.stream.Stream.getMeasure method moduleStream.html
 music21.chord.Chord.containsSeventh method moduleChord.html
 music21.clef.GSopranoClef class moduleClef.html
 music21.pitch.Accidental.alter attribute modulePitch.html
-music21.graph.Graph.setData method moduleGraph.html
+music21.converter.ArchiveFilter.getData method moduleConverter.html
 music21.dynamics.unitIntervalToName function moduleDynamics.html
 music21.stream.Stream.attributeCount method moduleStream.html
 music21.base.ElementWrapper.duration attribute moduleBase.html
@@ -438,6 +438,7 @@ music21.duration.Duration.type attribute moduleDuration.html
 music21.meter.TimeSignature.lily attribute moduleMeter.html
 music21.stream.Stream.flattenedRepresentationOf attribute moduleStream.html
 music21.duration.Duration.augmentOrDiminish method moduleDuration.html
+music21.converter.ArchiveFilter class moduleConverter.html
 music21.stream.Stream.getElementsByOffset method moduleStream.html
 music21.graph.PlotScatterWeighted class moduleGraph.html
 music21.note.Beams.getNumbers method moduleNote.html
@@ -486,6 +487,7 @@ music21.chord.Chord.hasAnyRepeatedScale method moduleChord.html
 music21.stream.Stream.getElementsByClass method moduleStream.html
 music21.interval.Interval.reinit method moduleInterval.html
 music21.stream.Stream.getElementBeforeElement method moduleStream.html
+music21.converter.ArchiveFilter.isArchive method moduleConverter.html
 music21.duration.unitSpec function moduleDuration.html
 music21.chord.Chord.hasSeventh method moduleChord.html
 music21.converter.ConverterTinyNotation.parseFile method moduleConverter.html
@@ -548,6 +550,7 @@ music21.graph.Graph.setFigureSize method moduleGraph.html
 music21.duration.convertTypeToQuarterLength function moduleDuration.html
 music21.interval.getAbsoluteHigherNote function moduleInterval.html
 music21.note.Note.isUnpitched attribute moduleNote.html
+music21.graph.Graph.setData method moduleGraph.html
 music21.chord.Chord.containsTriad method moduleChord.html
 music21.graph.PlotHistogramQuarterLength class moduleGraph.html
 music21.converter.ConverterMusicXML.parseFile method moduleConverter.html
@@ -565,6 +568,7 @@ music21.serial.RowSchoenbergOp48No1 class moduleSerial.html
 music21.stream.Stream.getElementById method moduleStream.html
 music21.chord.Chord.transpose method moduleChord.html
 music21.meter.TimeSignature.mx attribute moduleMeter.html
+music21.stream.Stream.prepareNotation method moduleStream.html
 music21.meter.CompoundTimeSignature class moduleMeter.html
 music21.graph.GraphColorGrid.setWindowStep method moduleGraph.html
 music21.clef.Clef class moduleClef.html

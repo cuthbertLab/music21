@@ -507,7 +507,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Eigh
 <dt id="music21.note.GeneralNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">GeneralNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.GeneralNote" title="Permalink to this definition">¶</a></dt>
-<dd><p>A GeneralNote object is the parent object for the Note, Rest, Chird, and related objects.</p>
+<dd><p>A GeneralNote object is the parent object for the <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">music21.note.Note</span></tt></a>, <a title="music21.note.Rest" class="reference internal" href="#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">music21.note.Rest</span></tt></a>, <tt class="xref docutils literal"><span class="pre">music21.note.Chord</span></tt>, and related objects.</p>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>GeneralNote</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -545,7 +545,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.quarterLength">
 <tt class="descname">quarterLength</tt><a class="headerlink" href="#music21.note.GeneralNote.quarterLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return quarter length</p>
+<dd><p>Return the Duration as represented in Quarter Length.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -562,7 +562,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.lyric">
 <tt class="descname">lyric</tt><a class="headerlink" href="#music21.note.GeneralNote.lyric" title="Permalink to this definition">¶</a></dt>
-<dd>returns the first Lyric&#8217;s text todo: should return a n separated string of lyrics</dd></dl>
+<dd>The lyric property can be used to get and set a lyric for this Note, Chord, or Rest. In most cases the <a title="music21.note.GeneralNote.addLyric" class="reference internal" href="#music21.note.GeneralNote.addLyric"><tt class="xref docutils literal"><span class="pre">addLyric()</span></tt></a> method should be used.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.musicxml">
@@ -576,20 +576,20 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="method">
 <dt id="music21.note.GeneralNote.addLyric">
 <tt class="descname">addLyric</tt><big>(</big><em>text</em>, <em>lyricNumber=None</em><big>)</big><a class="headerlink" href="#music21.note.GeneralNote.addLyric" title="Permalink to this definition">¶</a></dt>
-<dd><p>adds another lyric to the note&#8217;s lyric list optionally with a certain lyric number</p>
+<dd><p>Adds a lyric, or an additional lyric, to a Note, Chord, or Rest&#8217;s lyric list. If <cite>lyricNumber</cite> is not None, a specific line of lyric text can be set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">lyrics</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
 <span class="go">&#39;hello&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">lyrics</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span>
 <span class="go">1</span>
-<span class="go">## note that the option number specified gives the lyric number, not the list position</span>
+<span class="go"># note that the option number specified gives the lyric number, not the list position</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&quot;bye&quot;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">lyrics</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
 <span class="go">&#39;bye&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">lyrics</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">number</span>
 <span class="go">3</span>
-<span class="go">## replace existing lyric</span>
+<span class="go"># replace existing lyric</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&quot;ciao&quot;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">lyrics</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
 <span class="go">&#39;ciao&#39;</span>
@@ -602,7 +602,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="method">
 <dt id="music21.note.GeneralNote.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.note.GeneralNote.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a scalar greater than zero, return a Note with a scaled Duration.</p>
+<dd><p>Given a scalar greater than zero, return a Note with a scaled Duration. If <cite>inPlace</cite> is True, this is done in-place and the method returns None. If <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -865,7 +865,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Whol
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 17, 2010.
+      Last updated on May 19, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

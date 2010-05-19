@@ -85,7 +85,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: findFormat(fmt)
 
-    Given a format defined either by a format name or an extension, return the format name as well as the output exensions 
+    Given a format defined either by a format name or an extension, return the format name as well as the output exensions. Note that .mxl and .mx are only considered MusicXML input formats. 
 
     >>> findFormat('mx')
     ('musicxml', '.xml') 
@@ -108,7 +108,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: findFormatExtURL(url)
 
-    Given a URL, attempt to find the extension 
+    Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters. 
 
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'

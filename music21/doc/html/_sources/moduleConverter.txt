@@ -66,7 +66,7 @@ Converter
 
         .. method:: parseURL(url)
 
-            Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment `autoDownlaad` setting before downloading. 
+            Given a url, download and parse the file into a music21 Stream. Note that this checks the user Environment `autoDownlaad` setting before downloading. 
 
 
 ConverterMusicXML
@@ -99,7 +99,7 @@ ConverterMusicXML
 
         .. method:: parseFile(fp)
 
-            Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
+            Open from a file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
 
 
 ConverterHumdrum
@@ -128,6 +128,26 @@ ConverterHumdrum
         .. method:: parseFile(filepath)
 
             Open Humdram data from a file path. 
+
+
+ArchiveFilter
+-------------
+
+.. class:: ArchiveFilter(fp, format=zip)
+
+    Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive. 
+
+    
+
+    **ArchiveFilter** **methods**
+
+        .. method:: getData(name=None)
+
+            Return data from the archive by name. If no name is given, a default may be available. 
+
+        .. method:: isArchive()
+
+            Return True or False if the filepath is an archive of the supplied format. 
 
 
 ConverterTinyNotation
@@ -181,6 +201,7 @@ StreamFreezer
 
 .. class:: StreamFreezer(streamObj=None)
 
+    This class is used to freeze a Stream, preparing it for pickling. 
 
     
 
@@ -192,10 +213,10 @@ StreamFreezer
 
         .. method:: openPickle(fp)
 
-            No documentation. 
+            For a supplied file path to a pickled stream, unpickle 
 
         .. method:: writePickle(fp=None)
 
-            No documentation. 
+            For a supplied Stream, write a pickled version. 
 
 

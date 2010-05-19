@@ -2008,7 +2008,8 @@ class ElementWrapper(Music21Object):
     def __setattr__(self, name, value):
         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
-        if name in self.__dict__:  # if in the ElementWrapper already, set that first
+        # if in the ElementWrapper already, set that first
+        if name in self.__dict__:  
             object.__setattr__(self, name, value)
         
         # if not, change the attribute in the stored object

@@ -3671,17 +3671,19 @@ class Stream(music21.Music21Object):
         '''
         documented as part of property `pitches`, below.
         '''  
-        returnPitches = []
-        for thisEl in self.elements:
-            if hasattr(thisEl, "pitch"):
-                returnPitches.append(thisEl.pitch)
+        post = []
+        for e in self.elements:
+            # case of a Note or note-like object
+            if hasattr(e, "pitch"):
+                post.append(e.pitch)
             # both Chords and Stream have a pitches properties            
-            elif hasattr(thisEl, "pitches"):
-                for thisPitch in thisEl.pitches:
-                    returnPitches.append(thisPitch)
-            elif isinstance(thisEl, music21.pitch.Pitch):
-                returnPitches.append(thisEl)
-        return returnPitches
+            elif hasattr(e, "pitches"):
+                for thisPitch in e.pitches:
+                    post.append(thisPitch)
+            # do an ininstance comparison
+            elif isinstance(e, music21.pitch.Pitch):
+                post.append(e)
+        return post
     
     pitches = property(_getPitches, doc='''
         Return all :class:`~music21.pitch.Pitch` objects found in any 
@@ -3702,27 +3704,20 @@ class Stream(music21.Music21Object):
         >>> voiceOnePitches[0:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
         
-        
-        
         Note that the pitches returned above are 
         objects, not text:
-        
         
         >>> voiceOnePitches[0].octave
         4
         
-        
         Since pitches are found from internal objects,
         flattening the stream is not required:
-        
-        
         
         >>> len(a.pitches)
         104
 
-        OMIT_FROM_DOCS
-        Test to make sure that Pitch objects are
-        also being retrieved
+        Pitch objects are also retrieved when stored directly on a Stream.
+
         >>> from music21 import pitch
         >>> pitch1 = pitch.Pitch()
         >>> st1 = Stream()

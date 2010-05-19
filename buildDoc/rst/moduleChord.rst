@@ -48,13 +48,17 @@ Chord
 
         .. attribute:: pitches
 
-            
+            Return a list of all Pitch objects in this Chord. 
 
-            
+            >>> c = Chord(["C4", "E4", "G#4"])
+            >>> c.pitches
+            [C4, E4, G#4] 
+            >>> [p.midi for p in c.pitches]
+            [60, 64, 68] 
 
         .. attribute:: chordTablesAddress
 
-            
+            Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively). 
 
             >>> c = Chord(["C4", "E4", "G#4"])
             >>> c.chordTablesAddress
@@ -62,84 +66,63 @@ Chord
 
         .. attribute:: commonName
 
-            Get the common name of the TN set class. Possible rename forteIndex 
+            Return a list of common names as strings that are associated with this Chord. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.commonName
-            ['minor triad'] 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.commonName
             ['major triad'] 
 
         .. attribute:: forteClass
 
-            Return a forte class name 
+            Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.forteClass
-            '3-11A' 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.forteClass
             '3-11B' 
 
         .. attribute:: forteClassNumber
 
-            Get the Forte class index number. Possible rename forteIndex 
+            Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.forteClassNumber
-            11 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.forteClassNumber
             11 
 
         .. attribute:: forteClassTn
 
-            Return a forte class name 
+            Return the Forte Tn set class name, where inversion distinctions are represented. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.forteClass
-            '3-11A' 
             >>> c2 = Chord(['c', 'e', 'g'])
-            >>> c2.forteClass
+            >>> c2.forteClassTn
             '3-11B' 
 
         .. attribute:: forteClassTnI
 
-            Return a forte class name under TnI classification 
+            Return the Forte TnI class name, where inversion distinctions are not represented. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.forteClassTnI
-            '3-11' 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.forteClassTnI
             '3-11' 
 
         .. attribute:: hasZRelation
 
-            Get the Z-relation status 
+            Return True or False if the Chord has a Z-relation. 
 
             >>> c1 = Chord(['c', 'e-', 'g'])
             >>> c1.hasZRelation
             False 
-            >>> c2 = Chord(['c', 'e', 'g'])
-            >>> c2.hasZRelation
-            False 
 
         .. attribute:: intervalVector
 
-            Get the Forte class index number. Possible rename forteIndex 
+            Return the interval vector for this Chord as a list of integers. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.intervalVector
-            [0, 0, 1, 1, 1, 0] 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.intervalVector
             [0, 0, 1, 1, 1, 0] 
 
         .. attribute:: intervalVectorString
 
-            
+            Return the interval vector as a string representation. 
 
             >>> c1 = Chord(['c', 'e-', 'g'])
             >>> c1.intervalVectorString
@@ -147,7 +130,7 @@ Chord
 
         .. attribute:: isPrimeFormInversion
 
-            Get the Forte class index number. Possible rename forteIndex 
+            Return True or False if the Chord represents a set class inversion. 
 
             >>> c1 = Chord(['c', 'e-', 'g'])
             >>> c1.isPrimeFormInversion
@@ -162,7 +145,7 @@ Chord
 
         .. attribute:: multisetCardinality
 
-            Return the number of pitch classes, regardless of redundancy. 
+            Return an integer representing the cardinality of the mutliset, or the number of pitch values. 
 
             >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.multisetCardinality
@@ -192,18 +175,15 @@ Chord
 
         .. attribute:: normalForm
 
-            
+            Return the normal form of the Chord represented as a list of integers. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.normalForm
-            [0, 3, 7] 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.normalForm
             [0, 4, 7] 
 
         .. attribute:: normalFormString
 
-            
+            Return a string representation of the normal form of the Chord. 
 
             >>> c1 = Chord(['f#', 'e-', 'g'])
             >>> c1.normalFormString
@@ -211,7 +191,7 @@ Chord
 
         .. attribute:: orderedPitchClasses
 
-            Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set 
+            Return an list of pitch class integers, ordered form lowest to highest. 
 
             >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.orderedPitchClasses
@@ -219,7 +199,7 @@ Chord
 
         .. attribute:: orderedPitchClassesString
 
-            
+            Return a string representation of the pitch class values. 
 
             >>> c1 = Chord(['f#', 'e-', 'g'])
             >>> c1.orderedPitchClassesString
@@ -227,7 +207,7 @@ Chord
 
         .. attribute:: pitchClassCardinality
 
-            Return the number of unique pitch classes 
+            Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord. 
 
             >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.pitchClassCardinality
@@ -235,7 +215,7 @@ Chord
 
         .. attribute:: pitchClasses
 
-            Return a pitch class representation ordered as the original chord. 
+            Return a list of all pitch classes in the chord as integers. 
 
             >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.pitchClasses
@@ -243,11 +223,8 @@ Chord
 
         .. attribute:: pitchedCommonName
 
-            Get the common name of the TN set class. Possible rename forteIndex 
+            Return the common name of this Chord preceded by its root, if a root is available. 
 
-            >>> c1 = Chord(['c', 'e-', 'g'])
-            >>> c1.pitchedCommonName
-            'C-minor triad' 
             >>> c2 = Chord(['c', 'e', 'g'])
             >>> c2.pitchedCommonName
             'C-major triad' 
@@ -256,9 +233,17 @@ Chord
 
             Return a representation of the Chord as a prime-form list of pitch class integers. 
 
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.primeForm
+            [0, 3, 7] 
+
         .. attribute:: primeFormString
 
             Return a representation of the Chord as a prime-form set class string. 
+
+            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1.primeFormString
+            '<037>' 
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`, :attr:`~music21.note.GeneralNote.quarterLength`
 

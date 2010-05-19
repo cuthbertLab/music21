@@ -51,6 +51,7 @@
 <li><a class="reference external" href="#converter">Converter</a></li>
 <li><a class="reference external" href="#convertermusicxml">ConverterMusicXML</a></li>
 <li><a class="reference external" href="#converterhumdrum">ConverterHumdrum</a></li>
+<li><a class="reference external" href="#archivefilter">ArchiveFilter</a></li>
 <li><a class="reference external" href="#convertertinynotation">ConverterTinyNotation</a></li>
 <li><a class="reference external" href="#picklefilter">PickleFilter</a></li>
 <li><a class="reference external" href="#streamfreezer">StreamFreezer</a></li>
@@ -158,7 +159,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="method">
 <dt id="music21.converter.Converter.parseURL">
 <tt class="descname">parseURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseURL" title="Permalink to this definition">¶</a></dt>
-<dd>Given a url, download and parse the file into a music21 Stream. Note that this check the user Environment <cite>autoDownlaad</cite> setting before downloading.</dd></dl>
+<dd>Given a url, download and parse the file into a music21 Stream. Note that this checks the user Environment <cite>autoDownlaad</cite> setting before downloading.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -198,7 +199,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.parseFile">
 <tt class="descname">parseFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseFile" title="Permalink to this definition">¶</a></dt>
-<dd>Open from file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source.</dd></dl>
+<dd>Open from a file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -231,6 +232,29 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
 <dt id="music21.converter.ConverterHumdrum.parseFile">
 <tt class="descname">parseFile</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseFile" title="Permalink to this definition">¶</a></dt>
 <dd>Open Humdram data from a file path.</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="archivefilter">
+<h2>ArchiveFilter<a class="headerlink" href="#archivefilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.converter.ArchiveFilter">
+<em class="property">
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ArchiveFilter</tt><big>(</big><em>fp</em>, <em>format=zip</em><big>)</big><a class="headerlink" href="#music21.converter.ArchiveFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.</p>
+<p><strong>ArchiveFilter</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.converter.ArchiveFilter.getData">
+<tt class="descname">getData</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.converter.ArchiveFilter.getData" title="Permalink to this definition">¶</a></dt>
+<dd>Return data from the archive by name. If no name is given, a default may be available.</dd></dl>
+
+<dl class="method">
+<dt id="music21.converter.ArchiveFilter.isArchive">
+<tt class="descname">isArchive</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ArchiveFilter.isArchive" title="Permalink to this definition">¶</a></dt>
+<dd>Return True or False if the filepath is an archive of the supplied format.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -293,7 +317,8 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dt id="music21.converter.StreamFreezer">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">StreamFreezer</tt><big>(</big><em>streamObj=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>StreamFreezer</strong> <strong>attributes</strong></p>
+<dd><p>This class is used to freeze a Stream, preparing it for pickling.</p>
+<p><strong>StreamFreezer</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>stream</cite></blockquote>
 <p><strong>StreamFreezer</strong> <strong>methods</strong></p>
@@ -301,12 +326,12 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
 <dl class="method">
 <dt id="music21.converter.StreamFreezer.openPickle">
 <tt class="descname">openPickle</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.openPickle" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>For a supplied file path to a pickled stream, unpickle</dd></dl>
 
 <dl class="method">
 <dt id="music21.converter.StreamFreezer.writePickle">
 <tt class="descname">writePickle</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.converter.StreamFreezer.writePickle" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>For a supplied Stream, write a pickled version.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -340,7 +365,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 17, 2010.
+      Last updated on May 19, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

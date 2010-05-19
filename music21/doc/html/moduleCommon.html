@@ -186,7 +186,7 @@
 <dl class="function">
 <dt id="music21.common.findFormat">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormat</tt><big>(</big><em>fmt</em><big>)</big><a class="headerlink" href="#music21.common.findFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a format defined either by a format name or an extension, return the format name as well as the output exensions</p>
+<dd><p>Given a format defined either by a format name or an extension, return the format name as well as the output exensions. Note that .mxl and .mx are only considered MusicXML input formats.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;mx&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;.mxl&#39;</span><span class="p">)</span>
@@ -212,7 +212,7 @@
 <dl class="function">
 <dt id="music21.common.findFormatExtURL">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormatExtURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.common.findFormatExtURL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a URL, attempt to find the extension</p>
+<dd><p>Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
@@ -654,7 +654,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 17, 2010.
+      Last updated on May 19, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

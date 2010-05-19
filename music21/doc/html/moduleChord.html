@@ -126,12 +126,21 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.pitches">
 <tt class="descname">pitches</tt><a class="headerlink" href="#music21.chord.Chord.pitches" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return a list of all Pitch objects in this Chord.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">pitches</span>
+<span class="go">[C4, E4, G#4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">midi</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">pitches</span><span class="p">]</span>
+<span class="go">[60, 64, 68]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.chord.Chord.chordTablesAddress">
 <tt class="descname">chordTablesAddress</tt><a class="headerlink" href="#music21.chord.Chord.chordTablesAddress" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
+<dd><p>Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">chordTablesAddress</span>
 <span class="go">(3, 12, 0)</span>
 </pre></div>
@@ -141,11 +150,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.commonName">
 <tt class="descname">commonName</tt><a class="headerlink" href="#music21.chord.Chord.commonName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the common name of the TN set class. Possible rename forteIndex</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">commonName</span>
-<span class="go">[&#39;minor triad&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return a list of common names as strings that are associated with this Chord.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">commonName</span>
 <span class="go">[&#39;major triad&#39;]</span>
 </pre></div>
@@ -155,11 +161,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.forteClass">
 <tt class="descname">forteClass</tt><a class="headerlink" href="#music21.chord.Chord.forteClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a forte class name</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClass</span>
-<span class="go">&#39;3-11A&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span>
 <span class="go">&#39;3-11B&#39;</span>
 </pre></div>
@@ -169,11 +172,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.forteClassNumber">
 <tt class="descname">forteClassNumber</tt><a class="headerlink" href="#music21.chord.Chord.forteClassNumber" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the Forte class index number. Possible rename forteIndex</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClassNumber</span>
-<span class="go">11</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassNumber</span>
 <span class="go">11</span>
 </pre></div>
@@ -183,12 +183,9 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.forteClassTn">
 <tt class="descname">forteClassTn</tt><a class="headerlink" href="#music21.chord.Chord.forteClassTn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a forte class name</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClass</span>
-<span class="go">&#39;3-11A&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span>
+<dd><p>Return the Forte Tn set class name, where inversion distinctions are represented.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassTn</span>
 <span class="go">&#39;3-11B&#39;</span>
 </pre></div>
 </div>
@@ -197,11 +194,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.forteClassTnI">
 <tt class="descname">forteClassTnI</tt><a class="headerlink" href="#music21.chord.Chord.forteClassTnI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a forte class name under TnI classification</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">forteClassTnI</span>
-<span class="go">&#39;3-11&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the Forte TnI class name, where inversion distinctions are not represented.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassTnI</span>
 <span class="go">&#39;3-11&#39;</span>
 </pre></div>
@@ -211,12 +205,9 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.hasZRelation">
 <tt class="descname">hasZRelation</tt><a class="headerlink" href="#music21.chord.Chord.hasZRelation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the Z-relation status</p>
+<dd><p>Return True or False if the Chord has a Z-relation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">hasZRelation</span>
-<span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">hasZRelation</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -225,11 +216,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.intervalVector">
 <tt class="descname">intervalVector</tt><a class="headerlink" href="#music21.chord.Chord.intervalVector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the Forte class index number. Possible rename forteIndex</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">intervalVector</span>
-<span class="go">[0, 0, 1, 1, 1, 0]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the interval vector for this Chord as a list of integers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">intervalVector</span>
 <span class="go">[0, 0, 1, 1, 1, 0]</span>
 </pre></div>
@@ -239,7 +227,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.intervalVectorString">
 <tt class="descname">intervalVectorString</tt><a class="headerlink" href="#music21.chord.Chord.intervalVectorString" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the interval vector as a string representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">intervalVectorString</span>
 <span class="go">&#39;&lt;001110&gt;&#39;</span>
 </pre></div>
@@ -249,7 +238,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.isPrimeFormInversion">
 <tt class="descname">isPrimeFormInversion</tt><a class="headerlink" href="#music21.chord.Chord.isPrimeFormInversion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the Forte class index number. Possible rename forteIndex</p>
+<dd><p>Return True or False if the Chord represents a set class inversion.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">isPrimeFormInversion</span>
 <span class="go">False</span>
@@ -268,7 +257,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.multisetCardinality">
 <tt class="descname">multisetCardinality</tt><a class="headerlink" href="#music21.chord.Chord.multisetCardinality" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the number of pitch classes, regardless of redundancy.</p>
+<dd><p>Return an integer representing the cardinality of the mutliset, or the number of pitch values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">multisetCardinality</span>
 <span class="go">4</span>
@@ -304,10 +293,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.normalForm">
 <tt class="descname">normalForm</tt><a class="headerlink" href="#music21.chord.Chord.normalForm" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">normalForm</span>
-<span class="go">[0, 3, 7]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the normal form of the Chord represented as a list of integers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">normalForm</span>
 <span class="go">[0, 4, 7]</span>
 </pre></div>
@@ -317,7 +304,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.normalFormString">
 <tt class="descname">normalFormString</tt><a class="headerlink" href="#music21.chord.Chord.normalFormString" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return a string representation of the normal form of the Chord.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">normalFormString</span>
 <span class="go">&#39;&lt;034&gt;&#39;</span>
 </pre></div>
@@ -327,7 +315,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.orderedPitchClasses">
 <tt class="descname">orderedPitchClasses</tt><a class="headerlink" href="#music21.chord.Chord.orderedPitchClasses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a pitch class representation ordered by pitch class and removing redundancies. This is a traditional pitch class set</p>
+<dd><p>Return an list of pitch class integers, ordered form lowest to highest.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClasses</span>
 <span class="go">[2, 6, 9]</span>
@@ -338,7 +326,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.orderedPitchClassesString">
 <tt class="descname">orderedPitchClassesString</tt><a class="headerlink" href="#music21.chord.Chord.orderedPitchClassesString" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return a string representation of the pitch class values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClassesString</span>
 <span class="go">&#39;&lt;367&gt;&#39;</span>
 </pre></div>
@@ -348,7 +337,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.pitchClassCardinality">
 <tt class="descname">pitchClassCardinality</tt><a class="headerlink" href="#music21.chord.Chord.pitchClassCardinality" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the number of unique pitch classes</p>
+<dd><p>Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClassCardinality</span>
 <span class="go">3</span>
@@ -359,7 +348,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.pitchClasses">
 <tt class="descname">pitchClasses</tt><a class="headerlink" href="#music21.chord.Chord.pitchClasses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a pitch class representation ordered as the original chord.</p>
+<dd><p>Return a list of all pitch classes in the chord as integers.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClasses</span>
 <span class="go">[2, 9, 6, 2]</span>
@@ -370,11 +359,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.pitchedCommonName">
 <tt class="descname">pitchedCommonName</tt><a class="headerlink" href="#music21.chord.Chord.pitchedCommonName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the common name of the TN set class. Possible rename forteIndex</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchedCommonName</span>
-<span class="go">&#39;C-minor triad&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<dd><p>Return the common name of this Chord preceded by its root, if a root is available.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">pitchedCommonName</span>
 <span class="go">&#39;C-major triad&#39;</span>
 </pre></div>
@@ -384,12 +370,24 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="attribute">
 <dt id="music21.chord.Chord.primeForm">
 <tt class="descname">primeForm</tt><a class="headerlink" href="#music21.chord.Chord.primeForm" title="Permalink to this definition">¶</a></dt>
-<dd>Return a representation of the Chord as a prime-form list of pitch class integers.</dd></dl>
+<dd><p>Return a representation of the Chord as a prime-form list of pitch class integers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeForm</span>
+<span class="go">[0, 3, 7]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.chord.Chord.primeFormString">
 <tt class="descname">primeFormString</tt><a class="headerlink" href="#music21.chord.Chord.primeFormString" title="Permalink to this definition">¶</a></dt>
-<dd>Return a representation of the Chord as a prime-form set class string.</dd></dl>
+<dd><p>Return a representation of the Chord as a prime-form set class string.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeFormString</span>
+<span class="go">&#39;&lt;037&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <p>Properties inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.color" class="reference external" href="moduleNote.html#music21.note.GeneralNote.color"><tt class="xref docutils literal"><span class="pre">color</span></tt></a>, <a title="music21.note.GeneralNote.lyric" class="reference external" href="moduleNote.html#music21.note.GeneralNote.lyric"><tt class="xref docutils literal"><span class="pre">lyric</span></tt></a>, <a title="music21.note.GeneralNote.musicxml" class="reference external" href="moduleNote.html#music21.note.GeneralNote.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.note.GeneralNote.quarterLength" class="reference external" href="moduleNote.html#music21.note.GeneralNote.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
@@ -896,7 +894,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 17, 2010.
+      Last updated on May 19, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
