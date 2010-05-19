@@ -37,19 +37,23 @@ Environment
 
         .. method:: read(fp=None)
 
-            Load from an XML preference file if and only if available and has been written in the past. This means that no preference file will ever be written unless manually done so. 
+            Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None. 
 
         .. method:: write(fp=None)
 
-            Write an XML file. This must be manually called to store preferences. If fp is None, the default storage location will be used. 
+            Write an XML file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used. 
 
         .. method:: getSettingsPath()
 
             Return the path to the platform specific settings file. 
 
-        .. method:: getTempDir()
+        .. method:: getDefaultRootTempDir()
 
-            Get a temporary directory. Return the user preference if set. 
+            Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new 'music21' directory, and then return this directory. This method is only called if the no scratch directory preference has been set. If not able to create a 'music21' directory, the standard default is returned. 
+
+        .. method:: getRootTempDir()
+
+            Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible). 
 
         .. method:: getTempFile(suffix=)
 

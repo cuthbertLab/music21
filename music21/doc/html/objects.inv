@@ -27,6 +27,7 @@ music21.expressions mod moduleExpressions.html
 music21.duration.Duration.componentStartTime method moduleDuration.html
 music21.tinyNotation.HarmonyStream class moduleTinyNotation.html
 music21.graph.Graph.axis attribute moduleGraph.html
+music21.environment.Environment.getDefaultRootTempDir method moduleEnvironment.html
 music21.graph.Graph.done method moduleGraph.html
 music21.serial.rowToMatrix function moduleSerial.html
 music21.note.EighthNote class moduleNote.html
@@ -172,7 +173,7 @@ music21.stream.Stream.measureOffsetMap method moduleStream.html
 music21.stream.Stream.makeMeasures method moduleStream.html
 music21.serial.RowBergChamberConcerto class moduleSerial.html
 music21.meter.TimeSignature.beat attribute moduleMeter.html
-music21.environment.Environment.getTempDir method moduleEnvironment.html
+music21.graph.Graph.setFigureSize method moduleGraph.html
 music21.stream.Stream.index method moduleStream.html
 music21.common.dirPartitioned function moduleCommon.html
 music21.expressions.InvertedTurn class moduleExpressions.html
@@ -538,7 +539,6 @@ music21.clef.Bass8vaClef class moduleClef.html
 music21.common.formatStr function moduleCommon.html
 music21.note.GeneralNote.editorial attribute moduleNote.html
 music21.common.Iterator class moduleCommon.html
-music21.pitch.convertStepToPs function modulePitch.html
 music21.chord.Chord.inversion method moduleChord.html
 music21.serial.RowWebernOp30 class moduleSerial.html
 music21.duration.DurationUnit.ordinal attribute moduleDuration.html
@@ -546,7 +546,7 @@ music21.dynamics.Wedge class moduleDynamics.html
 music21.graph.PlotStream.id attribute moduleGraph.html
 music21.chord.Chord.areZRelations method moduleChord.html
 music21.pitch.Pitch.freq440 attribute modulePitch.html
-music21.graph.Graph.setFigureSize method moduleGraph.html
+music21.pitch.convertStepToPs function modulePitch.html
 music21.duration.convertTypeToQuarterLength function moduleDuration.html
 music21.interval.getAbsoluteHigherNote function moduleInterval.html
 music21.note.Note.isUnpitched attribute moduleNote.html
@@ -693,6 +693,7 @@ music21.duration.Duration.updateQuarterLength method moduleDuration.html
 music21.duration.DurationUnit.augmentOrDiminish method moduleDuration.html
 music21.duration.convertQuarterLengthToType function moduleDuration.html
 music21.graph.GraphColorGrid.setColors method moduleGraph.html
+music21.environment.Environment.getRootTempDir method moduleEnvironment.html
 music21.chord.Chord.isDominantSeventh method moduleChord.html
 music21.meter.TimeSignature.getAccentWeight method moduleMeter.html
 music21.stream.Stream.pop method moduleStream.html

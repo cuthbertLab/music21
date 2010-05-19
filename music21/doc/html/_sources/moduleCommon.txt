@@ -200,7 +200,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: getPlatform()
 
-    Shared function to get platform names. 
+    Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants). 
 
 .. function:: greaterThan(x, y=0.0)
 
