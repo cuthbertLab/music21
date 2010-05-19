@@ -222,7 +222,6 @@ def getComposerDir(composerName):
     >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
     True
     '''
-
     match = None
     for moduleName in MODULES:          
         if common.isListLike(moduleName):
@@ -294,9 +293,6 @@ def getWorkList(workName, movementNumber=None, extList=None):
                     postMvt.append(fp)
         if len(postMvt) == 0:
             pass # return an empty list
-#             raise CorpusException(
-#                 "Cannot get movement number " + str(movementNumber) + 
-#                 " either because " + workName + " does not have that many movements or because the corpus is not organized by movement")
     else:
         postMvt = post
 
@@ -395,7 +391,8 @@ bach = getComposer('bach')
 # additional libraries to define
 
 def getBachChorales(extList=None):
-    '''
+    '''Return all Bach chorales.
+
     >>> a = getBachChorales()
     >>> len(a) > 10
     True
@@ -427,7 +424,8 @@ bachChorales = getBachChorales('xml')
 
 
 def getBeethovenStringQuartets(extList=None):
-    '''
+    '''Return all Beethoven String Quartets.
+
     >>> a = getBeethovenStringQuartets()
     >>> len(a) > 10
     True

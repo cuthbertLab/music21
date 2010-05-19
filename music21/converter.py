@@ -20,6 +20,7 @@ import os
 import urllib
 import time
 import copy
+import zipfile
 
 try:
     import cPickle as pickleMod
@@ -49,6 +50,9 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
+class ArchiveFilterException(Exception):
+    pass
+
 class PickleFilterException(Exception):
     pass
 
@@ -60,6 +64,50 @@ class ConverterFileException(Exception):
 
 
 #-------------------------------------------------------------------------------
+class ArchiveFilter(object):
+    '''Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
+    '''
+    def __init__(self, fp, format='zip'):
+        self.fp = fp
+        self.format = format
+
+    def isArchive(self):
+        '''Return True or False if the filepath is an archive of the supplied format.
+        '''
+        if self.format == 'zip':
+            if self.fp.endswith('mxl'):
+                return True
+            if self.fp.endswith('zip'):
+                return True
+        else:
+            raise ArchiveFilterException('no support for format: %s' % self.format)
+
+    def getData(self, name=None):
+        '''Return data from the archive by name. If no name is given, a default may be available. 
+        '''
+        if self.format == 'zip':
+            f = zipfile.ZipFile(self.fp, 'r')
+            if name == None: # try to auto-harvest
+                # will return data as a string
+                # note that we need to read the META-INF/container.xml file
+                # and get the rootfile full-path
+                # a common presentation will be like this:
+                # ['musicXML.xml', 'META-INF/', 'META-INF/container.xml']
+                for subFp in f.namelist():
+                    # the name musicXML.xml is often used, or get top level
+                    # xml file
+                    if 'META-INF' in subFp: 
+                        continue
+                    if subFp.endswith('.xml'):
+                        return f.read(subFp)
+        # here, we might look specifically at the META-INF data structure
+        elif self.foramt == 'mxl':
+            pass
+        else:
+            raise ArchiveFilterException('no support for format: %s' % self.format)
+
+
+
 class PickleFilter(object):
     '''Before opening a file path, this class can check if there is an up 
     to date version pickled and stored in the scratch directory. 
@@ -122,7 +170,8 @@ class PickleFilter(object):
 
 #-------------------------------------------------------------------------------
 class StreamFreezer(object):
-
+    '''This class is used to freeze a Stream, preparing it for pickling. 
+    '''
 
     def __init__(self, streamObj=None):
         # may want to make a copy, as we are destructively modifying
@@ -139,7 +188,8 @@ class StreamFreezer(object):
 
     #---------------------------------------------------------------------------
     def writePickle(self, fp=None):
-
+        '''For a supplied Stream, write a pickled version.
+        '''
         if fp == None:
             dir = environLocal.getTempDir()
             fp = self._getPickleFp(dir)
@@ -164,7 +214,8 @@ class StreamFreezer(object):
         return fp
 
     def openPickle(self, fp):
-
+        '''For a supplied file path to a pickled stream, unpickle
+        '''
         if os.sep in fp: # assume its a complete path
             fp = fp
         else:
@@ -214,9 +265,6 @@ class ConverterHumdrum(object):
         self.stream = self.data.stream
         return self.data
 
-
-
-
 #-------------------------------------------------------------------------------
 class ConverterTinyNotation(object):
     '''Simple class wrapper for parsing TinyNotation data provided in a file or in a string.
@@ -249,11 +297,6 @@ class ConverterTinyNotation(object):
         tnStr = f.read()
         f.close()
         self.stream = tinyNotation.TinyNotationStream(tnStr)
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -298,15 +341,21 @@ class ConverterMusicXML(object):
         self.load()
 
     def parseFile(self, fp):
-        '''Open from file path; check to see if there is a pickled
+        '''Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
         open source.
         '''
         # return fp to load, if pickle needs to be written, fp pickle
+        # this should be able to work on a .mxl file, as all we are doing
+        # here is seeing which is more recent
+
         pfObj = PickleFilter(fp, self.forceSource)
+        # fpDst here is the file path to load, which may or may not be
+        # a pickled file 
         fpDst, writePickle, fpPickle = pfObj.status() # get status
 
         formatSrc = common.findFormatFile(fp)
+        # here we determine if we have pickled file or a musicxml file
         format = common.findFormatFile(fpDst)
         pickleError = False
 
@@ -341,7 +390,13 @@ class ConverterMusicXML(object):
 
         if format == 'musicxml' or (formatSrc == 'musicxml' and pickleError):
             environLocal.printDebug(['opening musicxml file', fpDst])
-            c.open(fpDst)
+
+            # here, we can see if this is a mxl or similar archive
+            arch = ArchiveFilter(fpDst)
+            if arch.isArchive():
+                c.read(arch.getData())
+            else: # its a file path
+                c.open(fpDst)
 
         if writePickle:
             if fpPickle == None: # if original file cannot be found
@@ -423,7 +478,7 @@ class Converter(object):
     def parseURL(self, url):
         '''Given a url, download and parse the file into a music21 Stream.
 
-        Note that this check the user Environment `autoDownlaad` setting before downloading. 
+        Note that this checks the user Environment `autoDownlaad` setting before downloading. 
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload == 'allow':

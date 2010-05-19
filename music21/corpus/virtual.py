@@ -68,7 +68,6 @@ class VirtualWork(object):
 class BachBWV1007Prelude(VirtualWork):
     def __init__(self):
         '''
-
         >>> a = BachBWV1007Prelude()
         >>> a.getUrlByExt('.xml')
         ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml']
