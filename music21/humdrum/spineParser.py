@@ -45,14 +45,14 @@ class HumdrumDataCollection(object):
     have it as a string.
 
     LIMITATION:    
-    (1) Spines cannot change definition mid-spine.
+    (1) Spines cannot change definition (**exclusive 
+        interpretations) mid-spine.
     
         So if you start off with **kern, the rest of the spine needs to be 
-        **kern (actually, the first interpretation for a spine is 
+        **kern (actually, the first exclusive interpretation for a spine is 
         used throughout)
 
-        You _can_ however change interpretations after a spine-path-indicator.  
-        Note that, even though changing spine types seems to be legal by
+        Note that, even though doing seems to be legal by
         the humdrum definition, it looks like none of the
         conventional humdrum parsing tools allow for changing 
         definitions mid-spine, so I don't think this limitation is a problem.

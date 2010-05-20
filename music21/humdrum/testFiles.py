@@ -1,23 +1,23 @@
 import re
 
-ojibway =  re.sub("\s\s\s\s", "\t", \
+ojibway =  re.sub("\s\s\s\s+", "\t", \
 '''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"
-**kern        **lyrics
-!        ! In Ojibway
-*clefF4        *
-*M3/4        *
-*k[b-e-a-d-g-]        *
-8.d-        Ma-
-16d-        -gi-
+**kern    **lyrics
+!         ! In Ojibway
+*clefF4   *
+*M3/4     *
+*k[b-e-a-d-g-]    *
+8.d-      Ma-
+16d-      -gi-
 =1        =1
-8d-        -ja-
-16A-        -go
-16A-        ic-
-4d-        -kew-
-4d-        -yan
+8d-       -ja-
+16A-      -go
+16A-      ic-
+4d-       -kew-
+4d-       -yan
 =2        =2
 *-        *-
 '''

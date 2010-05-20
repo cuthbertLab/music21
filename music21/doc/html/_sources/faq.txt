@@ -8,7 +8,7 @@ General
 
 How do I ask a question so that it becomes frequently asked?
 
-    Don't you hate FAQs that are not based on anything anyone's ever asked?  To ask, post to http://groups.google.com/group/music21list, after reading below.
+    Don't you hate FAQs that are not based on anything anyone's ever asked?  To ask, post to http://groups.google.com/group/music21list.  But first read what we've already come up with below.
 
 
 What is the native music21 data format?
@@ -29,33 +29,49 @@ What is the native music21 data format?
 
     * If you're programming data structures too complex to be encapsulated in one of the solutions above, you should have enough experience to create a data storage format of your own. Please consider contributing your solution to improve the package.
 
-Can I synthesize sounds with music21?
+Can I synthesize new sounds with music21?
 
-    Music21 is for manipulating symbolic musical data. Symbolic output can, however, be used as control data within a large variety of synthesis packages. Writing a python script to author alternative data formats is one of many plausible approaches.
+    Yes, and no.  Music21 is primarily built for manipulating symbolic 
+    musical data not sound waves.  There are lots of great programs for
+    doing that.  But the symbolic data, however, be used as data within 
+    a large variety of synthesis packages. So you could create new
+    music21 objects that control the synthesis package of your choosing.    
 
-How do I install music21?
+I'll bite the bullet, but how do I install music21?
 
     Please see the complete install instructions: :ref:`install`.
 
 
 
-Utilities
+3rd-Party Utilities
 --------------------
 
-MusicXML?
-    MusicXML is created and owned by Recordare. The definition and more information can be found at the following links:
+What is MusicXML?
+    MusicXML is a file format for exchanging musical scores among different 
+    programs, such as, oh...music21 and Finale (or music21 and Sibelius).  
+    It was created and owned by Recordare (Michael Good, CEO). More 
+    information about the project can be found at:
 
     * http://www.recordare.com/
 
-Humdrum?
-    Information on the Humdrum Toolkit can be found here at the following links:
+And this Humdrum about which you speak?
+    It's another framework for studying music as symbolic data using 
+    simple text files and UNIX scripting tools.  We're big fans of Humdrum 
+    here at music21, but we thought that it was time to take a 
+    different approach. 
+
+    Information on Humdrum can be found here at the following links:
 
     * http://music-cog.ohio-state.edu/Humdrum
     * http://kern.humdrum.net
 
-
-Lilypond?
-    Information on the Lilypond can be found here at the following links:
+What's Lilypond?
+    It's an open-source package for displaying music, sort of like 
+    Finale and Sibelius, but with different goals and a different 
+    approach (and it's free!).  If you have Lilypond installed, 
+    music21 can output to lilypond by using "show('lily')" 
+     
+    More information on the Lilypond can be found here at the following links:
 
     * http://lilypond.org/web
     * http://lilypond.org/doc/v2.12/input/regression/musicxml/collated-files.html

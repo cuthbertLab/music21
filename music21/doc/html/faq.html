@@ -49,7 +49,7 @@
             <ul>
 <li><a class="reference external" href="">Frequently Asked Questions</a><ul>
 <li><a class="reference external" href="#general">General</a></li>
-<li><a class="reference external" href="#utilities">Utilities</a></li>
+<li><a class="reference external" href="#rd-party-utilities">3rd-Party Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -92,7 +92,7 @@
 <h2>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h2>
 <p>How do I ask a question so that it becomes frequently asked?</p>
 <blockquote>
-Don&#8217;t you hate FAQs that are not based on anything anyone&#8217;s ever asked?  To ask, post to <a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a>, after reading below.</blockquote>
+Don&#8217;t you hate FAQs that are not based on anything anyone&#8217;s ever asked?  To ask, post to <a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a>.  But first read what we&#8217;ve already come up with below.</blockquote>
 <p>What is the native music21 data format?</p>
 <blockquote>
 <p>Quick answer: there is none.</p>
@@ -106,31 +106,46 @@ Don&#8217;t you hate FAQs that are not based on anything anyone&#8217;s ever ask
 <li>If you&#8217;re programming data structures too complex to be encapsulated in one of the solutions above, you should have enough experience to create a data storage format of your own. Please consider contributing your solution to improve the package.</li>
 </ul>
 </blockquote>
-<p>Can I synthesize sounds with music21?</p>
+<p>Can I synthesize new sounds with music21?</p>
 <blockquote>
-Music21 is for manipulating symbolic musical data. Symbolic output can, however, be used as control data within a large variety of synthesis packages. Writing a python script to author alternative data formats is one of many plausible approaches.</blockquote>
-<p>How do I install music21?</p>
+Yes, and no.  Music21 is primarily built for manipulating symbolic
+musical data not sound waves.  There are lots of great programs for
+doing that.  But the symbolic data, however, be used as data within
+a large variety of synthesis packages. So you could create new
+music21 objects that control the synthesis package of your choosing.</blockquote>
+<p>I&#8217;ll bite the bullet, but how do I install music21?</p>
 <blockquote>
 Please see the complete install instructions: <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>.</blockquote>
 </div>
-<div class="section" id="utilities">
-<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rd-party-utilities">
+<h2>3rd-Party Utilities<a class="headerlink" href="#rd-party-utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
-<dt>MusicXML?</dt>
-<dd><p class="first">MusicXML is created and owned by Recordare. The definition and more information can be found at the following links:</p>
+<dt>What is MusicXML?</dt>
+<dd><p class="first">MusicXML is a file format for exchanging musical scores among different
+programs, such as, oh...music21 and Finale (or music21 and Sibelius).
+It was created and owned by Recordare (Michael Good, CEO). More
+information about the project can be found at:</p>
 <ul class="last simple">
 <li><a class="reference external" href="http://www.recordare.com/">http://www.recordare.com/</a></li>
 </ul>
 </dd>
-<dt>Humdrum?</dt>
-<dd><p class="first">Information on the Humdrum Toolkit can be found here at the following links:</p>
+<dt>And this Humdrum about which you speak?</dt>
+<dd><p class="first">It&#8217;s another framework for studying music as symbolic data using
+simple text files and UNIX scripting tools.  We&#8217;re big fans of Humdrum
+here at music21, but we thought that it was time to take a
+different approach.</p>
+<p>Information on Humdrum can be found here at the following links:</p>
 <ul class="last simple">
 <li><a class="reference external" href="http://music-cog.ohio-state.edu/Humdrum">http://music-cog.ohio-state.edu/Humdrum</a></li>
 <li><a class="reference external" href="http://kern.humdrum.net">http://kern.humdrum.net</a></li>
 </ul>
 </dd>
-<dt>Lilypond?</dt>
-<dd><p class="first">Information on the Lilypond can be found here at the following links:</p>
+<dt>What&#8217;s Lilypond?</dt>
+<dd><p class="first">It&#8217;s an open-source package for displaying music, sort of like
+Finale and Sibelius, but with different goals and a different
+approach (and it&#8217;s free!).  If you have Lilypond installed,
+music21 can output to lilypond by using &#8220;show(&#8216;lily&#8217;)&#8221;</p>
+<p>More information on the Lilypond can be found here at the following links:</p>
 <ul class="last simple">
 <li><a class="reference external" href="http://lilypond.org/web">http://lilypond.org/web</a></li>
 <li><a class="reference external" href="http://lilypond.org/doc/v2.12/input/regression/musicxml/collated-files.html">http://lilypond.org/doc/v2.12/input/regression/musicxml/collated-files.html</a></li>

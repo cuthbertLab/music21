@@ -260,7 +260,7 @@ def ch1_basic_II_C_1(show=True, *arguments, **keywords):
     '''
     p. 4
     Practice writing whole and half steps. Watch for changes in clef.
-    Write hole steps
+    Write whole steps
     '''
     data = [[clef.TrebleClef(), 'g#4', 'b-4', 'd-4'], 
             [clef.BassClef(), 'e3', 'a-2'], 

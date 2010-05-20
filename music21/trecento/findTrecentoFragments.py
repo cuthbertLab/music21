@@ -183,7 +183,7 @@ def findUpDown(n1, n2, n3):
 if __name__ == "__main__":
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2
-#    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
+    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
 #    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25
@@ -191,7 +191,8 @@ if __name__ == "__main__":
 #    searchForNotes("D4 E4 C4 D4 E4 D4 C4") # Benedicamus Domino Seville 25
 ######    searchForIntervals("A4 A4 G4 A4 G4 A4") # Reina f. 18r top. = QUAL NOVITA
 #    searchForIntervals("G4 F4 F4 E4 E4 D4 D4 C4") # london 29987 88v C
-     searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 29987 88v T
+#    searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 29987 88v T
+#    searchForNotes("G3 E3 F3 G3 F3 E3 D3 C3")  # probable French piece, Nuremberg 9, but worth a check    
 
 #    landiniTonality()
 #    findCasanatense522()

@@ -495,7 +495,7 @@ def js_q5():
     returnStream.show()
 
 if (__name__ == "__main__"):
-    threeDimMozart()
+#    threeDimMozart()
 
-#    simple4d()
+    simple4d()
     #januaryThankYou()
