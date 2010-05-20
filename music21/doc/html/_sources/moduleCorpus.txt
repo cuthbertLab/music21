@@ -7,7 +7,7 @@ music21.corpus.base
 
 .. module:: music21.corpus.base
 
-The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data. 
+The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data. To see complete listing of works in the music21 corpus, visit  :ref:`referenceCorpus`. 
 
 
 .. function:: parseWork(workName, movementNumber=None, extList=None, forceSource=False)

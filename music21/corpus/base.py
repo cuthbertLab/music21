@@ -12,6 +12,8 @@
 
 '''
 The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
+
+To see complete listing of works in the music21 corpus, visit  :ref:`referenceCorpus`.
 '''
 
 
@@ -333,7 +335,7 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 #-------------------------------------------------------------------------------
 # high level utilities that mix corpus and virtual corpus
 def getWorkReferences(includeVirtual=True):
-    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works.
+    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
 
     >>> post = getWorkReferences()
     '''

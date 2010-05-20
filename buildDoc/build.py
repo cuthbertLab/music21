@@ -852,7 +852,7 @@ class CorpusDoc(RestructuredWriter):
         msg = []
 
         msg.append('.. _%s:\n\n' % self.fileRef)
-        msg += self._heading('Corpus Reference' , '=')
+        msg += self._heading('Corpus Reference Index' , '=')
         msg.append(WARN_EDIT)
 
 

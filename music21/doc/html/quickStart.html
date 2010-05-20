@@ -103,12 +103,12 @@
 <p>Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python intepreter. The Python interpreter is designated with the command prompt <cite>&gt;&gt;&gt;</cite>.</p>
 <p>On UNIX-based operating systems with a command line prompt (Terminal.app on Mac OS X), entering <cite>python</cite> will start the Python interpreter.</p>
 <p>On Windows, starting the Python.exe applicatoin or IDLE.py will provide an interactive Python session.</p>
-<p>Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the corpus module from music21, enter the following command.</p>
+<p>Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the <cite>corpus</cite> module from music21, enter the following command.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="go">&gt;&gt;&gt;</span>
 </pre></div>
 </div>
-<p>Assuming this works, your music21 installation is complete and you can move. However, you may get the following error:</p>
+<p>Assuming this works, your music21 installation is complete and you can move on. However, you may get the following error:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">&lt;module&gt;</span>
@@ -122,7 +122,7 @@
 <div class="section" id="examining-a-score">
 <h2>Examining a Score<a class="headerlink" href="#examining-a-score" title="Permalink to this headline">¶</a></h2>
 <p>Once music21 is installed, opening and examing a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.</p>
-<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module. We imported this above, but lets do it again and use the <cite>parseWork</cite> method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.</p>
+<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module. (To see a complete listing of works in the corpus, see <a class="reference external" href="referenceCorpus.html#referencecorpus"><em>Corpus Reference Index</em></a>) We imported this above, but lets do it again and use the <cite>parseWork</cite> method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv7.7&#39;</span><span class="p">)</span>
 </pre></div>

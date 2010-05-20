@@ -29,12 +29,12 @@ On UNIX-based operating systems with a command line prompt (Terminal.app on Mac 
 
 On Windows, starting the Python.exe applicatoin or IDLE.py will provide an interactive Python session.
 
-Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the corpus module from music21, enter the following command.
+Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the `corpus` module from music21, enter the following command.
 
 >>> from music21 import corpus
 >>>
 
-Assuming this works, your music21 installation is complete and you can move. However, you may get the following error:
+Assuming this works, your music21 installation is complete and you can move on. However, you may get the following error:
 
 >>> from music21 import corpus
 Traceback (most recent call last):
@@ -54,7 +54,7 @@ Examining a Score
 
 Once music21 is installed, opening and examing a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.
 
-To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus` module. We imported this above, but lets do it again and use the `parseWork` method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.
+To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`) We imported this above, but lets do it again and use the `parseWork` method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.
 
 >>> from music21 import corpus
 >>> sBach = corpus.parseWork('bach/bwv7.7')
