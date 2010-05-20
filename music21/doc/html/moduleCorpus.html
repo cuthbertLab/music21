@@ -141,7 +141,7 @@
 <dl class="function">
 <dt id="music21.corpus.base.getComposer">
 <tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getComposer</tt><big>(</big><em>composerName</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getComposer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all components of the corpus that match a composer&#8217;s name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions.</p>
+<dd><p>Return all components of the corpus that match a composer&#8217;s name. An <cite>extList</cite>, if provided, defines which extensions are returned. An <cite>extList</cite> of None returns all extensions.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposer</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
 <span class="go">True</span>
@@ -206,7 +206,7 @@
 <dl class="function">
 <dt id="music21.corpus.base.getVirtualWorkList">
 <tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getVirtualWorkList</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getVirtualWorkList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs.</p>
+<dd><p>Given a work name, search all virtual works and return a list of URLs for any matches.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getVirtualWorkList</span><span class="p">(</span><span class="s">&#39;bach/bwv1007/prelude&#39;</span><span class="p">)</span>
 <span class="go">[&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getVirtualWorkList</span><span class="p">(</span><span class="s">&#39;junk&#39;</span><span class="p">)</span>
@@ -261,7 +261,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 19, 2010.
+      Last updated on May 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

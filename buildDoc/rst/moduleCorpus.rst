@@ -60,7 +60,7 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: getComposer(composerName, extList=None)
 
-    Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
+    Return all components of the corpus that match a composer's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
 
     >>> a = getComposer('beethoven')
     >>> len(a) > 10
@@ -113,7 +113,7 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: getVirtualWorkList(workName, movementNumber=None, extList=None)
 
-    Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs. 
+    Given a work name, search all virtual works and return a list of URLs for any matches. 
 
     >>> getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 

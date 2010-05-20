@@ -1739,19 +1739,24 @@ class Music21Object(object):
 #-------------------------------------------------------------------------------
 class ElementWrapper(Music21Object):
     '''
-    An element wraps an object so that the same object can
-    be positioned within a stream.
+    An element wraps any object that is not a :class:`~music21.base.Music21Object`, so that that object can
+    be positioned within a :class:`~music21.stream.Stream`.
     
-    The object is always available as element.obj -- however, calls to
-    the ElementWrapper will call 
+    The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` attribute.
     
-    Object is now mandatory -- calls to ElementWrapper without an object fail,
+    Providing an object at initialization is mandatory. 
+
+    OMIT_FROM_DOCS
     because in the new (11/29) object model, ElementWrapper should only be used
     to wrap an object.
-    
     '''
     obj = None
     _id = None
+
+    _DOC_ORDER = ['obj']
+    _DOC_ATTR = {
+    'obj': 'The object this wrapper wraps.',
+    }
 
     def __init__(self, obj):
         Music21Object.__init__(self)

@@ -1113,18 +1113,21 @@ class Documentation(RestructuredWriter):
                              'glossary',
                              ]
         self.chaptersDeveloper = ['documenting',
-                                ]
+                             ]
     
+        self.chaptersModuleRef = [] # to be populated
         self.chaptersGenerated = [] # to be populated
 
-        self.titleAppendix = 'Indices and Tables'
-        self.chaptersAppendix = ['glossary']
+        #self.titleAppendix = 'Indices and Tables'
+        #self.chaptersAppendix = ['glossary']
     
         self.modulesToBuild = MODULES
         self.updateDirs()
 
 
     def updateDirs(self):
+        '''Update file paths.
+        '''
         self.dir = os.getcwd()
         self.parentDir = os.path.dirname(self.dir)
         parentContents = os.listdir(self.parentDir)
@@ -1164,13 +1167,15 @@ class Documentation(RestructuredWriter):
         msg.append('   :maxdepth: 2\n\n')
         for name in self.chaptersMain:
             msg.append('   %s\n' % name)        
+        for name in self.chaptersGenerated:
+            msg.append('   %s\n' % name)        
         msg.append('\n\n')
 
         msg += self._heading('Module Reference', '=')
         # second toc has collapsed tree
         msg.append('.. toctree::\n')
         msg.append('   :maxdepth: 1\n\n')
-        for name in self.chaptersGenerated:
+        for name in self.chaptersModuleRef:
             msg.append('   %s\n' % name)        
         msg.append('\n\n')
 
@@ -1182,44 +1187,20 @@ class Documentation(RestructuredWriter):
             msg.append('   %s\n' % name)        
         msg.append('\n\n')
 
-
-        msg += self._heading(self.titleAppendix, '=')
-        for name in self.chaptersAppendix:
-            msg.append("* :ref:`%s`\n" % name)
-        msg.append('\n')
+#         msg += self._heading(self.titleAppendix, '=')
+#         for name in self.chaptersAppendix:
+#             msg.append("* :ref:`%s`\n" % name)
+#         msg.append('\n')
 
         fp = os.path.join(self.dirRst, 'contents.rst')
         f = open(fp, 'w')
         f.write(''.join(msg))
         f.close()
 
-#         ex = '''.. _contents:
-# 
-# music21 Documentation
-# ==============================
-# 
-# .. toctree::
-#    :maxdepth: 2
-# 
-#    objects
-#    examples
-#    glossary
-#    faq
-# 
-#    moduleNote_
-# 
-# Indices and Tables
-# ==================
-# 
-# * :ref:`glossary`
-# 
-#         '''
-
-
 
     def writeModuleReference(self):
         '''Write a .rst file for each module defined in modulesToBuild.
-        Add the file reference to the list of chaptersGenerated.
+        Add the file reference to the list of chaptersModuleRef.
         '''
         for module in self.modulesToBuild:
             environLocal.printDebug(['writing rst documentation:', module])
@@ -1228,8 +1209,30 @@ class Documentation(RestructuredWriter):
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
             f.write(a.getRestructured())
             f.close()
-            self.chaptersGenerated.append(a.fileRef)
+            self.chaptersModuleRef.append(a.fileRef)
 
+
+
+    def _writeCorpusReference(self):
+        '''Create a listing of all work in the corpus, both virtual and real.
+        '''
+
+        for dataDict in []:
+            #work, title, author, paths in []:
+            pass
+        #fp = ''
+        #self.chaptersGenerated.append(fp)
+
+
+    def writeGeneratedChapters(self):
+        '''Create generated chapters. 
+        '''
+    
+        self._writeCorpusReference()
+
+
+
+    #---------------------------------------------------------------------------
     def main(self, format):
         '''Create the documentation. 
         '''
@@ -1237,6 +1240,7 @@ class Documentation(RestructuredWriter):
             raise Exception, 'bad format'
 
         self.writeModuleReference()    
+        self.writeGeneratedChapters()    
         self.writeContents()    
 
         if format == 'html':
@@ -1259,6 +1263,10 @@ class Documentation(RestructuredWriter):
     
         if format == 'html':
             webbrowser.open(pathLaunch)
+
+
+
+
 
 
 

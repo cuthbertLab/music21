@@ -65,8 +65,3 @@ Developer Reference
    documenting
 
 
-Indices and Tables
-==================
-
-* :ref:`glossary`
-

@@ -607,7 +607,7 @@ music21.serial.RowWebernOp25 class moduleSerial.html
 music21.pitch.convertPsToFq function modulePitch.html
 music21.expressions.GeneralMordent class moduleExpressions.html
 music21.stream.Stream.splitByClass method moduleStream.html
-music21.duration.roundDuration function moduleDuration.html
+music21.base.ElementWrapper.obj attribute moduleBase.html
 music21.duration.typeToMusicXMLType function moduleDuration.html
 music21.serial.RowSchoenbergOp41 class moduleSerial.html
 music21.interval.getWrittenLowerNote function moduleInterval.html
@@ -853,6 +853,7 @@ music21.chord.Chord.normalForm attribute moduleChord.html
 music21.serial.RowSchoenbergOp32 class moduleSerial.html
 music21.duration.Duration.tuplets attribute moduleDuration.html
 music21.note.GeneralNote.color attribute moduleNote.html
+music21.duration.roundDuration function moduleDuration.html
 music21.stream.Stream.getElementAfterElement method moduleStream.html
 music21.chord.Chord.isFalseDiminishedSeventh method moduleChord.html
 music21.base.ElementWrapper.offset attribute moduleBase.html

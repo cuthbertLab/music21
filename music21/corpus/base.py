@@ -29,7 +29,7 @@ _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 
-
+# import corpus packages as python modules
 from music21.corpus import beethoven
 from music21.corpus.beethoven import opus18no1
 from music21.corpus.beethoven import opus59no1
@@ -87,9 +87,20 @@ MODULES = [
             bach,
     ]
 
+# store all composers as two element tuples of path name, full name
+COMPOSERS = [
+    ('beethoven', 'Ludwig van Beethoven'),
+    ('ciconia', 'Johannes Ciconia'),
+    ('haydn', 'Joseph Haydn'),
+    ('mozart', 'Wolfgang Amadeus Mozart'),
+    ('schoenberg', 'Arnold Schoenberg'),
+    ('schumann', 'Robert Schumann'),
+    ('luca', 'Luca'),
+    ('bach', 'Johann Sebastian Bach'),
+    ]
 
 # instantiate an instance of each virtual work object in a module
-# level constant
+# level constant; this object contain meta data about the work
 VIRTUAL = []
 for name in dir(virtual): # look over virtual module
     className = getattr(virtual, name)
@@ -125,9 +136,7 @@ def getPaths(extList=None):
         extList = (common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('humdrum'))
-
     #environLocal.printDebug(['getting paths with extensions:', extList])
-
     paths = []    
     for moduleName in MODULES:
         if not hasattr(moduleName, '__path__'):
@@ -177,11 +186,11 @@ def getVirtualPaths(extList=None):
                 for part in post:
                     if part not in paths:
                         paths.append(part)
-
     return paths
 
+
 def getComposer(composerName, extList=None):
-    '''Return all components of the corpus that match a composer's name. An extList, if provided, defines which extensions are returned. An extList of None returns all extensions. 
+    '''Return all components of the corpus that match a composer's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
 
     >>> a = getComposer('beethoven')
     >>> len(a) > 10
@@ -274,7 +283,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
     # permit workName to be a list of paths/branches
     if common.isListLike(workName):
         workName = os.path.sep.join(workName)
-
+    # replace with os-dependent separators 
     workSlashes = workName.replace('/', os.path.sep)
 
     for path in paths:
@@ -302,7 +311,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
         return postMvt
 
 def getVirtualWorkList(workName, movementNumber=None, extList=None):
-    '''Given as work name, search all virtual works and see if there is a match. Return a list of one or more work URLs.
+    '''Given a work name, search all virtual works and return a list of URLs for any matches.
 
     >>> getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml']
@@ -320,8 +329,15 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 
 
 #-------------------------------------------------------------------------------
+# high level utilities that mix corpus and virtual corpus
+def getWorkReferences():
+    '''Return a data dictionary for all works in the corpus and virtual corpus.
+    '''
+
+
+
 def getWork(workName, movementNumber=None, extList=None):
-    '''Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+    '''Search the corpus, then the virtual corpus, for a work. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
     >>> import os
     >>> a = getWork('opus74no2', 4)
@@ -349,7 +365,7 @@ def getWork(workName, movementNumber=None, extList=None):
 
 
 def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
-    '''Return a parsed stream from a converter by providing only a work name.
+    '''Search the corpus, then the virtual corpus, for a work. Return a parsed :class:`music21.stream.Stream`.
 
     If forceSource is True, the original file will always be loaded and pickled
     files, if available, will be ignored.
