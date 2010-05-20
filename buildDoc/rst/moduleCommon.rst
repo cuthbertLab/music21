@@ -106,6 +106,27 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
     >>> findFormat('textline')
     ('textline', '.txt') 
 
+.. function:: findFormatExtFile(fp)
+
+    Given a file path (relative or absolute) find format and extension used (not the output extension) 
+
+    >>> findFormatExtFile('test.mx')
+    ('musicxml', '.mx') 
+    >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
+    ('musicxml', '.xml') 
+    >>> findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
+    ('musicxml', '.xml') 
+    >>> findFormatExtFile('test.mus')
+    ('finale', '.mus') 
+    >>> findFormatExtFile('test')
+    (None, None) 
+    Windows drive + pickle 
+    >>> findFormatExtFile('d:/long/file/path/test.p')
+    ('pickle', '.p') 
+    On a windows networked filesystem 
+    >>> findFormatExtFile('\\long\file\path\test.krn')
+    ('humdrum', '.krn') 
+
 .. function:: findFormatExtURL(url)
 
     Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters. 
@@ -316,6 +337,25 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 .. function:: sortModules(moduleList)
 
     Sort a lost of imported module names such that most recently modified is first 
+
+.. function:: spaceCamelCase(usrStr)
+
+    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string. 
+
+    >>> spaceCamelCase('thisIsATest')
+    'this Is A Test' 
+    >>> spaceCamelCase('ThisIsATest')
+    'This Is A Test' 
+    >>> spaceCamelCase('movement3')
+    'movement 3' 
+    >>> spaceCamelCase('opus41no1')
+    'opus 41 no 1' 
+    >>> spaceCamelCase('opus23402no219235')
+    'opus 23402 no 219235' 
+    >>> spaceCamelCase('opus23402no219235').title()
+    'Opus 23402 No 219235' 
+
+    
 
 .. function:: stripAddresses(textString, replacement=ADDRESS)
 

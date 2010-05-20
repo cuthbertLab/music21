@@ -32,6 +32,7 @@ fileExtensions = {
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
+    'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
     'png'  : {'input': ['png'], 'output': 'png'},
@@ -146,6 +147,37 @@ def findFormatFile(fp):
     '''
     format, ext = findFormat(fp.split('.')[-1])
     return format # may be None if no match
+
+
+def findFormatExtFile(fp):
+    '''Given a file path (relative or absolute) find format and extension used (not the output extension)
+
+    >>> findFormatExtFile('test.mx')
+    ('musicxml', '.mx')
+    >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
+    ('musicxml', '.xml')
+    >>> findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
+    ('musicxml', '.xml')
+
+    >>> findFormatExtFile('test.mus')
+    ('finale', '.mus')
+
+    >>> findFormatExtFile('test')
+    (None, None)
+    
+    Windows drive + pickle
+    >>> findFormatExtFile('d:/long/file/path/test.p')
+    ('pickle', '.p')
+    
+    On a windows networked filesystem
+    >>> findFormatExtFile('\\\\long\\file\\path\\test.krn')
+    ('humdrum', '.krn')
+    '''
+    format, extOut = findFormat(fp.split('.')[-1])
+    if format == None:
+        return None, None
+    else:
+        return format, '.'+fp.split('.')[-1] # may be None if no match
 
 
 def findFormatExtURL(url):
@@ -377,6 +409,61 @@ def getNumFromStr(usrStr):
             remain.append(char)
     # returns numbers, and then characeters
     return ''.join(found), ''.join(remain)
+
+def spaceCamelCase(usrStr):
+    '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
+
+    >>> spaceCamelCase('thisIsATest')
+    'this Is A Test'
+    >>> spaceCamelCase('ThisIsATest')
+    'This Is A Test'
+    >>> spaceCamelCase('movement3')
+    'movement 3'
+    >>> spaceCamelCase('opus41no1')
+    'opus 41 no 1'
+    >>> spaceCamelCase('opus23402no219235')
+    'opus 23402 no 219235'
+    >>> spaceCamelCase('opus23402no219235').title()
+    'Opus 23402 No 219235'
+
+    '''
+    numbers = '0123456789.'
+    firstNum = False
+    firstChar = False
+    isNum = False
+    lastIsNum = False
+    post = []
+
+    for char in usrStr:
+        if char in numbers:
+            isNum = True
+        else:
+            isNum = False
+
+        if isNum and not firstNum and not lastIsNum: 
+            firstNum = True
+        else:
+            firstNum = False
+
+        # for chars
+        if not isNum and not firstChar and lastIsNum: 
+            firstChar = True
+        else:
+            firstChar = False
+
+        if len(post) > 0:
+            if char.isupper() or firstNum or firstChar:
+                post.append(' ')
+            post.append(char)
+        else: # first character
+            post.append(char)
+
+        if isNum:
+            lastIsNum = True
+        else:
+            lastIsNum = False
+
+    return ''.join(post)
 
 
 def getPlatform():

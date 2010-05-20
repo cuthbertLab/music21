@@ -12,13 +12,13 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
 .. function:: parseWork(workName, movementNumber=None, extList=None, forceSource=False)
 
-    Return a parsed stream from a converter by providing only a work name. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
+    Search the corpus, then the virtual corpus, for a work. Return a parsed :class:`music21.stream.Stream`. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
 
     >>> aStream = parseWork('opus74no1/movement3')
 
 .. function:: getWork(workName, movementNumber=None, extList=None)
 
-    Search the corpus and return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+    Search the corpus, then the virtual corpus, for a work. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
     >>> import os
     >>> a = getWork('opus74no2', 4)
@@ -134,4 +134,8 @@ The music21 corpus provides a collection of freely distributable music in MusicX
     1 
     >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
     0 
+
+.. function:: getWorkReferences()
+
+    Return a data dictionary for all works in the corpus and virtual corpus. 
 

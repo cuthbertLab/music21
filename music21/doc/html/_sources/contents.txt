@@ -21,8 +21,17 @@ Music21 Documentation
    environment
    graphing
    advancedGraphing
+
+
+System Reference
+================
+
+.. toctree::
+   :maxdepth: 1
+
    faq
    glossary
+   referenceCorpus
 
 
 Module Reference

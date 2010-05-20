@@ -87,7 +87,8 @@ MODULES = [
             bach,
     ]
 
-# store all composers as two element tuples of path name, full name
+# store all composers in the corpus (not virtual) 
+# as two element tuples of path name, full name
 COMPOSERS = [
     ('beethoven', 'Ludwig van Beethoven'),
     ('ciconia', 'Johannes Ciconia'),
@@ -231,6 +232,7 @@ def getComposerDir(composerName):
     >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
     True
     '''
+    # TODO: have this also search COMPOSERS references for full names
     match = None
     for moduleName in MODULES:          
         if common.isListLike(moduleName):
@@ -333,6 +335,56 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 def getWorkReferences():
     '''Return a data dictionary for all works in the corpus and virtual corpus.
     '''
+    post = []
+    for dirComposer, composer in sorted(COMPOSERS):
+        ref = {}
+        ref['composer'] = composer
+        ref['dir'] = dirComposer
+        ref['works'] = {} # store by keys of name/dirname
+
+        works = getComposer(dirComposer)
+        for path in works:
+            # split by the composer dir to get relative path
+            junk, fileStub = path.split(dirComposer)
+            if fileStub.startswith(os.sep):
+                fileStub = fileStub[len(os.sep):]
+            # break into file components
+            fileComponents = fileStub.split(os.sep)
+            # the first is either a directory for containing components
+            # or a top-level name
+            format, ext = common.findFormatExtFile(fileComponents[0])
+            # if not a file w/ ext, we will get None for format
+            if format == None:
+                workStub = fileComponents[0]
+            else: # remove the extension
+                workStub = fileComponents[0].replace(ext, '')
+            # create list location if not already added
+            if workStub not in ref['works'].keys():
+                ref['works'][workStub] = {}
+                ref['works'][workStub]['files'] = []
+                title = common.spaceCamelCase(workStub).upper()
+                ref['works'][workStub]['title'] = title
+
+            # last component is name
+            format, ext = common.findFormatExtFile(fileComponents[-1])
+            fileDict = {}
+            fileDict['format'] = format
+            fileDict['ext'] = ext
+            # all path parts after corpus
+            fileDict['fileStub'] = os.path.join(dirComposer, fileStub)
+            fileDict['fileName'] = fileComponents[-1] # all after 
+
+            # if we do not have a proper name, convert from string
+            # TODO: try to get title form parsed work/score
+            title = common.spaceCamelCase(fileComponents[-1].replace(ext, ''))
+            fileDict['title'] = title.upper()
+
+            ref['works'][workStub]['files'].append(fileDict)
+
+            # add this path
+        
+        post.append(ref)
+    return post
 
 
 

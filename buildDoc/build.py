@@ -840,6 +840,60 @@ class RestructuredWriter(object):
 
 
 #-------------------------------------------------------------------------------
+class CorpusDoc(RestructuredWriter):
+    '''Provide a complete listing of works in the corpus
+    '''
+    def __init__(self):
+        RestructuredWriter.__init__(self)
+        self.fileName = 'referenceCorpus.rst'
+        self.fileRef = 'referenceCorpus'
+
+    def getRestructured(self):
+        msg = []
+
+        msg.append('.. _%s:\n\n' % self.fileRef)
+        msg += self._heading('Corpus Reference' , '=')
+        msg.append(WARN_EDIT)
+
+
+        msg += self._para('''The following listing shows all files available in the music21 corpus and available through the virtual corpus. To load a work from the corpus, provide the file path stub provided. For example::
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv108.6.xml')
+        ''')
+
+        refList = corpus.getWorkReferences()
+        for composerDict in refList:
+            #work, title, composer, paths in []:
+            msg += self._heading(composerDict['composer'], '-')
+
+            msg += self._para('''To get all works by %s, the :meth:`~music21.corpus.base.getComposer` function can be used to get all file paths. For example::
+
+            >>> from music21 import corpus
+            >>> paths = corpus.getComposer('%s')
+
+            ''' % (composerDict['composer'], composerDict['dir']))
+
+            workKeys = sorted(composerDict['works'].keys())
+            for workKey in workKeys:
+                workDict = composerDict['works'][workKey]
+                msg += self._heading(workDict['title'], '~')
+                msg.append('\n'*1)
+
+
+                fileList = ['%s (%s): %s' % (d['title'], 
+                            d['format'], d['fileStub'])
+                            for d in workDict['files']]
+                msg += self._list(fileList, INDENT*2)
+
+
+            msg.append('\n'*2)
+
+        msg.append('\n'*1)
+        return ''.join(msg) # return as tring not a list
+
+
+#-------------------------------------------------------------------------------
 class ClassDoc(RestructuredWriter):
 
     def __init__(self, className):
@@ -963,7 +1017,6 @@ class ClassDoc(RestructuredWriter):
         if docInitCooked != None:
             msg.append('%s\n' % docInitCooked)
         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
-
 
         # if all names are inherited (the are not newly defined) then skip
         # documentation of values
@@ -1109,14 +1162,14 @@ class Documentation(RestructuredWriter):
                              'environment', 
                              'graphing', 
                              'advancedGraphing', 
-                             'faq',
-                             'glossary',
                              ]
         self.chaptersDeveloper = ['documenting',
                              ]
     
         self.chaptersModuleRef = [] # to be populated
-        self.chaptersGenerated = [] # to be populated
+        self.chaptersReference = ['faq',
+                             'glossary',
+                            ] # to be populated
 
         #self.titleAppendix = 'Indices and Tables'
         #self.chaptersAppendix = ['glossary']
@@ -1167,7 +1220,13 @@ class Documentation(RestructuredWriter):
         msg.append('   :maxdepth: 2\n\n')
         for name in self.chaptersMain:
             msg.append('   %s\n' % name)        
-        for name in self.chaptersGenerated:
+        msg.append('\n\n')
+
+        msg += self._heading('System Reference', '=')
+        # second toc has collapsed tree
+        msg.append('.. toctree::\n')
+        msg.append('   :maxdepth: 1\n\n')
+        for name in self.chaptersReference:
             msg.append('   %s\n' % name)        
         msg.append('\n\n')
 
@@ -1212,23 +1271,14 @@ class Documentation(RestructuredWriter):
             self.chaptersModuleRef.append(a.fileRef)
 
 
-
-    def _writeCorpusReference(self):
-        '''Create a listing of all work in the corpus, both virtual and real.
-        '''
-
-        for dataDict in []:
-            #work, title, author, paths in []:
-            pass
-        #fp = ''
-        #self.chaptersGenerated.append(fp)
-
-
     def writeGeneratedChapters(self):
         '''Create generated chapters. 
         '''
-    
-        self._writeCorpusReference()
+        for obj in [CorpusDoc()]:
+            f = open(os.path.join(self.dirRst, obj.fileName), 'w')
+            f.write(obj.getRestructured())
+            f.close()
+            self.chaptersReference.append(obj.fileRef)
 
 
 

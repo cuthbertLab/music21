@@ -411,6 +411,7 @@ music21.corpus.base.getWorkList function moduleCorpus.html
 music21.meter.TimeSignature.ratioEqual method moduleMeter.html
 music21.stream.Stream class moduleStream.html
 music21.stream.System class moduleStream.html
+music21.common.spaceCamelCase function moduleCommon.html
 music21.base.Music21Object.duration attribute moduleBase.html
 music21.serial.RowSchoenbergOp50A class moduleSerial.html
 music21.meter.slashMixedToFraction function moduleMeter.html
@@ -516,6 +517,7 @@ music21.key.Key.generateKey method moduleKey.html
 music21.chord.Chord.inversionName method moduleChord.html
 music21.clef.standardClefFromXN function moduleClef.html
 music21.node.Node.tag attribute moduleNode.html
+music21.common.findFormatExtFile function moduleCommon.html
 music21.graph.PlotStream.ticksOffset method moduleGraph.html
 music21.serial.HistoricalTwelveToneRow.composer attribute moduleSerial.html
 music21.tinyNotation.TinyNotationStream class moduleTinyNotation.html
@@ -607,7 +609,7 @@ music21.serial.RowWebernOp25 class moduleSerial.html
 music21.pitch.convertPsToFq function modulePitch.html
 music21.expressions.GeneralMordent class moduleExpressions.html
 music21.stream.Stream.splitByClass method moduleStream.html
-music21.base.ElementWrapper.obj attribute moduleBase.html
+music21.duration.roundDuration function moduleDuration.html
 music21.duration.typeToMusicXMLType function moduleDuration.html
 music21.serial.RowSchoenbergOp41 class moduleSerial.html
 music21.interval.getWrittenLowerNote function moduleInterval.html
@@ -637,6 +639,7 @@ music21.meter.TimeSignature.load method moduleMeter.html
 music21.duration.DurationUnit.setTypeFromNum method moduleDuration.html
 music21.graph.PlotHorizontalBarPitchSpaceOffset class moduleGraph.html
 music21.interval.GenericInterval class moduleInterval.html
+music21.corpus.base.getWorkReferences function moduleCorpus.html
 music21.serial.RowSchoenbergFragOrganSonata class moduleSerial.html
 music21.serial.RowBergWozzeckPassacaglia class moduleSerial.html
 music21.editorial.NoteEditorial.lilyStart method moduleEditorial.html
@@ -853,7 +856,7 @@ music21.chord.Chord.normalForm attribute moduleChord.html
 music21.serial.RowSchoenbergOp32 class moduleSerial.html
 music21.duration.Duration.tuplets attribute moduleDuration.html
 music21.note.GeneralNote.color attribute moduleNote.html
-music21.duration.roundDuration function moduleDuration.html
+music21.base.ElementWrapper.obj attribute moduleBase.html
 music21.stream.Stream.getElementAfterElement method moduleStream.html
 music21.chord.Chord.isFalseDiminishedSeventh method moduleChord.html
 music21.base.ElementWrapper.offset attribute moduleBase.html
