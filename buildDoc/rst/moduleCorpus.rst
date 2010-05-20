@@ -135,7 +135,9 @@ The music21 corpus provides a collection of freely distributable music in MusicX
     >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
     0 
 
-.. function:: getWorkReferences()
+.. function:: getWorkReferences(includeVirtual=True)
 
-    Return a data dictionary for all works in the corpus and virtual corpus. 
+    Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
+
+    >>> post = getWorkReferences()
 

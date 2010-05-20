@@ -26,6 +26,7 @@ environLocal = environment.Environment(_MOD)
 
 class VirtualWork(object):
     def __init__(self):
+        self.composer = None
         self.title = None
         # provide a partial path in the corpus that represents this file
         self.corpusPath = None
@@ -75,6 +76,7 @@ class BachBWV1007Prelude(VirtualWork):
         '''
         VirtualWork.__init__(self)
 
+        self.composer = 'Johann Sebastian Bach'
         self.title = 'Prelude from Cello Suite No. 1 in G Major, BWV 1007'
         self.corpusPath = 'bach/bwv1007/prelude'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml')        
@@ -85,6 +87,7 @@ class BachBWV772(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
 
+        self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 1 in C Major, BWV 772'
         self.corpusPath = 'bach/bwv772'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven01.krn&f=xml')  
@@ -94,6 +97,7 @@ class BachBWV773(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
 
+        self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 2 in C Minor, BWV 773'
         self.corpusPath = 'bach/bwv773'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=xml')  
@@ -105,6 +109,7 @@ class ColtraneGiantSteps(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
 
+        self.composer = 'John Coltrane'
         self.title = 'Giant Steps'
         self.corpusPath = 'coltrane/giantSteps'        
         self.urlList.append('http://static.wikifonia.org/1164/musicxml.mxl')        
@@ -115,6 +120,7 @@ class SchubertD576(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
 
+        self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-1'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml')        
@@ -124,6 +130,7 @@ class SchubertD5762(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
         
+        self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-6'
         self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6.xml')
@@ -133,6 +140,7 @@ class SchubertD5763(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
         
+        self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-6a'
         self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6a.xml')
@@ -142,6 +150,7 @@ class SchubertD5764(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
         
+        self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-6b'
         self.urlList.append('http://web.mit.edu/sadoian/Public/corpus/schubert576-6b.xml')
@@ -151,6 +160,7 @@ class PachelbelCanonD(VirtualWork):
     def __init__(self):
         VirtualWork.__init__(self)
 
+        self.composer = 'Johann Pachelbel'
         self.title = 'Canon in D Major'
         self.corpusPath = 'pachelbel/canon'        
         self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/pachelbel&file=canon.krn&f=xml')        

@@ -235,8 +235,12 @@
 
 <dl class="function">
 <dt id="music21.corpus.base.getWorkReferences">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getWorkReferences</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.corpus.base.getWorkReferences" title="Permalink to this definition">¶</a></dt>
-<dd>Return a data dictionary for all works in the corpus and virtual corpus.</dd></dl>
+<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getWorkReferences</tt><big>(</big><em>includeVirtual=True</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getWorkReferences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A &#8216;works&#8217; dictionary for each composer provides references to dictionaries for all associated works.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">getWorkReferences</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </div>
 

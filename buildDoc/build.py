@@ -872,7 +872,7 @@ class CorpusDoc(RestructuredWriter):
             >>> from music21 import corpus
             >>> paths = corpus.getComposer('%s')
 
-            ''' % (composerDict['composer'], composerDict['dir']))
+            ''' % (composerDict['composer'], composerDict['composerDir']))
 
             workKeys = sorted(composerDict['works'].keys())
             for workKey in workKeys:
@@ -880,9 +880,8 @@ class CorpusDoc(RestructuredWriter):
                 msg += self._heading(workDict['title'], '~')
                 msg.append('\n'*1)
 
-
                 fileList = ['%s (%s): %s' % (d['title'], 
-                            d['format'], d['fileStub'])
+                            d['format'], d['corpusPath'])
                             for d in workDict['files']]
                 msg += self._list(fileList, INDENT*2)
 

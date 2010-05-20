@@ -107,7 +107,7 @@ for name in dir(virtual): # look over virtual module
     className = getattr(virtual, name)
     if callable(className):
         obj = className()
-        if isinstance(obj, virtual.VirtualWork):
+        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None:
             VIRTUAL.append(obj)
 
 
@@ -332,14 +332,18 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 
 #-------------------------------------------------------------------------------
 # high level utilities that mix corpus and virtual corpus
-def getWorkReferences():
-    '''Return a data dictionary for all works in the corpus and virtual corpus.
+def getWorkReferences(includeVirtual=True):
+    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works.
+
+    >>> post = getWorkReferences()
     '''
+    # from music21 import corpus; corpus.getWorkReferences()
+
     post = []
     for dirComposer, composer in sorted(COMPOSERS):
         ref = {}
         ref['composer'] = composer
-        ref['dir'] = dirComposer
+        ref['composerDir'] = dirComposer
         ref['works'] = {} # store by keys of name/dirname
 
         works = getComposer(dirComposer)
@@ -371,7 +375,7 @@ def getWorkReferences():
             fileDict['format'] = format
             fileDict['ext'] = ext
             # all path parts after corpus
-            fileDict['fileStub'] = os.path.join(dirComposer, fileStub)
+            fileDict['corpusPath'] = os.path.join(dirComposer, fileStub)
             fileDict['fileName'] = fileComponents[-1] # all after 
 
             # if we do not have a proper name, convert from string
@@ -382,10 +386,49 @@ def getWorkReferences():
             ref['works'][workStub]['files'].append(fileDict)
 
             # add this path
-        
         post.append(ref)
-    return post
 
+    # get virtual works
+    if not includeVirtual:
+        return post
+
+    # get each VirtualWork object
+    for vw in VIRTUAL:
+        composerDir = vw.corpusPath.split('/')[0]
+        match = False
+        for ref in post:
+            # check composer reference or first part of corpusPath
+            if (ref['composer'] == vw.composer or 
+                composerDir == ref['composerDir']):
+                match = True
+                break # use this ref
+
+        if not match: # new composers, create a new ref
+            ref = {}
+            ref['composer'] = vw.composer
+            ref['composerDir'] = composerDir
+            ref['works'] = {} # store by keys of name/dirname
+
+        # work stub should be everything other than top-level
+        workStub = vw.corpusPath.replace(composerDir+'/', '')
+        ref['works'][workStub] = {}
+        ref['works'][workStub]['files'] = []
+        ref['works'][workStub]['title'] = vw.title
+
+        for url in vw.urlList:
+            format, ext = common.findFormatExtURL(url)
+            fileDict = {}
+            fileDict['format'] = format
+            fileDict['ext'] = ext
+            # all path parts after corpus
+            fileDict['corpusPath'] = vw.corpusPath
+            fileDict['title'] = vw.title
+            ref['works'][workStub]['files'].append(fileDict)
+
+        if not match: # not found already, need to add
+            post.append(ref)
+
+    return post
 
 
 def getWork(workName, movementNumber=None, extList=None):
