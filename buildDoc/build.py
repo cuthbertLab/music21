@@ -1201,8 +1201,7 @@ class Documentation(RestructuredWriter):
             'music21' not in parentContents):
             raise Exception("not in the music21%sbuildDoc directory: %s" % (os.sep, self.dir))
     
-        parentDir = os.path.dirname(self.dir)
-        self.dirBuild = os.path.join(parentDir, 'music21', 'doc')
+        self.dirBuild = os.path.join(self.parentDir, 'music21', 'doc')
         self.dirRst = os.path.join(self.dir, 'rst')
         self.dirBuildHtml = os.path.join(self.dirBuild, 'html')
         #self.dirBuildLatex = os.path.join(self.dirBuild, 'latex')
