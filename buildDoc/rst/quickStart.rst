@@ -23,13 +23,13 @@ Otherwise, please read the full instructions: :ref:`install`.
 Starting Python and Importing Modules
 -------------------------------------
 
-Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python intepreter. The Python interpreter is designated with the command prompt `>>>`.
+Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python interpreter. The Python interpreter is designated with the command prompt `>>>`.
 
 On UNIX-based operating systems with a command line prompt (Terminal.app on Mac OS X), entering `python` will start the Python interpreter.
 
-On Windows, starting the Python.exe applicatoin or IDLE.py will provide an interactive Python session.
+On Windows, starting the Python.exe application or IDLE.py will provide an interactive Python session.
 
-Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusuable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the `corpus` module from music21, enter the following command.
+Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the :mod:`music21.corpus` module from music21, enter the following command.
 
 >>> from music21 import corpus
 >>>
@@ -52,7 +52,7 @@ http://groups.google.com/group/music21list
 Examining a Score
 ---------------------------------------
 
-Once music21 is installed, opening and examing a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.
+Once music21 is installed, opening and examining a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.
 
 To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`) We imported this above, but lets do it again and use the `parseWork` method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.
 
@@ -61,7 +61,7 @@ To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus`
 
 The score is returned as music21 :class:`~music21.stream.Score`, which is as type (subclass) of music21 :class:`~music21.stream.Stream`. 
 
-Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the :meth:`~music21.stream.Stream.show` method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a user-specied helper application. Assuming you have an appropriate MusicXML reader (see :ref:`install`), and have set it to handle MusicXML files (see :ref:`environment`), the following output (excerpted) will be displayed. 
+Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the :meth:`~music21.stream.Stream.show` method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a user-specified helper application. Assuming you have an appropriate MusicXML reader (see :ref:`install`), and have set it to handle MusicXML files (see :ref:`environment`), the following output (excerpted) will be displayed. 
 
 
 >>> sBach.show()
@@ -103,7 +103,7 @@ We can view one of these Parts by accessing the appropriate component and callin
     :width: 600
 
 
-Again, we can view the componetns of the Part with the 'text' option for the show() method:
+Again, we can view the components of the Part with the 'text' option for the show() method:
 
 >>> sBach[0].show('text')
 {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
@@ -137,7 +137,7 @@ Measures contain numerous components, including :class:`~music21.clef.Clef`, :cl
 Examining a Score by Part Id
 ---------------------------------------
 
-Alternatively, we can access components of a Stream by `id`, or string identifiers. Streams can get components by `id` by using the :meth:`~music21.stream.Stream.getElementById` method. For example, we can first look at all `id` attributes of all Score elements, and then slelect one. 
+Alternatively, we can access components of a Stream by `id`, or string identifiers. Streams can get components by `id` by using the :meth:`~music21.stream.Stream.getElementById` method. For example, we can first look at all `id` attributes of all Score elements, and then select one. 
 
 >>> [part.id for part in sBach]
 [u'Soprano', u'Alto', u'Tenor', u'Bass']
@@ -190,7 +190,7 @@ We might automate this procedure by using Python's loop control structure and ne
 .. image:: images/quickStart-06.*
     :width: 600
 
-Finally, we can add both Part objects to a Score object. To display both parts simultaneosly, we need to use the :meth:`~music21.stream.Stream.insert` method, adding each Part at the 0 position of the Score.
+Finally, we can add both Part objects to a Score object. To display both parts simultaneously, we need to use the :meth:`~music21.stream.Stream.insert` method, adding each Part at the 0 position of the Score.
 
 >>> sCadence = stream.Score()
 >>> sCadence.insert(0, partUpper)
