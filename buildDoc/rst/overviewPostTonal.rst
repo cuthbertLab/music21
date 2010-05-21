@@ -4,7 +4,7 @@
 Overview: Post-Tonal Tools
 =============================================
 
-The music21 toolkit features many tools for analyzing and creating music within a post-tonal context. A :class:`~music21.chord.Chord` can be identified as a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and many other anaytical tools are available. 
+The music21 toolkit features many tools for analyzing and creating music within a post-tonal context. A :class:`~music21.chord.Chord` can be identified as a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and many other analytical tools are available. 
 
 This overview will illustrate key features of music21's post tonal tools. For complete documentation on post-tonal tools, see the many methods in :class:`~music21.chord.Chord` as well as the objects in :ref:`moduleSerial`, such as :class:`~music21.serial.TwelveToneMatrix`, :class:`~music21.serial.TwelveToneRow`, and the many twelve tone rows defined in :attr:`~music21.serial.vienneseRows`.
 
@@ -21,7 +21,7 @@ In the following example, the :func:`~music21.corpus.base.parseWork` function is
 >>> [e.id for e in aScore]
 [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
 
-We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.getMeasureRange` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuraton information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
+We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.getMeasureRange` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
 
 >>> vlnPart = aScore.getElementById('Violin I.')
 >>> mRange = vlnPart.getMeasureRange(4,7)
@@ -53,15 +53,15 @@ If we want to label the notes in our measure range with the Note's pitch class r
 Chords as Forte Set Classes
 ----------------------------
 
-Any music21 Chord can be interpreted as a Forte set class. Additional, a wide variety of anlytical features, derived from the Forte set class, are available as methods of the chord. 
+Any music21 Chord can be interpreted as a Forte set class. Additional, a wide variety of analytical features, derived from the Forte set class, are available as methods of the chord. 
 
 For an example, lets create a sequence of randomly generated aggregate-completing trichords stored on a Stream. That is, we will randomly construct chords with pitch classes, drawing them from a list of all pitch classes. These pitches will be supplied to a Chord object and stored on a Stream.
 
 >>> import random
 >>> from music21 import stream, chord
 >>> aStream = stream.Stream()
->>> src = range(12) # create a list of integers 0 through 11
->>> random.suffle(src) # randomize the order of the integers
+>>> src = range(12) # cheate a list of integers 0 through 11
+>>> random.shuffle(src) # randomize the order of the integers
 >>> for i in range(0,12,3):
 ...     aStream.append(chord.Chord(src[i:i+3]))
 ... 

@@ -33,7 +33,7 @@ To begin, lets create an instance of a Stream and an instance of a Note. We can 
 >>> n1.quarterLength
 2.0
 
-There is more than one way to place this Note in the Stream. A convenient way is with the Stream method :meth:`~music21.stream.Stream.append`. This is related to, but very different from, the `append()` method of Python lists. After using append, there are a number of ways to confirm that our Note is on the Stream. We can use the Python `len()` function to return the number of elements on the Stream. Alternatively, we can use the :meth:`~music21.stream.Stream.show` method with the 'text' or (assuming correct setup of your environment) the 'musicxml' argument to return explicit notations. (See :ref:`quickStart` for basic configuraton information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
+There is more than one way to place this Note in the Stream. A convenient way is with the Stream method :meth:`~music21.stream.Stream.append`. This is related to, but very different from, the `append()` method of Python lists. After using append, there are a number of ways to confirm that our Note is on the Stream. We can use the Python `len()` function to return the number of elements on the Stream. Alternatively, we can use the :meth:`~music21.stream.Stream.show` method with the 'text' or (assuming correct setup of your environment) the 'musicxml' argument to return explicit notations. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
 
 >>> s.append(n1)
 >>> len(s)
@@ -346,9 +346,9 @@ As an aside, it is important to recognize that the offset of the Note has not be
 Accessing Stream Elements by Group and Identifiers
 -----------------------------------------------------------
 
-All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :class:`~music21.base.Music21Object.id` and :class:`~music21.base.Music21Object.gruop`. 
+All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :attr:`~music21.base.Music21Object.id` and :attr:`~music21.base.Music21Object.group`. 
 
-As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguish Part objcects in a Score, but may have other applications. The :meth:`~music21.stream.Stream.getElementById` method can be used to access elements of a Stream by `id`. As an example, after examining all of the `id` attributes of the Score, a new Score can be created, rearranging the order of the Parts by using the :meth:`~music21.stream.Stream.insert` method with an offset of zero.
+As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguish Part objects in a Score, but may have other applications. The :meth:`~music21.stream.Stream.getElementById` method can be used to access elements of a Stream by `id`. As an example, after examining all of the `id` attributes of the Score, a new Score can be created, rearranging the order of the Parts by using the :meth:`~music21.stream.Stream.insert` method with an offset of zero.
 
 >>> [part.id for part in sBach]
 [u'Soprano', u'Alto', u'Tenor', u'Bass']
@@ -367,7 +367,7 @@ As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguis
 Visualizing Streams in Plots
 ---------------------------------------------
 
-While the :meth:`~music21.stream.Stream.show` method provides a valuable view of a Stream, a visual plot a Stream's elements is very useful. Sometimes called a piano roll, we might graph the pitch of a Note over its position in a Measure (or offset if no Measures are defined). The :meth:`~music21.stream.Stream.plot` method permits us to create a plot of any Stream or Stream subclass. There are a large variety of plots: see :ref:`moduleGraph` for a complete list. There are a number of ways to get the desired plot; one, as demonstrated below, is to provide the name of the plot as a string. We can also add a keyward argument for the title of the plot (and configure many other feautures).
+While the :meth:`~music21.stream.Stream.show` method provides a valuable view of a Stream, a visual plot a Stream's elements is very useful. Sometimes called a piano roll, we might graph the pitch of a Note over its position in a Measure (or offset if no Measures are defined). The :meth:`~music21.stream.Stream.plot` method permits us to create a plot of any Stream or Stream subclass. There are a large variety of plots: see :ref:`moduleGraph` for a complete list. There are a number of ways to get the desired plot; one, as demonstrated below, is to provide the name of the plot as a string. We can also add a keyword argument for the title of the plot (and configure many other features).
 
 
 >>> sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')
