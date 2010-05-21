@@ -59,9 +59,9 @@ To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus`
 >>> from music21 import corpus
 >>> sBach = corpus.parseWork('bach/bwv7.7')
 
-The score is returned as music21 :class:`~music21.stream.Score`, which is as type (subclass) of music21 :class:`~music21.stream.Stream`. 
+The score is returned as music21 :class:`~music21.stream.Score`, which is a type (subclass) of music21 :class:`~music21.stream.Stream`. 
 
-Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the :meth:`~music21.stream.Stream.show` method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a user-specified helper application. Assuming you have an appropriate MusicXML reader (see :ref:`install`), and have set it to handle MusicXML files (see :ref:`environment`), the following output (excerpted) will be displayed. 
+Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the :meth:`~music21.stream.Stream.show` method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as a temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a user-specified helper application. Assuming you have an appropriate MusicXML reader (see :ref:`install`), and have set it to handle MusicXML files (see :ref:`environment`), the following output (excerpted) will be displayed. 
 
 
 >>> sBach.show()

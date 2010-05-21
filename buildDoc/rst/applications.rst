@@ -1,7 +1,7 @@
 .. _applications:
 
 
-Applications and Exentensions of music21
+Applications and Extensions of music21
 =============================================
 
 Music21 has been used in numerous research tasks already, and will continue to offer researchers many tools to explore new domains. 
@@ -30,7 +30,7 @@ There are numerous applications for music21 that we anticipate, yet simply have 
 
 - Automatic clarinet fingering generation via ClarFinger font (link: www.trecento.com/fonts/)
 
-- Autoamtic string fingerings. 
+- Automatic string fingerings. 
 
 - Indian Raga encoding: including ascending, descending, and typical presentations, microtonal inflections, common associations, historical context.
 
