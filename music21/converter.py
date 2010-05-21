@@ -80,11 +80,18 @@ class ArchiveFilter(object):
         '''
         if self.format == 'zip':
             if self.fp.endswith('mxl'):
+                # try to open it, as some mxl files are not zips
+                try:
+                    f = zipfile.ZipFile(self.fp, 'r')
+                except zipfile.BadZipfile:
+                    return False
                 return True
             if self.fp.endswith('zip'):
                 return True
         else:
             raise ArchiveFilterException('no support for format: %s' % self.format)
+        return False
+
 
     def getData(self, name=None):
         '''Return data from the archive by name. If no name is given, a default may be available. 
