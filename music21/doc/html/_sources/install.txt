@@ -32,7 +32,7 @@ Even if you have Python on your operating system, you may need to install a newe
 Linux/Mac OS X: Finding Python Version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To determine the Python version you have installed, open a shell or terminal (e.g. xterm, Terminal.app) and enter the following comand-line argument ::
+To determine the Python version you have installed, open a shell or terminal (e.g. xterm, Terminal.app) and enter the following command-line argument ::
 
     $ python -V
     Python 2.6.2
@@ -51,11 +51,11 @@ Python is not shipped with Winodws. If you have already installed Python on your
 Downloading a music21 Package
 ------------------------------
 
-Download the most-recent music21 paackage from the following URL. Windows users should download the .exe file; Linux / Mac OS X users should download the .tar.gz file. 
+Download the most-recent music21 package from the following URL. Windows users should download the .exe file; Linux / Mac OS X users should download the .tar.gz file. 
 
 http://code.google.com/p/music21/downloads/list
 
-For developers and advanced users, anonymous SVN access is available from Google Code. Enter the following command line argument or SVN commnds::
+For developers and advanced users, anonymous SVN access is available from Google Code. Enter the following command line argument or SVN commands::
 
     svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only
 
@@ -81,11 +81,11 @@ Open a shell or terminal (e.g. xterm, Terminal.app), enter the outer-most music2
     $ cd /path/to/dir/music21-version
     $ python setup.py install
 
-On Mac OS X, and possibly on other systems, you may need special permission to write in the Python site-packages directory. An easy way to tepmorarily gain this permission is to use the `sudo` command. If the above returns a permissions error, try the following: ::
+On Mac OS X, and possibly on other systems, you may need special permission to write in the Python site-packages directory. An easy way to temporarily gain this permission is to use the `sudo` command. If the above returns a permissions error, try the following: ::
 
     $ sudo python setup.py install
 
-If you cannot gain permission to install music21 in the Python site-pacakges directory, you can still run and use music21. Place the music21 folder anywhere convenient and note the file path. Start Python, and add this file path to Python's list of directories searched for modules:
+If you cannot gain permission to install music21 in the Python site-packages directory, you can still run and use music21. Place the music21 folder anywhere convenient and note the file path. Start Python, and add this file path to Python's list of directories searched for modules:
 
     >>> import sys
     >>> sys.path.append('/Users/ariza/Desktop/music21')

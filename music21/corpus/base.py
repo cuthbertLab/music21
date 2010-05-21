@@ -24,6 +24,7 @@ import doctest, unittest
 import music21
 from music21 import common
 from music21 import converter
+from music21 import musicxml
 from music21.corpus import virtual
 
 from music21 import environment
@@ -334,15 +335,14 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 
 #-------------------------------------------------------------------------------
 # high level utilities that mix corpus and virtual corpus
-def getWorkReferences(includeVirtual=True):
+def getWorkReferences(sort=True):
     '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
 
     >>> post = getWorkReferences()
     '''
     # from music21 import corpus; corpus.getWorkReferences()
-
     post = []
-    for dirComposer, composer in sorted(COMPOSERS):
+    for dirComposer, composer in COMPOSERS:
         ref = {}
         ref['composer'] = composer
         ref['composerDir'] = dirComposer
@@ -368,8 +368,9 @@ def getWorkReferences(includeVirtual=True):
             if workStub not in ref['works'].keys():
                 ref['works'][workStub] = {}
                 ref['works'][workStub]['files'] = []
-                title = common.spaceCamelCase(workStub).upper()
+                title = common.spaceCamelCase(workStub).title()
                 ref['works'][workStub]['title'] = title
+                ref['works'][workStub]['virtual'] = False
 
             # last component is name
             format, ext = common.findFormatExtFile(fileComponents[-1])
@@ -380,19 +381,22 @@ def getWorkReferences(includeVirtual=True):
             fileDict['corpusPath'] = os.path.join(dirComposer, fileStub)
             fileDict['fileName'] = fileComponents[-1] # all after 
 
-            # if we do not have a proper name, convert from string
-            # TODO: try to get title form parsed work/score
-            title = common.spaceCamelCase(fileComponents[-1].replace(ext, ''))
-            fileDict['title'] = title.upper()
+            title = None
+            # this works but takes a long time!
+#             if format == 'musicxml':
+#                 mxDocument = musicxml.Document()
+#                 mxDocument.open(path)
+#                 title = mxDocument.getBestTitle()
+            if title == None:
+                title = common.spaceCamelCase(
+                    fileComponents[-1].replace(ext, ''))
+                title = title.title()
+            fileDict['title'] = title
 
             ref['works'][workStub]['files'].append(fileDict)
 
             # add this path
         post.append(ref)
-
-    # get virtual works
-    if not includeVirtual:
-        return post
 
     # get each VirtualWork object
     for vw in VIRTUAL:
@@ -414,6 +418,7 @@ def getWorkReferences(includeVirtual=True):
         # work stub should be everything other than top-level
         workStub = vw.corpusPath.replace(composerDir+'/', '')
         ref['works'][workStub] = {}
+        ref['works'][workStub]['virtual'] = True
         ref['works'][workStub]['files'] = []
         ref['works'][workStub]['title'] = vw.title
 
@@ -425,11 +430,25 @@ def getWorkReferences(includeVirtual=True):
             # all path parts after corpus
             fileDict['corpusPath'] = vw.corpusPath
             fileDict['title'] = vw.title
+            fileDict['url'] = url
             ref['works'][workStub]['files'].append(fileDict)
 
         if not match: # not found already, need to add
             post.append(ref)
 
+    if sort:
+        sortGroup = []
+        for ref in post:
+            sortGroupSub = []
+            for workStub in ref['works'].keys():
+                # add title first for sorting
+                sortGroupSub.append([ref['works'][workStub]['title'], workStub])
+            sortGroupSub.sort()
+            ref['sortedWorkKeys'] = [y for x, y in sortGroupSub]
+            # prepare this sort group
+            sortGroup.append([ref['composerDir'], ref])
+        sortGroup.sort()
+        post = [ref for junk, ref in sortGroup]
     return post
 
 

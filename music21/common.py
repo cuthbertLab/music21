@@ -410,7 +410,7 @@ def getNumFromStr(usrStr):
     # returns numbers, and then characeters
     return ''.join(found), ''.join(remain)
 
-def spaceCamelCase(usrStr):
+def spaceCamelCase(usrStr, replaceUnderscore=True):
     '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
 
     >>> spaceCamelCase('thisIsATest')
@@ -463,7 +463,9 @@ def spaceCamelCase(usrStr):
         else:
             lastIsNum = False
 
-    return ''.join(post)
+    postStr = ''.join(post)
+    postStr = postStr.replace('_', ' ')
+    return postStr
 
 
 def getPlatform():

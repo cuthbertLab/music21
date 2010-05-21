@@ -7,9 +7,9 @@ Graphing Utilities
 
 Music21 can provide data graphs and plots of multiple musical attributes using high-level analysis tools.
 
-Users can create their own custom graphing routines by extending or reworking existing music21 grapha and plot classes. 
+Users can create their own custom graphing routines by extending or reworking existing music21 :class:`~music21.graph.Graph` and :class:`~music21.graph.PlotStream` classes. 
 
-Alternatively, music21 provides numersous bre-built plot classes to provide quick access to numerous graphica viewss.
+Alternatively, music21 provides numerous pre-built plot classes to provide quick access to numerous graphical views.
 
 
 

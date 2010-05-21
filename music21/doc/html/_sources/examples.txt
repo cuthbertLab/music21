@@ -5,14 +5,14 @@ Examples and Demonstrations
 =============================
 
 
-The following examples provide a few samples of some of the possibilites available when working with music21.
+The following examples provide a few samples of some of the possibilities available when working with music21.
 
 
 
 Counting, Searching, and Statistical Processing
 ------------------------------------------------
 
-1. Load a musicxml file and count the number of G#'s in it::
+1. Load a MusicXML file and count the number of G#'s in it::
 
     from music21 import *
     aScore = corpus.parseWork("bach/bwv30.6")

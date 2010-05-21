@@ -862,10 +862,11 @@ class CorpusDoc(RestructuredWriter):
         >>> s = corpus.parseWork('bach/bwv108.6.xml')
         ''')
 
-        refList = corpus.getWorkReferences()
+        refList = corpus.getWorkReferences(sort=True)
         for composerDict in refList:
             #work, title, composer, paths in []:
             msg += self._heading(composerDict['composer'], '-')
+            #msg += self._heading(composerDict['composer'], '-')
 
             msg += self._para('''To get all works by %s, the :meth:`~music21.corpus.base.getComposer` function can be used to get all file paths. For example::
 
@@ -874,16 +875,28 @@ class CorpusDoc(RestructuredWriter):
 
             ''' % (composerDict['composer'], composerDict['composerDir']))
 
-            workKeys = sorted(composerDict['works'].keys())
-            for workKey in workKeys:
+            for workKey in composerDict['sortedWorkKeys']:
                 workDict = composerDict['works'][workKey]
-                msg += self._heading(workDict['title'], '~')
+                #msg += self._heading(workDict['title'], '~')
+
+                if not workDict['virtual']: # if not virtual
+                    msg += self._para(workDict['title'])
+                else: # mark virtual sources
+                    msg += self._para(workDict['title'] + ' (*virtual*)')
+
                 msg.append('\n'*1)
 
-                fileList = ['%s (%s): %s' % (d['title'], 
+                if not workDict['virtual']: # if not virtual
+                    fileList = ['%s (*%s*): `%s`' % (d['title'], 
                             d['format'], d['corpusPath'])
                             for d in workDict['files']]
-                msg += self._list(fileList, INDENT*2)
+                else:
+                    fileList = ['%s (%s): `%s`, source: %s' % (d['title'], 
+                            d['format'], d['corpusPath'], d['url'])
+                            for d in workDict['files']]
+
+                msg += self._list(fileList)
+                #msg += self._list(fileList, INDENT*2)
 
 
             msg.append('\n'*2)

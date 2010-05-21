@@ -338,7 +338,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Sort a lost of imported module names such that most recently modified is first 
 
-.. function:: spaceCamelCase(usrStr)
+.. function:: spaceCamelCase(usrStr, replaceUnderscore=True)
 
     Given a camel-cased string, or a mixture of numbers and characters, create a space separated string. 
 

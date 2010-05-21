@@ -2822,6 +2822,17 @@ class Document(object):
     def open(self, fp, audit=False):
         self._load(fp, True, audit)
 
+    #---------------------------------------------------------------------------        
+    # convenience routines to get meta-data
+    def getBestTitle(self):
+        '''title may be stored in more than one place'''
+        if self.score.movementTitle != None:
+            title = self.score.movementTitle
+        elif self.score.workObj != None:
+            title = self.score.workObj.workTitle
+        else:
+            title = None
+        return title
 
     #---------------------------------------------------------------------------        
     def repr(self):
@@ -2829,14 +2840,8 @@ class Document(object):
 
     def reprTest(self):
         '''Basic display for testing'''
-        if self.score.movementTitle != None:
-            title = self.score.movementTitle
-        elif self.score.workObj != None:
-            title = self.score.workObj.workTitle
-        else:
-            title = ''
 
-        print('+'*20 + ' ' + title)
+        print('+'*20 + ' ' + self.getBestTitle())
         print(self.score)
         print()
         print(self.score.toxml(None, None, 1))
