@@ -135,7 +135,10 @@ As should be clear, we can alway check our work with the :class:`~music21.base.M
 .. image:: images/overviewNotes-03.*
     :width: 600
 
-As with the Duration object, we can edit the :attr:`~music21.note.Note.quarterLength` property to quickly change the Note's Duration. 
+As with the Duration object, we can edit the 
+:attr:`~music21.note.Note.quarterLength` property to quickly change the 
+Note's Duration. Notice that because we already set the lyric to have the
+previous QL of 1.0, it does not get changed in the following example.
 
 >>> n1.quarterLength = 6.25
 >>> n1.show()

@@ -273,9 +273,7 @@ Chord
 
         .. method:: canBeDominantV()
 
-            
-
-            
+            Returns True if the chord is a Major Triad or a Dominant Seventh 
 
             >>> a = Chord(['g', 'b', 'd', 'f'])
             >>> a.canBeDominantV()
@@ -283,9 +281,7 @@ Chord
 
         .. method:: canBeTonic()
 
-            
-
-            
+            returns True if the chord is a major or minor triad 
 
             >>> a = Chord(['g', 'b', 'd', 'f'])
             >>> a.canBeTonic()
@@ -293,10 +289,6 @@ Chord
             >>> a = Chord(['g', 'b', 'd'])
             >>> a.canBeTonic()
             True 
-
-        .. method:: checkDurationSanity()
-
-            TO WRITE Checks to make sure all notes have the same duration Does not run automatically 
 
         .. method:: closedPosition()
 
@@ -427,7 +419,7 @@ Chord
 
             Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None. 
 
-            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a = Chord(['G3', 'B3', 'F3', 'D3'])
             >>> a.inversionName()
             43 
 
@@ -585,7 +577,7 @@ Chord
 
         .. method:: semiClosedPosition()
 
-            No documentation. 
+            TODO: Write moves everything within an octave EXCEPT if there's already a pitch at that step, then it puts it up an octave.  It's a very useful display standard for dense post-tonal chords. 
 
         .. method:: sortAscending()
 

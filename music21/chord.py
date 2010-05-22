@@ -629,15 +629,6 @@ class Chord(note.NotRest):
             self._duration = self.pitches[0].duration
             
         return self._duration
-    
-    def checkDurationSanity(self):
-        '''
-		TO WRITE
-
-        Checks to make sure all notes have the same duration
-        Does not run automatically
-        '''
-        pass
 
     def hasThird(self, testRoot = None):
         '''Shortcut for hasScaleX(3)'''
@@ -1141,6 +1132,7 @@ class Chord(note.NotRest):
     
     def canBeDominantV(self):
         '''
+        Returns True if the chord is a Major Triad or a Dominant Seventh
 
         >>> a = Chord(['g', 'b', 'd', 'f'])
         >>> a.canBeDominantV()
@@ -1154,6 +1146,7 @@ class Chord(note.NotRest):
 
     def canBeTonic(self):
         '''
+        returns True if the chord is a major or minor triad
 
         >>> a = Chord(['g', 'b', 'd', 'f'])
         >>> a.canBeTonic()
@@ -1196,7 +1189,7 @@ class Chord(note.NotRest):
         ''' Returns an integer representing the common abbreviation for the inversion the chord is in.
         If chord is not in a common inversion, returns None.
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a = Chord(['G3', 'B3', 'F3', 'D3'])
         >>> a.inversionName()
         43
         '''
@@ -1247,14 +1240,14 @@ class Chord(note.NotRest):
         return newChord.sortAscending() # creates a second new chord object!
 
     def semiClosedPosition(self):
+        '''
+        TODO: Write
+        
+        moves everything within an octave EXCEPT if there's already 
+        a pitch at that step, then it puts it up an octave.  It's a 
+        very useful display standard for dense post-tonal chords.
+        '''
         raise ChordException('not yet implemented')
-
-        # TODO:
-        # moves
-        # everything within an octave EXCEPT if there's already a pitch at that step,
-        # that it puts it up an octave?  That's a very useful display standard for dense
-        # post-tonal chords.
-
 
     #---------------------------------------------------------------------------
     # new methods for forte/pitch class data
@@ -1279,10 +1272,6 @@ class Chord(note.NotRest):
 
     def _getPitchClasses(self):
         '''Return a pitch class representation ordered as the original chord.
-
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.pitchClasses
-        [2, 9, 6, 2]
         '''
         pcGroup = []
         for p in self.pitches:
@@ -1300,10 +1289,6 @@ class Chord(note.NotRest):
 
     def _getMultisetCardinality(self):
         '''Return the number of pitches, regardless of redundancy.
-
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.multisetCardinality
-        4
         '''            
         return len(self._getPitchClasses())
 
@@ -1320,10 +1305,6 @@ class Chord(note.NotRest):
         '''Return a pitch class representation ordered by pitch class and removing redundancies.
 
         This is a traditional pitch class set
-
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.orderedPitchClasses
-        [2, 6, 9]
         '''
         pcGroup = []
         for p in self.pitches:
@@ -1342,11 +1323,6 @@ class Chord(note.NotRest):
 
 
     def _getOrderedPitchClassesString(self):        
-        '''
-        >>> c1 = Chord(['f#', 'e-', 'g'])
-        >>> c1.orderedPitchClassesString
-        '<367>'
-        '''
         return self._formatVectorString(self._getOrderedPitchClasses())
 
     orderedPitchClassesString = property(_getOrderedPitchClassesString, 
@@ -1361,10 +1337,6 @@ class Chord(note.NotRest):
 
     def _getPitchClassCardinality(self):
         '''Return the number of unique pitch classes
-
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1.pitchClassCardinality
-        3
         '''            
         return len(self._getOrderedPitchClasses())
 

@@ -95,15 +95,25 @@
 <p>Here are some quick steps to get up and running quickly with music21.</p>
 <div class="section" id="download-and-install">
 <h2>Download and Install<a class="headerlink" href="#download-and-install" title="Permalink to this headline">¶</a></h2>
-<p>First, download and install music21. If you have installed other Python packages, do what you normally do (include using setuptools/easy_install or pip).</p>
-<p>Otherwise, please read the full instructions: <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>.</p>
+<p>First, download and install music21. Read the full instructions at: <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>.</p>
 </div>
 <div class="section" id="starting-python-and-importing-modules">
 <h2>Starting Python and Importing Modules<a class="headerlink" href="#starting-python-and-importing-modules" title="Permalink to this headline">¶</a></h2>
-<p>Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python interpreter. The Python interpreter is designated with the command prompt <cite>&gt;&gt;&gt;</cite>.</p>
-<p>On UNIX-based operating systems with a command line prompt (Terminal.app on Mac OS X), entering <cite>python</cite> will start the Python interpreter.</p>
-<p>On Windows, starting the Python.exe application or IDLE.py will provide an interactive Python session.</p>
-<p>Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the <tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module from music21, enter the following command.</p>
+<p>Like all Python functionality, music21 can be run from a Python
+script (a .py file) or interactively from the Python interpreter. The
+Python interpreter is designated with the command prompt <cite>&gt;&gt;&gt;</cite>.</p>
+<p>On UNIX-based operating systems with a command line prompt
+(Terminal.app on Mac OS X), entering <cite>python</cite> will start the
+Python interpreter.</p>
+<p>On Windows, starting IDLE from the start menu will provide an
+interactive Python session.</p>
+<p>Once you start Python, you can check to see if your music21
+installation is correctly configured by trying to import a music21 module.
+A module is a Python file that offers reusable resources.
+These are all found inside the music21 package, so often we will
+import a module (or all of them) from music21. To import the
+<tt class="xref docutils literal"><span class="pre">music21.corpus</span></tt> module
+from music21, enter the following command.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="go">&gt;&gt;&gt;</span>
 </pre></div>
@@ -116,7 +126,9 @@
 <span class="go">&gt;&gt;&gt;</span>
 </pre></div>
 </div>
-<p>If this happens, Python is not able to find the music21 package. Return and review the instructions in <a class="reference external" href="install.html#install"><em>Installing Music21</em></a> or contact the music21 group for help:</p>
+<p>If this happens, Python is not able to find the music21 package.
+Return and review the instructions in <a class="reference external" href="install.html#install"><em>Installing Music21</em></a> or contact
+the music21 group for help:</p>
 <p><a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a></p>
 </div>
 <div class="section" id="examining-a-score">
@@ -128,12 +140,24 @@
 </pre></div>
 </div>
 <p>The score is returned as music21 <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, which is a type (subclass) of music21 <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>.</p>
-<p>Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as a temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user&#8217;s environment settings. See <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete details.) Second, it attempts to open this file with a user-specified helper application. Assuming you have an appropriate MusicXML reader (see <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>), and have set it to handle MusicXML files (see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>), the following output (excerpted) will be displayed.</p>
+<p>Once the score is parsed, we can view, transform, and manipulate its
+components in a variety of ways. If we want to output and view the
+entire score, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method.
+Without any arguments, this method does two things. First, it
+writes a MusicXML file of the current Stream as a temporary file or
+in the user-specified scratch directory. (This directory can be defined as
+part of the user&#8217;s environment settings. See <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for
+complete details.) Second, it attempts to open this file with a
+user-specified helper application. Assuming you have an appropriate MusicXML
+reader (see <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>), and have set it to handle MusicXML files
+(see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>), the following output (excerpted) will be displayed.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/quickStart-01.png" src="_images/quickStart-01.png" style="width: 600px;" />
-<p>If we do not have a MusicXML reader handy, we can always show the components of a Stream in a text format, with the optional &#8216;text&#8217; argument passed to the show method. Here is an excerpt of the output.</p>
+<p>If we do not have a MusicXML reader handy, we can always show
+the components of a Stream in a text format, with the optional
+&#8216;text&#8217; argument passed to the show method. Here is an excerpt of the output.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
 <span class="go">{0.0} &lt;music21.stream.Part object at 0x1b67cb0&gt;</span>
 <span class="go">    {0.0} &lt;music21.instrument.Instrument P1: Soprano: Instrument 1&gt;</span>

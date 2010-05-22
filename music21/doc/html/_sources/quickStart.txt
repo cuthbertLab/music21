@@ -14,22 +14,31 @@ Download and Install
 -----------------------
 
 
-First, download and install music21. If you have installed other Python packages, do what you normally do (include using setuptools/easy_install or pip). 
-
-Otherwise, please read the full instructions: :ref:`install`.
+First, download and install music21. Read the full instructions at: :ref:`install`.
 
 
 
 Starting Python and Importing Modules
 -------------------------------------
 
-Like all Python functionality, music21 can be run from a Python script (a .py file) or interactively from the Python interpreter. The Python interpreter is designated with the command prompt `>>>`.
+Like all Python functionality, music21 can be run from a Python 
+script (a .py file) or interactively from the Python interpreter. The 
+Python interpreter is designated with the command prompt `>>>`.
 
-On UNIX-based operating systems with a command line prompt (Terminal.app on Mac OS X), entering `python` will start the Python interpreter.
+On UNIX-based operating systems with a command line prompt 
+(Terminal.app on Mac OS X), entering `python` will start the 
+Python interpreter.
 
-On Windows, starting the Python.exe application or IDLE.py will provide an interactive Python session.
+On Windows, starting IDLE from the start menu will provide an 
+interactive Python session.
 
-Once you start Python, you can check to see if your music21 installation is correctly configured by trying to import a music21 module. A module is a Python file that offers reusable resources. These are all found inside the music21 package, so often we will import a module from music21. To import the :mod:`music21.corpus` module from music21, enter the following command.
+Once you start Python, you can check to see if your music21 
+installation is correctly configured by trying to import a music21 module. 
+A module is a Python file that offers reusable resources. 
+These are all found inside the music21 package, so often we will 
+import a module (or all of them) from music21. To import the 
+:mod:`music21.corpus` module 
+from music21, enter the following command.
 
 >>> from music21 import corpus
 >>>
@@ -42,7 +51,9 @@ Traceback (most recent call last):
 ImportError: No module named music21
 >>> 
     
-If this happens, Python is not able to find the music21 package. Return and review the instructions in :ref:`install` or contact the music21 group for help:
+If this happens, Python is not able to find the music21 package. 
+Return and review the instructions in :ref:`install` or contact 
+the music21 group for help:
 
 http://groups.google.com/group/music21list
 
@@ -61,7 +72,17 @@ To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus`
 
 The score is returned as music21 :class:`~music21.stream.Score`, which is a type (subclass) of music21 :class:`~music21.stream.Stream`. 
 
-Once the score is parsed, we can view, transform, and manipulate its components in a variety of ways. If we want to output and view the entire score, we can use the :meth:`~music21.stream.Stream.show` method. Without any arguments, this method does two things. First, it writes a MusicXML file of the current Stream as a temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a user-specified helper application. Assuming you have an appropriate MusicXML reader (see :ref:`install`), and have set it to handle MusicXML files (see :ref:`environment`), the following output (excerpted) will be displayed. 
+Once the score is parsed, we can view, transform, and manipulate its 
+components in a variety of ways. If we want to output and view the 
+entire score, we can use the :meth:`~music21.stream.Stream.show` method. 
+Without any arguments, this method does two things. First, it 
+writes a MusicXML file of the current Stream as a temporary file or 
+in the user-specified scratch directory. (This directory can be defined as 
+part of the user's environment settings. See :ref:`environment` for 
+complete details.) Second, it attempts to open this file with a 
+user-specified helper application. Assuming you have an appropriate MusicXML 
+reader (see :ref:`install`), and have set it to handle MusicXML files 
+(see :ref:`environment`), the following output (excerpted) will be displayed. 
 
 
 >>> sBach.show()
@@ -69,7 +90,9 @@ Once the score is parsed, we can view, transform, and manipulate its components 
 .. image:: images/quickStart-01.*
     :width: 600
 
-If we do not have a MusicXML reader handy, we can always show the components of a Stream in a text format, with the optional 'text' argument passed to the show method. Here is an excerpt of the output. 
+If we do not have a MusicXML reader handy, we can always show 
+the components of a Stream in a text format, with the optional 
+'text' argument passed to the show method. Here is an excerpt of the output. 
 
 >>> sBach.show('text')
 {0.0} <music21.stream.Part object at 0x1b67cb0>

@@ -10,6 +10,7 @@ Applications include computational musicology, music informations, musical examp
 
 Music21, while newly created from the ground up, leverages many approaches and traditions from previous software systems. See :ref:`about` for information on the authors and the background of this project.
 
+The 21 in `music21` refers to the traditional MIT course number for music and some other humanities departments -- a nod to the place that helped us create this toolkit.
 
 
 Finding Solutions with Small Scripts
@@ -26,9 +27,15 @@ Getting Musical Data
 
 Music21 is specialized for working with musical data represented symbolically: most commonly, this is a musical score or notation. This data can be obtained from a wide variety of sources.
 
-If you use Finale or Sibelius, you can easily output scores or notation from these programs as MusicXML. Music21 can then import the MusicXML data. Additionally, there exist numerous on-line repositories of MusicXML data. See :ref:`overviewFormats` for links.
+If you use Finale, you can easily output scores or notation from 
+these programs as MusicXML (Sibelius can also do so with a commercial add-in). 
+Music21 can then import the MusicXML data. Additionally, there exist 
+numerous on-line repositories of MusicXML data. See :ref:`overviewFormats` 
+for links.
 
-There are numerous additional symbolic music representations. Presently, music21 supports Humdrum and its Kern format. MIDI and additional formats will be forthcoming.
+There are numerous additional symbolic music representations. Presently, 
+music21 supports Humdrum and its Kern format. MuseData, MIDI and additional 
+formats will be forthcoming.
 
 
 

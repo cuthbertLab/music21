@@ -871,7 +871,6 @@ music21.stream.Stream.makeRests method moduleStream.html
 music21.converter.ConverterHumdrum class moduleConverter.html
 music21.meter.TimeSignature.barDuration attribute moduleMeter.html
 music21.stream.Stream.measures attribute moduleStream.html
-music21.chord.Chord.checkDurationSanity method moduleChord.html
 music21.duration.DurationUnit.updateQuarterLength method moduleDuration.html
 music21.stream.Stream.bestClef method moduleStream.html
 music21.note.QuarterNote class moduleNote.html

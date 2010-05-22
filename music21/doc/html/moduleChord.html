@@ -423,7 +423,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="method">
 <dt id="music21.chord.Chord.canBeDominantV">
 <tt class="descname">canBeDominantV</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.canBeDominantV" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<dd><p>Returns True if the chord is a Major Triad or a Dominant Seventh</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">canBeDominantV</span><span class="p">()</span>
 <span class="go">True</span>
 </pre></div>
@@ -433,7 +434,8 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="method">
 <dt id="music21.chord.Chord.canBeTonic">
 <tt class="descname">canBeTonic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.canBeTonic" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<dd><p>returns True if the chord is a major or minor triad</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">canBeTonic</span><span class="p">()</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
@@ -442,11 +444,6 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 </pre></div>
 </div>
 </dd></dl>
-
-<dl class="method">
-<dt id="music21.chord.Chord.checkDurationSanity">
-<tt class="descname">checkDurationSanity</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.checkDurationSanity" title="Permalink to this definition">¶</a></dt>
-<dd>TO WRITE Checks to make sure all notes have the same duration Does not run automatically</dd></dl>
 
 <dl class="method">
 <dt id="music21.chord.Chord.closedPosition">
@@ -614,7 +611,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dt id="music21.chord.Chord.inversionName">
 <tt class="descname">inversionName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.inversionName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;G3&#39;</span><span class="p">,</span> <span class="s">&#39;B3&#39;</span><span class="p">,</span> <span class="s">&#39;F3&#39;</span><span class="p">,</span> <span class="s">&#39;D3&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">inversionName</span><span class="p">()</span>
 <span class="go">43</span>
 </pre></div>
@@ -811,7 +808,7 @@ class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Cho
 <dl class="method">
 <dt id="music21.chord.Chord.semiClosedPosition">
 <tt class="descname">semiClosedPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.semiClosedPosition" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>TODO: Write moves everything within an octave EXCEPT if there&#8217;s already a pitch at that step, then it puts it up an octave.  It&#8217;s a very useful display standard for dense post-tonal chords.</dd></dl>
 
 <dl class="method">
 <dt id="music21.chord.Chord.sortAscending">

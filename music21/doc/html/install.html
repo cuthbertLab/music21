@@ -48,22 +48,17 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Installing Music21</a><ul>
-<li><a class="reference external" href="#check-your-python">Check Your Python</a><ul>
-<li><a class="reference external" href="#downloading-python">Downloading Python</a></li>
-<li><a class="reference external" href="#linux-mac-os-x-finding-python-version">Linux/Mac OS X: Finding Python Version</a></li>
-<li><a class="reference external" href="#windows-finding-the-python-version">Windows: Finding the Python Version</a></li>
+<li><a class="reference external" href="#windows-install-instructions">Windows Install instructions</a><ul>
+<li><a class="reference external" href="#get-python">1. Get Python</a></li>
+<li><a class="reference external" href="#updating-python">1.1 Updating Python</a></li>
+<li><a class="reference external" href="#download-music21">2. Download music21</a></li>
+<li><a class="reference external" href="#install-music21">3.  Install music21</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#downloading-a-music21-package">Downloading a music21 Package</a></li>
-<li><a class="reference external" href="#id1">Installing Music21</a><ul>
-<li><a class="reference external" href="#linux-mac-os-x-installation">Linux/Mac OS X Installation</a></li>
-<li><a class="reference external" href="#windows-installation">Windows Installation</a></li>
-<li><a class="reference external" href="#installation-help">Installation Help</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#downloading-and-installing-music21-with-setuptools-or-pip">Downloading and Installing Music21 with setuptools or pip</a><ul>
-<li><a class="reference external" href="#automated-installation-with-setuptools">Automated Installation with setuptools</a></li>
-<li><a class="reference external" href="#automated-installation-with-pip">Automated Installation with pip</a></li>
+<li><a class="reference external" href="#mac-os-x-install-instructions">Mac OS X Install instructions</a><ul>
+<li><a class="reference external" href="#check-your-version-of-python">1. Check your version of Python</a></li>
+<li><a class="reference external" href="#id1">2. Download music21</a></li>
+<li><a class="reference external" href="#id2">3.  Install Music21</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#installing-additional-python-components">Installing Additional Python Components</a><ul>
@@ -72,8 +67,16 @@
 </ul>
 </li>
 <li><a class="reference external" href="#installing-additional-software-components">Installing Additional Software Components</a><ul>
+<li><a class="reference external" href="#finale-or-finale-reader">Finale or Finale Reader</a></li>
 <li><a class="reference external" href="#lilypond">Lilypond</a></li>
-<li><a class="reference external" href="#finale-reader">Finale Reader</a></li>
+<li><a class="reference external" href="#eclipse-pydev">Eclipse + PyDev</a></li>
+<li><a class="reference external" href="#installation-help">Installation Help</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#advanced-topics-pc-and-mac">Advanced Topics (PC and Mac)</a></li>
+<li><a class="reference external" href="#downloading-and-installing-music21-with-setuptools-or-pip">Downloading and Installing Music21 with setuptools or pip</a><ul>
+<li><a class="reference external" href="#automated-installation-with-setuptools">Automated Installation with setuptools</a></li>
+<li><a class="reference external" href="#automated-installation-with-pip">Automated Installation with pip</a></li>
 </ul>
 </li>
 </ul>
@@ -114,69 +117,213 @@
             
   <div class="section" id="installing-music21">
 <span id="install"></span><h1>Installing Music21<a class="headerlink" href="#installing-music21" title="Permalink to this headline">¶</a></h1>
-<p>Music21 can be installed with a number of different methods. Based on your platform, choose the installation method you are most comfortable with using.</p>
-<div class="section" id="check-your-python">
-<h2>Check Your Python<a class="headerlink" href="#check-your-python" title="Permalink to this headline">¶</a></h2>
-<p>Music21 requires Python 2.6 to run. Python 3.x is not yet supported. Check that you have Python on your system, and that that Python is up to date. Whereas many operating systems come with Python, Windows does not. Windows users will need to download and install Python.</p>
-<div class="section" id="downloading-python">
-<h3>Downloading Python<a class="headerlink" href="#downloading-python" title="Permalink to this headline">¶</a></h3>
-<p>Python 2.6 is available for all platforms and can be downloaded from the following URL:</p>
-<p><a class="reference external" href="http://www.python.org/download">http://www.python.org/download</a></p>
-<p>Even if you have Python on your operating system, you may need to install a newer version. Multiple version of Python can exist on a system without any problems.</p>
+<p>Music21 can be installed with a number of different methods. We give two
+different options depending on if you&#8217;re on PC (Windows) or Mac (OS X).
+Unix users can use most of the Mac instructions, though Finale is not
+available for Mac.</p>
+<div class="section" id="windows-install-instructions">
+<h2>Windows Install instructions<a class="headerlink" href="#windows-install-instructions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get-python">
+<h3>1. Get Python<a class="headerlink" href="#get-python" title="Permalink to this headline">¶</a></h3>
+<p>Python is a simple but powerful programming language that music21
+is written in and in which you will write your own programs that
+use music21.</p>
+<p>Whereas many operating systems come with Python, Windows does not.
+Windows users will need to download and install Python version 2.6
+(or 2.7, 2.8, etc. but NOT 3.0 or above).</p>
+<p>Go to <a class="reference external" href="http://www.python.org/download/">http://www.python.org/download/</a> and click on the &#8220;Windows installer&#8221;
+link.  It is probably the first link.  Save the file to your desktop
+and then click on it there.</p>
+<p>To test to see if Python has been installed properly, go
+to the start menu and run (either by clicking &#8220;Run&#8221; in older
+Windows or by typing in the search box) IDLE.  Type
+<cite>2+2</cite>.  If your system then
+displays <cite>4</cite> you&#8217;ve installed everything properly so far.</p>
 </div>
-<div class="section" id="linux-mac-os-x-finding-python-version">
-<h3>Linux/Mac OS X: Finding Python Version<a class="headerlink" href="#linux-mac-os-x-finding-python-version" title="Permalink to this headline">¶</a></h3>
-<p>To determine the Python version you have installed, open a shell or terminal (e.g. xterm, Terminal.app) and enter the following command-line argument</p>
-<div class="highlight-python"><pre>$ python -V
-Python 2.6.2</pre>
+<div class="section" id="updating-python">
+<h3>1.1 Updating Python<a class="headerlink" href="#updating-python" title="Permalink to this headline">¶</a></h3>
+<p>If you have already installed Python on your computer,
+launch IDLE (the Python editor) by clicking the start menu and
+clicking Run (on Windows XP or older) and typing in &#8220;IDLE&#8221; or
+(on Windows Vista and newer) typing in &#8220;IDLE&#8221; in the Search
+Programs list.</p>
+<p>The first lines of text displayed will include a version number.
+Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.</p>
+<p>If your version is too old, download a newer version as above.</p>
+</div>
+<div class="section" id="download-music21">
+<h3>2. Download music21<a class="headerlink" href="#download-music21" title="Permalink to this headline">¶</a></h3>
+<p>Download the most-recent music21 package from the following URL:</p>
+<blockquote>
+<a class="reference external" href="http://code.google.com/p/music21/downloads/list">http://code.google.com/p/music21/downloads/list</a></blockquote>
+<p>Windows users should download the .exe file to their desktops
+and then click on it.</p>
+</div>
+<div class="section" id="install-music21">
+<h3>3.  Install music21<a class="headerlink" href="#install-music21" title="Permalink to this headline">¶</a></h3>
+<p>Windows installation is easy. After downloading the music21.exe
+installer, click on it on your desktop, then follow and accept
+the prompts for default install options. This installer simply
+copies files into the Python site-packages directory. If the
+installer quits without further notice the installation has
+been successful.</p>
+<p>To test to see if music21 has been installed properly, go
+to the start menu and run (either by clicking &#8220;Run&#8221; in older
+Windows or by typing in the search box) IDLE.  Type
+&#8220;<cite>import music21</cite>&#8220;.  If your system waits for a few seconds and then
+displays &#8220;<cite>&gt;&gt;&gt;</cite>&#8221; you&#8217;ve installed everything properly.  (If the system
+cannot find <cite>music21</cite> then you may have more than one version of
+Python on your system.  Try uninstalling all of them along with <cite>music21</cite>
+and then restarting from scratch).</p>
+<p>After a successful installation, proceed to <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> to
+begin using music21, or skip ahead to Installing Additional Python
+Components below.</p>
 </div>
 </div>
-<div class="section" id="windows-finding-the-python-version">
-<h3>Windows: Finding the Python Version<a class="headerlink" href="#windows-finding-the-python-version" title="Permalink to this headline">¶</a></h3>
-<p>Python is not shipped with Winodws. If you have already installed Python on your computer, launch Python from the start menu or IDLE.py. View the python header to determine the installed version.</p>
-</div>
-</div>
-<div class="section" id="downloading-a-music21-package">
-<h2>Downloading a music21 Package<a class="headerlink" href="#downloading-a-music21-package" title="Permalink to this headline">¶</a></h2>
-<p>Download the most-recent music21 package from the following URL. Windows users should download the .exe file; Linux / Mac OS X users should download the .tar.gz file.</p>
-<p><a class="reference external" href="http://code.google.com/p/music21/downloads/list">http://code.google.com/p/music21/downloads/list</a></p>
-<p>For developers and advanced users, anonymous SVN access is available from Google Code. Enter the following command line argument or SVN commands:</p>
-<div class="highlight-python"><pre>svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only</pre>
-</div>
+<div class="section" id="mac-os-x-install-instructions">
+<h2>Mac OS X Install instructions<a class="headerlink" href="#mac-os-x-install-instructions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="check-your-version-of-python">
+<h3>1. Check your version of Python<a class="headerlink" href="#check-your-version-of-python" title="Permalink to this headline">¶</a></h3>
+<p>Python is a simple but powerful programming language that music21
+is written in and in which you will write your own programs that
+use music21.</p>
+<p>The Macintosh comes with Python, but it might not be a new enough version
+to run music21.  Music21 requires Python 2.6 to run (though many functions
+can run on 2.5 or 2.4). Python 3 is not yet supported.</p>
+<p>To determine the Python version you have installed, open a shell
+or terminal by going to Applications, the Utilities, and then
+clicking &#8220;Terminal&#8221; (if you have xterm installed, that will work
+fine too) and enter the following command-line argument (don&#8217;t type the
+&#8220;$&#8221;)</p>
+<blockquote>
+$ python -V</blockquote>
+<p>it should display something like:</p>
+<blockquote>
+Python 2.6.2</blockquote>
+<p>if so, you&#8217;re okay.  If not, go to <a class="reference external" href="http://www.python.org/download">http://www.python.org/download</a>
+and download a newer version.  Multiple versions of Python can exist
+on a single computer without any problems.</p>
 </div>
 <div class="section" id="id1">
-<h2>Installing Music21<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h3>2. Download music21<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Download the most-recent music21 package from the following URL.</p>
+<blockquote>
+<a class="reference external" href="http://code.google.com/p/music21/downloads/list">http://code.google.com/p/music21/downloads/list</a></blockquote>
+<p>Linux / Mac OS X users should download the .tar.gz file.</p>
+</div>
+<div class="section" id="id2">
+<h3>3.  Install Music21<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called &#8216;site-packages&#8217;. The site-packages directory is located in different places depending on your platform.</p>
-<p>After successful installation, proceed to : <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> to begin using music21.</p>
-<div class="section" id="linux-mac-os-x-installation">
-<h3>Linux/Mac OS X Installation<a class="headerlink" href="#linux-mac-os-x-installation" title="Permalink to this headline">¶</a></h3>
 <p>First, uncompress the .tar.gz file.</p>
-<p>Open a shell or terminal (e.g. xterm, Terminal.app), enter the outer-most music21 directory (using <cite>cd</cite>), and use <cite>python</cite> to execute the setup.py file with the &#8216;install&#8217; argument:</p>
+<p>Open a shell or terminal (e.g. Applications -&gt; Utilities -&gt; Terminal),
+enter the outer-most music21 directory (using <cite>cd</cite>), and use
+<cite>python</cite> to execute the setup.py file with the &#8216;install&#8217; argument:</p>
 <div class="highlight-python"><pre>$ cd /path/to/dir/music21-version
 $ python setup.py install</pre>
 </div>
-<p>On Mac OS X, and possibly on other systems, you may need special permission to write in the Python site-packages directory. An easy way to temporarily gain this permission is to use the <cite>sudo</cite> command. If the above returns a permissions error, try the following:</p>
+<p>On Mac OS X, and possibly on other systems, you may need special
+permission to write in the Python site-packages directory. An
+easy way to temporarily gain this permission is to use the
+<cite>sudo</cite> command. If the above returns a permissions error,
+try the following:</p>
 <div class="highlight-python"><pre>$ sudo python setup.py install</pre>
 </div>
-<p>If you cannot gain permission to install music21 in the Python site-packages directory, you can still run and use music21. Place the music21 folder anywhere convenient and note the file path. Start Python, and add this file path to Python&#8217;s list of directories searched for modules:</p>
+<p>If you cannot gain permission to install music21 in the Python
+site-pacakges directory, you can still run and use music21.
+Place the music21 folder anywhere convenient and note the file path.
+Start Python, and add this file path to Python&#8217;s list of directories
+searched for modules:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;/Users/ariza/Desktop/music21&#39;</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 </pre></div>
 </div>
-<p>This can be done permanently by adding the music21 directory to the Python PYTHONPATH environment variable. This is not necessary if music21 is installed in the Python site-packages directory. See the following link for more details:</p>
+<p>This can be done permanently by adding the music21 directory to the
+Python PYTHONPATH environment variable. This is not necessary if
+music21 is installed in the Python site-packages directory. See
+the following link for more details:</p>
 <p><a class="reference external" href="http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH">http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH</a></p>
-<p>After successful installation, proceed to <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> to begin using music21.</p>
+<p>After successful installation, proceed to <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> to begin
+using music21.</p>
 </div>
-<div class="section" id="windows-installation">
-<h3>Windows Installation<a class="headerlink" href="#windows-installation" title="Permalink to this headline">¶</a></h3>
-<p>Windows installation is easy. After downloading the music21.exe installer, follow and accept the prompts for default install options. This installer simply copies files into the Python site-packages directory. If the installer quits without further notice the installation has been successful.</p>
-<p>After successful installation, proceed to <a class="reference external" href="quickStart.html#quickstart"><em>Quick Start: Getting Started with music21</em></a> to begin using music21.</p>
+</div>
+<div class="section" id="installing-additional-python-components">
+<h2>Installing Additional Python Components<a class="headerlink" href="#installing-additional-python-components" title="Permalink to this headline">¶</a></h2>
+<p>Additional functionality of <cite>music21</cite>, such as plotting graphs
+is available with the installation of Python libraries.
+The following topics cover additional software used by Music21.
+For each library, visit the websites listed below, download the
+additional python libraries, and install them just as you did with
+music21 above.  If you don&#8217;t feel like installing them now, no worries:
+you can always install them later.</p>
+<div class="section" id="python-imaging-library-pil">
+<h3>Python Imaging Library (PIL)<a class="headerlink" href="#python-imaging-library-pil" title="Permalink to this headline">¶</a></h3>
+<p>The Python Imaging Library provides resources for transforming
+and editing graphics files.  Without this library, the output from
+Lilypond is less good.</p>
+<p><a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a></p>
+</div>
+<div class="section" id="matplotlib">
+<h3>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h3>
+<p>Graphing and visual displays in Music21 are provided by Matplotlib.
+Matplotlib itself has additional dependencies (such as SciPy).
+Please read the detailed instructions in the link below.</p>
+<p><a class="reference external" href="http://matplotlib.sourceforge.net/">http://matplotlib.sourceforge.net/</a></p>
+</div>
+</div>
+<div class="section" id="installing-additional-software-components">
+<h2>Installing Additional Software Components<a class="headerlink" href="#installing-additional-software-components" title="Permalink to this headline">¶</a></h2>
+<p>Additional functionality of Music21 is available with the
+installation of numerous helper applications. While not essential
+for all applications, these tools will aid in working with Music21.</p>
+<div class="section" id="finale-or-finale-reader">
+<h3>Finale or Finale Reader<a class="headerlink" href="#finale-or-finale-reader" title="Permalink to this headline">¶</a></h3>
+<p>Finale is one of the industry leaders in creating musical scores.  It
+can import MusicXML that music21 generates and let you see, edit, or print
+these scores for your own use.  There is also a free version of Finale,
+Finale Reader that can load MusicXML files but cannot edit them.  The reader
+is available for Windows and MacOS computers. Use of Finale or Finale reader
+is highly recommended for working with music21.</p>
+<p><a class="reference external" href="http://www.finalemusic.com/Reader/">http://www.finalemusic.com/Reader/</a></p>
+<p>On Windows, after you install Finale or Finale Reader, you will probably want
+to associate .xml files so that they are automatically opened by Finale or
+Finale Reader.  To do so download <a class="reference external" href="http://web.mit.edu/music21/blank.xml">http://web.mit.edu/music21/blank.xml</a>
+to your desktop.  Right click the file in on your desktop
+and click &#8220;Open with&#8221; then choose &#8220;browse&#8221;, select
+c:\Program Files\Finale Reader\Finale Reader.exe (or c:\Programs\Finale\Finale.exe
+depending on if you&#8217;re on Windows Vista or if you&#8217;re using Finale vs. Finale
+Reader), and the check the box for always using this program for
+opening xml files.  (Thanks to Craig Sapp for this missing step)</p>
+</div>
+<div class="section" id="lilypond">
+<h3>Lilypond<a class="headerlink" href="#lilypond" title="Permalink to this headline">¶</a></h3>
+<p>Lilypond is a free, open-source music display program that can produce
+beautiful scores.  Music21 can generate PDF or PNG (like JPG) files
+automatically if Lilypond is installed on your system.  Download it at:</p>
+<p><a class="reference external" href="http://lilypond.org/">http://lilypond.org/</a></p>
+</div>
+<div class="section" id="eclipse-pydev">
+<h3>Eclipse + PyDev<a class="headerlink" href="#eclipse-pydev" title="Permalink to this headline">¶</a></h3>
+<p>Eclipse is a free, open-source integrated development environment (IDE),
+essentially a program that makes writing (and finding bugs in) other
+programs much easier.  Eclipse is set up primarily for editing in Java,
+but the add-in PyDev makes it extremely powerful for creating Python scripts
+as well.  First download Eclipse at:</p>
+<p><a class="reference external" href="http://www.eclipse.org/">http://www.eclipse.org/</a></p>
+<p>Then follow the &#8220;Quick Install&#8221; instructions in the right-hand column of:</p>
+<p><a class="reference external" href="http://pydev.org/download.html">http://pydev.org/download.html</a></p>
 </div>
 <div class="section" id="installation-help">
 <h3>Installation Help<a class="headerlink" href="#installation-help" title="Permalink to this headline">¶</a></h3>
 <p>If you have followed these instructions and encounter problems, contact the music21 group for help:</p>
 <p><a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a></p>
+</div>
+</div>
+<div class="section" id="advanced-topics-pc-and-mac">
+<h2>Advanced Topics (PC and Mac)<a class="headerlink" href="#advanced-topics-pc-and-mac" title="Permalink to this headline">¶</a></h2>
+<p>For developers and advanced users, anonymous SVN access is available from
+Google Code. Enter the following command line argument or SVN commands:</p>
+<div class="highlight-python"><pre>svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only</pre>
 </div>
 </div>
 <div class="section" id="downloading-and-installing-music21-with-setuptools-or-pip">
@@ -197,34 +344,6 @@ $ python setup.py install</pre>
 <p>Second, install and/or update music21 with the following command-line argument:</p>
 <div class="highlight-python"><pre>$ pip install music21</pre>
 </div>
-</div>
-</div>
-<div class="section" id="installing-additional-python-components">
-<h2>Installing Additional Python Components<a class="headerlink" href="#installing-additional-python-components" title="Permalink to this headline">¶</a></h2>
-<p>Additional functionality of Music21 is available with the installation of Python libraries. The following topics cover additional software used by Music21.</p>
-<div class="section" id="python-imaging-library-pil">
-<h3>Python Imaging Library (PIL)<a class="headerlink" href="#python-imaging-library-pil" title="Permalink to this headline">¶</a></h3>
-<p>The Python Imaging Library provides resources for transforming and editing graphics files.</p>
-<p><a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a></p>
-</div>
-<div class="section" id="matplotlib">
-<h3>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h3>
-<p>Graphing and visual displays in Music21 are provided by Matplotlib. Matplotlib itself has additional dependencies. Please read the detailed instructions below.</p>
-<p><a class="reference external" href="http://matplotlib.sourceforge.net/">http://matplotlib.sourceforge.net/</a></p>
-</div>
-</div>
-<div class="section" id="installing-additional-software-components">
-<h2>Installing Additional Software Components<a class="headerlink" href="#installing-additional-software-components" title="Permalink to this headline">¶</a></h2>
-<p>Additional functionality of Music21 is available with the installation of numerous helper applications. While not essential for all applications, these tools will aid in working with Music21.</p>
-<div class="section" id="lilypond">
-<h3>Lilypond<a class="headerlink" href="#lilypond" title="Permalink to this headline">¶</a></h3>
-<p>Music21 can generate notation as lilypond files. Lilypond is required to render these files into graphical notation output.</p>
-<p><a class="reference external" href="http://lilypond.org/">http://lilypond.org/</a></p>
-</div>
-<div class="section" id="finale-reader">
-<h3>Finale Reader<a class="headerlink" href="#finale-reader" title="Permalink to this headline">¶</a></h3>
-<p>The Finale reader provides a free MusicXML reader for Windows and MacOS computers. Use of Finale reader is highly recommended for working with music21.</p>
-<p><a class="reference external" href="http://www.finalemusic.com/Reader/">http://www.finalemusic.com/Reader/</a></p>
 </div>
 </div>
 </div>

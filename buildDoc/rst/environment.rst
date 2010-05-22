@@ -77,7 +77,7 @@ Setting the `showFormat` will set the default output format of all calls to `sho
 
 Setting the `writeFormat` will set the default output format of all calls to `write()` methods. The behavior can be deviated from by providing an argument to `write()`.
 
-Setting the `directoryScratch` will determine where the file is written. If this setting is not made, the file will be written in a system-specified scratch directory. While useful, such temporary files and directories mat be buried deeply in your file system.
+Setting the `directoryScratch` will determine where the file is written. If this setting is not made, the file will be written in a system-specified scratch directory. While useful, such temporary files and directories may be buried deeply in your file system.
 
 
 `parseURL()` and `parseWork()` Functions and 'autoDownload'

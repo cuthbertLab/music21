@@ -378,7 +378,8 @@ class ProtoSpine(object):
 
 class HumdrumSpine(object):
     '''
-    A HumdrumSpine is a collection of events arranged vertically that have a connection to each other
+    A HumdrumSpine is a collection of events arranged vertically that have a
+    connection to each other.
     Each HumdrumSpine MUST have an id (numeric or string) attached to it.
 
     spine1 = HumdrumSpine(5, [SpineEvent1, SpineEvent2])
@@ -387,9 +388,12 @@ class HumdrumSpine(object):
     spine1.upstream = [3]
     spine1.downstream = [7,8]
     spine1.spineCollection = weakref.ref(SpineCollection1)
-           ## we keep weak references to the spineCollection so that we don't have circular references
+           # we keep weak references to the spineCollection so that we 
+           # don't have circular references
 
-    print(spine1.spineType)  ## searches the EventList or upstreamSpines to figure out the spineType
+    print(spine1.spineType)  
+           # searches the EventList or upstreamSpines to figure 
+           # out the spineType
 
     '''
     def __init__(self, id, eventList = None):
@@ -454,7 +458,8 @@ class HumdrumSpine(object):
 
     def downstreamSpines(self):
         '''
-        Returns the HumdrumSpine(s) that are downstream (if the spineCollection is set)
+        Returns the HumdrumSpine(s) that are downstream (if the 
+        spineCollection is set)
         '''
         if self.downstream:
             sc1 = self.spineCollection
@@ -516,7 +521,7 @@ class HumdrumSpine(object):
 
     def parse(self):
         '''
-        dummmy method that pushes all these objects to music21Objects
+        Dummmy method that pushes all these objects to music21Objects
         even though they probably are not.
         '''
         for event in self.eventList:
@@ -589,7 +594,7 @@ class DynamSpine(HumdrumSpine):
     def parse(self):
         thisContainer = None
         for event in self.eventList:
-            eventC = str(event.contents)  # is str already; just for Eclipse
+            eventC = str(event.contents)  # is str already; just so Eclipse gives the right tools
             thisObject = None
             if eventC == ".":
                 pass
@@ -627,7 +632,8 @@ class DynamSpine(HumdrumSpine):
 class SpineEvent(object):
     '''
     A SpineEvent is the next event in a HumdrumSpine.
-    It may be empty, in which case it means that a particular event appears after the last event in a different spine.
+    It may be empty, in which case it means that a 
+    particular event appears after the last event in a different spine.
 
     Should be initalized with its contents.
     two attributes: 
@@ -654,7 +660,8 @@ class SpineEvent(object):
 
 class SpineCollection(object):
     '''
-    A SpineCollection is a set of Spines with relationships to each other and where their position attributes indicate
+    A SpineCollection is a set of Spines with relationships to each 
+    other and where their position attributes indicate
     simultaneous onsets.
     '''
 
@@ -675,14 +682,15 @@ class SpineCollection(object):
     
     def appendSpine(self, spine):
         '''
-        appendSpine(spine) -- appends an already existing HumdrumSpine to the SpineCollection
-        returns void
+        appendSpine(spine) -- appends an already existing HumdrumSpine 
+        to the SpineCollection.  Returns void
         '''
         self.spines.append(spine)
         
     def getSpineById(self, id):
         '''
-        getSpineById(id) -- returns the HumdrumSpine with the given id
+        returns the HumdrumSpine with the given id.
+        
         raises a HumdrumException if the spine with a given id is not found
         '''
         for thisSpine in self.spines:
@@ -692,8 +700,9 @@ class SpineCollection(object):
 
     def reclass(self):
         '''
-        reclass() -- changes the classes of HumdrumSpines to more specific types (KernSpine, DynamicSpine)
-                     according to their spineType (**kern, **dynam)
+        changes the classes of HumdrumSpines to more specific types 
+        (KernSpine, DynamicSpine)
+        according to their spineType (**kern, **dynam)
         '''                     
         for thisSpine in self.spines:
             if thisSpine.spineType == "kern":
@@ -704,8 +713,8 @@ class SpineCollection(object):
 
     def parseMusic21(self):
         '''
-        runs spine.sparse for each Spine.  
-        thus populating a stream (music21Objects) for each Spine
+        runs spine.parse() for each Spine.  
+        thus populating a Stream of Music21Objects for each Spine
         '''
         for thisSpine in self.spines:
             thisSpine.parse()
@@ -727,20 +736,25 @@ class SpineCollection(object):
 
 class EventCollection(object):
     '''
-    An Event Collection is a time slice of all events that have an onset of a certain time
-    If an event does not occur at a certain time, then you should check EventCollection[n].lastEvent to get the previous event
-    (if it is a note, it is the note still sounding, etc.).  The happeningEvent method gets either currentEvent or lastEvent.
+    An Event Collection is a time slice of all events that have 
+    an onset of a certain time.  If an event does not occur at 
+    a certain time, then you should check EventCollection[n].lastEvent 
+    to get the previous event.  (If it is a note, it is the note 
+    still sounding, etc.).  The happeningEvent method gets either 
+    currentEvent or lastEvent.
     '''
     def __init__(self, maxspines = 0):
         self.events = common.defList()
         self.lastEvents = common.defList()
         self.maxspines = maxspines
-        self.spinePathData = False  ## true if the line contains data about changing spinePaths
+        self.spinePathData = False  
+               ## true if the line contains data about changing spinePaths
 
     def addSpineEvent(self, spineNum, spineEvent):
         self.events[spineNum] = spineEvent
         
-    def addLastSpineEvent(self, spineNum, spineEvent): ## should only add if current "event" is "." or a comment
+    def addLastSpineEvent(self, spineNum, spineEvent): 
+        ## should only add if current "event" is "." or a comment
         self.lastEvents[spineNum] = spineEvent
         
     def addGlobalEvent(self, globalEvent):
@@ -750,7 +764,9 @@ class EventCollection(object):
     def getSpineEvent(self, spineNum):
         return self.events[spineNum]
     
-    def getSpineOccuring(self, spineNum):  ## returns the currentEvent or the lastEvent if currentEvent is "."
+    def getSpineOccuring(self, spineNum):  
+        ## returns the currentEvent or the lastEvent 
+        ## if currentEvent is "."
         if self.lastEvents[spineNum] is not None:
             return self.lastEvents[spineNum]
         else:
@@ -770,10 +786,9 @@ class HumdrumException(Exception):
 
 def hdStringToNote(contents):
     '''
-    returns a music21.note.Note (or Rest or Unpitched, etc.) matching the current SpineEvent.
+    returns a music21.note.Note (or Rest or Unpitched, etc.) 
+    matching the current SpineEvent.
     Does not check to see that it is sane or part of a **kern spine, etc.
-
-    TODO: Write it!
     '''
     
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
@@ -856,11 +871,13 @@ def hdStringToNote(contents):
         thisObject.notations.append(t1)
     
     if contents.count(':'):
-        ## TODO: deal with arpeggiation -- should have been in a chord structure
+        ## TODO: deal with arpeggiation -- should have been in a 
+        ##  chord structure
         pass
     
     if contents.count("O"):
-        thisObject.notations.append(music21.expressions.Ornament())  # generic ornament
+        thisObject.notations.append(music21.expressions.Ornament())  
+        # generic ornament
     
     # 3.2.4 Articulation Marks
     if contents.count('\''):
@@ -915,7 +932,7 @@ def hdStringToNote(contents):
             thisObject.duration.appendTuplet(newTup)
                     
     # 3.2.9 Grace Notes and Groupettos
-    # TODO: Rewrite after music21 gracenotes are implimented
+    # TODO: Rewrite after music21 gracenotes are implemented
     if contents.count('q'):
         thisObject.duration.__class__ = music21.duration.GraceDuration
     elif contents.count('Q'):
@@ -1181,7 +1198,8 @@ class Test(unittest.TestCase):
                     for thisPitch in element.pitches:
                         if thisPitch.name == "G#":
                             GsharpCount += 1
-        # in reality, we should run getElementsByClass("measure") and use Measure attributes
+        # in reality, we should run getElementsByClass("measure") 
+        #   and use Measure attributes
         #   to get the note attacked at beat X.  but we're not there yet.
         # TODO: when measures have beats, do this...
         
