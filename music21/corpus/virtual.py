@@ -191,7 +191,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in the virtual corpus module
         '''
         a = BachBWV1007Prelude()
         self.assertNotEquals(a.getUrlByExt(['.xml']), [])

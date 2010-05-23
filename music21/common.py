@@ -31,7 +31,7 @@ fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
-    'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
+    'lilypond' : {'input': ['ly', 'lily', 'lily.png', 'lily.pdf'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},

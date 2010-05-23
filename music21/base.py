@@ -1713,6 +1713,12 @@ class Music21Object(object):
         '''
         Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
 
+        Valid formats include (but are not limited to):
+          xml (musicxml)
+          text
+          lily.png
+          lily.pdf
+
         OMIT_FROM_DOCS        
         This might need to return the file path.
         '''
@@ -1731,6 +1737,12 @@ class Music21Object(object):
         # single line of text; most for debugging. returned, not printed
         elif format == 'textline': 
             return self._reprTextLine()
+        elif fmt == 'lily.pdf':
+            return self.lily.showPDF()
+        elif fmt == 'lily.png':
+            return self.lily.showPNG()
+        elif fmt == 'lily':
+            return self.lily.showPNG()
         else: # a format that writes a file
             environLocal.launch(format, self.write(format))
 
@@ -1747,8 +1759,8 @@ class ElementWrapper(Music21Object):
     Providing an object at initialization is mandatory. 
 
     OMIT_FROM_DOCS
-    because in the new (11/29) object model, ElementWrapper should only be used
-    to wrap an object.
+    because in the new (29/11/2009) object model, ElementWrapper should only be used
+    to wrap a non music21-object it should be removed from most docs.
     '''
     obj = None
     _id = None

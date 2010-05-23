@@ -384,6 +384,7 @@ class Environment(object):
         the file and then a short time delay.
 
         TODO: Move showImageDirectfrom lilyString.py ; add MIDI
+        TODO: Switch to module subprocess to prevent hanging.
         '''
         # see common.fileExtensions for format names 
         format, ext = common.findFormat(fmt)
