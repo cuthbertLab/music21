@@ -19,13 +19,19 @@ class IntervalSearcher(object):
 
     def compareToStream(self, stream):
         streamLength = len(stream.notes)
-        if streamLength < self.intervalLength: return False
-        intervalListLength = len(stream.intervalOverRestsList)
-        if self.intervalLength > intervalListLength: return False
+        if self.intervalLength > streamLength: 
+            return False
+        stIntervalList = stream.melodicIntervals(skipRests = True)
+        if stIntervalList is None:
+            return False
+        
+        stIntervalListLength = len(stIntervalList)
+        if self.intervalLength > stIntervalListLength: 
+            return False
         #print "Length of Stream: " + str(streamLength)
-        for i in range(0, intervalListLength+1 - self.intervalLength):
+        for i in range(0, stIntervalListLength+1 - self.intervalLength):
             for j in range(0, self.intervalLength):
-                streamInterval = stream.intervalOverRestsList[i+j]
+                streamInterval = stIntervalList[i+j]
                 genI1 = self.intervalList[j].diatonic.generic.simpleDirected
                 genI2 = streamInterval.diatonic.generic.simpleDirected
                 if genI1 != genI2:
@@ -132,8 +138,8 @@ def searchForIntervals(notesStr):
                         #thisNote.editorial.color = "blue"
                     streamLily += "\\score {" + \
                             "<< \\time " + str(thisCadence.timeSig) + \
-                            "\n \\new Staff {" + thisCadence.streams[i].lily + "} >>" + \
-                            thisCadence.header() + "\n}\n"
+                            "\n \\new Staff {" + str(thisCadence.streams[i].lily) + "} >>" + \
+                            str(thisCadence.header()) + "\n}\n"
                     print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
 
     if streamLily:
@@ -183,7 +189,7 @@ def findUpDown(n1, n2, n3):
 if __name__ == "__main__":
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2
-    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
+#    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
 #    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25
@@ -193,10 +199,9 @@ if __name__ == "__main__":
 #    searchForIntervals("G4 F4 F4 E4 E4 D4 D4 C4") # london 29987 88v C
 #    searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 29987 88v T
 #    searchForNotes("G3 E3 F3 G3 F3 E3 D3 C3")  # probable French piece, Nuremberg 9, but worth a check    
-
-#    landiniTonality()
+#    searchForIntervals("A4 A4 G4 G4 F4 E4") # Nuremberg 9a, staff 6 probable French Piece
 #    findCasanatense522()
 #    findRandomVerona()
 #    findRavi3ORegina()
-#    pass
+    pass
 
