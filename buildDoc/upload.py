@@ -43,7 +43,7 @@ src = getDirBuildHtml()
 cmdStr = 'scp -r %s %s@%s' % (src, user, DST_MIT)
 print(cmdStr)
 
-#os.system(cmdStr)
+os.system(cmdStr)
 
 
 
