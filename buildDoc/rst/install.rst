@@ -49,6 +49,7 @@ Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.
 
 If your version is too old, download a newer version as above.
 
+
 2. Download music21
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -95,13 +96,12 @@ Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.  
 
-The Macintosh comes with Python, but it might not be a new enough version 
+Mac OS X comes with Python, but it might not be a new enough version 
 to run music21.  Music21 requires Python 2.6 to run (though many functions 
 can run on 2.5 or 2.4). Python 3 is not yet supported. 
 
 To determine the Python version you have installed, open a shell 
-or terminal by going to Applications, the Utilities, and then
-clicking "Terminal" (if you have xterm installed, that will work
+or terminal by going to Applications, then Utilities, and then double clicking "Terminal" (if you have xterm installed, that will work
 fine too) and enter the following command-line argument (don't type the
 "$")
 
@@ -131,8 +131,10 @@ Linux / Mac OS X users should download the .tar.gz file.
 3.  Install Music21
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your platform.
+After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your platform. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
 
+    >>> import distutils.sysconfig
+    >>> print(distutils.sysconfig.get_python_lib())
 
 First, uncompress the .tar.gz file. 
 
@@ -178,9 +180,8 @@ using music21.
 Installing Additional Python Components
 ----------------------------------------
 
-Additional functionality of `music21`, such as plotting graphs
-is available with the installation of Python libraries. 
-The following topics cover additional software used by Music21.
+Additional functionality of `music21`, such as plotting graphs, is available with the installation of additional Python libraries. 
+The following topics cover additional software used by music21.
 For each library, visit the websites listed below, download the
 additional python libraries, and install them just as you did with
 music21 above.  If you don't feel like installing them now, no worries:
@@ -219,6 +220,19 @@ installation of numerous helper applications. While not essential
 for all applications, these tools will aid in working with Music21.
 
 
+
+
+MuseScore
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu, Debian, and Fedora) application for viewing and editing music notation. MuseScore can import and export MusicXML, and provides an excellent way to view, edit, and export musical data for working in music21. Use of MuseScore is highly recommended for working with music21. 
+
+http://www.musescore.org/
+
+
+
+
+
 Finale or Finale Reader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -226,7 +240,7 @@ Finale is one of the industry leaders in creating musical scores.  It
 can import MusicXML that music21 generates and let you see, edit, or print
 these scores for your own use.  There is also a free version of Finale,
 Finale Reader that can load MusicXML files but cannot edit them.  The reader
-is available for Windows and MacOS computers. Use of Finale or Finale reader 
+is available for Windows and Mac OS computers. Use of Finale or Finale reader 
 is highly recommended for working with music21. 
 
 http://www.finalemusic.com/Reader/
@@ -240,6 +254,8 @@ c:\\Program Files\\Finale Reader\\Finale Reader.exe (or c:\\Programs\\Finale\\Fi
 depending on if you're on Windows Vista or if you're using Finale vs. Finale
 Reader), and the check the box for always using this program for 
 opening xml files.  (Thanks to Craig Sapp for this missing step)
+
+
 
 Lilypond
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -284,7 +300,7 @@ http://groups.google.com/group/music21list
 
 
 
-Advanced Topics (PC and Mac)
+Advanced Topics
 ---------------------------------
 
 For developers and advanced users, anonymous SVN access is available from 

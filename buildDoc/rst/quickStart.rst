@@ -70,20 +70,23 @@ To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus`
 >>> from music21 import corpus
 >>> sBach = corpus.parseWork('bach/bwv7.7')
 
-The score is returned as music21 :class:`~music21.stream.Score`, which is a type (subclass) of music21 :class:`~music21.stream.Stream`. 
+The score is returned as a music21 :class:`~music21.stream.Score`, which is a type (subclass) of a music21 :class:`~music21.stream.Stream`. 
 
 Once the score is parsed, we can view, transform, and manipulate its 
 components in a variety of ways. If we want to output and view the 
 entire score, we can use the :meth:`~music21.stream.Stream.show` method. 
-Without any arguments, this method does two things. First, it 
-writes a MusicXML file of the current Stream as a temporary file or 
-in the user-specified scratch directory. (This directory can be defined as 
-part of the user's environment settings. See :ref:`environment` for 
-complete details.) Second, it attempts to open this file with a 
-user-specified helper application. Assuming you have an appropriate MusicXML 
-reader (see :ref:`install`), and have set it to handle MusicXML files 
-(see :ref:`environment`), the following output (excerpted) will be displayed. 
 
+Without any arguments, this method does two things. First, it 
+writes a MusicXML file (the default output format) of the current Stream as a temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user's Environment settings. See :ref:`environment` for complete details.) Second, it attempts to open this file with a 
+user-specified helper application. 
+
+For a MusicXML file, an application that can load and display a MusicXML file as notation, or a MusicXML reader, is very useful. See :ref:`install` for information on "Additional Software Components," or download and install MuseScore or Finale Reader immediately:
+
+http://www.musescore.org/
+
+http://www.finalemusic.com/Reader/
+
+After installing an appropriate MusicXML reader, the generated file can be examined and opened. For music21 to automatically open MusicXML files, you may need to set a music21 preference in Environment (see :ref:`environment`). Once the MusicXML file has been opened, the following output (excerpted) will be displayed. 
 
 >>> sBach.show()
 

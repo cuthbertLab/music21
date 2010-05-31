@@ -13,7 +13,7 @@ The converter module, as well as the module function :func:`music21.converter.pa
 Parsing MusicXML Files
 -----------------------
 
-We can parse a MusicXML file by providing the :func:`music21.converter.parse` function with a local file path or an URL to a file path. The function will handle determining the file format. An appropriate :class:`~music21.stream.Stream`  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path "/Volumes/xdisc/_scratch/bwv1007-01.xml", a Stream can be created from the file with the following:
+We can parse a MusicXML file by providing the :func:`music21.converter.parse` function with a local file path or an URL to a file path. The function will determine the file format. An appropriate :class:`~music21.stream.Stream`  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path "/Volumes/xdisc/_scratch/bwv1007-01.xml", a Stream can be created from the file with the following:
 
 >>> from music21 import converter
 >>> sBach = converter.parse('/Volumes/xdisc/_scratch/bwv1007-01.xml')
@@ -34,7 +34,7 @@ Alternative, we can provide a URL to the :func:`music21.converter.parse` functio
 >>> sAlt = converter.parse(url)
 
 
-Note that presently music21 does not support compressed .mxl MusicXML files; this feature will be available soon.
+Note that presently music21 offers limited support for compressed .mxl MusicXML files; this feature will be expanded in the future.
 
 
 
@@ -62,14 +62,13 @@ Parsing Humdrum functions exactly as parsing other data formats. Simply call the
 
 
 
+
 Getting Humdrum Files
 -----------------------
 
 Over one hundred thousand Kern files can be found at the following URL.
 
 http://kern.humdrum.net/
-
-
 
 
 
