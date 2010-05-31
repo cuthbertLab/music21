@@ -139,18 +139,17 @@ the music21 group for help:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv7.7&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The score is returned as music21 <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, which is a type (subclass) of music21 <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>.</p>
+<p>The score is returned as a music21 <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a>, which is a type (subclass) of a music21 <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>.</p>
 <p>Once the score is parsed, we can view, transform, and manipulate its
 components in a variety of ways. If we want to output and view the
-entire score, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method.
-Without any arguments, this method does two things. First, it
-writes a MusicXML file of the current Stream as a temporary file or
-in the user-specified scratch directory. (This directory can be defined as
-part of the user&#8217;s environment settings. See <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for
-complete details.) Second, it attempts to open this file with a
-user-specified helper application. Assuming you have an appropriate MusicXML
-reader (see <a class="reference external" href="install.html#install"><em>Installing Music21</em></a>), and have set it to handle MusicXML files
-(see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>), the following output (excerpted) will be displayed.</p>
+entire score, we can use the <tt class="xref docutils literal"><span class="pre">show()</span></tt> method.</p>
+<p>Without any arguments, this method does two things. First, it
+writes a MusicXML file (the default output format) of the current Stream as a temporary file or in the user-specified scratch directory. (This directory can be defined as part of the user&#8217;s Environment settings. See <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a> for complete details.) Second, it attempts to open this file with a
+user-specified helper application.</p>
+<p>For a MusicXML file, an application that can load and display a MusicXML file as notation, or a MusicXML reader, is very useful. See <a class="reference external" href="install.html#install"><em>Installing Music21</em></a> for information on &#8220;Additional Software Components,&#8221; or download and install MuseScore or Finale Reader immediately:</p>
+<p><a class="reference external" href="http://www.musescore.org">http://www.musescore.org</a></p>
+<p><a class="reference external" href="http://www.finalemusic.com/Reader">http://www.finalemusic.com/Reader</a></p>
+<p>After installing an appropriate MusicXML reader, the generated file can be examined and opened. For music21 to automatically open MusicXML files, you may need to set a music21 <cite>musicxmlPath</cite> preference in Environment (see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>). Once the MusicXML file has been opened, the following output (excerpted) will be displayed.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -299,7 +298,7 @@ the components of a Stream in a text format, with the optional
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 21, 2010.
+      Last updated on May 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

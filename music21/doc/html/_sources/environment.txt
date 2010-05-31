@@ -26,7 +26,7 @@ After creating an environment file, this XML preference file can be edited direc
     >>> a.getSettingsPath()
     '/Users/ariza/.music21rc'
 
-Settings can be edited in the XML file or through the object interface. The Environment object acts as a Python dictionary. To view the names of user-configurable parameters, call the keys() method.
+Settings can be edited directly in the XML file or through the object interface. The Environment object acts as a Python dictionary. To view the names of user-configurable parameters, call the keys() method.
 
     >>> a.keys()
     ['lilypondBackend', 'lilypondVersion', 'graphicsPath', 'lilypondPath', 

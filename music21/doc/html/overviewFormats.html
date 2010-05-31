@@ -95,7 +95,7 @@
 <p>The converter module, as well as the module function <a title="music21.converter.parse" class="reference external" href="moduleConverter.html#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">music21.converter.parse()</span></tt></a> handle importing all supported formats. For complete documentation on file and data formats, see <a class="reference external" href="moduleConverter.html#moduleconverter"><em>music21.converter</em></a>.</p>
 <div class="section" id="parsing-musicxml-files">
 <h2>Parsing MusicXML Files<a class="headerlink" href="#parsing-musicxml-files" title="Permalink to this headline">¶</a></h2>
-<p>We can parse a MusicXML file by providing the <a title="music21.converter.parse" class="reference external" href="moduleConverter.html#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">music21.converter.parse()</span></tt></a> function with a local file path or an URL to a file path. The function will handle determining the file format. An appropriate <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path &#8220;/Volumes/xdisc/_scratch/bwv1007-01.xml&#8221;, a Stream can be created from the file with the following:</p>
+<p>We can parse a MusicXML file by providing the <a title="music21.converter.parse" class="reference external" href="moduleConverter.html#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">music21.converter.parse()</span></tt></a> function with a local file path or an URL to a file path. The function will determine the file format. An appropriate <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path &#8220;/Volumes/xdisc/_scratch/bwv1007-01.xml&#8221;, a Stream can be created from the file with the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">converter</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;/Volumes/xdisc/_scratch/bwv1007-01.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -112,7 +112,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sAlt</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that presently music21 does not support compressed .mxl MusicXML files; this feature will be available soon.</p>
+<p>Note that presently music21 offers limited support for compressed .mxl MusicXML files; this feature will be expanded in the future.</p>
 </div>
 <div class="section" id="getting-musicxml-files">
 <h2>Getting MusicXML Files<a class="headerlink" href="#getting-musicxml-files" title="Permalink to this headline">¶</a></h2>
@@ -165,7 +165,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 21, 2010.
+      Last updated on May 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

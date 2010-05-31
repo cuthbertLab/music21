@@ -37,10 +37,20 @@ Can I synthesize new sounds with music21?
     a large variety of synthesis packages. So you could create new
     music21 objects that control the synthesis package of your choosing.    
 
-I'll bite the bullet, but how do I install music21?
+I'm ready to give it a try, but how do I install music21?
 
     Please see the complete install instructions: :ref:`install`.
 
+Music21 doesn't have some feature that I need, how do I get it added?
+
+    It won't hurt to email the list (or us directly) and we'll consider it.
+    However, we do have a priority list based on what we think the widest
+    audience will require or what we need for our own research.  If you'd
+    like your request to leap-frog to the front of the line, the best way
+    is to endow the programming of your feature through a donation that will
+    enable us to increase the number of student programming assistants we
+    employ.  (Or side-step us and offer a cash bounty on the music21list
+    itself).
 
 
 3rd-Party Utilities

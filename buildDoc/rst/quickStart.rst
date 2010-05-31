@@ -82,11 +82,11 @@ user-specified helper application.
 
 For a MusicXML file, an application that can load and display a MusicXML file as notation, or a MusicXML reader, is very useful. See :ref:`install` for information on "Additional Software Components," or download and install MuseScore or Finale Reader immediately:
 
-http://www.musescore.org/
+http://www.musescore.org
 
-http://www.finalemusic.com/Reader/
+http://www.finalemusic.com/Reader
 
-After installing an appropriate MusicXML reader, the generated file can be examined and opened. For music21 to automatically open MusicXML files, you may need to set a music21 preference in Environment (see :ref:`environment`). Once the MusicXML file has been opened, the following output (excerpted) will be displayed. 
+After installing an appropriate MusicXML reader, the generated file can be examined and opened. For music21 to automatically open MusicXML files, you may need to set a music21 `musicxmlPath` preference in Environment (see :ref:`environment`). Once the MusicXML file has been opened, the following output (excerpted) will be displayed. 
 
 >>> sBach.show()
 

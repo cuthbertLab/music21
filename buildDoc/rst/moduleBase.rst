@@ -234,7 +234,7 @@ Music21Object
 
         .. method:: show(fmt=None)
 
-            Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
+            Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment Valid formats include (but are not limited to): xml (musicxml) text lily.png lily.pdf 
 
         .. method:: unfreezeIds()
 

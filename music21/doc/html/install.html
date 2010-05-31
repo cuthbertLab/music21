@@ -49,8 +49,8 @@
             <ul>
 <li><a class="reference external" href="">Installing Music21</a><ul>
 <li><a class="reference external" href="#windows-install-instructions">Windows Install instructions</a><ul>
-<li><a class="reference external" href="#get-python">1. Get Python</a></li>
-<li><a class="reference external" href="#updating-python">1.1 Updating Python</a></li>
+<li><a class="reference external" href="#a-get-python">1A. Get Python</a></li>
+<li><a class="reference external" href="#b-updating-python">1B. Updating Python</a></li>
 <li><a class="reference external" href="#download-music21">2. Download music21</a></li>
 <li><a class="reference external" href="#install-music21">3.  Install music21</a></li>
 </ul>
@@ -67,13 +67,14 @@
 </ul>
 </li>
 <li><a class="reference external" href="#installing-additional-software-components">Installing Additional Software Components</a><ul>
+<li><a class="reference external" href="#musescore">MuseScore</a></li>
 <li><a class="reference external" href="#finale-or-finale-reader">Finale or Finale Reader</a></li>
 <li><a class="reference external" href="#lilypond">Lilypond</a></li>
 <li><a class="reference external" href="#eclipse-pydev">Eclipse + PyDev</a></li>
 <li><a class="reference external" href="#installation-help">Installation Help</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#advanced-topics-pc-and-mac">Advanced Topics (PC and Mac)</a></li>
+<li><a class="reference external" href="#advanced-topics">Advanced Topics</a></li>
 <li><a class="reference external" href="#downloading-and-installing-music21-with-setuptools-or-pip">Downloading and Installing Music21 with setuptools or pip</a><ul>
 <li><a class="reference external" href="#automated-installation-with-setuptools">Automated Installation with setuptools</a></li>
 <li><a class="reference external" href="#automated-installation-with-pip">Automated Installation with pip</a></li>
@@ -123,8 +124,8 @@ Unix users can use most of the Mac instructions, though Finale is not
 available for Mac.</p>
 <div class="section" id="windows-install-instructions">
 <h2>Windows Install instructions<a class="headerlink" href="#windows-install-instructions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="get-python">
-<h3>1. Get Python<a class="headerlink" href="#get-python" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="a-get-python">
+<h3>1A. Get Python<a class="headerlink" href="#a-get-python" title="Permalink to this headline">¶</a></h3>
 <p>Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that
 use music21.</p>
@@ -140,13 +141,9 @@ Windows or by typing in the search box) IDLE.  Type
 <cite>2+2</cite>.  If your system then
 displays <cite>4</cite> you&#8217;ve installed everything properly so far.</p>
 </div>
-<div class="section" id="updating-python">
-<h3>1.1 Updating Python<a class="headerlink" href="#updating-python" title="Permalink to this headline">¶</a></h3>
-<p>If you have already installed Python on your computer,
-launch IDLE (the Python editor) by clicking the start menu and
-clicking Run (on Windows XP or older) and typing in &#8220;IDLE&#8221; or
-(on Windows Vista and newer) typing in &#8220;IDLE&#8221; in the Search
-Programs list.</p>
+<div class="section" id="b-updating-python">
+<h3>1B. Updating Python<a class="headerlink" href="#b-updating-python" title="Permalink to this headline">¶</a></h3>
+<p>If you have already installed Python on your computer, launch IDLE (a Python interpreter and code editor) by clicking the start menu and clicking Run (on Windows XP or older) and typing in &#8220;IDLE&#8221; or (on Windows Vista and newer) typing in &#8220;IDLE&#8221; in the Search Programs list.</p>
 <p>The first lines of text displayed will include a version number.
 Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.</p>
 <p>If your version is too old, download a newer version as above.</p>
@@ -187,12 +184,11 @@ Components below.</p>
 <p>Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that
 use music21.</p>
-<p>The Macintosh comes with Python, but it might not be a new enough version
+<p>Mac OS X comes with Python, but it might not be a new enough version
 to run music21.  Music21 requires Python 2.6 to run (though many functions
 can run on 2.5 or 2.4). Python 3 is not yet supported.</p>
 <p>To determine the Python version you have installed, open a shell
-or terminal by going to Applications, the Utilities, and then
-clicking &#8220;Terminal&#8221; (if you have xterm installed, that will work
+or terminal by going to Applications, then Utilities, and then double clicking &#8220;Terminal&#8221; (if you have xterm installed, that will work
 fine too) and enter the following command-line argument (don&#8217;t type the
 &#8220;$&#8221;)</p>
 <blockquote>
@@ -213,7 +209,11 @@ on a single computer without any problems.</p>
 </div>
 <div class="section" id="id2">
 <h3>3.  Install Music21<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called &#8216;site-packages&#8217;. The site-packages directory is located in different places depending on your platform.</p>
+<p>After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called &#8216;site-packages&#8217;. The site-packages directory is located in different places depending on your platform. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">distutils.sysconfig</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">distutils</span><span class="o">.</span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_python_lib</span><span class="p">())</span>
+</pre></div>
+</div>
 <p>First, uncompress the .tar.gz file.</p>
 <p>Open a shell or terminal (e.g. Applications -&gt; Utilities -&gt; Terminal),
 enter the outer-most music21 directory (using <cite>cd</cite>), and use
@@ -229,7 +229,7 @@ try the following:</p>
 <div class="highlight-python"><pre>$ sudo python setup.py install</pre>
 </div>
 <p>If you cannot gain permission to install music21 in the Python
-site-pacakges directory, you can still run and use music21.
+site-packages directory, you can still run and use music21.
 Place the music21 folder anywhere convenient and note the file path.
 Start Python, and add this file path to Python&#8217;s list of directories
 searched for modules:</p>
@@ -249,9 +249,8 @@ using music21.</p>
 </div>
 <div class="section" id="installing-additional-python-components">
 <h2>Installing Additional Python Components<a class="headerlink" href="#installing-additional-python-components" title="Permalink to this headline">¶</a></h2>
-<p>Additional functionality of <cite>music21</cite>, such as plotting graphs
-is available with the installation of Python libraries.
-The following topics cover additional software used by Music21.
+<p>Additional functionality of <cite>music21</cite>, such as plotting graphs, is available with the installation of additional Python libraries.
+The following topics cover additional software used by music21.
 For each library, visit the websites listed below, download the
 additional python libraries, and install them just as you did with
 music21 above.  If you don&#8217;t feel like installing them now, no worries:
@@ -261,14 +260,14 @@ you can always install them later.</p>
 <p>The Python Imaging Library provides resources for transforming
 and editing graphics files.  Without this library, the output from
 Lilypond is less good.</p>
-<p><a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a></p>
+<p><a class="reference external" href="http://www.pythonware.com/products/pil">http://www.pythonware.com/products/pil</a></p>
 </div>
 <div class="section" id="matplotlib">
 <h3>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h3>
 <p>Graphing and visual displays in Music21 are provided by Matplotlib.
 Matplotlib itself has additional dependencies (such as SciPy).
 Please read the detailed instructions in the link below.</p>
-<p><a class="reference external" href="http://matplotlib.sourceforge.net/">http://matplotlib.sourceforge.net/</a></p>
+<p><a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a></p>
 </div>
 </div>
 <div class="section" id="installing-additional-software-components">
@@ -276,15 +275,20 @@ Please read the detailed instructions in the link below.</p>
 <p>Additional functionality of Music21 is available with the
 installation of numerous helper applications. While not essential
 for all applications, these tools will aid in working with Music21.</p>
+<div class="section" id="musescore">
+<h3>MuseScore<a class="headerlink" href="#musescore" title="Permalink to this headline">¶</a></h3>
+<p>MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu, Debian, and Fedora) application for viewing and editing music notation. MuseScore can import and export MusicXML, and provides an excellent way to view, edit, and export musical data for working in music21. Use of MuseScore is highly recommended for working with music21.</p>
+<p><a class="reference external" href="http://www.musescore.org">http://www.musescore.org</a></p>
+</div>
 <div class="section" id="finale-or-finale-reader">
 <h3>Finale or Finale Reader<a class="headerlink" href="#finale-or-finale-reader" title="Permalink to this headline">¶</a></h3>
 <p>Finale is one of the industry leaders in creating musical scores.  It
 can import MusicXML that music21 generates and let you see, edit, or print
 these scores for your own use.  There is also a free version of Finale,
 Finale Reader that can load MusicXML files but cannot edit them.  The reader
-is available for Windows and MacOS computers. Use of Finale or Finale reader
+is available for Windows and Mac OS computers. Use of Finale or Finale reader
 is highly recommended for working with music21.</p>
-<p><a class="reference external" href="http://www.finalemusic.com/Reader/">http://www.finalemusic.com/Reader/</a></p>
+<p><a class="reference external" href="http://www.finalemusic.com/Reader">http://www.finalemusic.com/Reader</a></p>
 <p>On Windows, after you install Finale or Finale Reader, you will probably want
 to associate .xml files so that they are automatically opened by Finale or
 Finale Reader.  To do so download <a class="reference external" href="http://web.mit.edu/music21/blank.xml">http://web.mit.edu/music21/blank.xml</a>
@@ -319,8 +323,8 @@ as well.  First download Eclipse at:</p>
 <p><a class="reference external" href="http://groups.google.com/group/music21list">http://groups.google.com/group/music21list</a></p>
 </div>
 </div>
-<div class="section" id="advanced-topics-pc-and-mac">
-<h2>Advanced Topics (PC and Mac)<a class="headerlink" href="#advanced-topics-pc-and-mac" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="advanced-topics">
+<h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
 <p>For developers and advanced users, anonymous SVN access is available from
 Google Code. Enter the following command line argument or SVN commands:</p>
 <div class="highlight-python"><pre>svn checkout http://music21.googlecode.com/svn/trunk/ music21-read-only</pre>
@@ -374,7 +378,7 @@ Google Code. Enter the following command line argument or SVN commands:</p>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on May 21, 2010.
+      Last updated on May 31, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

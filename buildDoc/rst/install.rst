@@ -14,7 +14,7 @@ available for Mac.
 Windows Install instructions
 -------------------------------
 
-1. Get Python
+1A. Get Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Python is a simple but powerful programming language that music21
@@ -36,13 +36,9 @@ Windows or by typing in the search box) IDLE.  Type
 displays `4` you've installed everything properly so far.
 
 
-1.1 Updating Python
+1B. Updating Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-If you have already installed Python on your computer, 
-launch IDLE (the Python editor) by clicking the start menu and
-clicking Run (on Windows XP or older) and typing in "IDLE" or
-(on Windows Vista and newer) typing in "IDLE" in the Search
-Programs list.
+If you have already installed Python on your computer, launch IDLE (a Python interpreter and code editor) by clicking the start menu and clicking Run (on Windows XP or older) and typing in "IDLE" or (on Windows Vista and newer) typing in "IDLE" in the Search Programs list.
 
 The first lines of text displayed will include a version number.  
 Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.
@@ -195,7 +191,7 @@ The Python Imaging Library provides resources for transforming
 and editing graphics files.  Without this library, the output from
 Lilypond is less good.
 
-http://www.pythonware.com/products/pil/
+http://www.pythonware.com/products/pil
 
 
 Matplotlib
@@ -205,7 +201,7 @@ Graphing and visual displays in Music21 are provided by Matplotlib.
 Matplotlib itself has additional dependencies (such as SciPy). 
 Please read the detailed instructions in the link below.
 
-http://matplotlib.sourceforge.net/
+http://matplotlib.sourceforge.net
 
 
 
@@ -227,7 +223,7 @@ MuseScore
 
 MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu, Debian, and Fedora) application for viewing and editing music notation. MuseScore can import and export MusicXML, and provides an excellent way to view, edit, and export musical data for working in music21. Use of MuseScore is highly recommended for working with music21. 
 
-http://www.musescore.org/
+http://www.musescore.org
 
 
 
@@ -243,7 +239,7 @@ Finale Reader that can load MusicXML files but cannot edit them.  The reader
 is available for Windows and Mac OS computers. Use of Finale or Finale reader 
 is highly recommended for working with music21. 
 
-http://www.finalemusic.com/Reader/
+http://www.finalemusic.com/Reader
 
 On Windows, after you install Finale or Finale Reader, you will probably want
 to associate .xml files so that they are automatically opened by Finale or
