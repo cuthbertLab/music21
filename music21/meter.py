@@ -1167,8 +1167,6 @@ class MeterSequence(MeterTerminal):
     #---------------------------------------------------------------------------
     # alternative representations
 
-
-
     def _getLevelList(self, levelCount, flat=True):
         '''Recursive utility function
 
@@ -1297,7 +1295,7 @@ class MeterSequence(MeterTerminal):
 
     def positionToIndex(self, qLenPos, includeCoincidentBoundaries=False):
         '''Given a qLen pos (0 through self.duration.quarterLength), return
-        the active MeterTerminal or MeterSequence
+        the index of the active MeterTerminal or MeterSequence
 
         >>> a = MeterSequence('4/4')
         >>> a.positionToIndex(5)

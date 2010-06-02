@@ -898,28 +898,28 @@ class Stream(music21.Music21Object):
 
         Note: plots requires matplotib to be installed.
     
-        Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following:
+        Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following Plot classes:
     
-        pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`)
-        pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`)
-        quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`)
+        :class:`~music21.graph.PlotHistogramPitchSpace`
+        :class:`~music21.graph.PlotHistogramPitchClass`
+        :class:`~music21.graph.PlotHistogramQuarterLength`
     
-        scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
-        scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
-        scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
+        :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
+        :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
+        :class:`~graph.PlotScatterPitchClassOffset`
     
-        pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`)
-        pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`)
+        :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
+        :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
     
-        pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`)
-        pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`)
+        :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
+        :class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`
 
-        3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`)
+        :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
 
         >>> a = Stream()
         >>> n = note.Note()
         >>> a.append(n)
-        >>> a.plot('pitchspaceoffset', doneAction=None)
+        >>> a.plot('PlotHorizontalBarPitchSpaceOffset', doneAction=None)
         '''
         # import is here to avoid import of matplotlib problems
         from music21 import graph

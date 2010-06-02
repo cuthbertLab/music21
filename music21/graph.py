@@ -1212,7 +1212,10 @@ class PlotStream(object):
             if offsetStepSize == None:
                 offsetStepSize = 10
             #environLocal.printDebug(['using offsets for offset ticks'])
-            for i in range(offsetMin, offsetMax+1, offsetStepSize):
+            # get integers for range calculation
+            oMin = math.floor(offsetMin)
+            oMax = math.ceil(offsetMax)
+            for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
         #environLocal.printDebug(['final ticks', ticks])
@@ -1391,7 +1394,10 @@ class PlotHistogram(PlotStream):
         xTicks = dataTick
         # alway have min and max
         yTicks = []
-        for y in range(0, countMax, 10):
+        yTickStep = int(round(countMax / 8.))
+        if yTickStep <= 1:
+            yTickStep = 2
+        for y in range(0, countMax+1, yTickStep):
             yTicks.append([y, '%s' % y])
         yTicks.sort()
         return data, xTicks, yTicks
