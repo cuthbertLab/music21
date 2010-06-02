@@ -12,9 +12,9 @@ Papers, Presentations, and Publications
 
 The following papers and publications make extensive use of Music21. When links become available for download, they will be added.
 
-Ariza, C. and M. Cuthbert. 2010. "Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects." In *Proceedings of the International Computer Music Conference*. San Francisco: International Computer Music Association.
+Ariza, C. and M. S. Cuthbert. 2010. "Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects." In *Proceedings of the International Computer Music Conference*. San Francisco: International Computer Music Association.
 
-Cuthbert, M. and C. Ariza. 2010. "music21: A Toolkit for Computer-Aided Musicology and Symbolic Music Data." In *Proceedings of the International Society for Music Information Retrieval*. 
+Cuthbert, M. S. and C. Ariza. 2010. "music21: A Toolkit for Computer-Aided Musicology and Symbolic Music Data." In *Proceedings of the International Society for Music Information Retrieval*. 
 
 
 
