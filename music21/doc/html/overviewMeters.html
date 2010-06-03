@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats &mdash; music21 v0.2.4a2 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a2 documentation" href="index.html" />
+    <link rel="next" title="Examples and Demonstrations" href="examples.html" />
+    <link rel="prev" title="Overview: Post-Tonal Tools" href="overviewPostTonal.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples and Demonstrations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overviewPostTonal.html" title="Overview: Post-Tonal Tools"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats</a><ul>
+<li><a class="reference external" href="#creating-and-editing-meterterminals">Creating and Editing MeterTerminals</a></li>
+<li><a class="reference external" href="#creating-and-editing-metersequences">Creating and Editing MeterSequences</a></li>
+<li><a class="reference external" href="#creating-and-editing-time-signatures">Creating and Editing Time Signatures</a></li>
+<li><a class="reference external" href="#configuring-time-signature-display">Configuring Time Signature Display</a></li>
+<li><a class="reference external" href="#configuring-time-signature-beaming">Configuring Time Signature Beaming</a></li>
+<li><a class="reference external" href="#annotating-found-notes-with-beat-count">Annotating Found Notes with Beat Count</a></li>
+<li><a class="reference external" href="#using-beat-depth-to-provide-metrical-analysis">Using Beat Depth to Provide Metrical Analysis</a></li>
+<li><a class="reference external" href="#applying-articulations-based-on-accent">Applying Articulations Based on Accent</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="overviewPostTonal.html"
+                                  title="previous chapter">Overview: Post-Tonal Tools</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="examples.html"
+                                  title="next chapter">Examples and Demonstrations</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/overviewMeters.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overview-meters-time-signatures-and-processing-beams-accents-and-beats">
+<span id="overviewmeters"></span><h1>Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats<a class="headerlink" href="#overview-meters-time-signatures-and-processing-beams-accents-and-beats" title="Permalink to this headline">¶</a></h1>
+<p>Meters and Time Signatures are represented in music21 as nested hierarchical structures. In many cases, the default configuration of a music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object will do what you want. However, by configuring the fundamental component objects, the <a title="music21.meter.MeterTerminal" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a> and <a title="music21.meter.MeterSequence" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence"><tt class="xref docutils literal"><span class="pre">MeterSequence</span></tt></a>, a wide range of options are available.</p>
+<p>The <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object additionally features numerous high-level methods to provide access to and configuration of beaming, accent, and beat information</p>
+<p>This overview will illustrate key features of music21&#8217;s meter objects. For complete documentation of these objects, see <a class="reference external" href="moduleMeter.html#modulemeter"><em>music21.meter</em></a>.</p>
+<p>For a more formal discussion of these designs, see the paper &#8220;Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects&#8221; (Ariza and Cuthbert 2010), at the following URL: <a class="reference external" href="http://mit.edu/music21/papers/2010MeterObjects.pdf">http://mit.edu/music21/papers/2010MeterObjects.pdf</a></p>
+<div class="section" id="creating-and-editing-meterterminals">
+<h2>Creating and Editing MeterTerminals<a class="headerlink" href="#creating-and-editing-meterterminals" title="Permalink to this headline">¶</a></h2>
+<p>Pass</p>
+</div>
+<div class="section" id="creating-and-editing-metersequences">
+<h2>Creating and Editing MeterSequences<a class="headerlink" href="#creating-and-editing-metersequences" title="Permalink to this headline">¶</a></h2>
+<p>Pass</p>
+<img alt="_images/overviewMeters-02.png" src="_images/overviewMeters-02.png" style="width: 300px;" />
+</div>
+<div class="section" id="creating-and-editing-time-signatures">
+<h2>Creating and Editing Time Signatures<a class="headerlink" href="#creating-and-editing-time-signatures" title="Permalink to this headline">¶</a></h2>
+<p>The music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object contains four parallel MeterSequence objects, each assigned to the attributes <a title="music21.meter.TimeSignature.display" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.display"><tt class="xref docutils literal"><span class="pre">display</span></tt></a>, <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a>, <a title="music21.meter.TimeSignature.accent" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.accent"><tt class="xref docutils literal"><span class="pre">accent</span></tt></a>. The following displays a graphical realization of these four MeterSequence objects.</p>
+<img alt="_images/overviewMeters-01.png" src="_images/overviewMeters-01.png" style="width: 400px;" />
+</div>
+<div class="section" id="configuring-time-signature-display">
+<h2>Configuring Time Signature Display<a class="headerlink" href="#configuring-time-signature-display" title="Permalink to this headline">¶</a></h2>
+<p>The following example demonstrates setting an independent display MeterSequence for a TimeSignature:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ts1</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">)</span> <span class="c"># assumes two partitions</span>
+<span class="n">ts1</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/16&#39;</span><span class="p">,</span><span class="s">&#39;1/8&#39;</span><span class="p">,</span><span class="s">&#39;5/16&#39;</span><span class="p">])</span>
+
+<span class="n">ts2</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">)</span> <span class="c"># assumes two partitions</span>
+<span class="n">ts2</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;2/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="n">ts2</span><span class="o">.</span><span class="n">summedNumerator</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Measure</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">ts</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">5</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewMeters-08.png" src="_images/overviewMeters-08.png" style="width: 400px;" />
+</div>
+<div class="section" id="configuring-time-signature-beaming">
+<h2>Configuring Time Signature Beaming<a class="headerlink" href="#configuring-time-signature-beaming" title="Permalink to this headline">¶</a></h2>
+<p>The following example beams a bar of 3/4 in four different ways. The diversity, and complexity, of beaming is offered here to illustrate the flexibility of this model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ts1</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;5/32&#39;</span><span class="p">,</span> <span class="s">&#39;4/32&#39;</span><span class="p">,</span> <span class="s">&#39;3/32&#39;</span><span class="p">])</span>
+
+<span class="n">ts2</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="n">ts2</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+
+<span class="n">ts3</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="n">ts3</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts3</span><span class="o">.</span><span class="n">beam</span><span class="p">)):</span>
+    <span class="n">ts3</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts3</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+
+<span class="n">ts4</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">)):</span>
+    <span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="s">&#39;6/32&#39;</span><span class="p">,</span> <span class="s">&#39;6/32&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+        <span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts4</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">,</span> <span class="n">ts3</span><span class="p">,</span> <span class="n">ts4</span><span class="p">]:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Measure</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">ts</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">0.125</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">24</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">makeBeams</span><span class="p">())</span>
+<span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/overviewMeters-04.png" src="_images/overviewMeters-04.png" style="width: 400px;" />
+<p>The following is a fractional grid representation of the four beam partitions created.</p>
+<img alt="_images/overviewMeters-03.png" src="_images/overviewMeters-03.png" style="width: 300px;" />
+</div>
+<div class="section" id="annotating-found-notes-with-beat-count">
+<h2>Annotating Found Notes with Beat Count<a class="headerlink" href="#annotating-found-notes-with-beat-count" title="Permalink to this headline">¶</a></h2>
+<p>The following collects all C#s into a new Stream, and displays the resulting notes with annotations for part, measure, and beat:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">music21</span>
+<span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span><span class="p">,</span> <span class="n">stream</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv366.xml&#39;</span><span class="p">)</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">score</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span>
+    <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+
+<span class="n">found</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="n">offsetQL</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">score</span><span class="p">:</span>
+    <span class="n">found</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">offsetQL</span><span class="p">,</span>
+        <span class="n">part</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span>
+        <span class="n">music21</span><span class="o">.</span><span class="n">clef</span><span class="o">.</span><span class="n">Clef</span><span class="p">)[</span><span class="mf">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">measures</span><span class="p">)):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">measures</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">notes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;C#&#39;</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">, m. </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">id</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">measureNumber</span><span class="p">))</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&#39;beat </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                    <span class="n">ts</span><span class="o">.</span><span class="n">getBeat</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">offset</span><span class="p">))</span>
+                <span class="n">found</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">offsetQL</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="n">offsetQL</span> <span class="o">+=</span> <span class="mf">4</span>
+
+<span class="n">found</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewMeters-06.png" src="_images/overviewMeters-06.png" style="width: 400px;" />
+</div>
+<div class="section" id="using-beat-depth-to-provide-metrical-analysis">
+<h2>Using Beat Depth to Provide Metrical Analysis<a class="headerlink" href="#using-beat-depth-to-provide-metrical-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The following example uses the number of hierarchical levels starting at or before a note provide a metrical weighting:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">music21</span>
+<span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv281.xml&#39;</span><span class="p">)</span>
+<span class="n">partBass</span> <span class="o">=</span> <span class="n">score</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Bass&#39;</span><span class="p">)</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">partBass</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span>
+     <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+
+<span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">)):</span>
+    <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">])):</span>
+        <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">i</span><span class="p">])):</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">partBass</span><span class="o">.</span><span class="n">measures</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">notes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">getBeatDepth</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">offset</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">addLyric</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
+
+<span class="n">partBass</span><span class="o">.</span><span class="n">measures</span><span class="p">[</span><span class="mf">0</span><span class="p">:</span><span class="mf">7</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewMeters-07.png" src="_images/overviewMeters-07.png" style="width: 400px;" />
+</div>
+<div class="section" id="applying-articulations-based-on-accent">
+<h2>Applying Articulations Based on Accent<a class="headerlink" href="#applying-articulations-based-on-accent" title="Permalink to this headline">¶</a></h2>
+<p>The following example extract the Bass line of a Bach chorale in 3/4 and, after repartitioning the beat and accent attributes, applies accents to reflect a meter of 6/8:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span><span class="p">,</span> <span class="n">articulations</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv366.xml&#39;</span><span class="p">)</span>
+<span class="n">partBass</span> <span class="o">=</span> <span class="n">score</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&#39;Bass&#39;</span><span class="p">)</span>
+
+<span class="n">ts</span> <span class="o">=</span> <span class="n">partBass</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">accent</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;3/8&#39;</span><span class="p">])</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">setAccentWeight</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="o">.</span><span class="mf">5</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">partBass</span><span class="o">.</span><span class="n">measures</span><span class="p">:</span>
+    <span class="n">lastBeat</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">notes</span><span class="p">:</span>
+        <span class="n">beat</span><span class="p">,</span> <span class="n">progress</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">getBeatProgress</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">beat</span> <span class="o">!=</span> <span class="n">lastBeat</span> <span class="ow">and</span> <span class="n">progress</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">tie</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">tie</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;stop&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ts</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span><span class="p">:</span>
+                <span class="n">mark</span> <span class="o">=</span> <span class="n">articulations</span><span class="o">.</span><span class="n">StrongAccent</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">ts</span><span class="o">.</span><span class="n">getAccentWeight</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span><span class="p">:</span>
+                <span class="n">mark</span> <span class="o">=</span> <span class="n">articulations</span><span class="o">.</span><span class="n">Accent</span><span class="p">()</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">articulations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mark</span><span class="p">)</span>
+            <span class="n">lastBeat</span> <span class="o">=</span> <span class="n">beat</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sorted</span>
+
+<span class="n">partBass</span><span class="o">.</span><span class="n">measures</span><span class="p">[</span><span class="mf">0</span><span class="p">:</span><span class="mf">8</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;musicxml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/overviewMeters-05.png" src="_images/overviewMeters-05.png" style="width: 400px;" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples and Demonstrations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overviewPostTonal.html" title="Overview: Post-Tonal Tools"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Jun 03, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

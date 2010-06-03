@@ -14,6 +14,7 @@ Music21 Documentation
    overviewStreams
    overviewFormats
    overviewPostTonal
+   overviewMeters
    examples
    install
    about

@@ -705,7 +705,7 @@ MeterSequence
 
         .. method:: positionToIndex(qLenPos, includeCoincidentBoundaries=False)
 
-            Given a qLen pos (0 through self.duration.quarterLength), return the active MeterTerminal or MeterSequence 
+            Given a qLen pos (0 through self.duration.quarterLength), return the index of the active MeterTerminal or MeterSequence 
 
             >>> a = MeterSequence('4/4')
             >>> a.positionToIndex(5)

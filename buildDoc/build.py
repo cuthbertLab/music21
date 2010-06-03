@@ -1166,8 +1166,8 @@ class Documentation(RestructuredWriter):
                              'overviewStreams', 
                              'overviewFormats', 
                              'overviewPostTonal', 
+                             'overviewMeters', 
                              'examples', 
-
                              'install', 
                              'about', 
                              'applications', 
