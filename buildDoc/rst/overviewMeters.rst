@@ -4,9 +4,9 @@
 Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats
 ===========================================================================
 
-Meters and Time Signatures are represented in music21 as nested hierarchical structures. In many cases, the default configuration of a music21 :class:`~music21.meter.TimeSignature` object will do what you want. However, by configuring the fundamental component objects, the :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence`, a wide range of options are available.
+Meters and Time Signatures are represented in music21 as groups of nested hierarchical structures. In many cases, the default configuration of a music21 :class:`~music21.meter.TimeSignature` object will do what you want. However, by configuring the fundamental component objects, the :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects, a wide range of options are available.
 
-The :class:`~music21.meter.TimeSignature` object additionally features numerous high-level methods to provide access to and configuration of beaming, accent, and beat information
+The :class:`~music21.meter.TimeSignature` object additionally features numerous high-level methods to provide access to and configuration of display, beaming, beat, and accent information.
 
 This overview will illustrate key features of music21's meter objects. For complete documentation of these objects, see :ref:`moduleMeter`. 
 
@@ -14,36 +14,143 @@ For a more formal discussion of these designs, see the paper "Modeling Beats, Ac
 
 
 
+Objects for Organizing Hierarchical Partitions
+-----------------------------------------------
 
-Creating and Editing MeterTerminals
--------------------------------------
-
-Pass
-
+Hierarchical metrical structures can be described as a type of fractional, space-preserving tree structure. With such a structure we partition and divide a single duration into one or more parts, where each part is a fraction of the whole. Each part can, in turn, be similarly divided. The objects for configuring this structure are the MeterTerminal and the MeterSequence objects.
 
 
-Creating and Editing MeterSequences
--------------------------------------
+Creating and Editing MeterTerminal Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pass
+A MeterTerminal is a node of the metrical tree structure, defined as a duration expressed as fraction of a whole note. Thus, 1/4 is 1 quarter length (QL) duration; 3/8 is 1.5 QL; 3/16 is 0.75 QL. For this model, denominators are limited to *n* = 2^*x*, for *x* between 1 and 7 (e.g. 1/1 to 1/128).
+
+MeterTerminals can additionally store a weight, or a numerical value that can be interpreted in a variety of different ways.
+
+The following example, in the Python interpreter, demonstrates creating a MeterTerminal and accessing the :attr:`~music21.meter.MeterTerminal.numerator`, :attr:`~music21.meter.MeterTerminal.denominator` attributes. The  :attr:`~music21.meter.MeterTerminal.duration` attribute stores a :class:`~music21.duration.Duration` object.
+
+>>> from music21 import meter
+>>> mt = meter.MeterTerminal('3/4')
+>>> mt
+<MeterTerminal 3/4>
+>>> mt.numerator, mt.denominator
+(3, 4)
+>>> mt.duration.quarterLength
+3.0
+
+A MeterTerminal can be broken into an ordered sequence of MeterTerminal objects that sum to the same duration. This new object, to be discussed below, is the MeterSequence object. A MeterTerminal can be broken into duration-preserving components in a MeterSequence with the :meth:`~music21.meter.MeterTerminal.subdivide` method. An argument for subdivision can be given as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations. 
+
+>>> mt.subdivide(3)
+<MeterSequence {1/4+1/4+1/4}>
+>>> mt.subdivide([3,3]) 
+<MeterSequence {3/8+3/8}>
+>>> mt.subdivide(['1/4','4/8'])  
+<MeterSequence {1/4+4/8}>
+
+
+
+
+Creating and Editing MeterSequence Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A MeterSequence object is sub-class of a MeterTerminal. Like a MeterTerminal, a MeterSequence has a :attr:`~music21.meter.MeterSequence.numerator`, a :attr:`~music21.meter.MeterSequence.denominator`, and a :attr:`~music21.meter.MeterSequence.duration` attribute. A MeterSequence, however, can be a hierarchical tree or sub-tree, containing an ordered sequence of MeterTerminal and/or MeterSequence objects.
+
+The ordered collection of MeterTerminal and/or MeterSequence objects can be accessed like Python lists. MeterSequence objects, like MeterTerminal objects, store a weight that by default is the sum of constituent weights. 
+
+The :meth:`~music21.meter.MeterSequence.partition` and :meth:`~music21.meter.MeterSequence.subdivide` methods can be used to configure the nested hierarchical structure. 
+
+The :meth:`~music21.meter.MeterSequence.partition` method replaces existing MeterTerminal or MeterSequence objects in place with a new arrangement, specified as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations. 
+
+The :meth:`~music21.meter.MeterSequence.subdivide` method returns a new MeterSequence (leaving the source MeterSequence unchanged) with an arrangement of MeterTerminals as specified by an argument in the same form as for the :meth:`~music21.meter.MeterSequence.partition` method.
+
+Note that MeterTerminal objects cannot be partitioned in place. A common way to convert a MeterTerminal into a MeterSequence is to reassign the returned MeterSequence from the :meth:`~music21.meter.MeterTerminal.subdivide` method to the position occupied by the MeterTerminal.
+
+The following example creates and partitions a MeterSequence by re-assigning subdivisions to MeterTerminal objects. The use of Python list-like index access is also demonstrated. 
+
+
+>>> ms = meter.MeterSequence('3/4')
+>>> ms
+<MeterSequence {3/4}>
+>>> ms.partition([3,3]) 
+>>> ms
+<MeterSequence {3/8+3/8}>
+>>> ms[0] 
+<MeterTerminal 3/8>
+>>> ms[0] = ms[0].subdivide([3,3]) 
+>>> ms[0]
+<MeterSequence {3/16+3/16}>
+>>> ms
+<MeterSequence {{3/16+3/16}+3/8}>
+>>> ms[1] = ms[1].subdivide([1,1,1]) 
+>>> ms[1][0]
+<MeterTerminal 1/8>
+>>> ms[1]
+<MeterSequence {1/8+1/8+1/8}>
+>>> ms
+<MeterSequence {{3/16+3/16}+{1/8+1/8+1/8}}>
+
+
+The resulting structure can be graphically displayed with the following diagram:
+
 
 .. image:: images/overviewMeters-02.*
     :width: 300
 
 
+Numerous MeterSequence attributes provide convenient ways to access information about or new objects from the nested tree structure. The :attr:`~music21.meter.MeterSequence.depth` attribute returns the depth count at any node within the tree structure; the :attr:`~music21.meter.MeterSequence.flat` property returns a new, flat MeterSequence constructed from all the lowest-level MeterTerminal objects (all leaf nodes). 
+
+
+>>> ms.depth
+2
+>>> ms[0].depth
+1
+>>> ms.flat
+<MeterSequence {3/16+3/16+1/8+1/8+1/8}>
+
+
+Numerous methods provide ways to access levels (slices) of the hierarchical structure, or all nodes found at a desired hierarchical level. As all components preserve the duration of their container, all levels have the same total duration. The :meth:`~music21.meter.MeterSequence.getLevel` method returns, for a given depth, a new, flat MeterSequence. The :meth:`~music21.meter.MeterSequence.getLevelSpan` method returns, for a given depth, the time span of each node as a list of start and end values. 
+
+
+>>> ms.getLevel(0)
+<MeterSequence {3/8+3/8}>
+>>> ms.getLevel(1)
+<MeterSequence {3/16+3/16+1/8+1/8+1/8}>
+>>> ms.getLevelSpan(1)
+[(0.0, 0.75), (0.75, 1.5), (1.5, 2.0), (2.0, 2.5), (2.5, 3.0)]
+>>> ms[1].getLevelSpan(1)
+[(0.0, 0.5), (0.5, 1.0), (1.0, 1.5)]
+
+
+Finally, numerous methods provide ways to find and access the relevant nodes (the MeterTerminal or MeterSequence objects) active given a quarter length position into the tree structure. The :meth:`~music21.meter.MeterSequence.positionToIndex` method returns, for a given QL, the index of the active node. The :meth:`~music21.meter.MeterSequence.positionToSpan` method returns, for a given QL, the span of the active node. The :meth:`~music21.meter.MeterSequence.positionToDepth` method returns, for a given QL, the maximum depth at this position. 
+
+
+>>> ms.positionToIndex(2.5)
+1
+>>> ms.positionToSpan(2.5)
+(1.5, 3.0)
+>>> ms.positionToDepth(.5)
+2
+>>> ms[0].positionToDepth(.5)
+1
+>>> ms.getLevel(1).positionToSpan(.5)
+(0, 0.75)
 
 
 
 
 
-Creating and Editing Time Signatures 
----------------------------------------
+
+Creating and Editing Time Signature Objects 
+---------------------------------------------
 
 The music21 :class:`~music21.meter.TimeSignature` object contains four parallel MeterSequence objects, each assigned to the attributes :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.accent`. The following displays a graphical realization of these four MeterSequence objects. 
 
 
 .. image:: images/overviewMeters-01.*
     :width: 400
+
+The TimeSignature provides a model of all common hierarchical structures contained within a bar. Common meters are initialzied with expected defaults; however, full MeterSequence customization is available.
+
 
 
 

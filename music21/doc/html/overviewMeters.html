@@ -48,9 +48,12 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats</a><ul>
-<li><a class="reference external" href="#creating-and-editing-meterterminals">Creating and Editing MeterTerminals</a></li>
-<li><a class="reference external" href="#creating-and-editing-metersequences">Creating and Editing MeterSequences</a></li>
-<li><a class="reference external" href="#creating-and-editing-time-signatures">Creating and Editing Time Signatures</a></li>
+<li><a class="reference external" href="#objects-for-organizing-hierarchical-partitions">Objects for Organizing Hierarchical Partitions</a><ul>
+<li><a class="reference external" href="#creating-and-editing-meterterminal-objects">Creating and Editing MeterTerminal Objects</a></li>
+<li><a class="reference external" href="#creating-and-editing-metersequence-objects">Creating and Editing MeterSequence Objects</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#creating-and-editing-time-signature-objects">Creating and Editing Time Signature Objects</a></li>
 <li><a class="reference external" href="#configuring-time-signature-display">Configuring Time Signature Display</a></li>
 <li><a class="reference external" href="#configuring-time-signature-beaming">Configuring Time Signature Beaming</a></li>
 <li><a class="reference external" href="#annotating-found-notes-with-beat-count">Annotating Found Notes with Beat Count</a></li>
@@ -94,23 +97,111 @@
             
   <div class="section" id="overview-meters-time-signatures-and-processing-beams-accents-and-beats">
 <span id="overviewmeters"></span><h1>Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats<a class="headerlink" href="#overview-meters-time-signatures-and-processing-beams-accents-and-beats" title="Permalink to this headline">¶</a></h1>
-<p>Meters and Time Signatures are represented in music21 as nested hierarchical structures. In many cases, the default configuration of a music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object will do what you want. However, by configuring the fundamental component objects, the <a title="music21.meter.MeterTerminal" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a> and <a title="music21.meter.MeterSequence" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence"><tt class="xref docutils literal"><span class="pre">MeterSequence</span></tt></a>, a wide range of options are available.</p>
-<p>The <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object additionally features numerous high-level methods to provide access to and configuration of beaming, accent, and beat information</p>
+<p>Meters and Time Signatures are represented in music21 as groups of nested hierarchical structures. In many cases, the default configuration of a music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object will do what you want. However, by configuring the fundamental component objects, the <a title="music21.meter.MeterTerminal" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a> and <a title="music21.meter.MeterSequence" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence"><tt class="xref docutils literal"><span class="pre">MeterSequence</span></tt></a> objects, a wide range of options are available.</p>
+<p>The <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object additionally features numerous high-level methods to provide access to and configuration of display, beaming, beat, and accent information.</p>
 <p>This overview will illustrate key features of music21&#8217;s meter objects. For complete documentation of these objects, see <a class="reference external" href="moduleMeter.html#modulemeter"><em>music21.meter</em></a>.</p>
 <p>For a more formal discussion of these designs, see the paper &#8220;Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects&#8221; (Ariza and Cuthbert 2010), at the following URL: <a class="reference external" href="http://mit.edu/music21/papers/2010MeterObjects.pdf">http://mit.edu/music21/papers/2010MeterObjects.pdf</a></p>
-<div class="section" id="creating-and-editing-meterterminals">
-<h2>Creating and Editing MeterTerminals<a class="headerlink" href="#creating-and-editing-meterterminals" title="Permalink to this headline">¶</a></h2>
-<p>Pass</p>
+<div class="section" id="objects-for-organizing-hierarchical-partitions">
+<h2>Objects for Organizing Hierarchical Partitions<a class="headerlink" href="#objects-for-organizing-hierarchical-partitions" title="Permalink to this headline">¶</a></h2>
+<p>Hierarchical metrical structures can be described as a type of fractional, space-preserving tree structure. With such a structure we partition and divide a single duration into one or more parts, where each part is a fraction of the whole. Each part can, in turn, be similarly divided. The objects for configuring this structure are the MeterTerminal and the MeterSequence objects.</p>
+<div class="section" id="creating-and-editing-meterterminal-objects">
+<h3>Creating and Editing MeterTerminal Objects<a class="headerlink" href="#creating-and-editing-meterterminal-objects" title="Permalink to this headline">¶</a></h3>
+<p>A MeterTerminal is a node of the metrical tree structure, defined as a duration expressed as fraction of a whole note. Thus, 1/4 is 1 quarter length (QL) duration; 3/8 is 1.5 QL; 3/16 is 0.75 QL. For this model, denominators are limited to <em>n</em> = 2^*x*, for <em>x</em> between 1 and 7 (e.g. 1/1 to 1/128).</p>
+<p>MeterTerminals can additionally store a weight, or a numerical value that can be interpreted in a variety of different ways.</p>
+<p>The following example, in the Python interpreter, demonstrates creating a MeterTerminal and accessing the <a title="music21.meter.MeterTerminal.numerator" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.numerator"><tt class="xref docutils literal"><span class="pre">numerator</span></tt></a>, <a title="music21.meter.MeterTerminal.denominator" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.denominator"><tt class="xref docutils literal"><span class="pre">denominator</span></tt></a> attributes. The  <a title="music21.meter.MeterTerminal.duration" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a> attribute stores a <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">meter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterTerminal</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span>
+<span class="go">&lt;MeterTerminal 3/4&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mt</span><span class="o">.</span><span class="n">denominator</span>
+<span class="go">(3, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">3.0</span>
+</pre></div>
 </div>
-<div class="section" id="creating-and-editing-metersequences">
-<h2>Creating and Editing MeterSequences<a class="headerlink" href="#creating-and-editing-metersequences" title="Permalink to this headline">¶</a></h2>
-<p>Pass</p>
+<p>A MeterTerminal can be broken into an ordered sequence of MeterTerminal objects that sum to the same duration. This new object, to be discussed below, is the MeterSequence object. A MeterTerminal can be broken into duration-preserving components in a MeterSequence with the <a title="music21.meter.MeterTerminal.subdivide" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a> method. An argument for subdivision can be given as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/4+1/4+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">])</span>
+<span class="go">&lt;MeterSequence {3/8+3/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="s">&#39;1/4&#39;</span><span class="p">,</span><span class="s">&#39;4/8&#39;</span><span class="p">])</span>
+<span class="go">&lt;MeterSequence {1/4+4/8}&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-and-editing-metersequence-objects">
+<h3>Creating and Editing MeterSequence Objects<a class="headerlink" href="#creating-and-editing-metersequence-objects" title="Permalink to this headline">¶</a></h3>
+<p>A MeterSequence object is sub-class of a MeterTerminal. Like a MeterTerminal, a MeterSequence has a <a title="music21.meter.MeterSequence.numerator" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.numerator"><tt class="xref docutils literal"><span class="pre">numerator</span></tt></a>, a <a title="music21.meter.MeterSequence.denominator" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.denominator"><tt class="xref docutils literal"><span class="pre">denominator</span></tt></a>, and a <tt class="xref docutils literal"><span class="pre">duration</span></tt> attribute. A MeterSequence, however, can be a hierarchical tree or sub-tree, containing an ordered sequence of MeterTerminal and/or MeterSequence objects.</p>
+<p>The ordered collection of MeterTerminal and/or MeterSequence objects can be accessed like Python lists. MeterSequence objects, like MeterTerminal objects, store a weight that by default is the sum of constituent weights.</p>
+<p>The <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> and <tt class="xref docutils literal"><span class="pre">subdivide()</span></tt> methods can be used to configure the nested hierarchical structure.</p>
+<p>The <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> method replaces existing MeterTerminal or MeterSequence objects in place with a new arrangement, specified as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations.</p>
+<p>The <tt class="xref docutils literal"><span class="pre">subdivide()</span></tt> method returns a new MeterSequence (leaving the source MeterSequence unchanged) with an arrangement of MeterTerminals as specified by an argument in the same form as for the <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> method.</p>
+<p>Note that MeterTerminal objects cannot be partitioned in place. A common way to convert a MeterTerminal into a MeterSequence is to reassign the returned MeterSequence from the <a title="music21.meter.MeterTerminal.subdivide" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a> method to the position occupied by the MeterTerminal.</p>
+<p>The following example creates and partitions a MeterSequence by re-assigning subdivisions to MeterTerminal objects. The use of Python list-like index access is also demonstrated.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span>
+<span class="go">&lt;MeterSequence {3/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span>
+<span class="go">&lt;MeterSequence {3/8+3/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;MeterTerminal 3/8&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;MeterSequence {3/16+3/16}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span>
+<span class="go">&lt;MeterSequence {{3/16+3/16}+3/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">1</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span>
+<span class="go">&lt;MeterTerminal 1/8&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+<span class="go">&lt;MeterSequence {1/8+1/8+1/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span>
+<span class="go">&lt;MeterSequence {{3/16+3/16}+{1/8+1/8+1/8}}&gt;</span>
+</pre></div>
+</div>
+<p>The resulting structure can be graphically displayed with the following diagram:</p>
 <img alt="_images/overviewMeters-02.png" src="_images/overviewMeters-02.png" style="width: 300px;" />
+<p>Numerous MeterSequence attributes provide convenient ways to access information about or new objects from the nested tree structure. The <a title="music21.meter.MeterSequence.depth" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.depth"><tt class="xref docutils literal"><span class="pre">depth</span></tt></a> attribute returns the depth count at any node within the tree structure; the <a title="music21.meter.MeterSequence.flat" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.flat"><tt class="xref docutils literal"><span class="pre">flat</span></tt></a> property returns a new, flat MeterSequence constructed from all the lowest-level MeterTerminal objects (all leaf nodes).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">depth</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">flat</span>
+<span class="go">&lt;MeterSequence {3/16+3/16+1/8+1/8+1/8}&gt;</span>
+</pre></div>
 </div>
-<div class="section" id="creating-and-editing-time-signatures">
-<h2>Creating and Editing Time Signatures<a class="headerlink" href="#creating-and-editing-time-signatures" title="Permalink to this headline">¶</a></h2>
+<p>Numerous methods provide ways to access levels (slices) of the hierarchical structure, or all nodes found at a desired hierarchical level. As all components preserve the duration of their container, all levels have the same total duration. The <a title="music21.meter.MeterSequence.getLevel" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevel"><tt class="xref docutils literal"><span class="pre">getLevel()</span></tt></a> method returns, for a given depth, a new, flat MeterSequence. The <a title="music21.meter.MeterSequence.getLevelSpan" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevelSpan"><tt class="xref docutils literal"><span class="pre">getLevelSpan()</span></tt></a> method returns, for a given depth, the time span of each node as a lost of start and end values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {3/8+3/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {3/16+3/16+1/8+1/8+1/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevelSpan</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">[(0.0, 0.75), (0.75, 1.5), (1.5, 2.0), (2.0, 2.5), (2.5, 3.0)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">getLevelSpan</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">[(0.0, 0.5), (0.5, 1.0), (1.0, 1.5)]</span>
+</pre></div>
+</div>
+<p>Finally, numerous methods provide ways to find and access the relevant nodes (the MeterTerminal or MeterSequence objects) active given a quarter length position into the tree structure. The <a title="music21.meter.MeterSequence.positionToIndex" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.positionToIndex"><tt class="xref docutils literal"><span class="pre">positionToIndex()</span></tt></a> method returns, for a given QL, the index of the active node. The <a title="music21.meter.MeterSequence.positionToSpan" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.positionToSpan"><tt class="xref docutils literal"><span class="pre">positionToSpan()</span></tt></a> method returns, for a given QL, the span of the active node. The <a title="music21.meter.MeterSequence.positionToDepth" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.positionToDepth"><tt class="xref docutils literal"><span class="pre">positionToDepth()</span></tt></a> method returns, for a given QL, the maximum depth at this position.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">positionToIndex</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="go">(1.5, 3.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">positionToDepth</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">(0, 0.75)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-and-editing-time-signature-objects">
+<h2>Creating and Editing Time Signature Objects<a class="headerlink" href="#creating-and-editing-time-signature-objects" title="Permalink to this headline">¶</a></h2>
 <p>The music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object contains four parallel MeterSequence objects, each assigned to the attributes <a title="music21.meter.TimeSignature.display" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.display"><tt class="xref docutils literal"><span class="pre">display</span></tt></a>, <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a>, <a title="music21.meter.TimeSignature.accent" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.accent"><tt class="xref docutils literal"><span class="pre">accent</span></tt></a>. The following displays a graphical realization of these four MeterSequence objects.</p>
 <img alt="_images/overviewMeters-01.png" src="_images/overviewMeters-01.png" style="width: 400px;" />
+<p>The TimeSignature provides a model of all common hierarchical structures contained within a bar. Common meters are initialzied with expected defaults; however, full MeterSequence customization is available.</p>
 </div>
 <div class="section" id="configuring-time-signature-display">
 <h2>Configuring Time Signature Display<a class="headerlink" href="#configuring-time-signature-display" title="Permalink to this headline">¶</a></h2>
@@ -298,7 +389,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 03, 2010.
+      Last updated on Jun 04, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
