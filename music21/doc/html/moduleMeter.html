@@ -211,7 +211,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.beatBackgroundUnitCount">
 <tt class="descname">beatBackgroundUnitCount</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatBackgroundUnitCount" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature.</p>
+<dd><p>Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
 <span class="go">2</span>
@@ -249,7 +249,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Tim
 <dl class="attribute">
 <dt id="music21.meter.TimeSignature.beatDivision">
 <tt class="descname">beatDivision</tt><a class="headerlink" href="#music21.meter.TimeSignature.beatDivision" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the beat division as a Stream of <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects, if and only if the TimeSignature has a uniform beat division for all beats.</p>
+<dd><p>Return the beat division, or the durations that make up one beat, as a Stream of <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects, if and only if the TimeSignature has a uniform beat division for all beats.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatDivision</span>
 <span class="go">[&lt;music21.duration.Duration 0.5&gt;, &lt;music21.duration.Duration 0.5&gt;]</span>
@@ -1070,7 +1070,7 @@ class </em><tt class="descclassname">music21.meter.</tt><tt class="descname">Non
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 04, 2010.
+      Last updated on Jun 05, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

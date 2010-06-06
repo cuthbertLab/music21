@@ -54,11 +54,17 @@
 </ul>
 </li>
 <li><a class="reference external" href="#creating-and-editing-time-signature-objects">Creating and Editing Time Signature Objects</a></li>
-<li><a class="reference external" href="#configuring-time-signature-display">Configuring Time Signature Display</a></li>
-<li><a class="reference external" href="#configuring-time-signature-beaming">Configuring Time Signature Beaming</a></li>
+<li><a class="reference external" href="#configuring-display">Configuring Display</a></li>
+<li><a class="reference external" href="#configuring-beam">Configuring Beam</a></li>
+<li><a class="reference external" href="#configuring-beat">Configuring Beat</a><ul>
 <li><a class="reference external" href="#annotating-found-notes-with-beat-count">Annotating Found Notes with Beat Count</a></li>
 <li><a class="reference external" href="#using-beat-depth-to-provide-metrical-analysis">Using Beat Depth to Provide Metrical Analysis</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#configuring-accent">Configuring Accent</a><ul>
 <li><a class="reference external" href="#applying-articulations-based-on-accent">Applying Articulations Based on Accent</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -133,9 +139,9 @@
 <h3>Creating and Editing MeterSequence Objects<a class="headerlink" href="#creating-and-editing-metersequence-objects" title="Permalink to this headline">¶</a></h3>
 <p>A MeterSequence object is sub-class of a MeterTerminal. Like a MeterTerminal, a MeterSequence has a <a title="music21.meter.MeterSequence.numerator" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.numerator"><tt class="xref docutils literal"><span class="pre">numerator</span></tt></a>, a <a title="music21.meter.MeterSequence.denominator" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.denominator"><tt class="xref docutils literal"><span class="pre">denominator</span></tt></a>, and a <tt class="xref docutils literal"><span class="pre">duration</span></tt> attribute. A MeterSequence, however, can be a hierarchical tree or sub-tree, containing an ordered sequence of MeterTerminal and/or MeterSequence objects.</p>
 <p>The ordered collection of MeterTerminal and/or MeterSequence objects can be accessed like Python lists. MeterSequence objects, like MeterTerminal objects, store a weight that by default is the sum of constituent weights.</p>
-<p>The <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> and <tt class="xref docutils literal"><span class="pre">subdivide()</span></tt> methods can be used to configure the nested hierarchical structure.</p>
+<p>The <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> and <a title="music21.meter.MeterTerminal.subdivide" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a> methods can be used to configure the nested hierarchical structure.</p>
 <p>The <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> method replaces existing MeterTerminal or MeterSequence objects in place with a new arrangement, specified as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations.</p>
-<p>The <tt class="xref docutils literal"><span class="pre">subdivide()</span></tt> method returns a new MeterSequence (leaving the source MeterSequence unchanged) with an arrangement of MeterTerminals as specified by an argument in the same form as for the <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> method.</p>
+<p>The <a title="music21.meter.MeterTerminal.subdivide" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a> method returns a new MeterSequence (leaving the source MeterSequence unchanged) with an arrangement of MeterTerminals as specified by an argument in the same form as for the <a title="music21.meter.MeterSequence.partition" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.partition"><tt class="xref docutils literal"><span class="pre">partition()</span></tt></a> method.</p>
 <p>Note that MeterTerminal objects cannot be partitioned in place. A common way to convert a MeterTerminal into a MeterSequence is to reassign the returned MeterSequence from the <a title="music21.meter.MeterTerminal.subdivide" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a> method to the position occupied by the MeterTerminal.</p>
 <p>The following example creates and partitions a MeterSequence by re-assigning subdivisions to MeterTerminal objects. The use of Python list-like index access is also demonstrated.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
@@ -171,7 +177,7 @@
 <span class="go">&lt;MeterSequence {3/16+3/16+1/8+1/8+1/8}&gt;</span>
 </pre></div>
 </div>
-<p>Numerous methods provide ways to access levels (slices) of the hierarchical structure, or all nodes found at a desired hierarchical level. As all components preserve the duration of their container, all levels have the same total duration. The <a title="music21.meter.MeterSequence.getLevel" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevel"><tt class="xref docutils literal"><span class="pre">getLevel()</span></tt></a> method returns, for a given depth, a new, flat MeterSequence. The <a title="music21.meter.MeterSequence.getLevelSpan" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevelSpan"><tt class="xref docutils literal"><span class="pre">getLevelSpan()</span></tt></a> method returns, for a given depth, the time span of each node as a lost of start and end values.</p>
+<p>Numerous methods provide ways to access levels (slices) of the hierarchical structure, or all nodes found at a desired hierarchical level. As all components preserve the duration of their container, all levels have the same total duration. The <a title="music21.meter.MeterSequence.getLevel" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevel"><tt class="xref docutils literal"><span class="pre">getLevel()</span></tt></a> method returns, for a given depth, a new, flat MeterSequence. The <a title="music21.meter.MeterSequence.getLevelSpan" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevelSpan"><tt class="xref docutils literal"><span class="pre">getLevelSpan()</span></tt></a> method returns, for a given depth, the time span of each node as a list of start and end values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="go">&lt;MeterSequence {3/8+3/8}&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ms</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
@@ -201,11 +207,13 @@
 <h2>Creating and Editing Time Signature Objects<a class="headerlink" href="#creating-and-editing-time-signature-objects" title="Permalink to this headline">¶</a></h2>
 <p>The music21 <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object contains four parallel MeterSequence objects, each assigned to the attributes <a title="music21.meter.TimeSignature.display" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.display"><tt class="xref docutils literal"><span class="pre">display</span></tt></a>, <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a>, <a title="music21.meter.TimeSignature.accent" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.accent"><tt class="xref docutils literal"><span class="pre">accent</span></tt></a>. The following displays a graphical realization of these four MeterSequence objects.</p>
 <img alt="_images/overviewMeters-01.png" src="_images/overviewMeters-01.png" style="width: 400px;" />
-<p>The TimeSignature provides a model of all common hierarchical structures contained within a bar. Common meters are initialzied with expected defaults; however, full MeterSequence customization is available.</p>
+<p>The TimeSignature provides a model of all common hierarchical structures contained within a bar. Common meters are initialized with expected defaults; however, full MeterSequence customization is available.</p>
 </div>
-<div class="section" id="configuring-time-signature-display">
-<h2>Configuring Time Signature Display<a class="headerlink" href="#configuring-time-signature-display" title="Permalink to this headline">¶</a></h2>
-<p>The following example demonstrates setting an independent display MeterSequence for a TimeSignature:</p>
+<div class="section" id="configuring-display">
+<h2>Configuring Display<a class="headerlink" href="#configuring-display" title="Permalink to this headline">¶</a></h2>
+<p>The TimeSignature <a title="music21.meter.TimeSignature.display" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.display"><tt class="xref docutils literal"><span class="pre">display</span></tt></a> MeterSequence employs the highest-level partitions to configure the displayed time signature symbol. If more than one partition is given, those partitions will be interpreted as additive meter components. If partitions have a common denominator, a summed numerator (over a single denominator) can be displayed by setting the TimeSignature <tt class="xref docutils literal"><span class="pre">summedNumerator</span></tt> attribute to True. Lower-level subdivisions of the TimeSignature MeterSequence are not employed.</p>
+<p>Note that a new MeterSequence instance can be assigned to the <a title="music21.meter.TimeSignature.display" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.display"><tt class="xref docutils literal"><span class="pre">display</span></tt></a> attribute with a duration and/or partitioning completely independently from the <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a>, and <a title="music21.meter.TimeSignature.accent" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.accent"><tt class="xref docutils literal"><span class="pre">accent</span></tt></a> MeterSequences.</p>
+<p>The following example demonstrates setting the display MeterSequence for a TimeSignature:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ts1</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;5/8&#39;</span><span class="p">)</span> <span class="c"># assumes two partitions</span>
 <span class="n">ts1</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">partition</span><span class="p">([</span><span class="s">&#39;3/16&#39;</span><span class="p">,</span><span class="s">&#39;1/8&#39;</span><span class="p">,</span><span class="s">&#39;5/16&#39;</span><span class="p">])</span>
 
@@ -226,9 +234,12 @@
 </div>
 <img alt="_images/overviewMeters-08.png" src="_images/overviewMeters-08.png" style="width: 400px;" />
 </div>
-<div class="section" id="configuring-time-signature-beaming">
-<h2>Configuring Time Signature Beaming<a class="headerlink" href="#configuring-time-signature-beaming" title="Permalink to this headline">¶</a></h2>
-<p>The following example beams a bar of 3/4 in four different ways. The diversity, and complexity, of beaming is offered here to illustrate the flexibility of this model:</p>
+<div class="section" id="configuring-beam">
+<h2>Configuring Beam<a class="headerlink" href="#configuring-beam" title="Permalink to this headline">¶</a></h2>
+<p>The TimeSignature <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a> MeterSequence employs the complete hierarchical structure to configure the single or multi-level beaming of a bar. The outer-most partitions can specify one ore more top-level partitions. Lower-level partitions subdivide beam-groups, providing the appropriate beam-breaks when sufficiently small durations are employed.</p>
+<p>The <a title="music21.meter.TimeSignature.beam" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beam"><tt class="xref docutils literal"><span class="pre">beam</span></tt></a> MeterSequence is generally used to create and configure <a title="music21.note.Beams" class="reference external" href="moduleNote.html#music21.note.Beams"><tt class="xref docutils literal"><span class="pre">Beams</span></tt></a> objects stored in <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects. The TimeSignature <a title="music21.meter.TimeSignature.getBeams" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getBeams"><tt class="xref docutils literal"><span class="pre">getBeams()</span></tt></a> method, given a list of <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects, returns a list of <a title="music21.note.Beams" class="reference external" href="moduleNote.html#music21.note.Beams"><tt class="xref docutils literal"><span class="pre">Beams</span></tt></a> objects.</p>
+<p>Most users will likely find the Stream <a title="music21.stream.Stream.makeBeams" class="reference external" href="moduleStream.html#music21.stream.Stream.makeBeams"><tt class="xref docutils literal"><span class="pre">makeBeams()</span></tt></a> method the most convenient way to apply beams to a Measure or Stream of Note objects. This method returns a new Stream with created and configured Beams.</p>
+<p>The following example beams a bar of 3/4 in four different ways. The diversity and complexity of beaming is offered here to illustrate the flexibility of this model:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ts1</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts1</span><span class="o">.</span><span class="n">beam</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">([</span><span class="s">&#39;3/8&#39;</span><span class="p">,</span> <span class="s">&#39;5/32&#39;</span><span class="p">,</span> <span class="s">&#39;4/32&#39;</span><span class="p">,</span> <span class="s">&#39;3/32&#39;</span><span class="p">])</span>
@@ -263,9 +274,52 @@
 <p>The following is a fractional grid representation of the four beam partitions created.</p>
 <img alt="_images/overviewMeters-03.png" src="_images/overviewMeters-03.png" style="width: 300px;" />
 </div>
+<div class="section" id="configuring-beat">
+<h2>Configuring Beat<a class="headerlink" href="#configuring-beat" title="Permalink to this headline">¶</a></h2>
+<p>The TimeSignature <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a> MeterSequence employs the hierarchical structure to define the beats and background (or sub) beats of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the background, or sub-beat partitions. For most common meters, beats and background beats are pre-configured by default.</p>
+<p>In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The <a title="music21.meter.MeterSequence.getLevel" class="reference external" href="moduleMeter.html#music21.meter.MeterSequence.getLevel"><tt class="xref docutils literal"><span class="pre">getLevel()</span></tt></a> method can be used to show the beat and background beat partitions. The timeSignature <a title="music21.meter.TimeSignature.beatUnit" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beatUnit"><tt class="xref docutils literal"><span class="pre">beatUnit</span></tt></a>,  <a title="music21.meter.TimeSignature.beatUnitCount" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beatUnitCount"><tt class="xref docutils literal"><span class="pre">beatUnitCount</span></tt></a>, and <a title="music21.meter.TimeSignature.beatUnitCountName" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beatUnitCountName"><tt class="xref docutils literal"><span class="pre">beatUnitCountName</span></tt></a> properties can be used to return commonly needed beat information. The TimeSignature <a title="music21.meter.TimeSignature.beatBackgroundUnitCount" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beatBackgroundUnitCount"><tt class="xref docutils literal"><span class="pre">beatBackgroundUnitCount</span></tt></a>, and <a title="music21.meter.TimeSignature.beatBackgroundUnitCountName" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beatBackgroundUnitCountName"><tt class="xref docutils literal"><span class="pre">beatBackgroundUnitCountName</span></tt></a> properties can be used to return commonly needed background beat information. These descriptors can be combined to return a string representation of the TimeSignature classification with  <a title="music21.meter.TimeSignature.classification" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.classification"><tt class="xref docutils literal"><span class="pre">classification</span></tt></a> property.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/4+1/4+1/4}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/8+1/8+1/8+1/8+1/8+1/8}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnit</span>
+<span class="go">&lt;music21.duration.Duration 1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCount</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCountName</span>
+<span class="go">&#39;Triple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCountName</span>
+<span class="go">&#39;Simple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">classification</span>
+<span class="go">&#39;Simple Triple&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;12/16&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {3/16+3/16+3/16+3/16}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beat</span><span class="o">.</span><span class="n">getLevel</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">&lt;MeterSequence {1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnit</span>
+<span class="go">&lt;music21.duration.Duration 0.75&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCount</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatUnitCountName</span>
+<span class="go">&#39;Quadruple&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCount</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">beatBackgroundUnitCountName</span>
+<span class="go">&#39;Compound&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">classification</span>
+<span class="go">&#39;Compound Quadruple&#39;</span>
+</pre></div>
+</div>
 <div class="section" id="annotating-found-notes-with-beat-count">
-<h2>Annotating Found Notes with Beat Count<a class="headerlink" href="#annotating-found-notes-with-beat-count" title="Permalink to this headline">¶</a></h2>
-<p>The following collects all C#s into a new Stream, and displays the resulting notes with annotations for part, measure, and beat:</p>
+<h3>Annotating Found Notes with Beat Count<a class="headerlink" href="#annotating-found-notes-with-beat-count" title="Permalink to this headline">¶</a></h3>
+<p>The <a title="music21.meter.TimeSignature.getBeat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getBeat"><tt class="xref docutils literal"><span class="pre">getBeat()</span></tt></a> method returns the currently active beat given a quarter length position into the TimeSignature.</p>
+<p>In the following example, all leading tones, or C#s, are collected into a new Stream and displayed with annotations for part, measure, and beat:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">music21</span>
 <span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span><span class="p">,</span> <span class="n">stream</span>
 
@@ -298,8 +352,11 @@
 <img alt="_images/overviewMeters-06.png" src="_images/overviewMeters-06.png" style="width: 400px;" />
 </div>
 <div class="section" id="using-beat-depth-to-provide-metrical-analysis">
-<h2>Using Beat Depth to Provide Metrical Analysis<a class="headerlink" href="#using-beat-depth-to-provide-metrical-analysis" title="Permalink to this headline">¶</a></h2>
-<p>The following example uses the number of hierarchical levels starting at or before a note provide a metrical weighting:</p>
+<h3>Using Beat Depth to Provide Metrical Analysis<a class="headerlink" href="#using-beat-depth-to-provide-metrical-analysis" title="Permalink to this headline">¶</a></h3>
+<p>Another application of the <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a> MeterSequence is define the hierarchical depth active for a given note found within the TimeSignature.</p>
+<p>The <a title="music21.meter.TimeSignature.getBeatDepth" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getBeatDepth"><tt class="xref docutils literal"><span class="pre">getBeatDepth()</span></tt></a> method, when set with the optional parameter <cite>aligh</cite> to &#8220;quantize&#8221;, shows the number of hierarchical levels that start at or before that point. This value is described by Lerdahl and Jackendoff as metrical analysis.</p>
+<p>In the following example, <a title="music21.meter.TimeSignature.beat" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a> MeterSequence is partitioned first into one subdivision, and then each subsequent subdivision into two, down to four layers of partitioning.</p>
+<p>The number of hierarchical levels, found with the <a title="music21.meter.TimeSignature.getBeatDepth" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getBeatDepth"><tt class="xref docutils literal"><span class="pre">getBeatDepth()</span></tt></a> method, is appended to each note with the <tt class="xref docutils literal"><span class="pre">addLyric()</span></tt> method:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">music21</span>
 <span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span>
 
@@ -327,10 +384,16 @@
 </pre></div>
 </div>
 <img alt="_images/overviewMeters-07.png" src="_images/overviewMeters-07.png" style="width: 400px;" />
+<p>Alternatively, this type of annotation can be applied to a Stream using the <tt class="xref docutils literal"><span class="pre">labelBeatDepth()</span></tt> function.</p>
 </div>
+</div>
+<div class="section" id="configuring-accent">
+<h2>Configuring Accent<a class="headerlink" href="#configuring-accent" title="Permalink to this headline">¶</a></h2>
+<p>The TimeSignature <a title="music21.meter.TimeSignature.accent" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.accent"><tt class="xref docutils literal"><span class="pre">accent</span></tt></a> MeterSequence defines one or more levels of hierarchical accent levels, where quantitative accent value is encoded in MeterTerminal or MeterSequence with a number assigned to the <a title="music21.meter.MeterTerminal.weight" class="reference external" href="moduleMeter.html#music21.meter.MeterTerminal.weight"><tt class="xref docutils literal"><span class="pre">weight</span></tt></a> attribute.</p>
 <div class="section" id="applying-articulations-based-on-accent">
-<h2>Applying Articulations Based on Accent<a class="headerlink" href="#applying-articulations-based-on-accent" title="Permalink to this headline">¶</a></h2>
-<p>The following example extract the Bass line of a Bach chorale in 3/4 and, after repartitioning the beat and accent attributes, applies accents to reflect a meter of 6/8:</p>
+<h3>Applying Articulations Based on Accent<a class="headerlink" href="#applying-articulations-based-on-accent" title="Permalink to this headline">¶</a></h3>
+<p>The <a title="music21.meter.TimeSignature.getAccentWeight" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getAccentWeight"><tt class="xref docutils literal"><span class="pre">getAccentWeight()</span></tt></a> method returns the currently active accent weight given a quarter length position into the TimeSignature. Combined with the <a title="music21.meter.TimeSignature.getBeatProgress" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature.getBeatProgress"><tt class="xref docutils literal"><span class="pre">getBeatProgress()</span></tt></a> method, Notes that start on particular beat can be isolated and examined.</p>
+<p>The following example extracts the Bass line of a Bach chorale in 3/4 and, after repartitioning the beat and accent attributes, applies accents to reflect a meter of 6/8:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">meter</span><span class="p">,</span> <span class="n">articulations</span>
 
 <span class="n">score</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv366.xml&#39;</span><span class="p">)</span>
@@ -362,6 +425,7 @@
 <img alt="_images/overviewMeters-05.png" src="_images/overviewMeters-05.png" style="width: 400px;" />
 </div>
 </div>
+</div>
 
 
           </div>
@@ -389,7 +453,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 04, 2010.
+      Last updated on Jun 05, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

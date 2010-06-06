@@ -1748,7 +1748,7 @@ class TimeSignature(music21.Music21Object):
         ''')
 
     def _getBeatUnit(self):
-        '''Return a Duration object for the beat unit of this TimeSignature if the beat unit is constant; otherwise, return None
+        '''Return a Duration object for the beat unit of this TimeSignature if the beat unit is constant for all top-level beat partitions; otherwise, return None
         '''
         post = []
         if len(self.beat) == 1:
@@ -1790,7 +1790,7 @@ class TimeSignature(music21.Music21Object):
             raise TimeSignatureException('non uniform beat background: %s' % post)
 
     beatBackgroundUnitCount = property(_getBeatBackgroundUnitCount,
-        doc = '''Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature.
+        doc = '''Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature.
 
         >>> ts = TimeSignature('3/4')
         >>> ts.beatBackgroundUnitCount
@@ -1855,7 +1855,7 @@ class TimeSignature(music21.Music21Object):
 
 
     beatDivision = property(_getBeatDivision, 
-        doc = '''Return the beat division as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
+        doc = '''Return the beat division, or the durations that make up one beat, as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
 
         >>> ts = TimeSignature('3/4')
         >>> ts.beatDivision
@@ -1890,7 +1890,6 @@ class TimeSignature(music21.Music21Object):
         [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
         '''
         )
-
 
 
     def _getClassification(self):
@@ -2110,7 +2109,7 @@ class TimeSignature(music21.Music21Object):
                 else:
                     raise TimeSignatureException('cannot match beamType')
 
-
+                # debugging information displays:
 #                 if beamPrevious != None:
 #                     environLocal.printDebug(['beamPrevious', beamPrevious, 'beamPrevious.getNumbers()', beamPrevious.getNumbers(), 'beamPrevious.getByNumber(beamNumber).type'])
 #                     if beamNumber in beamPrevious.getNumbers():

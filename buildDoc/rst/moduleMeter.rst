@@ -116,7 +116,7 @@ TimeSignature
 
         .. attribute:: beatBackgroundUnitCount
 
-            Return the count of background beat units, or the number of subdivisions in the beat unit in this TimeSignature. 
+            Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature. 
 
             >>> ts = TimeSignature('3/4')
             >>> ts.beatBackgroundUnitCount
@@ -152,7 +152,7 @@ TimeSignature
 
         .. attribute:: beatDivision
 
-            Return the beat division as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
+            Return the beat division, or the durations that make up one beat, as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
 
             >>> ts = TimeSignature('3/4')
             >>> ts.beatDivision
