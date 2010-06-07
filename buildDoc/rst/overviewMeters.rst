@@ -249,22 +249,22 @@ Configuring Beat
 
 The TimeSignature :attr:`~music21.meter.TimeSignature.beat` MeterSequence employs the hierarchical structure to define the beats and background (or sub) beats of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the background, or sub-beat partitions. For most common meters, beats and background beats are pre-configured by default.
 
-In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatUnit`,  :attr:`~music21.meter.TimeSignature.beatUnitCount`, and :attr:`~music21.meter.TimeSignature.beatUnitCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatBackgroundUnitCount`, and :attr:`~music21.meter.TimeSignature.beatBackgroundUnitCountName` properties can be used to return commonly needed background beat information. These descriptors can be combined to return a string representation of the TimeSignature classification with  :attr:`~music21.meter.TimeSignature.classification` property.
+In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beatCount`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatBackgroundCount`, and :attr:`~music21.meter.TimeSignature.beatBackgroundCountName` properties can be used to return commonly needed background beat information. These descriptors can be combined to return a string representation of the TimeSignature classification with  :attr:`~music21.meter.TimeSignature.classification` property.
 
 >>> ts = meter.TimeSignature('3/4')
 >>> ts.beat.getLevel(0)
 <MeterSequence {1/4+1/4+1/4}>
 >>> ts.beat.getLevel(1)
 <MeterSequence {1/8+1/8+1/8+1/8+1/8+1/8}>
->>> ts.beatUnit
+>>> ts.beatDuration
 <music21.duration.Duration 1.0>
->>> ts.beatUnitCount
+>>> ts.beatCount
 3
->>> ts.beatUnitCountName
+>>> ts.beatCountName
 'Triple'
->>> ts.beatBackgroundUnitCount
+>>> ts.beatBackgroundCount
 2
->>> ts.beatBackgroundUnitCountName
+>>> ts.beatBackgroundCountName
 'Simple'
 >>> ts.classification
 'Simple Triple'
@@ -274,15 +274,15 @@ In the following example, a simple and a compound meter is created, and the defa
 <MeterSequence {3/16+3/16+3/16+3/16}>
 >>> ts.beat.getLevel(1)
 <MeterSequence {1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16}>
->>> ts.beatUnit
+>>> ts.beatDuration
 <music21.duration.Duration 0.75>
->>> ts.beatUnitCount
+>>> ts.beatCount
 4
->>> ts.beatUnitCountName
+>>> ts.beatCountName
 'Quadruple'
->>> ts.beatBackgroundUnitCount
+>>> ts.beatBackgroundCount
 3
->>> ts.beatBackgroundUnitCountName
+>>> ts.beatBackgroundCountName
 'Compound'
 >>> ts.classification
 'Compound Quadruple'

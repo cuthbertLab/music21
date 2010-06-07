@@ -642,15 +642,15 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
         m.timeSignature = ts
         n = note.Note()
         n.lyric = 'Beat Unit'
-        n.duration = ts.beatUnit
+        n.duration = ts.beatDuration
         m.append(n)
         return m
 
     def prepareBeatDivision(ts):
         m = stream.Measure()
         m.timeSignature = ts
-        for i in range(len(ts.beatDivision)):
-            d = ts.beatDivision[i]
+        for i in range(len(ts.beatBackgroundDurations)):
+            d = ts.beatBackgroundDurations[i]
             n = note.Note()
             if i == 0:
                 n.lyric = 'Beat Division'
@@ -662,8 +662,8 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     def prepareBeatSubDivision(ts):
         m = stream.Measure()
         m.timeSignature = ts
-        for i in range(len(ts.beatSubDivision)):
-            d = ts.beatSubDivision[i]
+        for i in range(len(ts.beatSubDivisionDurations)):
+            d = ts.beatSubDivisionDurations[i]
             n = note.Note()
             if i == 0:
                 n.lyric = 'Beat Subdivision'

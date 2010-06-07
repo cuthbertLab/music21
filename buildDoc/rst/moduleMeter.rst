@@ -114,51 +114,51 @@ TimeSignature
 
             
 
-        .. attribute:: beatBackgroundUnitCount
+        .. attribute:: beatBackgroundCount
 
             Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatBackgroundUnitCount
+            >>> ts.beatBackgroundCount
             2 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatBackgroundUnitCount
+            >>> ts.beatBackgroundCount
             3 
             >>> ts = TimeSignature('15/8')
-            >>> ts.beatBackgroundUnitCount
+            >>> ts.beatBackgroundCount
             3 
             >>> ts = TimeSignature('3/8')
-            >>> ts.beatBackgroundUnitCount
+            >>> ts.beatBackgroundCount
             2 
             >>> ts = TimeSignature('13/8')
-            >>> ts.beatBackgroundUnitCount
+            >>> ts.beatBackgroundCount
             Traceback (most recent call last): 
             TimeSignatureException: cannot determine beat background for an unpartitioned beat 
 
             
 
-        .. attribute:: beatBackgroundUnitCountName
+        .. attribute:: beatBackgroundCountName
 
             Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatBackgroundUnitCountName
+            >>> ts.beatBackgroundCountName
             'Simple' 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatBackgroundUnitCountName
+            >>> ts.beatBackgroundCountName
             'Compound' 
 
             
 
-        .. attribute:: beatDivision
+        .. attribute:: beatBackgroundDurations
 
             Return the beat division, or the durations that make up one beat, as a Stream of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatDivision
+            >>> ts.beatBackgroundDurations
             [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>] 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatDivision
+            >>> ts.beatBackgroundDurations
             [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>] 
 
         .. attribute:: beatLengthToQuarterLengthRatio
@@ -169,49 +169,49 @@ TimeSignature
             >>> a.beatLengthToQuarterLengthRatio
             2.0 
 
-        .. attribute:: beatSubDivision
+        .. attribute:: beatSubDivisionDurations
 
             Return a subdivision of the beat division, or a list of :class:`~music21.duration.Duration` objects representing each beat division divided by two. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatSubDivision
+            >>> ts.beatSubDivisionDurations
             [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>] 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatSubDivision
+            >>> ts.beatSubDivisionDurations
             [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>] 
 
-        .. attribute:: beatUnit
+        .. attribute:: beatDuration
 
             Return a :class:`~music21.duration.Duration` object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatUnit
+            >>> ts.beatDuration
             <music21.duration.Duration 1.0> 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatUnit
+            >>> ts.beatDuration
             <music21.duration.Duration 1.5> 
             >>> ts = TimeSignature('7/8')
-            >>> ts.beatUnit
+            >>> ts.beatDuration
             Traceback (most recent call last): 
             TimeSignatureException: cannot determine beat unit for an unpartitioned beat 
 
-        .. attribute:: beatUnitCount
+        .. attribute:: beatCount
 
             Return the count of beat units, or the number of beats in this TimeSignature 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatUnitCount
+            >>> ts.beatCount
             3 
 
-        .. attribute:: beatUnitCountName
+        .. attribute:: beatCountName
 
             Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple. 
 
             >>> ts = TimeSignature('3/4')
-            >>> ts.beatUnitCountName
+            >>> ts.beatCountName
             'Triple' 
             >>> ts = TimeSignature('6/8')
-            >>> ts.beatUnitCountName
+            >>> ts.beatCountName
             'Duple' 
 
             
