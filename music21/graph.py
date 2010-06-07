@@ -506,8 +506,12 @@ class GraphHorizontalBar(Graph):
         self.setAxisRange('x', (xMin, xMax), pad=True)
         self.setTicks('y', yTicks)  
 
+        rangeStep = int(xMin+int(round(xRange/10)))
+        if rangeStep == 0:
+            rangeStep = 1
         for x in range(int(math.floor(xMin)), 
-                       int(round(math.ceil(xMax))), int(xMin+int(round(xRange/10)))) + [int(round(xMax))]:
+                       int(round(math.ceil(xMax))), 
+                       rangeStep) + [int(round(xMax))]:
             xTicks.append([x, '%s' % x])
         self.setTicks('x', xTicks)  
 
@@ -1213,8 +1217,8 @@ class PlotStream(object):
                 offsetStepSize = 10
             #environLocal.printDebug(['using offsets for offset ticks'])
             # get integers for range calculation
-            oMin = math.floor(offsetMin)
-            oMax = math.ceil(offsetMax)
+            oMin = int(math.floor(offsetMin))
+            oMax = int(math.ceil(offsetMax))
             for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 

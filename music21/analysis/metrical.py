@@ -11,6 +11,8 @@
 #-------------------------------------------------------------------------------
 import music21.stream
 import music21.meter
+import unittest, doctest
+
 
 from music21 import environment
 _MOD = "analysis.metrical.py"
@@ -58,3 +60,16 @@ def labelBeatDepth(streamIn):
                 n.addLyric('*')
 
     return streamIn
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+
+

@@ -114,7 +114,7 @@ def findRaisedSevenths(show=True):
     score = corpus.parseWork('bach/bwv366.xml')  
     ts = score.flat.getElementsByClass(
         meter.TimeSignature)[0]
-    ts.beat.partition(3)
+    #ts.beat.partition(3)
 
     found = stream.Stream()
     count = 0
@@ -195,6 +195,6 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    bergEx01()
-    #music21.mainTest(Test)
+    #bergEx01()
+    music21.mainTest(Test)
 
