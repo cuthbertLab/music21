@@ -649,8 +649,8 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     def prepareBeatDivision(ts):
         m = stream.Measure()
         m.timeSignature = ts
-        for i in range(len(ts.beatBackgroundDurations)):
-            d = ts.beatBackgroundDurations[i]
+        for i in range(len(ts.beatDivisionDurations)):
+            d = ts.beatDivisionDurations[i]
             n = note.Note()
             if i == 0:
                 n.lyric = 'Beat Division'

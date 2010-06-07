@@ -1801,7 +1801,7 @@ class TimeSignature(music21.Music21Object):
         ''')
 
 
-    def _getBeatBackgroundCount(self):
+    def _getBeatDivisionCount(self):
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
         if len(self.beat[0]) == 1:
@@ -1822,34 +1822,34 @@ class TimeSignature(music21.Music21Object):
         else:
             raise TimeSignatureException('non uniform beat background: %s' % post)
 
-    beatBackgroundCount = property(_getBeatBackgroundCount,
+    beatDivisionCount = property(_getBeatDivisionCount,
         doc = '''Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature.
 
         >>> ts = TimeSignature('3/4')
-        >>> ts.beatBackgroundCount
+        >>> ts.beatDivisionCount
         2
 
         >>> ts = TimeSignature('6/8')
-        >>> ts.beatBackgroundCount
+        >>> ts.beatDivisionCount
         3
 
         >>> ts = TimeSignature('15/8')
-        >>> ts.beatBackgroundCount
+        >>> ts.beatDivisionCount
         3
 
         >>> ts = TimeSignature('3/8')
-        >>> ts.beatBackgroundCount
+        >>> ts.beatDivisionCount
         2
 
         >>> ts = TimeSignature('13/8', 13)
-        >>> ts.beatBackgroundCount
+        >>> ts.beatDivisionCount
         Traceback (most recent call last):
         TimeSignatureException: cannot determine beat backgrond when each beat is not partitioned
     
         ''')
 
-    def _getBeatBackgroundCountName(self):
-        bbuc = self._getBeatBackgroundCount()
+    def _getBeatDivisionCountName(self):
+        bbuc = self._getBeatDivisionCount()
         if bbuc == 2:
             return 'Simple'
         elif bbuc == 3:
@@ -1857,21 +1857,21 @@ class TimeSignature(music21.Music21Object):
         else:
             return None
 
-    beatBackgroundCountName = property(_getBeatBackgroundCountName,
+    beatDivisionCountName = property(_getBeatDivisionCountName,
         doc = '''Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.
 
         >>> ts = TimeSignature('3/4')
-        >>> ts.beatBackgroundCountName
+        >>> ts.beatDivisionCountName
         'Simple'
 
         >>> ts = TimeSignature('6/8')
-        >>> ts.beatBackgroundCountName
+        >>> ts.beatDivisionCountName
         'Compound'
 
         ''')
 
 
-    def _getBeatBackgroundDurations(self):
+    def _getBeatDivisionDurations(self):
         post = []
         if len(self.beat[0]) == 1:
             raise TimeSignatureException('cannot determine beat division for an unpartitioned beat')
@@ -1887,15 +1887,15 @@ class TimeSignature(music21.Music21Object):
             raise TimeSignatureException('non uniform beat division: %s' % post)
 
 
-    beatBackgroundDurations = property(_getBeatBackgroundDurations, 
+    beatDivisionDurations = property(_getBeatDivisionDurations, 
         doc = '''Return the beat division, or the durations that make up one beat, as a list of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
 
         >>> ts = TimeSignature('3/4')
-        >>> ts.beatBackgroundDurations
+        >>> ts.beatDivisionDurations
         [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
 
         >>> ts = TimeSignature('6/8')
-        >>> ts.beatBackgroundDurations
+        >>> ts.beatDivisionDurations
         [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
         ''')
 
@@ -1904,7 +1904,7 @@ class TimeSignature(music21.Music21Object):
         '''Subdivide each beat division in two. 
         '''
         post = []
-        src = self._getBeatBackgroundDurations()
+        src = self._getBeatDivisionDurations()
         for d in src:
             post.append(d.augmentOrDiminish(.5, inPlace=False))
             post.append(d.augmentOrDiminish(.5, inPlace=False))
@@ -1925,7 +1925,7 @@ class TimeSignature(music21.Music21Object):
 
 
     def _getClassification(self):
-        return '%s %s' % (self._getBeatBackgroundCountName(),
+        return '%s %s' % (self._getBeatDivisionCountName(),
                           self._getBeatCountName())
 
     classification = property(_getClassification, 
