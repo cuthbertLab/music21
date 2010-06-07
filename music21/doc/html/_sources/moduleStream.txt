@@ -806,7 +806,7 @@ Stream
             >>> len(d) == 0
             True 
 
-        .. method:: getTimeSignatures()
+        .. method:: getTimeSignatures(searchContext=True)
 
             Collect all :class:`~music21.meter.TimeSignature` objects in this stream. If no TimeSignature objects are defined, get a default 
 

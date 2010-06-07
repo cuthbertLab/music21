@@ -1633,7 +1633,7 @@ class Stream(music21.Music21Object):
                     map[offset].append(m)
         return map
 
-    def getTimeSignatures(self):
+    def getTimeSignatures(self, searchContext=True):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
         
@@ -1645,16 +1645,21 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
-        # TODO: this presently does not search parent Streams through contexts
         post = self.getElementsByClass(meter.TimeSignature)
-    
+
+        # search parent Streams through contexts    
+        if len(post) == 0 and searchContext:
+            # returns a single value
+            post = Stream()
+            obj = self.getContextByClass(meter.TimeSignature)
+            #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
+            if obj != None:
+                post.append(obj)
+
         # get a default and/or place default at zero if nothing at zero
         if len(post) == 0 or post[0].offset > 0: 
-            ts = meter.TimeSignature()
-            ts.load('%s/%s' % (defaults.meterNumerator, 
+            ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator, 
                                defaults.meterDenominatorBeatType))
-            #ts.numerator = defaults.meterNumerator
-            #ts.denominator = defaults.meterDenominatorBeatType
             post.insert(0, ts)
         return post
         

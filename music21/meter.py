@@ -1519,51 +1519,45 @@ class TimeSignature(music21.Music21Object):
         '''Set default beat partitions based on numerator and denominator.
 
         >>> ts = TimeSignature('3/4')
-        >>> len(ts.beat[0]) # first, not zeroth, level stores beat
+        >>> len(ts.beat) # first, not zeroth, level stores beat
         3
         '''
-        # by default, topmost partition is set at one partition
-        # this is motivated in part by metrical analysis, where we need one
-        # more partition at the top most level to give greater hierarchical
-        # depth to the first beat
-        self.beat.partition(1)
 
         # create toplevel partitions
         if self.numerator in [2, 6]: # duple meters
-            self.beat[0] = self.beat[0].subdivide(2)
+            self.beat.partition(2)
         elif self.numerator in [3]: # triple meters
-            #self.beat.partition([1,1,1])
-            self.beat[0] = self.beat[0].subdivide([1,1,1])
+            self.beat.partition([1,1,1])
         elif self.numerator in [9]: # triple meters
-            #self.beat.partition([3,3,3])
-            self.beat[0] = self.beat[0].subdivide([3,3,3])
+            self.beat.partition([3,3,3])
         elif self.numerator in [4, 12]: # quadruple meters
-            #self.beat.partition(4)
-            self.beat[0] = self.beat[0].subdivide(4)
+            self.beat.partition(4)
         elif self.numerator in [5]: # quintuple meters
-            #self.beat.partition(5)
-            self.beat[0] = self.beat[0].subdivide(5)
+            self.beat.partition(5)
         elif self.numerator in [15]: # quintuple meters
-            #self.beat.partition([3,3,3,3,3])
-            self.beat[0] = self.beat[0].subdivide([3,3,3,3,3])
+            self.beat.partition([3,3,3,3,3])
         # skip 6 numerators; covered above
         elif self.numerator in [18]: # sextuple meters
-            #self.beat.partition([3,3,3,3,3,3])
-            self.beat[0] = self.beat[0].subdivide([3,3,3,3,3,3])
+            self.beat.partition([3,3,3,3,3,3])
         else: # case of odd meters
-            self.beat[0] = self.beat[0].subdivide(self.numerator)
+            self.beat.partition(self.numerator)
+            #self.beat[0] = self.beat[0].subdivide()
 
 #         elif self.numerator != None: # partition by numerator      
 #             self.beat.partition(self.numerator)
 
         # create subdivisions, and thus define compound/simple distinction
-        if len(self.beat[0]) > 1: # if partitioned
-            for i in range(len(self.beat[0])): # either 2 or 3
-                if self.beat[0][i].numerator == 3:
-                    self.beat[0][i] = self.beat[0][i].subdivide(3)
-                elif self.beat[0][i].numerator == 1:
-                    self.beat[0][i] = self.beat[0][i].subdivide(2)
+        if len(self.beat) > 1: # if partitioned
+            for i in range(len(self.beat)): # either 2 or 3
+                if self.beat[i].numerator == 3:
+                    self.beat[i] = self.beat[i].subdivide(3)
+                elif self.beat[i].numerator == 1:
+                    self.beat[i] = self.beat[i].subdivide(2)
 
+                # any lower level is divided by 2 
+#                 for j in range(len(self.beat[0][i])):
+#                     self.beat[0][i][j] = self.beat[0][i][j].subdivide(2)
+                    
 
     def _setDefaultBeamPartitions(self):
         '''This sets default beam partitions when partitionRequest is None.
@@ -1611,9 +1605,7 @@ class TimeSignature(music21.Music21Object):
         self.beam = MeterSequence(value, partitionRequest)
 
         # used for getting beat divisions
-        # by default, always have a single, top-level beat partition
-        self.beat = MeterSequence(value, 1)
-        self.beat[0] = self.beat[0].subdivide(partitionRequest)
+        self.beat = MeterSequence(value, partitionRequest)
 
         # used for setting one level of accents
         self.accent = MeterSequence(value, partitionRequest)
@@ -1733,7 +1725,7 @@ class TimeSignature(music21.Music21Object):
     def _getBeatCount(self):
         # the default is for the beat to be defined by the first, not zero, 
         # level partition. 
-        return len(self.beat[0])
+        return len(self.beat)
 
     beatCount = property(_getBeatCount,
         doc = '''Return the count of beat units, or the number of beats in this TimeSignature
@@ -1775,12 +1767,12 @@ class TimeSignature(music21.Music21Object):
         '''Return a Duration object for the beat unit of this TimeSignature if the beat unit is constant for all top-level beat partitions; otherwise, return None
         '''
         post = []
-        if len(self.beat[0]) == 1:
+        if len(self.beat) == 1:
             raise TimeSignatureException('cannot determine beat unit for an unpartitioned beat')
-        for ms in self.beat[0]:
+        for ms in self.beat:
             post.append(ms.duration.quarterLength)
         if len(set(post)) == 1:
-            return self.beat[0][0].duration # all are the same
+            return self.beat[0].duration # all are the same
         else:
             raise TimeSignatureException('non uniform beat unit: %s' % post)
 
@@ -1804,21 +1796,21 @@ class TimeSignature(music21.Music21Object):
     def _getBeatDivisionCount(self):
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
-        if len(self.beat[0]) == 1:
+        if len(self.beat) == 1:
             raise TimeSignatureException('cannot determine beat background for an unpartitioned beat')
 
         # need to see if first-level subdivisions are partitioned
-        if not isinstance(self.beat[0][0], MeterSequence):
+        if not isinstance(self.beat[0], MeterSequence):
             raise TimeSignatureException('cannot determine beat backgrond when each beat is not partitioned')
 
 
         # getting length here gives number of subdivisions
-        for ms in self.beat[0]:
+        for ms in self.beat:
             post.append(len(ms))
 
         # convert this to a set; if length is 1, then all beats are uniform
         if len(set(post)) == 1:
-            return len(self.beat[0][0]) # all are the same
+            return len(self.beat[0]) # all are the same
         else:
             raise TimeSignatureException('non uniform beat background: %s' % post)
 
@@ -1873,14 +1865,14 @@ class TimeSignature(music21.Music21Object):
 
     def _getBeatDivisionDurations(self):
         post = []
-        if len(self.beat[0]) == 1:
+        if len(self.beat) == 1:
             raise TimeSignatureException('cannot determine beat division for an unpartitioned beat')
-        for mt in self.beat[0]:
+        for mt in self.beat:
             for subMt in mt:
                 post.append(subMt.duration.quarterLength)
         if len(set(post)) == 1: # all the same 
             out = [] # could be a Stream, but stream.py imports meter.py
-            for subMt in self.beat[0][0]:
+            for subMt in self.beat[0]:
                 out.append(subMt.duration)
             return out
         else:
@@ -2168,7 +2160,7 @@ class TimeSignature(music21.Music21Object):
         >>> a.beam
         <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.beat # a single top-level partition is default for beat
-        <MeterSequence {{{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}}>
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.setDisplay('3/4')
         >>> a.display
         <MeterSequence {3/4}>
@@ -2248,11 +2240,11 @@ class TimeSignature(music21.Music21Object):
         1
         >>> a.getBeat(2.5)
         3
-        >>> a.beat[0].partition(['3/8', '3/8'])
+        >>> a.beat.partition(['3/8', '3/8'])
         >>> a.getBeat(2.5)
         2
         '''
-        return self.beat[0].positionToIndex(qLenPos) + 1
+        return self.beat.positionToIndex(qLenPos) + 1
 
 
     def getBeatProgress(self, qLenPos):
@@ -2266,12 +2258,12 @@ class TimeSignature(music21.Music21Object):
         (1, 0.75)
         >>> a.getBeatProgress(2.5)
         (3, 0.5)
-        >>> a.beat[0].partition(['3/8', '3/8'])
+        >>> a.beat.partition(['3/8', '3/8'])
         >>> a.getBeatProgress(2.5)
         (2, 1.0)
         '''
-        beatIndex = self.beat[0].positionToIndex(qLenPos)
-        start, end = self.beat[0].positionToSpan(qLenPos)
+        beatIndex = self.beat.positionToIndex(qLenPos)
+        start, end = self.beat.positionToSpan(qLenPos)
         return beatIndex + 1, qLenPos - start
 
 
@@ -2282,7 +2274,7 @@ class TimeSignature(music21.Music21Object):
 
         >>> a = TimeSignature('3/4', 3)
         >>> a.getBeatDepth(0)
-        2
+        1
         >>> a.getBeatDepth(1)
         1
         >>> a.getBeatDepth(2)
@@ -2482,8 +2474,7 @@ class NonPowerOfTwoTimeSignature(TimeSignature):
 
 
 
-#-----------------------------------------------------------------||||||||||||--
-class TestExternal(unittest.TestCase):
+#-------------------------------------------------------------------------------class TestExternal(unittest.TestCase):
     
     def runTest(self):
         pass
@@ -2648,59 +2639,59 @@ class Test(unittest.TestCase):
         src = [('2/2'), ('2/4'), ('2/8'), ('6/4'), ('6/8'), ('6/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
-            self.assertEqual(len(ts.beat[0]), 2)
+            self.assertEqual(len(ts.beat), 2)
             self.assertEqual(ts.beatCountName, 'Duple')
             if ts.numerator == 2:
-                for ms in ts.beat[0]: # should be divided in two
+                for ms in ts.beat: # should be divided in two
                     self.assertEqual(len(ms), 2)
             elif ts.numerator == 6:
-                for ms in ts.beat[0]: # should be divided in three
+                for ms in ts.beat: # should be divided in three
                     self.assertEqual(len(ms), 3)
 
         src = [('3/2'), ('3/4'), ('3/8'), ('9/4'), ('9/8'), ('9/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
-            self.assertEqual(len(ts.beat[0]), 3)
+            self.assertEqual(len(ts.beat), 3)
             self.assertEqual(ts.beatCountName, 'Triple')
             if ts.numerator == 3:
-                for ms in ts.beat[0]: # should be divided in two
+                for ms in ts.beat: # should be divided in two
                     self.assertEqual(len(ms), 2)
             elif ts.numerator == 9:
-                for ms in ts.beat[0]: # should be divided in three
+                for ms in ts.beat: # should be divided in three
                     self.assertEqual(len(ms), 3)
 
 
         src = [('4/2'), ('4/4'), ('4/8'), ('12/4'), ('12/8'), ('12/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
-            self.assertEqual(len(ts.beat[0]), 4)
+            self.assertEqual(len(ts.beat), 4)
             self.assertEqual(ts.beatCountName, 'Quadruple')
             if ts.numerator == 4:
-                for ms in ts.beat[0]: # should be divided in two
+                for ms in ts.beat: # should be divided in two
                     self.assertEqual(len(ms), 2)
             elif ts.numerator == 12:
-                for ms in ts.beat[0]: # should be divided in three
+                for ms in ts.beat: # should be divided in three
                     self.assertEqual(len(ms), 3)
 
         src = [('5/2'), ('5/4'), ('5/8'), ('15/4'), ('15/8'), ('15/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
-            self.assertEqual(len(ts.beat[0]), 5)
+            self.assertEqual(len(ts.beat), 5)
             self.assertEqual(ts.beatCountName, 'Quintuple')
             if ts.numerator == 5:
-                for ms in ts.beat[0]: # should be divided in two
+                for ms in ts.beat: # should be divided in two
                     self.assertEqual(len(ms), 2)
             elif ts.numerator == 15:
-                for ms in ts.beat[0]: # should be divided in three
+                for ms in ts.beat: # should be divided in three
                     self.assertEqual(len(ms), 3)
 
         src = [('18/4'), ('18/8'), ('18/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
-            self.assertEqual(len(ts.beat[0]), 6)
+            self.assertEqual(len(ts.beat), 6)
             self.assertEqual(ts.beatCountName, 'Sextuple')
             if ts.numerator == 18:
-                for ms in ts.beat[0]: # should be divided in three
+                for ms in ts.beat: # should be divided in three
                     self.assertEqual(len(ms), 3)
 
         # odd or unusual partitions

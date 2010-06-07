@@ -4,7 +4,7 @@
 Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats
 ===========================================================================
 
-Meters and Time Signatures are represented in music21 as groups of nested hierarchical structures. In many cases, the default configuration of a music21 :class:`~music21.meter.TimeSignature` object will do what you want. However, by configuring the fundamental component objects, the :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects, a wide range of options are available.
+Meters and time signatures are represented in music21 as groups of nested hierarchical structures. In many cases, the default configuration of a music21 :class:`~music21.meter.TimeSignature` object will do what you want. However, by configuring the fundamental component objects, the :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects, a wide range of options are available.
 
 The :class:`~music21.meter.TimeSignature` object additionally features numerous high-level methods to provide access to and configuration of display, beaming, beat, and accent information.
 
@@ -19,15 +19,17 @@ Objects for Organizing Hierarchical Partitions
 
 Hierarchical metrical structures can be described as a type of fractional, space-preserving tree structure. With such a structure we partition and divide a single duration into one or more parts, where each part is a fraction of the whole. Each part can, in turn, be similarly divided. The objects for configuring this structure are the MeterTerminal and the MeterSequence objects.
 
+MeterTerminal and the MeterSequence objects are for advanced configuration. For basic data access about common meters, see the discussion of TimeSignature, below. 
+
 
 Creating and Editing MeterTerminal Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A MeterTerminal is a node of the metrical tree structure, defined as a duration expressed as fraction of a whole note. Thus, 1/4 is 1 quarter length (QL) duration; 3/8 is 1.5 QL; 3/16 is 0.75 QL. For this model, denominators are limited to *n* = 2^*x*, for *x* between 1 and 7 (e.g. 1/1 to 1/128).
+A MeterTerminal is a node of the metrical tree structure, defined as a duration expressed as a fraction of a whole note. Thus, 1/4 is 1 quarter length (QL) duration; 3/8 is 1.5 QL; 3/16 is 0.75 QL. For this model, denominators are limited to *n* = 2 :superscript:`x`, for *x* between 1 and 7 (e.g. 1/1 to 1/128).
 
 MeterTerminals can additionally store a weight, or a numerical value that can be interpreted in a variety of different ways.
 
-The following example, in the Python interpreter, demonstrates creating a MeterTerminal and accessing the :attr:`~music21.meter.MeterTerminal.numerator`, :attr:`~music21.meter.MeterTerminal.denominator` attributes. The  :attr:`~music21.meter.MeterTerminal.duration` attribute stores a :class:`~music21.duration.Duration` object.
+The following examples in the Python interpreter demonstrate creating a MeterTerminal and accessing the :attr:`~music21.meter.MeterTerminal.numerator` and :attr:`~music21.meter.MeterTerminal.denominator` attributes. The  :attr:`~music21.meter.MeterTerminal.duration` attribute stores a :class:`~music21.duration.Duration` object.
 
 >>> from music21 import meter
 >>> mt = meter.MeterTerminal('3/4')
@@ -38,7 +40,7 @@ The following example, in the Python interpreter, demonstrates creating a MeterT
 >>> mt.duration.quarterLength
 3.0
 
-A MeterTerminal can be broken into an ordered sequence of MeterTerminal objects that sum to the same duration. This new object, to be discussed below, is the MeterSequence object. A MeterTerminal can be broken into duration-preserving components in a MeterSequence with the :meth:`~music21.meter.MeterTerminal.subdivide` method. An argument for subdivision can be given as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations. 
+A MeterTerminal can be broken into an ordered sequence of MeterTerminal objects that sum to the same duration. This new object, to be discussed below, is the MeterSequence. A MeterTerminal can be broken into these duration-preserving components with the :meth:`~music21.meter.MeterTerminal.subdivide` method. An argument for subdivision can be given as a desired number of equal-valued components, a list of numerators assuming equal-denominators, or a list of string fraction representations. 
 
 >>> mt.subdivide(3)
 <MeterSequence {1/4+1/4+1/4}>
@@ -53,7 +55,7 @@ A MeterTerminal can be broken into an ordered sequence of MeterTerminal objects 
 Creating and Editing MeterSequence Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A MeterSequence object is sub-class of a MeterTerminal. Like a MeterTerminal, a MeterSequence has a :attr:`~music21.meter.MeterSequence.numerator`, a :attr:`~music21.meter.MeterSequence.denominator`, and a :attr:`~music21.meter.MeterSequence.duration` attribute. A MeterSequence, however, can be a hierarchical tree or sub-tree, containing an ordered sequence of MeterTerminal and/or MeterSequence objects.
+A MeterSequence object is a sub-class of a MeterTerminal. Like a MeterTerminal, a MeterSequence has a :attr:`~music21.meter.MeterSequence.numerator`, a :attr:`~music21.meter.MeterSequence.denominator`, and a :attr:`~music21.meter.MeterSequence.duration` attribute. A MeterSequence, however, can be a hierarchical tree or sub-tree, containing an ordered sequence of MeterTerminal and/or MeterSequence objects.
 
 The ordered collection of MeterTerminal and/or MeterSequence objects can be accessed like Python lists. MeterSequence objects, like MeterTerminal objects, store a weight that by default is the sum of constituent weights. 
 
@@ -97,7 +99,7 @@ The resulting structure can be graphically displayed with the following diagram:
     :width: 300
 
 
-Numerous MeterSequence attributes provide convenient ways to access information about or new objects from the nested tree structure. The :attr:`~music21.meter.MeterSequence.depth` attribute returns the depth count at any node within the tree structure; the :attr:`~music21.meter.MeterSequence.flat` property returns a new, flat MeterSequence constructed from all the lowest-level MeterTerminal objects (all leaf nodes). 
+Numerous MeterSequence attributes provide convenient ways to access information about, or new objects from, the nested tree structure. The :attr:`~music21.meter.MeterSequence.depth` attribute returns the depth count at any node within the tree structure; the :attr:`~music21.meter.MeterSequence.flat` property returns a new, flat MeterSequence constructed from all the lowest-level MeterTerminal objects (all leaf nodes). 
 
 
 >>> ms.depth
@@ -161,7 +163,7 @@ Configuring Display
 
 The TimeSignature :attr:`~music21.meter.TimeSignature.display` MeterSequence employs the highest-level partitions to configure the displayed time signature symbol. If more than one partition is given, those partitions will be interpreted as additive meter components. If partitions have a common denominator, a summed numerator (over a single denominator) can be displayed by setting the TimeSignature :attr:`~music21.meter.TimeSignature.summedNumerator` attribute to True. Lower-level subdivisions of the TimeSignature MeterSequence are not employed.
 
-Note that a new MeterSequence instance can be assigned to the :attr:`~music21.meter.TimeSignature.display` attribute with a duration and/or partitioning completely independently from the :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, and :attr:`~music21.meter.TimeSignature.accent` MeterSequences.
+Note that a new MeterSequence instance can be assigned to the :attr:`~music21.meter.TimeSignature.display` attribute with a duration and/or partitioning completely independent from the :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, and :attr:`~music21.meter.TimeSignature.accent` MeterSequences.
 
 The following example demonstrates setting the display MeterSequence for a TimeSignature::
 
@@ -193,11 +195,11 @@ The following example demonstrates setting the display MeterSequence for a TimeS
 Configuring Beam
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.beam` MeterSequence employs the complete hierarchical structure to configure the single or multi-level beaming of a bar. The outer-most partitions can specify one ore more top-level partitions. Lower-level partitions subdivide beam-groups, providing the appropriate beam-breaks when sufficiently small durations are employed. 
+The TimeSignature :attr:`~music21.meter.TimeSignature.beam` MeterSequence employs the complete hierarchical structure to configure the single or multi-level beaming of a bar. The outer-most partitions can specify one or more top-level partitions. Lower-level partitions subdivide beam-groups, providing the appropriate beam-breaks when sufficiently small durations are employed. 
 
-The :attr:`~music21.meter.TimeSignature.beam` MeterSequence is generally used to create and configure :class:`~music21.note.Beams` objects stored in :class:`~music21.note.Note` objects. The TimeSignature :meth:`~music21.meter.TimeSignature.getBeams` method, given a list of :class:`~music21.duration.Duration` objects, returns a list of :class:`~music21.note.Beams` objects. 
+The :attr:`~music21.meter.TimeSignature.beam` MeterSequence is generally used to create and configure :class:`~music21.note.Beams` objects stored in :class:`~music21.note.Note` objects. The TimeSignature :meth:`~music21.meter.TimeSignature.getBeams` method, given a list of :class:`~music21.duration.Duration` objects, returns a list of :class:`~music21.note.Beams` objects based on the TimeSignature  :attr:`~music21.meter.TimeSignature.beam` MeterSequence.
 
-Most users will likely find the Stream :meth:`~music21.stream.Stream.makeBeams` method the most convenient way to apply beams to a Measure or Stream of Note objects. This method returns a new Stream with created and configured Beams. 
+Many users may find the Stream :meth:`~music21.stream.Stream.makeBeams` method the most convenient way to apply beams to a Measure or Stream of Note objects. This method returns a new Stream with created and configured Beams. 
 
 The following example beams a bar of 3/4 in four different ways. The diversity and complexity of beaming is offered here to illustrate the flexibility of this model::
 
@@ -247,9 +249,9 @@ The following is a fractional grid representation of the four beam partitions cr
 Configuring Beat
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.beat` MeterSequence employs the hierarchical structure to define the beats and background (or sub) beats of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the background, or sub-beat partitions. For most common meters, beats and background beats are pre-configured by default.
+The TimeSignature :attr:`~music21.meter.TimeSignature.beat` MeterSequence employs the hierarchical structure to define the beats and beat divisions of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the beat division partitions. For most common meters, beats and beat divisions are pre-configured by default.
 
-In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beatCount`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatDivisionCount`, and :attr:`~music21.meter.TimeSignature.beatDivisionCountName` properties can be used to return commonly needed background beat information. These descriptors can be combined to return a string representation of the TimeSignature classification with  :attr:`~music21.meter.TimeSignature.classification` property.
+In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beatCount`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatDivisionCount`, and :attr:`~music21.meter.TimeSignature.beatDivisionCountName` properties can be used to return commonly needed beat division information. These descriptors can be combined to return a string representation of the TimeSignature classification with :attr:`~music21.meter.TimeSignature.classification` property.
 
 >>> ts = meter.TimeSignature('3/4')
 >>> ts.beat.getLevel(0)
@@ -334,7 +336,7 @@ In the following example, all leading tones, or C#s, are collected into a new St
 Using Beat Depth to Provide Metrical Analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another application of the :attr:`~music21.meter.TimeSignature.beat` MeterSequence is define the hierarchical depth active for a given note found within the TimeSignature. 
+Another application of the :attr:`~music21.meter.TimeSignature.beat` MeterSequence is to define the hierarchical depth active for a given note found within the TimeSignature. 
 
 The :meth:`~music21.meter.TimeSignature.getBeatDepth` method, when set with the optional parameter `aligh` to "quantize", shows the number of hierarchical levels that start at or before that point. This value is described by Lerdahl and Jackendoff as metrical analysis.
 
