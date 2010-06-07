@@ -18,6 +18,7 @@ Environment
 
     Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 
+    >>> from music21.environment import *
     >>> a = Environment()
     >>> post = a['writeFormat']
 
@@ -91,6 +92,7 @@ Preference
 
     
 
+    >>> from music21.environment import *
     >>> a = Preference()
 
     inherits from: :class:`~music21.node.Node`
@@ -107,6 +109,7 @@ Settings
 
     
 
+    >>> from music21.environment import *
     >>> a = Settings()
 
     inherits from: :class:`~music21.node.NodeList`, :class:`~music21.node.Node`

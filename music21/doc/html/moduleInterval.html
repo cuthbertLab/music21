@@ -408,7 +408,8 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <span class="go">&lt;music21.interval.Interval P15&gt;</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.interval</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;c3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="n">noteStart</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">noteEnd</span><span class="o">=</span><span class="n">n2</span><span class="p">)</span>
@@ -609,7 +610,8 @@ class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">ChromaticInterval</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.interval.ChromaticInterval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="o">-</span><span class="mf">14</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.interval</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">ChromaticInterval</span><span class="p">(</span><span class="o">-</span><span class="mf">14</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">semitones</span>
 <span class="go">-14</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">undirected</span>
@@ -675,7 +677,8 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">DiatonicInterval</tt><big>(</big><em>specifier</em>, <em>generic</em><big>)</big><a class="headerlink" href="#music21.interval.DiatonicInterval" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class representing a diatonic interval. Two required arguments are a <cite>specifier</cite> (such as perfect, major, or minor) and a <cite>generic</cite>, an interval size (such as 2, 2nd, or second). A DiatonicInterval contains and encapsulates a <a title="music21.interval.GenericInterval" class="reference internal" href="#music21.interval.GenericInterval"><tt class="xref docutils literal"><span class="pre">GenericInterval</span></tt></a></p>
 <p>The <cite>specifier</cite> is an integer specifying a value in the <cite>prefixSpecs</cite> and <cite>niceSpecNames</cite> lists. The <cite>generic</cite> is an integer or GenericInterval instance.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.interval</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">simpleName</span>
 <span class="go">&#39;P1&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">DiatonicInterval</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
@@ -765,7 +768,8 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
 <em class="property">
 class </em><tt class="descclassname">music21.interval.</tt><tt class="descname">GenericInterval</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.interval.GenericInterval" title="Permalink to this definition">¶</a></dt>
 <dd><p>A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth. Constructor takes an integer or string specifying the interval and direction. The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names (&#8216;3rd&#8217; or &#8216;third&#8217;) are accepted. staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.interval</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">GenericInterval</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">direction</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span><span class="o">.</span><span class="n">perfectable</span>

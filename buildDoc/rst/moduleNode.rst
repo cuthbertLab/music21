@@ -20,6 +20,7 @@ Node
 
     
 
+    >>> from music21.node import *
     >>> a = Node()
     >>> a.set('charData', 'test')
 

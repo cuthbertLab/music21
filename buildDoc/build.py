@@ -1038,7 +1038,8 @@ class ClassDoc(RestructuredWriter):
         # if we have __init__ documentation, place it with class documentation    
         docInitRaw = self.partitionedClass.getDoc('__init__')
         if docInitRaw != NO_DOC:
-            docInitCooked = self.formatDocString(docInitRaw, INDENT)
+            docInitCooked = self.formatDocString(docInitRaw, INDENT, 
+                            modName=self.modName)
         else:
             docInitCooked = None
 

@@ -67,6 +67,7 @@ KeySignature
 
     
 
+    >>> from music21.key import *
     >>> a = KeySignature(3)
     >>> a._strDescription()
     '3 sharps' 

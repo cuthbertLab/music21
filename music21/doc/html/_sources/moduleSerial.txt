@@ -99,6 +99,7 @@ TwelveToneMatrix
 
     
 
+    >>> from music21.serial import *
     >>> aMatrix = TwelveToneMatrix()
 
     inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`

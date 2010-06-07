@@ -147,6 +147,7 @@ Pitch
 
     Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
 
+    >>> from music21.pitch import *
     >>> p1 = Pitch('a#')
     >>> p1
     A# 

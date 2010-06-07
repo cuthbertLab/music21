@@ -288,6 +288,7 @@ Interval
 
     
 
+    >>> from music21.interval import *
     >>> from music21 import note
     >>> n1 = note.Note('c3')
     >>> n2 = note.Note('g3')
@@ -481,6 +482,7 @@ ChromaticInterval
 
     
 
+    >>> from music21.interval import *
     >>> aInterval = ChromaticInterval(-14)
     >>> aInterval.semitones
     -14 
@@ -546,6 +548,7 @@ DiatonicInterval
 
     The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. The `generic` is an integer or GenericInterval instance. 
 
+    >>> from music21.interval import *
     >>> aInterval = DiatonicInterval(1, 1)
     >>> aInterval.simpleName
     'P1' 
@@ -636,6 +639,7 @@ GenericInterval
 
     
 
+    >>> from music21.interval import *
     >>> aInterval = GenericInterval(3)
     >>> aInterval.direction
     1 

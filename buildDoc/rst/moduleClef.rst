@@ -62,6 +62,7 @@ TrebleClef
 
     
 
+    >>> from music21.clef import *
     >>> a = TrebleClef()
     >>> a.sign
     'G' 
@@ -77,6 +78,7 @@ BassClef
 
     
 
+    >>> from music21.clef import *
     >>> a = BassClef()
     >>> a.sign
     'F' 
@@ -92,6 +94,7 @@ AltoClef
 
     
 
+    >>> from music21.clef import *
     >>> a = AltoClef()
     >>> a.sign
     'C' 
@@ -107,6 +110,7 @@ Bass8vaClef
 
     
 
+    >>> from music21.clef import *
     >>> a = Bass8vaClef()
     >>> a.sign
     'F' 
@@ -122,6 +126,7 @@ Bass8vbClef
 
     
 
+    >>> from music21.clef import *
     >>> a = Bass8vbClef()
     >>> a.sign
     'F' 
@@ -139,6 +144,7 @@ CBaritoneClef
 
     
 
+    >>> from music21.clef import *
     >>> a = CBaritoneClef()
     >>> a.sign
     'C' 
@@ -156,6 +162,7 @@ CClef
 
     
 
+    >>> from music21.clef import *
     >>> a = CClef()
     >>> a.sign
     'C' 
@@ -193,6 +200,7 @@ FBaritoneClef
 
     
 
+    >>> from music21.clef import *
     >>> a = FBaritoneClef()
     >>> a.sign
     'F' 
@@ -215,6 +223,7 @@ FClef
 
     
 
+    >>> from music21.clef import *
     >>> a = FClef()
     >>> a.sign
     'F' 
@@ -252,6 +261,7 @@ FrenchViolinClef
 
     
 
+    >>> from music21.clef import *
     >>> a = FrenchViolinClef()
     >>> a.sign
     'G' 
@@ -267,6 +277,7 @@ GClef
 
     
 
+    >>> from music21.clef import *
     >>> a = GClef()
     >>> a.sign
     'G' 
@@ -304,6 +315,7 @@ GSopranoClef
 
     
 
+    >>> from music21.clef import *
     >>> a = GSopranoClef()
     >>> a.sign
     'G' 
@@ -319,6 +331,7 @@ MezzoSopranoClef
 
     
 
+    >>> from music21.clef import *
     >>> a = MezzoSopranoClef()
     >>> a.sign
     'C' 
@@ -383,6 +396,7 @@ SopranoClef
 
     
 
+    >>> from music21.clef import *
     >>> a = SopranoClef()
     >>> a.sign
     'C' 
@@ -398,6 +412,7 @@ SubBassClef
 
     
 
+    >>> from music21.clef import *
     >>> a = SubBassClef()
     >>> a.sign
     'F' 
@@ -422,6 +437,7 @@ TenorClef
 
     
 
+    >>> from music21.clef import *
     >>> a = TenorClef()
     >>> a.sign
     'C' 
@@ -441,6 +457,7 @@ Treble8vaClef
 
     
 
+    >>> from music21.clef import *
     >>> a = Treble8vaClef()
     >>> a.sign
     'G' 
@@ -458,6 +475,7 @@ Treble8vbClef
 
     
 
+    >>> from music21.clef import *
     >>> a = Treble8vbClef()
     >>> a.sign
     'G' 

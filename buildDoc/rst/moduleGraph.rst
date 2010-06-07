@@ -351,6 +351,7 @@ Graph
 
     Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
 
+    >>> from music21.graph import *
     >>> a = Graph()
     >>> a = Graph(title='green')
 
@@ -422,6 +423,7 @@ Graph3DPolygonBars
     .. image:: images/Graph3DPolygonBars.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> a = Graph3DPolygonBars(doneAction=None)
     >>> data = {1:[], 2:[], 3:[]}
     >>> for i in range(len(data.keys())):
@@ -510,6 +512,7 @@ GraphHistogram
     .. image:: images/GraphHistogram.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> a = GraphHistogram(doneAction=None)
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
     >>> a.setData(data)
@@ -531,6 +534,7 @@ GraphHorizontalBar
     .. image:: images/GraphHorizontalBar.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> a = GraphHorizontalBar(doneAction=None)
     >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
     >>> a.setData(data)
@@ -552,6 +556,7 @@ GraphScatter
     .. image:: images/GraphScatter.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> a = GraphScatter(doneAction=None)
     >>> data = [(x, x*x) for x in range(50)]
     >>> a.setData(data)
@@ -576,6 +581,7 @@ GraphScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
+    >>> from music21.graph import *
     >>> a = GraphScatterWeighted(doneAction=None)
     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
     >>> a.setData(data)
