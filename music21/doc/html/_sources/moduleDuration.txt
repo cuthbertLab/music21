@@ -14,6 +14,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Return a type if there exists a type that is exactly equal to the duration of the provided quarterLength. Similar to quarterLengthToClosestType() but this function only returns exact matches. 
 
+    >>> from music21.duration import *
     >>> convertQuarterLengthToType(2)
     'half' 
     >>> convertQuarterLengthToType(0.125)
@@ -26,6 +27,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Convert a duration type string (`dType`) to a numerical scalar representation that shows how many of that duration type fits within a whole note. 
 
+    >>> from music21.duration import *
     >>> convertTypeToNumber('quarter')
     4 
     >>> convertTypeToNumber('half')
@@ -39,6 +41,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of Tuplet objects (`tuplets`), and a (very) optional list of Medieval dot groups (`dotGroups`), return the equivalent quarter length. 
 
+    >>> from music21.duration import *
     >>> convertTypeToQuarterLength('whole')
     4.0 
     >>> convertTypeToQuarterLength('16th')
@@ -59,6 +62,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Given a quarterLength, determine if there is a dotted (or non-dotted) type that exactly matches. Returns a pair of (numDots, type) or (False, False) if no exact matches are found. Returns a maximum of four dots by default. 
 
+    >>> from music21.duration import *
     >>> dottedMatch(3.0)
     (1, 'half') 
     >>> dottedMatch(1.75)
@@ -78,6 +82,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Convert a MusicXML type to an music21 type. 
 
+    >>> from music21.duration import *
     >>> musicXMLTypeToType('long')
     'longa' 
     >>> musicXMLTypeToType('quarter')
@@ -90,6 +95,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Given a type (such as 16th or quarter), return the next larger type. 
 
+    >>> from music21.duration import *
     >>> nextLargerType("16th")
     'eighth' 
     >>> nextLargerType("whole")
@@ -101,6 +107,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into (default = 4; i.e., into whole notes), returns a list of Durations that partition the given quarterLength so that there is no leftovers. This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and make it fit within several measures) or by beat groups. 
 
+    >>> from music21.duration import *
     >>> # Here is a Little demonstration function that will show how we can use partitionQuarterLength:
     >>> def pql(qLen, qLenDiv):
     ...    partitionList = partitionQuarterLength(qLen, qLenDiv) 
@@ -146,6 +153,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Returns a two-unit tuple consisting of 1. The type string ("quarter") that is smaller than or equal to the quarterLength of provided. 2. Boolean, True or False, whether the conversion was exact. 
 
+    >>> from music21.duration import *
     >>> quarterLengthToClosestType(.5)
     ('eighth', True) 
     >>> quarterLengthToClosestType(.75)
@@ -157,6 +165,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Returns a List of new Duration Units given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (All quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that). This is mainly a utility function. Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and then let Duration automatically create Duration Components as necessary. These examples use unitSpec() to get a concise summary of the contents 
 
+    >>> from music21.duration import *
     >>> unitSpec(quarterLengthToDurations(2))
     [(2.0, 'half', 0, None, None, None)] 
     Dots are supported 
@@ -214,6 +223,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Returns a list of possible Tuplet objects for a given `qLen` (quarterLength). As there may be more than one possible solution, the `maxToReturn` integer specifies the maximum number of values returned. Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13). Does not return dotted tuplets, nor nested tuplets. Note that 4:3 tuplets won't be found, but will be found as dotted notes by dottedMatch. 
 
+    >>> from music21.duration import *
     >>> quarterLengthToTuplet(.33333333)
     [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>] 
     By specifying only 1 `maxToReturn`, the a single-length list containing the Tuplet with the smallest type will be returned. 
@@ -232,6 +242,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Convert a music21 type to a MusicXML type. 
 
+    >>> from music21.duration import *
     >>> typeToMusicXMLType('longa')
     'long' 
     >>> typeToMusicXMLType('quarter')
@@ -241,6 +252,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     A simple data representation of most Duration objects. Processes a single Duration or a List of Durations, returning a single or list of unitSpecs. A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, and tupletType (assuming top and bottom tuplets are the same). This function does not deal with nested tuplets, etc. 
 
+    >>> from music21.duration import *
     >>> aDur = Duration()
     >>> aDur.quarterLength = 3
     >>> unitSpec(aDur)
@@ -260,6 +272,7 @@ Classes and functions for creating and processing durations. Durations, while a 
 
     Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary. 
 
+    >>> from music21.duration import *
     >>> a = Duration(); a.quarterLength = .33333
     >>> b = Duration(); b.quarterLength = .33333
     >>> c = DurationUnit(); c.quarterLength = .33333
@@ -310,6 +323,7 @@ Duration
 
             Property defining if this Duration has more than one DurationUnit object on the `component` list. 
 
+            >>> from music21.duration import *
             >>> aDur = Duration()
             >>> aDur.quarterLength = 1.375
             >>> aDur.isComplex
@@ -343,6 +357,7 @@ Duration
 
             Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc. 
 
+            >>> from music21.duration import *
             >>> a = Duration()
             >>> a.quarterLength = 3
             >>> b = a.mx
@@ -376,6 +391,7 @@ Duration
 
             Add a DurationUnit or a Duration's components to this Duration. 
 
+            >>> from music21.duration import *
             >>> a = Duration('quarter')
             >>> b = Duration('quarter')
             >>> a.addDurationUnit(b)
@@ -392,6 +408,7 @@ Duration
 
             Given a scalar greater than zero, return a scaled version of this duration. 
 
+            >>> from music21.duration import *
             >>> aDur = Duration()
             >>> aDur.quarterLength = 1.5 # dotted quarter
             >>> aDur.augmentOrDiminish(2)
@@ -422,6 +439,7 @@ Duration
 
             Permit all componets to be removed. (It is not clear yet if this is needed) 
 
+            >>> from music21.duration import *
             >>> a = Duration()
             >>> a.quarterLength = 4
             >>> a.type
@@ -436,6 +454,7 @@ Duration
 
             returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned. 
 
+            >>> from music21.duration import *
             >>> components = []
             TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like) 
             better is just to copy and paste three times.  Very easy to see what 
@@ -465,6 +484,7 @@ Duration
 
             For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments. 
 
+            >>> from music21.duration import *
             >>> components = []
             >>> for x in [1,1,1]:
             ...    components.append(Duration('quarter')) 
@@ -482,6 +502,7 @@ Duration
 
             Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations, as DurationUnits cannot express all durations 
 
+            >>> from music21.duration import *
             >>> a = Duration()
             >>> a.fill(['quarter', 'half', 'quarter'])
             >>> a.quarterLength
@@ -513,6 +534,7 @@ Duration
 
             Given a quarter position within a component, divide that component into two components. 
 
+            >>> from music21.duration import *
             >>> a = Duration()
             >>> a.clear() # need to remove default
             >>> components = []
@@ -551,6 +573,7 @@ Tuplet
 
     A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects. Note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
 
+    >>> from music21.duration import *
     >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> print(myTup.tupletMultiplier())
     0.8 
@@ -596,6 +619,7 @@ Tuplet
 
             From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field 
 
+            >>> from music21.duration import *
             >>> a = Tuplet()
             >>> a.bracket = True
             >>> b, c = a.mx
@@ -614,6 +638,7 @@ Tuplet
 
             Given a scalar greater than zero, return a scaled version of this Duration. 
 
+            >>> from music21.duration import *
             >>> a = Tuplet()
             >>> a.setRatio(6,2)
             >>> a.tupletMultiplier()
@@ -630,6 +655,7 @@ Tuplet
 
             Set the Duration for both actual and normal. 
 
+            >>> from music21.duration import *
             >>> a = Tuplet()
             >>> a.tupletMultiplier()
             0.666... 
@@ -645,6 +671,7 @@ Tuplet
 
             Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal. 
 
+            >>> from music21.duration import *
             >>> a = Tuplet()
             >>> a.tupletMultiplier()
             0.666... 
@@ -665,6 +692,7 @@ Tuplet
 
             The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it's only the denominator that matters) 
 
+            >>> from music21.duration import *
             >>> a = Tuplet()
             >>> a.totalTupletLength()
             1.0 
@@ -685,6 +713,7 @@ Tuplet
 
             Get a floating point value by which to scale the duration that this Tuplet is associated with. 
 
+            >>> from music21.duration import *
             >>> myTuplet = Tuplet()
             >>> print(round(myTuplet.tupletMultiplier(), 3))
             0.667 
@@ -736,6 +765,7 @@ DurationCommon
 
             Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4, it will return (15, 8). This tuple is needed for MusicXML time-modification among other places 
 
+            >>> from music21.duration import *
             >>> complexDur = Duration('eighth')
             >>> complexDur.appendTuplet(Tuplet())
             >>> complexDur.aggregateTupletRatio()
@@ -774,6 +804,7 @@ DurationUnit
 
             Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6. Based on duration.ordinalTypeFromNum 
 
+            >>> from music21.duration import *
             >>> a = DurationUnit('whole')
             >>> a.ordinal
             4 
@@ -788,6 +819,7 @@ DurationUnit
 
             Property for getting or setting the quarterLength of a DurationUnit. 
 
+            >>> from music21.duration import *
             >>> a = DurationUnit()
             >>> a.quarterLength = 3
             >>> a.type
@@ -817,6 +849,7 @@ DurationUnit
 
             Property for getting or setting the type of a DurationUnit. 
 
+            >>> from music21.duration import *
             >>> a = DurationUnit()
             >>> a.quarterLength = 3
             >>> a.type
@@ -840,6 +873,7 @@ DurationUnit
 
             Given a scalar greater than one, return a scaled version of this duration. 
 
+            >>> from music21.duration import *
             >>> bDur = DurationUnit('16th')
             >>> bDur.augmentOrDiminish(2)
             >>> bDur.quarterLength
@@ -872,6 +906,7 @@ DurationUnit
 
             Updates the quarterLength if linkStatus is True. Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. To set quarterLength, use self.quarterLength. 
 
+            >>> from music21.duration import *
             >>> bDur = DurationUnit('16th')
             >>> bDur.quarterLength
             0.25 

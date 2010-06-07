@@ -165,7 +165,8 @@
 <dt id="music21.serial.pcToToneRow">
 <tt class="descclassname">music21.serial.</tt><tt class="descname">pcToToneRow</tt><big>(</big><em>pcSet</em><big>)</big><a class="headerlink" href="#music21.serial.pcToToneRow" title="Permalink to this definition">¶</a></dt>
 <dd><p>A convenience function that, given a list of pitch classes represented as integers</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pcToToneRow</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">12</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.serial</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pcToToneRow</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">12</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">matrixObj</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">matrixObj</span>
 <span class="go">0  1  2  3  4  5  6  7  8  9  A  B</span>
@@ -227,7 +228,8 @@ class </em><tt class="descclassname">music21.serial.</tt><tt class="descname">Tw
 <dt id="music21.serial.TwelveToneRow.matrix">
 <tt class="descname">matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.serial.TwelveToneRow.matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a title="music21.serial.TwelveToneMatrix" class="reference internal" href="#music21.serial.TwelveToneMatrix"><tt class="xref docutils literal"><span class="pre">TwelveToneMatrix</span></tt></a> object for the row.  That object can just be printed (or displayed via .show())</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s37</span> <span class="o">=</span> <span class="n">RowSchoenbergOp37</span><span class="p">()</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.serial</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s37</span> <span class="o">=</span> <span class="n">RowSchoenbergOp37</span><span class="p">()</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">s37</span>
 <span class="go">0  B  7  8  3  1  2  A  6  5  4  9</span>
 <span class="go">1  0  8  9  4  2  3  B  7  6  5  A</span>

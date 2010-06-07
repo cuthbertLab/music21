@@ -33,6 +33,7 @@ Clef
 
             Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
 
+            >>> from music21.clef import *
             >>> b = GClef()
             >>> a = b.mx
             >>> a.get('sign')

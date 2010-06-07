@@ -135,7 +135,8 @@ Attributes without Documentation: <cite>charData</cite></blockquote>
 <dt id="music21.node.Node.merge">
 <tt class="descname">merge</tt><big>(</big><em>other</em>, <em>favorSelf=True</em><big>)</big><a class="headerlink" href="#music21.node.Node.merge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given another similar or commonly used Node object, combine all attributes and return a new object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.node</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;charData&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>

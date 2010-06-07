@@ -9,6 +9,11 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''
+Classes and functions for creating and manipulating dynamics.
+
+'''
+
 
 import unittest, doctest
 

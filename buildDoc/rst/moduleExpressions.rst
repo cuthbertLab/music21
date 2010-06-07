@@ -29,6 +29,7 @@ Fermata
 
             Returns a musicxml.DynamicMark object 
 
+            >>> from music21.expressions import *
             >>> a = Fermata()
             >>> mxFermata = a.mx
             >>> mxFermata.get('type')
@@ -165,6 +166,7 @@ Trill
 
             Returns a musicxml.TrillMark object 
 
+            >>> from music21.expressions import *
             >>> a = Trill()
             >>> a.placement = 'above'
             >>> mxTrillMark = a.mx

@@ -97,7 +97,8 @@
 <dt id="music21.tinyNotation.TinyNotationNote">
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationNote</tt><big>(</big><em>stringRep</em>, <em>storedDict={}</em><big>)</big><a class="headerlink" href="#music21.tinyNotation.TinyNotationNote" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tcN</span> <span class="o">=</span> <span class="n">TinyNotationNote</span><span class="p">(</span><span class="s">&quot;AA-4.~=aflat_hel-&quot;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.tinyNotation</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tcN</span> <span class="o">=</span> <span class="n">TinyNotationNote</span><span class="p">(</span><span class="s">&quot;AA-4.~=aflat_hel-&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span> <span class="o">=</span> <span class="n">tcN</span><span class="o">.</span><span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">note1</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;A-&#39;</span>
@@ -137,7 +138,8 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">TinyNotationStream</tt><big>(</big><em>stringRep=</em>, <em>timeSignature=None</em><big>)</big><a class="headerlink" href="#music21.tinyNotation.TinyNotationStream" title="Permalink to this definition">¶</a></dt>
 <dd><p>A TinyNotationStream takes in a string representation similar to Lilypond format but simplified somewhat and an optional time signature string (or TimeSignature object). example in 3/4:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">TinyNotationStream</span><span class="p">(</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.tinyNotation</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">TinyNotationStream</span><span class="p">(</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s">&quot;lastG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
 <span class="go">&#39;G&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">isRest</span>
@@ -178,7 +180,8 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyStream</tt><big>(</big><em>stringRep=</em>, <em>timeSignature=None</em><big>)</big><a class="headerlink" href="#music21.tinyNotation.HarmonyStream" title="Permalink to this definition">¶</a></dt>
 <dd><p>example of subclassing TinyNotationStream to include a possible harmonic representation of the note</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">michelle</span> <span class="o">=</span> <span class="s">&quot;c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle &quot;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.tinyNotation</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">michelle</span> <span class="o">=</span> <span class="s">&quot;c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle &quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">michelle</span> <span class="o">+=</span> <span class="s">&quot;G4*E-*_these c_are A-_words G_that &quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">michelle</span> <span class="o">+=</span> <span class="s">&quot;F*Ddim*_go A-_to- Bn_geth- A-_er&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hns</span> <span class="o">=</span> <span class="n">HarmonyStream</span><span class="p">(</span><span class="n">michelle</span><span class="p">,</span> <span class="s">&quot;4/4&quot;</span><span class="p">)</span>

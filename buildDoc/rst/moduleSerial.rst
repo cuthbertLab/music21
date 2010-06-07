@@ -13,6 +13,7 @@ music21.serial
 
     A convenience function that, given a list of pitch classes represented as integers 
 
+    >>> from music21.serial import *
     >>> a = pcToToneRow(range(12))
     >>> matrixObj = a.matrix()
     >>> print matrixObj
@@ -73,6 +74,7 @@ TwelveToneRow
 
             Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show()) 
 
+            >>> from music21.serial import *
             >>> s37 = RowSchoenbergOp37().matrix()
             >>> print s37
             0  B  7  8  3  1  2  A  6  5  4  9 

@@ -772,7 +772,7 @@ class RestructuredWriter(object):
         return ' '.join(msg)
 
 
-    def formatDocString(self, doc, indent=''):
+    def formatDocString(self, doc, indent='', modName=None):
         '''Given a docstring, clean it up for RST presentation.
 
         Note: can use inspect.getdoc() or inspect.cleandoc(); though
@@ -783,6 +783,12 @@ class RestructuredWriter(object):
             #return '%sNo documentation.\n' % indent
         # define the start of lines that should not be changed
         rstExclude = ['.. image::', ':width:']
+
+        if modName != None:
+            docTestHead = '>>> from %s import *' % modName
+        else:
+            docTestHead = None
+
 
         lines = doc.split('\n')
         sub = []
@@ -817,17 +823,24 @@ class RestructuredWriter(object):
                 post.append(line)
 
         msg = [indent] # can add indent here
-        inExamples = False
+        inExamples = False # are we now in a code example?
         for line in post:
             if line == None: # insert breaks from two spaces
                 msg.append('\n\n' + indent) # can add indent here
             elif line.startswith('>>>'): # python examples
                 if inExamples == False:
                     space = '\n\n'
+                    # add module level import
+                    if docTestHead != None:
+                        msg.append(space + indent + docTestHead)
+                        # need only one return after first line
+                        msg.append('\n' + indent + line)
+                    else: # use normal, starting with two returns
+                        msg.append(space + indent + line)
                     inExamples = True
                 else:
                     space = '\n'
-                msg.append(space + indent + line)
+                    msg.append(space + indent + line)
             else: # continuing an existing line
                 if inExamples == False:
                     msg.append(line + ' ')
@@ -908,17 +921,20 @@ class CorpusDoc(RestructuredWriter):
 #-------------------------------------------------------------------------------
 class ClassDoc(RestructuredWriter):
 
-    def __init__(self, className):
+    def __init__(self, className, modName=None):
         RestructuredWriter.__init__(self)
 
+        # the class name provided is qualified, with all parts such as
+        # music21.note.Note; we can then get the module name
         self.className = className
         self.classNameEval = eval(className)
+        self.modName = modName
         self.partitionedClass = PartitionedClass(self.classNameEval)
         # this is a tuple of class instances that are in the order
         # of this class to base class
         self.mro = inspect.getmro(self.classNameEval)
         self.docCooked = self.formatDocString(self.classNameEval.__doc__, 
-                                             INDENT)
+                                             INDENT, modName=self.modName)
         self.name = self.classNameEval.__name__
 
     #---------------------------------------------------------------------------
@@ -941,7 +957,8 @@ class ClassDoc(RestructuredWriter):
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT*2, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3, 
+                            modName=self.modName))
         return ''.join(msg)
 
     def _fmtRstMethod(self, name):
@@ -951,7 +968,8 @@ class ClassDoc(RestructuredWriter):
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
         # do not need indent as doc is already formatted with indent
         docRaw = self.partitionedClass.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*3, 
+                  modName=self.modName))
         return ''.join(msg)
 
 
@@ -1094,9 +1112,11 @@ class ModuleDoc(RestructuredWriter):
         RestructuredWriter.__init__(self)
 
         self.partitionedModule = PartitionedModule(modNameEval)
-        self.docCooked = self.formatDocString(modNameEval.__doc__)
         self.modNameEval = modNameEval
         self.modName = self.modNameEval.__name__
+
+        self.docCooked = self.formatDocString(modNameEval.__doc__, 
+                         modName=self.modName)
 
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
@@ -1108,7 +1128,8 @@ class ModuleDoc(RestructuredWriter):
         msg = []
         msg.append('.. function:: %s%s\n\n' %  (name, signature))
         docRaw = self.partitionedModule.getDoc(name)
-        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*1))
+        msg.append('%s\n' % self.formatDocString(docRaw, INDENT*1, 
+                         modName=self.modName))
         return ''.join(msg)
 
     def getRestructured(self):
@@ -1141,7 +1162,7 @@ class ModuleDoc(RestructuredWriter):
                      #msg.append('%s\n' % self.functions[funcName]['doc'])
                 if group == 'classes':
                     qualifiedName = '%s.%s' % (self.modName, partName)
-                    classDoc = ClassDoc(qualifiedName)
+                    classDoc = ClassDoc(qualifiedName, modName=self.modName)
                     msg += classDoc.getRestructuredClass()
 
         return ''.join(msg)

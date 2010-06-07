@@ -27,6 +27,7 @@ PlotHistogramPitchSpace
 
     
 
+    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramPitchSpace(s)
@@ -60,6 +61,7 @@ PlotHistogramPitchClass
     .. image:: images/PlotHistogramPitchClass.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramPitchClass(s)
@@ -93,6 +95,7 @@ PlotHistogramQuarterLength
     .. image:: images/PlotHistogramQuarterLength.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramQuarterLength(s)
@@ -126,6 +129,7 @@ PlotScatterPitchSpaceQuarterLength
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
         :width: 600 
 
+    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramQuarterLength(s)
@@ -456,6 +460,7 @@ GraphColorGrid
 
     
 
+    >>> from music21.graph import *
     >>> a = GraphColorGrid(doneAction=None)
     >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
     >>> a.setData(data)
@@ -810,6 +815,7 @@ PlotStream
 
             Utility method to get ticks in dynamic values. 
 
+            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksDynamics()
@@ -819,6 +825,7 @@ PlotStream
 
             Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
 
+            >>> from music21.graph import *
             >>> from music21 import corpus, stream, note
             >>> s = corpus.parseWork('bach/bwv281.xml')
             >>> a = PlotStream(s)
@@ -843,6 +850,7 @@ PlotStream
 
             Utility method to get ticks in pitch classes 
 
+            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s)
@@ -853,6 +861,7 @@ PlotStream
 
             Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first. 
 
+            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s)
@@ -873,6 +882,7 @@ PlotStream
 
             Utility method to get ticks in pitch space values. 
 
+            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksPitchSpaceChromatic(60,72)
@@ -882,6 +892,7 @@ PlotStream
 
             Utility method to get ticks in pitch space only for every octave. 
 
+            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksPitchSpaceOctave()
@@ -891,6 +902,7 @@ PlotStream
 
             Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first. 
 
+            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s[0])
@@ -905,6 +917,7 @@ PlotStream
 
             Get ticks for quarterLength. If `remap` is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2. 
 
+            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
 

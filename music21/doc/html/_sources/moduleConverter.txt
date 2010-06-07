@@ -14,6 +14,7 @@ Public interface for importing file formats into music21.
 
     Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
+    >>> from music21.converter import *
     >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
     >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
 
@@ -121,6 +122,7 @@ ConverterHumdrum
 
             Open Humdrum data from a string 
 
+            >>> from music21.converter import *
             >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
             >>> c = ConverterHumdrum()
             >>> s = c.parseData(humdata)
@@ -169,6 +171,7 @@ ConverterTinyNotation
 
             Open TinyNotation data from a string or list 
 
+            >>> from music21.converter import *
             >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
             >>> c = ConverterTinyNotation()
             >>> s = c.parseData(tnData)

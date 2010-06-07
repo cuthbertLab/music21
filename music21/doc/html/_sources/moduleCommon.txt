@@ -14,6 +14,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     
 
+    >>> from music21.common import *
     >>> fromRoman('ii')
     2 
     >>> fromRoman('vii')
@@ -23,6 +24,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     
 
+    >>> from music21.common import *
     >>> toRoman(2)
     'II' 
     >>> toRoman(7)
@@ -44,6 +46,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     returns true if a and b are equal except for whitespace differences 
 
+    >>> from music21.common import *
     >>> a = " hello there "
     >>> b = "hello there"
     >>> c = " bye there "
@@ -56,6 +59,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     returns true if a and b are equal except for whitespace differences 
 
+    >>> from music21.common import *
     >>> a = " hello there "
     >>> b = "hello there"
     >>> c = " bye there "
@@ -76,6 +80,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
 
+    >>> from music21.common import *
     >>> dotMultiplier(1)
     1.5 
     >>> dotMultiplier(2)
@@ -87,6 +92,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a format defined either by a format name or an extension, return the format name as well as the output exensions. Note that .mxl and .mx are only considered MusicXML input formats. 
 
+    >>> from music21.common import *
     >>> findFormat('mx')
     ('musicxml', '.xml') 
     >>> findFormat('.mxl')
@@ -110,6 +116,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a file path (relative or absolute) find format and extension used (not the output extension) 
 
+    >>> from music21.common import *
     >>> findFormatExtFile('test.mx')
     ('musicxml', '.mx') 
     >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
@@ -131,6 +138,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters. 
 
+    >>> from music21.common import *
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
@@ -154,6 +162,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a file path (relative or absolute) return the format 
 
+    >>> from music21.common import *
     >>> findFormatFile('test.xml')
     'musicxml' 
     >>> findFormatFile('long/file/path/test-2009.03.02.xml')
@@ -171,6 +180,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given an input format, find and return all possible input extensions. 
 
+    >>> from music21.common import *
     >>> a = findInputExtension('musicxml')
     >>> a
     ['.xml', '.mxl', '.mx'] 
@@ -188,6 +198,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Format one or more data elements into string suitable for printing straight to stderr or other outputs 
 
+    >>> from music21.common import *
     >>> a = formatStr('test', '1', 2, 3)
     >>> print a
     test 1 2 3 
@@ -197,6 +208,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Return a string from an md5 haslib 
 
+    >>> from music21.common import *
     >>> getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6' 
 
@@ -204,6 +216,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters. 
 
+    >>> from music21.common import *
     >>> getNumFromStr('23a')
     ('23', 'a') 
     >>> getNumFromStr('23a954sdfwer')
@@ -235,6 +248,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Returns True if is the object can be iter'd over 
 
+    >>> from music21.common import *
     >>> isIterable([])
     True 
     >>> isIterable('sharp')
@@ -249,6 +263,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
 
+    >>> from music21.common import *
     >>> isListLike([])
     True 
     >>> isListLike('sharp')
@@ -263,6 +278,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
 
+    >>> from music21.common import *
     >>> isNum(3.0)
     True 
     >>> isNum(3)
@@ -274,6 +290,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
 
+    >>> from music21.common import *
     >>> isPowerOfTwo(3)
     False 
     >>> isPowerOfTwo(18)
@@ -289,6 +306,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Check of usrData is some form of string, including unicode. 
 
+    >>> from music21.common import *
     >>> isStr(3)
     False 
     >>> isStr('sharp')
@@ -300,6 +318,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Test if an object is a weakref 
 
+    >>> from music21.common import *
     >>> class Mock(object): pass
     >>> a1 = Mock()
     >>> a2 = Mock()
@@ -314,6 +333,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     
 
+    >>> from music21.common import *
     >>> lcm([3,4,5])
     60 
     >>> lcm([3,4])
@@ -331,6 +351,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given two files, sort by most recent. Return only the file paths. 
 
+    >>> from music21.common import *
     >>> a = os.listdir(os.curdir)
     >>> b = sortFilesRecent(a)
 
@@ -342,6 +363,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a camel-cased string, or a mixture of numbers and characters, create a space separated string. 
 
+    >>> from music21.common import *
     >>> spaceCamelCase('thisIsATest')
     'this Is A Test' 
     >>> spaceCamelCase('ThisIsATest')
@@ -361,6 +383,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
 
+    >>> from music21.common import *
     >>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>' 
     while this is left alone: 
@@ -371,6 +394,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     utility function that gets an object that might be an object itself or a weak reference to an object. 
 
+    >>> from music21.common import *
     >>> class Mock(object): pass
     >>> a1 = Mock()
     >>> a2 = Mock()

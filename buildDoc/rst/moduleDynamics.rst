@@ -7,6 +7,9 @@ music21.dynamics
 
 .. module:: music21.dynamics
 
+Classes and functions for creating and manipulating dynamics. 
+
+
 
 
 .. function:: unitIntervalToName(n)
@@ -38,6 +41,7 @@ Dynamic
 
             returns a musicxml.Direction object 
 
+            >>> from music21.dynamics import *
             >>> a = Dynamic('ppp')
             >>> a.posRelativeY = -10
             >>> b = a.mx
@@ -74,6 +78,7 @@ Wedge
 
             returns a musicxml.Direction object 
 
+            >>> from music21.dynamics import *
             >>> a = Wedge()
             >>> a.type = 'crescendo'
             >>> mxDirection = a.mx

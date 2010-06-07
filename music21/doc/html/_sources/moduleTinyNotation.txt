@@ -17,6 +17,7 @@ TinyNotationNote
 
     
 
+    >>> from music21.tinyNotation import *
     >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
     >>> note1 = tcN.note
     >>> note1.name
@@ -52,6 +53,7 @@ TinyNotationStream
 
     A TinyNotationStream takes in a string representation similar to Lilypond format but simplified somewhat and an optional time signature string (or TimeSignature object). example in 3/4: 
 
+    >>> from music21.tinyNotation import *
     >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
     >>> stream1.getElementById("lastG").step
     'G' 
@@ -94,6 +96,7 @@ HarmonyStream
 
     example of subclassing TinyNotationStream to include a possible harmonic representation of the note 
 
+    >>> from music21.tinyNotation import *
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"

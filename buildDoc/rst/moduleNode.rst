@@ -53,6 +53,7 @@ Node
 
             Given another similar or commonly used Node object, combine all attributes and return a new object. 
 
+            >>> from music21.node import *
             >>> a = Node()
             >>> a.set('charData', 'green')
             >>> b = Node()

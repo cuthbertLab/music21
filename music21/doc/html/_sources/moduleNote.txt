@@ -126,6 +126,7 @@ Note
 
             Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
+            >>> from music21.note import *
             >>> a = Note('g4')
             >>> b = a.transpose('m3')
             >>> b
@@ -178,6 +179,7 @@ Rest
 
             The name of the rest as it would appear in Lilypond format. 
 
+            >>> from music21.note import *
             >>> r1 = Rest()
             >>> r1.duration.type = "half"
             >>> r1.lily
@@ -205,6 +207,7 @@ Beam
 
     A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam 
 
+    >>> from music21.note import *
     >>> b1 = music21.note.Beam(type = 'start')
     >>> b2 = music21.note.Beam('start')
     Here is a partial beam (that is, one that does not 
@@ -230,6 +233,7 @@ Beam
 
             
 
+            >>> from music21.note import *
             >>> a = Beam()
             >>> a.type = 'start'
             >>> a.number = 1
@@ -274,6 +278,7 @@ Beams
 
             A quick way of setting the beams list for a particular duration, for instance, fill("16th") will clear the current list of beams in the Beams object and add two beams.  fill(2) will do the same (though note that that is an int, not a string). It does not do anything to the direction that the beams are going in. Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like 512th notes) raises an error. 
 
+            >>> from music21.note import *
             >>> a = music21.note.Beams()
             >>> a.fill('16th')
             >>> len(a)
@@ -288,6 +293,7 @@ Beams
 
             Gets an internal beam object by number... 
 
+            >>> from music21.note import *
             >>> a = Beams()
             >>> a.fill('16th')
             >>> a.setAll('start')
@@ -298,6 +304,7 @@ Beams
 
             Returns a list of all defined beam numbers; it should normally be a set of consecutive integers, but it might not be. 
 
+            >>> from music21.note import *
             >>> a = Beams()
             >>> a.fill('32nd')
             >>> a.getNumbers()
@@ -307,6 +314,7 @@ Beams
 
             Get beam type, with direction, by number 
 
+            >>> from music21.note import *
             >>> a = Beams()
             >>> a.fill('16th')
             >>> a.setAll('start')
@@ -320,6 +328,7 @@ Beams
 
             Returns a list of all beam types defined for the current beams 
 
+            >>> from music21.note import *
             >>> a = Beams()
             >>> a.fill('16th')
             >>> a.setAll('start')
@@ -330,6 +339,7 @@ Beams
 
             setAll is a method of convenience that sets the type of each of the beam objects within the beamsList to the specified type. It also takes an optional "direction" attribute that sets the direction for each beam (otherwise the direction of each beam is set to None) Acceptable directions (start, stop, continue, etc.) are listed under Beam() above. 
 
+            >>> from music21.note import *
             >>> a = music21.note.Beams()
             >>> a.fill('16th')
             >>> a.setAll('start')
@@ -342,6 +352,7 @@ Beams
 
             Set an internal beam object by number, or rhythmic symbol level 
 
+            >>> from music21.note import *
             >>> a = Beams()
             >>> a.fill('16th')
             >>> a.setAll('start')
@@ -382,6 +393,7 @@ GeneralNote
 
             EditorialComments that can be applied to notes 
 
+            >>> from music21.note import *
             >>> a = NoteEditorial()
             >>> a.misc
             {} 
@@ -408,6 +420,7 @@ GeneralNote
 
             Return the Duration as represented in Quarter Length. 
 
+            >>> from music21.note import *
             >>> n = Note()
             >>> n.quarterLength = 2.0
             >>> n.quarterLength
@@ -433,6 +446,7 @@ GeneralNote
 
             Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
+            >>> from music21.note import *
             >>> n1 = Note()
             >>> n1.addLyric("hello")
             >>> n1.lyrics[0].text
@@ -456,6 +470,7 @@ GeneralNote
 
             Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy. 
 
+            >>> from music21.note import *
             >>> n = Note('g#')
             >>> n.quarterLength = 3
             >>> n.augmentOrDiminish(2)
@@ -476,6 +491,7 @@ GeneralNote
 
             Takes a Note and returns a list of notes with only a single duration.DurationUnit in each. 
 
+            >>> from music21.note import *
             >>> a = Note()
             >>> a.duration.clear() # remove defaults
             >>> a.duration.addDurationUnit(duration.Duration('half'))
@@ -522,6 +538,7 @@ Lyric
 
             Returns an mxLyric 
 
+            >>> from music21.note import *
             >>> a = Lyric()
             >>> a.text = 'hello'
             >>> mxLyric = a.mx
@@ -558,6 +575,7 @@ NotRest
 
             Split a Note into two Notes. 
 
+            >>> from music21.note import *
             >>> a = NotRest()
             >>> a.duration.type = 'whole'
             >>> b, c = a.splitNoteAtPoint(3)
@@ -595,6 +613,7 @@ Tie
 
     Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
 
+    >>> from music21.note import *
     >>> note1 = Note()
     >>> note1.tie = Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
