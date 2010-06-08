@@ -45,14 +45,24 @@ class ChordException(Exception):
 class Chord(note.NotRest):
     '''Class for dealing with chords
     
-    A Chord is an object composed of Notes.
+    A Chord is like a Note object but has multiple pitches.
     
-    Create chords by creating notes:
-    C = note.Note(), C.name = 'C'
-    E = note.Note(), E.name = 'E'
-    G = note.Note(), G.name = 'G'
+    Create chords by creating Notes or Pitches:
+    
+    >>> from music21 import *
+    >>> C = note.Note()
+    >>> C.name = 'C'
+    >>> E = note.Note()
+    >>> E.name = 'E'
+    >>> G = note.Note()
+    >>> G.name = 'G'
+    
     And then create a chord with notes:    
-    cmaj = Chord([C, E, G])
+    >>> cmaj = Chord([C, E, G])
+
+    Or, more simply, just pass strings of pitch names:
+    >>> dmaj = Chord(["D","F#","A"])
+
     
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
@@ -64,9 +74,6 @@ class Chord(note.NotRest):
     for use in examples
     
     '''
-
-    # TODO -- not near future -- allow Chords to have Rests in them
-    # note.Note to self: in documentation, add examples of usage
     
     _bass = None
     _root = None
@@ -79,8 +86,8 @@ class Chord(note.NotRest):
     _DOC_ORDER = ['pitches']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this object is a Chord.',
-    'isRest': 'Boolean read-only value describing if this is a Rest.',
+    'isNote': 'Boolean read-only value describing if this object is a Chord. Is False',
+    'isRest': 'Boolean read-only value describing if this is a Rest. Is False',
     'beams': 'A :class:`music21.note.Beams` object.',
     }
     # update inherited _DOC_ATTR dictionary
@@ -231,7 +238,7 @@ class Chord(note.NotRest):
         attributes are added
 
         >>> from music21 import *
-        >>> a = Chord()
+        >>> a = chord.Chord()
         >>> a.quarterLength = 2
         >>> b = pitch.Pitch('A-')
         >>> c = pitch.Pitch('D-')
@@ -317,7 +324,7 @@ class Chord(note.NotRest):
         >>> a.external['divisions'] = m.external['divisions']
         >>> b.external['measure'] = m # assign measure for divisions ref
         >>> b.external['divisions'] = m.external['divisions']
-        >>> c = Chord()
+        >>> c = chord.Chord()
         >>> c.mx = [a, b]
         >>> len(c.pitches)
         2
@@ -349,29 +356,29 @@ class Chord(note.NotRest):
         NOTE: time consuming, and only should be run when necessary.
 
         >>> from music21 import *
-        >>> c1 = Chord(['c3'])
+        >>> c1 = chord.Chord(['c3'])
         >>> c1.orderedPitchClasses
         [0]
         >>> c1.seekChordTablesAddress()
         (1, 1, 0)
 
-        >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
+        >>> c1 = chord.Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
         >>> c1.seekChordTablesAddress()
         (11, 1, 0)
 
-        >>> c1 = Chord(['c', 'e', 'g'])
+        >>> c1 = chord.Chord(['c', 'e', 'g'])
         >>> c1.seekChordTablesAddress()
         (3, 11, -1)
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.seekChordTablesAddress()
         (3, 11, 1)
 
-        >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+        >>> c1 = chord.Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
         >>> c1.seekChordTablesAddress()
         (7, 34, 0)
 
-        >>> c1 = Chord(['c', 'c#', 'd'])
+        >>> c1 = chord.Chord(['c', 'c#', 'd'])
         >>> c1.seekChordTablesAddress()
         (3, 1, 0)
         '''
@@ -458,7 +465,7 @@ class Chord(note.NotRest):
         doc = '''Return a list of all Pitch objects in this Chord.
 
         >>> from music21 import *
-        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.pitches
         [C4, E4, G#4]
         >>> [p.midi for p in c.pitches]
@@ -468,7 +475,7 @@ class Chord(note.NotRest):
     def _getChordTablesAddress(self):
         '''
         >>> from music21 import *
-        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.chordTablesAddress
         (3, 12, 0)
         '''
@@ -479,7 +486,7 @@ class Chord(note.NotRest):
         doc = '''Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).
 
         >>> from music21 import *
-        >>> c = Chord(["C4", "E4", "G#4"])
+        >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.chordTablesAddress
         (3, 12, 0)
         ''')
@@ -494,7 +501,7 @@ class Chord(note.NotRest):
         '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
         >>> from music21 import *
-        >>> a = Chord(['g4', 'a3', 'c#6'])
+        >>> a = chord.Chord(['g4', 'a3', 'c#6'])
         >>> b = a.transpose('m3')
         >>> b
         <music21.chord.Chord B-4 C4 E6>
@@ -542,7 +549,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = Chord(['C', 'E', 'G'])
+        >>> cmaj = chord.Chord(['C', 'E', 'G'])
         >>> cmaj.bass() # returns C
         C
         '''
@@ -561,7 +568,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = Chord (['C4', 'E3', 'G4'])
+        >>> cmaj = chord.Chord(['C4', 'E3', 'G4'])
         >>> cmaj.findBass() # returns E3
         E3
         '''
@@ -582,7 +589,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = Chord (['C', 'E', 'G'])
+        >>> cmaj = chord.Chord(['C', 'E', 'G'])
         >>> cmaj.root() # returns C
         C
         '''
@@ -599,7 +606,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = Chord (['C', 'E', 'G'])
+        >>> cmaj = chord.Chord(['E', 'G', 'C'])
         >>> cmaj.findRoot() # returns C
         C
         '''
@@ -678,7 +685,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+        >>> cchord = chord.Chord(['C', 'E', 'E-', 'G'])
         >>> cchord.hasScaleX(3) #
         4
         >>> cchord.hasScaleX(5) # will return 7
@@ -705,7 +712,7 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = Chord (['C', 'E', 'G'])
+        >>> cmaj = chord.Chord(['C', 'E', 'G'])
         >>> cmaj.hasScaleX(3) #will return the interval between C and E
         4
         >>> cmaj.hasScaleX(5) #will return the interval between C and G
@@ -732,7 +739,7 @@ class Chord(note.NotRest):
        
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+        >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
         >>> cchord.hasRepeatedScaleX(3) # returns true
         True
         '''
@@ -756,8 +763,8 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'E-', 'G'])
-        >>> other = Chord (['C', 'E', 'F-', 'G'])
+        >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
+        >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
         >>> cchord.hasAnyRepeatedScale() 
         True
         >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
@@ -773,8 +780,9 @@ class Chord(note.NotRest):
         "Contains vs. Is": A dominant-seventh chord contains a triad.
         
         example:
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+        >>> from music21 import *
+        >>> cchord = chord.Chord(['C', 'E', 'G'])
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
         >>> cchord.containsTriad() #returns True
         True
         >>> other.containsTriad() #returns True
@@ -798,8 +806,8 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+        >>> cchord = chord.Chord(['C', 'E', 'G'])
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
         >>> cchord.isTriad() # returns True   
         True
         >>> other.isTriad() 
@@ -825,8 +833,8 @@ class Chord(note.NotRest):
         raises an exception if the Root can't be determined
         
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'G', 'B'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+        >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
         >>> cchord.containsSeventh() # returns True
         True
         >>> other.containsSeventh() # returns True
@@ -850,8 +858,8 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'G', 'B'])
-        >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+        >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
         >>> cchord.isSeventh() # returns True
         True
         >>> other.isSeventh() # returns False
@@ -884,8 +892,8 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E', 'G'])
-        >>> other = Chord (['C', 'G'])
+        >>> cchord = chord.Chord(['C', 'E', 'G'])
+        >>> other = chord.Chord(['C', 'G'])
         >>> cchord.isMajorTriad() # returns True
         True
         >>> other.isMajorTriad() # returns False
@@ -913,8 +921,8 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E-', 'G'])
-        >>> other = Chord (['C', 'E', 'G'])
+        >>> cchord = chord.Chord(['C', 'E-', 'G'])
+        >>> other = chord.Chord(['C', 'E', 'G'])
         >>> cchord.isMinorTriad() # returns True
         True
         >>> other.isMinorTriad() # returns False
@@ -938,8 +946,8 @@ class Chord(note.NotRest):
         Chord must be spelled correctly. Otherwise returns false.
         
         >>> from music21 import *
-        >>> cchord = Chord (['C', 'E-', 'G-'])
-        >>> other = Chord (['C', 'E-', 'F#'])
+        >>> cchord = chord.Chord(['C', 'E-', 'G-'])
+        >>> other = chord.Chord(['C', 'E-', 'F#'])
 
         >>> cchord.isDiminishedTriad() #returns True
         True
@@ -1010,7 +1018,7 @@ class Chord(note.NotRest):
         Chord must be spelled correctly. Otherwise returns false.
 
         >>> from music21 import *
-        >>> a = Chord(['b', 'g', 'd', 'f'])
+        >>> a = chord.Chord(['b', 'g', 'd', 'f'])
         >>> a.isDominantSeventh()
         True
         '''
@@ -1035,7 +1043,7 @@ class Chord(note.NotRest):
         Chord must be spelled correctly. Otherwise returns false.
 
         >>> from music21 import *
-        >>> a = Chord(['c', 'e-', 'g-', 'b--'])
+        >>> a = chord.Chord(['c', 'e-', 'g-', 'b--'])
         >>> a.isDiminishedSeventh()
         True
         '''
@@ -1059,17 +1067,17 @@ class Chord(note.NotRest):
         Chord must be spelled correctly. Otherwise returns false.
 
         >>> from music21 import *
-        >>> c1 = Chord(['C4','E-4','G-4','B-4'])
+        >>> c1 = chord.Chord(['C4','E-4','G-4','B-4'])
         >>> c1.isHalfDiminishedSeventh()
         True
         
         Incorrectly spelled chords are not considered half-diminished sevenths
-        >>> c2 = Chord(['C4','E-4','G-4','A#4'])
+        >>> c2 = chord.Chord(['C4','E-4','G-4','A#4'])
         >>> c2.isHalfDiminishedSeventh()
         False
         
         Nor are incomplete chords
-        >>> c3 = Chord(['C4', 'G-4','B-4'])
+        >>> c3 = chord.Chord(['C4', 'G-4','B-4'])
         >>> c3.isHalfDiminishedSeventh()
         False
         '''
@@ -1119,11 +1127,11 @@ class Chord(note.NotRest):
         Add option to add inversion name to abbreviation?
 
         >>> from music21 import *
-        >>> a = Chord(['a', 'c#', 'e'])
+        >>> a = chord.Chord(['a', 'c#', 'e'])
         >>> a.determineType()
         'Major Triad'
 
-        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.determineType()
         'Dominant Seventh'
 
@@ -1160,7 +1168,7 @@ class Chord(note.NotRest):
         Returns True if the chord is a Major Triad or a Dominant Seventh
 
         >>> from music21 import *
-        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.canBeDominantV()
         True
         '''
@@ -1175,10 +1183,10 @@ class Chord(note.NotRest):
         returns True if the chord is a major or minor triad
 
         >>> from music21 import *
-        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.canBeTonic()
         False
-        >>> a = Chord(['g', 'b', 'd'])
+        >>> a = chord.Chord(['g', 'b', 'd'])
         >>> a.canBeTonic()
         True
         '''
@@ -1193,7 +1201,7 @@ class Chord(note.NotRest):
         of the bass note to the root.
 
         >>> from music21 import *
-        >>> a = Chord(['g', 'b', 'd', 'f'])
+        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.inversion()
         2
         '''
@@ -1218,7 +1226,7 @@ class Chord(note.NotRest):
         If chord is not in a common inversion, returns None.
 
         >>> from music21 import *
-        >>> a = Chord(['G3', 'B3', 'F3', 'D3'])
+        >>> a = chord.Chord(['G3', 'B3', 'F3', 'D3'])
         >>> a.inversionName()
         43
         '''
@@ -1255,7 +1263,7 @@ class Chord(note.NotRest):
         returns a new Chord object with the same pitch classes, but now in closed position
 
         >>> from music21 import *
-        >>> chord1 = Chord(["C#4", "G5", "E6"])
+        >>> chord1 = chord.Chord(["C#4", "G5", "E6"])
         >>> chord2 = chord1.closedPosition()
         >>> print(chord2.lily.value)
         <cis' e' g'>4
@@ -1287,7 +1295,7 @@ class Chord(note.NotRest):
         Return a string representation of a vector or set
 
         >>> from music21 import *
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
         >>> c1._formatVectorString([3,4,5])
         '<345>'
         >>> c1._formatVectorString([10,11,3,5])
@@ -1313,7 +1321,7 @@ class Chord(note.NotRest):
         doc = '''Return a list of all pitch classes in the chord as integers.
 
         >>> from music21 import *
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.pitchClasses
         [2, 9, 6, 2]
         ''')    
@@ -1327,7 +1335,8 @@ class Chord(note.NotRest):
     multisetCardinality = property(_getMultisetCardinality, 
         doc = '''Return an integer representing the cardinality of the mutliset, or the number of pitch values. 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.multisetCardinality
         4
         ''')   
@@ -1348,7 +1357,8 @@ class Chord(note.NotRest):
     orderedPitchClasses = property(_getOrderedPitchClasses, 
         doc = '''Return an list of pitch class integers, ordered form lowest to highest. 
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.orderedPitchClasses
         [2, 6, 9]
         ''')    
@@ -1360,7 +1370,8 @@ class Chord(note.NotRest):
     orderedPitchClassesString = property(_getOrderedPitchClassesString, 
         doc = '''Return a string representation of the pitch class values. 
 
-        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['f#', 'e-', 'g'])
         >>> c1.orderedPitchClassesString
         '<367>'
         ''')    
@@ -1375,7 +1386,8 @@ class Chord(note.NotRest):
     pitchClassCardinality = property(_getPitchClassCardinality, 
         doc = '''Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord.
 
-        >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
         >>> c1.pitchClassCardinality
         3
         ''')    
@@ -1384,11 +1396,12 @@ class Chord(note.NotRest):
     def _getForteClass(self):
         '''Return a forte class name
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.forteClass
         '3-11A'
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClass
         '3-11B'
         '''
@@ -1398,7 +1411,8 @@ class Chord(note.NotRest):
     forteClass = property(_getForteClass, 
         doc = '''Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented. 
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClass
         '3-11B'
         ''')    
@@ -1406,7 +1420,8 @@ class Chord(note.NotRest):
     forteClassTn = property(_getForteClass, 
         doc = '''Return the Forte Tn set class name, where inversion distinctions are represented.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTn
         '3-11B'
         ''')    
@@ -1414,11 +1429,12 @@ class Chord(note.NotRest):
     def _getForteClassTnI(self):
         '''Return a forte class name under TnI classification
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.forteClassTnI
         '3-11'
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTnI
         '3-11'
         '''
@@ -1428,7 +1444,8 @@ class Chord(note.NotRest):
     forteClassTnI = property(_getForteClassTnI, 
         doc = '''Return the Forte TnI class name, where inversion distinctions are not represented.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTnI
         '3-11'
         ''')    
@@ -1436,11 +1453,12 @@ class Chord(note.NotRest):
 
     def _getNormalForm(self):
         '''
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.normalForm
         [0, 3, 7]
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.normalForm
         [0, 4, 7]
         '''
@@ -1450,14 +1468,16 @@ class Chord(note.NotRest):
     normalForm = property(_getNormalForm, 
         doc = '''Return the normal form of the Chord represented as a list of integers. 
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.normalForm
         [0, 4, 7]
         ''')    
 
     def _getNormalFormString(self):        
         '''
-        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['f#', 'e-', 'g'])
         >>> c1.normalFormString
         '<034>'
         '''
@@ -1466,7 +1486,8 @@ class Chord(note.NotRest):
     normalFormString = property(_getNormalFormString, 
         doc = '''Return a string representation of the normal form of the Chord.
 
-        >>> c1 = Chord(['f#', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['f#', 'e-', 'g'])
         >>> c1.normalFormString
         '<034>'
         ''')    
@@ -1476,10 +1497,11 @@ class Chord(note.NotRest):
 
         Possible rename forteIndex
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.forteClassNumber
         11
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassNumber
         11
         '''
@@ -1489,7 +1511,8 @@ class Chord(note.NotRest):
     forteClassNumber = property(_getForteClassNumber, 
         doc = '''Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassNumber
         11
         ''')    
@@ -1497,10 +1520,11 @@ class Chord(note.NotRest):
     def _getPrimeForm(self):
         '''Get the Forte class index number.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.primeForm
         [0, 3, 7]
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.primeForm
         [0, 3, 7]
         '''
@@ -1510,14 +1534,16 @@ class Chord(note.NotRest):
     primeForm = property(_getPrimeForm, 
         doc='''Return a representation of the Chord as a prime-form list of pitch class integers.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.primeForm
         [0, 3, 7]
        ''')    
 
     def _getPrimeFormString(self):        
         '''
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.primeFormString
         '<037>'
         '''
@@ -1526,7 +1552,8 @@ class Chord(note.NotRest):
     primeFormString = property(_getPrimeFormString, 
         doc='''Return a representation of the Chord as a prime-form set class string.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.primeFormString
         '<037>'
         ''')    
@@ -1537,10 +1564,11 @@ class Chord(note.NotRest):
 
         Possible rename forteIndex
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.intervalVector
         [0, 0, 1, 1, 1, 0]
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.intervalVector
         [0, 0, 1, 1, 1, 0]
         '''
@@ -1551,14 +1579,16 @@ class Chord(note.NotRest):
     intervalVector = property(_getIntervalVector, 
         doc = '''Return the interval vector for this Chord as a list of integers.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.intervalVector
         [0, 0, 1, 1, 1, 0]
         ''')    
 
     def _getIntervalVectorString(self):        
         '''
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.intervalVectorString
         '<001110>'
         '''
@@ -1567,7 +1597,8 @@ class Chord(note.NotRest):
     intervalVectorString = property(_getIntervalVectorString, 
         doc = '''Return the interval vector as a string representation.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.intervalVectorString
         '<001110>'
         ''')    
@@ -1575,10 +1606,11 @@ class Chord(note.NotRest):
 
     def _isPrimeFormInversion(self):
         '''
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.isPrimeFormInversion
         False
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.isPrimeFormInversion
         True
         '''
@@ -1591,10 +1623,11 @@ class Chord(note.NotRest):
     isPrimeFormInversion = property(_isPrimeFormInversion, 
         doc = '''Return True or False if the Chord represents a set class inversion. 
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.isPrimeFormInversion
         False
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.isPrimeFormInversion
         True
         ''')    
@@ -1603,10 +1636,11 @@ class Chord(note.NotRest):
     def _hasZRelation(self):
         '''Get the Z-relation status
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.hasZRelation
         False
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.hasZRelation
         False
         '''
@@ -1621,7 +1655,8 @@ class Chord(note.NotRest):
     hasZRelation = property(_hasZRelation, 
         doc = '''Return True or False if the Chord has a Z-relation.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.hasZRelation
         False
         ''')    
@@ -1632,9 +1667,10 @@ class Chord(note.NotRest):
     def areZRelations(self, other):
         '''Check of chord other is also a z relations
 
-        >>> c1 = Chord(["C", "c#", "e", "f#"])
-        >>> c2 = Chord(["C", "c#", "e-", "g"])
-        >>> c3 = Chord(["C", "c#", "f#", "g"])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(["C", "c#", "e", "f#"])
+        >>> c2 = chord.Chord(["C", "c#", "e-", "g"])
+        >>> c3 = chord.Chord(["C", "c#", "f#", "g"])
         >>> c1.areZRelations(c2)
         True
         >>> c1.areZRelations(c3)
@@ -1657,11 +1693,12 @@ class Chord(note.NotRest):
 
         Possible rename forteIndex
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.commonName
         ['minor triad']
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.commonName
         ['major triad']
         '''
@@ -1671,7 +1708,8 @@ class Chord(note.NotRest):
     commonName = property(_getCommonName, 
         doc = '''Return a list of common names as strings that are associated with this Chord.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.commonName
         ['major triad']
         ''')    
@@ -1680,11 +1718,12 @@ class Chord(note.NotRest):
     def _getPitchedCommonName(self):
         '''Get the common name of the TN set class.
 
-        >>> c1 = Chord(['c', 'e-', 'g'])
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.pitchedCommonName
         'C-minor triad'
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.pitchedCommonName
         'C-major triad'
         '''
@@ -1705,7 +1744,8 @@ class Chord(note.NotRest):
     pitchedCommonName = property(_getPitchedCommonName, 
         doc = '''Return the common name of this Chord preceded by its root, if a root is available.
 
-        >>> c2 = Chord(['c', 'e', 'g'])
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.pitchedCommonName
         'C-major triad'
         ''')    
@@ -1728,7 +1768,8 @@ class Chord(note.NotRest):
         The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).  
         Notes that are the identical pitch retain their order
         
-        >>> cMajUnsorted = Chord(['E4', 'C4', 'G4'])
+        >>> from music21 import *
+        >>> cMajUnsorted = chord.Chord(['E4', 'C4', 'G4'])
         >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
         >>> cMajSorted.pitches[0].name
         'C'
@@ -1847,7 +1888,7 @@ class Test(unittest.TestCase):
         LowG.name = 'G'
         LowG.octave = 3
     
-        chord1 = Chord ([HighEFlat, MiddleC, LowG])
+        chord1 = Chord([HighEFlat, MiddleC, LowG])
         assert chord1.hasScaleX(3, MiddleC) is not False
         chord1.root(MiddleC)
     
@@ -1855,7 +1896,7 @@ class Test(unittest.TestCase):
         HighAFlat.name = "A-"
         HighAFlat.octave = 5
         
-        chord2 = Chord ([MiddleC, HighEFlat, LowG, HighAFlat])
+        chord2 = Chord([MiddleC, HighEFlat, LowG, HighAFlat])
         assert chord1.hasThird() is not False
         assert chord1.hasFifth() is not False
         assert chord1.containsTriad()  == True
@@ -1867,26 +1908,26 @@ class Test(unittest.TestCase):
         MiddleE.name = 'E'
         MiddleE.octave = 4
     
-        chord3 = Chord ([MiddleC, HighEFlat, LowG, MiddleE])
+        chord3 = Chord([MiddleC, HighEFlat, LowG, MiddleE])
         assert chord3.isTriad() == False
         
         MiddleB = note.Note()
         MiddleB.name = 'B'
         MiddleB.octave = 4
         
-        chord4 = Chord ([MiddleC, HighEFlat, LowG, MiddleB])
+        chord4 = Chord([MiddleC, HighEFlat, LowG, MiddleB])
         assert chord4.containsSeventh() == True
         assert chord3.containsSeventh() == False
         assert chord4.isSeventh() == True
         
-        chord5 = Chord ([MiddleC, HighEFlat, LowG, MiddleE, MiddleB])
+        chord5 = Chord([MiddleC, HighEFlat, LowG, MiddleE, MiddleB])
         assert chord5.isSeventh() == False
         
-        chord6 = Chord ([MiddleC, MiddleE, LowG])
+        chord6 = Chord([MiddleC, MiddleE, LowG])
         assert chord6.isMajorTriad() == True
         assert chord3.isMajorTriad() == False
         
-        chord7 = Chord ([MiddleC, HighEFlat, LowG])
+        chord7 = Chord([MiddleC, HighEFlat, LowG])
         assert chord7.isMinorTriad() == True
         assert chord6.isMinorTriad() == False
         assert chord4.isMinorTriad() == False
@@ -1894,7 +1935,7 @@ class Test(unittest.TestCase):
         LowGFlat = note.Note()
         LowGFlat.name = 'G-'
         LowGFlat.octave = 3
-        chord8 = Chord ([MiddleC, HighEFlat, LowGFlat])
+        chord8 = Chord([MiddleC, HighEFlat, LowGFlat])
         
         assert chord8.isDiminishedTriad() == True
         assert chord7.isDiminishedTriad() == False
@@ -1903,7 +1944,7 @@ class Test(unittest.TestCase):
         MiddleBFlat.name = 'B-'
         MiddleBFlat.octave = 4
         
-        chord9 = Chord ([MiddleC, MiddleE, LowG, MiddleBFlat])
+        chord9 = Chord([MiddleC, MiddleE, LowG, MiddleBFlat])
         
         assert chord9.isDominantSeventh() == True
         assert chord5.isDominantSeventh() == False
@@ -1912,13 +1953,13 @@ class Test(unittest.TestCase):
         MiddleBDoubleFlat.name = 'B--'
         MiddleBDoubleFlat.octave = 4
         
-        chord10 = Chord ([MiddleC, HighEFlat, LowGFlat, MiddleBDoubleFlat])
+        chord10 = Chord([MiddleC, HighEFlat, LowGFlat, MiddleBDoubleFlat])
     #    chord10.root(MiddleC)
         
         assert chord10.isDiminishedSeventh() == True
         assert chord9.isDiminishedSeventh() == False
         
-        chord11 = Chord ([MiddleC])
+        chord11 = Chord([MiddleC])
         
         assert chord11.isTriad() == False
         assert chord11.isSeventh() == False
@@ -1927,13 +1968,13 @@ class Test(unittest.TestCase):
         MiddleCSharp.name = 'C#'
         MiddleCSharp.octave = 4
         
-        chord12 = Chord ([MiddleC, MiddleCSharp, LowG, MiddleE])
+        chord12 = Chord([MiddleC, MiddleCSharp, LowG, MiddleE])
         chord12.root(MiddleC)
         
         assert chord12.isTriad() == False
         assert chord12.isDiminishedTriad() == False
         
-        chord13 = Chord ([MiddleC, MiddleE, LowG, LowGFlat])
+        chord13 = Chord([MiddleC, MiddleE, LowG, LowGFlat])
         
         assert chord13.hasScaleX(5) is not False
         assert chord13.hasRepeatedScaleX(5) == True
@@ -1946,12 +1987,12 @@ class Test(unittest.TestCase):
         LowGSharp.name = 'G#'
         LowGSharp.octave = 3
         
-        chord14 = Chord ([MiddleC, MiddleE, LowGSharp])
+        chord14 = Chord([MiddleC, MiddleE, LowGSharp])
         
         assert chord14.isAugmentedTriad() == True
         assert chord6.isAugmentedTriad() == False
         
-        chord15 = Chord ([MiddleC, HighEFlat, LowGFlat, MiddleBFlat])
+        chord15 = Chord([MiddleC, HighEFlat, LowGFlat, MiddleBFlat])
         
         assert chord15.isHalfDiminishedSeventh() == True
         assert chord12.isHalfDiminishedSeventh() == False
@@ -1965,11 +2006,11 @@ class Test(unittest.TestCase):
         LowC.name = 'C'
         LowC.octave = 3
         
-        chord16 = Chord ([LowC, MiddleC, HighEFlat])
+        chord16 = Chord([LowC, MiddleC, HighEFlat])
         
         assert chord16.inversion() == 0
         
-        chord17 = Chord ([LowC, MiddleC, HighEFlat])
+        chord17 = Chord([LowC, MiddleC, HighEFlat])
         chord17.root(MiddleC)
         
         assert chord17.inversion() == 0
@@ -1978,7 +2019,7 @@ class Test(unittest.TestCase):
         LowE.name = 'E'
         LowE.octave = 3
         
-        chord18 = Chord ([MiddleC, LowE, LowGFlat])
+        chord18 = Chord([MiddleC, LowE, LowGFlat])
         
         assert chord18.inversion() == 1
         assert chord18.inversionName() == 6
@@ -1987,15 +2028,15 @@ class Test(unittest.TestCase):
         LowBFlat.name = 'B-'
         LowBFlat.octave = 3
         
-        chord19 = Chord ([MiddleC, HighEFlat, LowBFlat])
-        chord20 = Chord ([LowC, LowBFlat])
+        chord19 = Chord([MiddleC, HighEFlat, LowBFlat])
+        chord20 = Chord([LowC, LowBFlat])
         chord20.root(LowBFlat)
         
         assert chord19.inversion() == 3
         assert chord19.inversionName() == 42
         '''assert chord20.inversion() == 4 intentionally raises error'''
         
-        chord21 = Chord ([MiddleC, HighEFlat, LowGFlat])
+        chord21 = Chord([MiddleC, HighEFlat, LowGFlat])
         assert chord21.root().name == 'C'
         
         MiddleF = note.Note()
@@ -2006,11 +2047,11 @@ class Test(unittest.TestCase):
         LowA.name = 'A'
         LowA.octave = 3    
         
-        chord22 = Chord ([MiddleC, MiddleF, LowA])
+        chord22 = Chord([MiddleC, MiddleF, LowA])
         assert chord22.root().name == 'F'
         assert chord22.inversionName() == 6
         
-        chord23 = Chord ([MiddleC, MiddleF, LowA, HighEFlat])
+        chord23 = Chord([MiddleC, MiddleF, LowA, HighEFlat])
         assert chord23.root().name == 'F'
         
         HighC = note.Note()
@@ -2021,23 +2062,23 @@ class Test(unittest.TestCase):
         HighE.name = 'E'
         HighE.octave = 5
         
-        chord24 = Chord ([MiddleC])
+        chord24 = Chord([MiddleC])
         assert chord24.root().name == 'C'
         
-        chord25 = Chord ([MiddleC, HighE])
+        chord25 = Chord([MiddleC, HighE])
         assert chord25.root().name == 'C'
         
         MiddleG = note.Note()
         MiddleG.name = 'G'
         MiddleG.octave = 4
         
-        chord26 = Chord ([MiddleC, MiddleE, MiddleG])
+        chord26 = Chord([MiddleC, MiddleE, MiddleG])
         assert chord26.root().name == 'C'
         
-        chord27 = Chord ([MiddleC, MiddleE, MiddleG, MiddleBFlat])
+        chord27 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat])
         assert chord27.root().name == 'C'
         
-        chord28 = Chord ([LowE, LowBFlat, MiddleG, HighC])
+        chord28 = Chord([LowE, LowBFlat, MiddleG, HighC])
         assert chord28.root().name == 'C'
         
         HighD = note.Note()
@@ -2052,19 +2093,19 @@ class Test(unittest.TestCase):
         HighAFlat.name = 'A-'
         HighAFlat.octave = 5
         
-        chord29 = Chord ([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD])
+        chord29 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD])
         assert chord29.root().name == 'C'
         
-        chord30 = Chord ([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF])
+        chord30 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF])
         assert chord30.root().name == 'C'
          
         
         '''Should raise error'''
-        chord31 = Chord ([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF, HighAFlat])
+        chord31 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF, HighAFlat])
         
         self.assertRaises(ChordException, chord31.root)
         
-        chord32 = Chord ([MiddleC, MiddleE, MiddleG, MiddleB])
+        chord32 = Chord([MiddleC, MiddleE, MiddleG, MiddleB])
         assert chord32.bass().name == 'C'
         assert chord32.root().name == 'C'
         assert chord32.inversionName() == 7
@@ -2081,17 +2122,17 @@ class Test(unittest.TestCase):
         MiddleFSharp = note.Note()
         MiddleFSharp.name = 'F#'
         
-        chord33 = Chord ([MiddleC, MiddleE, MiddleG, MiddleFDbleFlat, MiddleASharp, MiddleBDoubleFlat, MiddleFSharp])
+        chord33 = Chord([MiddleC, MiddleE, MiddleG, MiddleFDbleFlat, MiddleASharp, MiddleBDoubleFlat, MiddleFSharp])
         chord33.root(MiddleC)
         
         assert chord33.isHalfDiminishedSeventh() == False
         assert chord33.isDiminishedSeventh() == False
         assert chord33.isFalseDiminishedSeventh() == False
         
-        chord34 = Chord ([MiddleC, MiddleFDbleFlat, MiddleFSharp, MiddleA])
+        chord34 = Chord([MiddleC, MiddleFDbleFlat, MiddleFSharp, MiddleA])
         assert chord34.isFalseDiminishedSeventh() == True
                 
-        scrambledChord1 = Chord ([HighAFlat, HighF, MiddleC, MiddleASharp, MiddleBDoubleFlat])
+        scrambledChord1 = Chord([HighAFlat, HighF, MiddleC, MiddleASharp, MiddleBDoubleFlat])
         unscrambledChord1 = scrambledChord1.sortAscending()
         assert unscrambledChord1.pitches[0].name == "C"
         assert unscrambledChord1.pitches[1].name == "A#"
