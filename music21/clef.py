@@ -165,7 +165,8 @@ class PitchClef(Clef):
 class GClef(PitchClef):
     def __init__(self):
         '''
-        >>> a = GClef()
+        >>> from music21 import clef
+        >>> a = clef.GClef()
         >>> a.sign
         'G'
         '''
@@ -176,7 +177,8 @@ class GClef(PitchClef):
 class FrenchViolinClef(GClef):
     def __init__(self):
         '''
-        >>> a = FrenchViolinClef()
+        >>> from music21 import clef
+        >>> a = clef.FrenchViolinClef()
         >>> a.sign
         'G'
         '''
@@ -187,7 +189,8 @@ class FrenchViolinClef(GClef):
 class TrebleClef(GClef):
     def __init__(self):
         '''
-        >>> a = TrebleClef()
+        >>> from music21 import clef
+        >>> a = clef.TrebleClef()
         >>> a.sign
         'G'
         '''
@@ -199,7 +202,8 @@ class TrebleClef(GClef):
 class Treble8vbClef(TrebleClef):
     def __init__(self):
         '''
-        >>> a = Treble8vbClef()
+        >>> from music21 import clef
+        >>> a = clef.Treble8vbClef()
         >>> a.sign
         'G'
         >>> a.octaveChange
@@ -213,7 +217,8 @@ class Treble8vbClef(TrebleClef):
 class Treble8vaClef(TrebleClef):
     def __init__(self):
         '''
-        >>> a = Treble8vaClef()
+        >>> from music21 import clef
+        >>> a = clef.Treble8vaClef()
         >>> a.sign
         'G'
         >>> a.octaveChange
@@ -226,7 +231,8 @@ class Treble8vaClef(TrebleClef):
 class GSopranoClef(GClef):
     def __init__(self):
         '''
-        >>> a = GSopranoClef()
+        >>> from music21 import clef
+        >>> a = clef.GSopranoClef()
         >>> a.sign
         'G'
         '''
@@ -340,7 +346,8 @@ class FBaritoneClef(FClef):
 class BassClef(FClef):
     def __init__(self):
         '''
-        >>> a = BassClef()
+        >>> from music21 import clef
+        >>> a = clef.BassClef()
         >>> a.sign
         'F'
         '''

@@ -784,11 +784,12 @@ class RestructuredWriter(object):
         # define the start of lines that should not be changed
         rstExclude = ['.. image::', ':width:']
 
-        if modName != None:
-            docTestHead = '>>> from %s import *' % modName
-        else:
-            docTestHead = None
-
+        docTestImportPackage = '>>> from music21 import *'
+        docTestImportModNames = '>>> from %s import *' % modName
+        # mod name here is qualified; need to remove package name
+        if 'music21.' in modName:
+            modStub = modName.replace('music21.', '')
+        docTestImportMod = '>>> from music21 import %s' % modStub
 
         lines = doc.split('\n')
         sub = []
@@ -830,13 +831,13 @@ class RestructuredWriter(object):
             elif line.startswith('>>>'): # python examples
                 if inExamples == False:
                     space = '\n\n'
-                    # add module level import
-                    if docTestHead != None:
-                        msg.append(space + indent + docTestHead)
+                    # if import is the module import, replace with package
+                    if line.startswith(docTestImportMod):
+                        msg.append(space + indent + docTestImportPackage)
+                    else: # if no import is given, assume we need a mod import
+                        msg.append(space + indent + docTestImportModNames)
                         # need only one return after first line
                         msg.append('\n' + indent + line)
-                    else: # use normal, starting with two returns
-                        msg.append(space + indent + line)
                     inExamples = True
                 else:
                     space = '\n'
@@ -845,7 +846,7 @@ class RestructuredWriter(object):
                 if inExamples == False:
                     msg.append(line + ' ')
                 else: # assume we are in examples; 
-                # need to get lines python lines that do not start with delim
+                # need to get python lines that do not start with delim
                     msg.append('\n' + indent + line + ' ')
         msg.append('\n')
 

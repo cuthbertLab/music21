@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 '''
-The music21 Framework is Copyright (c) 2008-10 music21lab 
+The music21 Framework is Copyright (c) 2008-10 music21 lab 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
@@ -53,6 +53,11 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus", \
            "voiceLeading"]
 
 # skipped purposely, "base", "node"
+
+#-------------------------------------------------------------------------------
+# for sub packages, need to manually add the modules in these subpackages
+#from music21.analysis import *
+
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!

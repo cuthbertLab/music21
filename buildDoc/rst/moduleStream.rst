@@ -1106,8 +1106,7 @@ Stream
 
             This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
 
-            >>> from music21.stream import *
-            >>> from music21 import stream, note
+            >>> from music21 import *
             >>> s = stream.Stream()
             >>> n = note.Note('g')
             >>> n.quarterLength = 1.5
