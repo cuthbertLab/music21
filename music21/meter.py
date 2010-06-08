@@ -404,6 +404,7 @@ class MeterTerminal(object):
 
     denominator = property(_getDenominator, _setDenominator)
 
+
     def _ratioChanged(self):
         '''If ratio has been changed, call this to update duration 
         '''
@@ -921,6 +922,48 @@ class MeterSequence(MeterTerminal):
             self.partitionByCount(value, loadDefault=False)
         else:
             raise MeterException('cannot process partition arguemtn %s' % value)
+
+
+    #---------------------------------------------------------------------------
+    def _getPartitionStr(self):
+        count = len(self) 
+        if count == 1:
+            return 'Single'
+        elif count == 2:
+            return 'Duple'
+        elif count == 3:
+            return 'Triple'
+        elif count == 4:
+            return 'Quadruple'
+        elif count == 5:
+            return 'Quintuple'
+        elif count == 6:
+            return 'Sextuple'
+        elif count == 7:
+            return 'Septuple'
+        elif count == 8:
+            return 'Octuple'
+        else:
+            return None
+
+    partitionStr = property(_getPartitionStr, 
+        doc = '''Return the number of top-level partitions in this MeterSequence as a string. 
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence('2/4+2/4')
+        >>> ms
+        <MeterSequence {2/4+2/4}>
+        >>> ms.partitionStr
+        'Duple'
+        >>> ms = meter.MeterSequence('6/4', 6)
+        >>> ms
+        <MeterSequence {1/4+1/4+1/4+1/4+1/4+1/4}>
+        >>> ms.partitionStr
+        'Sextuple'
+
+        ''')
+
+
 
 
     #---------------------------------------------------------------------------
@@ -1736,19 +1779,8 @@ class TimeSignature(music21.Music21Object):
         ''')
 
     def _getBeatCountName(self):
-        buc = self._getBeatCount()
-        if buc == 2:
-            return 'Duple'
-        elif buc == 3:
-            return 'Triple'
-        elif buc == 4:
-            return 'Quadruple'
-        elif buc == 5:
-            return 'Quintuple'
-        elif buc == 6:
-            return 'Sextuple'
-        else:
-            return None
+        # this will use the top-level partitions as the cuunt
+        return self.beat.partitionStr 
 
     beatCountName = property(_getBeatCountName,
         doc = '''Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.
@@ -1779,14 +1811,15 @@ class TimeSignature(music21.Music21Object):
     beatDuration = property(_getBeatDuration, 
         doc = '''Return a :class:`~music21.duration.Duration` object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit.
 
-        >>> ts = TimeSignature('3/4')
+        >>> from music21 import *
+        >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDuration
         <music21.duration.Duration 1.0>
-        >>> ts = TimeSignature('6/8')
+        >>> ts = meter.TimeSignature('6/8')
         >>> ts.beatDuration
         <music21.duration.Duration 1.5>
 
-        >>> ts = TimeSignature('7/8')
+        >>> ts = meter.TimeSignature('7/8')
         >>> ts.beatDuration
         <music21.duration.Duration 0.5>
 
@@ -2695,7 +2728,7 @@ class Test(unittest.TestCase):
                     self.assertEqual(len(ms), 3)
 
         # odd or unusual partitions
-        src = [('13/4'), ('19/8'), ('7/16')]
+        src = [('13/4'), ('19/8'), ('17/16')]
         for tsStr in src:
             ts = TimeSignature(tsStr)
             #self.assertEqual(len(ts.beat), 6)
