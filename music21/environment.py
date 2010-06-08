@@ -10,6 +10,15 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''
+The environment module describes a flexible system for accessing and setting
+variables related to the user's music21 environment.  Such variables include
+the location of external applications such as Finale, whether music21 is
+allowed to access the on-line virtual corpus, etc.
+
+Complete documentation for using the module is found in :ref:`environment`.
+'''
+
 
 import os, sys
 import tempfile
@@ -171,10 +180,11 @@ class Environment(object):
         return value
 
     def __setitem__(self, key, value):
-        '''Dictionary-like setting. Changes are made only to local dictonary.
-        Music call  write() to make permanant
+        '''Dictionary-like setting. Changes are made only to local dictionary.
+        Music call  write() to make permanent
 
-        >>> a = Environment()
+        >>> from music21 import *
+        >>> a = music21.environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
         >>> a['graphicsPath']
@@ -375,7 +385,8 @@ class Environment(object):
         return fp
 
     def launch(self, fmt, fp, options=''):
-        '''Open a file with an either default or user-specified applications.
+        '''
+        Opens a file with an either default or user-specified applications.
         
         OMIT_FROM_DOCS
 
@@ -413,7 +424,9 @@ class Environment(object):
 
     
     def printDebug(self, msg, statusLevel=common.DEBUG_USER):
-        '''Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+        '''Format one or more data elements into string, and print it 
+        to stderr. The first arg can be a list of string; lists are 
+        concatenated with common.formatStr(). 
         '''
         if not common.isNum(statusLevel):
             raise EnvironmentException('bad statusLevel argument given: %s' % statusLevel)
