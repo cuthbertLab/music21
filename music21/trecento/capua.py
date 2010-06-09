@@ -3,7 +3,7 @@ import unittest
 import music21
 from music21.trecento import cadencebook
 from music21 import note
-from music21.note import Accidental
+from music21.pitch import Accidental
 from music21.interval import notesToInterval
 from music21 import lily
 

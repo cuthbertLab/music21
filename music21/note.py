@@ -30,7 +30,8 @@ from music21 import musicxml
 musicxmlMod = musicxml # alias
 from music21 import expressions
 from music21 import pitch
-from music21.pitch import Pitch, Accidental
+from music21 import beam
+from music21 import meter
 
 
 
@@ -43,6 +44,7 @@ environLocal = environment.Environment(_MOD)
 class Tie(music21.Music21Object):
     '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
 
+    >>> from music21 import *
     >>> note1 = Note()
     >>> note1.tie = Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
@@ -109,344 +111,6 @@ class Tie(music21.Music21Object):
 
 
 
-#-------------------------------------------------------------------------------
-class BeamException(Exception):
-    pass
-
-class Beam(object):
-    '''
-    A Beam is an object representation of one single beam, that is, one horizontal
-    line connecting two notes together (or less commonly a note to a rest).  Thus it
-    takes two separate Beam objects to represent the beaming of a 16th note.  
-    
-    The Beams object (note the plural) is the object that handles groups of Beam objects;
-    it is defined later on.
-    
-    Here are two ways to define the start of a beam
-    >>> b1 = music21.note.Beam(type = 'start')
-    >>> b2 = music21.note.Beam('start')
-    
-    Here is a partial beam (that is, one that does not
-    connect to any other note, such as the second beam of
-    a dotted eighth, sixteenth group)
-    
-    Two ways of doing the same thing
-    >>> b3 = music21.note.Beam(type = 'partial', direction = 'left')
-    >>> b4 = music21.note.Beam('partial', 'left')
-    
-    '''
-
-    def __init__(self, type = None, direction = None):
-        self.type = type # start, stop, continue, partial
-        self.direction = direction # left or right for partial
-        self.independentAngle = None
-        # represents which beam line referred to
-        # 8th, 16th, etc represented as 1, 2, ...
-        self.number = None 
-
-    def __str__(self):
-        if self.direction == None:
-            return '<music21.note.Beam %s/%s>' % (self.number, self.type)
-        else:
-            return '<music21.note.Beam %s/%s/%s>' % (self.number, self.type, self.direction)        
-
-
-    def _getMX(self):
-        '''
-
-        >>> a = Beam()
-        >>> a.type = 'start'
-        >>> a.number = 1
-        >>> b = a.mx
-        >>> b.get('charData')
-        'begin'
-        >>> b.get('number')
-        1
-
-        >>> a.type = 'partial'
-        >>> a.direction = 'left'
-        >>> b = a.mx
-        >>> b.get('charData')
-        'backward hook'
-        '''
-        mxBeam = musicxmlMod.Beam()
-        if self.type == 'start':
-            mxBeam.set('charData', 'begin') 
-        elif self.type == 'continue':
-            mxBeam.set('charData', 'continue') 
-        elif self.type == 'stop':
-            mxBeam.set('charData', 'end') 
-        elif self.type == 'partial':
-            if self.direction == 'left':
-                mxBeam.set('charData', 'backward hook')
-            elif self.direction == 'right':
-                mxBeam.set('charData', 'forward hook') 
-            else:
-                raise BeamException('partial beam defined without a direction set (set to %s)' % self.direction)
-        else:
-            raise BeamException('unexpected beam type encountered (%s)' % self.type)
-
-        mxBeam.set('number', self.number)
-        return mxBeam
-
-
-    def _setMX(self, mxBeam):
-        '''given a list of mxBeam objects
-
-        >>> mxBeam = musicxmlMod.Beam()
-        >>> mxBeam.set('charData', 'begin')
-        >>> a = Beam()
-        >>> a.mx = mxBeam
-        >>> a.type
-        'start'
-        '''
-
-        mxType = mxBeam.get('charData')
-        if mxType == 'begin':
-            self.type = 'start'
-        elif mxType == 'continue':
-            self.type = 'continue'
-        elif mxType == 'end':
-            self.type = 'stop'
-        elif mxType == 'forward hook':
-            self.type = 'partial'
-            self.direction = 'right'
-        elif mxType == 'backward hook':
-            self.type = 'partial'
-            self.direction = 'left'
-        else:
-            raise BeamException('unexpected beam type encountered (%s)' % mxType)
-
-    mx = property(_getMX, _setMX)    
-
-
-class Beams(object):
-    '''
-    The Beams object stores in it attribute beamsList (a list) all
-    the Beam objects defined above.  Thus len(note.beams) tells you how many
-    beams the note currently has on it.
-    '''
-    
-    def __init__(self):
-        self.beamsList = []
-        self.feathered = False
-        
-    def __len__(self):
-        return len(self.beamsList)
-
-    def __repr__(self):
-        msg = []
-        for beam in self.beamsList:
-            msg.append(str(beam))        
-        return '<music21.note.Beams %s>' % '/'.join(msg)
-
-
-    def append(self, type=None, direction=None):
-        obj = Beam(type, direction)
-        obj.number = len(self.beamsList) + 1
-        self.beamsList.append(obj)
-
-
-    def fill(self, level=None):
-        '''
-        A quick way of setting the beams list for a particular duration,
-        for instance, fill("16th") will clear the current list of beams in the
-        Beams object and add two beams.  fill(2) will do the same (though note
-        that that is an int, not a string).
-        
-        It does not do anything to the direction that the beams are going in.
-        
-        Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like
-        512th notes) raises an error.
-
-        >>> a = music21.note.Beams()
-        >>> a.fill('16th')
-        >>> len(a)
-        2
-        
-        >>> a.fill('32nd')
-        >>> len(a)
-        3
-        >>> a.beamsList[2]
-        <music21.note.Beam object at 0x...>
-
-        OMIT_FROM_DOCS
-        >>> a.fill(4)
-        >>> len(a)
-        4
-        >>> a.fill('256th')
-        >>> len(a)
-        6
-        >>> a.fill(7)
-        Traceback (most recent call last):
-        ...
-        BeamException: cannot fill beams for level 7
-        '''
-        self.beamsList = []
-        # 8th, 16th, etc represented as 1, 2, ...
-        if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
-            count = 1
-        elif level in [2, duration.typeFromNumDict[16]]:
-            count = 2
-        elif level in [3, duration.typeFromNumDict[32]]:
-            count = 3
-        elif level in [4, duration.typeFromNumDict[64]]:
-            count = 4
-        elif level in [5, duration.typeFromNumDict[128]]:
-            count = 5
-        elif level in [6, duration.typeFromNumDict[256]]:
-            count = 6
-        else:
-            raise BeamException('cannot fill beams for level %s' % level)
-
-        for i in range(1, count+1):
-            if i == 0: raise Exception
-
-            obj = Beam()
-            obj.number = i
-            self.beamsList.append(obj)
-
-
-    def setAll(self, type, direction=None):
-        '''
-        setAll is a method of convenience that sets the type 
-        of each of the beam objects within the beamsList to the specified type.
-        It also takes an optional "direction" attribute that sets the direction
-        for each beam (otherwise the direction of each beam is set to None)
-        Acceptable directions (start, stop, continue, etc.) are listed under 
-        Beam() above.
-
-        >>> a = music21.note.Beams()
-        >>> a.fill('16th')
-        >>> a.setAll('start')
-        >>> a.getTypes()
-        ['start', 'start']
-
-        '''
-        if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %' %  type)
-        for beam in self.beamsList:
-            beam.type = type
-            beam.direction = direction
-
-    def setByNumber(self, number, type, direction=None):
-        '''Set an internal beam object by number, or rhythmic symbol level
-
-        >>> a = Beams()
-        >>> a.fill('16th')
-        >>> a.setAll('start')
-        >>> a.setByNumber(1, 'continue')
-        >>> a.beamsList[0].type
-        'continue'
-        >>> a.setByNumber(2, 'stop')
-        >>> a.beamsList[1].type
-        'stop'
-        >>> a.setByNumber(2, 'partial-right')
-        >>> a.beamsList[1].type
-        'partial'
-        >>> a.beamsList[1].direction
-        'right'
-        '''
-        # permit providing one argument hyphenated
-        if '-' in type:
-            type, direction = type.split('-')
-
-        if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %' %  type)
-
-        if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
-
-        for i in range(len(self)):
-            if self.beamsList[i].number == number:
-                self.beamsList[i].type = type
-                self.beamsList[i].direction = direction
-
-
-    def getByNumber(self, number):
-        '''Gets an internal beam object by number...
-
-        >>> a = Beams()
-        >>> a.fill('16th')
-        >>> a.setAll('start')
-        >>> a.getByNumber(2).type
-        'start'
-        '''
-        if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
-
-        for i in range(len(self)):
-            if self.beamsList[i].number == number:
-                return self.beamsList[i]
-
-    def getTypeByNumber(self, number):
-        '''Get beam type, with direction, by number
-
-        >>> a = Beams()
-        >>> a.fill('16th')
-        >>> a.setAll('start')
-        >>> a.setByNumber(2, 'partial-right')
-        >>> a.getTypeByNumber(2)
-        'partial-right'
-        >>> a.getTypeByNumber(1)
-        'start'
-        '''
-        beamObj = self.getByNumber(number)
-        if beamObj.direction == None:
-            return beamObj.type
-        else:
-            return '%s-%s' % (beamObj.type, beamObj.direction)
-            
-
-    def getTypes(self):
-        '''Returns a list of all beam types defined for the current beams
-
-        >>> a = Beams()
-        >>> a.fill('16th')
-        >>> a.setAll('start')
-        >>> a.getTypes()
-        ['start', 'start']
-        '''
-        return [x.type for x in self.beamsList]
-
-    def getNumbers(self):
-        '''Returns a list of all defined beam numbers; it should normally be
-        a set of consecutive integers, but it might not be.
-
-        >>> a = Beams()
-        >>> a.fill('32nd')
-        >>> a.getNumbers()
-        [1, 2, 3]
-        '''
-        return [x.number for x in self.beamsList]
-
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''
-        Returns a list of mxBeam objects
-        '''
-        mxBeamList = []
-        for beamObj in self.beamsList:
-            mxBeamList.append(beamObj.mx)
-        return mxBeamList
-
-    def _setMX(self, mxBeamList):
-        '''given a list of mxBeam objects, sets the beamsList
-
-        >>> mxBeamList = []
-        >>> a = Beams()
-        >>> a.mx = mxBeamList
-        '''
-        for mxBeam in mxBeamList:
-            beamObj = Beam()
-            beamObj.mx = mxBeam
-            self.beamsList.append(beamObj)
-
-    mx = property(_getMX, _setMX)    
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -468,6 +132,7 @@ class Lyric(object):
         '''
         Returns an mxLyric
 
+        >>> from music21 import *
         >>> a = Lyric()
         >>> a.text = 'hello'
         >>> mxLyric = a.mx
@@ -483,6 +148,7 @@ class Lyric(object):
     def _setMX(self, mxLyric):
         '''Given an mxLyric, fill the necessary parameters
         
+        >>> from music21 import *
         >>> mxLyric = musicxml.Lyric()
         >>> mxLyric.set('text', 'hello')
         >>> a = Lyric()
@@ -536,6 +202,7 @@ class GeneralNote(music21.Music21Object):
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
         No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
 
+        >>> from music21 import *
         >>> a = GeneralNote()
         >>> a.duration.type = 'whole'
         >>> a.color = '#235409'
@@ -571,6 +238,7 @@ class GeneralNote(music21.Music21Object):
         presently only creates one lyric, and destroys any existing
         lyrics
 
+        >>> from music21 import *
         >>> a = GeneralNote()
         >>> a.lyric = 'test'
         >>> a.lyric
@@ -586,6 +254,7 @@ class GeneralNote(music21.Music21Object):
     def addLyric(self, text, lyricNumber = None):
         '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
+        >>> from music21 import *
         >>> n1 = Note()
         >>> n1.addLyric("hello")
         >>> n1.lyrics[0].text
@@ -628,6 +297,7 @@ class GeneralNote(music21.Music21Object):
     def _getQuarterLength(self):
         '''Return quarter length
 
+        >>> from music21 import *
         >>> n = Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
@@ -641,6 +311,7 @@ class GeneralNote(music21.Music21Object):
     quarterLength = property(_getQuarterLength, _setQuarterLength, 
         doc = '''Return the Duration as represented in Quarter Length.
 
+        >>> from music21 import *
         >>> n = Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
@@ -648,9 +319,51 @@ class GeneralNote(music21.Music21Object):
         ''')
 
 
+
+
+    def _getBeat(self):
+        '''Return a beat designation based on local Measure and TimeSignature
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        '''
+        tsList = self.getContextByClass(meter.TimeSignature)
+        if len(tsList) == 0:
+            raise NoteException('cannot find a TimeSignature')
+
+
+    beat = property(_getBeat,  
+        doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show progress through the beat
+
+        >>> n = Note()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        ''')
+
+    def _getBeatDuration(self):
+        '''Return a  designation based on local Measure and TimeSignature
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        '''
+        return None
+
+    beatDuration = property(_getBeatDuration,  
+        doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
+
+        >>> n = Note()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        ''')
+
+
+
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
 
+        >>> from music21 import *
         >>> n = Note('g#')
         >>> n.quarterLength = 3
         >>> n.augmentOrDiminish(2)
@@ -756,7 +469,6 @@ class GeneralNote(music21.Music21Object):
 #         '''
 #         # note: the lower level interface has changed here
 #         self.duration.addDurationUnit(durationObject)
-# 
 
 #     def clearDurations(self):
 #         '''
@@ -776,6 +488,7 @@ class GeneralNote(music21.Music21Object):
         Takes a Note and returns a list of notes with only a single
         duration.DurationUnit in each.
 
+        >>> from music21 import *
         >>> a = Note()
         >>> a.duration.clear() # remove defaults
         >>> a.duration.addDurationUnit(duration.Duration('half'))
@@ -873,6 +586,7 @@ class NotRest(GeneralNote):
         '''
         Split a Note into two Notes. 
 
+        >>> from music21 import *
         >>> a = NotRest()
         >>> a.duration.type = 'whole'
         >>> b, c = a.splitNoteAtPoint(3)
@@ -957,12 +671,12 @@ class Note(NotRest):
         NotRest.__init__(self, **keywords)
 
         if len(arguments) > 0:
-            if isinstance(arguments[0], Pitch):
+            if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
             else:
-                self.pitch = Pitch(arguments[0]) # assume first arg is pitch
+                self.pitch = pitch.Pitch(arguments[0]) # assume first arg is pitch
         else:
-            self.pitch = Pitch('C4')
+            self.pitch = pitch.Pitch('C4')
 
 #         components = []
 #         linkages = []
@@ -973,7 +687,7 @@ class Note(NotRest):
         if "beams" in keywords:
             self.beams = keywords["beams"]
         else:
-            self.beams = Beams()
+            self.beams = beam.Beams()
 
     #---------------------------------------------------------------------------
     # operators, representations, and transformatioins
@@ -1005,17 +719,18 @@ class Note(NotRest):
         Adds an accidental to the Note, given as an Accidental object.
         Also alters the name of the note
         
+        >>> from music21 import *
         >>> a = Note()
         >>> a.step = "D"
         >>> a.name 
         'D'
-        >>> b = Accidental("sharp")
+        >>> b = pitch.Accidental("sharp")
         >>> a.setAccidental(b)
         >>> a.name 
         'D#'
         '''
         if common.isStr(value):
-            accidental = Accidental(value)
+            accidental = pitch.Accidental(value)
         else: 
             accidental = value
         self.pitch.accidental = accidental
@@ -1071,7 +786,7 @@ class Note(NotRest):
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
         >>> a = Note()
-        >>> a.pitch = Pitch('d-4')
+        >>> a.pitch = pitch.Pitch('d-4')
         >>> a.midi
         61
         '''
@@ -1091,6 +806,7 @@ class Note(NotRest):
         
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
+        >>> from music21 import *
         >>> a = Note()
         >>> a.ps = 60.5
         >>> a.midi
@@ -1112,8 +828,9 @@ class Note(NotRest):
     def _getPitchClass(self):
         '''Return pitch class
 
+        >>> from music21 import *
         >>> d = Note()
-        >>> d.pitch = Pitch('d-4')
+        >>> d.pitch = pitch.Pitch('d-4')
         >>> d.pitchClass
         1
         >>> 
@@ -1131,8 +848,9 @@ class Note(NotRest):
     def _getPitchClassString(self):
         '''Return pitch class string, replacing 10 and 11 as needed. 
 
+        >>> from music21 import *
         >>> d = Note()
-        >>> d.pitch = Pitch('b')
+        >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString
         'B'
         '''
@@ -1140,8 +858,10 @@ class Note(NotRest):
 
     def _setPitchClassString(self, value):
         '''
+
+        >>> from music21 import *
         >>> d = Note()
-        >>> d.pitch = Pitch('b')
+        >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString = 'a'
         >>> d.pitchClass
         10
@@ -1168,6 +888,7 @@ class Note(NotRest):
     def transpose(self, value, inPlace=False):
         '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
+        >>> from music21 import *
         >>> a = Note('g4')
         >>> b = a.transpose('m3')
         >>> b
@@ -1333,8 +1054,7 @@ class Note(NotRest):
     def _setMX(self, mxNote):
         '''Given an mxNote, fill the necessary parameters of a Note
 
-        >>> from music21 import musicxml
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> mxNote = musicxml.Note()
         >>> mxNote.setDefaults()
         >>> mxMeasure = musicxml.Measure()
@@ -1452,6 +1172,7 @@ class Rest(GeneralNote):
     def _lilyName(self):
         '''The name of the rest as it would appear in Lilypond format.
         
+        >>> from music21 import *
         >>> r1 = Rest()
         >>> r1.duration.type = "half"
         >>> r1.lily

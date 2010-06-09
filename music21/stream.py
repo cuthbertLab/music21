@@ -1935,9 +1935,7 @@ class Stream(music21.Music21Object):
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0, 
                        maxBefore = None, maxAfter = None):
-        r'''
-        extracts elements around the given element within (before) quarter notes and (after) quarter notes
-        (default 4)
+        '''Extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4), and returns a new Stream.
                 
         >>> from music21 import note
         >>> qn = note.QuarterNote()
@@ -1949,8 +1947,7 @@ class Stream(music21.Music21Object):
         >>> qtrStream.repeatInsert(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
         >>> hnStream._reprText()
-        '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>'
-
+        '{5.0} <music21.note.Note C>\\n{6.0} <music21.note.Note B->\\n{8.0} <music21.note.Note C>'
 
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
@@ -5605,6 +5602,8 @@ class Test(unittest.TestCase):
         self.assertEqual(a.lily.value, u' { \\clef "treble"  \\time 3/4   { c\'\'4 c\'\'4 c\'\'4 c\'\'4  }   } ')
 
     def testLilySemiComplex(self):
+        from music21 import pitch
+
         a = Stream()
         ts = meter.TimeSignature("3/8")
         
@@ -5624,7 +5623,7 @@ class Test(unittest.TestCase):
         
         for i in range(0,5):
             b.append(deepcopy(q))
-            b.elements[i].accidental = note.Accidental(i - 2)
+            b.elements[i].accidental = pitch.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
         b.elements[-1].duration.tuplets[0].type = "stop"

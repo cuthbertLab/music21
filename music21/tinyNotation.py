@@ -77,6 +77,8 @@ from music21 import common
 from music21 import stream
 from music21 import expressions
 from music21 import meter
+from music21 import pitch
+
 
 class TinyNotationStream(stream.Stream):
     '''A TinyNotationStream takes in a string representation similar to Lilypond format
@@ -275,15 +277,15 @@ class TinyNotationNote(object):
         ## get accidentals
         if (isinstance(noteObj, music21.note.Note)):
             if (self.EDSHARP.search(stringRep)): # must come before sharp
-                acc1 = music21.note.Accidental("sharp")
+                acc1 = pitch.Accidental("sharp")
                 noteObj.editorial.ficta = acc1
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
             elif (self.EDFLAT.search(stringRep)): # must come before flat
-                acc1 = music21.note.Accidental("flat")
+                acc1 = pitch.Accidental("flat")
                 noteObj.editorial.ficta = acc1
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
             elif (self.EDNAT.search(stringRep)):
-                acc1 = music21.note.Accidental("natural")
+                acc1 = pitch.Accidental("natural")
                 noteObj.editorial.ficta = acc1
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
                 noteObj.accidental = acc1

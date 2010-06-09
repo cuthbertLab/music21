@@ -26,6 +26,7 @@ from music21 import note
 from music21.lily import LilyString
 #from music21.pitch import Pitch
 from music21 import pitch
+from music21 import beam
 
 from music21 import chordTables
 
@@ -88,7 +89,7 @@ class Chord(note.NotRest):
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this object is a Chord. Is False',
     'isRest': 'Boolean read-only value describing if this is a Rest. Is False',
-    'beams': 'A :class:`music21.note.Beams` object.',
+    'beams': 'A :class:`music21.beam.Beams` object.',
     }
     # update inherited _DOC_ATTR dictionary
     note.NotRest._DOC_ATTR.update(_DOC_ATTR)
@@ -140,7 +141,7 @@ class Chord(note.NotRest):
         if "beams" in keywords:
             self.beams = keywords["beams"]
         else:
-            self.beams = note.Beams()
+            self.beams = beam.Beams()
 
         
     def _preDurationLily(self):
