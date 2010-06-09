@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -26,8 +26,7 @@ musicxmlMod = musicxml # alias as to avoid name conflicts
 
 #-------------------------------------------------------------------------------
 class Barline(music21.Music21Object):
-    valid_styles = ["regular", "dotted", "dashed", "heavy", "light-light", "light-heavy",
-                    "heavy-light", "heavy-heavy", "tick", "short", "none"]
+    valid_styles = ["regular", "dotted", "dashed", "heavy", "light-light", "light-heavy", "heavy-light", "heavy-heavy", "tick", "short", "none"]
         #defined in MusicXML barline.dtd
     valid_repeats = ["right","left","both"]
     repeat_dots = None
@@ -50,57 +49,6 @@ class Repeat(music21.Music21Object):
     the Measure object\'s addRepeat both adds a Repeat object and changes the appropriate
     Barline style.  So it is to be preferred.'''
     pass
-
-
-
-
-#-------------------------------------------------------------------------------
-# this is now defined n Stream.
-
-# class Part(object):
-#     '''Terminal, non stream representation of a Part. Does not contain
-#     notes, measures, Streams, ora ny other attributes that will occur 
-#     more than once. 
-# 
-#     Should be able ot represent MusicXML Parts and PartGroups?
-# 
-#         self.groupName = None
-#         self.groupAbbreviaton = None
-#         self.groupBarline = None
-# 
-#     '''
-#     
-#     def __init__(self):
-# 
-#         # should be .name
-#         self.partName = None
-#         self.partAbbreviation = None
-# 
-# 
-#     def _getMX(self):
-#         '''
-#         Returns an incomplete mxSorePart object
-#         '''
-#         mxScorePart = musicxmlMod.ScorePart()
-#         mxScorePart.set('partName', self.partName)
-#         mxScorePart.set('partAbbreviation', self.partAbbreviation)
-#         return mxScorePart
-# 
-#     def _setMX(self, mxNote):
-#         '''
-#         Given a lost of one or more MusicXML Note objects, read in and create
-#         Duration
-# 
-#         '''
-#         pass
-# 
-#     mx = property(_getMX, _setMX)
-# 
-# 
-
-
-
-
 
 
 

@@ -1638,7 +1638,7 @@ class Stream(music21.Music21Object):
                     map[offset].append(m)
         return map
 
-    def getTimeSignatures(self, searchContext=True):
+    def getTimeSignatures(self, searchContext=True, returnDefault=True):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
         
@@ -1662,10 +1662,11 @@ class Stream(music21.Music21Object):
                 post.append(obj)
 
         # get a default and/or place default at zero if nothing at zero
-        if len(post) == 0 or post[0].offset > 0: 
-            ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator, 
-                               defaults.meterDenominatorBeatType))
-            post.insert(0, ts)
+        if returnDefault:
+            if len(post) == 0 or post[0].offset > 0: 
+                ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator, 
+                                   defaults.meterDenominatorBeatType))
+                post.insert(0, ts)
         return post
         
 
@@ -4599,6 +4600,42 @@ class Measure(Stream):
         return ts
 
 
+    def barDurationProportion(self):
+        '''Return a floating point value greater than 1 showing the proportion of the bar duration that is filled by elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
+
+        Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. 
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        0.33333...
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        0.66666...
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        1.0
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        1.33333...
+        '''
+        # check for local ts
+        if self.timeSignature != None:
+            ts = self.timeSignature
+        else: # do a context-based search 
+            tsStream = self.getTimeSignatures(searchContext=True,
+                       returnDefault=False)
+            if len(tsStream) == 0:
+                raise StreamException('cannot determine bar duration without a time signature reference')
+            else: # it is the first found
+                ts = tsStream[0]
+        return self.highestTime / ts.barDuration.quarterLength
+        
+
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list 
     # properties are provided to store and access these attribute
@@ -4607,7 +4644,7 @@ class Measure(Stream):
         '''
         >>> a = Measure()
         >>> a.clef = clef.TrebleClef()
-        >>> a.clef.sign    # clef is an element
+        >>> a.clef.sign  # clef is an element
         'G'
         '''
         # TODO: perhaps sort by priority?

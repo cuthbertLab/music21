@@ -320,7 +320,20 @@ class GeneralNote(music21.Music21Object):
 
 
     def _getMeasureOffset(self):
-        '''Try to obtain the Measure that contains this Note, and the offset within that Measure
+        '''Try to obtain the nearest Measure that contains this Note, and return the offset within that Measure.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = 2
+        >>> m = stream.Measure()
+        >>> n._getMeasureOffset() # returns zero when not assigned
+        0.0 
+        >>> n.quarterLength = .5
+        >>> m = stream.Measure()
+        >>> m.repeatAppend(n, 4)
+        >>> [n._getMeasureOffset() for n in m.notes]
+        [0.0, 0.5, 1.0, 1.5]
+
         '''
         if self.parent != None and self.parent.isMeasure:
             environLocal.printDebug(['found parent as Measure, using for offset'])
@@ -1495,9 +1508,12 @@ class Test(unittest.TestCase):
     ['6/16', .25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
             [0.75]*6],
 
-
     ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
             [1.]*5],
+
+    ['2/8+3/8+2/8', .5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
+            [1., 1., 1.5, 1.5, 1.5, 1.]],
+
         ]
 
         # one measure case
@@ -1542,6 +1558,26 @@ class Test(unittest.TestCase):
                 self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
 
 
+
+    def testNoteBeatPropertyCorpus(self):
+
+        data = [['bach/bwv255', []], 
+                ['bach/bwv153.9', []]
+                ]
+
+        for work, match in data:
+            from music21 import corpus
+            s = corpus.parseWork(work)
+            # always use tenor line    
+            found = []
+            for n in s[2].flat.notes:
+                n.lyric = str(n.beat)
+                found.append(n.beat)
+            
+            for i in range(len(match)):
+                self.assertEquals(match[i], found[i])
+
+            s.show()
 
 
 #-------------------------------------------------------------------------------
