@@ -14,7 +14,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
-    >>> from music21.pitch import *
     >>> convertFqToPs(440)
     69.0 
     >>> convertFqToPs(261.62556530059862)
@@ -24,7 +23,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion: from a pitch name to a pitch class integer between 0 and 11. 
 
-    >>> from music21.pitch import *
     >>> convertNameToPitchClass('c4')
     0 
     >>> convertNameToPitchClass('c#')
@@ -40,7 +38,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values). 
 
-    >>> from music21.pitch import *
     >>> convertNameToPs('c4')
     60 
     >>> convertNameToPs('c2#')
@@ -56,7 +53,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation. 
 
-    >>> from music21.pitch import *
     >>> convertPitchClassToNumber(3)
     3 
     >>> convertPitchClassToNumber('a')
@@ -68,7 +64,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Given a pitch class number, return a string. 
 
-    >>> from music21.pitch import *
     >>> convertPitchClassToStr(3)
     '3' 
     >>> convertPitchClassToStr(10)
@@ -78,7 +73,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion; does not process internals. Assumes A4 = 440 Hz 
 
-    >>> from music21.pitch import *
     >>> convertPsToFq(69)
     440.0 
     >>> convertPsToFq(60)
@@ -92,7 +86,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4 
 
-    >>> from music21.pitch import *
     >>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
     [3, 4, 4] 
     >>> [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
@@ -104,7 +97,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp 
 
-    >>> from music21.pitch import *
     >>> convertPsToStep(60)
     ('C', <accidental natural>) 
     >>> convertPsToStep(66)
@@ -130,7 +122,6 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 
     Utility conversion; does not process internals. 
 
-    >>> from music21.pitch import *
     >>> convertStepToPs('c', 4, 1)
     61 
     >>> convertStepToPs('d', 2, -2)
@@ -147,7 +138,6 @@ Pitch
 
     Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  ("C#4", "B--3", etc.) 
 
-    >>> from music21.pitch import *
     >>> p1 = Pitch('a#')
     >>> p1
     A# 
@@ -169,7 +159,6 @@ Pitch
 
             Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('G#')
             >>> a.name
             'G#' 
@@ -182,7 +171,6 @@ Pitch
 
             
 
-            >>> from music21.pitch import *
             >>> a = Pitch('C#3')
             >>> a._getStep()
             'C' 
@@ -191,7 +179,6 @@ Pitch
 
             
 
-            >>> from music21.pitch import *
             >>> a = Pitch('a3')
             >>> a._getPitchClass()
             9 
@@ -211,7 +198,6 @@ Pitch
 
             returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute. 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('g')
             >>> a.octave is None
             True 
@@ -237,7 +223,6 @@ Pitch
 
             
 
-            >>> from music21.pitch import *
             >>> a = Pitch('D-2')
             >>> a.accidental.alter
             -1.0 
@@ -246,7 +231,6 @@ Pitch
 
             Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
 
-            >>> from music21.pitch import *
             >>> c = Pitch('c4')
             >>> c.diatonicNoteNum
             29 
@@ -271,7 +255,6 @@ Pitch
 
             
 
-            >>> from music21.pitch import *
             >>> a = Pitch('A4')
             >>> a.freq440
             440.0 
@@ -284,7 +267,6 @@ Pitch
 
             returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error). 
 
-            >>> from music21.pitch import *
             >>> print Pitch('B-').german
             B 
             >>> print Pitch('B').german
@@ -313,7 +295,6 @@ Pitch
 
             returns a musicxml.Note() object 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('g#4')
             >>> c = a.mx
             >>> c.get('pitch').get('step')
@@ -323,7 +304,6 @@ Pitch
 
             Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`. 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('a3')
             >>> a.pitchClassString = 'B'
             >>> a.pitchClass
@@ -335,7 +315,6 @@ Pitch
 
             The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent). 
 
-            >>> from music21.pitch import *
             >>> a = Pitch()
             >>> a.ps = 45
             >>> a
@@ -350,7 +329,6 @@ Pitch
 
             Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned. 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('G#4')
             >>> a.stepWithOctave
             'G4' 
@@ -366,7 +344,6 @@ Pitch
 
             Inherit display properties from another Pitch, including those found on the Accidental object. 
 
-            >>> from music21.pitch import *
             >>>
             >>> a = Pitch('c#')
             >>> a.accidental.displayType = 'always'
@@ -381,7 +358,6 @@ Pitch
 
             Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
-            >>> from music21.pitch import *
             >>> aPitch = Pitch('g4')
             >>> bPitch = aPitch.transpose('m3')
             >>> bPitch
@@ -400,7 +376,6 @@ Pitch
 
             Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object's Accidental object are made in-place. The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
-            >>> from music21.pitch import *
             >>> a = Pitch('a')
             >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
             >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
@@ -476,7 +451,6 @@ Accidental
 
             From music21 to MusicXML 
 
-            >>> from music21.pitch import *
             >>> a = Accidental()
             >>> a.set('half-sharp')
             >>> a.alter == .5
@@ -493,7 +467,6 @@ Accidental
 
             Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted. 
 
-            >>> from music21.pitch import *
             >>> a = Accidental()
             >>> a.set('sharp')
             >>> a.alter == 1
@@ -514,7 +487,6 @@ Accidental
 
             Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties. 
 
-            >>> from music21.pitch import *
             >>> a = Accidental('double-flat')
             >>> a.displayType = 'always'
             >>> b = Accidental('sharp')

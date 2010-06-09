@@ -27,7 +27,6 @@ PlotHistogramPitchSpace
 
     
 
-    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramPitchSpace(s)
@@ -61,7 +60,6 @@ PlotHistogramPitchClass
     .. image:: images/PlotHistogramPitchClass.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramPitchClass(s)
@@ -95,7 +93,6 @@ PlotHistogramQuarterLength
     .. image:: images/PlotHistogramQuarterLength.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramQuarterLength(s)
@@ -129,7 +126,6 @@ PlotScatterPitchSpaceQuarterLength
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
     >>> a = PlotHistogramQuarterLength(s)
@@ -351,7 +347,6 @@ Graph
 
     Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
 
-    >>> from music21.graph import *
     >>> a = Graph()
     >>> a = Graph(title='green')
 
@@ -423,7 +418,6 @@ Graph3DPolygonBars
     .. image:: images/Graph3DPolygonBars.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> a = Graph3DPolygonBars(doneAction=None)
     >>> data = {1:[], 2:[], 3:[]}
     >>> for i in range(len(data.keys())):
@@ -462,7 +456,6 @@ GraphColorGrid
 
     
 
-    >>> from music21.graph import *
     >>> a = GraphColorGrid(doneAction=None)
     >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
     >>> a.setData(data)
@@ -512,7 +505,6 @@ GraphHistogram
     .. image:: images/GraphHistogram.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> a = GraphHistogram(doneAction=None)
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
     >>> a.setData(data)
@@ -534,7 +526,6 @@ GraphHorizontalBar
     .. image:: images/GraphHorizontalBar.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> a = GraphHorizontalBar(doneAction=None)
     >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
     >>> a.setData(data)
@@ -551,12 +542,11 @@ GraphScatter
 .. class:: GraphScatter(*args, **keywords)
 
 
-    Graph two parameters in a scatter plot 
+    Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
     .. image:: images/GraphScatter.* 
         :width: 600 
 
-    >>> from music21.graph import *
     >>> a = GraphScatter(doneAction=None)
     >>> data = [(x, x*x) for x in range(50)]
     >>> a.setData(data)
@@ -581,7 +571,6 @@ GraphScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
-    >>> from music21.graph import *
     >>> a = GraphScatterWeighted(doneAction=None)
     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
     >>> a.setData(data)
@@ -759,6 +748,32 @@ PlotScatter
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
+PlotScatterPitchSpaceDynamicSymbols
+-----------------------------------
+
+.. class:: PlotScatterPitchSpaceDynamicSymbols(streamObj, *args, **keywords)
+
+    A scatter plot of pitch class and quarter length 
+
+    
+
+    inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
+
+    **PlotScatterPitchSpaceDynamicSymbols** **attributes**
+
+        Attributes without Documentation: `values`
+
+        Attributes inherited from :class:`~music21.graph.PlotScatter`: :attr:`~music21.graph.PlotScatter.format`
+
+    **PlotScatterPitchSpaceDynamicSymbols** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotScatterPitchSpaceDynamicSymbols** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
 PlotScatterWeighted
 -------------------
 
@@ -821,7 +836,6 @@ PlotStream
 
             Utility method to get ticks in dynamic values. 
 
-            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksDynamics()
@@ -831,7 +845,6 @@ PlotStream
 
             Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
 
-            >>> from music21.graph import *
             >>> from music21 import corpus, stream, note
             >>> s = corpus.parseWork('bach/bwv281.xml')
             >>> a = PlotStream(s)
@@ -856,7 +869,6 @@ PlotStream
 
             Utility method to get ticks in pitch classes 
 
-            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s)
@@ -867,7 +879,6 @@ PlotStream
 
             Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first. 
 
-            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s)
@@ -888,7 +899,6 @@ PlotStream
 
             Utility method to get ticks in pitch space values. 
 
-            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksPitchSpaceChromatic(60,72)
@@ -898,7 +908,6 @@ PlotStream
 
             Utility method to get ticks in pitch space only for every octave. 
 
-            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
             >>> a.ticksPitchSpaceOctave()
@@ -908,7 +917,6 @@ PlotStream
 
             Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first. 
 
-            >>> from music21.graph import *
             >>> from music21 import corpus
             >>> s = corpus.parseWork('bach/bwv324.xml')
             >>> a = PlotStream(s[0])
@@ -923,7 +931,6 @@ PlotStream
 
             Get ticks for quarterLength. If `remap` is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2. 
 
-            >>> from music21.graph import *
             >>> from music21 import stream; s = stream.Stream()
             >>> a = PlotStream(s)
 

@@ -22,10 +22,12 @@ Time Signature Quick Start
 While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly for most common tasks.
 
 
+
 Getting and Editing Time Signatures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 From a Stream, from a Measure.
+
 
 
 
@@ -40,11 +42,11 @@ Convert from one to another
 Given a Note, Finding its Beat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Convert from one to another
 
 
-
-
+n200 = myScore.notes[200]
+print str(n200.context(beat))
+3.5
 
 
 

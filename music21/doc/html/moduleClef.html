@@ -132,12 +132,12 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Clef
 <dt id="music21.clef.Clef.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.clef.Clef.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">GClef</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">GClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;sign&#39;</span><span class="p">)</span>
 <span class="go">&#39;G&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Treble8vbClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">Treble8vbClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">octaveChange</span>
 <span class="go">-1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mx</span>
@@ -195,8 +195,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass
 <dt id="music21.clef.AltoClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">AltoClef</tt><a class="headerlink" href="#music21.clef.AltoClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">AltoClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">AltoClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
@@ -211,8 +211,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Alto
 <dt id="music21.clef.Bass8vaClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass8vaClef</tt><a class="headerlink" href="#music21.clef.Bass8vaClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Bass8vaClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">Bass8vaClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;F&#39;</span>
 </pre></div>
@@ -227,8 +227,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass
 <dt id="music21.clef.Bass8vbClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass8vbClef</tt><a class="headerlink" href="#music21.clef.Bass8vbClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Bass8vbClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">Bass8vbClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;F&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">octaveChange</span>
@@ -245,8 +245,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Bass
 <dt id="music21.clef.CBaritoneClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">CBaritoneClef</tt><a class="headerlink" href="#music21.clef.CBaritoneClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CBaritoneClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">CBaritoneClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">line</span>
@@ -263,8 +263,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">CBar
 <dt id="music21.clef.CClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">CClef</tt><a class="headerlink" href="#music21.clef.CClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">CClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
@@ -295,13 +295,13 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
 <dt id="music21.clef.FBaritoneClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FBaritoneClef</tt><a class="headerlink" href="#music21.clef.FBaritoneClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">FBaritoneClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">FBaritoneClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;F&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">line</span>
 <span class="go">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CBaritoneClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">CBaritoneClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestLine</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">lowestLine</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">sign</span>
@@ -318,8 +318,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FBar
 <dt id="music21.clef.FClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">FClef</tt><a class="headerlink" href="#music21.clef.FClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">FClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">FClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;F&#39;</span>
 </pre></div>
@@ -414,8 +414,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">GSop
 <dt id="music21.clef.MezzoSopranoClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">MezzoSopranoClef</tt><a class="headerlink" href="#music21.clef.MezzoSopranoClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">MezzoSopranoClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">MezzoSopranoClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
@@ -477,8 +477,8 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
 <dt id="music21.clef.SopranoClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">SopranoClef</tt><a class="headerlink" href="#music21.clef.SopranoClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">SopranoClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">SopranoClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
@@ -493,8 +493,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">Sopr
 <dt id="music21.clef.SubBassClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">SubBassClef</tt><a class="headerlink" href="#music21.clef.SubBassClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">SubBassClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">SubBassClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;F&#39;</span>
 </pre></div>
@@ -518,8 +518,8 @@ class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">TabC
 <dt id="music21.clef.TenorClef">
 <em class="property">
 class </em><tt class="descclassname">music21.clef.</tt><tt class="descname">TenorClef</tt><a class="headerlink" href="#music21.clef.TenorClef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.clef</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TenorClef</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TenorClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sign</span>
 <span class="go">&#39;C&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">line</span>

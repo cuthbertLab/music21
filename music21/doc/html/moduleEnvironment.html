@@ -89,6 +89,7 @@
             
   <div class="section" id="module-music21.environment">
 <span id="moduleenvironment"></span><h1>music21.environment<a class="headerlink" href="#module-music21.environment" title="Permalink to this headline">¶</a></h1>
+<p>The environment module describes a flexible system for accessing and setting variables related to the user&#8217;s music21 environment.  Such variables include the location of external applications such as Finale, whether music21 is allowed to access the on-line virtual corpus, etc. Complete documentation for using the module is found in <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>.</p>
 <div class="section" id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -97,8 +98,7 @@
 class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Environment</tt><big>(</big><em>modName=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Environment object stores user preferences as dictionary-like object.</p>
 <p>Create an instance of this object. A modName argument can be provided for use in printDebug() calls.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.environment</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="s">&#39;writeFormat&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -155,7 +155,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dl class="method">
 <dt id="music21.environment.Environment.launch">
 <tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
-<dd>Open a file with an either default or user-specified applications.</dd></dl>
+<dd>Opens a file with an either default or user-specified applications.</dd></dl>
 
 <dl class="method">
 <dt id="music21.environment.Environment.loadDefaults">
@@ -165,7 +165,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dl class="method">
 <dt id="music21.environment.Environment.printDebug">
 <tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
-<dd>Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</dd></dl>
+<dd>Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</dd></dl>
 
 <dl class="method">
 <dt id="music21.environment.Environment.warn">
@@ -182,8 +182,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dt id="music21.environment.Preference">
 <em class="property">
 class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Preference</tt><a class="headerlink" href="#music21.environment.Preference" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.environment</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Preference</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Preference</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>inherits from: <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>
@@ -196,8 +195,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dt id="music21.environment.Settings">
 <em class="property">
 class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Settings</tt><a class="headerlink" href="#music21.environment.Settings" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.environment</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>inherits from: <a title="music21.node.NodeList" class="reference external" href="moduleNode.html#music21.node.NodeList"><tt class="xref docutils literal"><span class="pre">NodeList</span></tt></a>, <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>

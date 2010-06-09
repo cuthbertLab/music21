@@ -134,8 +134,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.notes">
 <tt class="descname">notes</tt><a class="headerlink" href="#music21.stream.Stream.notes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The notes property of a Stream returns a new Stream object that consists only of the notes (including <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a>, <a title="music21.note.Rest" class="reference external" href="moduleNote.html#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">Rest</span></tt></a>, etc.) found in the stream.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">k1</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span> <span class="c"># key of C</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span>
@@ -157,8 +156,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.pitches">
 <tt class="descname">pitches</tt><a class="headerlink" href="#music21.stream.Stream.pitches" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> objects found in any element in the Stream as a Python List. Elements such as Streams, and Chords will have their Pitch objects accumulated as well. For that reason, a flat representation may not be required. Pitch objects are returned in a List, not a Stream.  This usage differs from the notes property, but makes sense since Pitch objects are usually durationless.  (That&#8217;s the main difference between them and notes)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">voiceOnePitches</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pitches</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">voiceOnePitches</span><span class="p">)</span>
@@ -191,8 +189,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.stream.Stream.duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total duration of the Stream, from the beginning of the stream until the end of the final element. May be set independently by supplying a Duration object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span>
@@ -228,8 +225,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.highestOffset">
 <tt class="descname">highestOffset</tt><a class="headerlink" href="#music21.stream.Stream.highestOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get start time of element with the highest offset in the Stream. Note the difference between this property and highestTime which gets the end time of the highestOffset</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">8</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">WholeNote</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
@@ -260,8 +256,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.lowestOffset">
 <tt class="descname">lowestOffset</tt><a class="headerlink" href="#music21.stream.Stream.lowestOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the start time of the Element with the lowest offset in the Stream.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">5</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">stream1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
@@ -287,8 +282,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.stream.Stream.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create and return a musicxml score.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">str1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -307,8 +301,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.sorted">
 <tt class="descname">sorted</tt><a class="headerlink" href="#music21.stream.Stream.sorted" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">isSorted</span>
@@ -355,8 +348,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.append">
 <tt class="descname">append</tt><big>(</big><em>others</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add Music21Objects (including other Streams) to the Stream (or multiple if passed a list) with offset equal to the highestTime (that is the latest &#8220;release&#8221; of an object), that is, directly after the last element ends. if the objects are not Music21Objects, they are wrapped in ElementWrappers runs fast for multiple addition and will preserve isSorted if True</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">notes</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -399,8 +391,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.insert">
 <tt class="descname">insert</tt><big>(</big><em>offsetOrItemOrList</em>, <em>itemOrNone=None</em>, <em>ignoreSort=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not change whether the stream is sorted or not (much faster if you&#8217;re going to be inserting dozens of items that don&#8217;t change the sort status) Has three forms: in the two argument form, inserts an element at the given offset:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">32</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span><span class="o">.</span><span class="n">_getHighestOffset</span><span class="p">()</span>
 <span class="go">32.0</span>
@@ -437,8 +428,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.addGroupForElements">
 <tt class="descname">addGroupForElements</tt><big>(</big><em>group</em>, <em>classFilter=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.addGroupForElements" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add the group to the groups attribute of all elements. if classFilter is set then only those elements whose objects belong to a certain class (or for Streams which are themselves of a certain class) are set.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">),</span> <span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addGroupForElements</span><span class="p">(</span><span class="s">&#39;flute&#39;</span><span class="p">)</span>
@@ -477,8 +467,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.attributeCount">
 <tt class="descname">attributeCount</tt><big>(</big><em>classFilterList</em>, <em>attrName=quarterLength</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.attributeCount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of attribute usage for one or more classes provided in a the <cite>classFilterList</cite> list and having the attribute specified by <cite>attrName</cite>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">attributeCount</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">,</span> <span class="s">&#39;quarterLength&#39;</span><span class="p">)</span>
 <span class="go">{1.0: 12, 2.0: 11, 4.0: 2}</span>
@@ -495,8 +484,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.bestClef">
 <tt class="descname">bestClef</tt><big>(</big><em>allowTreble8vb=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.bestClef" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the clef that is the best fit for notes and chords found in thisStream.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">... </span>   <span class="n">n</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">60</span><span class="p">,</span><span class="mf">72</span><span class="p">))</span>
@@ -524,8 +512,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.extendDuration">
 <tt class="descname">extendDuration</tt><big>(</big><em>objName</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.extendDuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a Stream and an object class name, go through the Stream and find each instance of the desired object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to extend to the end of the Stream. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.dynamics</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.dynamics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -561,8 +548,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.extractContext">
 <tt class="descname">extractContext</tt><big>(</big><em>searchElement</em>, <em>before=4.0</em>, <em>after=4.0</em>, <em>maxBefore=None</em>, <em>maxAfter=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.extractContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qn</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qtrStream</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">qn</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
@@ -593,8 +579,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getClefs">
 <tt class="descname">getClefs</tt><big>(</big><em>searchParent=True</em>, <em>searchContext=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getClefs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collect all <a title="music21.clef.Clef" class="reference external" href="moduleClef.html#music21.clef.Clef"><tt class="xref docutils literal"><span class="pre">Clef</span></tt></a> objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. If no Clef objects are defined, get a default using <a title="music21.stream.Stream.bestClef" class="reference internal" href="#music21.stream.Stream.bestClef"><tt class="xref docutils literal"><span class="pre">bestClef()</span></tt></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">clef</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">clef</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">AltoClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
@@ -610,8 +595,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getElementAfterElement">
 <tt class="descname">getElementAfterElement</tt><big>(</big><em>element</em>, <em>classList=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAfterElement" title="Permalink to this definition">¶</a></dt>
 <dd><p>given an element, get the next element.  If classList is specified, check to make sure that the element is an instance of the class list</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">()</span>
@@ -651,8 +635,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getElementAtOrBefore">
 <tt class="descname">getElementAtOrBefore</tt><big>(</big><em>offset</em>, <em>classList=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementAtOrBefore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an offset, find the element at this offset, or with the offset less than and nearest to. Return one element or None if no elements are at or preceded by this offset.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;x&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
@@ -695,8 +678,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getElementById">
 <tt class="descname">getElementById</tt><big>(</big><em>id</em>, <em>classFilter=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementById" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the first encountered element for a given id. Return None if no match</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;green&#39;</span>
@@ -712,8 +694,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getElementsByClass">
 <tt class="descname">getElementsByClass</tt><big>(</big><em>classFilterList</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all Elements that match the className.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
@@ -742,8 +723,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="method">
 <dt id="music21.stream.Stream.getElementsByGroup">
 <tt class="descname">getElementsByGroup</tt><big>(</big><em>groupFilterList</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByGroup" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;trombone&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D&quot;</span><span class="p">)</span>
@@ -774,8 +754,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <tt class="descname">getElementsByOffset</tt><big>(</big><em>offsetStart</em>, <em>offsetEnd=None</em>, <em>includeEndBoundary=True</em>, <em>mustFinishInSpan=False</em>, <em>mustBeginInSpan=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getElementsByOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values. If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in. The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do. Setting mustBeginInSpan to False is a good way of finding</p>
 <img alt="_images/getElementsByOffset.png" src="_images/getElementsByOffset.png" style="width: 600px;" />
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;half&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n0</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">0</span>
@@ -835,8 +814,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getInstrument">
 <tt class="descname">getInstrument</tt><big>(</big><em>searchParent=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getInstrument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search this stream or parent streams for <a title="music21.instrument.Instrument" class="reference external" href="moduleInstrument.html#music21.instrument.Instrument"><tt class="xref docutils literal"><span class="pre">Instrument</span></tt></a> objects, otherwise return a default</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getInstrument</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -846,8 +824,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getKeySignatures">
 <tt class="descname">getKeySignatures</tt><big>(</big><em>searchParent=True</em>, <em>searchContext=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getKeySignatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collect all <a title="music21.key.KeySignature" class="reference external" href="moduleKey.html#music21.key.KeySignature"><tt class="xref docutils literal"><span class="pre">KeySignature</span></tt></a> objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. If no KeySignature objects are defined, returns an empty Stream</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">clef</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">clef</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
@@ -863,8 +840,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getMeasure">
 <tt class="descname">getMeasure</tt><big>(</big><em>measureNumber</em>, <em>collect=</em><span class="optional">[</span>, <em>&lt;class 'music21.clef.Clef'&gt;</em>, <em>&lt;class 'music21.meter.TimeSignature'&gt;</em>, <em>&lt;class 'music21.instrument.Instrument'&gt;</em>, <em>&lt;class 'music21.key.KeySignature'&gt;</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.stream.Stream.getMeasure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a measure number, return a single <a title="music21.stream.Measure" class="reference internal" href="#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> object if the Measure number exists, otherwise return None. This method is distinguished from <a title="music21.stream.Stream.getMeasureRange" class="reference internal" href="#music21.stream.Stream.getMeasureRange"><tt class="xref docutils literal"><span class="pre">getMeasureRange()</span></tt></a> in that this method returns a single Measure object, not a Stream containing one or more Measure objects.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasure</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">&lt;music21.stream.Measure 3 offset=0.0&gt;</span>
@@ -876,8 +852,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getMeasureRange">
 <tt class="descname">getMeasureRange</tt><big>(</big><em>numberStart</em>, <em>numberEnd</em>, <em>collect=</em><span class="optional">[</span>, <em>&lt;class 'music21.clef.Clef'&gt;</em>, <em>&lt;class 'music21.meter.TimeSignature'&gt;</em>, <em>&lt;class 'music21.instrument.Instrument'&gt;</em>, <em>&lt;class 'music21.key.KeySignature'&gt;</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.stream.Stream.getMeasureRange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10. Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasureRange</span><span class="p">(</span><span class="mf">4</span><span class="p">,</span><span class="mf">6</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
@@ -895,8 +870,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getOffsetByElement">
 <tt class="descname">getOffsetByElement</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getOffsetByElement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an object, return the offset of that object in the context of this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
@@ -918,8 +892,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getOverlaps">
 <tt class="descname">getOverlaps</tt><big>(</big><em>includeDurationless=True</em>, <em>includeEndBoundary=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getOverlaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find any elements that overlap. Overlaping might include elements that have no duration but that are simultaneous. Whether elements with None durations are included is determined by includeDurationless. CHRIS: What does this return? and how can someone use this? This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps is determined by the includeEndBoundary parameter.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
@@ -965,8 +938,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getSimultaneous">
 <tt class="descname">getSimultaneous</tt><big>(</big><em>includeDurationless=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getSimultaneous" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find and return any elements that start at the same time.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">4</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">0</span>
@@ -992,8 +964,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.getTimeSignatures">
 <tt class="descname">getTimeSignatures</tt><big>(</big><em>searchContext=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getTimeSignatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collect all <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> objects in this stream. If no TimeSignature objects are defined, get a default</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
@@ -1008,8 +979,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.groupCount">
 <tt class="descname">groupCount</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.groupCount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a dictionary for each groupId and the count of instances.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addGroupForElements</span><span class="p">(</span><span class="s">&#39;P1&#39;</span><span class="p">)</span>
@@ -1031,8 +1001,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.index">
 <tt class="descname">index</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the first matched index for the specified object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fSharp</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A#&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fSharp</span><span class="p">)</span>
@@ -1046,8 +1015,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.indexList">
 <tt class="descname">indexList</tt><big>(</big><em>obj</em>, <em>firstMatchOnly=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.indexList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of one or more index values where the supplied object is found on this Stream&#8217;s <cite>elements</cite> list. To just return the first matched index, set <cite>firstMatchOnly</cite> to True. No matches are found, an empty list is returned.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
@@ -1066,8 +1034,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.insertAtNativeOffset">
 <tt class="descname">insertAtNativeOffset</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.insertAtNativeOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>inserts the item at the offset that was defined before the item was inserted into a stream (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F-&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F-&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">20.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
@@ -1089,8 +1056,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.isClass">
 <tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.isClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns true if the Stream or Stream Subclass is a particular class or subclasses that class. Used by getElementsByClass in Stream</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">Stream</span><span class="p">)</span>
@@ -1108,8 +1074,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.isSequence">
 <tt class="descname">isSequence</tt><big>(</big><em>includeDurationless=True</em>, <em>includeEndBoundary=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.isSequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>A stream is a sequence if it has no overlaps.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">3</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
@@ -1131,8 +1096,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.makeBeams">
 <tt class="descname">makeBeams</tt><big>(</big><em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeBeams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new measure with beams applied to all notes. In the process of making Beams, this method also updates tuplet types. This is destructive and thus changes an attribute of Durations in Notes. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aMeasure</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aNote</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">25</span>
@@ -1146,8 +1110,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.makeMeasures">
 <tt class="descname">makeMeasures</tt><big>(</big><em>meterStream=None</em>, <em>refStreamOrTimeRange=None</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeMeasures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If <cite>meterStream</cite> is provided, this is used to establish a sequence of <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> objects, instead of any found in the Stream. If <cite>refStreamOrTimeRange</cite> is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sSrc</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sSrc</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sSrc</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Rest</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sMeasures</span> <span class="o">=</span> <span class="n">sSrc</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sMeasures</span><span class="o">.</span><span class="n">measures</span><span class="p">)</span>
@@ -1175,8 +1138,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.makeRests">
 <tt class="descname">makeRests</tt><big>(</big><em>refStreamOrTimeRange=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeRests" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If <cite>refStreamOrTimeRange</cite> is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">1</span>
@@ -1195,8 +1157,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.makeTies">
 <tt class="descname">makeTies</tt><big>(</big><em>meterStream=None</em>, <em>inPlace=True</em>, <em>displayTiedAccidentals=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeTies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">12</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
@@ -1211,8 +1172,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.measureOffsetMap">
 <tt class="descname">measureOffsetMap</tt><big>(</big><em>classFilterList=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.measureOffsetMap" title="Permalink to this definition">¶</a></dt>
 <dd><p>If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self). The <cite>classFilterList</cite> argument can be a list of classes used to find Measures. A default of None uses Measure.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">measureOffsetMap</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 <span class="go">[0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]</span>
@@ -1229,8 +1189,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.pitchAttributeCount">
 <tt class="descname">pitchAttributeCount</tt><big>(</big><em>pitchAttr=name</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.pitchAttributeCount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of pitch class usage (count) by selecting an attribute of the Pitch object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchAttributeCount</span><span class="p">(</span><span class="s">&#39;pitchClass&#39;</span><span class="p">)</span>
 <span class="go">{0: 3, 2: 25, 3: 3, 4: 14, 6: 15, 7: 13, 9: 17, 11: 14}</span>
@@ -1246,8 +1205,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.playingWhenAttacked">
 <tt class="descname">playingWhenAttacked</tt><big>(</big><em>el</em>, <em>elStream=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.playingWhenAttacked" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. If there are multiple elements sounding at the moment it is attacked, the method returns the first element of the same class as this element, if any. If no element is of the same class, then the first element encountered is returned. For more complex usages, use allPlayingWhileSounding. Returns None if no elements fit the bill. The optional elStream is the stream in which el is found. If provided, el&#8217;s offset in that Stream is used.  Otherwise, the current offset in el is used.  It is just in case you are paranoid that el.offset might not be what you want.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G#&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D#&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
@@ -1280,8 +1238,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.plot">
 <tt class="descname">plot</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a method and keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by the <cite>method</cite> keyword. Available plots include the following Plot classes: <a title="music21.graph.PlotHistogramPitchSpace" class="reference external" href="moduleGraph.html#music21.graph.PlotHistogramPitchSpace"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchSpace</span></tt></a> <a title="music21.graph.PlotHistogramPitchClass" class="reference external" href="moduleGraph.html#music21.graph.PlotHistogramPitchClass"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchClass</span></tt></a> <a title="music21.graph.PlotHistogramQuarterLength" class="reference external" href="moduleGraph.html#music21.graph.PlotHistogramQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotHistogramQuarterLength</span></tt></a> <a title="music21.graph.PlotScatterPitchSpaceQuarterLength" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchSpaceQuarterLength</span></tt></a> <a title="music21.graph.PlotScatterPitchClassQuarterLength" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterPitchClassQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassQuarterLength</span></tt></a> <tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassOffset</span></tt> <a title="music21.graph.PlotHorizontalBarPitchSpaceOffset" class="reference external" href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchSpaceOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchSpaceOffset</span></tt></a> <a title="music21.graph.PlotHorizontalBarPitchClassOffset" class="reference external" href="moduleGraph.html#music21.graph.PlotHorizontalBarPitchClassOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchClassOffset</span></tt></a> <a title="music21.graph.PlotScatterWeightedPitchSpaceQuarterLength" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchSpaceQuarterLength</span></tt></a> <tt class="xref docutils literal"><span class="pre">PlotScatterWeigthedPitchClassQuarterLength</span></tt> <a title="music21.graph.Plot3DBarsPitchSpaceQuarterLength" class="reference external" href="moduleGraph.html#music21.graph.Plot3DBarsPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">Plot3DBarsPitchSpaceQuarterLength</span></tt></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">&#39;PlotHorizontalBarPitchSpaceOffset&#39;</span><span class="p">,</span> <span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
@@ -1293,8 +1250,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.pop">
 <tt class="descname">pop</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return and remove the object found at the user-specified index value. Index values are those found in <cite>elements</cite> and are not necessary offset order.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">junk</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1307,7 +1263,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.prepareNotation">
 <tt class="descname">prepareNotation</tt><big>(</big><em>meterStream=None</em>, <em>refStreamOrTimeRange=None</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.prepareNotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">,</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.5</span>
@@ -1323,8 +1279,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.remove">
 <tt class="descname">remove</tt><big>(</big><em>target</em>, <em>firstMatchOnly=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove an object from this Stream. Additionally, this Stream is removed from the object&#8217;s sites in <a title="music21.base.DefinedContexts" class="reference external" href="moduleBase.html#music21.base.DefinedContexts"><tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt></a>. By default, only the first match is removed. This can be adjusted with the <cite>firstMatchOnly</cite> parameters.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
@@ -1340,8 +1295,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.repeatAppend">
 <tt class="descname">repeatAppend</tt><big>(</big><em>item</em>, <em>numberOfTimes</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.repeatAppend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an object and a number, run append that many times on a deepcopy of the object. numberOfTimes should of course be a positive integer.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
@@ -1357,8 +1311,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.repeatInsert">
 <tt class="descname">repeatInsert</tt><big>(</big><em>item</em>, <em>offsets</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.repeatInsert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an object, create many DEEPcopies at the positions specified by the offset list:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;G-&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">5</span><span class="p">,</span> <span class="mf">6</span><span class="p">,</span> <span class="mf">7</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">9</span><span class="p">,</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">11</span><span class="p">,</span> <span class="mf">12</span><span class="p">])</span>
@@ -1384,8 +1337,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.scaleOffsets">
 <tt class="descname">scaleOffsets</tt><big>(</big><em>scalar</em>, <em>anchorZero=lowest</em>, <em>anchorZeroRecurse=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.scaleOffsets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale all offsets by a provided scalar. The <cite>anchorZero</cite> parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), &#8220;lowest&#8221;, or &#8220;highest&#8221;. The <cite>anchorZeroRecurse</cite> parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to &#8216;lowest&#8217; will not alter the space between the start of that Stream and the first element to be scaled. To shift all the elements in a Stream, see the <a title="music21.stream.Stream.shiftElements" class="reference internal" href="#music21.stream.Stream.shiftElements"><tt class="xref docutils literal"><span class="pre">shiftElements()</span></tt></a> method.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
@@ -1398,8 +1350,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.setupPickleScaffold">
 <tt class="descname">setupPickleScaffold</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.setupPickleScaffold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare this stream and all of its contents for pickling.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
@@ -1412,8 +1363,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.shiftElements">
 <tt class="descname">shiftElements</tt><big>(</big><em>offset</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.shiftElements" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add offset value to every offset of contained Elements.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">shiftElements</span><span class="p">(</span><span class="mf">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">lowestOffset</span>
@@ -1429,8 +1379,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.simultaneousAttacks">
 <tt class="descname">simultaneousAttacks</tt><big>(</big><em>stream2</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.simultaneousAttacks" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns an ordered list of offsets where elements are started (attacked) in both stream1 and stream2.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n11</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n12</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -1451,8 +1400,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.splitByClass">
 <tt class="descname">splitByClass</tt><big>(</big><em>objName</em>, <em>fx</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.splitByClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a stream, get all objects specified by objName and then form two new streams.  Fx should be a lambda or other function on elements. All elements where fx returns True go in the first stream. All other elements are put in the second stream.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stream1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">,</span><span class="mf">81</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">n</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">x</span>
@@ -1472,8 +1420,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.stripTies">
 <tt class="descname">stripTies</tt><big>(</big><em>inPlace=False</em>, <em>matchByPitch=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.stripTies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied constituents. Lastly, remove the formerly-tied notes. Presently, this only returns Note objects; Measures and other structures are stripped from the Stream. Presently, this only works if tied notes are sequentual; ultimately this will need to look at .to and .from attributes (if they exist) In some cases (under makeMeasures()) a continuation note will not have a Tie object with a stop attribute set. In that case, we need to look for sequential notes with matching pitches. The matchByPitch option can be used to use this technique.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
@@ -1493,8 +1440,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.teardownPickleScaffold">
 <tt class="descname">teardownPickleScaffold</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.teardownPickleScaffold" title="Permalink to this definition">¶</a></dt>
 <dd><p>After rebuilding this stream from pickled storage, prepare this as a normal Stream.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;whole&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
@@ -1508,8 +1454,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.transferOffsetToElements">
 <tt class="descname">transferOffsetToElements</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Stream.transferOffsetToElements" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfer the offset of this stream to all internal elements; then set the offset of this stream to zero.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">transferOffsetToElements</span><span class="p">()</span>
@@ -1529,8 +1474,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dt id="music21.stream.Stream.transpose">
 <tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.transpose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transpose all Pitches, Notes, and Chords in the Stream by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. returns a new Stream by default, but if the optional &#8220;inPlace&#8221; key is set to True then it modifies pitches in place.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">interval</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="s">&#39;d5&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aInterval</span> <span class="o">=</span> <span class="n">interval</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="s">&#39;d5&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">part</span> <span class="o">=</span> <span class="n">aStream</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
@@ -1605,8 +1549,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="attribute">
 <dt id="music21.stream.Measure.clef">
 <tt class="descname">clef</tt><a class="headerlink" href="#music21.stream.Measure.clef" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clef</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clef</span><span class="o">.</span><span class="n">sign</span>    <span class="c"># clef is an element</span>
 <span class="go">&#39;G&#39;</span>
@@ -1617,8 +1560,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="attribute">
 <dt id="music21.stream.Measure.keySignature">
 <tt class="descname">keySignature</tt><a class="headerlink" href="#music21.stream.Measure.keySignature" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">keySignature</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">keySignature</span><span class="o">.</span><span class="n">sharps</span>
 <span class="go">0</span>
@@ -1635,8 +1577,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dt id="music21.stream.Measure.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.stream.Measure.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a musicxml Measure, populated with notes, chords, rests and a musixcml Attributes, populated with time, meter, key, etc</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
@@ -1652,8 +1593,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="attribute">
 <dt id="music21.stream.Measure.timeSignature">
 <tt class="descname">timeSignature</tt><a class="headerlink" href="#music21.stream.Measure.timeSignature" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.stream</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">timeSignature</span><span class="o">.</span><span class="n">denominator</span>
 <span class="go">(2, 4)</span>

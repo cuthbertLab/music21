@@ -16,7 +16,6 @@ NoteEditorial
 
     EditorialComments that can be applied to notes 
 
-    >>> from music21.editorial import *
     >>> a = NoteEditorial()
     >>> a.misc
     {} 

@@ -14,14 +14,12 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Search the corpus, then the virtual corpus, for a work. Return a parsed :class:`music21.stream.Stream`. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored. 
 
-    >>> from music21.corpus.base import *
     >>> aStream = parseWork('opus74no1/movement3')
 
 .. function:: getWork(workName, movementNumber=None, extList=None)
 
     Search the corpus, then the virtual corpus, for a work. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
-    >>> from music21.corpus.base import *
     >>> import os
     >>> a = getWork('opus74no2', 4)
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
@@ -36,7 +34,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Return all Bach chorales. 
 
-    >>> from music21.corpus.base import *
     >>> a = getBachChorales()
     >>> len(a) > 10
     True 
@@ -51,7 +48,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Return all Beethoven String Quartets. 
 
-    >>> from music21.corpus.base import *
     >>> a = getBeethovenStringQuartets()
     >>> len(a) > 10
     True 
@@ -66,7 +62,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Return all components of the corpus that match a composer's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
 
-    >>> from music21.corpus.base import *
     >>> a = getComposer('beethoven')
     >>> len(a) > 10
     True 
@@ -84,7 +79,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Given the name of a composer, get the path to the top-level directory of that composer 
 
-    >>> from music21.corpus.base import *
     >>> import os
     >>> a = getComposerDir('beethoven')
     >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
@@ -103,7 +97,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Get all paths in the corpus that match a known extension, or an extenion provided by an argument. 
 
-    >>> from music21.corpus.base import *
     >>> a = getPaths()
     >>> len(a) > 30
     True 
@@ -115,7 +108,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions. 
 
-    >>> from music21.corpus.base import *
     >>> len(getVirtualPaths()) > 6
     True 
 
@@ -123,7 +115,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Given a work name, search all virtual works and return a list of URLs for any matches. 
 
-    >>> from music21.corpus.base import *
     >>> getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 
     >>> getVirtualWorkList('junk')
@@ -133,7 +124,6 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned. 
 
-    >>> from music21.corpus.base import *
     >>> len(getWorkList('beethoven/opus18no1'))
     8 
     >>> len(getWorkList('beethoven/opus18no1', 1))
@@ -149,6 +139,5 @@ The music21 corpus provides a collection of freely distributable music in MusicX
 
     Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
 
-    >>> from music21.corpus.base import *
     >>> post = getWorkReferences()
 

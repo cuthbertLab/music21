@@ -16,7 +16,6 @@ TempoMark
 
     
 
-    >>> from music21.tempo import *
     >>> tm = TempoMark("adagio")
     >>> tm.value
     'adagio' 
@@ -45,7 +44,6 @@ MetronomeMark
 
     
 
-    >>> from music21.tempo import *
     >>> a = MetronomeMark(40)
     >>> a.number
     40 

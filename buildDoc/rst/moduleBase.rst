@@ -49,7 +49,6 @@ Music21Object
 
             Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score. 
 
-            >>> from music21.base import *
             >>> a = Music21Object()
             >>> a.priority = 3
             >>> a.priority = 'high'
@@ -66,7 +65,6 @@ Music21Object
 
             Given the name of an attribute, search Conctexts and return the best match. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> aObj.attr1 = 'test'
@@ -79,7 +77,6 @@ Music21Object
 
             Given the name of an attribute, search Conctexts and return the best match. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> aObj.attr1 = 'test'
@@ -95,7 +92,6 @@ Music21Object
 
             Add an ojbect to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> aObj.attr1 = 'test'
@@ -108,7 +104,6 @@ Music21Object
 
             Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object. This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream. 
 
-            >>> from music21.base import *
             >>> from music21 import note, stream
             >>> s = stream.Stream()
             >>> n = note.Note()
@@ -118,7 +113,6 @@ Music21Object
 
             ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert -- this saves some dual processing.  Does not do safety checks that the siteId doesn't already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated) 
 
-            >>> from music21.base import *
             >>> from stream import Stream
             >>> st1 = Stream()
             >>> o1 = Music21Object()
@@ -135,7 +129,6 @@ Music21Object
 
             Temporarily replace are stored keys with a different value. 
 
-            >>> from music21.base import *
             >>> aM21Obj = Music21Object()
             >>> bM21Obj = Music21Object()
             >>> aM21Obj.offset = 30
@@ -158,7 +151,6 @@ Music21Object
 
             If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream. 
 
-            >>> from music21.base import *
             >>> a = Music21Object()
             >>> a.offset = 30
             >>> a.getOffsetBySite(None)
@@ -172,7 +164,6 @@ Music21Object
 
             Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder. 
 
-            >>> from music21.base import *
             >>> from music21 import note, stream
             >>> s1 = stream.Stream()
             >>> s2 = stream.Stream()
@@ -186,7 +177,6 @@ Music21Object
 
             Return a Boolean if an object reference is stored in the object's DefinedContexts object. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> aObj.attr1 = 'test'
@@ -203,7 +193,6 @@ Music21Object
 
             Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
-            >>> from music21.base import *
             >>> from music21 import note
             >>> n = note.Note()
             >>> n.isClass(note.Note)
@@ -224,7 +213,6 @@ Music21Object
 
             Remove a location in the :class:`~music21.base.DefinedContexts` object. This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
 
-            >>> from music21.base import *
             >>> from music21 import note, stream
             >>> s = stream.Stream()
             >>> n = note.Note()
@@ -238,7 +226,6 @@ Music21Object
 
             Direct access to the DefinedContexts setOffsetBySite() method. This should only be used for advanced processing of known site that already has been added. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> a = Music21Object()
@@ -253,7 +240,6 @@ Music21Object
 
             Restore keys to be the id() of the object they contain 
 
-            >>> from music21.base import *
             >>> aM21Obj = Music21Object()
             >>> bM21Obj = Music21Object()
             >>> aM21Obj.offset = 30
@@ -276,7 +262,6 @@ Music21Object
 
             Public interface to operation on DefinedContexts. 
 
-            >>> from music21.base import *
             >>> aM21Obj = Music21Object()
             >>> bM21Obj = Music21Object()
             >>> aM21Obj.offset = 30
@@ -291,7 +276,6 @@ Music21Object
 
             Public interface to operation on DefinedContexts. 
 
-            >>> from music21.base import *
             >>> aM21Obj = Music21Object()
             >>> bM21Obj = Music21Object()
             >>> aM21Obj.offset = 30
@@ -327,7 +311,6 @@ ElementWrapper
 
             Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None. 
 
-            >>> from music21.base import *
             >>> import note
             >>> n = note.Note('F#')
             >>> n.quarterLength = 2.0
@@ -373,7 +356,6 @@ ElementWrapper
 
             Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
 
-            >>> from music21.base import *
             >>> import note
             >>> a = ElementWrapper(None)
             >>> a.isClass(note.Note)
@@ -390,7 +372,6 @@ ElementWrapper
 
             a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context 
 
-            >>> from music21.base import *
             >>> import note
             >>> aE = ElementWrapper(obj = note.Note("A-"))
             >>> aE.id = "aflat-Note"
@@ -443,7 +424,6 @@ DefinedContexts
 
             Temporarily replace are stored keys with a different value. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -460,7 +440,6 @@ DefinedContexts
 
             Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The locationsTrail option forces locations to come after all other defined contexts. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -478,7 +457,6 @@ DefinedContexts
 
             Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> aObj.attr1 = 234
@@ -499,7 +477,6 @@ DefinedContexts
 
             Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -519,7 +496,6 @@ DefinedContexts
 
             For a given object return the offset using a direct object match. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -536,7 +512,6 @@ DefinedContexts
 
             For a given site return its offset. The None site is permitted. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -553,7 +528,6 @@ DefinedContexts
 
             For a given site id, return its offset. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -570,7 +544,6 @@ DefinedContexts
 
             Return a list of all offsets. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -588,7 +561,6 @@ DefinedContexts
 
             For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts! 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -607,7 +579,6 @@ DefinedContexts
 
             Get all defined contexts that are locations; unwrap from weakrefs 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -627,7 +598,6 @@ DefinedContexts
 
             Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -643,7 +613,6 @@ DefinedContexts
 
             Clean all locations that refer to objects that no longer exist. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -663,7 +632,6 @@ DefinedContexts
 
             Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -690,7 +658,6 @@ DefinedContexts
 
             Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): attr1=234
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -706,7 +673,6 @@ DefinedContexts
 
             Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aSite = Mock()
             >>> bSite = Mock()
@@ -725,7 +691,6 @@ DefinedContexts
 
             Restore keys to be the id() of the object they contain 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -754,7 +719,6 @@ DefinedContexts
 
             Unwrap any and all weakrefs stored. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -775,7 +739,6 @@ DefinedContexts
 
             Wrap any and all weakrefs stored. 
 
-            >>> from music21.base import *
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
             >>> bObj = Mock()
@@ -797,7 +760,6 @@ Groups
 
     A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
 
-    >>> from music21.base import *
     >>> g = Groups()
     >>> g.append("hello")
     >>> g[0]

@@ -33,12 +33,12 @@ Clef
 
             Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
 
-            >>> from music21.clef import *
-            >>> b = GClef()
+            >>> from music21 import *
+            >>> b = clef.GClef()
             >>> a = b.mx
             >>> a.get('sign')
             'G' 
-            >>> b = Treble8vbClef()
+            >>> b = clef.Treble8vbClef()
             >>> b.octaveChange
             -1 
             >>> a = b.mx
@@ -78,6 +78,8 @@ BassClef
 
     
 
+    
+
     >>> from music21 import *
     >>> a = clef.BassClef()
     >>> a.sign
@@ -94,8 +96,8 @@ AltoClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = AltoClef()
+    >>> from music21 import *
+    >>> a = clef.AltoClef()
     >>> a.sign
     'C' 
 
@@ -110,8 +112,8 @@ Bass8vaClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = Bass8vaClef()
+    >>> from music21 import *
+    >>> a = clef.Bass8vaClef()
     >>> a.sign
     'F' 
 
@@ -126,8 +128,8 @@ Bass8vbClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = Bass8vbClef()
+    >>> from music21 import *
+    >>> a = clef.Bass8vbClef()
     >>> a.sign
     'F' 
     >>> a.octaveChange
@@ -144,8 +146,8 @@ CBaritoneClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = CBaritoneClef()
+    >>> from music21 import *
+    >>> a = clef.CBaritoneClef()
     >>> a.sign
     'C' 
     >>> a.line
@@ -162,8 +164,8 @@ CClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = CClef()
+    >>> from music21 import *
+    >>> a = clef.CClef()
     >>> a.sign
     'C' 
 
@@ -200,13 +202,13 @@ FBaritoneClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = FBaritoneClef()
+    >>> from music21 import *
+    >>> a = clef.FBaritoneClef()
     >>> a.sign
     'F' 
     >>> a.line
     3 
-    >>> b = CBaritoneClef()
+    >>> b = clef.CBaritoneClef()
     >>> a.lowestLine == b.lowestLine
     True 
     >>> a.sign == b.sign
@@ -223,8 +225,8 @@ FClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = FClef()
+    >>> from music21 import *
+    >>> a = clef.FClef()
     >>> a.sign
     'F' 
 
@@ -331,8 +333,8 @@ MezzoSopranoClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = MezzoSopranoClef()
+    >>> from music21 import *
+    >>> a = clef.MezzoSopranoClef()
     >>> a.sign
     'C' 
 
@@ -396,8 +398,8 @@ SopranoClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = SopranoClef()
+    >>> from music21 import *
+    >>> a = clef.SopranoClef()
     >>> a.sign
     'C' 
 
@@ -412,8 +414,8 @@ SubBassClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = SubBassClef()
+    >>> from music21 import *
+    >>> a = clef.SubBassClef()
     >>> a.sign
     'F' 
 
@@ -437,8 +439,8 @@ TenorClef
 
     
 
-    >>> from music21.clef import *
-    >>> a = TenorClef()
+    >>> from music21 import *
+    >>> a = clef.TenorClef()
     >>> a.sign
     'C' 
     >>> a.line

@@ -14,7 +14,28 @@ Chord
 
 .. class:: Chord(notes=[], **keywords)
 
-    Class for dealing with chords A Chord is an object composed of Notes. Create chords by creating notes: C = note.Note(), C.name = 'C' E = note.Note(), E.name = 'E' G = note.Note(), G.name = 'G' And then create a chord with notes: cmaj = Chord([C, E, G]) Chord has the ability to determine the root of a chord, as well as the bass note of a chord. In addition, Chord is capable of determining what type of chord a particular chord is, whether it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. NOTE: For now, the examples used in documentation give chords made from notes that are not defined. In the future, it may be possible to define a chord without first creating notes, but for now note that notes that appear in chords are simply shorthand instead of creating notes for use in examples 
+    Class for dealing with chords A Chord is like a Note object but has multiple pitches. Create chords by creating Notes or Pitches: 
+
+    >>> from music21 import *
+    >>> C = note.Note()
+    >>> C.name = 'C'
+    >>> E = note.Note()
+    >>> E.name = 'E'
+    >>> G = note.Note()
+    >>> G.name = 'G'
+    And then create a chord with notes: 
+    >>> cmaj = Chord([C, E, G])
+    Or, more simply, just pass strings of pitch names: 
+    >>> dmaj = Chord(["D","F#","A"])
+
+    
+    Chord has the ability to determine the root of a chord, as well as the bass note of a chord. 
+    In addition, Chord is capable of determining what type of chord a particular chord is, whether 
+    it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. 
+    NOTE: For now, the examples used in documentation give chords made from notes that are not 
+    defined. In the future, it may be possible to define a chord without first creating notes, 
+    but for now note that notes that appear in chords are simply shorthand instead of creating notes 
+    for use in examples 
 
     
 
@@ -28,11 +49,11 @@ Chord
 
         .. attribute:: isNote
 
-            Boolean read-only value describing if this object is a Chord. 
+            Boolean read-only value describing if this object is a Chord. Is False 
 
         .. attribute:: isRest
 
-            Boolean read-only value describing if this is a Rest. 
+            Boolean read-only value describing if this is a Rest. Is False 
 
         .. attribute:: beams
 
@@ -50,8 +71,8 @@ Chord
 
             Return a list of all Pitch objects in this Chord. 
 
-            >>> from music21.chord import *
-            >>> c = Chord(["C4", "E4", "G#4"])
+            >>> from music21 import *
+            >>> c = chord.Chord(["C4", "E4", "G#4"])
             >>> c.pitches
             [C4, E4, G#4] 
             >>> [p.midi for p in c.pitches]
@@ -61,8 +82,8 @@ Chord
 
             Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively). 
 
-            >>> from music21.chord import *
-            >>> c = Chord(["C4", "E4", "G#4"])
+            >>> from music21 import *
+            >>> c = chord.Chord(["C4", "E4", "G#4"])
             >>> c.chordTablesAddress
             (3, 12, 0) 
 
@@ -70,8 +91,8 @@ Chord
 
             Return a list of common names as strings that are associated with this Chord. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.commonName
             ['major triad'] 
 
@@ -79,8 +100,8 @@ Chord
 
             Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.forteClass
             '3-11B' 
 
@@ -88,8 +109,8 @@ Chord
 
             Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.forteClassNumber
             11 
 
@@ -97,8 +118,8 @@ Chord
 
             Return the Forte Tn set class name, where inversion distinctions are represented. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.forteClassTn
             '3-11B' 
 
@@ -106,8 +127,8 @@ Chord
 
             Return the Forte TnI class name, where inversion distinctions are not represented. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.forteClassTnI
             '3-11' 
 
@@ -115,8 +136,8 @@ Chord
 
             Return True or False if the Chord has a Z-relation. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.hasZRelation
             False 
 
@@ -124,8 +145,8 @@ Chord
 
             Return the interval vector for this Chord as a list of integers. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.intervalVector
             [0, 0, 1, 1, 1, 0] 
 
@@ -133,8 +154,8 @@ Chord
 
             Return the interval vector as a string representation. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.intervalVectorString
             '<001110>' 
 
@@ -142,11 +163,11 @@ Chord
 
             Return True or False if the Chord represents a set class inversion. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.isPrimeFormInversion
             False 
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.isPrimeFormInversion
             True 
 
@@ -158,8 +179,8 @@ Chord
 
             Return an integer representing the cardinality of the mutliset, or the number of pitch values. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.multisetCardinality
             4 
 
@@ -167,8 +188,8 @@ Chord
 
             Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
 
-            >>> from music21.chord import *
-            >>> a = Chord()
+            >>> from music21 import *
+            >>> a = chord.Chord()
             >>> a.quarterLength = 2
             >>> b = pitch.Pitch('A-')
             >>> c = pitch.Pitch('D-')
@@ -190,8 +211,8 @@ Chord
 
             Return the normal form of the Chord represented as a list of integers. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.normalForm
             [0, 4, 7] 
 
@@ -199,8 +220,8 @@ Chord
 
             Return a string representation of the normal form of the Chord. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['f#', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['f#', 'e-', 'g'])
             >>> c1.normalFormString
             '<034>' 
 
@@ -208,8 +229,8 @@ Chord
 
             Return an list of pitch class integers, ordered form lowest to highest. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.orderedPitchClasses
             [2, 6, 9] 
 
@@ -217,8 +238,8 @@ Chord
 
             Return a string representation of the pitch class values. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['f#', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['f#', 'e-', 'g'])
             >>> c1.orderedPitchClassesString
             '<367>' 
 
@@ -226,8 +247,8 @@ Chord
 
             Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.pitchClassCardinality
             3 
 
@@ -235,8 +256,8 @@ Chord
 
             Return a list of all pitch classes in the chord as integers. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(["D4", "A4", "F#5", "D6"])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
             >>> c1.pitchClasses
             [2, 9, 6, 2] 
 
@@ -244,8 +265,8 @@ Chord
 
             Return the common name of this Chord preceded by its root, if a root is available. 
 
-            >>> from music21.chord import *
-            >>> c2 = Chord(['c', 'e', 'g'])
+            >>> from music21 import *
+            >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.pitchedCommonName
             'C-major triad' 
 
@@ -253,8 +274,8 @@ Chord
 
             Return a representation of the Chord as a prime-form list of pitch class integers. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.primeForm
             [0, 3, 7] 
 
@@ -262,8 +283,8 @@ Chord
 
             Return a representation of the Chord as a prime-form set class string. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.primeFormString
             '<037>' 
 
@@ -277,10 +298,10 @@ Chord
 
             Check of chord other is also a z relations 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(["C", "c#", "e", "f#"])
-            >>> c2 = Chord(["C", "c#", "e-", "g"])
-            >>> c3 = Chord(["C", "c#", "f#", "g"])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(["C", "c#", "e", "f#"])
+            >>> c2 = chord.Chord(["C", "c#", "e-", "g"])
+            >>> c3 = chord.Chord(["C", "c#", "f#", "g"])
             >>> c1.areZRelations(c2)
             True 
             >>> c1.areZRelations(c3)
@@ -290,8 +311,8 @@ Chord
 
             returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example: 
 
-            >>> from music21.chord import *
-            >>> cmaj = Chord(['C', 'E', 'G'])
+            >>> from music21 import *
+            >>> cmaj = chord.Chord(['C', 'E', 'G'])
             >>> cmaj.bass() # returns C
             C 
 
@@ -299,8 +320,8 @@ Chord
 
             Returns True if the chord is a Major Triad or a Dominant Seventh 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.canBeDominantV()
             True 
 
@@ -308,11 +329,11 @@ Chord
 
             returns True if the chord is a major or minor triad 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.canBeTonic()
             False 
-            >>> a = Chord(['g', 'b', 'd'])
+            >>> a = chord.Chord(['g', 'b', 'd'])
             >>> a.canBeTonic()
             True 
 
@@ -320,8 +341,8 @@ Chord
 
             returns a new Chord object with the same pitch classes, but now in closed position 
 
-            >>> from music21.chord import *
-            >>> chord1 = Chord(["C#4", "G5", "E6"])
+            >>> from music21 import *
+            >>> chord1 = chord.Chord(["C#4", "G5", "E6"])
             >>> chord2 = chord1.closedPosition()
             >>> print(chord2.lily.value)
             <cis' e' g'>4 
@@ -330,9 +351,9 @@ Chord
 
             returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can't be determined 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'G', 'B'])
-            >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
+            >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
             >>> cchord.containsSeventh() # returns True
             True 
             >>> other.containsSeventh() # returns True
@@ -342,9 +363,9 @@ Chord
 
             returns True or False if there is no triad above the root. "Contains vs. Is": A dominant-seventh chord contains a triad. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'G'])
-            >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'G'])
+            >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
             >>> cchord.containsTriad() #returns True
             True 
             >>> other.containsTriad() #returns True
@@ -354,11 +375,11 @@ Chord
 
             returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation? 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['a', 'c#', 'e'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['a', 'c#', 'e'])
             >>> a.determineType()
             'Major Triad' 
-            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.determineType()
             'Dominant Seventh' 
 
@@ -370,8 +391,8 @@ Chord
 
             Returns the lowest note in the chord The only time findBass should be called is by bass() when it is figuring out what the bass note of the chord is. Generally call bass() instead example: 
 
-            >>> from music21.chord import *
-            >>> cmaj = Chord (['C4', 'E3', 'G4'])
+            >>> from music21 import *
+            >>> cmaj = chord.Chord(['C4', 'E3', 'G4'])
             >>> cmaj.findBass() # returns E3
             E3 
 
@@ -379,8 +400,8 @@ Chord
 
             Looks for the root by finding the note with the most 3rds above it Generally use root() instead, since if a chord doesn't know its root, root() will run findRoot() automatically. example: 
 
-            >>> from music21.chord import *
-            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> from music21 import *
+            >>> cmaj = chord.Chord(['E', 'G', 'C'])
             >>> cmaj.findRoot() # returns C
             C 
 
@@ -388,9 +409,9 @@ Chord
 
             Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
-            >>> other = Chord (['C', 'E', 'F-', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
+            >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
             >>> cchord.hasAnyRepeatedScale()
             True 
             >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
@@ -404,8 +425,8 @@ Chord
 
             Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
             >>> cchord.hasRepeatedScaleX(3) # returns true
             True 
 
@@ -413,8 +434,8 @@ Chord
 
             Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., "c" => "e----"), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we're using "Scale" to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'E-', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'E-', 'G'])
             >>> cchord.hasScaleX(3) #
             4 
             >>> cchord.hasScaleX(5) # will return 7
@@ -430,8 +451,8 @@ Chord
 
             Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example: 
 
-            >>> from music21.chord import *
-            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> from music21 import *
+            >>> cmaj = chord.Chord(['C', 'E', 'G'])
             >>> cmaj.hasScaleX(3) #will return the interval between C and E
             4 
             >>> cmaj.hasScaleX(5) #will return the interval between C and G
@@ -447,8 +468,8 @@ Chord
 
             returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root. 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['g', 'b', 'd', 'f'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.inversion()
             2 
 
@@ -456,8 +477,8 @@ Chord
 
             Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None. 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['G3', 'B3', 'F3', 'D3'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['G3', 'B3', 'F3', 'D3'])
             >>> a.inversionName()
             43 
 
@@ -465,7 +486,6 @@ Chord
 
             Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad. 
 
-            >>> from music21.chord import *
             >>> import music21.chord
             >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
             >>> c.isAugmentedTriad()
@@ -490,8 +510,8 @@ Chord
 
             Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['c', 'e-', 'g-', 'b--'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['c', 'e-', 'g-', 'b--'])
             >>> a.isDiminishedSeventh()
             True 
 
@@ -499,9 +519,9 @@ Chord
 
             Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E-', 'G-'])
-            >>> other = Chord (['C', 'E-', 'F#'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E-', 'G-'])
+            >>> other = chord.Chord(['C', 'E-', 'F#'])
             >>> cchord.isDiminishedTriad() #returns True
             True 
             >>> other.isDiminishedTriad() #returns False
@@ -511,8 +531,8 @@ Chord
 
             Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['b', 'g', 'd', 'f'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['b', 'g', 'd', 'f'])
             >>> a.isDominantSeventh()
             True 
 
@@ -524,16 +544,16 @@ Chord
 
             Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root. Chord must be spelled correctly. Otherwise returns false. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['C4','E-4','G-4','B-4'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['C4','E-4','G-4','B-4'])
             >>> c1.isHalfDiminishedSeventh()
             True 
             Incorrectly spelled chords are not considered half-diminished sevenths 
-            >>> c2 = Chord(['C4','E-4','G-4','A#4'])
+            >>> c2 = chord.Chord(['C4','E-4','G-4','A#4'])
             >>> c2.isHalfDiminishedSeventh()
             False 
             Nor are incomplete chords 
-            >>> c3 = Chord(['C4', 'G-4','B-4'])
+            >>> c3 = chord.Chord(['C4', 'G-4','B-4'])
             >>> c3.isHalfDiminishedSeventh()
             False 
 
@@ -541,9 +561,9 @@ Chord
 
             Returns True if chord is a Major Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'G'])
-            >>> other = Chord (['C', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'G'])
+            >>> other = chord.Chord(['C', 'G'])
             >>> cchord.isMajorTriad() # returns True
             True 
             >>> other.isMajorTriad() # returns False
@@ -553,9 +573,9 @@ Chord
 
             Returns True if chord is a Minor Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E-', 'G'])
-            >>> other = Chord (['C', 'E', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E-', 'G'])
+            >>> other = chord.Chord(['C', 'E', 'G'])
             >>> cchord.isMinorTriad() # returns True
             True 
             >>> other.isMinorTriad() # returns False
@@ -565,9 +585,9 @@ Chord
 
             Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'G', 'B'])
-            >>> other = Chord (['C', 'D', 'E', 'F', 'G', 'B'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
+            >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
             >>> cchord.isSeventh() # returns True
             True 
             >>> other.isSeventh() # returns False
@@ -577,9 +597,9 @@ Chord
 
             returns True or False "Contains vs. Is:" A dominant-seventh chord is NOT a triad. returns True if the chord contains at least one Third and one Fifth and all notes are equivalent to either of those notes. Only returns True if triad is spelled correctly. example: 
 
-            >>> from music21.chord import *
-            >>> cchord = Chord (['C', 'E', 'G'])
-            >>> other = Chord (['C', 'D', 'E', 'F', 'G'])
+            >>> from music21 import *
+            >>> cchord = chord.Chord(['C', 'E', 'G'])
+            >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
             >>> cchord.isTriad() # returns True
             True 
             >>> other.isTriad()
@@ -593,8 +613,8 @@ Chord
 
             Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example: 
 
-            >>> from music21.chord import *
-            >>> cmaj = Chord (['C', 'E', 'G'])
+            >>> from music21 import *
+            >>> cmaj = chord.Chord(['C', 'E', 'G'])
             >>> cmaj.root() # returns C
             C 
 
@@ -602,25 +622,25 @@ Chord
 
             Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary. 
 
-            >>> from music21.chord import *
-            >>> c1 = Chord(['c3'])
+            >>> from music21 import *
+            >>> c1 = chord.Chord(['c3'])
             >>> c1.orderedPitchClasses
             [0] 
             >>> c1.seekChordTablesAddress()
             (1, 1, 0) 
-            >>> c1 = Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
+            >>> c1 = chord.Chord(['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b'])
             >>> c1.seekChordTablesAddress()
             (11, 1, 0) 
-            >>> c1 = Chord(['c', 'e', 'g'])
+            >>> c1 = chord.Chord(['c', 'e', 'g'])
             >>> c1.seekChordTablesAddress()
             (3, 11, -1) 
-            >>> c1 = Chord(['c', 'e-', 'g'])
+            >>> c1 = chord.Chord(['c', 'e-', 'g'])
             >>> c1.seekChordTablesAddress()
             (3, 11, 1) 
-            >>> c1 = Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+            >>> c1 = chord.Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
             >>> c1.seekChordTablesAddress()
             (7, 34, 0) 
-            >>> c1 = Chord(['c', 'c#', 'd'])
+            >>> c1 = chord.Chord(['c', 'c#', 'd'])
             >>> c1.seekChordTablesAddress()
             (3, 1, 0) 
 
@@ -640,8 +660,8 @@ Chord
 
             After talking with Daniel Jackson, let's try to make the chord object as immutable as possible, so we return a new Chord object with the notes arranged from lowest to highest The notes are sorted by Scale degree and then by Offset (so F## sorts below G-). Notes that are the identical pitch retain their order 
 
-            >>> from music21.chord import *
-            >>> cMajUnsorted = Chord(['E4', 'C4', 'G4'])
+            >>> from music21 import *
+            >>> cMajUnsorted = chord.Chord(['E4', 'C4', 'G4'])
             >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
             >>> cMajSorted.pitches[0].name
             'C' 
@@ -654,8 +674,8 @@ Chord
 
             Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
-            >>> from music21.chord import *
-            >>> a = Chord(['g4', 'a3', 'c#6'])
+            >>> from music21 import *
+            >>> a = chord.Chord(['g4', 'a3', 'c#6'])
             >>> b = a.transpose('m3')
             >>> b
             <music21.chord.Chord B-4 C4 E6> 

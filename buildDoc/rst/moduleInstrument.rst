@@ -75,7 +75,6 @@ StringInstrument
 
             stringPitches is a property that stores a list of Pitches (or pitch names, such as "C4") that represent the pitch of the open strings from lowest to highest[#reentrant]_ 
 
-            >>> from music21.instrument import *
             >>> vln1 = Violin()
             >>> vln1.stringPitches
             [G3, D4, A4, E5] 

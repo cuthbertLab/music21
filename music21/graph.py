@@ -22,6 +22,7 @@ from music21 import pitch
 from music21 import common
 from music21 import chord
 from music21.analysis import windowedAnalysis
+from music21.analysis import correlate
 
 from music21 import environment
 _MOD = 'graph.py'
@@ -634,7 +635,7 @@ class GraphScatterWeighted(Graph):
 
 class GraphScatter(Graph):
     def __init__(self, *args, **keywords):
-        '''Graph two parameters in a scatter plot
+        '''Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
     .. image:: images/GraphScatter.*
         :width: 600
@@ -1275,16 +1276,26 @@ class PlotStream(object):
         return ticks
 
    
-    def ticksDynamics(self):
+    def ticksDynamics(self, minNameIndex=None, maxNameIndex=None):
         '''Utility method to get ticks in dynamic values.
 
         >>> from music21 import stream; s = stream.Stream()
         >>> a = PlotStream(s)
         >>> a.ticksDynamics()
         [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']]
+
+        >>> a.ticksDynamics(3,6)
+        [[3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp']]
+
         '''
+        if minNameIndex == None:
+            minNameIndex = 0
+        if maxNameIndex == None:
+            # will add one in range()
+            maxNameIndex = len(dynamics.shortNames)-1
+
         ticks = []
-        for i in range(len(dynamics.shortNames)):
+        for i in range(minNameIndex, maxNameIndex+1):
             ticks.append([i, dynamics.shortNames[i]])
         return ticks
     
@@ -1712,6 +1723,49 @@ class PlotScatterPitchClassOffset(PlotScatter):
             self.graph.alpha = .7
 
 
+class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
+    '''A scatter plot of pitch class and quarter length
+
+    .. image:: images/PlotScatterPitchSpaceDynamicSymbol.*
+        :width: 600
+    '''
+    # string name used to access this class
+    values = ['pitchClass', 'dynamicSymbol']
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatter.__init__(self, streamObj, *args, **keywords)
+
+        self.fxTicks = self.ticksPitchSpaceUsage
+        self.fyTicks = self.ticksDynamics
+
+        # get data from correlate object
+        am = correlate.ActivityMatch(self.streamObj)
+        data  = am.pitchToDynamic(dataPoints=True)
+
+        xVals = [x for x,y in data]
+        yVals = [y for x,y in data]
+
+        xTicks = self.fxTicks(min(xVals), max(xVals))
+        # ticks dynamics takes no args
+        yTicks = self.fyTicks(min(yVals), max(yVals))
+
+        self.graph = GraphScatter(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setTicks('y', yTicks)
+        self.graph.setTicks('x', xTicks)
+        self.graph.setAxisLabel('y', 'Dynamics')
+        self.graph.setAxisLabel('x', 'Pitch')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([10,6])
+        if 'title' not in keywords:
+            self.graph.setTitle('Pitch Class by Quarter Length Scatter')
+        if 'alpha' not in keywords:
+            self.graph.alpha = .7
+
+
+
 
 #-------------------------------------------------------------------------------
 # horizontal bar graphs
@@ -2004,6 +2058,50 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
         if 'alpha' not in keywords:
             self.graph.alpha = .8
 
+
+
+class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
+    '''A graph of event, sorted by pitch class, over time.
+
+    .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
+        :width: 600
+    '''
+
+    values = ['pitchClass', 'dynamicSymbol']
+    def __init__(self, streamObj, *args, **keywords):
+        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+
+        self.fxTicks = self.ticksPitchSpaceUsage
+        self.fyTicks = self.ticksDynamics
+
+        # get data from correlate object
+        am = correlate.ActivityMatch(self.streamObj)
+        data  = am.pitchToDynamic(dataPoints=False)
+
+        xVals = [x for x,y,z in data]
+        yVals = [y for x,y,z in data]
+
+        xTicks = self.fxTicks(min(xVals), max(xVals))
+        # ticks dynamics takes no args
+        yTicks = self.fyTicks(min(yVals), max(yVals))
+
+
+        self.graph = GraphScatterWeighted(*args, **keywords)
+        self.graph.setData(data)
+
+        self.graph.setAxisLabel('x', 'Pitch')
+        self.graph.setAxisLabel('y', 'Dynamics')
+
+        self.graph.setTicks('y', yTicks)  
+        self.graph.setTicks('x', xTicks)  
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([8,8])
+        if 'title' not in keywords:
+            self.graph.setTitle('Count of Pitch Class and Quarter Length')
+        if 'alpha' not in keywords:
+            self.graph.alpha = .8
 
 
 
@@ -2357,6 +2455,17 @@ class TestExternal(unittest.TestCase):
         b.process()
 
 
+    def testPlotScatterPitchSpaceDynamicSymbol(self):
+        from music21 import corpus      
+        a = corpus.parseWork('schumann/opus41no1', 2)
+        b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
+        b.process()
+
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
+        b.process()
+
+
+
     def testPlot3DPitchSpaceQuarterLengthCount(self):
         from music21 import corpus      
         a = corpus.parseWork('bach/bwv57.8')
@@ -2572,6 +2681,16 @@ class Test(unittest.TestCase):
         a = corpus.parseWork('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
+
+    def testPitchDuration(self):
+        from music21 import corpus      
+        a = corpus.parseWork('schumann/opus41no1', 2)
+        b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        b.process()
+
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        b.process()
+
         
     def testPlotColorGridSadoianAmbitus(self):
         from music21 import corpus
@@ -2610,7 +2729,8 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         a = TestExternal()
-        a.testPlotScatterWeightedPitchSpaceQuarterLength()
+        #a.testPlotScatterWeightedPitchSpaceQuarterLength()
 
         #a.testPlotQuarterLength()
-        a.testPlotScatterPitchSpaceQuarterLength()
+        #a.testPlotScatterPitchSpaceQuarterLength()
+        a.testPlotScatterPitchSpaceDynamicSymbol()

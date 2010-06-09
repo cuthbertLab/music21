@@ -48,6 +48,12 @@
             <h3><a href="contents.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Overview: Meters, Time Signatures, and Processing Beams, Accents, and Beats</a><ul>
+<li><a class="reference external" href="#time-signature-quick-start">Time Signature Quick Start</a><ul>
+<li><a class="reference external" href="#getting-and-editing-time-signatures">Getting and Editing Time Signatures</a></li>
+<li><a class="reference external" href="#rebaring-music-into-a-different-time-signature">Rebaring Music into a Different Time Signature</a></li>
+<li><a class="reference external" href="#given-a-note-finding-its-beat">Given a Note, Finding its Beat</a></li>
+</ul>
+</li>
 <li><a class="reference external" href="#objects-for-organizing-hierarchical-partitions">Objects for Organizing Hierarchical Partitions</a><ul>
 <li><a class="reference external" href="#creating-and-editing-meterterminal-objects">Creating and Editing MeterTerminal Objects</a></li>
 <li><a class="reference external" href="#creating-and-editing-metersequence-objects">Creating and Editing MeterSequence Objects</a></li>
@@ -107,6 +113,24 @@
 <p>The <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> object additionally features numerous high-level methods to provide access to and configuration of display, beaming, beat, and accent information.</p>
 <p>This overview will illustrate key features of music21&#8217;s meter objects. For complete documentation of these objects, see <a class="reference external" href="moduleMeter.html#modulemeter"><em>music21.meter</em></a>.</p>
 <p>For a more formal discussion of these designs, see the paper &#8220;Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects&#8221; (Ariza and Cuthbert 2010), at the following URL: <a class="reference external" href="http://mit.edu/music21/papers/2010MeterObjects.pdf">http://mit.edu/music21/papers/2010MeterObjects.pdf</a></p>
+<div class="section" id="time-signature-quick-start">
+<h2>Time Signature Quick Start<a class="headerlink" href="#time-signature-quick-start" title="Permalink to this headline">¶</a></h2>
+<p>While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly for most common tasks.</p>
+<div class="section" id="getting-and-editing-time-signatures">
+<h3>Getting and Editing Time Signatures<a class="headerlink" href="#getting-and-editing-time-signatures" title="Permalink to this headline">¶</a></h3>
+<p>From a Stream, from a Measure.</p>
+</div>
+<div class="section" id="rebaring-music-into-a-different-time-signature">
+<h3>Rebaring Music into a Different Time Signature<a class="headerlink" href="#rebaring-music-into-a-different-time-signature" title="Permalink to this headline">¶</a></h3>
+<p>Convert from one to another</p>
+</div>
+<div class="section" id="given-a-note-finding-its-beat">
+<h3>Given a Note, Finding its Beat<a class="headerlink" href="#given-a-note-finding-its-beat" title="Permalink to this headline">¶</a></h3>
+<p>n200 = myScore.notes[200]
+print str(n200.context(beat))
+3.5</p>
+</div>
+</div>
 <div class="section" id="objects-for-organizing-hierarchical-partitions">
 <h2>Objects for Organizing Hierarchical Partitions<a class="headerlink" href="#objects-for-organizing-hierarchical-partitions" title="Permalink to this headline">¶</a></h2>
 <p>Hierarchical metrical structures can be described as a type of fractional, space-preserving tree structure. With such a structure we partition and divide a single duration into one or more parts, where each part is a fraction of the whole. Each part can, in turn, be similarly divided. The objects for configuring this structure are the MeterTerminal and the MeterSequence objects.</p>

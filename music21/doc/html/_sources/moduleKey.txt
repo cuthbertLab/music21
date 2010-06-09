@@ -17,7 +17,6 @@ music21.key
 
     Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None, 'major', or 'minor'. 
 
-    >>> from music21.key import *
     >>> pitchToSharps('c')
     0 
     >>> pitchToSharps('c', 'minor')
@@ -45,7 +44,6 @@ music21.key
 
     Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value. 
 
-    >>> from music21.key import *
     >>> sharpsToPitch(1)
     G 
     >>> sharpsToPitch(1)
@@ -67,7 +65,6 @@ KeySignature
 
     
 
-    >>> from music21.key import *
     >>> a = KeySignature(3)
     >>> a._strDescription()
     '3 sharps' 
@@ -86,7 +83,6 @@ KeySignature
 
             Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental. 
 
-            >>> from music21.key import *
             >>> a = KeySignature(3)
             >>> a.alteredPitches
             [F#, C#, G#] 
@@ -113,7 +109,6 @@ KeySignature
 
             Returns a musicxml.KeySignature object 
 
-            >>> from music21.key import *
             >>> a = KeySignature(3)
             >>> a.sharps = -3
             >>> mxKey = a.mx
@@ -124,7 +119,6 @@ KeySignature
 
             Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
 
-            >>> from music21.key import *
             >>> keyArray = [KeySignature(x) for x in range(-7,8)]
             >>> keyArray[0].pitchAndMode
             (C-, None) 
@@ -153,7 +147,6 @@ KeySignature
 
             Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
-            >>> from music21.key import *
             >>> a = KeySignature(2)
             >>> a.pitchAndMode
             (D, None) 

@@ -93,8 +93,7 @@
 <dt id="music21.pitch.convertFqToPs">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertFqToPs</tt><big>(</big><em>fq</em><big>)</big><a class="headerlink" href="#music21.pitch.convertFqToPs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">440</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">440</span><span class="p">)</span>
 <span class="go">69.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">261.62556530059862</span><span class="p">)</span>
 <span class="go">60.0</span>
@@ -106,8 +105,7 @@
 <dt id="music21.pitch.convertNameToPitchClass">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPitchClass</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPitchClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion: from a pitch name to a pitch class integer between 0 and 11.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
 <span class="go">1</span>
@@ -125,8 +123,7 @@
 <dt id="music21.pitch.convertNameToPs">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPs</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values).</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="go">60</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c2#&#39;</span><span class="p">)</span>
 <span class="go">37.0</span>
@@ -144,8 +141,7 @@
 <dt id="music21.pitch.convertPitchClassToNumber">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToNumber</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToNumber" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="go">10</span>
@@ -159,8 +155,7 @@
 <dt id="music21.pitch.convertPitchClassToStr">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToStr</tt><big>(</big><em>pc</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToStr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a pitch class number, return a string.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">&#39;3&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">10</span><span class="p">)</span>
 <span class="go">&#39;A&#39;</span>
@@ -172,8 +167,7 @@
 <dt id="music21.pitch.convertPsToFq">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
 <span class="go">440.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
 <span class="go">261.62556530059862</span>
@@ -189,8 +183,7 @@
 <dt id="music21.pitch.convertPsToOct">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToOct</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToOct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">59</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">60</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">61</span><span class="p">)]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">59</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">60</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">61</span><span class="p">)]</span>
 <span class="go">[3, 4, 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">12</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">0</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="o">-</span><span class="mf">12</span><span class="p">)]</span>
 <span class="go">[0, -1, -2]</span>
@@ -204,8 +197,7 @@
 <dt id="music21.pitch.convertPsToStep">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToStep</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToStep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
 <span class="go">(&#39;C&#39;, &lt;accidental natural&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">66</span><span class="p">)</span>
 <span class="go">(&#39;F&#39;, &lt;accidental sharp&gt;)</span>
@@ -233,8 +225,7 @@
 <dt id="music21.pitch.convertStepToPs">
 <tt class="descclassname">music21.pitch.</tt><tt class="descname">convertStepToPs</tt><big>(</big><em>step</em>, <em>oct</em>, <em>acc=None</em><big>)</big><a class="headerlink" href="#music21.pitch.convertStepToPs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion; does not process internals.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="go">61</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">36</span>
@@ -252,8 +243,7 @@
 class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.</p>
 <p>Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
 <span class="go">A#</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
@@ -273,8 +263,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.name">
 <tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.Pitch.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;G#&#39;</span>
 </pre></div>
@@ -289,8 +278,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.step">
 <tt class="descname">step</tt><a class="headerlink" href="#music21.pitch.Pitch.step" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C#3&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C#3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_getStep</span><span class="p">()</span>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
@@ -300,8 +288,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.pitchClass">
 <tt class="descname">pitchClass</tt><a class="headerlink" href="#music21.pitch.Pitch.pitchClass" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_getPitchClass</span><span class="p">()</span>
 <span class="go">9</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dis</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;d3&#39;</span><span class="p">)</span>
@@ -323,8 +310,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.octave">
 <tt class="descname">octave</tt><a class="headerlink" href="#music21.pitch.Pitch.octave" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">octave</span> <span class="ow">is</span> <span class="bp">None</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">implicitOctave</span>
@@ -352,8 +338,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.accidental">
 <tt class="descname">accidental</tt><a class="headerlink" href="#music21.pitch.Pitch.accidental" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;D-2&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;D-2&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">alter</span>
 <span class="go">-1.0</span>
 </pre></div>
@@ -364,8 +349,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.diatonicNoteNum">
 <tt class="descname">diatonicNoteNum</tt><a class="headerlink" href="#music21.pitch.Pitch.diatonicNoteNum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
 <span class="go">29</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#4&#39;</span><span class="p">)</span>
@@ -391,8 +375,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.freq440">
 <tt class="descname">freq440</tt><a class="headerlink" href="#music21.pitch.Pitch.freq440" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A4&#39;</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">freq440</span>
 <span class="go">440.0</span>
 </pre></div>
@@ -408,8 +391,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.german">
 <tt class="descname">german</tt><a class="headerlink" href="#music21.pitch.Pitch.german" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error).</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
 <span class="go">B</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
 <span class="go">H</span>
@@ -442,8 +424,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.Pitch.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Note() object</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g#4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g#4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;pitch&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;step&#39;</span><span class="p">)</span>
 <span class="go">&#39;G&#39;</span>
@@ -455,8 +436,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.pitchClassString">
 <tt class="descname">pitchClassString</tt><a class="headerlink" href="#music21.pitch.Pitch.pitchClassString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with <a title="music21.pitch.Pitch.pitchClass" class="reference internal" href="#music21.pitch.Pitch.pitchClass"><tt class="xref docutils literal"><span class="pre">pitchClass</span></tt></a>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClassString</span> <span class="o">=</span> <span class="s">&#39;B&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClass</span>
 <span class="go">11</span>
@@ -470,8 +450,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.ps">
 <tt class="descname">ps</tt><a class="headerlink" href="#music21.pitch.Pitch.ps" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="mf">45</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
 <span class="go">A2</span>
@@ -486,8 +465,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.stepWithOctave">
 <tt class="descname">stepWithOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.stepWithOctave" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">stepWithOctave</span>
 <span class="go">&#39;G4&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">)</span>
@@ -505,8 +483,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.inheritDisplay">
 <tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.inheritDisplay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inherit display properties from another Pitch, including those found on the Accidental object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="go">&gt;&gt;&gt;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayType</span> <span class="o">=</span> <span class="s">&#39;always&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c-&#39;</span><span class="p">)</span>
@@ -521,8 +498,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.transpose">
 <tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.transpose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">music21.interval.Interval</span></tt></a> object can be supplied.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g4&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">aPitch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
 <span class="go">B-4</span>
@@ -543,8 +519,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dt id="music21.pitch.Pitch.updateAccidentalDisplay">
 <tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>alteredPitches=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em>, <em>overrideStatus=False</em>, <em>cautionaryNotImmediateRepeat=True</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch&#8217;s Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object&#8217;s Accidental object are made in-place. The <cite>alteredPitches</cite> list supplies pitches from a <a title="music21.key.KeySignature" class="reference external" href="moduleKey.html#music21.key.KeySignature"><tt class="xref docutils literal"><span class="pre">music21.key.KeySignature</span></tt></a> object using the <a title="music21.key.KeySignature.alteredPitches" class="reference external" href="moduleKey.html#music21.key.KeySignature.alteredPitches"><tt class="xref docutils literal"><span class="pre">alteredPitches</span></tt></a> property. If <cite>cautionaryPitchClass</cite> is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. If <cite>overrideStatus</cite> is True, this method will ignore any current <cite>displayStatus</cite> stetting found on the Accidental. By default this does not happen. If <cite>displayStatus</cite> is set to None, the Accidental&#8217;s <cite>displayStatus</cite> is set. If <cite>cautionaryNotImmediateRepeat</cite> is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryAll</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayStatus</span>
@@ -628,8 +603,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <dt id="music21.pitch.Accidental.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.Accidental.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>From music21 to MusicXML</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
 <span class="go">True</span>
@@ -648,8 +622,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <dt id="music21.pitch.Accidental.set">
 <tt class="descname">set</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="mf">1</span>
 <span class="go">True</span>
@@ -672,8 +645,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
 <dt id="music21.pitch.Accidental.inheritDisplay">
 <tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.inheritDisplay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.pitch</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;double-flat&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;double-flat&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">displayType</span> <span class="o">=</span> <span class="s">&#39;always&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">inheritDisplay</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>

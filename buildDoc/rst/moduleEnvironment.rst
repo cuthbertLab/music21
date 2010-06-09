@@ -7,6 +7,7 @@ music21.environment
 
 .. module:: music21.environment
 
+The environment module describes a flexible system for accessing and setting variables related to the user's music21 environment.  Such variables include the location of external applications such as Finale, whether music21 is allowed to access the on-line virtual corpus, etc. Complete documentation for using the module is found in :ref:`environment`. 
 
 
 Environment
@@ -18,7 +19,6 @@ Environment
 
     Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
 
-    >>> from music21.environment import *
     >>> a = Environment()
     >>> post = a['writeFormat']
 
@@ -66,7 +66,7 @@ Environment
 
         .. method:: launch(fmt, fp, options=)
 
-            Open a file with an either default or user-specified applications. 
+            Opens a file with an either default or user-specified applications. 
 
         .. method:: loadDefaults()
 
@@ -74,7 +74,7 @@ Environment
 
         .. method:: printDebug(msg, statusLevel=1)
 
-            Format one or more data elements into string, and print to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
+            Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
         .. method:: warn(msg)
 
@@ -92,7 +92,6 @@ Preference
 
     
 
-    >>> from music21.environment import *
     >>> a = Preference()
 
     inherits from: :class:`~music21.node.Node`
@@ -109,7 +108,6 @@ Settings
 
     
 
-    >>> from music21.environment import *
     >>> a = Settings()
 
     inherits from: :class:`~music21.node.NodeList`, :class:`~music21.node.Node`

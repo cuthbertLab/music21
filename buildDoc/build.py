@@ -785,11 +785,11 @@ class RestructuredWriter(object):
         rstExclude = ['.. image::', ':width:']
 
         docTestImportPackage = '>>> from music21 import *'
-        docTestImportModNames = '>>> from %s import *' % modName
-        # mod name here is qualified; need to remove package name
-        if 'music21.' in modName:
-            modStub = modName.replace('music21.', '')
-        docTestImportMod = '>>> from music21 import %s' % modStub
+#         docTestImportModNames = '>>> from %s import *' % modName
+#         # mod name here is qualified; need to remove package name
+#         if 'music21.' in modName:
+#             modStub = modName.replace('music21.', '')
+#         docTestImportMod = '>>> from music21 import %s' % modStub
 
         lines = doc.split('\n')
         sub = []
@@ -832,12 +832,12 @@ class RestructuredWriter(object):
                 if inExamples == False:
                     space = '\n\n'
                     # if import is the module import, replace with package
-                    if line.startswith(docTestImportMod):
+                    if line.startswith(docTestImportPackage):
+                        # can try to mark up import here
                         msg.append(space + indent + docTestImportPackage)
                     else: # if no import is given, assume we need a mod import
-                        msg.append(space + indent + docTestImportModNames)
                         # need only one return after first line
-                        msg.append('\n' + indent + line)
+                        msg.append(space + indent + line)
                     inExamples = True
                 else:
                     space = '\n'
