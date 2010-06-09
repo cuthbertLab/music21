@@ -331,7 +331,7 @@ class GeneralNote(music21.Music21Object):
             from music21 import stream
             m = self.getContextByClass(stream.Measure)
             if m != None:
-                environLocal.printDebug(['using found Measure for offset access'])            
+                #environLocal.printDebug(['using found Measure for offset access'])            
                 offsetLocal = self.getOffsetBySite(m)
             else: # hope that we get the right one
                 environLocal.printDebug(['using standard offset access'])
@@ -1474,7 +1474,74 @@ class Test(unittest.TestCase):
 
     def testNoteBeatProperty(self):
 
-        from music21 import stream, meter
+        from music21 import stream, meter, note
+
+
+        data = [
+    ['3/4', .5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5], 
+            [1.0]*6, ],
+    ['3/4', .25, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
+            [1.0]*8],
+    ['3/2', .5, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
+            [2.0]*8],
+
+    ['6/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+            [1.5]*6],
+    ['9/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+            [1.5]*6],
+    ['12/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+            [1.5]*6],
+
+    ['6/16', .25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+            [0.75]*6],
+
+
+    ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
+            [1.]*5],
+        ]
+
+        # one measure case
+        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
+            n = note.Note()
+            n.quarterLength = nQL
+            m = stream.Measure()
+            m.timeSignature = meter.TimeSignature(tsStr)
+            m.repeatAppend(n, nCount)
+            # test matching beat proportion value
+            post = [m.notes[i].beat for i in range(nCount)]
+            for i in range(len(matchBeat)):
+                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+            # test getting beat duration
+            post = [m.notes[i].beatDuration.quarterLength for i in range(nCount)]
+            for i in range(len(matchBeat)):
+                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+
+        # two measure case
+        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
+            p = stream.Part()
+            n = note.Note()
+            n.quarterLength = nQL
+
+            # m1 has time signature
+            m1 = stream.Measure()
+            m1.timeSignature = meter.TimeSignature(tsStr)
+            p.append(m1)
+
+            # m2 does not have time signature
+            m2 = stream.Measure()
+            m2.repeatAppend(n, nCount)
+            p.append(m2)
+
+            # test matching beat proportion value
+            post = [m2.notes[i].beat for i in range(nCount)]
+            for i in range(len(matchBeat)):
+                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+            # test getting beat duration
+            post = [m2.notes[i].beatDuration.quarterLength for i in range(nCount)]
+            for i in range(len(matchBeat)):
+                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -1482,4 +1549,14 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Note, Rest]
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+        b = TestExternal()
+
+
+
+        a.testNoteBeatProperty()
