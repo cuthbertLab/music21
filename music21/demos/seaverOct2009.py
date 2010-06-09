@@ -14,7 +14,6 @@ from music21 import lily
 from music21 import meter
 from music21 import stream
 from music21 import note
-from music21.analysis import correlate
 
 
 def simple1():
@@ -31,22 +30,9 @@ def simple1():
                 instrument.Instrument)[0].bestName()
             title='%s, Movement %s, %s' % (work, movementNumber, instrumentName)
 
-            #grapher = correlate.NoteAnalysis(part.flat.sorted)    
-            #grapher.pitchToLengthScatter(title=title)
             g = graph.PlotScatterPitchSpaceQuarterLength(part.flat.sorted, 
                 title=title)
             g.process()
-#
-#  longer version -- reuse for something less common than quarterLength to pitch
-#            
-#            iObj = part.getElementsByClass(instrument.Instrument)[0]
-#            na = correlate.NoteAnalysis(part.flat.sorted)    
-#            na.noteAttributeScatter('quarterLength', 'midi', 
-#                                    xLabel='Duration', yLabel='Pitch',
-#                                    title='%s, Movement %s, %s' % (work, movementNumber, iObj.bestName()),
-#                                    yTicks=correlate.ticksPitchSpace(),
-#                                    xTicks=correlate.ticksQuarterLength()
-#                                    )
 
 def simple2():
     '''
@@ -146,12 +132,6 @@ def simple4a(show=True):
              doneAction=doneAction, title=titleStr)
         p.process()
 
-#     for part in s:
-#         # get the instrument object from the stream
-#         iObj = part.getElementsByClass(instrument.Instrument)[0]
-#         am = correlate.ActivityMatch(part.flat.sorted)
-#         titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
-#         am.pitchToDynamic(title=titleStr)
 
 
 def simple4b(show=True):
@@ -229,7 +209,7 @@ def simple4e(show=True):
     from music21 import stream
     
     qLenMax = 0
-    beethovenQuartet = corpus.parseWork('opus18no1', 4)
+    beethovenQuartet = corpus.parseWork('opus18no1', 3, extList=['xml'])
     maxNote = None
     for part in beethovenQuartet:
 #         lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
@@ -237,7 +217,7 @@ def simple4e(show=True):
         # note: this probably is not re-joining tied notes
         pf = part.flat.notes
         for n in pf:
-            if n.quarterLength >= qLenMax:
+            if n.quarterLength >= qLenMax and n.isNote==True:
                 qLenMax = n.quarterLength
                 maxNote = n
         maxNote.color = 'red'
@@ -312,7 +292,6 @@ def simple4h():
 def threeDimChopin():
     from music21 import converter
     from music21.humdrum import testFiles  
-    from music21.analysis import correlate
 
     streamObject = converter.parse(testFiles.mazurka6)
 #    n1 = music21.note.Note("C7")
@@ -326,8 +305,6 @@ def threeDimChopin():
 #    streamObject.append(n2)
     
     stream2 = streamObject.stripTies()
-    #correlated = correlate.NoteAnalysis(stream2)  
-    #correlated.noteAttributeCount()
     g = graph.Plot3DBarsPitchSpaceQuarterLength(stream2)
     g.process()
 
@@ -335,12 +312,9 @@ def threeDimChopin():
 def threeDimMozart():
     from music21 import converter
     from music21.musicxml import testFiles  
-    from music21.analysis import correlate
 
     streamObject = converter.parse(testFiles.mozartTrioK581Excerpt)
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
-#     correlated = correlate.NoteAnalysis(streamObject.flat)  
-#     correlated.noteAttributeCount(colors=['b'], barWidth = 0.2)
 
     g = graph.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
     g.process()
@@ -351,21 +325,15 @@ def threeDimBoth():
     from music21 import converter
     from music21.musicxml import testFiles as xmlTest
     from music21.humdrum import testFiles as kernTest  
-    from music21.analysis import correlate
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
     g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
     g.process()
-
-#     correlated1 = correlate.NoteAnalysis(mozartStream.flat)  
-#     correlated1.noteAttributeCount()
     
     chopinStream = converter.parse(kernTest.mazurka6) 
     g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.flat)
     g.process()
 
-#     correlated2 = correlate.NoteAnalysis(chopinStream.flat)  
-#     correlated2.noteAttributeCount()
 
 
 def januaryThankYou():
@@ -526,8 +494,7 @@ def js_q5():
 
 
 #-------------------------------------------------------------------------------
-# simple4e,
-tests = [simple4a, simple4b, simple4c, simple4f]
+tests = [simple4a, simple4b, simple4c, simple4e, simple4f]
 
 class TestExternal(unittest.TestCase):
 
