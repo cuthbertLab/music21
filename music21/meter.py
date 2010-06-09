@@ -49,6 +49,7 @@ def slashToFraction(value):
         d = int(matches.group(2))
         return n,d
     else:
+        environLocal.printDebug(['slashToFraction() cannot find two part fraction', value])
         return None
 
 def slashCompoundToFraction(value):
@@ -106,7 +107,10 @@ def slashMixedToFraction(valueSrc):
     value = value.split('+')
     for part in value:
         if '/' in part:
-            pre.append(list(slashToFraction(part)))
+            fraction = slashToFraction(part)
+            if fraction == None:
+                raise TimeSignatureException('cannot create time signature from:', valueSrc)
+            pre.append(list(fraction))
         else: # its just a numerator
             pre.append([int(part), None])
     # when encountering a missing denominator, find the fist defined

@@ -16,6 +16,7 @@ from xml.sax import saxutils
 import xml.dom.minidom
 
 
+# cannot import environment
 import doctest, unittest
 from music21 import common
 
@@ -364,7 +365,8 @@ class Node(object):
 
         for component in self._getComponents():
             if component == None: continue
-            elif type(component) == tuple: # its a simple element
+            # its a simple element
+            elif isinstance(component, tuple): 
                 tag, content = component
                 if content == None: continue
                 # some elements are treated as boolean values; presence 
@@ -381,6 +383,8 @@ class Node(object):
                 # parent is this node
                 # if we have sub objects, we need to attach them to caller node
                 component.toxml(doc, node, 0)
+            elif isinstance(component, list):
+                print(['cannot process component object', component, 'doc', doc, 'parent', parent])
             else:
                 raise NodeException(
                     'cannot process component object: %s' % component)

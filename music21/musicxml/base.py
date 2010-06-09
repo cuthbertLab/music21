@@ -2143,6 +2143,7 @@ class Handler(xml.sax.ContentHandler):
             self._dynamicMarkObj = DynamicMark(name)
 
         elif name in ARTICULATION_MARKS:
+            #environLocal.printDebug(['articulation mark mx obj creation', name])
             self._articulationMarkObj = ArticulationMark(name)
             self._articulationMarkObj.loadAttrs(attrs)
 

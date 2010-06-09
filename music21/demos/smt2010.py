@@ -107,23 +107,16 @@ def ex04(show=True, *arguments, **keywords):
     # This example, by graphing pitch class over note offset, shows the usage of pitch classes in the violoncello part over the duration of the composition. While the display is coarse, it is clear that the part gets less chromatic towards the end of the work.
     
     from music21 import corpus
-    from music21.analysis import correlate
     if 'op133' in keywords.keys():
         sStream = keywords['op133']
     else:
         sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
 
-#     na = correlate.NoteAnalysis(sStream[3].flat)
-#     fy = lambda n: n.pitchClass # y values will be pitch classes
-#     fx = lambda n: n.offset # x values will be offsets in quarter notes
-#     if show:
-#         na.noteAttributeScatter(fx, fy, yTicks=correlate.ticksPitchClass())
-
-
-
     # note: measure numbers are not being shown correcntly
     # need to investigate
     part = sStream[3]
+
+
     g = graph.PlotScatterPitchClassOffset(part.flat,
                  title=part.getInstrument().partName)
     if show:

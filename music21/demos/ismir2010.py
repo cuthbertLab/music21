@@ -174,15 +174,6 @@ def  pitchDensity(show=True):
     
     
 
-    
-#def  eventPitchCount(show=True):
-#
-#    from music21 import corpus
-#    from music21.analysis import correlate
-#    
-#    s = corpus.parseWork('bach/bwv773')
-#    na = correlate.NoteAnalysis(s.flat)
-#    na.notePitchDurationCount()
 
 def pitchQuarterLengthUsageWeightedScatter(show=True):
     
@@ -230,13 +221,7 @@ def pitchQuarterLengthUsage3D(show=True):
     g.process()
     
 
-#     na1 = correlate.NoteAnalysis(mozartStream.flat)  
-#     na1.noteAttributeCount(barWidth=.15, 
-#                            colors=['r']) 
-#     
-#     na2 = correlate.NoteAnalysis(chopinStream.flat)
-#     na2.noteAttributeCount(barWidth=.15, 
-#                            colors=['b']) 
+
 
 
 def messiaen(show = True):

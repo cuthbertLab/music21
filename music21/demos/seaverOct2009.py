@@ -111,7 +111,7 @@ def simple3():
             allLily += thisLily
     allLily.showPNG()
 
-def simple4a():
+def simple4a(show=True):
     '''
     find at least 5 questions that are difficult to solve in Humdrum which are simple in music21; (one which just uses Python)
     '''
@@ -120,24 +120,41 @@ def simple4a():
 # dynamic for a given pitch, and a single number for the Correlation Coefficient
 # between dynamic level and pitch -- the sort of super scientific. I imagine
 # it'd be something like 0.55, so no, not a connection between pitch and dynamic.
-
-    from music21 import corpus
-    from music21.analysis import correlate
+    from music21 import graph, corpus  
 
     # question 1: Above G4 do higher pitches tend to be louder?
     work = 'opus18no1'
     movementNumber = 3
-    movement = corpus.getWork(work, movementNumber)
-    s = converter.parse(movement)
-    for part in s:
-        # get the instrument object from the stream
-        iObj = part.getElementsByClass(instrument.Instrument)[0]
-        am = correlate.ActivityMatch(part.flat.sorted)
+    #movement = corpus.getWork(work, movementNumber)
+    #s = converter.parse(movement)
+
+    s = corpus.parseWork('opus18no1', movementNumber, extList=['xml'])
+
+    #s[0].show()
+
+    for movement in [0]:
+        sPart = s[movement]
+        iObj = sPart.getElementsByClass(instrument.Instrument)[0]
         titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
-        am.pitchToDynamic(title=titleStr)
+    
+        if not show:
+            doneAction = None
+        else:
+            doneAction = 'write'
+
+        p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s[0].flat,
+             doneAction=doneAction, title=titleStr)
+        p.process()
+
+#     for part in s:
+#         # get the instrument object from the stream
+#         iObj = part.getElementsByClass(instrument.Instrument)[0]
+#         am = correlate.ActivityMatch(part.flat.sorted)
+#         titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
+#         am.pitchToDynamic(title=titleStr)
 
 
-def simple4b():
+def simple4b(show=True):
     from music21 import corpus
     from music21 import dynamics
 
@@ -146,7 +163,7 @@ def simple4b():
 
     work = 'opus41no1'
     movementNumber = 2
-    s = corpus.getWork(work, movementNumber)
+    s = corpus.parseWork(work, movementNumber, extList='xml')
     countCrescendo = 0
     countDiminuendo = 0
     for part in s:
@@ -159,12 +176,15 @@ def simple4b():
             elif wedge.type == 'diminuendo': 
                 countDiminuendo += 1
                 map.append(('<', wedge.offset))
-        print(map)
+        if show:
+            print(map)
 
-    print('total crescendi: %s' % countCrescendo) 
-    print('total diminuendi: %s' % countDiminuendo)
+    if show:
+        print('total crescendi: %s' % countCrescendo) 
+        print('total diminuendi: %s' % countDiminuendo)
 
-def simple4c():
+
+def simple4c(show=True):
     # question 178 Generate a set matrix for a given tone row. (python only)
 
     p = [8,1,7,9,0,2,3,5,4,11,6,10]
@@ -176,7 +196,8 @@ def simple4c():
         msg = []
         for pitch in row:
             msg.append(str(pitch).ljust(3))
-        print (''.join(msg))
+        if show:
+            print (''.join(msg))
 
 
 def simple4c_b():
@@ -203,7 +224,7 @@ def simple4d():
     # open a web browswer to google, searching for the string
 
 
-def simple4e():
+def simple4e(show=True):
     # 250.    Identify the longest note in a score
     from music21 import stream
     
@@ -214,33 +235,35 @@ def simple4e():
 #         lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
 
         # note: this probably is not re-joining tied notes
-        pf = part.flat.getNotes()
+        pf = part.flat.notes
         for n in pf:
             if n.quarterLength >= qLenMax:
                 qLenMax = n.quarterLength
                 maxNote = n
         maxNote.color = 'red'
+
+        offset = part.flat.getOffsetByElement(maxNote)
+        if offset == None:
+            raise Exception('cannot find this note in the Stream: %s' % offset)
         display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
                
-    print('longest duration was: %s quarters long' % (qLenMax))
+    if show:
+        print('longest duration was: %s quarters long' % (qLenMax))
+        lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
+        display.show()
 
 
-    lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
-    display.show()
 
-
-
-def simple4f():
+def simple4f(show=True):
     # question 19: Calculate pitch-class sets for melodic passages segmented by rests.
     work = 'opus18no1'
     movementNumber = 3
-    movement = corpus.getWork(work, movementNumber)
-    s = converter.parse(movement)
+    s = corpus.parseWork(work, movementNumber, extList=['xml'])
 
     foundSets = []
     candidateSet = []
     for part in s:
-        eventStream = part.flat.getNotes()
+        eventStream = part.flat.notes
         for i in range(len(eventStream)):
             e = eventStream[i]
             if isinstance(e, music21.note.Rest) or i == len(eventStream)-1:
@@ -254,7 +277,9 @@ def simple4f():
                 if e.pitchClass not in candidateSet:
                     candidateSet.append(e.pitchClass)
     foundSets.sort()
-    print(foundSets)
+
+    if show:
+        print(foundSets)
 
 
 def simple4g():
@@ -379,6 +404,9 @@ def januaryThankYou():
 
 
 
+#-------------------------------------------------------------------------------
+
+
 '''
 jdstewar@fas.harvard.edu wrote on Nov 21 [1999]:
 > Dear Myke, 
@@ -494,8 +522,44 @@ def js_q5():
         
     returnStream.show()
 
-if (__name__ == "__main__"):
-#    threeDimMozart()
 
-    simple4d()
-    #januaryThankYou()
+
+
+#-------------------------------------------------------------------------------
+# simple4e,
+tests = [simple4a, simple4b, simple4c, simple4f]
+
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        '''Test showing functions
+        '''
+        #
+        for func in tests:
+            func(show=True)
+
+
+
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        '''Test non-showing functions
+        '''
+        for func in tests:
+            func(show=False)
+
+
+if __name__ == "__main__":
+
+    music21.mainTest(Test)
+    #music21.mainTest(TestExternal)
+
+
+
+
