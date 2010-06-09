@@ -443,14 +443,16 @@ class GraphHorizontalBar(Graph):
         '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap.
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
-
-    .. image:: images/GraphHorizontalBar.*
-        :width: 600
-
-        >>> a = GraphHorizontalBar(doneAction=None)
-        >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
+       
+        >>> from music21 import *
+        >>> #----# a = graph.GraphHorizontalBar(doneAction='show')
+        >>> a = graph.GraphHorizontalBar(doneAction=None)  #--OMIT_DOCS--#
+        >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
         >>> a.setData(data)
         >>> a.process()
+
+    .. image:: images/GraphHorizontalBar_composers.*
+        :width: 600
 
         '''
         Graph.__init__(self, *args, **keywords)
@@ -1336,7 +1338,7 @@ class PlotColorGrid(PlotStream):
         for y in range(self.graph.minWindow, len(soln[1]), ((len(soln[1])-self.graph.minWindow)/10)+1):
             yTicks.append([y, '%s' % y])
         
-        print yTicks
+        # print yTicks
         return soln[1], yTicks
     
     
