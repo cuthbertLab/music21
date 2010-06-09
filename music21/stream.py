@@ -1845,7 +1845,7 @@ class Stream(music21.Music21Object):
     #--------------------------------------------------------------------------
     # offset manipulation
 
-    def shiftElements(self, offset):
+    def shiftElements(self, offset, classFilterList=None):
         '''Add offset value to every offset of contained Elements.
 
         >>> a = Stream()
@@ -1859,7 +1859,18 @@ class Stream(music21.Music21Object):
         '''
         #for e in self:
         for e in self._elements:
-            e.setOffsetBySite(self, e.getOffsetBySite(self) + offset)
+            match = False
+            if classFilterList != None:
+                for className in classFilterList:
+                    # this may not match wrapped objects
+                    if isinstance(e, className):
+                        match = True
+                        break
+            else:
+                match = True
+            if match:
+                e.setOffsetBySite(self, e.getOffsetBySite(self) + offset)
+
         self._elementsChanged() 
         
     def transferOffsetToElements(self):
@@ -3611,6 +3622,22 @@ class Stream(music21.Music21Object):
                 mOffsetShift = lastTimeSignature.barDuration.quarterLength 
             oMeasure += mOffsetShift
 
+        # see if the first measure is a pickup
+        try:
+            firstBarDuration = streamPart.measures[0].barDuration
+        # may not be able to get TimeSignature; if so pass
+        except StreamException:
+            firstBarDuration = None
+            environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.measures[0]])
+            #streamPart.show('t')
+
+        # cannot get bar duration proportion if cannot get a ts
+        if firstBarDuration != None: 
+            if streamPart.measures[0].barDurationProportion(
+                barDuration=firstBarDuration) < 1.0:
+                environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
+                streamPart.measures[0].shiftElementsAsAnacrusis()
+
 
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
@@ -4600,10 +4627,31 @@ class Measure(Stream):
         return ts
 
 
-    def barDurationProportion(self):
-        '''Return a floating point value greater than 1 showing the proportion of the bar duration that is filled by elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
+    def _getBarDuration(self):
+        '''Return the bar duration, or the Duration specified by the TimeSignature. 
+
+        '''
+        if self.timeSignature != None:
+            ts = self.timeSignature
+        else: # do a context-based search 
+            tsStream = self.getTimeSignatures(searchContext=True,
+                       returnDefault=False)
+            if len(tsStream) == 0:
+                raise StreamException('cannot determine bar duration without a time signature reference')
+            else: # it is the first found
+                ts = tsStream[0]
+        return ts.barDuration
+
+    barDuration = property(_getBarDuration, 
+        doc = '''Return the bar duration, or the Duration specified by the TimeSignature. TimeSignature is found first within the Measure, or within a context based search.
+        ''')
+
+    def barDurationProportion(self, barDuration=None):
+        '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
 
         Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. 
+
+        An already-obtained Duration object can be supplied with the `barDuration` optional argument. 
 
         >>> from music21 import *
         >>> m = stream.Measure()
@@ -4623,18 +4671,37 @@ class Measure(Stream):
         >>> m.barDurationProportion()
         1.33333...
         '''
-        # check for local ts
-        if self.timeSignature != None:
-            ts = self.timeSignature
-        else: # do a context-based search 
-            tsStream = self.getTimeSignatures(searchContext=True,
-                       returnDefault=False)
-            if len(tsStream) == 0:
-                raise StreamException('cannot determine bar duration without a time signature reference')
-            else: # it is the first found
-                ts = tsStream[0]
-        return self.highestTime / ts.barDuration.quarterLength
-        
+        # passing a barDuration may save time in the lookup process
+        if barDuration == None:
+            barDuration = self.barDuration
+        return self.highestTime / barDuration.quarterLength
+
+
+    def shiftElementsAsAnacrusis(self):
+        '''This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part. 
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1
+        >>> m.append(copy.deepcopy(n))
+        >>> m.shiftElementsAsAnacrusis()
+        '''
+        barDuration = self.barDuration
+        proportion = self.barDurationProportion(barDuration=barDuration)
+        if proportion < 1.:
+            # get 1 complement
+            proportionShift = 1 - proportion
+            shift = barDuration.quarterLength * proportionShift
+            environLocal.printDebug(['got anacrusis shift:', shift, 
+                                barDuration.quarterLength, proportion])
+            # this will shift all elements
+            self.shiftElements(shift, classFilterList=[note.GeneralNote])
+        else:
+            environLocal.printDebug(['shiftElementsAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
+
+
 
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list 
@@ -7325,6 +7392,46 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testMeasureBarDurationProportion(self):
+        
+        from music21 import meter, stream, note
+
+        m = stream.Measure()
+        m.timeSignature = meter.TimeSignature('3/4')
+        n = note.Note()
+        n.quarterLength = 1
+        m.append(copy.deepcopy(n))
+
+        self.assertEqual(m.notes[0].offset, 0)
+        self.assertAlmostEqual(m.barDurationProportion(), .333333, 4)
+        self.assertAlmostEqual(m.barDuration.quarterLength, 3, 4)
+
+        m.shiftElementsAsAnacrusis()
+        self.assertEqual(m.notes[0].hasContext(m), True)
+        self.assertEqual(m.notes[0].offset, 2.0)
+        # now the duration is full
+        self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+        self.assertAlmostEqual(m.highestOffset, 2.0, 4)
+
+
+        m = stream.Measure()
+        m.timeSignature = meter.TimeSignature('5/4')
+        n1 = note.Note()
+        n1.quarterLength = .5
+        n2 = note.Note()
+        n2.quarterLength = 1.5
+        m.append(n1)
+        m.append(n2)
+
+        self.assertAlmostEqual(m.barDurationProportion(), .4, 4)
+        self.assertEqual(m.barDuration.quarterLength, 5.0)
+
+        m.shiftElementsAsAnacrusis()
+        self.assertEqual(m.notes[0].offset, 3.0)
+        self.assertEqual(n1.offset, 3.0)
+        self.assertEqual(n2.offset, 3.5)
+        self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -7359,5 +7466,6 @@ if __name__ == "__main__":
 
         #a.testAugmentOrDiminishBasic()
         #a.testAugmentOrDiminishHighestTimes()
-        a.testAugmentOrDiminishCorpus()
+        #a.testAugmentOrDiminishCorpus()
 
+        a.testMeasureBarDurationProportion()
