@@ -92,6 +92,8 @@ class Stream(music21.Music21Object):
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
 
+    isMeasure = False
+
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['append', 'insert', 'measures', 'notes', 'pitches']
     # documentation for all attributes (not properties or methods)
@@ -668,7 +670,7 @@ class Stream(music21.Music21Object):
         (18.0, 21.0)
         
         '''
-
+        # store and increment highest time for insert offset
         highestTime = self.highestTime
         if not common.isListLike(others):
             # back into a list for list processing if single
@@ -684,6 +686,8 @@ class Stream(music21.Music21Object):
     
             self._addElementPreProcess(element)
     
+            # add this Stream as a location for the new elements, with the 
+            # the offset set to the current highestTime
             element.addLocation(self, highestTime)
             # need to explicitly set the parent of the element
             element.parent = self 
@@ -692,6 +696,7 @@ class Stream(music21.Music21Object):
             # this should look to the contained object duration
             if (hasattr(element, "duration") and 
                 hasattr(element.duration, "quarterLength")):
+                # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
 
         ## does not change sorted state
@@ -4454,6 +4459,8 @@ class Measure(Stream):
     the Stream's elements. 
     '''
 
+    isMeasure = True
+
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['']
     # documentation for all attributes (not properties or methods)
@@ -4463,7 +4470,6 @@ class Measure(Stream):
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
     'measureNumber': 'A number representing the displayed or shown Measure number as presented in a written Score.',
     'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
-   
     }
 
     def __init__(self, *args, **keywords):

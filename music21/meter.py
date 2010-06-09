@@ -2334,7 +2334,7 @@ class TimeSignature(music21.Music21Object):
 
 
     def getBeatDuration(self, qLenPos):
-        '''Give a quarter length position into this meter, return a :class:`~music21.duration.Duration` object active for the top-level beat.
+        '''Give a quarter length position into this meter, return a :class:`~music21.duration.Duration` object active for the top-level beat. Unlike the :attr:`music21.meter.TimeSignature.beatDuration` parameter, this will work for asymmetrical meters.
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
