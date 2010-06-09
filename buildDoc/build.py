@@ -46,6 +46,10 @@ from music21 import tinyNotation
 
 from music21.trecento import cadencebook as trecentoCadencebook
 
+from music21.analysis import correlate
+from music21.analysis import metrical
+
+
 #from music21 import environment #redundant
 _MOD = "doc.build.py"
 environLocal = environment.Environment(_MOD)
@@ -70,6 +74,7 @@ MODULES = [
     common, 
     converter,
     corpus, 
+    correlate,
     chord, 
     duration, 
     dynamics,
@@ -81,6 +86,7 @@ MODULES = [
     instrument,
     interval, 
     meter, 
+    metrical,
     note, 
     node, 
     pitch, 
@@ -1122,7 +1128,13 @@ class ModuleDoc(RestructuredWriter):
 
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
-        self.fileRef = 'module' + fn[1][0].upper() + fn[1][1:]
+        if len(fn) == 2:
+            self.fileRef = 'module' + fn[1].title()
+        elif len(fn) == 3:
+            self.fileRef = 'module' + fn[1].title() + fn[2].title()
+        else:
+            raise Exception('cannot determine file name from module name: %s' % self.modName)
+
         self.fileName = self.fileRef + '.rst'
         # references used in rst table of contents
 

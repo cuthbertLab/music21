@@ -1724,7 +1724,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
 
 
 class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
-    '''A scatter plot of pitch class and quarter length
+    '''A graph of dynamics used by pitch space.
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.*
         :width: 600
@@ -2061,7 +2061,7 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 
 
 class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
-    '''A graph of event, sorted by pitch class, over time.
+    '''A graph of dynamics used by pitch space.
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600

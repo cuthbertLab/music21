@@ -748,28 +748,29 @@ PlotScatter
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
 
-PlotScatterPitchSpaceDynamicSymbols
------------------------------------
+PlotScatterPitchSpaceDynamicSymbol
+----------------------------------
 
-.. class:: PlotScatterPitchSpaceDynamicSymbols(streamObj, *args, **keywords)
+.. class:: PlotScatterPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
-    A scatter plot of pitch class and quarter length 
+    A graph of dynamics used by pitch space. 
 
-    
+    .. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
+        :width: 600 
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
-    **PlotScatterPitchSpaceDynamicSymbols** **attributes**
+    **PlotScatterPitchSpaceDynamicSymbol** **attributes**
 
         Attributes without Documentation: `values`
 
         Attributes inherited from :class:`~music21.graph.PlotScatter`: :attr:`~music21.graph.PlotScatter.format`
 
-    **PlotScatterPitchSpaceDynamicSymbols** **properties**
+    **PlotScatterPitchSpaceDynamicSymbol** **properties**
 
         Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
 
-    **PlotScatterPitchSpaceDynamicSymbols** **methods**
+    **PlotScatterPitchSpaceDynamicSymbol** **methods**
 
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
@@ -793,6 +794,33 @@ PlotScatterWeighted
         Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
 
     **PlotScatterWeighted** **methods**
+
+        Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
+
+
+PlotScatterWeightedPitchSpaceDynamicSymbol
+------------------------------------------
+
+.. class:: PlotScatterWeightedPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
+
+    A graph of dynamics used by pitch space. 
+
+    .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
+        :width: 600 
+
+    inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
+
+    **PlotScatterWeightedPitchSpaceDynamicSymbol** **attributes**
+
+        Attributes without Documentation: `values`
+
+        Attributes inherited from :class:`~music21.graph.PlotScatterWeighted`: :attr:`~music21.graph.PlotScatterWeighted.format`
+
+    **PlotScatterWeightedPitchSpaceDynamicSymbol** **properties**
+
+        Properties inherited from :class:`~music21.graph.PlotStream`: :attr:`~music21.graph.PlotStream.id`
+
+    **PlotScatterWeightedPitchSpaceDynamicSymbol** **methods**
 
         Methods inherited from :class:`~music21.graph.PlotStream`: :meth:`~music21.graph.PlotStream.process`, :meth:`~music21.graph.PlotStream.remapQuarterLength`, :meth:`~music21.graph.PlotStream.show`, :meth:`~music21.graph.PlotStream.ticksDynamics`, :meth:`~music21.graph.PlotStream.ticksOffset`, :meth:`~music21.graph.PlotStream.ticksPitchClass`, :meth:`~music21.graph.PlotStream.ticksPitchClassUsage`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceChromatic`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceOctave`, :meth:`~music21.graph.PlotStream.ticksPitchSpaceUsage`, :meth:`~music21.graph.PlotStream.ticksQuarterLength`, :meth:`~music21.graph.PlotStream.write`
 
@@ -832,7 +860,7 @@ PlotStream
 
             Call internal Graphs show() method independently of doneAction set and run with process() 
 
-        .. method:: ticksDynamics()
+        .. method:: ticksDynamics(minNameIndex=None, maxNameIndex=None)
 
             Utility method to get ticks in dynamic values. 
 
@@ -840,6 +868,10 @@ PlotStream
             >>> a = PlotStream(s)
             >>> a.ticksDynamics()
             [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']] 
+            >>> a.ticksDynamics(3,6)
+            [[3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp']] 
+
+            
 
         .. method:: ticksOffset(offsetMin=None, offsetMax=None, offsetStepSize=None, displayMeasureNumberZero=False, remap=False)
 

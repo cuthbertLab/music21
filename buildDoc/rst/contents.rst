@@ -45,7 +45,8 @@ Module Reference
    moduleClef
    moduleCommon
    moduleConverter
-   moduleCorpus
+   moduleCorpusBase
+   moduleAnalysisCorrelate
    moduleChord
    moduleDuration
    moduleDynamics
@@ -57,13 +58,14 @@ Module Reference
    moduleInstrument
    moduleInterval
    moduleMeter
+   moduleAnalysisMetrical
    moduleNote
    moduleNode
    modulePitch
    moduleStream
    moduleSerial
    moduleTempo
-   moduleTinyNotation
+   moduleTinynotation
 
 
 Developer Reference
