@@ -1638,7 +1638,8 @@ class Stream(music21.Music21Object):
                     map[offset].append(m)
         return map
 
-    def getTimeSignatures(self, searchContext=True, returnDefault=True):
+    def getTimeSignatures(self, searchContext=True, returnDefault=True,
+        sortByCreationTime=False):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
         
@@ -1659,9 +1660,9 @@ class Stream(music21.Music21Object):
             # sort by time to search the most recent objects
 
             # TODO: problem: errors result in offset axis and generation
-            # when sortByTime=True here
+            # when sortByCreationTime=True here
             # run testMusicXMLGenerationViaPropertyA()
-            obj = self.getContextByClass(meter.TimeSignature, sortByTime=False)
+            obj = self.getContextByClass(meter.TimeSignature, sortByCreationTime=sortByCreationTime)
             environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
@@ -2098,7 +2099,8 @@ class Stream(music21.Music21Object):
         # may need to look in parent if no time signatures are found
         if meterStream is None:
             # get from this Stream, or search the contexts
-            meterStream = srcObj.getTimeSignatures(returnDefault=True)
+            meterStream = srcObj.getTimeSignatures(returnDefault=True, 
+                          sortByCreationTime=False)
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
             ts = meterStream
@@ -2333,7 +2335,7 @@ class Stream(music21.Music21Object):
 
         # may need to look in parent if no time signatures are found
         if meterStream is None:
-            meterStream = returnObj.getTimeSignatures()
+            meterStream = returnObj.getTimeSignatures(sortByCreationTime=False)
     
         mCount = 0
         lastTimeSignature = None
@@ -3492,7 +3494,8 @@ class Stream(music21.Music21Object):
         multiPart = False
         
         # get from containter first
-        meterStream = self.getTimeSignatures(searchContext=True) 
+        meterStream = self.getTimeSignatures(searchContext=True,
+                        sortByCreationTime=False) 
 
         # we need independent sub-stream elements to shift in presentation
         highestTime = 0
@@ -3530,7 +3533,7 @@ class Stream(music21.Music21Object):
                 # apply this streams offset to elements
                 obj.transferOffsetToElements() 
 
-                ts = obj.getTimeSignatures()
+                ts = obj.getTimeSignatures(sortByCreationTime=False)
                 # the longest meterStream is the meterStream for all parts
                 if len(ts) > meterStream:
                     meterStream = ts
@@ -4659,7 +4662,7 @@ class Measure(Stream):
             ts = self.timeSignature
         else: # do a context-based search 
             tsStream = self.getTimeSignatures(searchContext=True,
-                       returnDefault=False)
+                       returnDefault=False, sortByCreationTime=False)
             if len(tsStream) == 0:
                 raise StreamException('cannot determine bar duration without a time signature reference')
             else: # it is the first found
@@ -6105,7 +6108,7 @@ class Test(unittest.TestCase):
 
         a.repeatInsert(n, range(0,120,3))        
 
-        b = a.getTimeSignatures()
+        b = a.getTimeSignatures(sortByCreationTime=False)
         self.assertEqual(len(b), 5)
         self.assertEqual(b[0].numerator, 5)
         self.assertEqual(b[4].numerator, 10)

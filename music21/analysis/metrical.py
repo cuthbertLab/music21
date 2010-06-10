@@ -35,7 +35,7 @@ def labelBeatDepth(streamIn):
     for m in streamIn.getElementsByClass(music21.stream.Measure):
 
         # this will search contexts
-        ts = m.getTimeSignatures()[0]
+        ts = m.getTimeSignatures(sortByCreationTime=False)[0]
 
 
         ts.beat.partition(1)

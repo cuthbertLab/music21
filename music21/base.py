@@ -490,12 +490,12 @@ class DefinedContexts(object):
         return [k for t, k in post]
 
 
-    def get(self, locationsTrail=False, sortByTime=False):
+    def get(self, locationsTrail=False, sortByCreationTime=False):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
 
-        The `sortByTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
+        The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -509,10 +509,10 @@ class DefinedContexts(object):
         True
         >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
         True
-        >>> aContexts.get(sortByTime=True) == [bObj, aObj, cObj]
+        >>> aContexts.get(sortByCreationTime=True) == [bObj, aObj, cObj]
         True
         '''
-        if sortByTime:
+        if sortByCreationTime:
             keyRepository = self._keysByTime()
         else:
             keyRepository = self._definedContexts.keys()
@@ -802,7 +802,7 @@ class DefinedContexts(object):
     #---------------------------------------------------------------------------
     # for dealing with contexts or getting other information
 
-    def getByClass(self, className, callerFirst=None, sortByTime=False, 
+    def getByClass(self, className, callerFirst=None, sortByCreationTime=False, 
                    memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
@@ -824,9 +824,9 @@ class DefinedContexts(object):
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
         >>> # we get the most recently added object first
-        >>> aContexts.getByClass('mock', sortByTime=True) == bObj
+        >>> aContexts.getByClass('mock', sortByCreationTime=True) == bObj
         True
-        >>> aContexts.getByClass(Mock, sortByTime=True) == bObj
+        >>> aContexts.getByClass(Mock, sortByCreationTime=True) == bObj
         True
 
         OMIT_FROM_DOCS
@@ -847,7 +847,7 @@ class DefinedContexts(object):
         count = 0
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
-        for obj in self.get(locationsTrail=True, sortByTime=sortByTime):
+        for obj in self.get(locationsTrail=True, sortByCreationTime=sortByCreationTime):
             #environLocal.printDebug(['searching defined context', obj])
             count += 1
 
@@ -870,7 +870,7 @@ class DefinedContexts(object):
                 if id(obj) not in memo.keys():
                     if hasattr(obj, 'getContextByClass'):
                         post = obj.getContextByClass(className,
-                               callerFirst=callerFirst, sortByTime=sortByTime, 
+                               callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
                                memo=memo)
                         # after searching, store this obj in memo
                         memo[id(obj)] = obj
@@ -1322,7 +1322,7 @@ class Music21Object(object):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          callerFirst=None, sortByTime=False, memo=None):
+                          callerFirst=None, sortByCreationTime=False, memo=None):
         '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -1413,7 +1413,7 @@ class Music21Object(object):
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
-                   callerFirst=callerFirst, sortByTime=sortByTime, memo=memo)
+                   callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, memo=memo)
         return post
 
 
