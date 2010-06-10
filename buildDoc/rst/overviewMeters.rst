@@ -16,7 +16,7 @@ For a more formal discussion of these designs, see the paper "Modeling Beats, Ac
 
 
 
-Time Signature Quick Start
+Basic Time Signature 
 -------------------------------------------------------
 
 While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly for most common tasks.
@@ -26,13 +26,65 @@ While the full structure and configuration options of TimeSignature objects will
 Getting and Editing Time Signatures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-From a Stream, from a Measure.
+In general, :class:`~music21.meter.TimeSignature` objects are found within :class:`~music21.stream.Measure` objects (a Stream subclass). However, in some cases :class:`~music21.meter.TimeSignature` objects can exist directly on a Stream. 
+
+TimeSignature objects, as a subclass of :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the zero offset positioned. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature. If a Measure does not have a TimeSignature, :attr:`~music21.stream.Measure.timeSignature` is None.
+
+
+>>> sSrc = corpus.parseWork('bach/bwv13.6.xml')
+>>> sPart = sSrc.getElementById('Alto')
+
+>>> sPart.measures[0].timeSignature
+<music21.meter.TimeSignature 4/4>
+>>> sPart.measures[1].timeSignature
+
+
+
+Setting a Measures Time Signature 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# setting a different time signature
+
+>>> sPart.measures[0].timeSignature = meter.TimeSignature('5/4')
+>>> sPart.show()
+
+
+Rebaring with Changing Time Signature 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# rebaring time siagnure
+
+>>> sNew = sPart.notes
+>>> sNew.insert(0, meter.TimeSignature('3/4'))
+
+
+# removing and adding different time signatures
+
+>>> ts = sNew.getTimeSignatures()[0]
+>>> ts
+<music21.meter.TimeSignature 3/4>
+
+>>> sNew.replace(ts, meter.TimeSignature('5/8'))
+>>> sNew.insert(10, meter.TimeSignature('7/8'))
+>>> sNew.insert(24, meter.TimeSignature('9/8'))
+>>> sNew.insert(33, meter.TimeSignature('3/8'))
+
+>>> tsStream = sNew.getTimeSignatures()
+
+
+# rebaring a complete score
+
+>>> sRebar = stream.Stream()
+>>> for part in sSrc:
+...     sRebar.insert(0, part.flat.notes.makeMeasures(tsStream))
+... 
+>>> sRebar.show()
 
 
 
 
-Rebaring Music into a Different Time Signature
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Convert from one to another
 
@@ -43,10 +95,31 @@ Given a Note, Finding its Beat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+If a note is in a Measure, and that Measure or a preceding Measure has a TimeSignature, it is possible to find the beat.
 
-n200 = myScore.notes[200]
-print str(n200.context(beat))
-3.5
+
+>>> sSrc = corpus.parseWork('bach/bwv13.6.xml')
+>>> sPart = sSrc.getElementById('Tenor')
+
+>>> sPart.flat.notes[0]
+<music21.note.Note F>
+>>> sPart.flat.notes[0].beat
+4.0
+
+
+>>> for n in sPart.flat.notes:
+...     n.addLyric(n.beat)
+... 
+>>> sPart.show()
+
+
+
+
+>>> sPart = sSrc.getElementById('Bass')
+>>> sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
+>>> for n in sMeasures.flat.notes:
+...     n.addLyric(n.beatStr)
+... 
 
 
 
@@ -182,7 +255,7 @@ Finally, numerous methods provide ways to find and access the relevant nodes (th
 
 
 
-Creating and Editing Time Signature Objects 
+Advanced Time Signature Configuration
 ---------------------------------------------
 
 The music21 :class:`~music21.meter.TimeSignature` object contains four parallel MeterSequence objects, each assigned to the attributes :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.accent`. The following displays a graphical realization of these four MeterSequence objects. 

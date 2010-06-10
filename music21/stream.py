@@ -2043,7 +2043,7 @@ class Stream(music21.Music21Object):
         copied from self stream. 
     
         If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any 
-        found in the Stream.
+        found in the Stream. Alternatively, a TimeSignature object can be provided. 
     
         If `refStreamOrTimeRange` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar.
 
@@ -2085,9 +2085,16 @@ class Stream(music21.Music21Object):
 
         # TODO: make inPlace an option
         srcObj = copy.deepcopy(self.flat)
+
+
         # may need to look in parent if no time signatures are found
         if meterStream is None:
             meterStream = srcObj.getTimeSignatures()
+        # if meterStream is a TimeSignature, use it
+        elif isinstance(meterStream, meter.TimeSignature):
+            ts = meterStream
+            meterStream = Stream()
+            meterStream.insert(0, ts)
 
         # get a clef for the entire stream; this will use bestClef
         # presently, this only gets the first clef
@@ -3623,6 +3630,7 @@ class Stream(music21.Music21Object):
             oMeasure += mOffsetShift
 
         # see if the first measure is a pickup
+        # this may raise an exception if no time signature can be found
         try:
             firstBarDuration = streamPart.measures[0].barDuration
         # may not be able to get TimeSignature; if so pass
@@ -4631,6 +4639,8 @@ class Measure(Stream):
         '''Return the bar duration, or the Duration specified by the TimeSignature. 
 
         '''
+        # TODO: it is possible that this should be cached or exposed as a method
+        # as this search may take some time. 
         if self.timeSignature != None:
             ts = self.timeSignature
         else: # do a context-based search 

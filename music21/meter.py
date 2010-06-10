@@ -219,8 +219,34 @@ def fractionSum(fList):
         return (sum(nShift), d)
 
 
+def proportionToFraction(value):
+    '''Given a floating point proportional value between 0 and 1, return the best-fit slash-base fraction
 
-
+    >>> proportionToFraction(.5)
+    (1, 2)
+    >>> proportionToFraction(.25)
+    (1, 4)
+    >>> proportionToFraction(.75)
+    (3, 4)
+    >>> proportionToFraction(.125)
+    (1, 8)
+    >>> proportionToFraction(.375) 
+    (3, 8)
+    >>> proportionToFraction(.625) 
+    (5, 8)
+    >>> proportionToFraction(.333) 
+    (1, 3)
+    >>> proportionToFraction(0.83333) 
+    (5, 6)
+    '''
+    # TODO: this is a brut-force method: is there a more elegant alternative?
+    for i in range(2,16+1):
+        xBase = 1. / i
+        for j in range(1,i+1): # take all multiples
+            x = xBase * j
+            if common.almostEquals(value, x, grain=1e-3):
+                return (j, i)
+    return None
 
 
 #-------------------------------------------------------------------------------
@@ -2400,6 +2426,39 @@ class TimeSignature(music21.Music21Object):
         range = end - start
         progress = qLenPos - start # how far in QL
         return beatIndex + 1 + (progress / range)
+
+
+    def getBeatProportionStr(self, qLenPos):
+        '''Return a string presentation of the beat. 
+
+        >>> from music21 import *
+        >>> ts1 = meter.TimeSignature('3/4')
+        >>> ts1.getBeatProportionStr(0)
+        '1'
+        >>> ts1.getBeatProportionStr(0.5)
+        '1 1/2'
+        >>> ts1.getBeatProportionStr(1)
+        '2'
+        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
+        >>> ts3.getBeatProportionStr(.75)
+        '1 1/2'
+        >>> ts3.getBeatProportionStr(2)
+        '2 1/2'
+
+        >>> ts4 = meter.TimeSignature(['6/8']) # will partition as 2 beat
+        '''
+
+        beatIndex = int(self.beat.positionToIndex(qLenPos))
+        start, end = self.beat.positionToSpan(qLenPos)
+        range = end - start
+        progress = qLenPos - start # how far in QL
+
+        if (progress / range) == 0.0:
+            post = '%s' % (beatIndex + 1) # just show beat 
+        else:
+            a, b = proportionToFraction(progress / range)
+            post = '%s %s/%s' % (beatIndex + 1, a, b) # just show beat 
+        return post
 
 
     def getBeatDepth(self, qLenPos, align='quantize'):

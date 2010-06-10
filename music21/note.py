@@ -394,6 +394,31 @@ class GeneralNote(music21.Music21Object):
 
         ''')
 
+
+    def _getBeatStr(self):
+        ts = self.getContextByClass(meter.TimeSignature)
+        if ts == None:
+            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+        return ts.getBeatProportionStr(self._getMeasureOffset())
+
+
+    beatStr = property(_getBeatStr,  
+        doc = '''Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = .5
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> m.repeatAppend(n, 6)
+        >>> [m.notes[i].beatStr for i in range(6)]
+        ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
+        >>> m.timeSignature = meter.TimeSignature('6/8')
+        >>> [m.notes[i].beatStr for i in range(6)]
+        ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
+        ''')
+
+
     def _getBeatDuration(self):
         '''Return a  designation based on local Measure and TimeSignature
 
