@@ -15,8 +15,8 @@ import sys
 from copy import deepcopy
 
 
-import music21 ## needed to properly do isinstance checking
-#from music21 import ElementWrapper
+import music21 # needed to do fully-qualified isinstance name checking
+
 from music21 import common
 from music21 import clef
 from music21 import chord
@@ -1656,8 +1656,13 @@ class Stream(music21.Music21Object):
         if len(post) == 0 and searchContext:
             # returns a single value
             post = Stream()
-            obj = self.getContextByClass(meter.TimeSignature)
-            #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
+            # sort by time to search the most recent objects
+
+            # TODO: problem: errors result in offset axis and generation
+            # when sortByTime=True here
+            # run testMusicXMLGenerationViaPropertyA()
+            obj = self.getContextByClass(meter.TimeSignature, sortByTime=False)
+            environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
 
@@ -1667,6 +1672,9 @@ class Stream(music21.Music21Object):
                 ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator, 
                                    defaults.meterDenominatorBeatType))
                 post.insert(0, ts)
+
+        #environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
+
         return post
         
 
@@ -2083,13 +2091,14 @@ class Stream(music21.Music21Object):
 
         #environLocal.printDebug(['makeMeasures(): first clef found before copying and flattening', self.getClefs()[0]])
 
+
         # TODO: make inPlace an option
         srcObj = copy.deepcopy(self.flat)
 
-
         # may need to look in parent if no time signatures are found
         if meterStream is None:
-            meterStream = srcObj.getTimeSignatures()
+            # get from this Stream, or search the contexts
+            meterStream = srcObj.getTimeSignatures(returnDefault=True)
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
             ts = meterStream
@@ -2121,7 +2130,7 @@ class Stream(music21.Music21Object):
             offsetMap.append([offset, offset + dur, e])
             #offsetMap.append([offset, offset + dur, copy.copy(e)])
     
-        #environLocal.printDebug(['makesMeasures()', offsetMap])    
+        #environLocal.printDebug(['makesMeasures(): offset map', offsetMap])    
     
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([start for start, end, e in offsetMap])
@@ -2242,7 +2251,6 @@ class Stream(music21.Music21Object):
         TODO: rename fillRests() or something else.
         TODO: if inPlace == True, this should return None
         '''
-        #environLocal.printDebug(['calling makeRests'])
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -2251,6 +2259,7 @@ class Stream(music21.Music21Object):
         oLow = returnObj.lowestOffset
         oHigh = returnObj.highestTime
 
+        environLocal.printDebug(['calling makeRests', 'processing object lowestOffset, highestTime', oLow, oHigh])
 
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
@@ -2278,6 +2287,9 @@ class Stream(music21.Music21Object):
             r.duration.quarterLength = qLen
             returnObj.insert(oHigh, r)
     
+        returnObj = returnObj.sorted
+        environLocal.printDebug(['makeRests(); dur of first object', returnObj[0].duration])
+
         # do not need to sort, can concatenate without sorting
         # post = streamLead + returnObj 
         return returnObj.sorted
@@ -2472,13 +2484,15 @@ class Stream(music21.Music21Object):
             if lastTimeSignature is None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
     
-            # environLocal.printDebug(['beaming with ts', ts])
             noteStream = m.notes
             if len(noteStream) <= 1: 
                 continue # nothing to beam
             durList = []
             for n in noteStream:
                 durList.append(n.duration)
+
+            #environLocal.printDebug(['beaming with ts', lastTimeSignature, 'measure', m, durList, noteStream[0], noteStream[1]])
+
             # getBeams can take a list of Durations; however, this cannot
             # distinguish a Note from a Rest; thus, we can submit a flat 
             # stream of note or note-like entities; will return
@@ -2572,8 +2586,8 @@ class Stream(music21.Music21Object):
 
 
 
-    def prepareNotation(self, meterStream=None, 
-        refStreamOrTimeRange=None, inPlace=False):
+    def prepareNotation(self, meterStream=None, refStreamOrTimeRange=None,
+                        inPlace=False):
         '''This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
@@ -3476,13 +3490,14 @@ class Stream(music21.Music21Object):
         mxComponents = []
         instList = []
         multiPart = False
-        meterStream = self.getTimeSignatures() # get from containter first
+        
+        # get from containter first
+        meterStream = self.getTimeSignatures(searchContext=True) 
 
         # we need independent sub-stream elements to shift in presentation
         highestTime = 0
 
         for obj in self:
-    
             # if obj is a Part, we have multi-parts
             if isinstance(obj, Part):
                 multiPart = True
@@ -3551,7 +3566,6 @@ class Stream(music21.Music21Object):
                 if inst.partId in instIdList: # must have unique ids 
                     inst.partIdRandomize() # set new random id
                 instList.append(inst)
-
                 mxComponents.append(obj._getMXPart(inst, meterStream,
                                 refStreamOrTimeRange))
 
@@ -5392,17 +5406,14 @@ class TestExternal(unittest.TestCase):
         q = Stream()
         r = Stream()
         p = Stream()
-
         for x in ['c3','a3','c#4','d3'] * 30:
             n = note.Note(x)
             #n.quarterLength = random.choice([.25, .125, .5])
             n.quarterLength = random.choice([.25])
             q.append(n)
-
             m = note.Note(x)
             m.quarterLength = .5
             r.append(m)
-
             o = note.Note(x)
             o.quarterLength = .125
             p.append(o)
@@ -6440,10 +6451,46 @@ class Test(unittest.TestCase):
         #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
 
 
-    def testMusicXMLAttribute(self):
+    def testMusicXMLGenerationViaPropertyA(self):
         '''Test output tests above just by calling the musicxml attribute
         '''
-        
+        a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
+
+        s = Stream()
+        partOffsetShift = 1.25
+        partOffset = 7.5
+        for part in range(2):  
+            p = Stream()
+            for pitchName in a:
+                n = note.Note(pitchName)
+                n.quarterLength = 1.5
+                p.append(n)
+            p.offset = partOffset
+            s.insert(p)
+            partOffset += partOffsetShift
+        #s.show()
+        post = s.musicxml
+
+
+    def testMusicXMLGenerationViaPropertyB(self):
+        '''Test output tests above just by calling the musicxml attribute
+        '''
+        n = note.Note()        
+        n.quarterLength = 3
+        a = Stream()
+        a.repeatInsert(n, range(0,120,3))
+        #a.show() # default time signature used
+        a.insert( 0, meter.TimeSignature("5/4")  )
+        a.insert(10, meter.TimeSignature("2/4")  )
+        a.insert( 3, meter.TimeSignature("3/16") )
+        a.insert(20, meter.TimeSignature("9/8")  )
+        a.insert(40, meter.TimeSignature("10/4") )
+        post = a.musicxml
+
+
+    def testMusicXMLGenerationViaPropertyC(self):
+        '''Test output tests above just by calling the musicxml attribute
+        '''
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         s = Stream()
@@ -6458,24 +6505,8 @@ class Test(unittest.TestCase):
             p.offset = partOffset
             s.insert(p)
             partOffset += partOffsetShift
-
+        #s.show()
         post = s.musicxml
-
-
-        n = note.Note()        
-        n.quarterLength = 3
-        a = Stream()
-        a.repeatInsert(n, range(0,120,3))
-        #a.show() # default time signature used
-        
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
-
-        post = a.musicxml
-
 
 
 
@@ -6724,6 +6755,46 @@ class Test(unittest.TestCase):
 
 
         #s3.show()
+
+    def testMakeRests(self):
+
+        import music21
+        from music21 import note
+
+        a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
+
+
+        partOffsetShift = 1.25
+        partOffset = 2  # start at non zero
+        for part in range(6):  
+            p = Stream()
+            for pitchName in a:
+                n = note.Note(pitchName)
+                n.quarterLength = 1.5
+                p.append(n)
+            p.offset = partOffset
+
+            self.assertEqual(p.lowestOffset, 0)
+
+            p.transferOffsetToElements()
+            self.assertEqual(p.lowestOffset, partOffset)
+
+            p.makeRests()
+
+            environLocal.printDebug(['first element', p[0], p[0].duration])
+            # by default, initial rest should be made
+            sub = p.getElementsByClass(note.Rest)
+            self.assertEqual(len(sub), 1)
+
+            self.assertEqual(sub.duration.quarterLength, partOffset)
+
+            # first element should have offset of first dur
+            self.assertEqual(p[1].offset, sub.duration.quarterLength)
+
+            partOffset += partOffsetShift
+
+            
+
 
     def testMakeMeasuresMeterStream(self):
         '''Testing making measures of various sizes with a supplied single element meter stream. This illustrate an approach to partitioning elements by various sized windows. 
@@ -7478,4 +7549,8 @@ if __name__ == "__main__":
         #a.testAugmentOrDiminishHighestTimes()
         #a.testAugmentOrDiminishCorpus()
 
-        a.testMeasureBarDurationProportion()
+        #a.testMeasureBarDurationProportion()
+
+
+        #a.testMakeRests()
+        a.testMusicXMLGenerationViaPropertyA()

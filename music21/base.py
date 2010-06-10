@@ -466,10 +466,36 @@ class DefinedContexts(object):
             return dict['obj']
 
 
-    def get(self, locationsTrail=False):
+    def _keysByTime(self):
+        '''Get keys sorted by creation time, where most recent are always first.
+
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mock()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(cObj, 345)
+        >>> aContexts.add(aObj)
+        >>> aContexts.add(bObj)
+        >>> k = aContexts._keysByTime()
+        >>> aContexts._definedContexts[k[0]]['time'] > aContexts._definedContexts[k[1]]['time'] > aContexts._definedContexts[k[2]]['time']
+        True
+        '''
+
+        post = []
+        for key in self._definedContexts.keys():
+            post.append((self._definedContexts[key]['time'], key))
+        post.sort()
+        post.reverse()
+        return [k for t, k in post]
+
+
+    def get(self, locationsTrail=False, sortByTime=False):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
-        The locationsTrail option forces locations to come after all other defined contexts.
+        The `locationsTrail` option forces locations to come after all other defined contexts.
+
+        The `sortByTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -483,17 +509,27 @@ class DefinedContexts(object):
         True
         >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
         True
+        >>> aContexts.get(sortByTime=True) == [bObj, aObj, cObj]
+        True
         '''
+        if sortByTime:
+            keyRepository = self._keysByTime()
+        else:
+            keyRepository = self._definedContexts.keys()
+
         post = [] 
         # get partitioned lost of all, w/ locations last if necessary
         if locationsTrail:
             keys = []
-            for key in self._definedContexts.keys():
+            keysLocations = [] # but possibly sorted
+            for key in keyRepository:
                 if key not in self._locationKeys: # skip these
                     keys.append(key) # others first
-            keys += self._locationKeys # now locations are at end
+                else:
+                    keysLocations.append(key)
+            keys += keysLocations # now locations are at end
         else:
-            keys = self._definedContexts.keys()
+            keys = keyRepository
             
         # get each dict from all defined contexts
         for key in keys:
@@ -766,10 +802,11 @@ class DefinedContexts(object):
     #---------------------------------------------------------------------------
     # for dealing with contexts or getting other information
 
-    def getByClass(self, className, callerFirst=None, memo=None):
-        '''Return the most recently added reference based on className. Class name can be a string or the real class name.
+    def getByClass(self, className, callerFirst=None, sortByTime=False, 
+                   memo=None):
+        '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
-        This will recursively search the defined contexts of existing defined context.
+        This will recursively search the defined contexts of existing defined contexts.
 
         Caller here can be the object that is hosting this DefinedContexts
         object (such as a Stream). This is necessary when, later on, we need
@@ -786,9 +823,10 @@ class DefinedContexts(object):
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
-        >>> aContexts.getByClass('mock') == aObj
+        >>> # we get the most recently added object first
+        >>> aContexts.getByClass('mock', sortByTime=True) == bObj
         True
-        >>> aContexts.getByClass(Mock) == aObj
+        >>> aContexts.getByClass(Mock, sortByTime=True) == bObj
         True
 
         OMIT_FROM_DOCS
@@ -808,7 +846,8 @@ class DefinedContexts(object):
 
         count = 0
         # search any defined contexts first
-        for obj in self.get(locationsTrail=True):
+        # need to sort: look at most-recently added objs are first
+        for obj in self.get(locationsTrail=True, sortByTime=sortByTime):
             #environLocal.printDebug(['searching defined context', obj])
             count += 1
 
@@ -831,7 +870,8 @@ class DefinedContexts(object):
                 if id(obj) not in memo.keys():
                     if hasattr(obj, 'getContextByClass'):
                         post = obj.getContextByClass(className,
-                               callerFirst=callerFirst, memo=memo)
+                               callerFirst=callerFirst, sortByTime=sortByTime, 
+                               memo=memo)
                         # after searching, store this obj in memo
                         memo[id(obj)] = obj
                         if post != None:
@@ -1282,7 +1322,7 @@ class Music21Object(object):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          callerFirst=None, memo=None):
+                          callerFirst=None, sortByTime=False, memo=None):
         '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -1361,7 +1401,6 @@ class Music21Object(object):
                 # to search the 
                 # offsetOfCaller = caller.flat.getOffsetBySite(self)
                 # offsetOfCaller = caller.getOffsetBySite(self)
-
                 if offsetOfCaller != None:
                     post = self.flat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
@@ -1374,7 +1413,7 @@ class Music21Object(object):
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
-                                   callerFirst=callerFirst, memo=memo)
+                   callerFirst=callerFirst, sortByTime=sortByTime, memo=memo)
         return post
 
 
