@@ -38,7 +38,7 @@ Stream
 
             Boolean describing whether the Stream is sorted or not. 
 
-        Attributes without Documentation: `classNames`
+        Attributes without Documentation: `isMeasure`, `classNames`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -431,7 +431,7 @@ Stream
 
         .. method:: extractContext(searchElement, before=4.0, after=4.0, maxBefore=None, maxAfter=None)
 
-            extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4) 
+            Extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4), and returns a new Stream. 
 
             >>> from music21 import note
             >>> qn = note.QuarterNote()
@@ -444,8 +444,6 @@ Stream
             >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
             >>> hnStream._reprText()
             '{5.0} <music21.note.Note C>\n{6.0} <music21.note.Note B->\n{8.0} <music21.note.Note C>' 
-
-            
 
         .. method:: findConsecutiveNotes(skipRests=False, skipChords=False, skipUnisons=False, skipOctaves=False, skipGaps=False, getOverlaps=False, noNone=False, **keywords)
 
@@ -806,7 +804,7 @@ Stream
             >>> len(d) == 0
             True 
 
-        .. method:: getTimeSignatures(searchContext=True)
+        .. method:: getTimeSignatures(searchContext=True, returnDefault=True, sortByCreationTime=False)
 
             Collect all :class:`~music21.meter.TimeSignature` objects in this stream. If no TimeSignature objects are defined, get a default 
 
@@ -932,7 +930,7 @@ Stream
 
         .. method:: makeMeasures(meterStream=None, refStreamOrTimeRange=None, inPlace=False)
 
-            Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any found in the Stream. If `refStreamOrTimeRange` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
+            Take a stream and partition all elements into measures based on one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used. This always creates a new stream with Measures, though objects are not copied from self stream. If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any found in the Stream. Alternatively, a TimeSignature object can be provided. If `refStreamOrTimeRange` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
 
             >>> sSrc = Stream()
             >>> sSrc.repeatAppend(note.Rest(), 3)
@@ -1138,7 +1136,7 @@ Stream
             >>> a.repeatAppend(n, 10)
             >>> a.setupPickleScaffold()
 
-        .. method:: shiftElements(offset)
+        .. method:: shiftElements(offset, classFilterList=None)
 
             Add offset value to every offset of contained Elements. 
 
@@ -1293,7 +1291,7 @@ Measure
 
             If a Measure number has a string annotation, such as "a" or similar, this string is stored here. 
 
-        Attributes without Documentation: `leftbarline`, `rightbarline`, `filled`
+        Attributes without Documentation: `isMeasure`, `leftbarline`, `rightbarline`, `filled`
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -1301,13 +1299,17 @@ Measure
 
     **Measure** **properties**
 
+        .. attribute:: barDuration
+
+            Return the bar duration, or the Duration specified by the TimeSignature. TimeSignature is found first within the Measure, or within a context based search. 
+
         .. attribute:: clef
 
             
 
             >>> a = Measure()
             >>> a.clef = clef.TrebleClef()
-            >>> a.clef.sign    # clef is an element
+            >>> a.clef.sign  # clef is an element
             'G' 
 
         .. attribute:: keySignature
@@ -1360,6 +1362,28 @@ Measure
 
             No documentation. 
 
+        .. method:: barDurationProportion(barDuration=None)
+
+            Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. An already-obtained Duration object can be supplied with the `barDuration` optional argument. 
+
+            >>> from music21 import *
+            >>> m = stream.Measure()
+            >>> m.timeSignature = meter.TimeSignature('3/4')
+            >>> n = note.Note()
+            >>> n.quarterLength = 1
+            >>> m.append(copy.deepcopy(n))
+            >>> m.barDurationProportion()
+            0.33333... 
+            >>> m.append(copy.deepcopy(n))
+            >>> m.barDurationProportion()
+            0.66666... 
+            >>> m.append(copy.deepcopy(n))
+            >>> m.barDurationProportion()
+            1.0 
+            >>> m.append(copy.deepcopy(n))
+            >>> m.barDurationProportion()
+            1.33333... 
+
         .. method:: bestTimeSignature()
 
             Given a Measure with elements in it, get a TimeSignature that contains all elements. Note: this does not yet accommodate triplets. 
@@ -1375,6 +1399,18 @@ Measure
         .. method:: setRightBarline(blStyle=None)
 
             No documentation. 
+
+        .. method:: shiftElementsAsAnacrusis()
+
+            This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part. 
+
+            >>> from music21 import *
+            >>> m = stream.Measure()
+            >>> m.timeSignature = meter.TimeSignature('3/4')
+            >>> n = note.Note()
+            >>> n.quarterLength = 1
+            >>> m.append(copy.deepcopy(n))
+            >>> m.shiftElementsAsAnacrusis()
 
         Methods inherited from :class:`~music21.stream.Stream`: :meth:`~music21.stream.Stream.addGroupForElements`, :meth:`~music21.stream.Stream.allPlayingWhileSounding`, :meth:`~music21.stream.Stream.append`, :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`~music21.stream.Stream.attributeCount`, :meth:`~music21.stream.Stream.augmentOrDiminish`, :meth:`~music21.stream.Stream.bestClef`, :meth:`~music21.stream.Stream.extendDuration`, :meth:`~music21.stream.Stream.extractContext`, :meth:`~music21.stream.Stream.findConsecutiveNotes`, :meth:`~music21.stream.Stream.findGaps`, :meth:`~music21.stream.Stream.getClefs`, :meth:`~music21.stream.Stream.getElementAfterElement`, :meth:`~music21.stream.Stream.getElementAfterOffset`, :meth:`~music21.stream.Stream.getElementAtOrAfter`, :meth:`~music21.stream.Stream.getElementAtOrBefore`, :meth:`~music21.stream.Stream.getElementBeforeElement`, :meth:`~music21.stream.Stream.getElementBeforeOffset`, :meth:`~music21.stream.Stream.getElementById`, :meth:`~music21.stream.Stream.getElementsByClass`, :meth:`~music21.stream.Stream.getElementsByGroup`, :meth:`~music21.stream.Stream.getElementsByOffset`, :meth:`~music21.stream.Stream.getInstrument`, :meth:`~music21.stream.Stream.getKeySignatures`, :meth:`~music21.stream.Stream.getMeasure`, :meth:`~music21.stream.Stream.getMeasureRange`, :meth:`~music21.stream.Stream.getMeasures`, :meth:`~music21.stream.Stream.getOffsetByElement`, :meth:`~music21.stream.Stream.getOverlaps`, :meth:`~music21.stream.Stream.getSimultaneous`, :meth:`~music21.stream.Stream.getTimeSignatures`, :meth:`~music21.stream.Stream.groupCount`, :meth:`~music21.stream.Stream.groupElementsByOffset`, :meth:`~music21.stream.Stream.index`, :meth:`~music21.stream.Stream.indexList`, :meth:`~music21.stream.Stream.insert`, :meth:`~music21.stream.Stream.insertAtNativeOffset`, :meth:`~music21.stream.Stream.isClass`, :meth:`~music21.stream.Stream.isSequence`, :meth:`~music21.stream.Stream.makeAccidentals`, :meth:`~music21.stream.Stream.makeBeams`, :meth:`~music21.stream.Stream.makeMeasures`, :meth:`~music21.stream.Stream.makeRests`, :meth:`~music21.stream.Stream.makeTies`, :meth:`~music21.stream.Stream.measureOffsetMap`, :meth:`~music21.stream.Stream.melodicIntervals`, :meth:`~music21.stream.Stream.pitchAttributeCount`, :meth:`~music21.stream.Stream.playingWhenAttacked`, :meth:`~music21.stream.Stream.plot`, :meth:`~music21.stream.Stream.pop`, :meth:`~music21.stream.Stream.prepareNotation`, :meth:`~music21.stream.Stream.remove`, :meth:`~music21.stream.Stream.repeatAppend`, :meth:`~music21.stream.Stream.repeatInsert`, :meth:`~music21.stream.Stream.replace`, :meth:`~music21.stream.Stream.scaleDurations`, :meth:`~music21.stream.Stream.scaleOffsets`, :meth:`~music21.stream.Stream.setupPickleScaffold`, :meth:`~music21.stream.Stream.shiftElements`, :meth:`~music21.stream.Stream.simultaneousAttacks`, :meth:`~music21.stream.Stream.splitByClass`, :meth:`~music21.stream.Stream.stripTies`, :meth:`~music21.stream.Stream.teardownPickleScaffold`, :meth:`~music21.stream.Stream.transferOffsetToElements`, :meth:`~music21.stream.Stream.transpose`, :meth:`~music21.stream.Stream.trimPlayingWhileSounding`
 
@@ -1400,7 +1436,7 @@ Page
 
         Attributes without Documentation: `pageNumber`
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -1478,7 +1514,7 @@ Staff
 
         Attributes without Documentation: `staffLines`
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -1514,7 +1550,7 @@ System
 
         Attributes without Documentation: `systemNumber`, `systemNumbering`
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

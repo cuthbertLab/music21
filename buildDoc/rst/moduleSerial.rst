@@ -57,7 +57,7 @@ TwelveToneRow
 
             A list representing the pitch class values of the row. 
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
@@ -127,7 +127,7 @@ HistoricalTwelveToneRow
 
         Attributes inherited from :class:`~music21.serial.TwelveToneRow`: :attr:`~music21.serial.TwelveToneRow.row`
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

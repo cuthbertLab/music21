@@ -112,7 +112,7 @@ Note
 
             Return or set the pitch step from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.step`. 
 
-        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
+        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -126,6 +126,7 @@ Note
 
             Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
+            >>> from music21 import *
             >>> a = Note('g4')
             >>> b = a.transpose('m3')
             >>> b
@@ -178,6 +179,7 @@ Rest
 
             The name of the rest as it would appear in Lilypond format. 
 
+            >>> from music21 import *
             >>> r1 = Rest()
             >>> r1.duration.type = "half"
             >>> r1.lily
@@ -187,7 +189,7 @@ Rest
 
             Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 
 
-        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
+        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -196,166 +198,6 @@ Rest
         Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
-
-
-Beam
-----
-
-.. class:: Beam(type=None, direction=None)
-
-    A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam 
-
-    >>> b1 = music21.note.Beam(type = 'start')
-    >>> b2 = music21.note.Beam('start')
-    Here is a partial beam (that is, one that does not 
-    connect to any other note, such as the second beam of 
-    a dotted eighth, sixteenth group) 
-    Two ways of doing the same thing 
-    >>> b3 = music21.note.Beam(type = 'partial', direction = 'left')
-    >>> b4 = music21.note.Beam('partial', 'left')
-
-    
-
-    
-
-    **Beam** **attributes**
-
-        Attributes without Documentation: `direction`, `type`, `number`, `independentAngle`
-
-    **Beam** **properties**
-
-        .. attribute:: mx
-
-            
-
-            
-
-            >>> a = Beam()
-            >>> a.type = 'start'
-            >>> a.number = 1
-            >>> b = a.mx
-            >>> b.get('charData')
-            'begin' 
-            >>> b.get('number')
-            1 
-            >>> a.type = 'partial'
-            >>> a.direction = 'left'
-            >>> b = a.mx
-            >>> b.get('charData')
-            'backward hook' 
-
-
-Beams
------
-
-.. class:: Beams()
-
-    The Beams object stores in it attribute beamsList (a list) all the Beam objects defined above.  Thus len(note.beams) tells you how many beams the note currently has on it. 
-
-    
-
-    **Beams** **attributes**
-
-        Attributes without Documentation: `feathered`, `beamsList`
-
-    **Beams** **properties**
-
-        .. attribute:: mx
-
-            Returns a list of mxBeam objects 
-
-    **Beams** **methods**
-
-        .. method:: append(type=None, direction=None)
-
-            No documentation. 
-
-        .. method:: fill(level=None)
-
-            A quick way of setting the beams list for a particular duration, for instance, fill("16th") will clear the current list of beams in the Beams object and add two beams.  fill(2) will do the same (though note that that is an int, not a string). It does not do anything to the direction that the beams are going in. Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like 512th notes) raises an error. 
-
-            >>> a = music21.note.Beams()
-            >>> a.fill('16th')
-            >>> len(a)
-            2 
-            >>> a.fill('32nd')
-            >>> len(a)
-            3 
-            >>> a.beamsList[2]
-            <music21.note.Beam object at 0x...> 
-
-        .. method:: getByNumber(number)
-
-            Gets an internal beam object by number... 
-
-            >>> a = Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getByNumber(2).type
-            'start' 
-
-        .. method:: getNumbers()
-
-            Returns a list of all defined beam numbers; it should normally be a set of consecutive integers, but it might not be. 
-
-            >>> a = Beams()
-            >>> a.fill('32nd')
-            >>> a.getNumbers()
-            [1, 2, 3] 
-
-        .. method:: getTypeByNumber(number)
-
-            Get beam type, with direction, by number 
-
-            >>> a = Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.setByNumber(2, 'partial-right')
-            >>> a.getTypeByNumber(2)
-            'partial-right' 
-            >>> a.getTypeByNumber(1)
-            'start' 
-
-        .. method:: getTypes()
-
-            Returns a list of all beam types defined for the current beams 
-
-            >>> a = Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getTypes()
-            ['start', 'start'] 
-
-        .. method:: setAll(type, direction=None)
-
-            setAll is a method of convenience that sets the type of each of the beam objects within the beamsList to the specified type. It also takes an optional "direction" attribute that sets the direction for each beam (otherwise the direction of each beam is set to None) Acceptable directions (start, stop, continue, etc.) are listed under Beam() above. 
-
-            >>> a = music21.note.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getTypes()
-            ['start', 'start'] 
-
-            
-
-        .. method:: setByNumber(number, type, direction=None)
-
-            Set an internal beam object by number, or rhythmic symbol level 
-
-            >>> a = Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.setByNumber(1, 'continue')
-            >>> a.beamsList[0].type
-            'continue' 
-            >>> a.setByNumber(2, 'stop')
-            >>> a.beamsList[1].type
-            'stop' 
-            >>> a.setByNumber(2, 'partial-right')
-            >>> a.beamsList[1].type
-            'partial' 
-            >>> a.beamsList[1].direction
-            'right' 
 
 
 EighthNote
@@ -408,10 +250,61 @@ GeneralNote
 
             Return the Duration as represented in Quarter Length. 
 
+            >>> from music21 import *
             >>> n = Note()
             >>> n.quarterLength = 2.0
             >>> n.quarterLength
             2.0 
+
+        .. attribute:: beat
+
+            Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat. 
+
+            >>> from music21 import *
+            >>> n = note.Note()
+            >>> n.quarterLength = .5
+            >>> m = stream.Measure()
+            >>> m.timeSignature = meter.TimeSignature('3/4')
+            >>> m.repeatAppend(n, 6)
+            >>> [m.notes[i].beat for i in range(6)]
+            [1.0, 1.5, 2.0, 2.5, 3.0, 3.5] 
+            >>> m.timeSignature = meter.TimeSignature('6/8')
+            >>> [m.notes[i].beat for i in range(6)]
+            [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...] 
+
+            
+
+        .. attribute:: beatDuration
+
+            Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure. 
+
+            >>> from music21 import *
+            >>> n = note.Note()
+            >>> n.quarterLength = .5
+            >>> m = stream.Measure()
+            >>> m.timeSignature = meter.TimeSignature('3/4')
+            >>> m.repeatAppend(n, 6)
+            >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] 
+            >>> m.timeSignature = meter.TimeSignature('6/8')
+            >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+            [1.5, 1.5, 1.5, 1.5, 1.5, 1.5] 
+
+        .. attribute:: beatStr
+
+            Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat. 
+
+            >>> from music21 import *
+            >>> n = note.Note()
+            >>> n.quarterLength = .5
+            >>> m = stream.Measure()
+            >>> m.timeSignature = meter.TimeSignature('3/4')
+            >>> m.repeatAppend(n, 6)
+            >>> [m.notes[i].beatStr for i in range(6)]
+            ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2'] 
+            >>> m.timeSignature = meter.TimeSignature('6/8')
+            >>> [m.notes[i].beatStr for i in range(6)]
+            ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3'] 
 
         .. attribute:: color
 
@@ -433,6 +326,7 @@ GeneralNote
 
             Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
+            >>> from music21 import *
             >>> n1 = Note()
             >>> n1.addLyric("hello")
             >>> n1.lyrics[0].text
@@ -456,6 +350,7 @@ GeneralNote
 
             Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy. 
 
+            >>> from music21 import *
             >>> n = Note('g#')
             >>> n.quarterLength = 3
             >>> n.augmentOrDiminish(2)
@@ -476,6 +371,7 @@ GeneralNote
 
             Takes a Note and returns a list of notes with only a single duration.DurationUnit in each. 
 
+            >>> from music21 import *
             >>> a = Note()
             >>> a.duration.clear() # remove defaults
             >>> a.duration.addDurationUnit(duration.Duration('half'))
@@ -522,6 +418,7 @@ Lyric
 
             Returns an mxLyric 
 
+            >>> from music21 import *
             >>> a = Lyric()
             >>> a.text = 'hello'
             >>> mxLyric = a.mx
@@ -548,7 +445,7 @@ NotRest
 
     **NotRest** **properties**
 
-        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
+        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -558,6 +455,7 @@ NotRest
 
             Split a Note into two Notes. 
 
+            >>> from music21 import *
             >>> a = NotRest()
             >>> a.duration.type = 'whole'
             >>> b, c = a.splitNoteAtPoint(3)
@@ -595,6 +493,7 @@ Tie
 
     Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
 
+    >>> from music21 import *
     >>> note1 = Note()
     >>> note1.tie = Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
@@ -658,7 +557,7 @@ Unpitched
 
     **Unpitched** **properties**
 
-        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
+        Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 

@@ -66,7 +66,7 @@ TinyNotationStream
 
         Attributes without Documentation: `stringRep`
 
-        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
+        Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 

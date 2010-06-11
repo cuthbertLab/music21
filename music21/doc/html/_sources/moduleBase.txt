@@ -143,7 +143,7 @@ Music21Object
             >>> oldParentId == newParentId
             False 
 
-        .. method:: getContextByClass(className, serialReverseSearch=True, callerFirst=None, memo=None)
+        .. method:: getContextByClass(className, serialReverseSearch=True, callerFirst=None, sortByCreationTime=False, memo=None)
 
             Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
@@ -436,9 +436,9 @@ DefinedContexts
             >>> oldKeys == newKeys
             False 
 
-        .. method:: get(locationsTrail=False)
+        .. method:: get(locationsTrail=False, sortByCreationTime=False)
 
-            Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The locationsTrail option forces locations to come after all other defined contexts. 
+            Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The `locationsTrail` option forces locations to come after all other defined contexts. The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
@@ -451,6 +451,8 @@ DefinedContexts
             >>> aContexts.get() == [cObj, aObj, bObj]
             True 
             >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
+            True 
+            >>> aContexts.get(sortByCreationTime=True) == [bObj, aObj, cObj]
             True 
 
         .. method:: getAttrByName(attrName)
@@ -473,9 +475,9 @@ DefinedContexts
             >>> aContexts.getAttrByName('attr1') == 98
             True 
 
-        .. method:: getByClass(className, callerFirst=None, memo=None)
+        .. method:: getByClass(className, callerFirst=None, sortByCreationTime=False, memo=None)
 
-            Return the most recently added reference based on className. Class name can be a string or the real class name. This will recursively search the defined contexts of existing defined context. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
+            Return the most recently added reference based on className. Class name can be a string or the class name. This will recursively search the defined contexts of existing defined contexts. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 
             >>> class Mock(Music21Object): pass
             >>> aObj = Mock()
@@ -483,9 +485,10 @@ DefinedContexts
             >>> aContexts = DefinedContexts()
             >>> aContexts.add(aObj)
             >>> aContexts.add(bObj)
-            >>> aContexts.getByClass('mock') == aObj
+            >>> # we get the most recently added object first
+            >>> aContexts.getByClass('mock', sortByCreationTime=True) == bObj
             True 
-            >>> aContexts.getByClass(Mock) == aObj
+            >>> aContexts.getByClass(Mock, sortByCreationTime=True) == bObj
             True 
 
         .. method:: getById(id)

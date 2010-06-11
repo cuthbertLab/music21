@@ -19,93 +19,137 @@ For a more formal discussion of these designs, see the paper "Modeling Beats, Ac
 Basic Time Signature 
 -------------------------------------------------------
 
-While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly for most common tasks.
+While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly with the most common tasks.
 
 
 
-Getting and Editing Time Signatures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Getting Time Signatures From Parts and Measures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In general, :class:`~music21.meter.TimeSignature` objects are found within :class:`~music21.stream.Measure` objects (a Stream subclass). However, in some cases :class:`~music21.meter.TimeSignature` objects can exist directly on a Stream. 
 
-TimeSignature objects, as a subclass of :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the zero offset positioned. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature. If a Measure does not have a TimeSignature, :attr:`~music21.stream.Measure.timeSignature` is None.
+TimeSignature objects, as a subclass of the :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the start, or zero offset position. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature at the zero offset position. If a Measure does not have a TimeSignature, :attr:`~music21.stream.Measure.timeSignature` returns None.
+
+In the following example, a score is parsed from the :ref:`moduleCorpus.base` module :func:`~music21.corpus.base.parseWork` function. The alto Part Stream is accessed by its identification string, 'Alto,' using :meth:`~music21.stream.Stream.getElementById`. We can produce notation output of this Part by calling the :meth:`~music21.stream.Stream.show` method.
+
+.. bwv57.8.xml 3/4
+.. bwv127.5.xml : good eight note runs
 
 
->>> sSrc = corpus.parseWork('bach/bwv13.6.xml')
+>>> from music21 import *
+>>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Alto')
+>>> sPart.show()
+
+
+.. image:: images/overviewMeters-09.*
+    :width: 600
+
+
+To examine the :class:`~music21.meter.TimeSignature` object active for this part, we can look for it in a few ways. The most course method is to simply search for the class within the flattened Stream representation. Remember that a Part is generally built of Measures, both Stream containers. To get all elements in the Stream we can use the :attr:`~music21.stream.Stream.flat` property, and then search for a class with the :meth:`~music21.stream.Stream.getElementsByClass` method. This returns a new Stream containing all found classes; the first element in this Stream is the TimeSignature. 
+
+>>> sPart.flat.getElementsByClass(meter.TimeSignature)[0]
+<music21.meter.TimeSignature 3/4>
+
+Alternatively, we can look at the first Measure in the Stream, and examine the :attr:`~music21.stream.Measure.timeSignature` property. Notice that the second Measure does not have a TimeSignature. 
 
 >>> sPart.measures[0].timeSignature
-<music21.meter.TimeSignature 4/4>
->>> sPart.measures[1].timeSignature
+<music21.meter.TimeSignature 3/4>
+>>> sPart.measures[1].timeSignature == None
+True
 
 
 
-Setting a Measures Time Signature 
+Setting a Time Signature in a Measure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-# setting a different time signature
+We can create a new TimeSignature object by providing a string representation of the meter. In most cases, intuitive string representations will give you the expected results. Assigning a new TimeSignature class, however, does only that: it will not automatically rebar or reposition notes within bars. For example, the same part examined above can be modified. Here, the first Measure's :attr:`~music21.stream.Measure.timeSignature` property is set to a new object. Note that, when viewing the Part, the time signature is changed though the position of notes in Measures is not changed.
 
 >>> sPart.measures[0].timeSignature = meter.TimeSignature('5/4')
 >>> sPart.show()
 
 
+.. image:: images/overviewMeters-10.*
+    :width: 600
+
+
+
+
 Rebaring with Changing Time Signature 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+To actually change the position of the notes, creating new Measures with new TimeSignatures, we need to rebar the music. The simplest way to do this is to get all the notes from a Part using the :attr:`~music21.stream.Stream.notes` property on a flat Stream representation. Then, by inserting a new TimeSignature at the start of this Stream using the :meth:`~music21.stream.Stream.insert` method, we can generate new notation with the show() method. Note that here we are not creating Measures directly; instead, we are assigning TimeSignature objects into a Stream of notes. When the show() method is called, Measures are in a temporary Stream according to the relevant TimeSignature objects.
 
-# rebaring time siagnure
+>>> sNew = sPart.flat.notes
+>>> sNew.insert(0, meter.TimeSignature('2/4'))
+>>> sNew.show()
 
->>> sNew = sPart.notes
->>> sNew.insert(0, meter.TimeSignature('3/4'))
 
+.. image:: images/overviewMeters-11.*
+    :width: 600
 
-# removing and adding different time signatures
+We can continue to add multiple TimeSignature objects to this Stream of Notes. First, we will replace the 2/4 bar previously added with a new TimeSignature, using the Stream :meth:`~music21.stream.Stream.replace` method. Then, we will insert a number of additional TimeSignature objects at offsets further into the Stream. Again, as this Stream has no Measures, Measures are automatically created with calling the show() method.
+
 
 >>> ts = sNew.getTimeSignatures()[0]
 >>> ts
-<music21.meter.TimeSignature 3/4>
-
+<music21.meter.TimeSignature 2/4>
 >>> sNew.replace(ts, meter.TimeSignature('5/8'))
 >>> sNew.insert(10, meter.TimeSignature('7/8'))
->>> sNew.insert(24, meter.TimeSignature('9/8'))
->>> sNew.insert(33, meter.TimeSignature('3/8'))
+>>> sNew.insert(17, meter.TimeSignature('9/8'))
+>>> sNew.insert(26, meter.TimeSignature('3/8'))
+>>> sNew.show()
+
+.. image:: images/overviewMeters-12.*
+    :width: 600
+
+
+If we wanted to apply this sequence of TimeSignature objects to a complete score, we could extract all the TimeSignature objects from our new Stream with the :meth:`~music21.stream.Stream.getTimeSignatures` method.
 
 >>> tsStream = sNew.getTimeSignatures()
+>>> tsStream.show('t')
+{0.0} <music21.meter.TimeSignature 5/8>
+{10.0} <music21.meter.TimeSignature 7/8>
+{17.0} <music21.meter.TimeSignature 9/8>
+{26.0} <music21.meter.TimeSignature 3/8>
 
 
-# rebaring a complete score
+We can then iterate of the Part objects in the source Stream, get a flat representation of notes, and use the :meth:`~music21.stream.Stream.makeMeasures` method to create new Parts. The :meth:`~music21.stream.Stream.makeMeasures` method can take an optional Stream of TimeSignature to configure the making of Measures. To split and extend nots with ties, the Stream :meth:`~music21.stream.Stream.makeTies` method must be used. These new Parts can be added to a new Stream and displayed. 
+
 
 >>> sRebar = stream.Stream()
 >>> for part in sSrc:
-...     sRebar.insert(0, part.flat.notes.makeMeasures(tsStream))
+...     newPart = part.flat.notes.makeMeasures(tsStream)
+...     newPart.makeTies(inPlace=True)
+...     sRebar.insert(0, newPart)
 ... 
 >>> sRebar.show()
 
 
-
-
-
-Convert from one to another
+.. image:: images/overviewMeters-13.*
+    :width: 600
 
 
 
 
-Given a Note, Finding its Beat
+Finding the Beat of a Note in a Measure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+If a note is in a Measure, and that Measure or a preceding Measure has a TimeSignature, it is possible to find the beat, or the count of whole or fractional subdivisions of top-level beat partitions.
 
-If a note is in a Measure, and that Measure or a preceding Measure has a TimeSignature, it is possible to find the beat.
+The Note :attr:`~music21.note.GeneralNote.beat` property will return, if available, a numerical representation of the beat, with a floating point value corresponding the the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
 
 
->>> sSrc = corpus.parseWork('bach/bwv13.6.xml')
->>> sPart = sSrc.getElementById('Tenor')
-
+>>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
+>>> sPart = sSrc.getElementById('Soprano')
 >>> sPart.flat.notes[0]
-<music21.note.Note F>
->>> sPart.flat.notes[0].beat
-4.0
+<music21.note.Note B->
+>>> sPart.flat.notes[4].beat
+2.5
+>>> sPart.flat.notes[4].beatStr
+'2 1/2'
 
+We can annotate each Note in the Part with the string returned by :attr:`~music21.note.GeneralNote.beatStr` using the note :attr:`~music21.note.GeneralNote.addLyric` method. 
 
 >>> for n in sPart.flat.notes:
 ...     n.addLyric(n.beat)
@@ -114,17 +158,23 @@ If a note is in a Measure, and that Measure or a preceding Measure has a TimeSig
 
 
 
+.. image:: images/overviewMeters-14.*
+    :width: 600
 
->>> sPart = sSrc.getElementById('Bass')
+If we change the TimeSignature for a Part, the beat counts will reflect this change. For example, if the Bass part of the same chorale is re-barred in 6/8, new, syncopated beat counts will be used.
+
+
+>>> sPart = sSrc.getElementById('Alto')
 >>> sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
+>>> sMeasures.makeTies(inPlace=True)
 >>> for n in sMeasures.flat.notes:
 ...     n.addLyric(n.beatStr)
 ... 
+>>> sMeasures.show()
 
 
-
-
-
+.. image:: images/overviewMeters-15.*
+    :width: 600
 
 
 Objects for Organizing Hierarchical Partitions
