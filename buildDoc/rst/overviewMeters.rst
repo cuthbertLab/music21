@@ -19,8 +19,7 @@ For a more formal discussion of these designs, see the paper "Modeling Beats, Ac
 Basic Time Signature 
 -------------------------------------------------------
 
-While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly with the most common tasks.
-
+While the full structure and configuration options of TimeSignature objects will be discussed below, a few quick demonstrations will get you up and running quickly with the many common tasks.
 
 
 Getting Time Signatures From Parts and Measures
@@ -28,13 +27,12 @@ Getting Time Signatures From Parts and Measures
 
 In general, :class:`~music21.meter.TimeSignature` objects are found within :class:`~music21.stream.Measure` objects (a Stream subclass). However, in some cases :class:`~music21.meter.TimeSignature` objects can exist directly on a Stream. 
 
-TimeSignature objects, as a subclass of the :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the start, or zero offset position. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature at the zero offset position. If a Measure does not have a TimeSignature, :attr:`~music21.stream.Measure.timeSignature` returns None.
+TimeSignature objects, as a subclass of the :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the start, or zero offset position. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature at the zero offset position. If a Measure does not have a TimeSignature, the :attr:`~music21.stream.Measure.timeSignature` property returns None.
 
-In the following example, a score is parsed from the :ref:`moduleCorpus.base` module :func:`~music21.corpus.base.parseWork` function. The alto Part Stream is accessed by its identification string, 'Alto,' using :meth:`~music21.stream.Stream.getElementById`. We can produce notation output of this Part by calling the :meth:`~music21.stream.Stream.show` method.
+In the following example, a score is parsed from the :ref:`moduleCorpus.base` module :func:`~music21.corpus.base.parseWork` function. The alto :class:`~music21.stream.Part` Stream is accessed by its identification string, 'Alto,' using the :meth:`~music21.stream.Stream.getElementById` method. We can produce notation output of this Part by calling the :meth:`~music21.base.Music21Object.show` method.
 
 .. bwv57.8.xml 3/4
 .. bwv127.5.xml : good eight note runs
-
 
 >>> from music21 import *
 >>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
@@ -46,7 +44,7 @@ In the following example, a score is parsed from the :ref:`moduleCorpus.base` mo
     :width: 600
 
 
-To examine the :class:`~music21.meter.TimeSignature` object active for this part, we can look for it in a few ways. The most course method is to simply search for the class within the flattened Stream representation. Remember that a Part is generally built of Measures, both Stream containers. To get all elements in the Stream we can use the :attr:`~music21.stream.Stream.flat` property, and then search for a class with the :meth:`~music21.stream.Stream.getElementsByClass` method. This returns a new Stream containing all found classes; the first element in this Stream is the TimeSignature. 
+To examine the :class:`~music21.meter.TimeSignature` object active for this part, there are a few approaches. One method is to simply search for the class within all objects in the Part, or the flattened Part Stream representation. Remember that a Part is generally built of Measures, or Stream-embedded containers. To get all the elements in the Stream we can use the :attr:`~music21.stream.Stream.flat` property, and then search for a class with the :meth:`~music21.stream.Stream.getElementsByClass` method. This returns a new Stream containing all found classes. The first element in this Stream is the TimeSignature. 
 
 >>> sPart.flat.getElementsByClass(meter.TimeSignature)[0]
 <music21.meter.TimeSignature 3/4>
@@ -63,7 +61,7 @@ True
 Setting a Time Signature in a Measure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can create a new TimeSignature object by providing a string representation of the meter. In most cases, intuitive string representations will give you the expected results. Assigning a new TimeSignature class, however, does only that: it will not automatically rebar or reposition notes within bars. For example, the same part examined above can be modified. Here, the first Measure's :attr:`~music21.stream.Measure.timeSignature` property is set to a new object. Note that, when viewing the Part, the time signature is changed though the position of notes in Measures is not changed.
+We can create a new TimeSignature object by providing a string representation of the meter. In most cases, intuitive string-based time signature representations will give you the expected results. Assigning a new TimeSignature object, however, simple associated it with a Measure: it will not automatically rebar or reposition notes within bars. For example, the same part examined above can be modified. Here, the first Measure's :attr:`~music21.stream.Measure.timeSignature` property is set to a new object. Note that, when viewing the Part, the time signature is changed even though the position of the notes in Measures is not changed.
 
 >>> sPart.measures[0].timeSignature = meter.TimeSignature('5/4')
 >>> sPart.show()
