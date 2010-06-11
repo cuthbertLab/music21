@@ -462,6 +462,7 @@ music21.tinyNotation.HarmonyNote class moduleTinyNotation.html
 music21.note.GeneralNote.musicxml attribute moduleNote.html
 music21.base.ElementWrapper.getId method moduleBase.html
 music21.converter.parseData function moduleConverter.html
+music21.stream.Stream.makeNotation method moduleStream.html
 music21.duration.Duration.quarterLength attribute moduleDuration.html
 music21.meter.MeterSequence.partitionByOther method moduleMeter.html
 music21.stream.Stream.getElementAfterOffset method moduleStream.html
@@ -576,7 +577,6 @@ music21.stream.Stream.getElementById method moduleStream.html
 music21.meter.TimeSignature.beatDivisionCount attribute moduleMeter.html
 music21.chord.Chord.transpose method moduleChord.html
 music21.meter.TimeSignature.mx attribute moduleMeter.html
-music21.stream.Stream.prepareNotation method moduleStream.html
 music21.meter.CompoundTimeSignature class moduleMeter.html
 music21.graph.GraphColorGrid.setWindowStep method moduleGraph.html
 music21.clef.Clef class moduleClef.html

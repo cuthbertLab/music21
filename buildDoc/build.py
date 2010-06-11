@@ -1126,12 +1126,15 @@ class ModuleDoc(RestructuredWriter):
         self.docCooked = self.formatDocString(modNameEval.__doc__, 
                          modName=self.modName)
 
+        def capFirst(str): # not the same as .title()
+            return str[0].upper() + str[1:]
+
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
         if len(fn) == 2:
-            self.fileRef = 'module' + fn[1].title()
+            self.fileRef = 'module' + capFirst(fn[1])
         elif len(fn) == 3:
-            self.fileRef = 'module' + fn[1].title() + fn[2].title()
+            self.fileRef = 'module' + capFirst(fn[1]) + capFirst(fn[2])
         else:
             raise Exception('cannot determine file name from module name: %s' % self.modName)
 

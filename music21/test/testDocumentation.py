@@ -49,6 +49,23 @@ class Test(unittest.TestCase):
         s.append(n2)
         self.assertEquals(len(s), 2)
         self.assertEquals(n2.offset, 2.0)
+    
+        post = s.musicxml
+        self.assertEquals(s.duration.quarterLength, 2.5)
+        self.assertEquals(s.highestTime, 2.5)
+        self.assertEquals(s.lowestOffset, 0.0)
+
+        n3 = note.Note('d#5') # octave values can be included in creation arguments
+        n3.quarterLength = .25 # a sixteenth note
+        s.repeatAppend(n3, 6)
+        self.assertEquals(len(s), 8)
+
+        r1 = note.Rest()
+        r1.quarterLength = .5
+        n4 = note.Note('b5')
+        n4.quarterLength = 1.5
+        s.insert(4, r1)
+        s.insert(4.5, n4)
 
 
     def testOverviewMeter(self):
@@ -110,7 +127,7 @@ class Test(unittest.TestCase):
             sRebar.insert(0, newPart)
         post = sRebar.musicxml
 
-        sSrc = corpus.parseWork('bach/bwv57.8.xml')
+        #sSrc = corpus.parseWork('bach/bwv57.8.xml')
         sPart = sSrc.getElementById('Soprano')
         self.assertEquals(sPart.flat.notes[0].name, 'B-')
         self.assertEquals(sPart.flat.notes[4].beat, 2.5)

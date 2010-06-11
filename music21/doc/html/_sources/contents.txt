@@ -65,7 +65,7 @@ Module Reference
    moduleStream
    moduleSerial
    moduleTempo
-   moduleTinynotation
+   moduleTinyNotation
 
 
 Developer Reference
