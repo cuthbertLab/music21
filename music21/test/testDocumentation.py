@@ -35,8 +35,23 @@ class Test(unittest.TestCase):
         pass
 
 
+    def testOverviewStreams(self):
+        s = stream.Stream()
+        n1 = note.Note()
+        n1.pitch.name = 'E4'
+        n1.duration.type = 'half'
+        self.assertEquals(n1.quarterLength, 2.0)
+        s.append(n1)
+        self.assertEquals(len(s), 1)
 
-    def testMeterOverview(self):
+        n2 = note.Note('f#')
+        n2.quarterLength = .5
+        s.append(n2)
+        self.assertEquals(len(s), 2)
+        self.assertEquals(n2.offset, 2.0)
+
+
+    def testOverviewMeter(self):
 
         sSrc = corpus.parseWork('bach/bwv13.6.xml')
         sPart = sSrc.getElementById('Bass')
@@ -72,6 +87,50 @@ class Test(unittest.TestCase):
         sNew = sPart.flat.notes
         sNew.insert(0, meter.TimeSignature('2/4'))
         post = sNew.musicxml
+
+        ts = sNew.getTimeSignatures()[0]
+        self.assertEquals(ts.numerator, 2)    
+
+        sNew.replace(ts, meter.TimeSignature('5/8'))
+        sNew.insert(10, meter.TimeSignature('7/8'))
+        sNew.insert(17, meter.TimeSignature('9/8'))
+        sNew.insert(26, meter.TimeSignature('3/8'))
+        post = sNew.musicxml
+
+
+        tsStream = sNew.getTimeSignatures()
+        tsOffset = [e.offset for e in tsStream]
+        self.assertEquals(tsOffset, [0.0, 10.0, 17.0, 26.0])
+
+
+        sRebar = stream.Stream()
+        for part in sSrc:
+            newPart = part.flat.notes.makeMeasures(tsStream)
+            newPart.makeTies(inPlace=True)
+            sRebar.insert(0, newPart)
+        post = sRebar.musicxml
+
+        sSrc = corpus.parseWork('bach/bwv57.8.xml')
+        sPart = sSrc.getElementById('Soprano')
+        self.assertEquals(sPart.flat.notes[0].name, 'B-')
+        self.assertEquals(sPart.flat.notes[4].beat, 2.5)
+        self.assertEquals(sPart.flat.notes[4].beatStr, '2 1/2')
+
+        for n in sPart.flat.notes:
+            n.addLyric(n.beatStr)
+        post = sPart.musicxml
+
+        sPart = sSrc.getElementById('Alto')
+        sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
+        sMeasures.makeTies(inPlace=True)
+        for n in sMeasures.flat.notes:
+            n.addLyric(n.beatStr)
+        post = sMeasures.musicxml
+
+        # meter terminal objects
+        mt = meter.MeterTerminal('3/4')
+        self.assertEquals(mt.numerator, 3)
+
 
 
 

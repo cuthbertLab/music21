@@ -1639,7 +1639,7 @@ class Stream(music21.Music21Object):
         return map
 
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
-        sortByCreationTime=False):
+        sortByCreationTime=True):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
         
@@ -1658,11 +1658,8 @@ class Stream(music21.Music21Object):
             # returns a single value
             post = Stream()
             # sort by time to search the most recent objects
-
-            # TODO: problem: errors result in offset axis and generation
-            # when sortByCreationTime=True here
-            # run testMusicXMLGenerationViaPropertyA()
-            obj = self.getContextByClass(meter.TimeSignature, sortByCreationTime=sortByCreationTime)
+            obj = self.getContextByClass(meter.TimeSignature, 
+                  sortByCreationTime=sortByCreationTime)
             environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
@@ -2100,6 +2097,7 @@ class Stream(music21.Music21Object):
         if meterStream is None:
             # get from this Stream, or search the contexts
             meterStream = srcObj.getTimeSignatures(returnDefault=True, 
+                          searchContext=False,
                           sortByCreationTime=False)
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
@@ -2257,11 +2255,11 @@ class Stream(music21.Music21Object):
             returnObj = deepcopy(self)
         else:
             returnObj = self
-    
+
         oLow = returnObj.lowestOffset
         oHigh = returnObj.highestTime
 
-        environLocal.printDebug(['calling makeRests', 'processing object lowestOffset, highestTime', oLow, oHigh])
+        environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
 
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
@@ -2281,12 +2279,15 @@ class Stream(music21.Music21Object):
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
+            environLocal.printDebug(['makeRests(): add rests', r, r.duration])
+            # place at oLowTarget to reach to oLow
             returnObj.insert(oLowTarget, r)
     
         qLen = oHighTarget - oHigh
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
+            # place at oHigh to reach to oHighTarget
             returnObj.insert(oHigh, r)
     
         returnObj = returnObj.sorted
@@ -2334,8 +2335,10 @@ class Stream(music21.Music21Object):
         environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
 
         # may need to look in parent if no time signatures are found
+        # presently searchContext is False to save time
         if meterStream is None:
-            meterStream = returnObj.getTimeSignatures(sortByCreationTime=False)
+            meterStream = returnObj.getTimeSignatures(sortByCreationTime=True,             
+                          searchContext=False)
     
         mCount = 0
         lastTimeSignature = None
@@ -2588,7 +2591,7 @@ class Stream(music21.Music21Object):
 
 
 
-    def prepareNotation(self, meterStream=None, refStreamOrTimeRange=None,
+    def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False):
         '''This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
 
@@ -2599,7 +2602,7 @@ class Stream(music21.Music21Object):
         >>> n = note.Note('g')
         >>> n.quarterLength = 1.5
         >>> s.repeatAppend(n, 10)
-        >>> sMeasures = s.prepareNotation()
+        >>> sMeasures = s.makeNotation()
         >>> len(sMeasures.measures)
         4
         '''
@@ -2608,7 +2611,7 @@ class Stream(music21.Music21Object):
         measureStream = self.makeMeasures(meterStream=meterStream,
             refStreamOrTimeRange=refStreamOrTimeRange, inPlace=inPlace)
 
-        #environLocal.printDebug(['Stream.prepareNotation(): post makeMeasures, length', len(measureStream)])
+        #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
 
         # for now, calling makeAccidentals once per measures       
         # pitches from last measure are passed
@@ -2625,7 +2628,7 @@ class Stream(music21.Music21Object):
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
-        environLocal.printDebug(['Stream.prepareNotation(): created measures:', len(measureStream)])
+        environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
 
         return measureStream
 
@@ -3015,18 +3018,17 @@ class Stream(music21.Music21Object):
         '''
         if self._cache["HighestOffset"] is not None:
             pass # return cache unaltered
-        elif len(self.elements) == 0:
+        elif len(self._elements) == 0:
             self._cache["HighestOffset"] = 0.0
         elif self.isSorted is True:
-            lastEl = self.elements[-1]
-            self._cache["HighestOffset"] = lastEl.offset 
+            eLast = self._elements[-1]
+            self._cache["HighestOffset"] = eLast.getOffsetBySite(self) 
         else: # iterate through all elements
             max = None
-            for thisElement in self.elements:
-                elEndTime = None
-                elEndTime = thisElement.offset
-                if max is None or elEndTime > max :
-                    max = elEndTime
+            for e in self._elements:
+                candidateOffset = e.getOffsetBySite(self)
+                if max is None or candidateOffset > max:
+                    max = candidateOffset
             self._cache["HighestOffset"] = max
         return self._cache["HighestOffset"]
 
@@ -3074,27 +3076,28 @@ class Stream(music21.Music21Object):
 
         if self._cache["HighestTime"] is not None:
             pass # return cache unaltered
-        elif len(self.elements) == 0:
+        elif len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
             return 0.0
         elif self.isSorted is True:
-            lastEl = self.elements[-1]
-            if hasattr(lastEl, "duration") and hasattr(lastEl.duration, "quarterLength"):
-                #environLocal.printDebug([lastEl.offset,
-                #         lastEl.offsetlastEl.duration.quarterLength])
-                self._cache["HighestTime"] = lastEl.getOffsetBySite(self) + lastEl.duration.quarterLength
+            eLast = self._elements[-1]
+            if hasattr(eLast, "duration") and hasattr(eLast.duration,
+                    "quarterLength"):
+                self._cache["HighestTime"] = (eLast.getOffsetBySite(self) + 
+                    eLast.duration.quarterLength)
             else:
-                self._cache["HighestTime"] = lastEl.getOffsetBySite(self)
+                self._cache["HighestTime"] = eLast.getOffsetBySite(self)
         else:
             max = None
-            for thisElement in self:
-                elEndTime = None
-                if hasattr(thisElement, "duration") and hasattr(thisElement.duration, "quarterLength"):
-                    elEndTime = thisElement.getOffsetBySite(self) + thisElement.duration.quarterLength
+            for e in self._elements:
+                if hasattr(e, "duration") and hasattr(e.duration, 
+                        "quarterLength"):
+                    candidateOffset = (e.getOffsetBySite(self) + 
+                                 e.duration.quarterLength)
                 else:
-                    elEndTime = thisElement.getOffsetBySite(self)
-                if max is None or elEndTime > max :
-                    max = elEndTime
+                    candidateOffset = e.getOffsetBySite(self)
+                if max is None or candidateOffset > max :
+                    max = candidateOffset
             self._cache["HighestTime"] = max
 
         return self._cache["HighestTime"]
@@ -3126,20 +3129,23 @@ class Stream(music21.Music21Object):
         '''
         if self._cache["LowestOffset"] is not None:
             pass # return cache unaltered
-        elif len(self.elements) == 0:
+        elif len(self._elements) == 0:
             self._cache["LowestOffset"] = 0.0
         elif self.isSorted is True:
-            firstEl = self.elements[0]
-            self._cache["LowestOffset"] = firstEl.offset 
+            eFirst = self._elements[0]
+            self._cache["LowestOffset"] = eFirst.getOffsetBySite(self) 
         else: # iterate through all elements
             min = None
-            for thisElement in self.elements:
-                elStartTime = None
-                elStartTime = thisElement.offset
-                if min is None or elStartTime < min :
-                    min = elStartTime
+            for e in self._elements:
+                candidateOffset = e.getOffsetBySite(self) 
+                if min is None or candidateOffset < min:
+                    min = candidateOffset
             self._cache["LowestOffset"] = min
+
+            environLocal.printDebug(['_getLowestOffset: iterated elements', min])
+
         return self._cache["LowestOffset"]
+
 
     lowestOffset = property(_getLowestOffset, doc='''
         Get the start time of the Element with the lowest offset in the Stream.        
@@ -3151,15 +3157,12 @@ class Stream(music21.Music21Object):
         ...
         >>> stream1.lowestOffset
         3.0
-
         
         If the Stream is empty, then the lowest offset is 0.0:
-        
-        
+                
         >>> stream2 = Stream()
         >>> stream2.lowestOffset
         0.0
-
 
         ''')
 
@@ -3317,12 +3320,16 @@ class Stream(music21.Music21Object):
             raise StreamException('an achorZero value of %s is not accepted' % anchorZero)
 
         for e in returnObj._elements:
+
             # subtract the offset shift (and lowestOffset of 80 becomes 0)
             # then apply the scalar
-            o = (e.offset - offsetShift) * scalar
+            o = (e.getOffsetBySite(returnObj) - offsetShift) * scalar
             # after scaling, return the shift taken away
             o += offsetShift
-            e.offset = o # reassign
+
+            #environLocal.printDebug(['changng offset', o, scalar, offsetShift])
+
+            e.setOffsetBySite(returnObj, o) # reassign
             # need to look for embedded Streams, and call this method
             # on them, with inPlace == True, as already copied if 
             # inPlace is != True
@@ -3438,7 +3445,12 @@ class Stream(music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        #environLocal.printDebug(['calling Stream._getMXPart'])
+        environLocal.printDebug(['calling Stream._getMXPart'])
+        # note: meterStream may have TimeSignature objects from an unrelated
+        # Stream.
+        #self.show('t')
+        if len(self) > 2:
+            environLocal.printDebug(['_getMXPart(): first two elements', self[0].offset, self[0].duration, self[1].offset, self[1].duration ])
 
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
@@ -3460,9 +3472,9 @@ class Stream(music21.Music21Object):
         if len(measureStream) == 0:
             # try to add measures if none defined
             # returns a new stream w/ new Measures but the same objects
-            measureStream = self.prepareNotation(meterStream=meterStream,
+            measureStream = self.makeNotation(meterStream=meterStream,
                             refStreamOrTimeRange=refStreamOrTimeRange)
-            #environLocal.printDebug(['Stream._getMXPart: post prepareNotation, length', len(measureStream)])
+            #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
         else: # there are measures
             pass
 
@@ -3494,8 +3506,9 @@ class Stream(music21.Music21Object):
         multiPart = False
         
         # get from containter first
+        # search context probably should always be True here
         meterStream = self.getTimeSignatures(searchContext=True,
-                        sortByCreationTime=False) 
+                        sortByCreationTime=True) 
 
         # we need independent sub-stream elements to shift in presentation
         highestTime = 0
@@ -3532,8 +3545,9 @@ class Stream(music21.Music21Object):
                 # may need to copy element here
                 # apply this streams offset to elements
                 obj.transferOffsetToElements() 
-
-                ts = obj.getTimeSignatures(sortByCreationTime=False)
+    
+                ts = obj.getTimeSignatures(sortByCreationTime=True, 
+                     searchContext=True)
                 # the longest meterStream is the meterStream for all parts
                 if len(ts) > meterStream:
                     meterStream = ts
@@ -3553,8 +3567,6 @@ class Stream(music21.Music21Object):
             # replace object inside of the stream
             for obj in partStream.getElementsByClass(sTemplate.classNames):
                 obj.makeRests(refStreamOrTimeRange, inPlace=True)
-                # used to move into a final Stream: no longer necessary
-                #finalStream.insert(obj)
 
             environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
             count = 0
@@ -3577,7 +3589,6 @@ class Stream(music21.Music21Object):
             # if no instrument is provided it will be obtained through self
             # when _getMxPart is called
             mxComponents.append(self._getMXPart(None, meterStream))
-
 
         # create score and part list
         mxPartList = musicxmlMod.PartList()
@@ -4662,7 +4673,7 @@ class Measure(Stream):
             ts = self.timeSignature
         else: # do a context-based search 
             tsStream = self.getTimeSignatures(searchContext=True,
-                       returnDefault=False, sortByCreationTime=False)
+                       returnDefault=False, sortByCreationTime=True)
             if len(tsStream) == 0:
                 raise StreamException('cannot determine bar duration without a time signature reference')
             else: # it is the first found
@@ -6462,7 +6473,29 @@ class Test(unittest.TestCase):
         s = Stream()
         partOffsetShift = 1.25
         partOffset = 7.5
-        for part in range(2):  
+        p = Stream()
+        for pitchName in a:
+            n = note.Note(pitchName)
+            n.quarterLength = 1.5
+            p.append(n)
+        p.offset = partOffset
+
+        p.transferOffsetToElements()
+
+        junk = p.getTimeSignatures(searchContext=True, sortByCreationTime=True)
+        p.makeRests(refStreamOrTimeRange=[0, 100], 
+            inPlace=True)
+
+        self.assertEqual(p.lowestOffset, 0)
+        self.assertEqual(p.highestTime, 100.0)
+        post = p.musicxml
+
+
+        # can only recreate problem in the context of two Streams
+        s = Stream()
+        partOffsetShift = 1.25
+        partOffset = 7.5
+        for x in range(2):
             p = Stream()
             for pitchName in a:
                 n = note.Note(pitchName)
@@ -6471,6 +6504,7 @@ class Test(unittest.TestCase):
             p.offset = partOffset
             s.insert(p)
             partOffset += partOffsetShift
+
         #s.show()
         post = s.musicxml
 
@@ -7210,6 +7244,128 @@ class Test(unittest.TestCase):
 
 
 
+    def testScaleOffsetsBasicInPlaceA(self):
+        '''
+        '''
+        from music21 import note, stream
+
+        def procCompare(s, scalar, match):
+            # test equally spaced half notes starting at zero
+            n = note.Note()
+            n.quarterLength = 2
+            s = stream.Stream()
+            s.repeatAppend(n, 10)
+
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            s.scaleOffsets(scalar, inPlace=True)
+            oListPost = [e.offset for e in s]
+            oListPost.sort()
+            #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+        s = None # placeholder
+        # provide start of resulting values
+        # half not spacing becomes whole note spacing
+        procCompare(s, 2, [0.0, 4.0, 8.0])
+        procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
+        procCompare(s, 3, [0.0, 6.0, 12.0, 18.0])
+        procCompare(s, .5, [0.0, 1.0, 2.0, 3.0])
+        procCompare(s, .25, [0.0, 0.5, 1.0, 1.5])
+
+
+    def testScaleOffsetsBasicInPlaceB(self):
+        '''
+        '''
+        from music21 import note, stream
+
+        def procCompare(s, scalar, match):
+            # test equally spaced quarter notes start at non-zero
+            n = note.Note()
+            n.quarterLength = 1
+            s = stream.Stream()
+            s.repeatInsert(n, range(100, 110))
+
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            s.scaleOffsets(scalar, inPlace=True)
+            oListPost = [e.offset for e in s]
+            oListPost.sort()
+            #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+        s = None # placeholder
+        procCompare(s, 1, [100, 101, 102, 103])
+        procCompare(s, 2, [100, 102, 104, 106])
+        procCompare(s, 4, [100, 104, 108, 112])
+        procCompare(s, 1.5, [100, 101.5, 103.0, 104.5])
+        procCompare(s, .5, [100, 100.5, 101.0, 101.5])
+        procCompare(s, .25, [100, 100.25, 100.5, 100.75])
+
+
+    def testScaleOffsetsBasicInPlaceC(self):
+        '''
+        '''
+        from music21 import note, stream
+
+        def procCompare(s, scalar, match):
+            # test non equally spaced notes starting at zero
+            s = stream.Stream()
+            n1 = note.Note()
+            n1.quarterLength = 1
+            s.repeatInsert(n1, range(0, 30, 3))
+            n2 = note.Note()
+            n2.quarterLength = 2
+            s.repeatInsert(n2, range(1, 30, 3))
+
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            s.scaleOffsets(scalar, inPlace=True)
+            oListPost = [e.offset for e in s]
+            oListPost.sort()
+            #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+        # procCompare will  sort offsets; this test non sorted operation
+        s = None # placeholder
+        procCompare(s, 1, [0.0, 1.0, 3.0, 4.0, 6.0, 7.0])
+        procCompare(s, .5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
+        procCompare(s, 2, [0.0, 2.0, 6.0, 8.0, 12.0, 14.0])
+
+
+
+    def testScaleOffsetsBasicInPlaceD(self):
+        '''
+        '''
+        from music21 import note, stream
+
+        def procCompare(s, scalar, match):
+            # test non equally spaced notes starting at non-zero
+            s = stream.Stream()
+            n1 = note.Note()
+            n1.quarterLength = 1
+            s.repeatInsert(n1, range(100, 130, 3))
+            n2 = note.Note()
+            n2.quarterLength = 2
+            s.repeatInsert(n2, range(101, 130, 3))
+
+            oListSrc = [e.offset for e in s]
+            oListSrc.sort()
+            s.scaleOffsets(scalar, inPlace=True)
+            oListPost = [e.offset for e in s]
+            oListPost.sort()
+            #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
+            self.assertEqual(oListPost[:len(match)], match)
+
+        # procCompare will  sort offsets; this test non sorted operation
+        s = None # placeholder
+        procCompare(s, 1, [100.0, 101.0, 103.0, 104.0, 106.0, 107.0])
+        procCompare(s, .5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
+        procCompare(s, 2, [100.0, 102.0, 106.0, 108.0, 112.0, 114.0])
+        procCompare(s, 6, [100.0, 106.0, 118.0, 124.0, 136.0, 142.0])
+
+
+
 
     def testScaleOffsetsNested(self):
         '''
@@ -7430,15 +7586,22 @@ class Test(unittest.TestCase):
 
         # try first when doing this not in place
         newEx = ex.augmentOrDiminish(2, inPlace=False)
+        self.assertEqual(newEx.notes[0].offset, 0.0)
+        self.assertEqual(newEx.notes[1].offset, 4.0)
+
         self.assertEqual(newEx.highestOffset, 76.0)
         self.assertEqual(newEx.highestTime, 84.0)
 
         # try in place
         ex.augmentOrDiminish(2, inPlace=True)
+        self.assertEqual(ex.notes[1].getOffsetBySite(ex), 4.0)
+        self.assertEqual(ex.notes[1].offset, 4.0)
+
         self.assertEqual(ex.highestOffset, 76.0)
         self.assertEqual(ex.highestTime, 84.0)
 
         
+
     def testAugmentOrDiminishCorpus(self):
         '''Extact phrases from the corpus and use for testing 
         '''
@@ -7557,3 +7720,10 @@ if __name__ == "__main__":
 
         #a.testMakeRests()
         a.testMusicXMLGenerationViaPropertyA()
+        a.testScaleOffsetsBasic()
+        a.testScaleOffsetsBasicInPlaceA()
+        a.testScaleOffsetsBasicInPlaceB()
+        a.testScaleOffsetsBasicInPlaceC()
+        a.testScaleOffsetsBasicInPlaceD()
+
+        a.testAugmentOrDiminishHighestTimes()
