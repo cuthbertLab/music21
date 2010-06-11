@@ -85,6 +85,17 @@ To actually change the position of the notes, creating new Measures with new Tim
 .. image:: images/overviewMeters-11.*
     :width: 600
 
+The :attr:`~music21.stream.Stream.notes` property, while useful, only gathers Notes, Rests, or other subclasses of :class:`~music21.note.GeneralNote`. Notice that, in the above example, the :class:`~music21.key.KeySignature` and :class:`~music21.instrument.Insturment` objects, as apparent in the notation, have been removed.  
+
+If we want to get all elements in the Stream except those that are a specific class, the :meth:`~music21.stream.Stream.getElementsByNotClass` method can be used. In the example below, we gather all elements that are not TimeSignature objects, and then assign a new TimeSignature to the new Stream.
+
+>>> sNew = sPart.flat.getElementsByNotClass(meter.TimeSignature)
+>>> sNew.insert(0, meter.TimeSignature('2/4'))
+>>> sNew.show()
+
+.. image:: images/overviewMeters-16.*
+    :width: 600
+
 We can continue to add multiple TimeSignature objects to this Stream of Notes. First, we will replace the 2/4 bar previously added with a new TimeSignature, using the Stream :meth:`~music21.stream.Stream.replace` method. Then, we will insert a number of additional TimeSignature objects at offsets further into the Stream. Again, as this Stream has no Measures, temporary Measures are automatically created when calling the show() method.
 
 >>> ts = sNew.getTimeSignatures()[0]
@@ -114,7 +125,8 @@ After Measure creation, Notes need to be split and extend with ties. the Stream 
 
 >>> sRebar = stream.Stream()
 >>> for part in sSrc:
-...     newPart = part.flat.notes.makeMeasures(tsStream)
+...     newPart = part.flat.getElementsByNotClass(meter.TimeSignature)
+...     newPart = newPart.makeMeasures(tsStream)
 ...     newPart.makeTies(inPlace=True)
 ...     sRebar.insert(0, newPart)
 ... 

@@ -182,6 +182,7 @@ music21.expressions.InvertedTurn class moduleExpressions.html
 music21.environment.Environment.keys method moduleEnvironment.html
 music21.meter.TimeSignature.getBeatProportion method moduleMeter.html
 music21.chord.Chord.isHalfDiminishedSeventh method moduleChord.html
+music21.stream.Stream.getMeasures method moduleStream.html
 music21.node.NodeList class moduleNode.html
 music21.serial.RowBergLuluActIScene20 class moduleSerial.html
 music21.graph.PlotStream.ticksDynamics method moduleGraph.html
@@ -580,7 +581,7 @@ music21.meter.TimeSignature.mx attribute moduleMeter.html
 music21.meter.CompoundTimeSignature class moduleMeter.html
 music21.graph.GraphColorGrid.setWindowStep method moduleGraph.html
 music21.clef.Clef class moduleClef.html
-music21.stream.Stream.getMeasures method moduleStream.html
+music21.stream.Stream.getElementsByNotClass method moduleStream.html
 music21.common.defList class moduleCommon.html
 music21.pitch.Accidental.lily attribute modulePitch.html
 music21.note.Unpitched class moduleNote.html
