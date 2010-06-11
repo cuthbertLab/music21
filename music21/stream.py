@@ -966,26 +966,26 @@ class Stream(music21.Music21Object):
         'B-'
 
         '''
-        for myElement in self.elements:
+        for e in self._elements:
             if classFilter is None:
-                myElement.groups.append(group)
+                e.groups.append(group)
             else:
-                if hasattr(myElement, "elements"): # stream type
-                    if isinstance(myElement, classFilter):
-                        myElement.groups.append(group)
-                elif hasattr(myElement, "obj"): # element type
-                    if isinstance(myElement.obj, classFilter):
-                        myElement.groups.append(group)
+                if hasattr(e, "elements"): # stream type
+                    if isinstance(e, classFilter):
+                        e.groups.append(group)
+                elif hasattr(e, "obj"): # element type
+                    if isinstance(e.obj, classFilter):
+                        e.groups.append(group)
                 else: # music21 type
-                    if isinstance(myElement, classFilter):
-                        myElement.groups.append(group)
+                    if isinstance(e, classFilter):
+                        e.groups.append(group)
 
 
     #---------------------------------------------------------------------------
     # getElementsByX(self): anything that returns a collection of Elements should return a Stream
 
     def getElementsByClass(self, classFilterList):
-        '''Return a list of all Elements that match the className.
+        '''Return a list of all Elements that match one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
         >>> a = Stream()
         >>> a.repeatInsert(note.Rest(), range(10))
@@ -1018,15 +1018,58 @@ class Stream(music21.Music21Object):
             if not isinstance(classFilterList, tuple):
                 classFilterList = [classFilterList]
 
+        # use direct access to elements list
+        for e in self._elements:
+            for className in classFilterList:
+                if e.isClass(className):
+                    found.insert(e.getOffsetBySite(self), e, ignoreSort = True)
+                    break
+        # if this stream was sorted, the resultant stream is sorted
+        found.isSorted = self.isSorted
+        return found
+
+
+    def getElementsByNotClass(self, classFilterList):
+        '''Return a list of all Elements that do not match the one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
+        
+        >>> a = Stream()
+        >>> a.repeatInsert(note.Rest(), range(10))
+        >>> for x in range(4):
+        ...     n = note.Note('G#')
+        ...     n.offset = x * 3
+        ...     a.insert(n)
+        >>> found = a.getElementsByNotClass(note.Note)
+        >>> len(found)
+        10
+
+        >>> b = Stream()
+        >>> b.repeatInsert(note.Rest(), range(15))
+        >>> a.insert(b)
+        >>> # here, it gets elements from within a stream
+        >>> # this probably should not do this, as it is one layer lower
+        >>> found = a.flat.getElementsByNotClass(note.Rest)
+        >>> len(found)
+        4
+        >>> found = a.flat.getElementsByNotClass(note.Note)
+        >>> len(found)
+        25
+        '''
+        # should probably be whatever class the caller is
+        found = Stream()
+
+        # much faster in the most common case than calling common.isListLike
+        if not isinstance(classFilterList, list):
+            if not isinstance(classFilterList, tuple):
+                classFilterList = [classFilterList]
+
         # appendedAlready fixes bug where if an element matches two 
         # classes it was appendedTwice
-        for myEl in self:
-            appendedAlready = False
-            for myCl in classFilterList:
-                if appendedAlready is False and myEl.isClass(myCl):
-                    appendedAlready = True
-                    found.insert(myEl.getOffsetBySite(self), myEl, 
-                                 ignoreSort = True)
+        for e in self._elements:
+            for className in classFilterList:
+                if e.isClass(className):
+                    break # if a match to any of the classes, break
+                # only insert after all no match to all classes   
+                found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
         return found
@@ -1071,7 +1114,6 @@ class Stream(music21.Music21Object):
                     returnStream.insert(myEl.getOffsetBySite(self),
                                                 myEl, ignoreSort = True)
                     #returnStream.append(myEl)
-
         returnStream.isSorted = self.isSorted
         return returnStream
 
