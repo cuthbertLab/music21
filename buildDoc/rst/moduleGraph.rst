@@ -523,13 +523,19 @@ GraphHorizontalBar
 
     Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
 
-    .. image:: images/GraphHorizontalBar.* 
+    .. image:: images/GraphHorizontalBarComposers.* 
         :width: 600 
 
-    >>> a = GraphHorizontalBar(doneAction=None)
-    >>> data = [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]
+    
+
+    >>> from music21 import *
+    >>> #----# a = graph.GraphHorizontalBar(doneAction='show')
+    >>> a = graph.GraphHorizontalBar(doneAction=None)  #--OMIT_DOCS--#
+    >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
     >>> a.setData(data)
     >>> a.process()
+
+    
 
     
 

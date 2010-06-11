@@ -229,11 +229,11 @@ def sacredTonality(show = True):
         tCounter.displayLily.showPNG()
 
 def testAll(show = True, fast = False):
-        landiniTonality(show)
+        sacredTonality(show)
         if fast is False:
             nonLandiniTonality(show)
             anonBallataTonality(show)
-            sacredTonality(show)
+            landiniTonality(show)
 
 class Test(unittest.TestCase):
     pass

@@ -443,6 +443,10 @@ class GraphHorizontalBar(Graph):
         '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap.
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
+
+    .. image:: images/GraphHorizontalBarComposers.*
+        :width: 600
+
        
         >>> from music21 import *
         >>> #----# a = graph.GraphHorizontalBar(doneAction='show')
@@ -451,8 +455,6 @@ class GraphHorizontalBar(Graph):
         >>> a.setData(data)
         >>> a.process()
 
-    .. image:: images/GraphHorizontalBar_composers.*
-        :width: 600
 
         '''
         Graph.__init__(self, *args, **keywords)
