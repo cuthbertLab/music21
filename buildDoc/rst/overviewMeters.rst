@@ -165,7 +165,8 @@ We can annotate each Note in the Part with the string returned by :attr:`~music2
 If we change the TimeSignature in a Part, the beat counts will reflect this change. For example, if the Bass part of the same chorale is re-barred in 6/8, new, syncopated beat counts will be given.
 
 >>> sPart = sSrc.getElementById('Alto')
->>> sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
+>>> sPart = sPart.flat.getElementsByNotClass(meter.TimeSignature)
+>>> sMeasures = sPart.makeMeasures(meter.TimeSignature('6/8'))
 >>> sMeasures.makeTies(inPlace=True)
 >>> for n in sMeasures.flat.notes:
 ...     n.addLyric(n.beatStr)
