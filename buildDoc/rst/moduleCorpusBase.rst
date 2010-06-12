@@ -116,7 +116,7 @@ The music21 corpus provides a collection of freely distributable music in MusicX
     Given a work name, search all virtual works and return a list of URLs for any matches. 
 
     >>> getVirtualWorkList('bach/bwv1007/prelude')
-    ['http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'] 
+    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'] 
     >>> getVirtualWorkList('junk')
     [] 
 

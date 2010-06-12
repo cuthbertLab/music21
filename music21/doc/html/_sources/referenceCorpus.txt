@@ -2859,8 +2859,8 @@ Invention No. 2 in C Minor, BWV 773 (*virtual*)
 Prelude from Cello Suite No. 1 in G Major, BWV 1007 (*virtual*)
 
 
-+ Prelude from Cello Suite No. 1 in G Major, BWV 1007 (musicxml): `bach/bwv1007/prelude`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml
-+ Prelude from Cello Suite No. 1 in G Major, BWV 1007 (humdrum): `bach/bwv1007/prelude`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=kern
++ Prelude from Cello Suite No. 1 in G Major, BWV 1007 (musicxml): `bach/bwv1007/prelude`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml
++ Prelude from Cello Suite No. 1 in G Major, BWV 1007 (humdrum): `bach/bwv1007/prelude`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=kern
 
 
 
@@ -3118,7 +3118,7 @@ To get all works by Johann Pachelbel, the :meth:`~music21.corpus.base.getCompose
 Canon in D Major (*virtual*)
 
 
-+ Canon in D Major (musicxml): `pachelbel/canon`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/pachelbel&file=canon.krn&f=xml
++ Canon in D Major (musicxml): `pachelbel/canon`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=cc/pachelbel&file=canon.krn&f=xml
 
 
 
@@ -3157,7 +3157,7 @@ To get all works by Franz Schubert, the :meth:`~music21.corpus.base.getComposer`
 13 Variations on a Theme by Anselm Hüttenbrenner (*virtual*)
 
 
-+ 13 Variations on a Theme by Anselm Hüttenbrenner (musicxml): `schubert/d576-1`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml
++ 13 Variations on a Theme by Anselm Hüttenbrenner (musicxml): `schubert/d576-1`, source: http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml
 
 
 

@@ -96,19 +96,14 @@
 <div class="section" id="parsing-musicxml-files">
 <h2>Parsing MusicXML Files<a class="headerlink" href="#parsing-musicxml-files" title="Permalink to this headline">¶</a></h2>
 <p>We can parse a MusicXML file by providing the <a title="music21.converter.parse" class="reference external" href="moduleConverter.html#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">music21.converter.parse()</span></tt></a> function with a local file path or an URL to a file path. The function will determine the file format. An appropriate <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path &#8220;/Volumes/xdisc/_scratch/bwv1007-01.xml&#8221;, a Stream can be created from the file with the following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">converter</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;/Volumes/xdisc/_scratch/bwv1007-01.xml&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>After setting a new Clef on the first Measure, the Score can be viewed with the <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a> method.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">clef</span> <span class="o">=</span> <span class="n">sBach</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">bestClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/overviewFormats-01.png" src="_images/overviewFormats-01.png" style="width: 600px;" />
 <p>Alternative, we can provide a URL to the <a title="music21.converter.parse" class="reference external" href="moduleConverter.html#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">music21.converter.parse()</span></tt></a> function that points to the desired file. Assuming proper system configuration (see <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>), the file will be downloaded and parsed.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sAlt</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -165,7 +160,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 11, 2010.
+      Last updated on Jun 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

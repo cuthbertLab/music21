@@ -87,9 +87,9 @@ To actually change the position of the notes, creating new Measures with new Tim
 
 The :attr:`~music21.stream.Stream.notes` property, while useful, only gathers Notes, Rests, or other subclasses of :class:`~music21.note.GeneralNote`. Notice that, in the above example, the :class:`~music21.key.KeySignature` and :class:`~music21.instrument.Insturment` objects, as apparent in the notation, have been removed.  
 
-If we want to get all elements in the Stream except those that are a specific class, the :meth:`~music21.stream.Stream.getElementsByNotClass` method can be used. In the example below, we gather all elements that are not TimeSignature objects, and then assign a new TimeSignature to the new Stream.
+If we want to get all elements in the Stream except those that are a specific class, the :meth:`~music21.stream.Stream.getElementsNotOfClass` method can be used. In the example below, we gather all elements that are not TimeSignature objects, and then assign a new TimeSignature to the new Stream.
 
->>> sNew = sPart.flat.getElementsByNotClass(meter.TimeSignature)
+>>> sNew = sPart.flat.getElementsNotOfClass(meter.TimeSignature)
 >>> sNew.insert(0, meter.TimeSignature('2/4'))
 >>> sNew.show()
 
@@ -125,7 +125,7 @@ After Measure creation, Notes need to be split and extend with ties. the Stream 
 
 >>> sRebar = stream.Stream()
 >>> for part in sSrc:
-...     newPart = part.flat.getElementsByNotClass(meter.TimeSignature)
+...     newPart = part.flat.getElementsNotOfClass(meter.TimeSignature)
 ...     newPart = newPart.makeMeasures(tsStream)
 ...     newPart.makeTies(inPlace=True)
 ...     sRebar.insert(0, newPart)
@@ -165,7 +165,7 @@ We can annotate each Note in the Part with the string returned by :attr:`~music2
 If we change the TimeSignature in a Part, the beat counts will reflect this change. For example, if the Bass part of the same chorale is re-barred in 6/8, new, syncopated beat counts will be given.
 
 >>> sPart = sSrc.getElementById('Alto')
->>> sPart = sPart.flat.getElementsByNotClass(meter.TimeSignature)
+>>> sPart = sPart.flat.getElementsNotOfClass(meter.TimeSignature)
 >>> sMeasures = sPart.makeMeasures(meter.TimeSignature('6/8'))
 >>> sMeasures.makeTies(inPlace=True)
 >>> for n in sMeasures.flat.notes:

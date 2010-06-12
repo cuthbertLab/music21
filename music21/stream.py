@@ -1040,7 +1040,7 @@ class Stream(music21.Music21Object):
         return found
 
 
-    def getElementsByNotClass(self, classFilterList):
+    def getElementsNotOfClass(self, classFilterList):
         '''Return a list of all Elements that do not match the one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
         >>> a = Stream()
@@ -1049,7 +1049,7 @@ class Stream(music21.Music21Object):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
         ...     a.insert(n)
-        >>> found = a.getElementsByNotClass(note.Note)
+        >>> found = a.getElementsNotOfClass(note.Note)
         >>> len(found)
         10
 
@@ -1058,10 +1058,10 @@ class Stream(music21.Music21Object):
         >>> a.insert(b)
         >>> # here, it gets elements from within a stream
         >>> # this probably should not do this, as it is one layer lower
-        >>> found = a.flat.getElementsByNotClass(note.Rest)
+        >>> found = a.flat.getElementsNotOfClass(note.Rest)
         >>> len(found)
         4
-        >>> found = a.flat.getElementsByNotClass(note.Note)
+        >>> found = a.flat.getElementsNotOfClass(note.Note)
         >>> len(found)
         25
         '''

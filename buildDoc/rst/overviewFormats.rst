@@ -15,22 +15,16 @@ Parsing MusicXML Files
 
 We can parse a MusicXML file by providing the :func:`music21.converter.parse` function with a local file path or an URL to a file path. The function will determine the file format. An appropriate :class:`~music21.stream.Stream`  or Stream subclass will be returned. For example, given a MusicXML file stored at the file path "/Volumes/xdisc/_scratch/bwv1007-01.xml", a Stream can be created from the file with the following:
 
->>> from music21 import converter
+>>> from music21 import *
 >>> sBach = converter.parse('/Volumes/xdisc/_scratch/bwv1007-01.xml')
->>> sBach.show()
-
-After setting a new Clef on the first Measure, the Score can be viewed with the :meth:`~music21.base.Music21Object.show` method.
-
->>> sBach[0][1].clef = sBach[0][1].bestClef()
 >>> sBach.show()
 
 .. image:: images/overviewFormats-01.*
     :width: 600
 
-
 Alternative, we can provide a URL to the :func:`music21.converter.parse` function that points to the desired file. Assuming proper system configuration (see :ref:`environment`), the file will be downloaded and parsed.
 
->>> url = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+>>> url = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
 >>> sAlt = converter.parse(url)
 
 
