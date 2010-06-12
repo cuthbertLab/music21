@@ -1022,7 +1022,18 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             for className in classFilterList:
                 if e.isClass(className):
-                    found.insert(e.getOffsetBySite(self), e, ignoreSort = True)
+
+                    # problem: temporary try except clause
+                    # TODO: this is experimental: need to isolate cases
+                    # where this is and is not necessary;
+                    try:
+                        o = e.getOffsetBySite(self)
+                    except: # get offset from None
+                        environLocal.printDebug(['element', e, 'cannot get offset by site of self', self, 'instead, getting site from None', e.getOffsetBySite(None)])
+                        raise
+                        #o = e.getOffsetBySite(None)
+
+                    found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                     break
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted

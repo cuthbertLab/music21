@@ -209,7 +209,7 @@ class Node(object):
         localAttr = self._publicAttributes()
         otherAttr = other._publicAttributes()
 
-        # print _MOD, 'attempting to merge', localAttr
+        #print _MOD, 'attempting to merge', localAttr
 
         # if attrs are the same, these are instances of same class
         if localAttr == otherAttr:
@@ -221,13 +221,19 @@ class Node(object):
                 # local is defined
                 elif (self.get(localAttr[i]) != None and 
                     other.get(otherAttr[i]) == None):
-                    pass # already set as this ia copy
-                    # new.set(localAttr[i], self.get(localAttr[i]))
+                    pass # already set as this is a copy of self
+
                 # other is defined
                 elif (self.get(localAttr[i]) == None and 
                     other.get(otherAttr[i]) != None):
                     new.set(otherAttr[i], other.get(otherAttr[i]))
-                # both are defined
+
+                # other is defined as an empty list
+                elif (self.get(localAttr[i]) == [] and 
+                    other.get(otherAttr[i]) != []):
+                    new.set(otherAttr[i], other.get(otherAttr[i]))
+
+                # both are defined; this will not match an empty list
                 elif (self.get(localAttr[i]) == None and 
                     other.get(otherAttr[i]) == None):
                     if favorSelf:

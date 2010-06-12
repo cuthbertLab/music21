@@ -37,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 2, 2) 
+VERSION_MINIMUM = (0, 2, 3) 
 
 
 #-------------------------------------------------------------------------------
@@ -936,6 +936,10 @@ class Measure(MusicXMLElementList):
         self.attributesObj = None # an object
         self.componentList = [] # a list notes and other things
 
+        # in some cases we have multiple attribute objects in one measure
+        # need to store and merge
+        # store multiple attributes objects found in this Measure
+        self._attributesObjList = []
         self._crossReference['attributesObj'] = ['attributes']
 
     def _getComponents(self):
@@ -954,6 +958,18 @@ class Measure(MusicXMLElementList):
 
     def update(self):
         '''This method looks at all note, forward, and backup objects and updates note start times'''
+        updateAttributes = False
+        if len(self._attributesObjList) > 1:
+            updateAttributes = True
+            attrConsolidate = Attributes()
+            for attrObj in self._attributesObjList:
+                #environLocal.printDebug(['found multiple Attributes', attrObj])
+                attrConsolidate = attrConsolidate.merge(attrObj)
+            environLocal.printDebug(['Measure.updaate(); found multiple Attributes objects for a single measure', attrConsolidate])
+            self.attributesObj = attrConsolidate
+            self.external['attributes'] = self.attributesObj
+            self.external['divisions'] = self.attributesObj.divisions
+
         counter = 0
         noteThis = None
         noteNext = None
@@ -966,6 +982,12 @@ class Measure(MusicXMLElementList):
                 counter -= int(obj.duration)
                 continue
             elif obj.tag == 'note':
+                # may need to assign new, merged attributes obj to components
+                if updateAttributes:
+                    obj.external['attributes'] = self.attributesObj     
+                    if self.attributesObj.divisions != None:
+                        obj.external['divisions'] = self.attributesObj.divisions     
+
                 noteThis = obj
                 # get a reference to the next note
                 if pos+1 == len(self.componentList):
@@ -2326,9 +2348,8 @@ class Handler(xml.sax.ContentHandler):
             self._noteObj.restObj = self._restObj
             self._restObj = None
 
-        elif name == 'measure':
+        elif name == 'measure': # in endElement
             # measures need to be stored in order; numbers may have odd values
-            # X1, for example.
             # update note start times w/ measure utility method
             self._measureObj.update()
             self._partObj.componentList.append(self._measureObj)
@@ -2426,7 +2447,9 @@ class Handler(xml.sax.ContentHandler):
 
 
 
-        elif name == 'attributes':
+        elif name == 'attributes': # in endElement
+            self._measureObj._attributesObjList.append(self._attributesObj)
+            # this is the most recently found atttributes obj; not the final
             self._measureObj.attributesObj = self._attributesObj
             # update last found
             self._attributesObjLast = copy.deepcopy(self._attributesObj)
@@ -3476,6 +3499,36 @@ class Test(unittest.TestCase):
         self.assertEqual(mxClef.get('sign'), 'G')
         # values is stored as a string
         self.assertEqual(mxClef.get('clef-octave-change'), '-1')
+
+
+    def testMergeAttributes(self):
+        a1 = Attributes()
+        a2 = Attributes()
+        a3 = Attributes()
+
+        a1.divisions = 10
+
+        mxClef = Clef()
+        mxClef.sign = 'G'
+        a2.clefList.append(mxClef)
+        self.assertEqual(a2.get('clefList'), [mxClef])
+
+        ax = Attributes()
+        ax = ax.merge(a1)
+        ax = ax.merge(a2)
+
+        self.assertEqual(ax.divisions, 10)
+        self.assertEqual(ax.clefList[0].sign, 'G')
+
+        # makes sure that we get a merged attributes obj
+        from music21.musicxml import testPrimitive
+        d = Document()
+        d.read(testPrimitive.multipleAttributesPerMeasures)
+        mxMeasure = d.score.componentList[0][0] # first part, first measure
+        mxAttributes = mxMeasure.attributesObj
+        self.assertEqual(mxAttributes.clefList[0].sign, 'F')
+        self.assertEqual(mxAttributes.divisions, '4')
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

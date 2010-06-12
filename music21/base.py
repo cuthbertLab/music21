@@ -708,7 +708,7 @@ class DefinedContexts(object):
         try:
             post = self._definedContexts[siteId]['offset']
         except KeyError: # the site id is not valid
-            environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contxts:', self._definedContexts])
+            #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
             raise # re-raise Exception
         if post == None: # 
             raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)

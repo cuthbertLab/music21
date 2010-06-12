@@ -1049,8 +1049,8 @@ class Test(unittest.TestCase):
     
 
 if (__name__ == "__main__"):
-    runPiece(267)
-    #music21.mainTest(Test) #, TestExternal)
+    #runPiece(267)
+    music21.mainTest(Test) #, TestExternal)
     
 #    test()
 #    correctedMin6()
