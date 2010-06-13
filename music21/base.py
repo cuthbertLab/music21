@@ -1632,9 +1632,8 @@ class Music21Object(object):
         note at the same offset.  This produces the familiar order of 
         materials at the start of a musical score.
         
-        >>> import music21
         >>> from music21 import *
-        >>> a = music21.Music21Object()
+        >>> a = base.Music21Object()
         >>> a.priority = 3
         >>> a.priority = 'high'
         Traceback (most recent call last):

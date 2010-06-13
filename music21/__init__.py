@@ -35,11 +35,12 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 '''
 
 # put these in alphabetical order FIRST dirs then modules
-__all__ = ["analysis", "composition", "counterpoint", "corpus", \
-           "demos", "doc", "humdrum", \
-           "lily", "musicxml", "test", "trecento", \
-           \
-           "articulations", \
+__all__ = ["analysis", "composition", "counterpoint", "corpus", 
+           "demos", "doc", "humdrum", 
+           "lily", "musicxml", "test", "trecento", 
+           
+           "articulations", 
+           'base', 
            "chord", "chordTables", "clef","common", "converter", \
            "defaults", "duration", "dynamics",\
            "editorial","enharmonic", "environment", \

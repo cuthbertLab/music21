@@ -2887,13 +2887,10 @@ class Stream(music21.Music21Object):
         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority) or cmp(x.classSortOrder, y.classSortOrder))
         newStream = copy.copy(self)
         newStream.elements = post
-        for thisElement in post:
-            thisElement._definedContexts.add(newStream,
-                                     thisElement.getOffsetBySite(self))
+        for e in post:
+            e.addLocation(newStream, e.getOffsetBySite(self))
             # need to explicitly set parent
-            thisElement.parent = newStream 
-
-
+            e.parent = newStream 
         newStream.isSorted = True
         return newStream
     
@@ -2987,7 +2984,7 @@ class Stream(music21.Music21Object):
             # check for stream instance instead
             # if this element is a stream
             if hasattr(e, "elements"): # recurse time:
-                recurseStreamOffset = e._definedContexts.getOffsetBySite(self)
+                recurseStreamOffset = e.getOffsetBySite(self)
                 if retainContainers is True: # semiFlat
                     sNew.insert(recurseStreamOffset, e)
                     recurseStream = e.semiFlat
@@ -2998,15 +2995,14 @@ class Stream(music21.Music21Object):
                 
                 for subEl in recurseStream:
                     # TODO: this should not access the private attribute 
-                    oldOffset = subEl._definedContexts.getOffsetBySite(
-                                recurseStream)
+                    oldOffset = subEl.getOffsetBySite(recurseStream)
                     newOffset = oldOffset + recurseStreamOffset
                     #environLocal.printDebug(["newOffset: ", subEl.id, newOffset])
                     sNew.insert(newOffset, subEl)
             # if element not a stream
             else:
                 # insert into new stream at offset in old stream
-                sNew.insert(e._definedContexts.getOffsetBySite(self), e)
+                sNew.insert(e.getOffsetBySite(self), e)
 
         sNew.isFlat = True
         # here, we store the source stream from which thiss stream was derived
