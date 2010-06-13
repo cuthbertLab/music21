@@ -36,7 +36,6 @@ from music21 import environment
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
-CLASS_SORT_ORDER = ["Clef", "TempoMark", "KeySignature", "TimeSignature", "Dynamic", "GeneralNote"]
 #-------------------------------------------------------------------------------
 
 class StreamException(Exception):
@@ -564,7 +563,8 @@ class Stream(music21.Music21Object):
         >>> n1.getOffsetBySite(st1)
         30.0
         
-        In single argument form list a list of alternating offsets and items, inserts the items
+        In single argument form with a list, the list should contain pairs that alternate
+        offsets and items; the method then, obviously, inserts the items
         at the specified offsets:
         
         >>> n1 = note.Note("G")
@@ -577,7 +577,8 @@ class Stream(music21.Music21Object):
         2.0
         >>> len(st3)
         2
-        
+
+        OMIT_FROM_DOCS
         Raise an error if offset is not a number
         >>> Stream().insert("l","g")
         Traceback (most recent call last):
@@ -676,7 +677,8 @@ class Stream(music21.Music21Object):
         >>> a.append(n3)
         >>> a.highestOffset, a.highestTime
         (18.0, 21.0)
-        
+        >>> n3.getOffsetBySite(a)
+        18.0
         '''
         # store and increment highest time for insert offset
         highestTime = self.highestTime
@@ -2289,12 +2291,17 @@ class Stream(music21.Music21Object):
 
 
     def makeRests(self, refStreamOrTimeRange=None, inPlace=True):
-        '''Given a Stream with an offset not equal to zero, 
+        '''
+        Given a Stream with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
     
-        If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream.
+        If `refStreamOrTimeRange` is provided as a Stream, this 
+        Stream is used to get min and max offsets. If a list is provided, 
+        the list assumed to provide minimum and maximum offsets. Rests will 
+        be added to fill all time defined within refStream.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, 
+        this returns a modified deepcopy.
         
         >>> a = Stream()
         >>> a.insert(20, note.Note())
@@ -2351,12 +2358,12 @@ class Stream(music21.Music21Object):
             # place at oHigh to reach to oHighTarget
             returnObj.insert(oHigh, r)
     
-        returnObj = returnObj.sorted
+        returnObj.elements = returnObj.sorted.elements
         environLocal.printDebug(['makeRests(); dur of first object', returnObj[0].duration])
 
         # do not need to sort, can concatenate without sorting
         # post = streamLead + returnObj 
-        return returnObj.sorted
+        return returnObj
 
 
     def makeTies(self, meterStream=None, inPlace=True, 
@@ -2887,13 +2894,52 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getSorted(self):
-        '''
-        returns a new Stream where all the elements are sorted according to offset time
+        post = copy.copy(self.elements) ## already a copy
+        post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority) or cmp(x.classSortOrder, y.classSortOrder))
+        newStream = copy.copy(self)
+        newStream.elements = post
+        for thisElement in post:
+            thisElement._definedContexts.add(newStream,
+                                     thisElement.getOffsetBySite(self))
+            # need to explicitly set parent
+            thisElement.parent = newStream 
+
+
+        newStream.isSorted = True
+        return newStream
+    
+    sorted = property(_getSorted, doc='''
+        returns a new Stream where all the elements are sorted according to offset time, then
+        priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
+        a Note at offset 0)
         
         if this stream is not flat, then only the highest elements are sorted.  To sort all,
         run myStream.flat.sorted
-                
-        >>> s = Stream()
+        
+        For instance, here is an unsorted Stream
+        
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(1, note.Note("D"))
+        >>> s.insert(0, note.Note("C"))
+        >>> s.show('text')
+        {1.0} <music21.note.Note D>
+        {0.0} <music21.note.Note C>
+        
+        But a sorted version of the Stream puts the C first:
+        
+        >>> s.sorted.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        
+        While the original stream remains unsorted:
+        
+        >>> s.show('text')
+        {1.0} <music21.note.Note D>
+        {0.0} <music21.note.Note C>
+        
+        OMIT_FROM_DOCS
+        >>> s = stream.Stream()
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
         >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
         >>> s.isSorted
@@ -2930,23 +2976,7 @@ class Stream(music21.Music21Object):
         ('C#', 'E')
 
 
-        OMIT_FROM_DOCS
-        TODO: CLEF ORDER RULES, etc.
-        '''
-        post = self.elements ## already a copy
-        post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority))
-        newStream = copy.copy(self)
-        newStream.elements = post
-        for thisElement in post:
-            thisElement._definedContexts.add(newStream,
-                                     thisElement.getOffsetBySite(self))
-            # need to explicitly set parent
-            thisElement.parent = newStream 
-
-        newStream.isSorted = True
-        return newStream
-    
-    sorted = property(_getSorted)        
+        ''')        
 
         
     def _getFlatOrSemiFlat(self, retainContainers):
@@ -4777,7 +4807,13 @@ class Measure(Stream):
 
 
     def shiftElementsAsAnacrusis(self):
-        '''This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part. 
+        '''
+        TODO: NEED Documentation for when to use this -- and needs test
+        that it's actually working.
+        
+        This method assumes that this is an incompletely filled Measure, 
+        and that all elements need to be shifted to the right so that the 
+        last element ends at the end of the part. 
 
         >>> from music21 import *
         >>> m = stream.Measure()
@@ -6856,9 +6892,7 @@ class Test(unittest.TestCase):
 
     def testMakeRests(self):
 
-        import music21
         from music21 import note
-
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
 

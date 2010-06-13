@@ -30,6 +30,8 @@ class ClefException(Exception):
 
 #-------------------------------------------------------------------------------
 class Clef(music21.Music21Object):
+    classSortOrder = 0
+
     def __init__(self):
         music21.Music21Object.__init__(self)
         self.sign = None

@@ -44,10 +44,11 @@ def capuaRuleOne(srcStream):
     '''
     numChanged = 0
     
-    for i in range(0, len(srcStream.notes)-2):
-        n1 = srcStream.notes[i]
-        n2 = srcStream.notes[i+1]
-        n3 = srcStream.notes[i+2]
+    ssn = srcStream.notes
+    for i in range(0, len(ssn)-2):
+        n1 = ssn[i]
+        n2 = ssn[i+1]
+        n3 = ssn[i+2]
 
         if n1.isRest or \
            n2.isRest or \
@@ -98,12 +99,13 @@ def capuaRuleTwo(srcStream):
     returns the number of times a note was changed
     '''
     numChanged = 0
-    
-    for i in range(0, len(srcStream.notes)-3):
-        n1 = srcStream.notes[i]
-        n2 = srcStream.notes[i+1]
-        n3 = srcStream.notes[i+2]
-        n4 = srcStream.notes[i+3]
+
+    ssn = srcStream.notes
+    for i in range(0, len(ssn)-3):
+        n1 = ssn[i]
+        n2 = ssn[i+1]
+        n3 = ssn[i+2]
+        n4 = ssn[i+3]
 
         if n1.isRest or \
            n2.isRest or \
@@ -165,10 +167,11 @@ def capuaRuleThree(srcStream):
     '''
     numChanged = 0
     
-    for i in range(0, len(srcStream.notes)-2):
-        n1 = srcStream.notes[i]
-        n2 = srcStream.notes[i+1]
-        n3 = srcStream.notes[i+2]
+    ssn = srcStream.notes
+    for i in range(0, len(ssn)-2):
+        n1 = ssn[i]
+        n2 = ssn[i+1]
+        n3 = ssn[i+2]
 
         if n1.isRest or \
            n2.isRest or \
@@ -212,11 +215,12 @@ def capuaRuleFourA(srcStream):
     returns the number of notes that were changed
     '''
     numChanged = 0
-    
-    for i in range(0, len(srcStream.notes)-2):
-        n1 = srcStream.notes[i]
-        n2 = srcStream.notes[i+1]
-        n3 = srcStream.notes[i+2]
+
+    ssn = srcStream.notes
+    for i in range(0, len(ssn)-2):
+        n1 = ssn[i]
+        n2 = ssn[i+1]
+        n3 = ssn[i+2]
 
         if n1.isRest or \
            n2.isRest or \
@@ -262,10 +266,11 @@ def capuaRuleFourB(srcStream):
     returns the number of times a note was changed.
     '''
     numChanged = 0
-    for i in range(0, len(srcStream.notes)-2):
-        n1 = srcStream.notes[i]
-        n2 = srcStream.notes[i+1]
-        n3 = srcStream.notes[i+2]
+    ssn = srcStream.notes
+    for i in range(0, len(ssn)-2):
+        n1 = ssn[i]
+        n2 = ssn[i+1]
+        n3 = ssn[i+2]
 
         if n1.isRest or \
            n2.isRest or \
@@ -882,9 +887,12 @@ def ruleFrequency():
     num3 = 0
     num4a = 0
     num4b = 0
-    for i in range(2, 100): #459): # all ballate
+    for i in range(2, 459): # all ballate
+        if (i == 15):
+            pass
         pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         theseStreams = pieceObj.getAllStreams()
+
         for thisStream in theseStreams:
             num1 += 0#capuaRuleOne(thisStream)
             num2 += 0#capuaRuleTwo(thisStream)

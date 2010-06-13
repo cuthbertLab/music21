@@ -53,10 +53,20 @@ englishNames  = {'ppp': 'extremely soft',
                  'fff': 'extremely loud'} 
 
 
-def unitIntervalToName(n):
-    '''Given a unit interval value, map to a dynamic name.
+def dynamicStrFromDecimal(n):
     '''
-    if n > 0 and n < .1:
+    Given a decimal from 0 to 1, return a string representing a dynamic
+    with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
+    0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
+    
+    >>> dynamicStrFromDecimal(0.25)
+    'p'
+    >>> dynamicStrFromDecimal(1)
+    'fff'
+    '''
+    if n == 0:
+        return 'n'
+    elif n > 0 and n < .1:
         return 'ppp'
     elif n >= .1 and n < .2:
         return 'pp'
@@ -83,14 +93,32 @@ class WedgeException(Exception):
 
 class Dynamic(music21.Music21Object):
     '''Object representation of Dyanmics.
+    
+    >>> from music21 import *
+    >>> pp1 = dynamics.Dynamic('pp')
+    >>> pp1.value
+    'pp'
+    >>> pp1.longName
+    'pianissimo'
+    >>> pp1.englishName
+    'very soft'
+    
+    Dynamics can also be specified on a 0 to 1 scale with 1 being the 
+    loudest (see dynamicStrFromDecimal() above)
+    
+    >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
+    >>> pp2.value
+    'pp'
     '''
+    
+    classSortOrder = 10
     
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
 
         if not common.isStr(value):
             # assume it is a number, try to convert
-            value = unitIntervalToName(value)
+            value = dynamicStrFromDecimal(value)
 
         self.value = value
 

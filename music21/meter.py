@@ -1579,6 +1579,8 @@ class MeterSequence(MeterTerminal):
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
 
+    classSortOrder = 4
+    
     def __init__(self, value='4/4', partitionRequest=None):
         music21.Music21Object.__init__(self)
 

@@ -23,6 +23,8 @@ class TempoMark(music21.Music21Object):
     'adagio'
     '''
     
+    classSortOrder = 1
+    
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
         self.value = value

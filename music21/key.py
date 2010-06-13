@@ -213,6 +213,8 @@ class KeySignature(music21.Music21Object):
     # one or more altered tones; these are given as pairs of 
     # step names and semiton alterations
 
+    classSortOrder = 2
+    
     def __init__(self, sharps = None):
         '''
         >>> a = KeySignature(3)

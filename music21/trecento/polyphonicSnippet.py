@@ -99,17 +99,23 @@ class FrontPaddedCadence(PolyphonicSnippet):
         front to make it the same length as the longest line
         '''
         shortmeasures = int(self.measuresShort(thisStream))
+
         if (shortmeasures > 0):
             shortDuration = self.timeSig.barDuration
-            newNotes = stream.Stream()
+            offsetShift = shortDuration.quarterLength * shortmeasures
+            for thisNote in thisStream.notes:
+                thisNote.setOffsetBySite(thisStream, thisNote.getOffsetBySite(thisStream) + offsetShift) 
+
             for i in range(0, shortmeasures):
                 newRest = note.Rest()
                 newRest.duration = copy.deepcopy(shortDuration)
                 newRest.transparent = 1
-                newNotes.append(newRest)
-            newNotes[0].startTransparency = 1
-            newNotes[-1].stopTransparency = 1
-            thisStream.elements = newNotes.elements + thisStream.elements
+                thisStream.insert(shortDuration.quarterLength * i, newRest)
+                if i == 0:
+                    newRest.startTransparency = 1
+                elif i == (shortmeasures - 1):
+                    newRest.stopTransparency = 1
+            thisStream.elements = thisStream.sorted.elements
 
     def header(self):
         headOut = " \\header { \n piece = \"" + self.parentPiece.title
