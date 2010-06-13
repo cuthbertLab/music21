@@ -353,10 +353,18 @@ class Stream(music21.Music21Object):
         >>> c = a + b   
         >>> c.pitches
         [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
+        >>> len(c.notes)
+        20
         '''
         s = Stream()
-        s.elements = self._elements + other._elements
-        s._elementsChanged()
+        # may want to keep parent of source Stream?
+        #s.elements = self._elements + other._elements
+        # need to iterate over elements and re-assign to create new locations
+        for e in self._elements:
+            s.insert(e.getOffsetBySite(self), e)
+        for e in other._elements:
+            s.insert(e.getOffsetBySite(other), e)
+        #s._elementsChanged()
         return s
 
 
