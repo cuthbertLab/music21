@@ -63,7 +63,7 @@ Chord
 
         Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Chord** **properties**
 

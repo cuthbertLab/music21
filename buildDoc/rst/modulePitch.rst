@@ -151,7 +151,7 @@ Pitch
 
         Attributes without Documentation: `defaultOctave`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Pitch** **properties**
 
@@ -431,7 +431,7 @@ Accidental
 
         Attributes without Documentation: `displayLocation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
 
     **Accidental** **properties**
 

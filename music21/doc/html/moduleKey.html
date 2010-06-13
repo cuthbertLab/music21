@@ -157,6 +157,28 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>KeySignature</strong> <strong>attributes</strong></p>
 <blockquote>
+<dl class="attribute">
+<dt id="music21.key.KeySignature.classSortOrder">
+<tt class="descname">classSortOrder</tt><a class="headerlink" href="#music21.key.KeySignature.classSortOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone &#8211; used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">1</span>
+<span class="go">New classes can define their own default classSortOrder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">ExampleClass</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">classSortOrderDefault</span> <span class="o">=</span> <span class="mf">5</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span> <span class="o">=</span> <span class="n">ExampleClass</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p>Attributes without Documentation: <cite>sharps</cite>, <cite>mode</cite></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
@@ -277,7 +299,7 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">Key</
 <p><strong>Key</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>accidental</cite>, <cite>typeList</cite>, <cite>step</cite>, <cite>stepList</cite>, <cite>stream1</cite>, <cite>accidentalList</cite>, <cite>type</cite></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
 </blockquote>
 <p><strong>Key</strong> <strong>properties</strong></p>
 <blockquote>
@@ -327,7 +349,7 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 12, 2010.
+      Last updated on Jun 13, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

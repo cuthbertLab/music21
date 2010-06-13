@@ -52,7 +52,7 @@ Note
 
         Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Note** **properties**
 
@@ -171,7 +171,7 @@ Rest
 
         Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Rest** **properties**
 
@@ -242,7 +242,7 @@ GeneralNote
 
         Attributes without Documentation: `notations`, `articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **GeneralNote** **properties**
 
@@ -441,7 +441,7 @@ NotRest
 
         Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **NotRest** **properties**
 
@@ -515,7 +515,7 @@ Tie
 
         Attributes without Documentation: `type`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Tie** **properties**
 
@@ -553,7 +553,7 @@ Unpitched
 
         Attributes inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.editorial`, :attr:`~music21.note.GeneralNote.isChord`, :attr:`~music21.note.GeneralNote.lyrics`, :attr:`~music21.note.GeneralNote.notations`, :attr:`~music21.note.GeneralNote.tie`, :attr:`~music21.note.GeneralNote.articulations`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Unpitched** **properties**
 

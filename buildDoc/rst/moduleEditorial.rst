@@ -30,7 +30,7 @@ NoteEditorial
 
         Attributes without Documentation: `comment`, `ficta`, `melodicInterval`, `color`, `melodicIntervalOverRests`, `harmonicInterval`, `melodicIntervals`, `melodicIntervalsOverRests`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
 
     **NoteEditorial** **properties**
 

@@ -21,7 +21,7 @@ Fermata
 
         Attributes without Documentation: `lily`, `shape`, `type`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Fermata** **properties**
 
@@ -55,7 +55,7 @@ GeneralMordent
 
         Attributes inherited from :class:`~music21.expressions.Ornament`: :attr:`~music21.expressions.Ornament.connectedToPrevious`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **GeneralMordent** **properties**
 
@@ -132,7 +132,7 @@ Ornament
 
         Attributes without Documentation: `connectedToPrevious`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Ornament** **properties**
 
@@ -157,7 +157,7 @@ Trill
 
         Attributes inherited from :class:`~music21.expressions.Ornament`: :attr:`~music21.expressions.Ornament.connectedToPrevious`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Trill** **properties**
 

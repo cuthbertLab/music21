@@ -121,7 +121,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dd>Boolean describing whether the Stream is sorted or not.</dd></dl>
 
 <p>Attributes without Documentation: <cite>isMeasure</cite>, <cite>classNames</cite></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Stream</strong> <strong>properties</strong></p>
 <blockquote>
@@ -298,42 +298,22 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt id="music21.stream.Stream.sorted">
 <tt class="descname">sorted</tt><a class="headerlink" href="#music21.stream.Stream.sorted" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C#&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">isSorted</span>
-<span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
-<span class="go">&#39;0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; &#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sorted</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">isSorted</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
-<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; &#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">farRight</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">2.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">farRight</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
-<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; &#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">sorted</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">myElement</span> <span class="ow">in</span> <span class="n">z</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="n">g</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myElement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">myElement</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
-<span class="go">&#39;0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; &#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-<span class="go">(&#39;C#&#39;, &#39;E&#39;)</span>
+<dd><p>returns a new Stream where all the elements are sorted according to offset time, then priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before a Note at offset 0) if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted For instance, here is an unsorted Stream</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{1.0} &lt;music21.note.Note D&gt;</span>
+<span class="go">{0.0} &lt;music21.note.Note C&gt;</span>
+<span class="go">But a sorted version of the Stream puts the C first:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">sorted</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.note.Note C&gt;</span>
+<span class="go">{1.0} &lt;music21.note.Note D&gt;</span>
+<span class="go">While the original stream remains unsorted:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{1.0} &lt;music21.note.Note D&gt;</span>
+<span class="go">{0.0} &lt;music21.note.Note C&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -381,6 +361,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">highestOffset</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">highestTime</span>
 <span class="go">(18.0, 21.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n3</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">18.0</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -402,7 +384,8 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">40.0</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="n">st1</span><span class="p">)</span>
 <span class="go">30.0</span>
-<span class="go">In single argument form list a list of alternating offsets and items, inserts the items</span>
+<span class="go">In single argument form with a list, the list should contain pairs that alternate</span>
+<span class="go">offsets and items; the method then, obviously, inserts the items</span>
 <span class="go">at the specified offsets:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;G&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">)</span>
@@ -414,10 +397,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <span class="go">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">st3</span><span class="p">)</span>
 <span class="go">2</span>
-<span class="go">Raise an error if offset is not a number</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Stream</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&quot;l&quot;</span><span class="p">,</span><span class="s">&quot;g&quot;</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">StreamException</span>: <span class="n-Identifier">...</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1179,7 +1158,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="method">
 <dt id="music21.stream.Stream.makeRests">
 <tt class="descname">makeRests</tt><big>(</big><em>refStreamOrTimeRange=None</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.makeRests" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If <cite>refStreamOrTimeRange</cite> is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deep copy.</p>
+<dd><p>Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If <cite>refStreamOrTimeRange</cite> is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. If <cite>inPlace</cite> is True, this is done in-place; if <cite>inPlace</cite> is False, this returns a modified deepcopy.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1568,7 +1547,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 
 <p>Attributes without Documentation: <cite>isMeasure</cite>, <cite>leftbarline</cite>, <cite>rightbarline</cite>, <cite>filled</cite></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Measure</strong> <strong>properties</strong></p>
 <blockquote>
@@ -1695,7 +1674,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="method">
 <dt id="music21.stream.Measure.shiftElementsAsAnacrusis">
 <tt class="descname">shiftElementsAsAnacrusis</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.shiftElementsAsAnacrusis" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part.</p>
+<dd><p>TODO: NEED Documentation for when to use this &#8211; and needs test that it&#8217;s actually working. This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">timeSignature</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">)</span>
@@ -1725,7 +1704,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 <blockquote>
 <p>Attributes without Documentation: <cite>pageNumber</cite></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <tt class="xref docutils literal"><span class="pre">isMeasure</span></tt>, <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Page</strong> <strong>properties</strong></p>
 <blockquote>
@@ -1785,7 +1764,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <blockquote>
 <p>Attributes without Documentation: <cite>staffLines</cite></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <tt class="xref docutils literal"><span class="pre">isMeasure</span></tt>, <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Staff</strong> <strong>properties</strong></p>
 <blockquote>
@@ -1812,7 +1791,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 <blockquote>
 <p>Attributes without Documentation: <cite>systemNumber</cite>, <cite>systemNumbering</cite></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <tt class="xref docutils literal"><span class="pre">isMeasure</span></tt>, <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>System</strong> <strong>properties</strong></p>
 <blockquote>
@@ -1866,7 +1845,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 12, 2010.
+      Last updated on Jun 13, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -21,7 +21,7 @@ Instrument
 
         Attributes without Documentation: `instrumentName`, `midiChannel`, `partId`, `partName`, `midiProgram`, `instrumentAbbreviation`, `transposition`, `partAbbreviation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Instrument** **properties**
 
@@ -67,7 +67,7 @@ StringInstrument
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **StringInstrument** **properties**
 
@@ -117,7 +117,7 @@ Viola
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Viola** **properties**
 
@@ -150,7 +150,7 @@ Violin
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Violin** **properties**
 
@@ -183,7 +183,7 @@ Violoncello
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Violoncello** **properties**
 

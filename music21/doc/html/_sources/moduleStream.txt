@@ -40,7 +40,7 @@ Stream
 
         Attributes without Documentation: `isMeasure`, `classNames`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Stream** **properties**
 
@@ -192,45 +192,23 @@ Stream
 
         .. attribute:: sorted
 
-            returns a new Stream where all the elements are sorted according to offset time if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted 
+            returns a new Stream where all the elements are sorted according to offset time, then priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before a Note at offset 0) if this stream is not flat, then only the highest elements are sorted.  To sort all, run myStream.flat.sorted For instance, here is an unsorted Stream 
 
-            >>> s = Stream()
-            >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
-            >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
-            >>> s.isSorted
-            False 
-            >>> g = ""
-            >>> for myElement in s:
-            ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
-            >>> g
-            '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; ' 
-            >>> y = s.sorted
-            >>> y.isSorted
-            True 
-            >>> g = ""
-            >>> for myElement in y:
-            ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
-            >>> g
-            '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ' 
-            >>> farRight = note.Note("E")
-            >>> farRight.priority = 5
-            >>> farRight.offset = 2.0
-            >>> y.insert(farRight)
-            >>> g = ""
-            >>> for myElement in y:
-            ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
-            >>> g
-            '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; ' 
-            >>> z = y.sorted
-            >>> g = ""
-            >>> for myElement in z:
-            ...    g += "%s: %s; " % (myElement.offset, myElement.name) 
-            >>> g
-            '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; ' 
-            >>> z[2].name, z[3].name
-            ('C#', 'E') 
-
-            
+            >>> from music21 import *
+            >>> s = stream.Stream()
+            >>> s.insert(1, note.Note("D"))
+            >>> s.insert(0, note.Note("C"))
+            >>> s.show('text')
+            {1.0} <music21.note.Note D> 
+            {0.0} <music21.note.Note C> 
+            But a sorted version of the Stream puts the C first: 
+            >>> s.sorted.show('text')
+            {0.0} <music21.note.Note C> 
+            {1.0} <music21.note.Note D> 
+            While the original stream remains unsorted: 
+            >>> s.show('text')
+            {1.0} <music21.note.Note D> 
+            {0.0} <music21.note.Note C> 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -275,8 +253,8 @@ Stream
             >>> a.append(n3)
             >>> a.highestOffset, a.highestTime
             (18.0, 21.0) 
-
-            
+            >>> n3.getOffsetBySite(a)
+            18.0 
 
         .. method:: insert(offsetOrItemOrList, itemOrNone=None, ignoreSort=False)
 
@@ -295,7 +273,8 @@ Stream
             >>> st2.insert(40.0, n1)
             >>> n1.getOffsetBySite(st1)
             30.0 
-            In single argument form list a list of alternating offsets and items, inserts the items 
+            In single argument form with a list, the list should contain pairs that alternate 
+            offsets and items; the method then, obviously, inserts the items 
             at the specified offsets: 
             >>> n1 = note.Note("G")
             >>> n2 = note.Note("F#")
@@ -307,12 +286,6 @@ Stream
             2.0 
             >>> len(st3)
             2 
-            Raise an error if offset is not a number 
-            >>> Stream().insert("l","g")
-            Traceback (most recent call last): 
-            StreamException: ... 
-
-            
 
         .. method:: addGroupForElements(group, classFilter=None)
 
@@ -987,7 +960,7 @@ Stream
 
         .. method:: makeRests(refStreamOrTimeRange=None, inPlace=True)
 
-            Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
+            Given a Stream with an offset not equal to zero, fill with one Rest preeceding this offset. If `refStreamOrTimeRange` is provided as a Stream, this Stream is used to get min and max offsets. If a list is provided, the list assumed to provide minimum and maximum offsets. Rests will be added to fill all time defined within refStream. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deepcopy. 
 
             >>> a = Stream()
             >>> a.insert(20, note.Note())
@@ -1314,7 +1287,7 @@ Measure
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Measure** **properties**
 
@@ -1421,7 +1394,7 @@ Measure
 
         .. method:: shiftElementsAsAnacrusis()
 
-            This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part. 
+            TODO: NEED Documentation for when to use this -- and needs test that it's actually working. This method assumes that this is an incompletely filled Measure, and that all elements need to be shifted to the right so that the last element ends at the end of the part. 
 
             >>> from music21 import *
             >>> m = stream.Measure()
@@ -1457,7 +1430,7 @@ Page
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Page** **properties**
 
@@ -1535,7 +1508,7 @@ Staff
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Staff** **properties**
 
@@ -1571,7 +1544,7 @@ System
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **System** **properties**
 

@@ -101,6 +101,28 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <p><strong>Music21Object</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
+<dt id="music21.base.Music21Object.classSortOrder">
+<tt class="descname">classSortOrder</tt><a class="headerlink" href="#music21.base.Music21Object.classSortOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone &#8211; used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">1</span>
+<span class="go">New classes can define their own default classSortOrder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">ExampleClass</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">classSortOrderDefault</span> <span class="o">=</span> <span class="mf">5</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span> <span class="o">=</span> <span class="n">ExampleClass</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span><span class="o">.</span><span class="n">classSortOrder</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.base.Music21Object.id">
 <tt class="descname">id</tt><a class="headerlink" href="#music21.base.Music21Object.id" title="Permalink to this definition">¶</a></dt>
 <dd>Unique identification string.</dd></dl>
@@ -131,8 +153,9 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <dl class="attribute">
 <dt id="music21.base.Music21Object.priority">
 <tt class="descname">priority</tt><a class="headerlink" href="#music21.base.Music21Object.priority" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.stream.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
+<dd><p>Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.base.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="s">&#39;high&#39;</span>
 <span class="gt">Traceback (most recent call last):</span>
@@ -442,6 +465,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <tt class="descname">obj</tt><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
 <dd>The object this wrapper wraps.</dd></dl>
 
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference internal" href="#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a></p>
 </blockquote>
 <p><strong>ElementWrapper</strong> <strong>properties</strong></p>
 <blockquote>
@@ -1015,7 +1039,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 12, 2010.
+      Last updated on Jun 13, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

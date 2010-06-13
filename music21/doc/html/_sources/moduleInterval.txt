@@ -318,7 +318,7 @@ Interval
 
         Attributes without Documentation: `chromatic`, `diatonic`, `diatonicType`, `direction`, `generic`, `niceName`, `type`
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
     **Interval** **properties**
 
@@ -472,7 +472,7 @@ ChromaticInterval
 
     **ChromaticInterval** **attributes**
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
 
     **ChromaticInterval** **properties**
 
@@ -556,7 +556,7 @@ DiatonicInterval
 
     **DiatonicInterval** **attributes**
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
 
     **DiatonicInterval** **properties**
 
@@ -644,7 +644,7 @@ GenericInterval
 
     **GenericInterval** **attributes**
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`
+        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
 
     **GenericInterval** **properties**
 

@@ -791,6 +791,7 @@ class RestructuredWriter(object):
         rstExclude = ['.. image::', ':width:']
 
         docTestImportPackage = '>>> from music21 import *'
+        docTestImportPackageReplace = """>>> from music21 import *"""
 #         docTestImportModNames = '>>> from %s import *' % modName
 #         # mod name here is qualified; need to remove package name
 #         if 'music21.' in modName:
@@ -840,7 +841,7 @@ class RestructuredWriter(object):
                     # if import is the module import, replace with package
                     if line.startswith(docTestImportPackage):
                         # can try to mark up import here
-                        msg.append(space + indent + docTestImportPackage)
+                        msg.append(space + indent + docTestImportPackageReplace)
                     else: # if no import is given, assume we need a mod import
                         # need only one return after first line
                         msg.append(space + indent + line)
@@ -1160,6 +1161,9 @@ class ModuleDoc(RestructuredWriter):
         # the heading needs to immediately follow the underscore identifier
         msg.append('.. _module%s:\n\n' % modNameStr)
         msg += self._heading(self.modName , '=')
+
+        # add any global roles here
+        #msg.append('.. roles:: import\n\n')
 
         msg.append(WARN_EDIT)
         # this defines this rst file as a module; does not create output

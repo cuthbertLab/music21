@@ -108,6 +108,25 @@ TimeSignature
 
     **TimeSignature** **attributes**
 
+        .. attribute:: classSortOrder
+
+            Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone -- used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 -- same as note.Note 
+
+            >>> from music21 import *
+            >>> tc = clef.TrebleClef()
+            >>> tc.classSortOrder
+            0 
+            >>> ks = key.KeySignature(3)
+            >>> ks.classSortOrder
+            1 
+            New classes can define their own default classSortOrder 
+            >>> class ExampleClass(base.Music21Object):
+            ...     classSortOrderDefault = 5 
+            ... 
+            >>> ec1 = ExampleClass()
+            >>> ec1.classSortOrder
+            5 
+
         .. attribute:: display
 
             A meter sequence is a list of MeterTerminals, or other MeterSequences 
@@ -979,7 +998,7 @@ NonPowerOfTwoTimeSignature
 
     **NonPowerOfTwoTimeSignature** **attributes**
 
-        Attributes inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.symbolizeDenominator`, :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.symbol`, :attr:`~music21.meter.TimeSignature.accent`, :attr:`~music21.meter.TimeSignature.summedNumerator`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.inherited`
+        Attributes inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.classSortOrder`, :attr:`~music21.meter.TimeSignature.symbolizeDenominator`, :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.symbol`, :attr:`~music21.meter.TimeSignature.accent`, :attr:`~music21.meter.TimeSignature.summedNumerator`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.inherited`
 
         Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.id`, :attr:`~music21.base.Music21Object.groups`
 
