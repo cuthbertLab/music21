@@ -331,9 +331,14 @@ class MeterTerminal(object):
         >>> from music21 import meter
         >>> a = meter.MeterTerminal('3/4')
         >>> b = meter.MeterTerminal('6/4')
-        >>> b = meter.MeterTerminal('2/4')
-        >>> c = meter.MeterTerminal('3/4')
+        >>> c = meter.MeterTerminal('2/4')
+        >>> d = meter.MeterTerminal('3/4')
         >>> a.ratioEqual(b)
+        False
+        >>> a.ratioEqual(c)
+        False
+        >>> a.ratioEqual(d)
+        True
         '''
         if other == None: return False
         if (other.numerator == self.numerator and 
