@@ -399,6 +399,7 @@ class DefinedContexts(object):
         else:
             dict['name'] = name
         if timeValue == None:
+            # NOTE: this may not give sub-second resolution on some platforms
             dict['time'] = time.time()
         else:
             dict['time'] = timeValue
