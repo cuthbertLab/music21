@@ -468,19 +468,22 @@ class DefinedContexts(object):
     def _keysByTime(self):
         '''Get keys sorted by creation time, where most recent are always first.
 
+        >>> from music21 import *
+        >>> import time
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(cObj, 345)
+        >>> time.sleep(.05)
         >>> aContexts.add(aObj)
+        >>> time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> k = aContexts._keysByTime()
         >>> aContexts._definedContexts[k[0]]['time'] > aContexts._definedContexts[k[1]]['time'] > aContexts._definedContexts[k[2]]['time']
         True
         '''
-
         post = []
         for key in self._definedContexts.keys():
             post.append((self._definedContexts[key]['time'], key))
@@ -496,13 +499,17 @@ class DefinedContexts(object):
 
         The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
+        >>> from music21 import *
+        >>> import time
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
-        >>> aContexts.add(cObj, 345)
+        >>> aContexts.add(cObj, 345) # a locations
+        >>> time.sleep(.05)
         >>> aContexts.add(aObj)
+        >>> time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> aContexts.get() == [cObj, aObj, bObj]
         True
@@ -817,10 +824,12 @@ class DefinedContexts(object):
         is necessary if we are looking within a Stream for a flat offset position.
 
         >>> class Mock(Music21Object): pass
+        >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(aObj)
+        >>> time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> # we get the most recently added object first
         >>> aContexts.getByClass('mock', sortByCreationTime=True) == bObj
