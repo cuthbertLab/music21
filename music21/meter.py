@@ -222,21 +222,22 @@ def fractionSum(fList):
 def proportionToFraction(value):
     '''Given a floating point proportional value between 0 and 1, return the best-fit slash-base fraction
 
-    >>> proportionToFraction(.5)
+    >>> from music21 import *
+    >>> meter.proportionToFraction(.5)
     (1, 2)
-    >>> proportionToFraction(.25)
+    >>> meter.proportionToFraction(.25)
     (1, 4)
-    >>> proportionToFraction(.75)
+    >>> meter.proportionToFraction(.75)
     (3, 4)
-    >>> proportionToFraction(.125)
+    >>> meter.proportionToFraction(.125)
     (1, 8)
-    >>> proportionToFraction(.375) 
+    >>> meter.proportionToFraction(.375) 
     (3, 8)
-    >>> proportionToFraction(.625) 
+    >>> meter.proportionToFraction(.625) 
     (5, 8)
-    >>> proportionToFraction(.333) 
+    >>> meter.proportionToFraction(.333) 
     (1, 3)
-    >>> proportionToFraction(0.83333) 
+    >>> meter.proportionToFraction(0.83333) 
     (5, 6)
     '''
     # TODO: this is a brut-force method: is there a more elegant alternative?
@@ -326,6 +327,13 @@ class MeterTerminal(object):
     def ratioEqual(self, other):        
         '''Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
+
+        >>> from music21 import meter
+        >>> a = meter.MeterTerminal('3/4')
+        >>> b = meter.MeterTerminal('6/4')
+        >>> b = meter.MeterTerminal('2/4')
+        >>> c = meter.MeterTerminal('3/4')
+        >>> a.ratioEqual(b)
         '''
         if other == None: return False
         if (other.numerator == self.numerator and 
