@@ -260,11 +260,11 @@ class Stream(music21.Music21Object):
         '''
         self.isSorted = False
         self.isFlat = True
-
         for thisElement in self._elements:
             if isinstance(thisElement, Stream): 
                 self.isFlat = False
                 break
+        # resetting the cache removes lowest and highest time storage
         self._cache = common.defHash()
 
     def _getElements(self):
@@ -689,7 +689,6 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:    
-    
             # if not an element, embed
             if not isinstance(item, music21.Music21Object): 
                 element = music21.ElementWrapper(item)
@@ -739,14 +738,18 @@ class Stream(music21.Music21Object):
         '''
         self.insert(item.getOffsetBySite(None), item)
 
-    def insertAndShift(self, offsetOrItemOrList, itemOrNone=None, 
-            ignoreSort=False):
+    def insertAndShift(self, offsetOrItemOrList, itemOrNone=None):
         '''Insert an item at a specified or native offset, and shit any elements found in the Stream to start at the end of the added elements.
+
+        This presently does not shift elements that have durations that extend into the lowest insert position.
 
         >>> st1 = Stream()
         >>> st1.insertAndShift(32, note.Note("B-"))
-        >>> st1._getHighestOffset()
+        >>> st1.highestOffset
         32.0
+        >>> st1.insertAndShift(32, note.Note("B-"))
+        >>> st1.highestOffset
+        33.0
         
         In the single argument form with an object, inserts the element at its stored offset:
         
@@ -776,7 +779,7 @@ class Stream(music21.Music21Object):
         '''
         # need to find the highest time after the insert  
         if itemOrNone != None: # we have an offset and an element
-            if hasattr(itemOrNone, 'duration'):
+            if hasattr(itemOrNone, 'duration') and itemOrNone.duration != None:
                 dur = itemOrNone.duration.quarterLength
             else:
                 dur = 0.0
@@ -790,7 +793,7 @@ class Stream(music21.Music21Object):
             while i < len(offsetOrItemOrList):
                 o = offsetOrItemOrList[i]
                 e = offsetOrItemOrList[i+1]
-                if hasattr(e, 'duration'):
+                if hasattr(e, 'duration')  and e.duration != None:
                     dur = e.duration.quarterLength
                 else:
                     dur = 0.0
@@ -808,18 +811,56 @@ class Stream(music21.Music21Object):
             highestTimeInsert = offsetOrItemOrList.offset + dur
             lowestOffsetInsert = offsetOrItemOrList.offset
 
-        shift = highestTimeInsert - lowestOffsetInsert
-        # need to move all the elements at the specifie
+        # this shift is the additional time to move due to the duration
+        # of the newly inserted elements
+        shiftDur = highestTimeInsert - lowestOffsetInsert
+
+
+        environLocal.printDebug(['insertAndShift()', 'adding one or more elements', 'lowestOffsetInsert', lowestOffsetInsert, 'highestTimeInsert', highestTimeInsert])
+
+        # are not assuming that elements are ordered
+        # use getElementAtOrAfter() in the future
+        lowestElementToShift = None
+        lowestGap = None
         for e in self._elements:
             o = e.getOffsetBySite(self)
+            # gap is distance from offset to insert point; tells if shift is 
+            # necessary
             gap = o - lowestOffsetInsert
+            if gap < 0: # no shifting necessary
+                continue 
             # only process elments whose offsets are after the lowest insert
-            if gap >= 0.0:
-                # need shift, plus the distance from the start
-                e.setOffsetBySite(self, gap+shift)
+            if lowestGap == None or gap < lowestGap:
+                lowestGap = gap
+                lowestElementToShift = e
+
+        if lowestElementToShift != None:
+            lowestOffsetToShift = lowestElementToShift.getOffsetBySite(self)
+            shiftPos = highestTimeInsert - lowestOffsetToShift
+        else:
+            shiftPos = 0
+
+        if shiftPos > 0:
+            # need to move all the elements already in this stream
+            for e in self._elements:
+                o = e.getOffsetBySite(self)
+                # gap is distance from offset to insert point; tells if shift is 
+                # necessary
+                gap = o - lowestOffsetInsert
+                # only process elments whose offsets are after the lowest insert
+                if gap >= 0.0:
+                    environLocal.printDebug(['insertAndShift()', e, 'offset', o,
+                        'gap:', gap, 'shiftDur:', shiftDur, 'shiftPos:', shiftPos, 
+                        'o+shiftDur', o+shiftDur,
+                        'o+shiftPos', o+shiftPos])
+    
+                    # need original offset, shiftDur, plus the distance from the start
+                    e.setOffsetBySite(self, o+shiftPos)
         # after shifting all the necessary elements, append new ones
         # these will not be in order
-        self.insert(offsetOrItemOrList, itemOrNone, ignoreSort)
+        self.insert(offsetOrItemOrList, itemOrNone)
+        # call this is elements are now out of order
+        self._elementsChanged()         
 
 
     def isClass(self, className):
@@ -7846,18 +7887,152 @@ class Test(unittest.TestCase):
 
 
     def testInsertAndShiftBasic(self):
+        import random
         from music21 import note
-
         offsets = [0, 2, 4, 6, 8, 10, 12]
         n = note.Note()
         n.quarterLength = 2
-        
         s = Stream()
         s.repeatInsert(n, offsets)
-        
-        
-        nAlter = note.Note()
-        s.insertAndShift(0, nAlter)
+        # qL, insertOffset, newHighOffset, newHighTime
+        data = [
+                 (.25, 0, 12.25, 14.25),
+                 (3, 0, 15, 17),
+                 (6.5, 0, 18.5, 20.5),
+                 # shifting at a positing where another element starts
+                 (.25, 4, 12.25, 14.25),
+                 (3, 4, 15, 17),
+                 (6.5, 4, 18.5, 20.5),
+                 # shift the same duration at different insert points
+                 (1, 2, 13, 15),
+                 (2, 2, 14, 16),
+                 # this is overlapping element at 2 by 1, ending at 4
+                 # results in no change in new high values
+                 (1, 3, 12, 14), 
+                 # since duration is here 2, extend new starts to 5
+                 (2, 3, 13, 15), 
+                 (1, 4, 13, 15),
+                 (2, 4, 14, 16),
+                 # here, we do not shift the element at 4, only event at 6
+                 (2, 4.5, 12.5, 14.5),
+                 # here, we insert the start of an element and can shift it
+                 (2.5, 4, 14.5, 16.5),
+            ]
+        for qL, insertOffset, newHighOffset, newHighTime in data:
+            sProc = copy.deepcopy(s)        
+            self.assertEqual(sProc.highestOffset, 12)
+            self.assertEqual(sProc.highestTime, 14)
+            nAlter = note.Note()
+            nAlter.quarterLength = qL
+            sProc.insertAndShift(insertOffset, nAlter)
+            sProc.elements = sProc.sorted.elements
+            self.assertEqual(sProc.highestOffset, newHighOffset)
+            self.assertEqual(sProc.highestTime, newHighTime)
+            self.assertEqual(len(sProc), len(s)+1)
+
+            # try the same with scrambled elements
+            sProc = copy.deepcopy(s)        
+            random.shuffle(sProc._elements)
+            sProc._elementsChanged()
+
+            self.assertEqual(sProc.highestOffset, 12)
+            self.assertEqual(sProc.highestTime, 14)
+            nAlter = note.Note()
+            nAlter.quarterLength = qL
+            sProc.insertAndShift(insertOffset, nAlter)
+            sProc.elements = sProc.sorted.elements
+            self.assertEqual(sProc.highestOffset, newHighOffset)
+            self.assertEqual(sProc.highestTime, newHighTime)
+            self.assertEqual(len(sProc), len(s)+1)
+
+
+    def testInsertAndShiftNoDuration(self):
+        import random
+        from music21 import note
+        offsets = [0, 2, 4, 6, 8, 10, 12]
+        n = note.Note()
+        n.quarterLength = 2
+        s = Stream()
+        s.repeatInsert(n, offsets)
+        # qL, insertOffset, newHighOffset, newHighTime
+        data = [
+                 (.25, 0, 12, 14),
+                 (3, 0, 12, 14),
+                 (6.5, 0, 12, 14),
+                 (.25, 4, 12, 14),
+                 (3, 4, 12, 14),
+                 (6.5, 4, 12, 14),
+                 (1, 2, 12, 14),
+                 (2, 2, 12, 14),
+                 (1, 3, 12, 14), 
+            ]
+        for qL, insertOffset, newHighOffset, newHighTime in data:
+            sProc = copy.deepcopy(s)        
+            self.assertEqual(sProc.highestOffset, 12)
+            self.assertEqual(sProc.highestTime, 14)
+
+            c = clef.Clef()
+            sProc.insertAndShift(insertOffset, c)
+            #sProc.elements = sProc.sorted.elements
+            self.assertEqual(sProc.highestOffset, newHighOffset)
+            self.assertEqual(sProc.highestTime, newHighTime)
+            self.assertEqual(len(sProc), len(s)+1)
+
+
+
+    def testInsertAndShiftMultipleElements(self):
+        import random
+        from music21 import note
+        offsets = [0, 2, 4, 6, 8, 10, 12]
+        n = note.Note()
+        n.quarterLength = 2
+        s = Stream()
+        s.repeatInsert(n, offsets)
+        # qL, insertOffset, newHighOffset, newHighTime
+        data = [
+                 (.25, 0, 12.25, 14.25),
+                 (3, 0, 15, 17),
+                 (6.5, 0, 18.5, 20.5),
+                 # shifting at a positing where another element starts
+                 (.25, 4, 12.25, 14.25),
+                 (3, 4, 15, 17),
+                 (6.5, 4, 18.5, 20.5),
+                 # shift the same duration at different insert points
+                 (1, 2, 13, 15),
+                 (2, 2, 14, 16),
+                 # this is overlapping element at 2 by 1, ending at 4
+                 # results in no change in new high values
+                 (1, 3, 12, 14), 
+                 # since duration is here 2, extend new starts to 5
+                 (2, 3, 13, 15), 
+                 (1, 4, 13, 15),
+                 (2, 4, 14, 16),
+                 # here, we do not shift the element at 4, only event at 6
+                 (2, 4.5, 12.5, 14.5),
+                 # here, we insert the start of an element and can shift it
+                 (2.5, 4, 14.5, 16.5),
+            ]
+        for qL, insertOffset, newHighOffset, newHighTime in data:
+            sProc = copy.deepcopy(s)        
+            self.assertEqual(sProc.highestOffset, 12)
+            self.assertEqual(sProc.highestTime, 14)
+
+            # fill with sixteenth notes
+            nAlter = note.Note()
+            nAlter.quarterLength = .25
+            itemList = []
+            o = insertOffset
+            while o < insertOffset + qL:
+                itemList.append(o)
+                itemList.append(copy.deepcopy(nAlter))
+                o += .25
+            environLocal.printDebug(['itemList', itemList])            
+
+            sProc.insertAndShift(itemList)
+            sProc.elements = sProc.sorted.elements
+            self.assertEqual(sProc.highestOffset, newHighOffset)
+            self.assertEqual(sProc.highestTime, newHighTime)
+            self.assertEqual(len(sProc), len(s)+len(itemList) / 2)
 
 
 
@@ -7878,4 +8053,6 @@ if __name__ == "__main__":
 
         #a.testAugmentOrDiminishHighestTimes()
 
-        a.testInsertAndShiftBasic()
+        #a.testInsertAndShiftBasic()
+        #a.testInsertAndShiftNoDuration()
+        a.testInsertAndShiftMultipleElements()
