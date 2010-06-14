@@ -26,7 +26,6 @@ import copy
 import unittest, doctest
 import sys
 import types
-import time
 import inspect
 import uuid
 
@@ -34,6 +33,16 @@ from music21 import common
 from music21 import environment
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
+
+# get the right timer for windows
+import time
+if common.getPlatform() == "win":
+    defaultTimer = time.clock
+else:
+    defaultTimer = time.time
+
+
+
 
 #-------------------------------------------------------------------------------
 VERSION = (0, 2, 4)  # increment any time picked versions will be obsolete.
@@ -400,7 +409,7 @@ class DefinedContexts(object):
             dict['name'] = name
         if timeValue == None:
             # NOTE: this may not give sub-second resolution on some platforms
-            dict['time'] = time.time()
+            dict['time'] = defaultTimer()
         else:
             dict['time'] = timeValue
 
@@ -477,9 +486,9 @@ class DefinedContexts(object):
         >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(cObj, 345)
-        >>> time.sleep(.05)
+        >>> #time.sleep(.05)
         >>> aContexts.add(aObj)
-        >>> time.sleep(.05)
+        >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> k = aContexts._keysByTime()
         >>> aContexts._definedContexts[k[0]]['time'] > aContexts._definedContexts[k[1]]['time'] > aContexts._definedContexts[k[2]]['time']
@@ -508,9 +517,9 @@ class DefinedContexts(object):
         >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(cObj, 345) # a locations
-        >>> time.sleep(.05)
+        >>> #time.sleep(.05)
         >>> aContexts.add(aObj)
-        >>> time.sleep(.05)
+        >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> aContexts.get() == [cObj, aObj, bObj]
         True
@@ -830,7 +839,7 @@ class DefinedContexts(object):
         >>> bObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(aObj)
-        >>> time.sleep(.05)
+        >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> # we get the most recently added object first
         >>> aContexts.getByClass('mock', sortByCreationTime=True) == bObj
