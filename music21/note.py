@@ -45,7 +45,7 @@ class Tie(music21.Music21Object):
     '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
 
     >>> from music21 import *
-    >>> note1 = Note()
+    >>> note1 = note.Note()
     >>> note1.tie = Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
     >>> note1.tie.type
@@ -133,7 +133,7 @@ class Lyric(object):
         Returns an mxLyric
 
         >>> from music21 import *
-        >>> a = Lyric()
+        >>> a = note.Lyric()
         >>> a.text = 'hello'
         >>> mxLyric = a.mx
         >>> mxLyric.get('text')
@@ -203,7 +203,7 @@ class GeneralNote(music21.Music21Object):
         No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
 
         >>> from music21 import *
-        >>> a = GeneralNote()
+        >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
         >>> a.color = '#235409'
         >>> a.color
@@ -239,7 +239,7 @@ class GeneralNote(music21.Music21Object):
         lyrics
 
         >>> from music21 import *
-        >>> a = GeneralNote()
+        >>> a = note.GeneralNote()
         >>> a.lyric = 'test'
         >>> a.lyric
         'test'
@@ -255,21 +255,21 @@ class GeneralNote(music21.Music21Object):
         '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
         >>> from music21 import *
-        >>> n1 = Note()
+        >>> n1 = note.Note()
         >>> n1.addLyric("hello")
         >>> n1.lyrics[0].text
         'hello'
         >>> n1.lyrics[0].number
         1
         
-        # note that the option number specified gives the lyric number, not the list position
+        >>> # note that the option number specified gives the lyric number, not the list position
         >>> n1.addLyric("bye", 3)
         >>> n1.lyrics[1].text
         'bye'
         >>> n1.lyrics[1].number
         3
         
-        # replace existing lyric
+        >>> # replace existing lyric
         >>> n1.addLyric("ciao", 3)
         >>> n1.lyrics[1].text
         'ciao'
@@ -298,7 +298,7 @@ class GeneralNote(music21.Music21Object):
         '''Return quarter length
 
         >>> from music21 import *
-        >>> n = Note()
+        >>> n = note.Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
         2.0
@@ -312,7 +312,7 @@ class GeneralNote(music21.Music21Object):
         doc = '''Return the Duration as represented in Quarter Length.
 
         >>> from music21 import *
-        >>> n = Note()
+        >>> n = note.Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
         2.0
@@ -461,7 +461,7 @@ class GeneralNote(music21.Music21Object):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
 
         >>> from music21 import *
-        >>> n = Note('g#')
+        >>> n = note.Note('g#')
         >>> n.quarterLength = 3
         >>> n.augmentOrDiminish(2)
         >>> n.quarterLength
@@ -586,7 +586,7 @@ class GeneralNote(music21.Music21Object):
         duration.DurationUnit in each.
 
         >>> from music21 import *
-        >>> a = Note()
+        >>> a = note.Note()
         >>> a.duration.clear() # remove defaults
         >>> a.duration.addDurationUnit(duration.Duration('half'))
         >>> a.duration.quarterLength
@@ -684,7 +684,7 @@ class NotRest(GeneralNote):
         Split a Note into two Notes. 
 
         >>> from music21 import *
-        >>> a = NotRest()
+        >>> a = note.NotRest()
         >>> a.duration.type = 'whole'
         >>> b, c = a.splitNoteAtPoint(3)
         >>> b.duration.type
@@ -817,7 +817,7 @@ class Note(NotRest):
         Also alters the name of the note
         
         >>> from music21 import *
-        >>> a = Note()
+        >>> a = note.Note()
         >>> a.step = "D"
         >>> a.name 
         'D'
@@ -882,7 +882,8 @@ class Note(NotRest):
         
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
-        >>> a = Note()
+        >>> from music21 import *
+        >>> a = note.Note()
         >>> a.pitch = pitch.Pitch('d-4')
         >>> a.midi
         61
@@ -904,7 +905,7 @@ class Note(NotRest):
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
         >>> from music21 import *
-        >>> a = Note()
+        >>> a = note.Note()
         >>> a.ps = 60.5
         >>> a.midi
         61
@@ -926,7 +927,7 @@ class Note(NotRest):
         '''Return pitch class
 
         >>> from music21 import *
-        >>> d = Note()
+        >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('d-4')
         >>> d.pitchClass
         1
@@ -946,7 +947,7 @@ class Note(NotRest):
         '''Return pitch class string, replacing 10 and 11 as needed. 
 
         >>> from music21 import *
-        >>> d = Note()
+        >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString
         'B'
@@ -957,7 +958,7 @@ class Note(NotRest):
         '''
 
         >>> from music21 import *
-        >>> d = Note()
+        >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString = 'a'
         >>> d.pitchClass
@@ -986,7 +987,7 @@ class Note(NotRest):
         '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
         >>> from music21 import *
-        >>> a = Note('g4')
+        >>> a = note.Note('g4')
         >>> b = a.transpose('m3')
         >>> b
         <music21.note.Note B->
@@ -1270,7 +1271,7 @@ class Rest(GeneralNote):
         '''The name of the rest as it would appear in Lilypond format.
         
         >>> from music21 import *
-        >>> r1 = Rest()
+        >>> r1 = note.Rest()
         >>> r1.duration.type = "half"
         >>> r1.lily
         'r2'
