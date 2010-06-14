@@ -59,9 +59,10 @@ def dynamicStrFromDecimal(n):
     with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
     
-    >>> dynamicStrFromDecimal(0.25)
+    >>> from music21 import *
+    >>> dynamics.dynamicStrFromDecimal(0.25)
     'p'
-    >>> dynamicStrFromDecimal(1)
+    >>> dynamics.dynamicStrFromDecimal(1)
     'fff'
     '''
     if n == 0:
@@ -149,7 +150,8 @@ class Dynamic(music21.Music21Object):
         '''
         returns a musicxml.Direction object
 
-        >>> a = Dynamic('ppp')
+        >>> from music21 import *
+        >>> a = dynamics.Dynamic('ppp')
         >>> a.posRelativeY = -10
         >>> b = a.mx
         >>> b[0][0][0].get('tag')
@@ -176,6 +178,7 @@ class Dynamic(music21.Music21Object):
     def _setMX(self, mxDirection):
         '''Given an mxDirection, load instance
 
+        >>> from music21 import *
         >>> mxDirection = musicxml.Direction()
         >>> mxDirectionType = musicxml.DirectionType()
         >>> mxDynamicMark = musicxml.DynamicMark('ff')
@@ -276,7 +279,9 @@ class Wedge(music21.Music21Object):
     def _getMX(self):
         '''
         returns a musicxml.Direction object
-        >>> a = Wedge()
+
+        >>> from music21 import *
+        >>> a = dynamics.Wedge()
         >>> a.type = 'crescendo'
         >>> mxDirection = a.mx
         >>> mxWedge = mxDirection.getWedge()
@@ -299,6 +304,7 @@ class Wedge(music21.Music21Object):
         '''
         given an mxDirection, load instance
 
+        >>> from music21 import *
         >>> mxDirection = musicxml.Direction()
         >>> mxDirectionType = musicxml.DirectionType()
         >>> mxWedge = musicxml.Wedge()
@@ -306,7 +312,7 @@ class Wedge(music21.Music21Object):
         >>> mxDirectionType.append(mxWedge)
         >>> mxDirection.append(mxDirectionType)
         >>>
-        >>> a = Wedge()
+        >>> a = dynamics.Wedge()
         >>> a.mx = mxDirection
         >>> a.type
         'crescendo'
