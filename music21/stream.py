@@ -541,8 +541,10 @@ class Stream(music21.Music21Object):
 
     def insert(self, offsetOrItemOrList, itemOrNone = None, ignoreSort = False):
         '''
-        Inserts an item(s) at the given offset(s).  if ignoreSort is True then the inserting does not
-        change whether the stream is sorted or not (much faster if you're going to be inserting dozens
+        Inserts an item(s) at the given offset(s). 
+
+        If `ignoreSort` is True then the inserting does not
+        change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
         of items that don't change the sort status)
         
         Has three forms: in the two argument form, inserts an element at the given offset:
@@ -599,7 +601,7 @@ class Stream(music21.Music21Object):
             return
         else:
             item = offsetOrItemOrList
-            offset = item.offset
+            offset = item.offset # should this be getOffsetBySite(None)?
 
         if not common.isNum(offset):
             raise StreamException("offset %s must be a number", offset)
@@ -716,9 +718,9 @@ class Stream(music21.Music21Object):
 
 
     def insertAtNativeOffset(self, item):
-        '''
-        inserts the item at the offset that was defined before the item was inserted into a stream
-        (that is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)
+        '''Inserts an item at the offset that was defined before the item was inserted into a Stream.
+
+        That is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)
 
         >>> n1 = note.Note("F-")
         >>> n1.offset = 20.0
@@ -736,6 +738,89 @@ class Stream(music21.Music21Object):
         20.0
         '''
         self.insert(item.getOffsetBySite(None), item)
+
+    def insertAndShift(self, offsetOrItemOrList, itemOrNone=None, 
+            ignoreSort=False):
+        '''Insert an item at a specified or native offset, and shit any elements found in the Stream to start at the end of the added elements.
+
+        >>> st1 = Stream()
+        >>> st1.insertAndShift(32, note.Note("B-"))
+        >>> st1._getHighestOffset()
+        32.0
+        
+        In the single argument form with an object, inserts the element at its stored offset:
+        
+        >>> n1 = note.Note("C#")
+        >>> n1.offset = 30.0
+        >>> st1 = Stream()
+        >>> st1.insertAndShift(n1)
+        >>> st2 = Stream()
+        >>> st2.insertAndShift(40.0, n1)
+        >>> n1.getOffsetBySite(st1)
+        30.0
+        
+        In single argument form with a list, the list should contain pairs that alternate
+        offsets and items; the method then, obviously, inserts the items
+        at the specified offsets:
+        
+        >>> n1 = note.Note("G")
+        >>> n2 = note.Note("F#")
+        >>> st3 = Stream()
+        >>> st3.insertAndShift([1.0, n1, 2.0, n2])
+        >>> n1.getOffsetBySite(st3)
+        1.0
+        >>> n2.getOffsetBySite(st3)
+        2.0
+        >>> len(st3)
+        2
+        '''
+        # need to find the highest time after the insert  
+        if itemOrNone != None: # we have an offset and an element
+            if hasattr(itemOrNone, 'duration'):
+                dur = itemOrNone.duration.quarterLength
+            else:
+                dur = 0.0
+            lowestOffsetInsert = offsetOrItemOrList
+            highestTimeInsert = offsetOrItemOrList + dur
+        elif itemOrNone == None and isinstance(offsetOrItemOrList, list):
+            # need to find which has the max combined offset and dur
+            highestTimeInsert = 0.0
+            lowestOffsetInsert = None
+            i = 0
+            while i < len(offsetOrItemOrList):
+                o = offsetOrItemOrList[i]
+                e = offsetOrItemOrList[i+1]
+                if hasattr(e, 'duration'):
+                    dur = e.duration.quarterLength
+                else:
+                    dur = 0.0
+                if o + dur > highestTimeInsert:
+                    highestTimeInsert = o + dur
+                if o < lowestOffsetInsert or lowestOffsetInsert == None:
+                    lowestOffsetInsert = o
+                i += 2
+        else: # using native offset
+            if hasattr(offsetOrItemOrList, 'duration'):
+                dur = offsetOrItemOrList.duration.quarterLength
+            else:
+                dur = 0.0
+            # should this be getOffsetBySite(None)?
+            highestTimeInsert = offsetOrItemOrList.offset + dur
+            lowestOffsetInsert = offsetOrItemOrList.offset
+
+        shift = highestTimeInsert - lowestOffsetInsert
+        # need to move all the elements at the specifie
+        for e in self._elements:
+            o = e.getOffsetBySite(self)
+            gap = o - lowestOffsetInsert
+            # only process elments whose offsets are after the lowest insert
+            if gap >= 0.0:
+                # need shift, plus the distance from the start
+                e.setOffsetBySite(self, gap+shift)
+        # after shifting all the necessary elements, append new ones
+        # these will not be in order
+        self.insert(offsetOrItemOrList, itemOrNone, ignoreSort)
+
 
     def isClass(self, className):
         '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
@@ -7760,6 +7845,22 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
 
 
+    def testInsertAndShiftBasic(self):
+        from music21 import note
+
+        offsets = [0, 2, 4, 6, 8, 10, 12]
+        n = note.Note()
+        n.quarterLength = 2
+        
+        s = Stream()
+        s.repeatInsert(n, offsets)
+        
+        
+        nAlter = note.Note()
+        s.insertAndShift(0, nAlter)
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -7774,36 +7875,7 @@ if __name__ == "__main__":
         a = Test()
         b = TestExternal()
 
-        # a.testMeasureRange()
 
-        #a.testMultipartStream()
-
-        #a.testBestTimeSignature()
-
-        #a.testGetKeySignatures()
-        #a.testGetKeySignaturesThreeMeasures()
-        #a.testMakeAccidentals()
-
-        #a.testMakeAccidentalsWithKeysInMeasures()
-
-        #a.testScaleOffsetsBasic()
-        #a.testScaleOffsetsNested()
-
-        #a.testScaleDurationsBasic()
-
-        #a.testAugmentOrDiminishBasic()
         #a.testAugmentOrDiminishHighestTimes()
-        #a.testAugmentOrDiminishCorpus()
 
-        #a.testMeasureBarDurationProportion()
-
-
-        #a.testMakeRests()
-        a.testMusicXMLGenerationViaPropertyA()
-        a.testScaleOffsetsBasic()
-        a.testScaleOffsetsBasicInPlaceA()
-        a.testScaleOffsetsBasicInPlaceB()
-        a.testScaleOffsetsBasicInPlaceC()
-        a.testScaleOffsetsBasicInPlaceD()
-
-        a.testAugmentOrDiminishHighestTimes()
+        a.testInsertAndShiftBasic()
