@@ -1099,6 +1099,50 @@ Attributes without Documentation: <cite>parenthesis</cite>, <cite>summedNumerato
 </div>
 </dd></dl>
 
+<dl class="method">
+<dt id="music21.meter.MeterSequence.positionToWeight">
+<tt class="descname">positionToWeight</tt><big>(</big><em>qLenPos</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.positionToWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a lenPos, return the weight of the active region. Only applies to the top-most level of partitions</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;3/4&#39;</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
+<span class="go">(0, 1.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">positionToSpan</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">(1.0, 2.0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.meter.MeterSequence.setLevelWeight">
+<tt class="descname">setLevelWeight</tt><big>(</big><em>weightList</em>, <em>level=0</em><big>)</big><a class="headerlink" href="#music21.meter.MeterSequence.setLevelWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>weightList</cite> is an array of weights to be applied to a single level of the MeterSequence..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setLevelWeight</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">()</span>
+<span class="go">[1, 2, 3, 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">MeterSequence</span><span class="p">(</span><span class="s">&#39;4/4&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">setLevelWeight</span><span class="p">([</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[2, 3, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[2, 3.0, 2, 3.0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mf">3</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
+<span class="go">&lt;MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+<span class="go">[2, 3.0, 2, 3.0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="go">[2, 1.5, 1.5, 2, 1.5, 1.5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getLevelWeight</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">[2, 1.5, 1.5, 2, 0.75, 0.75, 1.5]</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p>Methods inherited from <a title="music21.meter.MeterTerminal" class="reference internal" href="#music21.meter.MeterTerminal"><tt class="xref docutils literal"><span class="pre">MeterTerminal</span></tt></a>: <a title="music21.meter.MeterTerminal.ratioEqual" class="reference internal" href="#music21.meter.MeterTerminal.ratioEqual"><tt class="xref docutils literal"><span class="pre">ratioEqual()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivide" class="reference internal" href="#music21.meter.MeterTerminal.subdivide"><tt class="xref docutils literal"><span class="pre">subdivide()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivideByCount" class="reference internal" href="#music21.meter.MeterTerminal.subdivideByCount"><tt class="xref docutils literal"><span class="pre">subdivideByCount()</span></tt></a>, <a title="music21.meter.MeterTerminal.subdivideByList" class="reference internal" href="#music21.meter.MeterTerminal.subdivideByList"><tt class="xref docutils literal"><span class="pre">subdivideByList()</span></tt></a></p>
 </blockquote>
 </dd></dl>

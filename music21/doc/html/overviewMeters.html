@@ -51,7 +51,7 @@
 <li><a class="reference external" href="#basic-time-signature">Basic Time Signature</a><ul>
 <li><a class="reference external" href="#getting-time-signatures-from-parts-and-measures">Getting Time Signatures From Parts and Measures</a></li>
 <li><a class="reference external" href="#setting-a-time-signature-in-a-measure">Setting a Time Signature in a Measure</a></li>
-<li><a class="reference external" href="#rebaring-with-changing-time-signature">Rebaring with Changing Time Signature</a></li>
+<li><a class="reference external" href="#rebaring-with-changing-time-signatures">Rebaring with Changing Time Signatures</a></li>
 <li><a class="reference external" href="#finding-the-beat-of-a-note-in-a-measure">Finding the Beat of a Note in a Measure</a></li>
 </ul>
 </li>
@@ -151,8 +151,8 @@
 </div>
 <img alt="_images/overviewMeters-10.png" src="_images/overviewMeters-10.png" style="width: 600px;" />
 </div>
-<div class="section" id="rebaring-with-changing-time-signature">
-<h3>Rebaring with Changing Time Signature<a class="headerlink" href="#rebaring-with-changing-time-signature" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="rebaring-with-changing-time-signatures">
+<h3>Rebaring with Changing Time Signatures<a class="headerlink" href="#rebaring-with-changing-time-signatures" title="Permalink to this headline">¶</a></h3>
 <p>To actually change the position of the notes, creating new Measures with new TimeSignatures, we need to rebar the music. The simplest way to do this is to get all the notes from a Part using the <a title="music21.stream.Stream.notes" class="reference external" href="moduleStream.html#music21.stream.Stream.notes"><tt class="xref docutils literal"><span class="pre">notes</span></tt></a> property on a flat Stream representation. Then, by inserting a new TimeSignature at the start of this Stream using the <a title="music21.stream.Stream.insert" class="reference external" href="moduleStream.html#music21.stream.Stream.insert"><tt class="xref docutils literal"><span class="pre">insert()</span></tt></a> method, we can generate new notation with the show() method. Note that here we are not creating Measures directly; instead, we are assigning TimeSignature objects into a Stream of notes. When the show() method is called, Measures are created within a temporary Stream according to the relevant TimeSignature objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span> <span class="o">=</span> <span class="n">sPart</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">notes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sNew</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">(</span><span class="s">&#39;2/4&#39;</span><span class="p">))</span>

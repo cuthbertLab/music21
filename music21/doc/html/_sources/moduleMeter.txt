@@ -897,6 +897,46 @@ MeterSequence
 
             
 
+        .. method:: positionToWeight(qLenPos)
+
+            Given a lenPos, return the weight of the active region. Only applies to the top-most level of partitions 
+
+            >>> from music21 import *
+            >>> a = meter.MeterSequence('3/4', 3)
+            >>> a.positionToSpan(.5)
+            (0, 1.0) 
+            >>> a.positionToSpan(1.5)
+            (1.0, 2.0) 
+
+            
+
+        .. method:: setLevelWeight(weightList, level=0)
+
+            The `weightList` is an array of weights to be applied to a single level of the MeterSequence.. 
+
+            >>> from music21 import *
+            >>> a = meter.MeterSequence('4/4', 4)
+            >>> a.setLevelWeight([1, 2, 3, 4])
+            >>> a.getLevelWeight()
+            [1, 2, 3, 4] 
+            >>> b = meter.MeterSequence('4/4', 4)
+            >>> b.setLevelWeight([2, 3])
+            >>> b.getLevelWeight(0)
+            [2, 3, 2, 3] 
+            >>> b[1] = b[1].subdivide(2)
+            >>> b[3] = b[3].subdivide(2)
+            >>> b.getLevelWeight(0)
+            [2, 3.0, 2, 3.0] 
+            >>> b[3][0] = b[3][0].subdivide(2)
+            >>> b
+            <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}> 
+            >>> b.getLevelWeight(0)
+            [2, 3.0, 2, 3.0] 
+            >>> b.getLevelWeight(1)
+            [2, 1.5, 1.5, 2, 1.5, 1.5] 
+            >>> b.getLevelWeight(2)
+            [2, 1.5, 1.5, 2, 0.75, 0.75, 1.5] 
+
         Methods inherited from :class:`~music21.meter.MeterTerminal`: :meth:`~music21.meter.MeterTerminal.ratioEqual`, :meth:`~music21.meter.MeterTerminal.subdivide`, :meth:`~music21.meter.MeterTerminal.subdivideByCount`, :meth:`~music21.meter.MeterTerminal.subdivideByList`
 
 

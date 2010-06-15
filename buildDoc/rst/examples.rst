@@ -12,23 +12,22 @@ The following examples provide a few samples of some of the possibilities availa
 Pitch and Duration Transformations
 ------------------------------------------------
 
-1. This example creates a mensural canon from the Soprano part of Bach chorale. The procedure extracts the :class:`~music21.note.Note` objects from the parsed :class:`~music21.stream.Score` object, using the :func:`~music21.corpus.base.parseWork` function and the :meth:`~music21.stream.Stream.getElementById` method. Then, a new part Stream is created by first scaling the timing and duration of events with the :meth:`~music21.stream.Stream.augmentOrDiminish` method and then transposing the pitches with the :meth:`~music21.stream.Stream.transpose` method. The modified Stream is then inserted into another Stream and displayed with the :meth:`~music21.base.Music21Object.show` method.
+1. This example creates a mensural canon from the Soprano part of a Bach chorale. The procedure extracts the :class:`~music21.note.Note` objects from the parsed :class:`~music21.stream.Score` object, using the :func:`~music21.corpus.base.parseWork` function and the :meth:`~music21.stream.Stream.getElementById` method. Then, a new part Stream is created by first scaling the timing and duration of events with the :meth:`~music21.stream.Stream.augmentOrDiminish` method and then transposing the pitches with the :meth:`~music21.stream.Stream.transpose` method. The modified Stream is then inserted into another Stream and displayed with the :meth:`~music21.base.Music21Object.show` method::
 
 
-from music21 import *
-src = corpus.parseWork('bach/bwv323.xml')
-ex = src.getElementById('Soprano').flat.notes
+    from music21 import *
+    src = corpus.parseWork('bach/bwv323.xml')
+    ex = src.getElementById('Soprano').flat.notes
+    
+    s = stream.Score()
+    for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
+        part = ex.augmentOrDiminish(scalar, inPlace=False)
+        part.transpose(t, inPlace=True)
+        s.insert(0, part)
+    s.show()
 
-s = stream.Score()
-for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
-    part = ex.augmentOrDiminish(scalar, inPlace=False)
-    part.transpose(t, inPlace=True)
-    s.insert(0, part)
-s.show()
 
-
-
-.. image:: images/examples-01.*
+.. image:: images/examples-02.*
     :width: 600
 
 

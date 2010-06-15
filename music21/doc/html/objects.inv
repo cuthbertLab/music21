@@ -216,6 +216,7 @@ music21.tinyNotation.TinyNotationNote class moduleTinyNotation.html
 music21.stream.Measure.mx attribute moduleStream.html
 music21.chord.Chord.hasFifth method moduleChord.html
 music21.stream.Stream.getMeasureRange method moduleStream.html
+music21.meter.MeterSequence.positionToWeight method moduleMeter.html
 music21.serial.RowSchoenbergOp35No3 class moduleSerial.html
 music21.chord.Chord.mx attribute moduleChord.html
 music21.serial.RowSchoenbergOp35No1 class moduleSerial.html
@@ -697,6 +698,7 @@ music21.stream.Stream.repeatInsert method moduleStream.html
 music21.common.almostEqual function moduleCommon.html
 music21.stream.Measure.timeSignatureIsNew attribute moduleStream.html
 music21.note.Note.setAccidental method moduleNote.html
+music21.meter.MeterSequence.setLevelWeight method moduleMeter.html
 music21.base.Music21Object.addLocation method moduleBase.html
 music21.key.Key class moduleKey.html
 music21.base.Music21Object.unwrapWeakref method moduleBase.html

@@ -151,6 +151,25 @@ class Test(unittest.TestCase):
 
 
 
+    def testExamples(self):
+
+
+        from music21 import stream, corpus
+        src = corpus.parseWork('bach/bwv323.xml')
+        ex = src.getElementById('Soprano').flat.notes[:20]
+        
+        s = stream.Score()
+        for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
+            part = ex.augmentOrDiminish(scalar, inPlace=False)
+            part.transpose(t, inPlace=True)
+            s.insert(0, part)
+        post = s.musicxml
+        #s.show()
+        
+        
+        
+
+
 if __name__ == "__main__":
     import sys
 
@@ -160,4 +179,4 @@ if __name__ == "__main__":
         a = Test()
 
 
-
+        a.testExamples()

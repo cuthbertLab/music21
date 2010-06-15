@@ -94,7 +94,10 @@ class Stream(music21.Music21Object):
     isMeasure = False
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['append', 'insert', 'measures', 'notes', 'pitches']
+    _DOC_ORDER = ['append', 'insert', 'insertAndShift', 
+        'measures', 'notes', 'pitches',
+        'transpose', 
+        'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isSorted': 'Boolean describing whether the Stream is sorted or not.',
@@ -823,8 +826,7 @@ class Stream(music21.Music21Object):
         # of the newly inserted elements
         shiftDur = highestTimeInsert - lowestOffsetInsert
 
-
-        environLocal.printDebug(['insertAndShift()', 'adding one or more elements', 'lowestOffsetInsert', lowestOffsetInsert, 'highestTimeInsert', highestTimeInsert])
+        #environLocal.printDebug(['insertAndShift()', 'adding one or more elements', 'lowestOffsetInsert', lowestOffsetInsert, 'highestTimeInsert', highestTimeInsert])
 
         # are not assuming that elements are ordered
         # use getElementAtOrAfter() in the future
@@ -857,10 +859,7 @@ class Stream(music21.Music21Object):
                 gap = o - lowestOffsetInsert
                 # only process elments whose offsets are after the lowest insert
                 if gap >= 0.0:
-                    environLocal.printDebug(['insertAndShift()', e, 'offset', o,
-                        'gap:', gap, 'shiftDur:', shiftDur, 'shiftPos:', shiftPos, 
-                        'o+shiftDur', o+shiftDur,
-                        'o+shiftPos', o+shiftPos])
+                    #environLocal.printDebug(['insertAndShift()', e, 'offset', o, 'gap:', gap, 'shiftDur:', shiftDur, 'shiftPos:', shiftPos, 'o+shiftDur', o+shiftDur, 'o+shiftPos', o+shiftPos])
     
                     # need original offset, shiftDur, plus the distance from the start
                     e.setOffsetBySite(self, o+shiftPos)
@@ -3485,7 +3484,9 @@ class Stream(music21.Music21Object):
 
     def scaleOffsets(self, scalar, anchorZero='lowest', 
             anchorZeroRecurse=None, inPlace=True):
-        '''Scale all offsets by a provided scalar.
+        '''Scale all offsets by a provided scalar. Durations are not altered. 
+
+        To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
 
         The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
 
@@ -3548,7 +3549,10 @@ class Stream(music21.Music21Object):
 
 
     def scaleDurations(self, scalar, inPlace=True):
-        '''Scale all durations by a provided scalar.
+        '''Scale all durations by a provided scalar. Offsets are not modified.
+
+        To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
+
         '''
         if not scalar > 0:
             raise StreamException('scalar must be greater than zero')
@@ -3572,7 +3576,23 @@ class Stream(music21.Music21Object):
 
 
     def augmentOrDiminish(self, scalar, inPlace=False):
-        '''Scale this Stream by a provided scalar. 
+        '''Scale this Stream by a provided numerical scalar. A scalar of .5 is half the durations and relative offset positions; a scalar of 2 is twice the durations and relative offset positions.
+    
+        If `inPlace` is True, the alteration will be made to the calling object. Otherwise, a new Stream is returned. 
+
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> s.repeatAppend(n, 10)
+        >>> s.highestOffset, s.highestTime  
+        (9.0, 10.0)
+        >>> s1 = s.augmentOrDiminish(2)
+        >>> s1.highestOffset, s1.highestTime
+        (18.0, 20.0)
+        >>> s1 = s.augmentOrDiminish(.5)
+        >>> s1.highestOffset, s1.highestTime
+        (4.5, 5.0)
         '''
         if not scalar > 0:
             raise StreamException('scalar must be greater than zero')
@@ -3585,7 +3605,8 @@ class Stream(music21.Music21Object):
         returnObj.scaleOffsets(scalar=scalar, anchorZero='lowest', 
             anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(scalar=scalar, inPlace=True)
-    
+        returnObj._elementsChanged() 
+
         # do not need to call elements changed, as called in sub methods
         return returnObj
 
