@@ -93,9 +93,10 @@
 <dt id="music21.dynamics.dynamicStrFromDecimal">
 <tt class="descclassname">music21.dynamics.</tt><tt class="descname">dynamicStrFromDecimal</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#music21.dynamics.dynamicStrFromDecimal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a decimal from 0 to 1, return a string representing a dynamic with 0 being the softest (0.01 = &#8216;ppp&#8217;) and 1 being the loudest (0.9+ = &#8216;fff&#8217;) 0 returns &#8220;n&#8221; (niente), while ppp and fff are the loudest dynamics used.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dynamicStrFromDecimal</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dynamics</span><span class="o">.</span><span class="n">dynamicStrFromDecimal</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
 <span class="go">&#39;p&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dynamicStrFromDecimal</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dynamics</span><span class="o">.</span><span class="n">dynamicStrFromDecimal</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="go">&#39;fff&#39;</span>
 </pre></div>
 </div>
@@ -162,7 +163,8 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <dt id="music21.dynamics.Dynamic.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Dynamic.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Direction object</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">posRelativeY</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tag&#39;</span><span class="p">)</span>
@@ -200,7 +202,8 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <dt id="music21.dynamics.Wedge.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Wedge.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Direction object</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Wedge</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Wedge</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;crescendo&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mxDirection</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mxWedge</span> <span class="o">=</span> <span class="n">mxDirection</span><span class="o">.</span><span class="n">getWedge</span><span class="p">()</span>
@@ -246,7 +249,7 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 13, 2010.
+      Last updated on Jun 15, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

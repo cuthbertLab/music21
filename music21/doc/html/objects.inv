@@ -551,6 +551,7 @@ music21.clef.Bass8vaClef class moduleClef.html
 music21.common.formatStr function moduleCommon.html
 music21.note.GeneralNote.editorial attribute moduleNote.html
 music21.common.Iterator class moduleCommon.html
+music21.stream.Stream.insertAndShift method moduleStream.html
 music21.chord.Chord.inversion method moduleChord.html
 music21.serial.RowWebernOp30 class moduleSerial.html
 music21.duration.DurationUnit.ordinal attribute moduleDuration.html
@@ -775,6 +776,7 @@ music21.clef.CClef class moduleClef.html
 music21.expressions.Trill class moduleExpressions.html
 music21.stream.Stream.mx attribute moduleStream.html
 music21.graph.GraphColorGrid.setMaxWindow method moduleGraph.html
+music21.note.GeneralNote.splitByQuarterLengths method moduleNote.html
 music21.meter.MeterTerminal class moduleMeter.html
 music21.graph.GraphHistogram class moduleGraph.html
 music21.graph.PlotStream class moduleGraph.html

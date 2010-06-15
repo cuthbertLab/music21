@@ -16,9 +16,10 @@ Classes and functions for creating and manipulating dynamics.
 
     Given a decimal from 0 to 1, return a string representing a dynamic with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff') 0 returns "n" (niente), while ppp and fff are the loudest dynamics used. 
 
-    >>> dynamicStrFromDecimal(0.25)
+    >>> from music21 import *
+    >>> dynamics.dynamicStrFromDecimal(0.25)
     'p' 
-    >>> dynamicStrFromDecimal(1)
+    >>> dynamics.dynamicStrFromDecimal(1)
     'fff' 
 
 Dynamic
@@ -79,7 +80,8 @@ Dynamic
 
             returns a musicxml.Direction object 
 
-            >>> a = Dynamic('ppp')
+            >>> from music21 import *
+            >>> a = dynamics.Dynamic('ppp')
             >>> a.posRelativeY = -10
             >>> b = a.mx
             >>> b[0][0][0].get('tag')
@@ -115,7 +117,8 @@ Wedge
 
             returns a musicxml.Direction object 
 
-            >>> a = Wedge()
+            >>> from music21 import *
+            >>> a = dynamics.Wedge()
             >>> a.type = 'crescendo'
             >>> mxDirection = a.mx
             >>> mxWedge = mxDirection.getWedge()

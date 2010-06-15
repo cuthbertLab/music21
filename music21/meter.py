@@ -1403,6 +1403,40 @@ class MeterSequence(MeterTerminal):
         return post
 
     
+    def setLevelWeight(self, weightList, level=0):
+        '''The `weightList` is an array of weights to be applied to a single level of the MeterSequence..
+
+        >>> from music21 import *
+        >>> a = meter.MeterSequence('4/4', 4)
+        >>> a.setLevelWeight([1, 2, 3, 4])
+        >>> a.getLevelWeight()
+        [1, 2, 3, 4]
+
+        >>> b = meter.MeterSequence('4/4', 4)
+        >>> b.setLevelWeight([2, 3])
+        >>> b.getLevelWeight(0)
+        [2, 3, 2, 3]
+
+        >>> b[1] = b[1].subdivide(2)
+        >>> b[3] = b[3].subdivide(2)
+        >>> b.getLevelWeight(0)
+        [2, 3.0, 2, 3.0]
+
+        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b
+        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        >>> b.getLevelWeight(0)
+        [2, 3.0, 2, 3.0]
+        >>> b.getLevelWeight(1)
+        [2, 1.5, 1.5, 2, 1.5, 1.5]
+        >>> b.getLevelWeight(2)
+        [2, 1.5, 1.5, 2, 0.75, 0.75, 1.5]
+        '''
+        levelObjs = self._getLevelList(level)
+        for i in range(len(levelObjs)):
+            mt = levelObjs[i]
+            mt.weight = weightList[i%len(weightList)]
+
 
     #---------------------------------------------------------------------------
     # given a quarter note position, return the active index
@@ -1529,7 +1563,7 @@ class MeterSequence(MeterTerminal):
 
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
+            #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
             raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
         
         iMatch = self.positionToIndex(qLenPos)
@@ -1542,6 +1576,23 @@ class MeterSequence(MeterTerminal):
             else:
                 pos += self[i].duration.quarterLength
         return start, end
+
+    def positionToWeight(self, qLenPos):
+        '''Given a lenPos, return the weight of the active region.
+        Only applies to the top-most level of partitions
+
+        >>> from music21 import *
+        >>> a = meter.MeterSequence('3/4', 3)
+        >>> a.positionToSpan(.5)
+        (0, 1.0)
+        >>> a.positionToSpan(1.5)
+        (1.0, 2.0)
+
+        '''
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+            raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
+        iMatch = self.positionToIndex(qLenPos)        
+        return self[iMatch].weight
 
 
     def positionToDepth(self, qLenPos, align='quantize'):

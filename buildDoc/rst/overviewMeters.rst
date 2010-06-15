@@ -73,7 +73,7 @@ We can create a new TimeSignature object by providing a string representation of
 
 
 
-Rebaring with Changing Time Signature 
+Rebaring with Changing Time Signatures 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To actually change the position of the notes, creating new Measures with new TimeSignatures, we need to rebar the music. The simplest way to do this is to get all the notes from a Part using the :attr:`~music21.stream.Stream.notes` property on a flat Stream representation. Then, by inserting a new TimeSignature at the start of this Stream using the :meth:`~music21.stream.Stream.insert` method, we can generate new notation with the show() method. Note that here we are not creating Measures directly; instead, we are assigning TimeSignature objects into a Stream of notes. When the show() method is called, Measures are created within a temporary Stream according to the relevant TimeSignature objects.

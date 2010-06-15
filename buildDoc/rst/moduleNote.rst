@@ -127,7 +127,7 @@ Note
             Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. 
 
             >>> from music21 import *
-            >>> a = Note('g4')
+            >>> a = note.Note('g4')
             >>> b = a.transpose('m3')
             >>> b
             <music21.note.Note B-> 
@@ -143,7 +143,7 @@ Note
 
         Methods inherited from :class:`~music21.note.NotRest`: :meth:`~music21.note.NotRest.splitNoteAtPoint`
 
-        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`, :meth:`~music21.note.GeneralNote.splitByQuarterLengths`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -180,7 +180,7 @@ Rest
             The name of the rest as it would appear in Lilypond format. 
 
             >>> from music21 import *
-            >>> r1 = Rest()
+            >>> r1 = note.Rest()
             >>> r1.duration.type = "half"
             >>> r1.lily
             'r2' 
@@ -195,7 +195,7 @@ Rest
 
     **Rest** **methods**
 
-        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`, :meth:`~music21.note.GeneralNote.splitByQuarterLengths`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -251,7 +251,7 @@ GeneralNote
             Return the Duration as represented in Quarter Length. 
 
             >>> from music21 import *
-            >>> n = Note()
+            >>> n = note.Note()
             >>> n.quarterLength = 2.0
             >>> n.quarterLength
             2.0 
@@ -327,19 +327,19 @@ GeneralNote
             Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
             >>> from music21 import *
-            >>> n1 = Note()
+            >>> n1 = note.Note()
             >>> n1.addLyric("hello")
             >>> n1.lyrics[0].text
             'hello' 
             >>> n1.lyrics[0].number
             1 
-            # note that the option number specified gives the lyric number, not the list position 
+            >>> # note that the option number specified gives the lyric number, not the list position
             >>> n1.addLyric("bye", 3)
             >>> n1.lyrics[1].text
             'bye' 
             >>> n1.lyrics[1].number
             3 
-            # replace existing lyric 
+            >>> # replace existing lyric
             >>> n1.addLyric("ciao", 3)
             >>> n1.lyrics[1].text
             'ciao' 
@@ -351,7 +351,7 @@ GeneralNote
             Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy. 
 
             >>> from music21 import *
-            >>> n = Note('g#')
+            >>> n = note.Note('g#')
             >>> n.quarterLength = 3
             >>> n.augmentOrDiminish(2)
             >>> n.quarterLength
@@ -365,14 +365,14 @@ GeneralNote
 
         .. method:: compactNoteInfo()
 
-            nice debugging info tool -- returns information about a note E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet) 
+            A debugging info tool, returning information about a note E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet) 
 
         .. method:: splitAtDurations()
 
-            Takes a Note and returns a list of notes with only a single duration.DurationUnit in each. 
+            Takes a Note and returns a list of Notes with only a single duration.DurationUnit in each. Ties are added. 
 
             >>> from music21 import *
-            >>> a = Note()
+            >>> a = note.Note()
             >>> a.duration.clear() # remove defaults
             >>> a.duration.addDurationUnit(duration.Duration('half'))
             >>> a.duration.quarterLength
@@ -387,6 +387,16 @@ GeneralNote
             'half' 
             >>> b[1].duration.type
             'whole' 
+
+        .. method:: splitByQuarterLengths(quarterLengthList)
+
+            Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations. 
+
+            >>> n = Note()
+            >>> n.quarterLength = 3
+            >>> post = n.splitByQuarterLengths([1,1,1])
+            >>> [n.quarterLength for n in post]
+            [1, 1, 1] 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -419,7 +429,7 @@ Lyric
             Returns an mxLyric 
 
             >>> from music21 import *
-            >>> a = Lyric()
+            >>> a = note.Lyric()
             >>> a.text = 'hello'
             >>> mxLyric = a.mx
             >>> mxLyric.get('text')
@@ -456,7 +466,7 @@ NotRest
             Split a Note into two Notes. 
 
             >>> from music21 import *
-            >>> a = NotRest()
+            >>> a = note.NotRest()
             >>> a.duration.type = 'whole'
             >>> b, c = a.splitNoteAtPoint(3)
             >>> b.duration.type
@@ -472,7 +482,7 @@ NotRest
             >>> c.duration.quarterLength
             1.0 
 
-        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`, :meth:`~music21.note.GeneralNote.splitByQuarterLengths`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -494,7 +504,7 @@ Tie
     Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
 
     >>> from music21 import *
-    >>> note1 = Note()
+    >>> note1 = note.Note()
     >>> note1.tie = Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
     >>> note1.tie.type
@@ -563,7 +573,7 @@ Unpitched
 
     **Unpitched** **methods**
 
-        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`
+        Methods inherited from :class:`~music21.note.GeneralNote`: :meth:`~music21.note.GeneralNote.addLyric`, :meth:`~music21.note.GeneralNote.augmentOrDiminish`, :meth:`~music21.note.GeneralNote.compactNoteInfo`, :meth:`~music21.note.GeneralNote.splitAtDurations`, :meth:`~music21.note.GeneralNote.splitByQuarterLengths`
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
