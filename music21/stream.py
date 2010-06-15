@@ -2264,17 +2264,13 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
-        #environLocal.printDebug(['calling Stream.makeMeasures()'])
+        environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         # the srcObj shold not be modified or chagned
         # removed element copyig below and now making a deepcopy of entire stream
         # must take a flat representation, as we need to be able to 
         # position components, and sub-streams might hide elements that
         # should be contained
-
-
-        #environLocal.printDebug(['makeMeasures(): first clef found before copying and flattening', self.getClefs()[0]])
-
 
         # TODO: make inPlace an option
         srcObj = copy.deepcopy(self.flat)
@@ -3659,8 +3655,8 @@ class Stream(music21.Music21Object):
         # note: meterStream may have TimeSignature objects from an unrelated
         # Stream.
         #self.show('t')
-        if len(self) > 2:
-            environLocal.printDebug(['_getMXPart(): first two elements', self[0].offset, self[0].duration, self[1].offset, self[1].duration ])
+#         if len(self) > 2:
+#             environLocal.printDebug(['_getMXPart(): first two elements', self[0].offset, self[0].duration, self[1].offset, self[1].duration ])
 
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
@@ -3715,10 +3711,15 @@ class Stream(music21.Music21Object):
         instList = []
         multiPart = False
         
-        # get from containter first
         # search context probably should always be True here
-        meterStream = self.getTimeSignatures(searchContext=True,
-                        sortByCreationTime=True) 
+        # to search container first, we need a non-flat version
+        # searching a flattened version, we will get contained and non-container
+        # this meter  stream is passed to makeMeasures()
+        meterStream = self.getTimeSignatures(searchContext=False,
+                        sortByCreationTime=False, returnDefault=False) 
+        if len(meterStream) == 0:
+            meterStream = self.flat.getTimeSignatures(searchContext=True,
+                        sortByCreationTime=True, returnDefault=True) 
 
         # we need independent sub-stream elements to shift in presentation
         highestTime = 0

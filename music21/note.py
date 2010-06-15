@@ -582,8 +582,8 @@ class GeneralNote(music21.Music21Object):
 
     def splitAtDurations(self):
         '''
-        Takes a Note and returns a list of notes with only a single
-        duration.DurationUnit in each.
+        Takes a Note and returns a list of Notes with only a single
+        duration.DurationUnit in each. Ties are added. 
 
         >>> from music21 import *
         >>> a = note.Note()
@@ -607,6 +607,7 @@ class GeneralNote(music21.Music21Object):
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
                 tempNote = copy.deepcopy(self)
+                # note that this keeps durations 
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
                     tempNote.tie = self.duration.linkages[i]                
@@ -626,9 +627,38 @@ class GeneralNote(music21.Music21Object):
         return returnNotes
 
 
-    def compactNoteInfo(self):
+    def splitByQuarterLengths(self, quarterLengthList):
+        '''Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations.
+
+        >>> n = Note()
+        >>> n.quarterLength = 3
+        >>> post = n.splitByQuarterLengths([1,1,1])
+        >>> [n.quarterLength for n in post]
+        [1, 1, 1]
         '''
-        nice debugging info tool -- returns information about a note
+        if sum(quarterLengthList) != self.duration.quarterLength:
+            raise NoteException('cannot split by quarter length list that is not equal to the duratoin of the source.')
+        if len(quarterLengthList) <= 1:
+            raise NoteException('cannot split by this quarter length list: %s.' % quarterLengthList)
+
+        post = []
+        for i in range(len(quarterLengthList)):
+            ql = quarterLengthList[i]
+            n = copy.deepcopy(self)
+            n.quarterLength = ql
+
+            # if not last
+            if i != (len(quarterLengthList) - 1):
+                n.tie = Tie() # need a tie objects
+            else: # if last
+                # last note just gets the tie of the original Note
+                n.tie = Tie("stop")
+            post.append(n)
+
+        return post
+
+    def compactNoteInfo(self):
+        '''A debugging info tool, returning information about a note
         E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
         '''
         

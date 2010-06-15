@@ -440,6 +440,8 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
     if show:
         ex.show()
+    else:
+        post = ex.musicxml
 
 #     purcellScore = music21.parseData("Music_for_a_while.musicxml")
 #     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
@@ -499,6 +501,8 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
 
     if show:
         s.show()
+    else:
+        post = s.musicxml
 
 
 def ch1_writing_II_B(show=True, *arguments, **keywords):
@@ -588,7 +592,8 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
 
     if show:
         ex.show()
-       
+    else:
+        post = ex.musicxml
 
 
 def ch2_basic_I_A_2(show=True, *arguments, **keywords):
@@ -684,7 +689,8 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
         
     if show:
         ex.show()
-       
+    else:
+        post = ex.musicxml
 
 
 def ch2_basic_II(show=True, *arguments, **keywords):
@@ -776,37 +782,148 @@ def ch2_writing_II_C(show=True, *arguments, **keywords):
 #-------------------------------------------------------------------------------
 # III Dots and ties
 
+def ch2_writing_III_A(quarterLengthSrc, meterStr):
+    '''Function for A1, A2, A3: Add ties. 
+    '''
+    from music21 import meter, stream, note
+    ex = stream.Stream()
+
+    # the source rhythms
+    s1 = stream.Stream()
+    s1.append(meter.TimeSignature(meterStr))
+    for ql in quarterLengthSrc:
+        n = note.Note()
+        n.quarterLength = ql
+        s1.append(n)
+    ex.insert(s1)
+
+    # the modified
+    s2 = stream.Stream()
+    s2.append(meter.TimeSignature(meterStr))
+    for ql in quarterLengthSrc:
+        n = note.Note()
+        n.quarterLength = ql
+        if ql == .75:
+            nSub = n.splitByQuarterLengths([.5, .25])
+        elif ql == 1.5:
+            nSub = n.splitByQuarterLengths([1, .5])
+        elif ql == 3:
+            nSub = n.splitByQuarterLengths([2, 1])
+        else:
+            nSub = [n]
+        for n in nSub:
+            s2.append(n)
+    ex.insert(s2)
+    return ex
+
 def ch2_writing_III_A_1(show=True, *arguments, **keywords):
     '''p. 16
-    '''
-    pass
 
+    Renotate the following rhythms with ties instead of dotted notes.
+    '''
+    quarterLengthSrc = [3, 1, 2, 2, 1.5, .5, 2, .5, 1.5, 2, 2, 3]
+    ex = ch2_writing_III_A(quarterLengthSrc, '3/2')
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_III_A_2(show=True, *arguments, **keywords):
     '''p. 16
     '''
-    pass
+    quarterLengthSrc = [.75, .25, .75, .25, 1.5, .5, 3, .5, .5, .25, .75, 1, 2]
+    ex = ch2_writing_III_A(quarterLengthSrc, '4/4')
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_III_A_3(show=True, *arguments, **keywords):
     '''p. 16
     '''
-    pass
+    quarterLengthSrc = [3, 1, .5, .5, .5, .5, 1.5, .5, 2, 1, 1, 1, 3]
+    ex = ch2_writing_III_A(quarterLengthSrc, '2/2')
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
+
+
+def ch2_writing_III_B(src):
+    '''Function for B1, B2, B3: Remove ties.
+    '''
+    import copy
+    from music21 import meter, stream, note
+    ex = stream.Stream()
+
+    # the source rhythms
+    s1 = copy.deepcopy(src)
+    ex.insert(s1)
+
+    # the modified
+    s2 = copy.deepcopy(src)
+    ex.insert(s2)
+
+    # note that ending ties are not given with tiny notation
+    group = []
+    for n in s2.notes:
+        environLocal.printDebug([n, n.tie])
+        if n.tie != None or len(group) > 0:
+            if n.tie != None and n.tie.type != 'stop':
+                group.append(n)
+            else: # end of tied notes
+                group.append(n)
+                ql= sum([x.quarterLength for x in group])
+                for i in range(len(group)):
+                    if i == 0: # keep first, extend dur
+                        group[i].quarterLength = ql
+                        group[i].tie = None # remove tie
+                    else: # remove from source
+                        s2.remove(group[i])
+                group = [] # reset
+
+    return ex
 
 
 def ch2_writing_III_B_1(show=True, *arguments, **keywords):
     '''p. 17
+
+    Renotate the following rhythms without ties. 
     '''
-    pass
+    from music21 import tinyNotation
+    ex = tinyNotation.TinyNotationStream("c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8", "3/8")
+
+    ex = ch2_writing_III_B(ex)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
+
 
 def ch2_writing_III_B_2(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    pass
+    from music21 import tinyNotation
+    ex = tinyNotation.TinyNotationStream("c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2", "4/4")
+
+    ex = ch2_writing_III_B(ex)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
+
 
 def ch2_writing_III_B_3(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    pass
+    from music21 import tinyNotation
+    ex = tinyNotation.TinyNotationStream("c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2", "3/2")
+
+    ex = ch2_writing_III_B(ex)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 
 
@@ -1405,7 +1522,8 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
     if show:
         # calling show creates measures and allocates notes for the time sig
         ex.show()
-
+    else:
+        post = ex.musicxml
 
 
 def ch5_writing_IV_B(show=True, *arguments, **keywords):
@@ -1473,12 +1591,146 @@ FUNCTIONS = [ch1_basic_I_A,
             ch1_writing_II_A,
             ch1_writing_II_B,
 
-
-
+            ch1_analysis_A_1, 
+            ch1_analysis_A_2,
+            ch1_analysis_B_1,
+            ch1_analysis_B_2,
 
             ch2_basic_I_A_1,
+            ch2_basic_I_A_2,
+            ch2_basic_I_A_3,
+            ch2_basic_I_A_4,
+
+            ch2_basic_I_B,
 
             ch2_basic_I_C,
+            ch2_basic_II,
+
+            ch2_writing_I_A_1,
+            ch2_writing_I_A_2,
+            ch2_writing_I_A_3,
+            ch2_writing_I_A_4,
+            ch2_writing_I_A_5,
+
+            ch2_writing_I_B_1,
+            ch2_writing_I_B_2,
+            ch2_writing_I_B_3,
+            ch2_writing_I_B_4,
+            ch2_writing_I_B_5,
+
+            ch2_writing_II_A,
+            ch2_writing_II_B,
+            ch2_writing_II_C,
+
+            ch2_writing_III_A_1,
+            ch2_writing_III_A_2,
+            ch2_writing_III_A_3,
+            ch2_writing_III_B_1,
+            ch2_writing_III_B_2,
+            ch2_writing_III_B_3,
+
+            ch2_writing_IV_A,
+            ch2_writing_IV_B,
+
+            ch2_writing_V_A,
+            ch2_writing_V_B,
+
+            ch2_writing_VI,
+
+            ch2_analysis_A_1,
+            ch2_analysis_A_2,
+            ch2_analysis_A_3,
+            ch2_analysis_B_1,
+            ch2_analysis_B_2,
+            ch2_analysis_B_3,
+
+            ch3_basic_I_A,
+            ch3_basic_I_B,
+
+            ch3_basic_II_A,
+            ch3_basic_II_B,
+            ch3_basic_II_C,
+
+            ch3_basic_III_A,
+            ch3_basic_III_B,
+
+            ch3_basic_IV_A,
+            ch3_basic_IV_B,
+
+            ch3_writing_I_A,
+            ch3_writing_I_B,
+            ch3_writing_I_C,
+            ch3_writing_I_D,
+
+            ch3_writing_II,
+
+            ch3_analysis_I_A_1,
+            ch3_analysis_I_A_2,
+            ch3_analysis_I_A_3,
+            ch3_analysis_I_B_1,
+            ch3_analysis_I_B_2,
+            ch3_analysis_I_B_3,
+
+            ch3_analysis_II_A,
+            ch3_analysis_II_B,
+
+            ch4_basic_I_A,
+            ch4_basic_I_B,
+            ch4_basic_I_C,
+            ch4_basic_I_D,
+
+            ch4_basic_II,
+
+            ch4_basic_III_A,
+            ch4_basic_III_B,
+            ch4_basic_IV_A,
+            ch4_basic_IV_B,
+            ch4_basic_V_A,
+            ch4_basic_V_B,
+
+            ch4_writing_I_A,
+            ch4_writing_I_B,
+            ch4_writing_I_C,
+
+            ch4_writing_II,
+
+            ch4_analysis_I_A_1,
+            ch4_analysis_I_A_2,
+            ch4_analysis_I_A_3,
+            ch4_analysis_I_B_1,
+            ch4_analysis_I_B_2,
+            ch4_analysis_I_B_3,
+            ch4_analysis_I_B_4,
+
+            ch4_analysis_II_A,
+            ch4_analysis_II_B,
+
+            ch5_basic_I_A_1,
+            ch5_basic_I_A_2,
+            ch5_basic_I_A_3,
+            ch5_basic_I_A_4,
+            ch5_basic_I_B,
+            ch5_basic_I_C,
+
+            ch5_basic_II,
+            ch5_writing_I_A,
+            ch5_writing_I_B,
+
+            ch5_writing_II_A,
+            ch5_writing_II_B,
+            ch5_writing_II_C,
+
+            ch5_writing_III_A,
+            ch5_writing_III_B,
+
+            ch5_writing_IV_A,
+            ch5_writing_IV_B,
+            ch5_writing_IV_C,
+
+            ch5_writing_V,
+            ch5_analysis_A,
+            ch5_analysis_B,
+            ch5_analysis_C,
 
             ]
 
@@ -1522,4 +1774,8 @@ if __name__ == "__main__":
         #ch2_basic_I_A_1(show=True)
 
 
-        ch2_basic_I_C(show=True)
+        #ch2_writing_III_A_1(show=True)
+        #ch2_writing_III_A_2(show=True)
+        #ch2_writing_III_A_3(show=True)
+
+        ch2_writing_III_B_3(show=True)
