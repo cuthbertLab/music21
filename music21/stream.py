@@ -755,13 +755,21 @@ class Stream(music21.Music21Object):
         
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
+        >>> n2 = note.Note("C#")
+        >>> n2.offset = 30.0
         >>> st1 = Stream()
         >>> st1.insertAndShift(n1)
+        >>> st1.insertAndShift(n2) # should shift offset of n1
+        >>> n1.getOffsetBySite(st1)
+        31.0
+        >>> n2.getOffsetBySite(st1)
+        30.0
         >>> st2 = Stream()
         >>> st2.insertAndShift(40.0, n1)
-        >>> n1.getOffsetBySite(st1)
-        30.0
-        
+        >>> st2.insertAndShift(40.0, n2)
+        >>> n1.getOffsetBySite(st2)
+        41.0        
+
         In single argument form with a list, the list should contain pairs that alternate
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets:
