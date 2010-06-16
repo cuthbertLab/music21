@@ -418,7 +418,7 @@ class DefinedContexts(object):
         if update: # add new/missing information to dictionary
             self._definedContexts[idKey].update(dict)
 
-    def remove(self, site):
+    def removeBySite(self, site):
         '''Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
         >>> class Mock(Music21Object): pass
@@ -435,7 +435,7 @@ class DefinedContexts(object):
         >>> aContexts.add(cSite, 232223)
         >>> len(aContexts)
         3
-        >>> aContexts.remove(aSite)
+        >>> aContexts.removeBySite(aSite)
         >>> len(aContexts)
         2
 
@@ -456,7 +456,9 @@ class DefinedContexts(object):
             self._locationKeys.pop(self._locationKeys.index(siteId))
 
 
-    def removeById(self, idKey):
+    def removeBySiteId(self, idKey):
+        '''Remove a defined contexts entry by id key, which is id() of the object. 
+        '''
         if idKey == None:
             raise Exception('trying to remove None idKey')
         del self._definedContexts[idKey]
@@ -650,7 +652,7 @@ class DefinedContexts(object):
             if obj == None: # if None, it no longer exists
                 match.append(idKey)
         for id in match:
-            self.removeById(id)
+            self.removeBySiteId(id)
 
 
 #     def clearLocations(self):
@@ -659,7 +661,7 @@ class DefinedContexts(object):
 #         for idKey in self._locationKeys:
 #             if idKey == None: 
 #                 continue
-#             self.removeById(idKey)
+#             self.removeBySiteId(idKey)
 
 
     def getOffsets(self):
@@ -920,7 +922,7 @@ class DefinedContexts(object):
         1
         >>> aContexts.getAttrByName('attr1') == 234
         True
-        >>> aContexts.removeById(id(aObj))
+        >>> aContexts.removeBySiteId(id(aObj))
         >>> aContexts.add(bObj)
         >>> aContexts.getAttrByName('attr1') == 98
         True
@@ -1326,7 +1328,7 @@ class Music21Object(object):
         '''
         return self._definedContexts.getSiteIds()
 
-    def removeLocation(self, site):
+    def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
 
         This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
@@ -1336,19 +1338,34 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> n.addLocation(s, 10)
         >>> n.parent = s
-        >>> n.removeLocation(s)
+        >>> n.removeLocationBySite(s)
         >>> n.parent == None
         True
         '''
         if not self._definedContexts.isSite(site):
             raise Music21ObjectException('supplied object (%s) is not a site in this object.')
-        self._definedContexts.remove(site)
+        self._definedContexts.removeBySite(site)
         # if parent is set to that site, reassign to None
 
-        # TODO: when multiple offsets for a single site are permitted
-        # need to only set parent to none when there are no further 
-        # offsets
         if self._getParent() == site:
+            self._setParent(None)
+
+
+    def removeLocationBySiteId(self, siteId):
+        '''Remove a location in the :class:`~music21.base.DefinedContexts` object by id.
+
+        >>> from music21 import note, stream
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> n.addLocation(s, 10)
+        >>> n.parent = s
+        >>> n.removeLocationBySiteId(id(s))
+        >>> n.parent == None
+        True
+        '''
+        self._definedContexts.removeBySiteId(siteId)
+        p = self._getParent()
+        if p != None and id(p) == siteId:
             self._setParent(None)
 
 

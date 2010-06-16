@@ -321,13 +321,19 @@ def isNum(usrData):
     >>> isNum('three')
     False
     '''
-    if (isinstance(usrData, int) or 
-        isinstance(usrData, float) or 
-        isinstance(usrData, long) or
-        isinstance(usrData, decimal.Decimal)):
+    try:
+        x = usrData + 0
         return True
-    else:
-        return False        
+    except:
+        return False
+
+#     if (isinstance(usrData, int) or 
+#         isinstance(usrData, float) or 
+#         isinstance(usrData, long) or
+#         isinstance(usrData, decimal.Decimal)):
+#         return True
+#     else:
+#         return False        
 
 
 def isStr(usrData):
