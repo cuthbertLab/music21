@@ -70,7 +70,7 @@ class Date(object):
         self.minute = None
         self.second = None
 
-        # certainty: can be 'approximate', 'uncertain'
+        # error: can be 'approximate', 'uncertain'
         # None is assumed to be certain
         self.yearError = None
         self.monthError = None
@@ -80,17 +80,17 @@ class Date(object):
         self.secondError = None
 
         self.attrNames = ['year', 'month', 'day', 'hour', 'minute', 'second']
+
         # format strings for data components
         self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
                               '%02.i', '%02.i', '%006.2f']
 
+        # set any keywords supplied
         for attr in self.attrNames:
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
-
-        self.attrErrors = ['yearError', 'monthError', 'dayError',
-             'hourError', 'minuteError', 'secondError']
-        for attr in self.attrErrors:
+        for attr in self.attrNames:
+            attr = attr + 'Error'
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
 
