@@ -246,10 +246,12 @@ class Stream(music21.Music21Object):
 
 #     def __del__(self):
 #         #environLocal.printDebug(['calling __del__ from Stream', self])
+#         # this is experimental
+#         # this did not offer improvements, and raised a number of errors
+#         siteId = id(self)
 #         for e in self._elements:
-#             #probably faster
-#             #e.removeLocationBySiteId(id(self))
-#             e.removeLocationBySite(self)
+#             e.removeLocationBySiteId(siteId)
+
 
     #---------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call _elementsChanged
