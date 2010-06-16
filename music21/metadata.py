@@ -31,12 +31,12 @@ class MetadataException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class TextData(object):
+class Text(object):
     '''One unit of text data: a title, a name, or some other text data. Store the string and a language name or code.
     '''
     def __init__(self, data='', language=None):
         '''
-        >>> td = TextData('concerto in d', 'en')
+        >>> td = Text('concerto in d', 'en')
         >>> str(td)
         'concerto in d'
         '''
@@ -49,8 +49,111 @@ class TextData(object):
 
 
 #-------------------------------------------------------------------------------
+class Date(object):
+    '''A single date value, specified by year, month, day, hour, minute, and second. 
+
+    Additionally, each value can be specified as `certain`, `approximate`, and 
+    '''
+    def __init__(self, *args, **keywords):
+        '''
+        >>> a = Date(year=1843, yearError='approximate')
+        >>> a.year
+        1843
+        >>> a.yearError
+        'approximate'
+
+        '''
+        self.year = None
+        self.month = None
+        self.day = None
+        self.hour = None
+        self.minute = None
+        self.second = None
+
+        # certainty: can be 'approximate', 'uncertain'
+        # None is assumed to be certain
+        self.yearError = None
+        self.monthError = None
+        self.dayError = None
+        self.hourError = None
+        self.minuteError = None
+        self.secondError = None
+
+        self.attrValues = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
+                              '%02.i', '%02.i', '%006.2f']
+
+        for attr in self.attrValues:
+            if attr in keywords.keys():
+                setattr(self, attr, keywords[attr])
+
+        self.attrErrors = ['yearError', 'monthError', 'dayError',
+             'hourError', 'minuteError', 'secondError']
+        for attr in self.attrErrors:
+            if attr in keywords.keys():
+                setattr(self, attr, keywords[attr])
+
+
+    def __str__(self):
+        # cannot use this, as it does not support dates lower than 1900!
+        # self._data.strftime("%Y.%m.%d")
+        msg = []
+
+        if self.hour == None and self.minute == None and self.second == None:
+            breakIndex = 3 # index
+
+        for i in range(len(self.attrValues)):
+            if i >= breakIndex:
+                break
+            attr = self.attrValues[i]
+            value = getattr(self, attr)
+            if value == None:
+                msg.append('--')
+            else:
+                fmt = self.attrStrFormat[i]
+                msg.append(fmt % value)
+
+        return '.'.join(msg)
+
+
+    def loadStr(self, str):
+        '''Load a string date representation.
+        
+        Assume year/month/day/hour:minute:second
+        '''
+        post = []
+        if '.' in str:
+            for chunk in str.split('.'):
+                post.append(chunk) # assume year, month date
+        elif '/' in str:
+            for chunk in str.split('/'):
+                post.append(chunk) # assume year, month date
+        post = [int(x) for x in post]
+
+        # assume in order in post list
+        for i in range(len(self.attrValues)):
+            if len(post) > i: # only assign for those specified
+                setattr(self, self.attrValues[i], post[i])
+
+
+    def _getDatetime(self):
+        '''Get a datetime object.
+        '''
+        post = []
+        for attr in self.attrValues:
+            # need to be integers
+            post.append(int(getattr(self, attr)))
+        return datetime.datetime(*post)
+
+    datetime = property(_getDatetime, 
+        doc = '''Return a datetime object representation. 
+        ''')
+
+
+#-------------------------------------------------------------------------------
 class DateSingle(object):
-    '''Store a date, either as an exact known date, or an approximation or prior to or after representation.
+    '''Store a date, either as certain, approximate, or uncertain.
+
     '''
 # z	value uncertain
 # x	value approximate
@@ -65,13 +168,13 @@ class DateSingle(object):
 
     isSingle = True
 
-    def __init__(self, data='', relevance=None):
+    def __init__(self, data='', relevance='certain'):
         '''
         >>> dd = DateSingle('2009/12/31', 'approximate')
         >>> str(dd)
         '2009.12.31'
 
-        >>> dd = DateSingle('1805.3.12', 'approximate')
+        >>> dd = DateSingle('1805.3.12', 'uncertain')
         >>> str(dd)
         '1805.03.12'
         '''
@@ -85,41 +188,16 @@ class DateSingle(object):
         self.relevance = relevance # will use property
     
 
-    def _strDateToList(self, str):
-        post = []
-        if '.' in str:
-            for chunk in str.split('.'):
-                post.append(chunk) # assume year, month date
-        elif '/' in str:
-            for chunk in str.split('/'):
-                post.append(chunk) # assume year, month date
-        post = [int(x) for x in post]
-        return post
-
-    def _dateTimeToStr(self, dateTimeObj):
-        # cannot use this, as it does not support dates lower than 1900!
-        # self._data.strftime("%Y.%m.%d")
-        msg = []
-        msg.append(str(dateTimeObj.year))
-
-        s = '%2i' % dateTimeObj.month
-        msg.append(s.replace(' ', '0'))
-
-        s = '%2i' % dateTimeObj.day
-        msg.append(s.replace(' ', '0'))
-        return '.'.join(msg)
 
     def _prepareData(self, data):
         '''Assume a string is supplied as argument
         '''
-        numerical = [] # a list of year, month, day, hour, min sec
+        self._data = Date()
         if common.isStr(data):
-            numerical = self._strDateToList(data)
-        #environLocal.printDebug(numerical)
-        self._data = datetime.datetime(*numerical)
+            self._data.loadStr(data)
 
     def _setRelevance(self, value):
-        if value in ['certain', 'approximate']:
+        if value in ['certain', 'approximate', 'uncertain']:
             self._relevance = value
         else:
             raise MetadataException('relevance value is not supported by this object: %s' % value)
@@ -131,7 +209,7 @@ class DateSingle(object):
 
 
     def __str__(self):
-        return self._dateTimeToStr(self._data)
+        return str(self._data)
 
 
 class DateRelative(DateSingle):
@@ -180,26 +258,21 @@ class DateBetween(DateSingle):
         '''
         DateSingle.__init__(self, data, relevance)
 
-
     def _prepareData(self, data):
         '''Assume a list of dates as strings is supplied as argument
         '''
-        numerical = [] # a list of year, month, day, hour, min sec
-        for part in data:
-            if common.isStr(part):
-                numerical.append(self._strDateToList(part))
-        #environLocal.printDebug(numerical)
         self._data = []
-        for part in numerical:
-            self._data.append(datetime.datetime(*part))
-
+        for part in data:
+            d = Date()
+            if common.isStr(part):
+                d.loadStr(part)
+            self._data.append(d) # a lost of Date objects
 
     def __str__(self):
         msg = []
-        for part in self._data:
-            msg.append(self._dateTimeToStr(part))
+        for d in self._data:
+            msg.append(str(d))
         return ' to '.join(msg)
-
 
     def _setRelevance(self, value):
         if value in ['between']:
@@ -212,7 +285,7 @@ class DateBetween(DateSingle):
 
 
 class DateSelection(DateSingle):
-    '''Store a relative date, or a collection of dates that might all be possible
+    '''Store a selection of dates, or a collection of dates that might all be possible
     '''
     isSingle = False
 
@@ -231,19 +304,17 @@ class DateSelection(DateSingle):
     def _prepareData(self, data):
         '''Assume a list of dates as strings is supplied as argument
         '''
-        numerical = [] # a list of year, month, day, hour, min sec
-        for part in data:
-            if common.isStr(part):
-                numerical.append(self._strDateToList(part))
-        #environLocal.printDebug(numerical)
         self._data = []
-        for part in numerical:
-            self._data.append(datetime.datetime(*part))
+        for part in data:
+            d = Date()
+            if common.isStr(part):
+                d.loadStr(part)
+            self._data.append(d) # a lost of Date objects
 
     def __str__(self):
         msg = []
-        for part in self._data:
-            msg.append(self._dateTimeToStr(part))
+        for d in self._data:
+            msg.append(str(d))
         return ' or '.join(msg)
 
     def _setRelevance(self, value):
@@ -297,6 +368,7 @@ class Contributor(object):
             return None
 
 
+
 class Metadata(object):
     '''Metadata for a work, including title, composer, dates, and other relevant information.
     '''
@@ -323,7 +395,7 @@ class Test(unittest.TestCase):
 
 
 #-------------------------------------------------------------------------------
-_DOC_ORDER = [TextData]
+_DOC_ORDER = [Text]
 
 
 if __name__ == "__main__":
