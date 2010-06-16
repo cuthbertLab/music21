@@ -60,7 +60,7 @@ ROLES = ['com', 'coa', 'cos', 'col', 'coc', 'lyr', 'lib', 'lar', 'lor', 'trn']
 # !!!TRN: Translator of text. 
 
 def roleToStr(value):
-    '''Get roles, used for Contributors. 
+    '''Get roles as string-like attributes, used for Contributors. 
 
     >>> roleToStr('com')
     'composer'
@@ -71,13 +71,13 @@ def roleToStr(value):
     if value in ['com']:
         return 'composer'
     elif value in ['coa']:
-        return 'attributed composer'
+        return 'attributedComposer'
     elif value in ['cos']:
-        return 'suspected composer'
+        return 'suspectedComposer'
     elif value in ['col']:
-        return 'composer alias'
+        return 'composerAlias'
     elif value in ['coc']:
-        return 'composer corporate'
+        return 'composerCorporate'
     elif value in ['lyr']:
         return 'lyricist'
     elif value in ['lib']:
@@ -89,7 +89,88 @@ def roleToStr(value):
     elif value in ['trn']:
         return 'translator'
     else:
-        return None
+        raise MetadataException('no such role: %s' % value)
+
+
+# contributors can have roles
+WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac', 
+            'osc', 'omv', 'omd', 'ops', 'onm', 
+            'ovm', 'ode', 'oco', 'gtl', 'gaw', 
+            'gco', 'txo', 'txl', 'ocy', 'opc']
+# !!!OTL: Title. 
+# !!!OTP: Popular Title.
+# !!!OTA: Alternative title.
+# !!!OPR: Title of larger (or parent) work 
+# !!!OAC: Act number.
+# !!!OSC: Scene number.
+# !!!OMV: Movement number.
+# !!!OMD: Movement designation or movement name. 
+# !!!OPS: Opus number. 
+# !!!ONM: Number.
+# !!!OVM: Volume.
+# !!!ODE: Dedication. 
+# !!!OCO: Commission
+# !!!GTL: Group Title. 
+# !!!GAW: Associated Work. 
+
+# !!!GCO: Collection designation. 
+# !!!TXO: Original language of vocal/choral text. 
+# !!!TXL: Language of the encoded vocal/choral text. 
+# !!!OCY: Country of composition. 
+# !!!OPC: City, town or village of composition. 
+
+def workIdToStr(value):
+    '''Get roles as string-like attributes, used for Contributors. 
+
+    >>> roleToStr('com')
+    'composer'
+    >>> roleToStr('lib')
+    'librettist'
+    '''
+    value = value.lower()
+    if value in ['otl']:
+        return 'title'
+    elif value in ['otp']:
+        return 'popularTitle'
+    elif value in ['ota']:
+        return 'alternativeTitle'
+    elif value in ['opr']:
+        return 'parentTitle'
+    elif value in ['oac']:
+        return 'actNumber'
+    elif value in ['osc']:
+        return 'sceneNumber'
+    elif value in ['omv']:
+        return 'movementNumber'
+    elif value in ['omd']:
+        return 'movementName'
+    elif value in ['ops']:
+        return 'opusNumber'
+    elif value in ['onm']:
+        return 'number'
+    elif value in ['ovm']:
+        return 'volume'
+    elif value in ['ode']:
+        return 'dedication'
+    elif value in ['oco']:
+        return 'commission'
+    elif value in ['gtl']:
+        return 'groupTitle'
+    elif value in ['gaw']:
+        return 'associatedWork'
+    elif value in ['gco']:
+        return 'collectionDesignation'
+    elif value in ['txo']:
+        return 'textOriginalLanguage'
+    elif value in ['txl']:
+        return 'textLanguage'
+    elif value in ['ocy']:
+        return 'countryOfComposition'
+    elif value in ['opc']:
+        return 'localeOfComposition'
+    else:
+        raise MetadataException('no such work id: %s' % value)
+
 
 
 
@@ -679,22 +760,6 @@ class Metadata(object):
     '''
     # all Text objects
     
-    # !!!OTL: Title. 
-    # !!!OTP: Popular Title.
-    # !!!OTA: Alternative title.
-    # !!!OPR: Title of larger (or parent) work 
-    # !!!OAC: Act number.
-    # !!!OSC: Scene number.
-    # !!!OMV: Movement number.
-    # !!!OMD: Movement designation or movement name. 
-    # !!!OPS: Opus number. 
-    # !!!ONM: Number.
-    # !!!OVM: Volume.
-    # !!!ODE: Dedication. 
-    # !!!OCO: Commission
-    # !!!GTL: Group Title. 
-    # !!!GAW: Associated Work. 
-    # !!!GCO: Collection designation. 
 
     def __init__(self):
         '''
@@ -706,19 +771,12 @@ class Metadata(object):
 
         self._date = None
 
-        # need an object for imprint
+        # need a specific object for copyright and imprint
         self._imprint = None
+        self._copyright = None
 
-        # the text or lyrics of a work
-        # !!!TXO: Original language of vocal/choral text. 
-        # !!!TXL: Language of the encoded vocal/choral text. 
-        self._textOriginalLanguage = None
-        self._textLanguage = None        
-
-        # !!!OCY: Country of composition. 
-        # !!!OPC: City, town or village of composition. 
-        self._country = None
-        self._city = None
+        # a dictionary of Text elements, where keys are work ids
+        self._workIds = {}
 
 
 
