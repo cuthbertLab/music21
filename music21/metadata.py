@@ -25,9 +25,72 @@ environLocal = environment.Environment(_MOD)
 
 
 
-
 class MetadataException(Exception):
     pass
+
+
+# error can be designated
+APPROXIMATE = ['~', 'x']
+UNCERTAIN = ['?', 'z']
+
+def errorToSymbol(value):
+    '''
+    >>> errorToSymbol('approximate')
+    '~'
+    >>> errorToSymbol('uncertain')
+    '?'
+    '''
+    if value.lower() in APPROXIMATE + ['approximate']:
+        return APPROXIMATE[0]
+    if value.lower() in UNCERTAIN + ['uncertain']:
+        return UNCERTAIN[0]
+
+# contributors can have roles
+ROLES = ['com', 'coa', 'cos', 'col', 'coc', 'lyr', 'lib', 'lar', 'lor', 'trn']
+# !!!COM: Composer's name.
+# !!!COA: Attributed composer.
+# !!!COS: Suspected composer.
+# !!!COL: Composer abbreviated, alias, 
+# !!!COC: Composer(s) corporate name.
+# 
+# !!!LYR: Lyricist. 
+# !!!LIB: Librettist. 
+# !!!LAR: Arranger. 
+# !!!LOR: Orchestrator. 
+# !!!TRN: Translator of text. 
+
+def roleToStr(value):
+    '''Get roles, used for Contributors. 
+
+    >>> roleToStr('com')
+    'composer'
+    >>> roleToStr('lib')
+    'librettist'
+    '''
+    value = value.lower()
+    if value in ['com']:
+        return 'composer'
+    elif value in ['coa']:
+        return 'attributed composer'
+    elif value in ['cos']:
+        return 'suspected composer'
+    elif value in ['col']:
+        return 'composer alias'
+    elif value in ['coc']:
+        return 'composer corporate'
+    elif value in ['lyr']:
+        return 'lyricist'
+    elif value in ['lib']:
+        return 'librettist'
+    elif value in ['lar']:
+        return 'arranger'
+    elif value in ['lor']:
+        return 'orchestrator'
+    elif value in ['trn']:
+        return 'translator'
+    else:
+        return None
+
 
 
 #-------------------------------------------------------------------------------
@@ -42,7 +105,6 @@ class Text(object):
         '''
         self._data = data
         self._language = language
-    
 
     def __str__(self):
         return str(self._data)
@@ -62,6 +124,10 @@ class Date(object):
         >>> a.yearError
         'approximate'
 
+        >>> a = Date(year='1843?')
+        >>> a.yearError
+        'uncertain'
+
         '''
         self.year = None
         self.month = None
@@ -80,7 +146,6 @@ class Date(object):
         self.secondError = None
 
         self.attrNames = ['year', 'month', 'day', 'hour', 'minute', 'second']
-
         # format strings for data components
         self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
                               '%02.i', '%02.i', '%006.2f']
@@ -88,11 +153,47 @@ class Date(object):
         # set any keywords supplied
         for attr in self.attrNames:
             if attr in keywords.keys():
-                setattr(self, attr, keywords[attr])
+                value, error = self._stripError(keywords[attr])
+                setattr(self, attr, value)
+                if error != None:
+                    setattr(self, attr+'Error', error)            
         for attr in self.attrNames:
             attr = attr + 'Error'
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
+
+    def _stripError(self, value):
+        '''Strip error symbols from a numerical value. Return cleaned source and sym. Assumed to only be one per string.
+
+        >>> d = Date()
+        >>> d._stripError('1247~')
+        ('1247', 'approximate')
+        >>> d._stripError('234.43?')
+        ('234.43', 'uncertain')
+        >>> d._stripError('234.43')
+        ('234.43', None)
+
+        '''
+        if common.isNum(value): # if a number, let pass
+            return value, None
+        else:
+            str = value
+
+        sym = APPROXIMATE + UNCERTAIN
+        found = None
+        for char in str:
+            if char in sym:
+                found = char
+                break
+
+        if found == None:
+            return str, None
+        elif found in APPROXIMATE:
+            str = str.replace(found, '')
+            return  str, 'approximate'
+        elif found in UNCERTAIN:
+            str = str.replace(found, '')
+            return  str, 'uncertain'
 
 
     def _getHasTime(self):
@@ -129,14 +230,11 @@ class Date(object):
         >>> b = Date(year=1843, month=3, day=3, minute=3)
         >>> b.hasError
         False
-
         ''')
 
-
-
     def __str__(self):
+        # datetime.strftime("%Y.%m.%d")
         # cannot use this, as it does not support dates lower than 1900!
-        # self._data.strftime("%Y.%m.%d")
         msg = []
 
         if self.hour == None and self.minute == None and self.second == None:
@@ -147,11 +245,16 @@ class Date(object):
                 break
             attr = self.attrNames[i]
             value = getattr(self, attr)
+            error = getattr(self, attr+'Error')
             if value == None:
                 msg.append('--')
             else:
                 fmt = self.attrStrFormat[i]
-                msg.append(fmt % value)
+                if error != None:
+                    sub = fmt % value + errorToSymbol(error)
+                else:
+                    sub = fmt % value
+                msg.append(sub)
 
         return '.'.join(msg)
 
@@ -160,22 +263,91 @@ class Date(object):
         '''Load a string date representation.
         
         Assume year/month/day/hour:minute:second
+
+        >>> d = Date()
+        >>> d.loadStr('3030?/12~/?4')
+        >>> d.month, d.monthError
+        (12, 'approximate')
+        >>> d.year, d.yearError
+        (3030, 'uncertain')
+        >>> d.day, d.dayError
+        (4, 'uncertain')
         '''
         post = []
+        postError = []
         if '.' in str:
             for chunk in str.split('.'):
-                post.append(chunk) # assume year, month date
+                value, error = self._stripError(chunk)
+                post.append(value) 
+                postError.append(error)
         elif '/' in str:
             for chunk in str.split('/'):
-                post.append(chunk) # assume year, month date
+                value, error = self._stripError(chunk)
+                post.append(value) 
+                postError.append(error)
+
+        # as error is stripped, we can now convert to numbers
         post = [int(x) for x in post]
 
         # assume in order in post list
         for i in range(len(self.attrNames)):
             if len(post) > i: # only assign for those specified
                 setattr(self, self.attrNames[i], post[i])
+                if postError[i] != None:
+                    setattr(self, self.attrNames[i]+'Error', postError[i])            
 
 
+    def loadDatetime(self, dt):
+        '''Load time data from a datetime object.
+
+        >>> import datetime
+        >>> dt = datetime.datetime(2005, 02, 01)
+        >>> dt
+        datetime.datetime(2005, 2, 1, 0, 0)
+        >>> a = Date()
+        >>> a.loadDatetime(dt)
+        >>> str(a)
+        '2005.02.01'
+        '''
+        for attr in self.attrNames:
+            if hasattr(dt, attr):
+                # names here are the same, so we can directly map
+                value = getattr(dt, attr)
+                if value not in [0, None]:
+                    setattr(self, attr, value)
+
+    def loadOther(self, other):
+        '''Load values based on another Date object:
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> b = Date()
+        >>> b.loadOther(a)
+        >>> b.year
+        1843
+        '''
+        for attr in self.attrNames:
+            if getattr(other, attr) != None:
+                setattr(self, attr, getattr(other, attr))
+
+    def load(self, value):
+        '''Load values by string, datetime object, or Date object.
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> b = Date()
+        >>> b.load(a)
+        >>> b.year
+        1843
+        '''
+
+        if isinstance(value, datetime.datetime):
+            self.loadDatetime(value)
+        elif common.isStr(value):
+            self.loadStr(value)
+        elif isinstance(value, Date):
+            self.loadOther(value)
+        else:
+            raise MetadataException('cannot load data: %s' % value)    
+    
     def _getDatetime(self):
         '''Get a datetime object.
 
@@ -187,6 +359,8 @@ class Date(object):
 
         '''
         post = []
+        # order here is order for datetime
+        # TODO: need defaults for incomplete times. 
         for attr in self.attrNames:
             # need to be integers
             value = getattr(self, attr)
@@ -205,17 +379,6 @@ class DateSingle(object):
     '''Store a date, either as certain, approximate, or uncertain.
 
     '''
-# z	value uncertain
-# x	value approximate
-
-# ?	date uncertain
-# ~	date approximate
-# <	sometime prior to
-# >	sometime after
-
-# ^	"between" conjunction
-# |	"or" conjunction
-
     isSingle = True
 
     def __init__(self, data='', relevance='certain'):
@@ -228,17 +391,18 @@ class DateSingle(object):
         >>> str(dd)
         '1805.03.12'
         '''
-        # store an array of values marking if date data positions
-        # are certain or not
-        self._dataCertainty = None
         self._data = None
         self._relevance = None # managed by property
+
+        # not yet implemented
+        # store an array of values marking if date data itself
+        # is certain, approximate, or uncertain
+        # here, dataError is relevance
+        self._dataError = None
 
         self._prepareData(data)
         self.relevance = relevance # will use property
     
-
-
     def _prepareData(self, data):
         '''Assume a string is supplied as argument
         '''
@@ -249,6 +413,7 @@ class DateSingle(object):
     def _setRelevance(self, value):
         if value in ['certain', 'approximate', 'uncertain']:
             self._relevance = value
+            self._dataError = value # only here is dataError the same as relevance
         else:
             raise MetadataException('relevance value is not supported by this object: %s' % value)
 
@@ -256,7 +421,6 @@ class DateSingle(object):
         return self._relevance
 
     relevance = property(_getRelevance, _setRelevance)
-
 
     def __str__(self):
         return str(self._data)
@@ -312,11 +476,15 @@ class DateBetween(DateSingle):
         '''Assume a list of dates as strings is supplied as argument
         '''
         self._data = []
+        self._dataError = []
         for part in data:
             d = Date()
             if common.isStr(part):
                 d.loadStr(part)
             self._data.append(d) # a lost of Date objects
+            # can look at Date and determine overall error
+            self._dataError.append(None)
+
 
     def __str__(self):
         msg = []
@@ -355,11 +523,14 @@ class DateSelection(DateSingle):
         '''Assume a list of dates as strings is supplied as argument
         '''
         self._data = []
+        self._dataError = []
         for part in data:
             d = Date()
             if common.isStr(part):
                 d.loadStr(part)
             self._data.append(d) # a lost of Date objects
+            # can look at Date and determine overall error
+            self._dataError.append(None)
 
     def __str__(self):
         msg = []
@@ -377,61 +548,177 @@ class DateSelection(DateSingle):
 
 
 
+
+
 #-------------------------------------------------------------------------------
 class Contributor(object):
     '''A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
     '''
-# !!!COA: Attributed composer.
-# !!!COS: Suspected composer.
-# !!!COL: Composer abbreviated, alias, 
-# !!!COC: Composer(s) corporate name.
-# 
-# !!!CDT: Composer dates.
-# !!!CNT: Nationality of the composer. 
-# !!!LYR: Lyricist. 
-# !!!LIB: Librettist. 
-# !!!LAR: Arranger. 
-# !!!LOR: Orchestrator. 
-# !!!TRN: Translator of text. 
-
-    def __init__(self):
+    def __init__(self, *args, **keywords ):
         '''
-        >>> td = Contributor()
-        '''
-        self._role = None
+        >>> td = Contributor(role='com', name='Chopin, Fryderyk')
+        >>> td.role
+        'com'
+        >>> td.roleStr
+        'composer'
+        >>> td.name
+        'Chopin, Fryderyk'
 
-        # a list of TextData objects to support various spellings or 
+        >>> td = Contributor(role='com', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+        >>> td.name
+        'Chopin, Fryderyk'
+        >>> td.names
+        ['Chopin, Fryderyk', 'Chopin, Frederick']
+
+        '''
+        if 'role' in keywords.keys():
+            self.role = keywords['role'] # will use property
+        else:
+            self.role = None
+
+        # a list of Text objects to support various spellings or 
         # language translatiions
-        self._textData = []
+        self._names = []
+        if 'name' in keywords.keys(): # a single
+            self._names.append(Text(keywords['name']))
+        if 'names' in keywords.keys(): # many
+            for n in keywords['names']:
+                self._names.append(Text(n))
 
         # store the nationality, if known
-        self._nationality = None
+        self._nationality = []
 
         # store birth and death of contributor, if known
         self._dateRange = [None, None]
+        if 'birth' in keywords.keys():
+            self._dateRange[0] = Date()
+            self._dateRange[0].load(keywords['birth'])
+        if 'death' in keywords.keys():
+            self._dateRange[0] = Date()
+            self._dateRange[0].load(keywords['death'])
 
+
+
+    def _getRole(self):
+        return self._role
+
+    def _setRole(self, value):
+        if value == None or value in ROLES:
+            self._role = value
+        else:
+            raise MetadataException('role value is not supported by this object: %s' % value)
+
+    role = property(_getRole, _setRole)
+
+    def _getRoleStr(self):
+        return roleToStr(self._role)
+
+    roleStr = property(_getRoleStr)
+
+
+    def _getName(self):
+        # return first name
+        return str(self._names[0])
+
+    name = property(_getName, 
+        doc = '''Returns the first entered name.
+        ''')
+
+    def _getNames(self):
+        # return first name
+        msg = []
+        for n in self._names:
+            msg.append(str(n))
+        return msg
+
+    names = property(_getNames, 
+        doc = '''Returns all names in a list.
+        ''')
 
     def age(self):
-        if self._dateRange[0] != None and self._dateRange != None:
+        if self._dateRange[0] != None and self._dateRange[1] != None:
+            b = self._dateRange[0].datetime
+            d = self._dateRange[1].datetime
             pass
         else:
             return None
 
 
+#-------------------------------------------------------------------------------
 
+class Imprint(object):
+    pass
+# !!!PUB: Publication status. 
+# !!!PPR: First publisher. 
+# !!!PDT: Date first published. 
+# !!!PPP: Place first published. 
+# !!!PC#: Publisher's catalogue number. 
+# !!!SCT: Scholarly catalogue abbreviation and number. E.g. BWV 551
+# !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Koechel 117.
+# !!!SMS: Manuscript source name. 
+# !!!SML: Manuscript location. 
+# !!!SMA: Acknowledgement of manuscript access.
+
+
+class Copyright(object):
+    pass
+# !!!YEP: Publisher of electronic edition. 
+# !!!YEC: Date and owner of electronic copyright. 
+# !!!YER: Date electronic edition released.
+# !!!YEM: Copyright message. 
+# !!!YEN: Country of copyright. 
+# !!!YOR: Original document. 
+# !!!YOO: Original document owner. 
+# !!!YOY: Original copyright year.
+# !!!YOE: Original editor. 
+
+
+#-------------------------------------------------------------------------------
 class Metadata(object):
     '''Metadata for a work, including title, composer, dates, and other relevant information.
     '''
-# !!!TXO: Original language of vocal/choral text. 
-# !!!TXL: Language of the encoded vocal/choral text. 
+    # all Text objects
+    
+    # !!!OTL: Title. 
+    # !!!OTP: Popular Title.
+    # !!!OTA: Alternative title.
+    # !!!OPR: Title of larger (or parent) work 
+    # !!!OAC: Act number.
+    # !!!OSC: Scene number.
+    # !!!OMV: Movement number.
+    # !!!OMD: Movement designation or movement name. 
+    # !!!OPS: Opus number. 
+    # !!!ONM: Number.
+    # !!!OVM: Volume.
+    # !!!ODE: Dedication. 
+    # !!!OCO: Commission
+    # !!!GTL: Group Title. 
+    # !!!GAW: Associated Work. 
+    # !!!GCO: Collection designation. 
 
     def __init__(self):
         '''
         >>> md = Metadata()
         '''
+        # a lost of Contributor objects
+        # there can be more than one composer, or any other combination
+        self._contributors = []
+
+        self._date = None
+
+        # need an object for imprint
+        self._imprint = None
+
+        # the text or lyrics of a work
+        # !!!TXO: Original language of vocal/choral text. 
+        # !!!TXL: Language of the encoded vocal/choral text. 
         self._textOriginalLanguage = None
         self._textLanguage = None        
 
+        # !!!OCY: Country of composition. 
+        # !!!OPC: City, town or village of composition. 
+        self._country = None
+        self._city = None
 
 
 
