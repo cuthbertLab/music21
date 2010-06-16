@@ -52,7 +52,6 @@ ROLES = ['com', 'coa', 'cos', 'col', 'coc', 'lyr', 'lib', 'lar', 'lor', 'trn']
 # !!!COS: Suspected composer.
 # !!!COL: Composer abbreviated, alias, 
 # !!!COC: Composer(s) corporate name.
-# 
 # !!!LYR: Lyricist. 
 # !!!LIB: Librettist. 
 # !!!LAR: Arranger. 
@@ -66,6 +65,8 @@ def roleToStr(value):
     'composer'
     >>> roleToStr('lib')
     'librettist'
+    >>> for id in ROLES: 
+    ...    post = roleToStr(id)
     '''
     value = value.lower()
     if value in ['com']:
@@ -91,6 +92,22 @@ def roleToStr(value):
     else:
         raise MetadataException('no such role: %s' % value)
 
+ROLE_STRINGS = [roleToStr(x) for x in ROLES]
+
+def strToRole(value):
+    '''Get a role id from a string representation.
+
+    >>> strToRole('composer')
+    'com'
+    >>> for n in ROLE_STRINGS:
+    ...     post = strToRole(n)
+    '''
+    # note: probably not the fastest way to do this
+    for id in ROLES:
+        if value.lower() == roleToStr(id).lower():
+            return id
+    raise MetadataException('no such role: %s' % value)
+
 
 # contributors can have roles
 WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac', 
@@ -112,7 +129,6 @@ WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac',
 # !!!OCO: Commission
 # !!!GTL: Group Title. 
 # !!!GAW: Associated Work. 
-
 # !!!GCO: Collection designation. 
 # !!!TXO: Original language of vocal/choral text. 
 # !!!TXL: Language of the encoded vocal/choral text. 
@@ -122,10 +138,10 @@ WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac',
 def workIdToStr(value):
     '''Get roles as string-like attributes, used for Contributors. 
 
-    >>> roleToStr('com')
-    'composer'
-    >>> roleToStr('lib')
-    'librettist'
+    >>> workIdToStr('otl')
+    'title'
+    >>> for id in WORK_IDS: 
+    ...    post = workIdToStr(id)
     '''
     value = value.lower()
     if value in ['otl']:
@@ -171,7 +187,21 @@ def workIdToStr(value):
     else:
         raise MetadataException('no such work id: %s' % value)
 
+WORK_ID_STRINGS = [workIdToStr(x) for x in WORK_IDS]
 
+def strToWorkId(value):
+    '''Get a role id from a string representation.
+
+    >>> strToWorkId('localeOfComposition')
+    'opc'
+    >>> for n in WORK_ID_STRINGS:
+    ...     post = strToWorkId(n)
+    '''
+    # note: probably not the fastest way to do this
+    for id in WORK_IDS:
+        if value.lower() == workIdToStr(id).lower():
+            return id
+    raise MetadataException('no such role: %s' % value)
 
 
 #-------------------------------------------------------------------------------
@@ -637,15 +667,13 @@ class Contributor(object):
     '''
     def __init__(self, *args, **keywords ):
         '''
-        >>> td = Contributor(role='com', name='Chopin, Fryderyk')
+        >>> td = Contributor(role='composer', name='Chopin, Fryderyk')
         >>> td.role
-        'com'
-        >>> td.roleStr
         'composer'
         >>> td.name
         'Chopin, Fryderyk'
 
-        >>> td = Contributor(role='com', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+        >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
         >>> td.name
         'Chopin, Fryderyk'
         >>> td.names
@@ -653,7 +681,7 @@ class Contributor(object):
 
         '''
         if 'role' in keywords.keys():
-            self.role = keywords['role'] # will use property
+            self.role = keywords['role'] # validated with property
         else:
             self.role = None
 
@@ -679,22 +707,18 @@ class Contributor(object):
             self._dateRange[0].load(keywords['death'])
 
 
-
     def _getRole(self):
         return self._role
 
     def _setRole(self, value):
-        if value == None or value in ROLES:
+        if value == None or value in ROLE_STRINGS:
             self._role = value
         else:
             raise MetadataException('role value is not supported by this object: %s' % value)
 
-    role = property(_getRole, _setRole)
-
-    def _getRoleStr(self):
-        return roleToStr(self._role)
-
-    roleStr = property(_getRoleStr)
+    role = property(_getRole, _setRole, 
+        doc = '''The role is what part this Contributor plays in the work. 
+        ''')
 
 
     def _getName(self):
@@ -726,6 +750,7 @@ class Contributor(object):
 
 
 #-------------------------------------------------------------------------------
+# as these have Date and Text fields, these need to be specialized objects
 
 class Imprint(object):
     pass
@@ -758,12 +783,12 @@ class Copyright(object):
 class Metadata(object):
     '''Metadata for a work, including title, composer, dates, and other relevant information.
     '''
-    # all Text objects
+    # possible rename Work?
     
 
-    def __init__(self):
+    def __init__(self, *args, **keywords ):
         '''
-        >>> md = Metadata()
+        >>> md = Metadata(title='Concerto in F')
         '''
         # a lost of Contributor objects
         # there can be more than one composer, or any other combination
@@ -775,10 +800,37 @@ class Metadata(object):
         self._imprint = None
         self._copyright = None
 
-        # a dictionary of Text elements, where keys are work ids
+        # a dictionary of Text elements, where keys are work id strings
+        # all are loaded with None by default
         self._workIds = {}
+        for idStr in WORK_ID_STRINGS:
+            id = strToWorkId(idStr)
+            if id in keywords.keys():
+                self._workIds[idStr] = Text(keywords[id])
+            elif idStr in keywords.keys():
+                self._workIds[idStr] = Text(keywords[idStr])
+            else:
+                self._workIds[idStr] = None
 
+    def _getTitle(self):
+        searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
+        post = None
+        for key in searchId:
+            post = self._workIds[key]
+            if post != None: # get first matched
+                # get a string from this Text object
+                return str(self._workIds[key])
 
+    def _setTitle(self, value):
+        self._workIds['title'] = Text(value)
+
+    title = property(_getTitle, _setTitle, 
+        doc = '''Get the title of the work, or the next matched title string.
+
+        >>> md = Metadata(title='Concerto in F')
+        >>> md.title
+        'Concerto in F'
+        ''')
 
 #-------------------------------------------------------------------------------
 
