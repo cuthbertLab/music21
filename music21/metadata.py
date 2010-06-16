@@ -52,7 +52,7 @@ class Text(object):
 class Date(object):
     '''A single date value, specified by year, month, day, hour, minute, and second. 
 
-    Additionally, each value can be specified as `certain`, `approximate`, and 
+    Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain.
     '''
     def __init__(self, *args, **keywords):
         '''
@@ -79,12 +79,12 @@ class Date(object):
         self.minuteError = None
         self.secondError = None
 
-        self.attrValues = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        self.attrNames = ['year', 'month', 'day', 'hour', 'minute', 'second']
         # format strings for data components
         self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
                               '%02.i', '%02.i', '%006.2f']
 
-        for attr in self.attrValues:
+        for attr in self.attrNames:
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
 
@@ -95,6 +95,45 @@ class Date(object):
                 setattr(self, attr, keywords[attr])
 
 
+    def _getHasTime(self):
+        if self.hour != None or self.minute != None or self.second != None:
+            return True
+        else:
+            return False
+       
+    hasTime = property(_getHasTime, 
+        doc = '''Return True if any time elements are defined.
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> a.hasTime
+        False
+        >>> b = Date(year=1843, month=3, day=3, minute=3)
+        >>> b.hasTime
+        True
+
+        ''')
+
+
+    def _getHasError(self):
+        for attr in self.attrNames:
+            if getattr(self, attr+'Error') != None:
+                return True
+        return False
+       
+    hasError = property(_getHasError, 
+        doc = '''Return True if any data points have error defined. 
+
+        >>> a = Date(year=1843, month=3, day=3, dayError='approximate')
+        >>> a.hasError
+        True
+        >>> b = Date(year=1843, month=3, day=3, minute=3)
+        >>> b.hasError
+        False
+
+        ''')
+
+
+
     def __str__(self):
         # cannot use this, as it does not support dates lower than 1900!
         # self._data.strftime("%Y.%m.%d")
@@ -103,10 +142,10 @@ class Date(object):
         if self.hour == None and self.minute == None and self.second == None:
             breakIndex = 3 # index
 
-        for i in range(len(self.attrValues)):
+        for i in range(len(self.attrNames)):
             if i >= breakIndex:
                 break
-            attr = self.attrValues[i]
+            attr = self.attrNames[i]
             value = getattr(self, attr)
             if value == None:
                 msg.append('--')
@@ -132,9 +171,9 @@ class Date(object):
         post = [int(x) for x in post]
 
         # assume in order in post list
-        for i in range(len(self.attrValues)):
+        for i in range(len(self.attrNames)):
             if len(post) > i: # only assign for those specified
-                setattr(self, self.attrValues[i], post[i])
+                setattr(self, self.attrNames[i], post[i])
 
 
     def _getDatetime(self):
@@ -142,11 +181,18 @@ class Date(object):
 
         >>> a = Date(year=1843, month=3, day=3)
         >>> str(a)
+        '1843.03.03'
+        >>> a.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
+
         '''
         post = []
-        for attr in self.attrValues:
+        for attr in self.attrNames:
             # need to be integers
-            post.append(int(getattr(self, attr)))
+            value = getattr(self, attr)
+            if value == None:
+                break
+            post.append(int(value))
         return datetime.datetime(*post)
 
     datetime = property(_getDatetime, 
