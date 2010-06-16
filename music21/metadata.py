@@ -80,6 +80,7 @@ class Date(object):
         self.secondError = None
 
         self.attrValues = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        # format strings for data components
         self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
                               '%02.i', '%02.i', '%006.2f']
 
@@ -138,6 +139,9 @@ class Date(object):
 
     def _getDatetime(self):
         '''Get a datetime object.
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> str(a)
         '''
         post = []
         for attr in self.attrValues:
