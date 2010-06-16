@@ -401,7 +401,7 @@ class Stream(music21.Music21Object):
 
         '''
         iMatch = []
-        for i in xrange(len(self._elements)):
+        for i in range(len(self._elements)):
             if self._elements[i] == obj:
                 iMatch.append(i)
             elif (hasattr(self._elements[i], "obj") and \
@@ -1608,7 +1608,7 @@ class Stream(music21.Music21Object):
             else:
                 return self.elements[elPos + 1]
         else:
-            for i in xrange(elPos + 1, len(self._elements)):
+            for i in range(elPos + 1, len(self._elements)):
                 for cl in classList:
                     if isinstance(self._elements[i], cl): 
                         return self._elements[i]
@@ -1704,7 +1704,7 @@ class Stream(music21.Music21Object):
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
-        for i in xrange(numberStart, numberEnd+1):
+        for i in range(numberStart, numberEnd+1):
             match = None
             for number, suffix in mapCooked.keys():
                 # this will match regardless of suffix
@@ -2118,7 +2118,7 @@ class Stream(music21.Music21Object):
         else:
             element = item
             
-        for i in xrange(0, numberOfTimes):
+        for i in range(0, numberOfTimes):
             self.append(deepcopy(element))
     
     def repeatInsert(self, item, offsets):
@@ -2177,7 +2177,7 @@ class Stream(music21.Music21Object):
         found = None
         foundOffset = 0
         foundEnd = 0 
-        for i in xrange(0, len(self._elements)):
+        for i in range(0, len(self._elements)):
             b = self._elements[i]
             if b.id is not None or searchElement.id is not None:
                 if b.id == searchElement.id:
@@ -2381,7 +2381,7 @@ class Stream(music21.Music21Object):
             # iterate through all measures 
             match = False
             lastTimeSignature = None
-            for i in xrange(len(post)):
+            for i in range(len(post)):
                 m = post[i]
                 if m.timeSignature is not None:
                     lastTimeSignature = m.timeSignature
@@ -2698,7 +2698,7 @@ class Stream(music21.Music21Object):
             # stream of note or note-like entities; will return
             # the saem lost of beam objects
             beamsList = lastTimeSignature.getBeams(noteStream)
-            for i in xrange(len(noteStream)):
+            for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest
                 noteStream[i].beams = beamsList[i]
             # apply tuple types in place
@@ -2761,7 +2761,7 @@ class Stream(music21.Music21Object):
         noteStream = returnObj.sorted.notes
 
         # get chords, notes, and rests
-        for i in xrange(len(noteStream)):
+        for i in range(len(noteStream)):
             e = noteStream[i]
             if isinstance(e, note.Note):
                 e.pitch.updateAccidentalDisplay(pitchPast, alteredPitches,
@@ -2811,7 +2811,7 @@ class Stream(music21.Music21Object):
         # for now, calling makeAccidentals once per measures       
         # pitches from last measure are passed
         # this needs to be called before makeTies
-        for i in xrange(len(measureStream)):
+        for i in range(len(measureStream)):
             m = measureStream[i]
             if i > 0:
                 m.makeAccidentals(measureStream[i-1].pitches)
@@ -2894,7 +2894,7 @@ class Stream(music21.Music21Object):
     
         #print elements[-1], qLenTotal, elements[-1].duration
         # print _MOD, elements
-        for i in xrange(len(elements)-1):
+        for i in range(len(elements)-1):
             #print i, len(elements)
             span = elements[i+1].getOffsetBySite(self) - elements[i].getOffsetBySite(self)
             elements[i].duration.quarterLength = span
@@ -2948,7 +2948,7 @@ class Stream(music21.Music21Object):
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
 
-        for i in xrange(len(notes)):
+        for i in range(len(notes)):
             endMatch = None # can be True, False, or None
 
             n = notes[i]
@@ -4197,7 +4197,7 @@ class Stream(music21.Music21Object):
             return None
         
         returnStream = self.__class__()
-        for i in xrange(len(returnList) - 1):
+        for i in range(len(returnList) - 1):
             firstNote = returnList[i]
             secondNote = returnList[i+1]
             firstPitch = None
@@ -4230,7 +4230,7 @@ class Stream(music21.Music21Object):
         [(0.0, 2.0), (1.0, 3.0), (2.0, 4.0), (3.0, 5.0), (4.0, 6.0)]
         '''
         post = []        
-        for i in xrange(len(flatStream)):
+        for i in range(len(flatStream)):
             element = flatStream[i]
             if element.duration is None:
                 durSpan = (element.offset, element.offset)
@@ -4299,17 +4299,17 @@ class Stream(music21.Music21Object):
 
         # create a list with an entry for each element
         # in each entry, provide indices of all other elements that overalap
-        overlapMap = [[] for i in xrange(len(durSpanSorted))]
+        overlapMap = [[] for i in range(len(durSpanSorted))]
         # create a list of keys for events that start at the same time
-        simultaneityMap = [[] for i in xrange(len(durSpanSorted))]
+        simultaneityMap = [[] for i in range(len(durSpanSorted))]
         
-        for i in xrange(len(durSpanSorted)):
+        for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
             # second entry is duration
             if not includeDurationless and flatStream[i].duration is None: 
                 continue
             # compare to all past and following durations
-            for j in xrange(len(durSpanSorted)):
+            for j in range(len(durSpanSorted)):
                 if j == i: continue # do not compare to self
                 dst = durSpanSorted[j]
                 # print src, dst, self._durSpanOverlap(src, dst, includeEndBoundary)
@@ -4336,7 +4336,7 @@ class Stream(music21.Music21Object):
             raise StreamException('map must be the same length as flatStream')
 
         post = {}
-        for i in xrange(len(map)):
+        for i in range(len(map)):
             # print 'examining i:', i
             indices = map[i]
             if len(indices) > 0: 
@@ -5194,7 +5194,7 @@ class Measure(Stream):
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure        
         mxNoteList = [] # for chords
-        for i in xrange(len(mxMeasure)):
+        for i in range(len(mxMeasure)):
             mxObj = mxMeasure[i]
             if i < len(mxMeasure)-1:
                 mxObjNext = mxMeasure[i+1]

@@ -973,7 +973,7 @@ class Measure(MusicXMLElementList):
         counter = 0
         noteThis = None
         noteNext = None
-        for pos in xrange(len(self.componentList)):
+        for pos in range(len(self.componentList)):
             obj = self.componentList[pos]
             if obj.tag == 'forward':
                 counter += int(obj.duration)
@@ -993,7 +993,7 @@ class Measure(MusicXMLElementList):
                 if pos+1 == len(self.componentList):
                     noteNext = None
                 else:
-                    for posSub in xrange(pos+1, len(self.componentList)):
+                    for posSub in range(pos+1, len(self.componentList)):
                         if self.componentList[posSub].tag == 'note':
                             noteNext = self.componentList[posSub]
                             break
