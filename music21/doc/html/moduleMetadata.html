@@ -1,0 +1,646 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>music21.metadata &mdash; music21 v0.2.4a2 documentation</title>
+    <link rel="stylesheet" href="_static/music21doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.4a2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="music21 v0.2.4a2 documentation" href="index.html" />
+    <link rel="next" title="music21.analysis.metrical" href="moduleAnalysisMetrical.html" />
+    <link rel="prev" title="music21.meter" href="moduleMeter.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="moduleAnalysisMetrical.html" title="music21.analysis.metrical"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="moduleMeter.html" title="music21.meter"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">music21.metadata</a><ul>
+<li><a class="reference external" href="#text">Text</a></li>
+<li><a class="reference external" href="#date">Date</a></li>
+<li><a class="reference external" href="#datesingle">DateSingle</a></li>
+<li><a class="reference external" href="#daterelative">DateRelative</a></li>
+<li><a class="reference external" href="#datebetween">DateBetween</a></li>
+<li><a class="reference external" href="#dateselection">DateSelection</a></li>
+<li><a class="reference external" href="#contributor">Contributor</a></li>
+<li><a class="reference external" href="#metadata">Metadata</a></li>
+<li><a class="reference external" href="#copyright">Copyright</a></li>
+<li><a class="reference external" href="#imprint">Imprint</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="moduleMeter.html"
+                                  title="previous chapter">music21.meter</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="moduleAnalysisMetrical.html"
+                                  title="next chapter">music21.analysis.metrical</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/moduleMetadata.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-music21.metadata">
+<span id="modulemetadata"></span><h1>music21.metadata<a class="headerlink" href="#module-music21.metadata" title="Permalink to this headline">¶</a></h1>
+<p>Classes and functions for creating and processing score meta data, such as titles, movements, authors, publishers, and regions.</p>
+<dl class="function">
+<dt id="music21.metadata.abbreviationToRole">
+<tt class="descclassname">music21.metadata.</tt><tt class="descname">abbreviationToRole</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.abbreviationToRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ROLE_ABBREVIATIONS as string-like attributes, used for Contributors.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">abbreviationToRole</span><span class="p">(</span><span class="s">&#39;com&#39;</span><span class="p">)</span>
+<span class="go">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">abbreviationToRole</span><span class="p">(</span><span class="s">&#39;lib&#39;</span><span class="p">)</span>
+<span class="go">&#39;librettist&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">ROLE_ABBREVIATIONS</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">post</span> <span class="o">=</span> <span class="n">abbreviationToRole</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="music21.metadata.abbreviationToWorkId">
+<tt class="descclassname">music21.metadata.</tt><tt class="descname">abbreviationToWorkId</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.abbreviationToWorkId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get work id abbreviations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">abbreviationToWorkId</span><span class="p">(</span><span class="s">&#39;otl&#39;</span><span class="p">)</span>
+<span class="go">&#39;title&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">WORK_ID_ABBREVIATIONS</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">post</span> <span class="o">=</span> <span class="n">abbreviationToWorkId</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="music21.metadata.errorToSymbol">
+<tt class="descclassname">music21.metadata.</tt><tt class="descname">errorToSymbol</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.errorToSymbol" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">errorToSymbol</span><span class="p">(</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
+<span class="go">&#39;~&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">errorToSymbol</span><span class="p">(</span><span class="s">&#39;uncertain&#39;</span><span class="p">)</span>
+<span class="go">&#39;?&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="music21.metadata.roleToAbbreviation">
+<tt class="descclassname">music21.metadata.</tt><tt class="descname">roleToAbbreviation</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.roleToAbbreviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a role id from a string representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">roleToAbbreviation</span><span class="p">(</span><span class="s">&#39;composer&#39;</span><span class="p">)</span>
+<span class="go">&#39;com&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ROLES</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">post</span> <span class="o">=</span> <span class="n">roleToAbbreviation</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="music21.metadata.workIdToAbbreviation">
+<tt class="descclassname">music21.metadata.</tt><tt class="descname">workIdToAbbreviation</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.workIdToAbbreviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a role id from a string representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">workIdToAbbreviation</span><span class="p">(</span><span class="s">&#39;localeOfComposition&#39;</span><span class="p">)</span>
+<span class="go">&#39;opc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">WORK_IDS</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">post</span> <span class="o">=</span> <span class="n">workIdToAbbreviation</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="text">
+<h2>Text<a class="headerlink" href="#text" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Text">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Text</tt><big>(</big><em>data=</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#music21.metadata.Text" title="Permalink to this definition">¶</a></dt>
+<dd><p>One unit of text data: a title, a name, or some other text data. Store the string and a language name or code.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s">&#39;concerto in d&#39;</span><span class="p">,</span> <span class="s">&#39;en&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
+<span class="go">&#39;concerto in d&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="date">
+<h2>Date<a class="headerlink" href="#date" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Date">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Date</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single date value, specified by year, month, day, hour, minute, and second. Additionally, each value can be specified as <cite>uncertain</cite> or <cite>approximate</cite>; if None, assumed to be certain.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">yearError</span><span class="o">=</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">year</span>
+<span class="go">1843</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">yearError</span>
+<span class="go">&#39;approximate&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="s">&#39;1843?&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">yearError</span>
+<span class="go">&#39;uncertain&#39;</span>
+</pre></div>
+</div>
+<p><strong>Date</strong> <strong>attributes</strong></p>
+<blockquote>
+Attributes without Documentation: <cite>attrStrFormat</cite>, <cite>minuteError</cite>, <cite>monthError</cite>, <cite>hour</cite>, <cite>hourError</cite>, <cite>dayError</cite>, <cite>attrNames</cite>, <cite>month</cite>, <cite>second</cite>, <cite>secondError</cite>, <cite>yearError</cite>, <cite>year</cite>, <cite>day</cite>, <cite>minute</cite></blockquote>
+<p><strong>Date</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.Date.datetime">
+<tt class="descname">datetime</tt><a class="headerlink" href="#music21.metadata.Date.datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a datetime object representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">datetime</span>
+<span class="go">datetime.datetime(1843, 3, 3, 0, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Date.hasError">
+<tt class="descname">hasError</tt><a class="headerlink" href="#music21.metadata.Date.hasError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if any data points have error defined.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">dayError</span><span class="o">=</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">hasError</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">hasError</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Date.hasTime">
+<tt class="descname">hasTime</tt><a class="headerlink" href="#music21.metadata.Date.hasTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if any time elements are defined.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">hasTime</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">hasTime</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</blockquote>
+<p><strong>Date</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.metadata.Date.load">
+<tt class="descname">load</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.Date.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load values by string, datetime object, or Date object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">year</span>
+<span class="go">1843</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.metadata.Date.loadDatetime">
+<tt class="descname">loadDatetime</tt><big>(</big><em>dt</em><big>)</big><a class="headerlink" href="#music21.metadata.Date.loadDatetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load time data from a datetime object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mf">2005</span><span class="p">,</span> <span class="mf">02</span><span class="p">,</span> <span class="mf">01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span>
+<span class="go">datetime.datetime(2005, 2, 1, 0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">loadDatetime</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;2005.02.01&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.metadata.Date.loadOther">
+<tt class="descname">loadOther</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.metadata.Date.loadOther" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load values based on another Date object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">loadOther</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">year</span>
+<span class="go">1843</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.metadata.Date.loadStr">
+<tt class="descname">loadStr</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#music21.metadata.Date.loadStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a string date representation. Assume year/month/day/hour:minute:second</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">loadStr</span><span class="p">(</span><span class="s">&#39;3030?/12~/?4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">monthError</span>
+<span class="go">(12, &#39;approximate&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">yearError</span>
+<span class="go">(3030, &#39;uncertain&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">dayError</span>
+<span class="go">(4, &#39;uncertain&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="datesingle">
+<h2>DateSingle<a class="headerlink" href="#datesingle" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.DateSingle">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">DateSingle</tt><big>(</big><em>data=</em>, <em>relevance=certain</em><big>)</big><a class="headerlink" href="#music21.metadata.DateSingle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a date, either as certain, approximate, or uncertain.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;approximate&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+<span class="go">&#39;2009.12.31&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;1805.3.12&#39;</span><span class="p">,</span> <span class="s">&#39;uncertain&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+<span class="go">&#39;1805.03.12&#39;</span>
+</pre></div>
+</div>
+<p><strong>DateSingle</strong> <strong>attributes</strong></p>
+<blockquote>
+Attributes without Documentation: <cite>isSingle</cite></blockquote>
+<p><strong>DateSingle</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.DateSingle.relevance">
+<tt class="descname">relevance</tt><a class="headerlink" href="#music21.metadata.DateSingle.relevance" title="Permalink to this definition">¶</a></dt>
+<dd>No documentation.</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="daterelative">
+<h2>DateRelative<a class="headerlink" href="#daterelative" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.DateRelative">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">DateRelative</tt><big>(</big><em>data=</em>, <em>relevance=after</em><big>)</big><a class="headerlink" href="#music21.metadata.DateRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a relative date, sometime prior or sometime after</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateRelative</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;prior&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+<span class="go">&#39;2009.12.31&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateRelative</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
+</pre></div>
+</div>
+<p>inherits from: <a title="music21.metadata.DateSingle" class="reference internal" href="#music21.metadata.DateSingle"><tt class="xref docutils literal"><span class="pre">DateSingle</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="datebetween">
+<h2>DateBetween<a class="headerlink" href="#datebetween" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.DateBetween">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">DateBetween</tt><big>(</big><em>data=</em><span class="optional">[</span><span class="optional">]</span>, <em>relevance=between</em><big>)</big><a class="headerlink" href="#music21.metadata.DateBetween" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a relative date, sometime between two dates</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateBetween</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+<span class="go">&#39;2009.12.31 to 2010.01.28&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateBetween</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
+</pre></div>
+</div>
+<p>inherits from: <a title="music21.metadata.DateSingle" class="reference internal" href="#music21.metadata.DateSingle"><tt class="xref docutils literal"><span class="pre">DateSingle</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="dateselection">
+<h2>DateSelection<a class="headerlink" href="#dateselection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.DateSelection">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">DateSelection</tt><big>(</big><em>data=</em>, <em>relevance=or</em><big>)</big><a class="headerlink" href="#music21.metadata.DateSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a selection of dates, or a collection of dates that might all be possible</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSelection</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">,</span> <span class="s">&#39;1894/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;or&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+<span class="go">&#39;2009.12.31 or 2010.01.28 or 1894.01.28&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSelection</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
+</pre></div>
+</div>
+<p>inherits from: <a title="music21.metadata.DateSingle" class="reference internal" href="#music21.metadata.DateSingle"><tt class="xref docutils literal"><span class="pre">DateSingle</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="contributor">
+<h2>Contributor<a class="headerlink" href="#contributor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Contributor">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Contributor</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Contributor" title="Permalink to this definition">¶</a></dt>
+<dd><p>A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are &#8220;creator&#8221; elements.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;Chopin, Fryderyk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span>
+<span class="go">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Chopin, Fryderyk&#39;</span>
+</pre></div>
+</div>
+<p><strong>Contributor</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.Contributor.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.metadata.Contributor.mx" title="Permalink to this definition">¶</a></dt>
+<dd>No documentation.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Contributor.name">
+<tt class="descname">name</tt><a class="headerlink" href="#music21.metadata.Contributor.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the text name, or the first of many names entered.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Chopin, Fryderyk&#39;</span><span class="p">,</span> <span class="s">&#39;Chopin, Frederick&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Chopin, Fryderyk&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Contributor.names">
+<tt class="descname">names</tt><a class="headerlink" href="#music21.metadata.Contributor.names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all names in a list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Chopin, Fryderyk&#39;</span><span class="p">,</span> <span class="s">&#39;Chopin, Frederick&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">names</span>
+<span class="go">[&#39;Chopin, Fryderyk&#39;, &#39;Chopin, Frederick&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Contributor.role">
+<tt class="descname">role</tt><a class="headerlink" href="#music21.metadata.Contributor.role" title="Permalink to this definition">¶</a></dt>
+<dd><p>The role is what part this Contributor plays in the work. Both full roll strings and roll abbreviations may be used.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="s">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span>
+<span class="go">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="s">&#39;lor&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span>
+<span class="go">&#39;orchestrator&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</blockquote>
+<p><strong>Contributor</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.metadata.Contributor.age">
+<tt class="descname">age</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.metadata.Contributor.age" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the age of the Contributor, returning a datetime.timedelta object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Beethoven, Ludwig van&#39;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">birth</span><span class="o">=</span><span class="s">&#39;1770/12/17&#39;</span><span class="p">,</span> <span class="n">death</span><span class="o">=</span><span class="s">&#39;1827/3/26&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">role</span>
+<span class="go">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">age</span><span class="p">()</span>
+<span class="go">datetime.timedelta(20552)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">age</span><span class="p">())</span>
+<span class="go">&#39;20552 days, 0:00:00&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">age</span><span class="p">()</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="mf">365</span>
+<span class="go">56</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Metadata">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Metadata</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Metadata represent data for a work or fragment, including title, composer, dates, and other relevant information. Metadata is a <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a> subclass, meaing that it can be positioned on a Stream by offset and have a <a title="music21.duration.Duration" class="reference external" href="moduleDuration.html#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>. In many cases, each Stream will have a single Metadata object at the zero offset position.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Concerto in F&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Concerto in F&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">otl</span><span class="o">=</span><span class="s">&#39;Concerto in F&#39;</span><span class="p">)</span> <span class="c"># can use abbreviations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Concerto in F&#39;</span>
+</pre></div>
+</div>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+<p><strong>Metadata</strong> <strong>attributes</strong></p>
+<blockquote>
+Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></blockquote>
+<p><strong>Metadata</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.composer">
+<tt class="descname">composer</tt><a class="headerlink" href="#music21.metadata.Metadata.composer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set the composer of this work. More than one composer may be specified. The composer attribute does not live in Metadata, but creates a <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a> object in the Metadata object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Third Symphony&#39;</span><span class="p">,</span> <span class="n">popularTitle</span><span class="o">=</span><span class="s">&#39;Eroica&#39;</span><span class="p">,</span> <span class="n">composer</span><span class="o">=</span><span class="s">&#39;Beethoven, Ludwig van&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">composer</span>
+<span class="go">&#39;Beethoven, Ludwig van&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.composers">
+<tt class="descname">composers</tt><a class="headerlink" href="#music21.metadata.Metadata.composers" title="Permalink to this definition">¶</a></dt>
+<dd>Get a list of all <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a> objects defined as composer of this work.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.movementNumber">
+<tt class="descname">movementNumber</tt><a class="headerlink" href="#music21.metadata.Metadata.movementNumber" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the movement number.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.movementTitle">
+<tt class="descname">movementTitle</tt><a class="headerlink" href="#music21.metadata.Metadata.movementTitle" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the movement title.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.metadata.Metadata.mx" title="Permalink to this definition">¶</a></dt>
+<dd>No documentation.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.number">
+<tt class="descname">number</tt><a class="headerlink" href="#music21.metadata.Metadata.number" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the number of the work.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.opusNumber">
+<tt class="descname">opusNumber</tt><a class="headerlink" href="#music21.metadata.Metadata.opusNumber" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the opus number.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.metadata.Metadata.title">
+<tt class="descname">title</tt><a class="headerlink" href="#music21.metadata.Metadata.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the title of the work, or the next matched title string available from related parameter fields.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Third Symphony&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Third Symphony&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">popularTitle</span><span class="o">=</span><span class="s">&#39;Eroica&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Eroica&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Third Symphony&#39;</span><span class="p">,</span> <span class="n">popularTitle</span><span class="o">=</span><span class="s">&#39;Eroica&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Third Symphony&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">popularTitle</span>
+<span class="go">&#39;Eroica&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">otp</span>
+<span class="go">&#39;Eroica&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
+</blockquote>
+<p><strong>Metadata</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.metadata.Metadata.addContributor">
+<tt class="descname">addContributor</tt><big>(</big><em>c</em><big>)</big><a class="headerlink" href="#music21.metadata.Metadata.addContributor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign a <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a> object to this Metadata.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Third Symphony&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;Beethoven, Ludwig van&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="s">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">addContributor</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">composer</span>
+<span class="go">&#39;Beethoven, Ludwig van&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">composer</span> <span class="o">=</span> <span class="s">&#39;frank&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">composers</span>
+<span class="go">[&#39;Beethoven, Ludwig van&#39;, &#39;frank&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.metadata.Metadata.getContributorsByRole">
+<tt class="descname">getContributorsByRole</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.Metadata.getContributorsByRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a> if defined for a provided role.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Third Symphony&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;Beethoven, Ludwig van&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="s">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">addContributor</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cList</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">getContributorsByRole</span><span class="p">(</span><span class="s">&#39;composer&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cList</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Beethoven, Ludwig van&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+</blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Copyright">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Copyright</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Copyright" title="Permalink to this definition">¶</a></dt>
+<dd>An object representation of copyright.</dd></dl>
+
+</div>
+<div class="section" id="imprint">
+<h2>Imprint<a class="headerlink" href="#imprint" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Imprint">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Imprint</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Imprint" title="Permalink to this definition">¶</a></dt>
+<dd>An object representation of imprint, or publication.</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="moduleAnalysisMetrical.html" title="music21.analysis.metrical"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="moduleMeter.html" title="music21.meter"
+             >previous</a> |</li>
+        <li><a href="contents.html">music21 v0.2.4a2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010 The music21 Project.
+      Last updated on Jun 17, 2010.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
