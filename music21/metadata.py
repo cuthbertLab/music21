@@ -24,9 +24,14 @@ environLocal = environment.Environment(_MOD)
 
 
 
-
+#-------------------------------------------------------------------------------
 class MetadataException(Exception):
     pass
+
+
+#-------------------------------------------------------------------------------
+# utility dictionaries and conversion functions; used by objects defined in this
+# module
 
 
 # error can be designated
@@ -45,8 +50,19 @@ def errorToSymbol(value):
     if value.lower() in UNCERTAIN + ['uncertain']:
         return UNCERTAIN[0]
 
-# contributors can have roles
-ROLES = ['com', 'coa', 'cos', 'col', 'coc', 'lyr', 'lib', 'lar', 'lor', 'trn']
+
+roleAbbreviationsDict = {
+    'com' : 'composer',
+    'coa' : 'attributedComposer',
+    'cos' : 'suspectedComposer',
+    'col' : 'composerAlias',
+    'coc' : 'composerCorporate',
+    'lyr' : 'lyricist',
+    'lib' : 'librettist',
+    'lar' : 'arranger',
+    'lor' : 'orchestrator',
+    'trn' : 'translator',
+    }
 # !!!COM: Composer's name.
 # !!!COA: Attributed composer.
 # !!!COS: Suspected composer.
@@ -58,62 +74,67 @@ ROLES = ['com', 'coa', 'cos', 'col', 'coc', 'lyr', 'lib', 'lar', 'lor', 'trn']
 # !!!LOR: Orchestrator. 
 # !!!TRN: Translator of text. 
 
-def roleToStr(value):
-    '''Get roles as string-like attributes, used for Contributors. 
+# contributors can have ROLE_ABBREVIATIONS
+ROLE_ABBREVIATIONS = roleAbbreviationsDict.keys()
+ROLES = roleAbbreviationsDict.values()
 
-    >>> roleToStr('com')
+def abbreviationToRole(value):
+    '''Get ROLE_ABBREVIATIONS as string-like attributes, used for Contributors. 
+
+    >>> abbreviationToRole('com')
     'composer'
-    >>> roleToStr('lib')
+    >>> abbreviationToRole('lib')
     'librettist'
-    >>> for id in ROLES: 
-    ...    post = roleToStr(id)
+    >>> for id in ROLE_ABBREVIATIONS: 
+    ...    post = abbreviationToRole(id)
     '''
     value = value.lower()
-    if value in ['com']:
-        return 'composer'
-    elif value in ['coa']:
-        return 'attributedComposer'
-    elif value in ['cos']:
-        return 'suspectedComposer'
-    elif value in ['col']:
-        return 'composerAlias'
-    elif value in ['coc']:
-        return 'composerCorporate'
-    elif value in ['lyr']:
-        return 'lyricist'
-    elif value in ['lib']:
-        return 'librettist'
-    elif value in ['lar']:
-        return 'arranger'
-    elif value in ['lor']:
-        return 'orchestrator'
-    elif value in ['trn']:
-        return 'translator'
+    if value in roleAbbreviationsDict.keys():
+        return roleAbbreviationsDict[value]
     else:
         raise MetadataException('no such role: %s' % value)
 
-ROLE_STRINGS = [roleToStr(x) for x in ROLES]
 
-def strToRole(value):
+def roleToAbbreviation(value):
     '''Get a role id from a string representation.
 
-    >>> strToRole('composer')
+    >>> roleToAbbreviation('composer')
     'com'
-    >>> for n in ROLE_STRINGS:
-    ...     post = strToRole(n)
+    >>> for n in ROLES:
+    ...     post = roleToAbbreviation(n)
     '''
     # note: probably not the fastest way to do this
-    for id in ROLES:
-        if value.lower() == roleToStr(id).lower():
+    for id in ROLE_ABBREVIATIONS:
+        if value.lower() == roleAbbreviationsDict[id].lower():
             return id
     raise MetadataException('no such role: %s' % value)
 
 
-# contributors can have roles
-WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac', 
-            'osc', 'omv', 'omd', 'ops', 'onm', 
-            'ovm', 'ode', 'oco', 'gtl', 'gaw', 
-            'gco', 'txo', 'txl', 'ocy', 'opc']
+workIdDict = {
+    'otl' : 'title',
+    'otp' : 'popularTitle',
+    'ota' : 'alternativeTitle',
+    'opr' : 'parentTitle',
+    'oac' : 'actNumber',
+
+    'osc' : 'sceneNumber',
+    'omv' : 'movementNumber',
+    'omd' : 'movementName',
+    'ops' : 'opusNumber',
+    'onm' : 'number',
+
+    'ovm' : 'volume',
+    'ode' : 'dedication',
+    'oco' : 'commission',
+    'gtl' : 'groupTitle',
+    'gaw' : 'associatedWork',
+
+    'gco' : 'collectionDesignation',
+    'txo' : 'textOriginalLanguage',
+    'txl' : 'textLanguage',
+    'ocy' : 'countryOfComposition',
+    'opc' : 'localeOfComposition',
+    }
 # !!!OTL: Title. 
 # !!!OTP: Popular Title.
 # !!!OTA: Alternative title.
@@ -135,73 +156,43 @@ WORK_IDS = ['otl', 'otp', 'ota', 'opr', 'oac',
 # !!!OCY: Country of composition. 
 # !!!OPC: City, town or village of composition. 
 
-def workIdToStr(value):
-    '''Get roles as string-like attributes, used for Contributors. 
+WORK_ID_ABBREVIATIONS = workIdDict.keys()
+WORK_IDS = workIdDict.values()
 
-    >>> workIdToStr('otl')
+def abbreviationToWorkId(value):
+    '''Get work id abbreviations.
+
+    >>> abbreviationToWorkId('otl')
     'title'
-    >>> for id in WORK_IDS: 
-    ...    post = workIdToStr(id)
+    >>> for id in WORK_ID_ABBREVIATIONS: 
+    ...    post = abbreviationToWorkId(id)
     '''
     value = value.lower()
-    if value in ['otl']:
-        return 'title'
-    elif value in ['otp']:
-        return 'popularTitle'
-    elif value in ['ota']:
-        return 'alternativeTitle'
-    elif value in ['opr']:
-        return 'parentTitle'
-    elif value in ['oac']:
-        return 'actNumber'
-    elif value in ['osc']:
-        return 'sceneNumber'
-    elif value in ['omv']:
-        return 'movementNumber'
-    elif value in ['omd']:
-        return 'movementName'
-    elif value in ['ops']:
-        return 'opusNumber'
-    elif value in ['onm']:
-        return 'number'
-    elif value in ['ovm']:
-        return 'volume'
-    elif value in ['ode']:
-        return 'dedication'
-    elif value in ['oco']:
-        return 'commission'
-    elif value in ['gtl']:
-        return 'groupTitle'
-    elif value in ['gaw']:
-        return 'associatedWork'
-    elif value in ['gco']:
-        return 'collectionDesignation'
-    elif value in ['txo']:
-        return 'textOriginalLanguage'
-    elif value in ['txl']:
-        return 'textLanguage'
-    elif value in ['ocy']:
-        return 'countryOfComposition'
-    elif value in ['opc']:
-        return 'localeOfComposition'
+    if value in workIdDict.keys():
+        return workIdDict[value]
     else:
         raise MetadataException('no such work id: %s' % value)
 
-WORK_ID_STRINGS = [workIdToStr(x) for x in WORK_IDS]
-
-def strToWorkId(value):
+def workIdToAbbreviation(value):
     '''Get a role id from a string representation.
 
-    >>> strToWorkId('localeOfComposition')
+    >>> workIdToAbbreviation('localeOfComposition')
     'opc'
-    >>> for n in WORK_ID_STRINGS:
-    ...     post = strToWorkId(n)
+    >>> for n in WORK_IDS:
+    ...     post = workIdToAbbreviation(n)
     '''
     # note: probably not the fastest way to do this
-    for id in WORK_IDS:
-        if value.lower() == workIdToStr(id).lower():
+    for id in WORK_ID_ABBREVIATIONS:
+        if value.lower() == workIdDict[id].lower():
             return id
     raise MetadataException('no such role: %s' % value)
+
+
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -711,7 +702,7 @@ class Contributor(object):
         return self._role
 
     def _setRole(self, value):
-        if value == None or value in ROLE_STRINGS:
+        if value == None or value in ROLES:
             self._role = value
         else:
             raise MetadataException('role value is not supported by this object: %s' % value)
@@ -803,8 +794,8 @@ class Metadata(object):
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = {}
-        for idStr in WORK_ID_STRINGS:
-            id = strToWorkId(idStr)
+        for idStr in WORK_IDS:
+            id = workIdToAbbreviation(idStr)
             if id in keywords.keys():
                 self._workIds[idStr] = Text(keywords[id])
             elif idStr in keywords.keys():
@@ -812,6 +803,7 @@ class Metadata(object):
             else:
                 self._workIds[idStr] = None
 
+    #---------------------------------------------------------------------------
     def _getTitle(self):
         searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
         post = None
