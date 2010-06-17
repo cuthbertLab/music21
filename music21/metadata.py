@@ -265,7 +265,7 @@ class Date(object):
                 setattr(self, attr, keywords[attr])
 
     def _stripError(self, value):
-        '''Strip error symbols from a numerical value. Return cleaned source and sym. Assumed to only be one per string.
+        '''Strip error symbols from a numerical value. Return cleaned source and sym. Only one error symbol is expected per string.
 
         >>> d = Date()
         >>> d._stripError('1247~')
@@ -280,14 +280,12 @@ class Date(object):
             return value, None
         else:
             str = value
-
         sym = APPROXIMATE + UNCERTAIN
         found = None
         for char in str:
             if char in sym:
                 found = char
                 break
-
         if found == None:
             return str, None
         elif found in APPROXIMATE:
@@ -296,7 +294,6 @@ class Date(object):
         elif found in UNCERTAIN:
             str = str.replace(found, '')
             return  str, 'uncertain'
-
 
     def _getHasTime(self):
         if self.hour != None or self.minute != None or self.second != None:
@@ -313,9 +310,7 @@ class Date(object):
         >>> b = Date(year=1843, month=3, day=3, minute=3)
         >>> b.hasTime
         True
-
         ''')
-
 
     def _getHasError(self):
         for attr in self.attrNames:
@@ -335,6 +330,13 @@ class Date(object):
         ''')
 
     def __str__(self):
+        '''Return a string representation, including error if defined. 
+
+        >>> d = Date()
+        >>> d.loadStr('3030?/12~/?4')
+        >>> str(d)
+        '3030?.12~.04?'
+        '''
         # datetime.strftime("%Y.%m.%d")
         # cannot use this, as it does not support dates lower than 1900!
         msg = []
@@ -473,6 +475,10 @@ class Date(object):
 
     datetime = property(_getDatetime, 
         doc = '''Return a datetime object representation. 
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> a.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
         ''')
 
 
@@ -555,7 +561,6 @@ class DateRelative(DateSingle):
     relevance = property(DateSingle._getRelevance, _setRelevance)
 
 
-
 class DateBetween(DateSingle):
     '''Store a relative date, sometime between two dates
     '''
@@ -601,7 +606,6 @@ class DateBetween(DateSingle):
             raise MetadataException('relevance value is not supported by this object: %s' % value)
 
     relevance = property(DateSingle._getRelevance, _setRelevance)
-
 
 
 class DateSelection(DateSingle):
@@ -664,12 +668,6 @@ class Contributor(object):
         >>> td.name
         'Chopin, Fryderyk'
 
-        >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
-        >>> td.name
-        'Chopin, Fryderyk'
-        >>> td.names
-        ['Chopin, Fryderyk', 'Chopin, Frederick']
-
         '''
         if 'role' in keywords.keys():
             self.role = keywords['role'] # validated with property
@@ -694,8 +692,8 @@ class Contributor(object):
             self._dateRange[0] = Date()
             self._dateRange[0].load(keywords['birth'])
         if 'death' in keywords.keys():
-            self._dateRange[0] = Date()
-            self._dateRange[0].load(keywords['death'])
+            self._dateRange[1] = Date()
+            self._dateRange[1].load(keywords['death'])
 
 
     def _getRole(self):
@@ -704,20 +702,33 @@ class Contributor(object):
     def _setRole(self, value):
         if value == None or value in ROLES:
             self._role = value
+        elif value in ROLE_ABBREVIATIONS:
+            self._role = roleAbbreviationsDict[value]
         else:
             raise MetadataException('role value is not supported by this object: %s' % value)
 
     role = property(_getRole, _setRole, 
-        doc = '''The role is what part this Contributor plays in the work. 
-        ''')
+        doc = '''The role is what part this Contributor plays in the work. Both full roll strings and roll abbreviations may be used.
 
+        >>> td = Contributor()
+        >>> td.role = 'composer'
+        >>> td.role
+        'composer'
+        >>> td.role = 'lor'
+        >>> td.role
+        'orchestrator'
+        ''')
 
     def _getName(self):
         # return first name
         return str(self._names[0])
 
     name = property(_getName, 
-        doc = '''Returns the first entered name.
+        doc = '''Returns the text name, or the first of many names entered. 
+
+        >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+        >>> td.name
+        'Chopin, Fryderyk'
         ''')
 
     def _getNames(self):
@@ -729,13 +740,29 @@ class Contributor(object):
 
     names = property(_getNames, 
         doc = '''Returns all names in a list.
+
+        >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+        >>> td.names
+        ['Chopin, Fryderyk', 'Chopin, Frederick']
         ''')
 
     def age(self):
+        '''Calculate the age of the composer, returning a datetime.timedelta object.
+
+        >>> a = Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
+        >>> a.role
+        'composer'
+        >>> a.age()
+        datetime.timedelta(20552)
+        >>> str(a.age())
+        '20552 days, 0:00:00'
+        >>> a.age().days / 365
+        56
+        '''
         if self._dateRange[0] != None and self._dateRange[1] != None:
             b = self._dateRange[0].datetime
             d = self._dateRange[1].datetime
-            pass
+            return d-b
         else:
             return None
 
