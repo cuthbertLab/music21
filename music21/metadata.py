@@ -801,12 +801,16 @@ class Copyright(object):
 class Metadata(object):
     '''Metadata for a work, including title, composer, dates, and other relevant information.
     '''
-    # possible rename Work?
-    
+    # possibly rename Work?
 
     def __init__(self, *args, **keywords ):
         '''
         >>> md = Metadata(title='Concerto in F')
+        >>> md.title
+        'Concerto in F'
+        >>> md = Metadata(otl='Concerto in F') # can use abbreviations
+        >>> md.title
+        'Concerto in F'
         '''
         # a lost of Contributor objects
         # there can be more than one composer, or any other combination
@@ -821,14 +825,34 @@ class Metadata(object):
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = {}
-        for idStr in WORK_IDS:
-            id = workIdToAbbreviation(idStr)
+        for id in WORK_IDS:
+            abbr = workIdToAbbreviation(id)
             if id in keywords.keys():
-                self._workIds[idStr] = Text(keywords[id])
-            elif idStr in keywords.keys():
-                self._workIds[idStr] = Text(keywords[idStr])
+                self._workIds[id] = Text(keywords[id])
+            elif abbr in keywords.keys():
+                self._workIds[id] = Text(keywords[abbr])
             else:
-                self._workIds[idStr] = None
+                self._workIds[id] = None
+
+
+    def __getattr__(self, name):
+        '''Utility attribute access for attributes that do not yet have property definitions. 
+        '''
+        for id in WORK_IDS:
+            abbr = workIdToAbbreviation(id)
+            if name == id:
+                match = id 
+                break
+            elif name == abbr:
+                match = id 
+                break
+        post = self._workIds[match]
+        # if a Text object, return a string representation
+        if isinstance(post, Text):
+            return str(post)
+        elif isinstance(post, Date):
+            return str(post)
+
 
     #---------------------------------------------------------------------------
     def _getTitle(self):
@@ -844,11 +868,21 @@ class Metadata(object):
         self._workIds['title'] = Text(value)
 
     title = property(_getTitle, _setTitle, 
-        doc = '''Get the title of the work, or the next matched title string.
+        doc = '''Get the title of the work, or the next matched title string available from related parameter fields. 
 
-        >>> md = Metadata(title='Concerto in F')
+        >>> md = Metadata(title='Third Symphony')
         >>> md.title
-        'Concerto in F'
+        'Third Symphony'
+
+        >>> md = Metadata(popularTitle='Eroica')
+        >>> md.title
+        'Eroica'
+
+        >>> md = Metadata(title='Third Symphony', popularTitle='Eroica')
+        >>> md.title
+        'Third Symphony'
+        >>> md.popularTitle
+        'Eroica'
         ''')
 
 #-------------------------------------------------------------------------------
