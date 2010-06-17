@@ -883,7 +883,10 @@ class Metadata(object):
         'Third Symphony'
         >>> md.popularTitle
         'Eroica'
+        >>> md.otp
+        'Eroica'
         ''')
+
 
 #-------------------------------------------------------------------------------
 
