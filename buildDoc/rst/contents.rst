@@ -58,6 +58,7 @@ Module Reference
    moduleInstrument
    moduleInterval
    moduleMeter
+   moduleMetadata
    moduleAnalysisMetrical
    moduleNote
    moduleNode

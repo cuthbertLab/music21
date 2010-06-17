@@ -33,11 +33,12 @@ from music21 import graph
 from music21 import key
 from music21 import instrument
 from music21 import interval
+from music21 import metadata
+from music21 import meter
+from music21 import musicxml
 from music21 import note
 from music21 import node
 from music21 import pitch
-from music21 import meter
-from music21 import musicxml
 from music21 import scale
 from music21 import serial
 from music21 import stream
@@ -86,6 +87,7 @@ MODULES = [
     instrument,
     interval, 
     meter, 
+    metadata,
     metrical,
     note, 
     node, 

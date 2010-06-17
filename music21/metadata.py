@@ -15,6 +15,7 @@
 import unittest, doctest
 import datetime
 
+import music21
 from music21 import common
 
 
@@ -33,8 +34,7 @@ class MetadataException(Exception):
 # utility dictionaries and conversion functions; used by objects defined in this
 # module
 
-
-# error can be designated
+# error can be designated with either symbol in string date representations
 APPROXIMATE = ['~', 'x']
 UNCERTAIN = ['?', 'z']
 
@@ -724,11 +724,16 @@ class Contributor(object):
         'orchestrator'
         ''')
 
+    def _setName(self, value):
+        # return first name
+        self._names = [] # reset
+        self._names.append(Text(value))
+
     def _getName(self):
         # return first name
         return str(self._names[0])
 
-    name = property(_getName, 
+    name = property(_getName, _setName,
         doc = '''Returns the text name, or the first of many names entered. 
 
         >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
@@ -752,7 +757,7 @@ class Contributor(object):
         ''')
 
     def age(self):
-        '''Calculate the age of the composer, returning a datetime.timedelta object.
+        '''Calculate the age of the Contributor, returning a datetime.timedelta object.
 
         >>> a = Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
         >>> a.role
@@ -772,11 +777,44 @@ class Contributor(object):
             return None
 
 
+    def _getMX(self):
+        pass
+
+
+    def _setMX(self, mxCreator):
+        '''Given an mxCreator, fill the necessary parameters of a Contributor.
+
+        >>> from music21 import musicxml
+        >>> mxCreator = musicxml.Creator()
+        >>> mxCreator.set('type', 'composer')
+        >>> mxCreator.set('charData', 'Beethoven, Ludwig van')
+        >>> c = Contributor()
+        >>> c.mx = mxCreator
+        >>> c.role
+        'composer'
+        >>> c.name
+        'Beethoven, Ludwig van'
+        '''
+        mxCreatorType = mxCreator.get('type')
+        if mxCreatorType != None and mxCreatorType in ROLES:
+            self.role = mxCreatorType
+        else: # roles are not defined in musicxml
+            environLocal.printDebug(['_setMX:', 'received unknown Contributor role: %s' % mxCreatorType])
+        self.name = mxCreator.get('charData')
+
+
+    mx = property(_getMX, _setMX)    
+
+
+
 #-------------------------------------------------------------------------------
 # as these have Date and Text fields, these need to be specialized objects
 
 class Imprint(object):
-    pass
+    '''An object representation of imprint, or publication.
+    '''
+    def __init__(self, *args, **keywords ):
+        pass
 # !!!PUB: Publication status. 
 # !!!PPR: First publisher. 
 # !!!PDT: Date first published. 
@@ -790,7 +828,10 @@ class Imprint(object):
 
 
 class Copyright(object):
-    pass
+    '''An object representation of copyright.
+    '''
+    def __init__(self, *args, **keywords ):
+        pass
 # !!!YEP: Publisher of electronic edition. 
 # !!!YEC: Date and owner of electronic copyright. 
 # !!!YER: Date electronic edition released.
@@ -803,8 +844,12 @@ class Copyright(object):
 
 
 #-------------------------------------------------------------------------------
-class Metadata(object):
-    '''Metadata for a work, including title, composer, dates, and other relevant information.
+class Metadata(music21.Music21Object):
+    '''Metadata represent data for a work or fragment, including title, composer, dates, and other relevant information.
+
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it can be positioned on a Stream by offset and have a :class:`~music21.duration.Duration`.
+
+    In many cases, each Stream will have a single Metadata object at the zero offset position. 
     '''
     # possibly rename Work?
 
@@ -817,10 +862,11 @@ class Metadata(object):
         >>> md.title
         'Concerto in F'
         '''
+        music21.Music21Object.__init__(self)
+
         # a lost of Contributor objects
         # there can be more than one composer, or any other combination
         self._contributors = []
-
         self._date = None
 
         # need a specific object for copyright and imprint
@@ -839,6 +885,12 @@ class Metadata(object):
             else:
                 self._workIds[id] = None
 
+        # search for any keywords that match attributes 
+        # these are for direct Contributor access, must have defined
+        # properties
+        for attr in ['composer']:
+            if attr in keywords.keys():
+                setattr(self, attr, keywords[attr])
 
     def __getattr__(self, name):
         '''Utility attribute access for attributes that do not yet have property definitions. 
@@ -923,10 +975,114 @@ class Metadata(object):
         ''')
 
 
+    def _getNumber(self):
+        post = self._workIds['number']
+        if post == None:
+            return None
+        return str(self._workIds['number'])
+
+    def _setNumber(self, value):
+        self._workIds['number'] = Text(value)
+
+    number = property(_getNumber, _setNumber, 
+        doc = '''Get or set the number of the work. 
+        ''')
+
+
+    def _getOpusNumber(self):
+        post = self._workIds['opusNumber']
+        if post == None:
+            return None
+        return str(self._workIds['opusNumber'])
+
+    def _setOpusNumber(self, value):
+        self._workIds['opusNumber'] = Text(value)
+
+    opusNumber = property(_getOpusNumber, _setOpusNumber, 
+        doc = '''Get or set the opus number. 
+        ''')
+
+    #---------------------------------------------------------------------------
+    # provide direct access to common Contributor roles
+    def getContributorsByRole(self, value):
+        '''Return a :class:`~music21.metadata.Contributor` if defined for a provided role. 
+
+        >>> md = Metadata(title='Third Symphony')
+        >>> c = Contributor()
+        >>> c.name = 'Beethoven, Ludwig van'
+        >>> c.role = 'composer'
+        >>> md.addContributor(c)
+        >>> cList = md.getContributorsByRole('composer')
+        >>> cList[0].name
+        'Beethoven, Ludwig van'
+
+        '''
+        post = [] # there may be more than one per role
+        for c in self._contributors:
+            if c.role == value:
+                post.append(c)
+        if len(post) > 0:
+            return post 
+        else:
+            return None
+
+    def addContributor(self, c):
+        '''Assign a :class:`~music21.metadata.Contributor` object to this Metadata.
+
+        >>> md = Metadata(title='Third Symphony')
+        >>> c = Contributor()
+        >>> c.name = 'Beethoven, Ludwig van'
+        >>> c.role = 'composer'
+        >>> md.addContributor(c)
+        >>> md.composer
+        'Beethoven, Ludwig van'
+        >>> md.composer = 'frank'
+        >>> md.composers
+        ['Beethoven, Ludwig van', 'frank']
+        '''
+        if not isinstance(c, Contributor):
+            raise MetadataException('supplied object is not a Contributor: %s' % c)
+        self._contributors.append(c)
+
+
+    def _getComposers(self):
+        post = self.getContributorsByRole('composer')
+        if post == None:
+            return None
+        # get just the name of the first composer
+        return [x.name for x in post]
+
+    composers = property(_getComposers,  
+        doc = '''Get a list of all :class:`~music21.metadata.Contributor` objects defined as composer of this work.
+        ''')
+
+    def _getComposer(self):
+        post = self.getContributorsByRole('composer')
+        if post == None:
+            return None
+        # get just the name of the first composer
+        return str(post[0].name)
+
+    def _setComposer(self, value):
+        c = Contributor()
+        c.name = value
+        c.role = 'composer'
+        self._contributors.append(c)
+
+    composer = property(_getComposer, _setComposer, 
+        doc = '''Get or set the composer of this work. More than one composer may be specified.
+
+        The composer attribute does not live in Metadata, but creates a :class:`~music21.metadata.Contributor` object in the Metadata object.
+
+        >>> md = Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
+        >>> md.composer
+        'Beethoven, Ludwig van'
+        ''')
+
+
     #---------------------------------------------------------------------------
     def _getMX(self):
         pass
-
 
     def _setMX(self, mxScore):
         '''Given an msSCore, fill the necessary parameters of a Metadata.
@@ -936,16 +1092,23 @@ class Metadata(object):
         self.movementTitle = mxScore.get('movementTitle')
 
         mxWork = mxScore.get('workObj')
-        self.title = mxWork.get('workTitle')
-        #self.title = mxWork.get('workNumber')
-        #self.title = mxWork.get('opus')
+        if mxWork != None: # may be set to none
+            self.title = mxWork.get('workTitle')
+            self.number = mxWork.get('workNumber')
+            self.opusNumber = mxWork.get('opus')
 
         mxIdentification = mxScore.get('identificationObj')
+        
+        for mxCreator in mxIdentification.get('creatorList'):
+            # do an mx conversion for mxCreator to Contributor
+            c = Contributor()
+            c.mx = mxCreator
+            self._contributors.append(c)
+
+        # not yet supported; an encoding is also fond in identification obj
         mxEncoding = mxScore.get('encodingObj')
 
-
     mx = property(_getMX, _setMX)    
-
 
 
 #     def _getMusicXML(self):
@@ -977,24 +1140,30 @@ class Test(unittest.TestCase):
         d = musicxml.Document()
         d.read(testFiles.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
-
         md = Metadata()
         md.mx = mxScore
-
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(md.movementTitle, 'Menuetto (Excerpt from Second Trio)')
         self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
+        self.assertEqual(md.number, 'K. 581')
+        # get contributors directly from Metadata interface
+        self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
 
+        d.read(testFiles.binchoisMagnificat)
+        mxScore = d.score # get the mx score directly
+        md = Metadata()
+        md.mx = mxScore
+        self.assertEqual(md.composer, 'Gilles Binchois')
 
 
-
-        
-
+       
 
 #-------------------------------------------------------------------------------
-_DOC_ORDER = [Text]
+_DOC_ORDER = [Text, Date, 
+            DateSingle, DateRelative, DateBetween, DateSelection, 
+            Contributor, Metadata]
 
 
 if __name__ == "__main__":

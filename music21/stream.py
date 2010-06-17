@@ -31,6 +31,7 @@ from music21 import measure
 from music21 import meter
 from music21 import musicxml as musicxmlMod
 from music21 import note
+from music21 import metadata
 
 from music21 import environment
 _MOD = "stream.py"
@@ -3440,6 +3441,50 @@ class Stream(music21.Music21Object):
         >>> a.highestTime # unchanged
         4.0
         ''')
+
+
+
+    #---------------------------------------------------------------------------
+    # Metadata access
+
+    def _getMetadata(self):
+        '''
+        >>> a = Stream()
+        >>> a.metadata = metadata.Metadata()
+        '''
+        mdList = self.getElementsByClass(metadata.Metadata)
+        # only return clefs that have offset = 0.0 
+        mdList = mdList.getElementsByOffset(0)
+        if len(mdList) == 0:
+            return None
+        else:
+            return mdList[0]    
+    
+    def _setMetadata(self, metadataObj):
+        '''
+        >>> from music21 import *
+        >>> a = stream.Stream()
+        >>> a.metadata = metadata.Metadata()
+        '''
+        oldMetadata = self._getMetadata()
+        if oldMetadata is not None:
+            environLocal.printDebug(['removing old metadata', oldMetadata])
+            junk = self.pop(self.index(oldMetadata))
+
+        if metadataObj != None and isinstance(metadataObj, metadata.Metadata):
+            self.insert(0, metadataObj)
+
+    metadata = property(_getMetadata, _setMetadata, 
+        doc = '''Get or set the :class:`~music21.metadata.Metadata` object found at offset zero for this Stream.
+
+        >>> s = Stream()
+        >>> s.metadata = metadata.Metadata()
+        >>> s.metadata.composer = 'frank'
+        >>> s.metadata.composer
+        'frank'
+        ''')    
+
+
 
     #---------------------------------------------------------------------------
     # transformations

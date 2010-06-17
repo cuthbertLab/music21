@@ -229,7 +229,7 @@ Music21Object
 
             Remove references to all locations in objects that no longer exist. 
 
-        .. method:: removeLocation(site)
+        .. method:: removeLocationBySite(site)
 
             Remove a location in the :class:`~music21.base.DefinedContexts` object. This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
 
@@ -238,7 +238,20 @@ Music21Object
             >>> n = note.Note()
             >>> n.addLocation(s, 10)
             >>> n.parent = s
-            >>> n.removeLocation(s)
+            >>> n.removeLocationBySite(s)
+            >>> n.parent == None
+            True 
+
+        .. method:: removeLocationBySiteId(siteId)
+
+            Remove a location in the :class:`~music21.base.DefinedContexts` object by id. 
+
+            >>> from music21 import note, stream
+            >>> s = stream.Stream()
+            >>> n = note.Note()
+            >>> n.addLocation(s, 10)
+            >>> n.parent = s
+            >>> n.removeLocationBySiteId(id(s))
             >>> n.parent == None
             True 
 
@@ -418,7 +431,7 @@ ElementWrapper
 
             No documentation. 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocation`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
 DefinedContexts
@@ -496,7 +509,7 @@ DefinedContexts
             1 
             >>> aContexts.getAttrByName('attr1') == 234
             True 
-            >>> aContexts.removeById(id(aObj))
+            >>> aContexts.removeBySiteId(id(aObj))
             >>> aContexts.add(bObj)
             >>> aContexts.getAttrByName('attr1') == 98
             True 
@@ -659,7 +672,7 @@ DefinedContexts
             >>> len(aLocations)
             1 
 
-        .. method:: remove(site)
+        .. method:: removeBySite(site)
 
             Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
@@ -677,13 +690,13 @@ DefinedContexts
             >>> aContexts.add(cSite, 232223)
             >>> len(aContexts)
             3 
-            >>> aContexts.remove(aSite)
+            >>> aContexts.removeBySite(aSite)
             >>> len(aContexts)
             2 
 
-        .. method:: removeById(idKey)
+        .. method:: removeBySiteId(idKey)
 
-            No documentation. 
+            Remove a defined contexts entry by id key, which is id() of the object. 
 
         .. method:: setAttrByName(attrName, value)
 

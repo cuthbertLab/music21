@@ -46,7 +46,7 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus",
            "editorial","enharmonic", "environment", \
            "graph", \
            "interval", "instrument", "key", \
-           "measure", "meter", \
+           "metadata", "measure", "meter", \
            "expressions", "note", \
            "pitch", "ratios", \
            "scale", "serial", "stream", 

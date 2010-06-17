@@ -723,6 +723,7 @@ class Identification(MusicXMLElement):
 
 
 class Creator(MusicXMLElement):
+    # types: composer, lyricist, and arranger
     def __init__(self):
         '''
         >>> a = Creator()
