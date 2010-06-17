@@ -205,8 +205,13 @@ class Text(object):
         >>> str(td)
         'concerto in d'
         '''
-        self._data = data
-        self._language = language
+        if isinstance(data, Text): # if this is a Text obj, get data
+            # accessing private attributes here; not desirable
+            self._data = data._data
+            self._language = data._language
+        else:            
+            self._data = data
+            self._language = language
 
     def __str__(self):
         return str(self._data)
@@ -838,6 +843,7 @@ class Metadata(object):
     def __getattr__(self, name):
         '''Utility attribute access for attributes that do not yet have property definitions. 
         '''
+        match = None
         for id in WORK_IDS:
             abbr = workIdToAbbreviation(id)
             if name == id:
@@ -846,6 +852,8 @@ class Metadata(object):
             elif name == abbr:
                 match = id 
                 break
+        if match == None:
+            raise AttributeError('object has no attribute: %s' % name)
         post = self._workIds[match]
         # if a Text object, return a string representation
         if isinstance(post, Text):
@@ -887,6 +895,72 @@ class Metadata(object):
         'Eroica'
         ''')
 
+    def _getMovementNumber(self):
+        post = self._workIds['movementNumber']
+        if post == None:
+            return None
+        return str(self._workIds['movementNumber'])
+
+    def _setMovementNumber(self, value):
+        self._workIds['movementNumber'] = Text(value)
+
+    movementNumber = property(_getMovementNumber, _setMovementNumber, 
+        doc = '''Get or set the movement number. 
+        ''')
+
+
+    def _getMovementTitle(self):
+        post = self._workIds['movementTitle']
+        if post == None:
+            return None
+        return str(self._workIds['movementTitle'])
+
+    def _setMovementTitle(self, value):
+        self._workIds['movementTitle'] = Text(value)
+
+    movementTitle = property(_getMovementTitle, _setMovementTitle, 
+        doc = '''Get or set the movement title. 
+        ''')
+
+
+    #---------------------------------------------------------------------------
+    def _getMX(self):
+        pass
+
+
+    def _setMX(self, mxScore):
+        '''Given an msSCore, fill the necessary parameters of a Metadata.
+        '''
+
+        self.movementNumber = mxScore.get('movementNumber')
+        self.movementTitle = mxScore.get('movementTitle')
+
+        mxWork = mxScore.get('workObj')
+        self.title = mxWork.get('workTitle')
+        #self.title = mxWork.get('workNumber')
+        #self.title = mxWork.get('opus')
+
+        mxIdentification = mxScore.get('identificationObj')
+        mxEncoding = mxScore.get('encodingObj')
+
+
+    mx = property(_getMX, _setMX)    
+
+
+
+#     def _getMusicXML(self):
+#         '''Provide a complete MusicXML representation. 
+#         '''
+#         mxScore = self._getMX()
+#         return mxScore.xmlStr()
+# 
+#     musicxml = property(_getMusicXML,
+#         doc = '''Return a complete MusicXML reprsentatoin as a string. 
+#         ''')
+# 
+
+
+
 
 #-------------------------------------------------------------------------------
 
@@ -895,6 +969,28 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+
+    def testMetadataLoadCorpus(self):
+        from music21 import musicxml
+        from music21.musicxml import testFiles
+
+        d = musicxml.Document()
+        d.read(testFiles.mozartTrioK581Excerpt)
+        mxScore = d.score # get the mx score directly
+
+        md = Metadata()
+        md.mx = mxScore
+
+
+        self.assertEqual(md.movementNumber, '3')
+        self.assertEqual(md.movementTitle, 'Menuetto (Excerpt from Second Trio)')
+        self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
+
+
+
+
+
+        
 
 
 #-------------------------------------------------------------------------------
