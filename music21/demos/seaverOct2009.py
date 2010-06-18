@@ -146,7 +146,7 @@ def simple4b(show=True):
     s = corpus.parseWork(work, movementNumber, extList='xml')
     countCrescendo = 0
     countDiminuendo = 0
-    for part in s:
+    for part in s.getElementsByClass(stream.Part):
         map = [] # create a l
         wedgeStream = part.flat.getElementsByClass(dynamics.Wedge)
         for wedge in wedgeStream:
@@ -211,7 +211,7 @@ def simple4e(show=True):
     qLenMax = 0
     beethovenQuartet = corpus.parseWork('opus18no1', 3, extList=['xml'])
     maxNote = None
-    for part in beethovenQuartet:
+    for part in beethovenQuartet.getElementsByClass(stream.Part):
 #         lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
 
         # note: this probably is not re-joining tied notes
@@ -242,7 +242,7 @@ def simple4f(show=True):
 
     foundSets = []
     candidateSet = []
-    for part in s:
+    for part in s.getElementsByClass(stream.Part):
         eventStream = part.flat.notes
         for i in range(len(eventStream)):
             e = eventStream[i]

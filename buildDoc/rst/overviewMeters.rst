@@ -124,7 +124,7 @@ We can then iterate through the Part objects in the source Stream, get a flat re
 After Measure creation, Notes need to be split and extend with ties. the Stream :meth:`~music21.stream.Stream.makeTies` method can be used. These new Parts can be added to a new Stream and displayed. 
 
 >>> sRebar = stream.Stream()
->>> for part in sSrc:
+>>> for part in sSrc.getElementsByClass(stream.Part):
 ...     newPart = part.flat.getElementsNotOfClass(meter.TimeSignature)
 ...     newPart = newPart.makeMeasures(tsStream)
 ...     newPart.makeTies(inPlace=True)

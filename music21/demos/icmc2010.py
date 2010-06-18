@@ -118,7 +118,7 @@ def findRaisedSevenths(show=True):
 
     found = stream.Stream()
     count = 0
-    for part in score:
+    for part in score.getElementsByClass(stream.Part):
         found.insert(count, 
             part.flat.getElementsByClass(
             music21.clef.Clef)[0])

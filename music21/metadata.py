@@ -17,6 +17,7 @@ import datetime
 
 import music21
 from music21 import common
+from music21 import musicxml
 
 
 from music21 import environment
@@ -700,7 +701,6 @@ class Contributor(object):
             self._dateRange[1] = Date()
             self._dateRange[1].load(keywords['death'])
 
-
     def _getRole(self):
         return self._role
 
@@ -778,12 +778,27 @@ class Contributor(object):
 
 
     def _getMX(self):
-        pass
+        '''Return a mxCreator object based on this object. 
 
+        >>> from music21 import *
+        >>> md = metadata.Metadata()
+        >>> md.composer = 'frank'
+        >>> mxCreator = md._contributors[0].mx
+        >>> mxCreator.get('charData')
+        'frank'
+        >>> mxCreator.get('type')
+        'composer'
+        '''
+        mxCreator = musicxml.Creator()
+        # not sure what do if we have multiple names
+        mxCreator.set('type', self.role)
+        mxCreator.set('charData', self.name)        
+        return mxCreator
 
     def _setMX(self, mxCreator):
         '''Given an mxCreator, fill the necessary parameters of a Contributor.
 
+        >>> from music21 import *
         >>> from music21 import musicxml
         >>> mxCreator = musicxml.Creator()
         >>> mxCreator.set('type', 'composer')
@@ -804,7 +819,7 @@ class Contributor(object):
 
 
     mx = property(_getMX, _setMX)    
-
+        
 
 
 #-------------------------------------------------------------------------------
@@ -961,16 +976,16 @@ class Metadata(music21.Music21Object):
         ''')
 
 
-    def _getMovementTitle(self):
-        post = self._workIds['movementTitle']
+    def _getMovementName(self):
+        post = self._workIds['movementName']
         if post == None:
             return None
-        return str(self._workIds['movementTitle'])
+        return str(self._workIds['movementName'])
 
-    def _setMovementTitle(self, value):
-        self._workIds['movementTitle'] = Text(value)
+    def _setMovementName(self, value):
+        self._workIds['movementName'] = Text(value)
 
-    movementTitle = property(_getMovementTitle, _setMovementTitle, 
+    movementName = property(_getMovementName, _setMovementName, 
         doc = '''Get or set the movement title. 
         ''')
 
@@ -1082,14 +1097,17 @@ class Metadata(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getMX(self):
+        '''Return a mxScore object, to be merged or used in final musicxml output
+        '''
         pass
 
     def _setMX(self, mxScore):
-        '''Given an msSCore, fill the necessary parameters of a Metadata.
+        '''Given an msScore, fill the necessary parameters of a Metadata.
         '''
 
         self.movementNumber = mxScore.get('movementNumber')
-        self.movementTitle = mxScore.get('movementTitle')
+        # xml calls this title not name
+        self.movementName = mxScore.get('movementTitle')
 
         mxWork = mxScore.get('workObj')
         if mxWork != None: # may be set to none
@@ -1098,12 +1116,12 @@ class Metadata(music21.Music21Object):
             self.opusNumber = mxWork.get('opus')
 
         mxIdentification = mxScore.get('identificationObj')
-        
-        for mxCreator in mxIdentification.get('creatorList'):
-            # do an mx conversion for mxCreator to Contributor
-            c = Contributor()
-            c.mx = mxCreator
-            self._contributors.append(c)
+        if mxIdentification != None:
+            for mxCreator in mxIdentification.get('creatorList'):
+                # do an mx conversion for mxCreator to Contributor
+                c = Contributor()
+                c.mx = mxCreator
+                self._contributors.append(c)
 
         # not yet supported; an encoding is also fond in identification obj
         mxEncoding = mxScore.get('encodingObj')
@@ -1144,7 +1162,7 @@ class Test(unittest.TestCase):
         md.mx = mxScore
 
         self.assertEqual(md.movementNumber, '3')
-        self.assertEqual(md.movementTitle, 'Menuetto (Excerpt from Second Trio)')
+        self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')
         self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(md.number, 'K. 581')
         # get contributors directly from Metadata interface

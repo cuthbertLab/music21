@@ -3877,12 +3877,14 @@ class Stream(music21.Music21Object):
             mxComponents.append(self._getMXPart(None, meterStream))
 
         # create score and part list
-        mxPartList = musicxmlMod.PartList()
-        mxIdentification = musicxmlMod.Identification()
-        mxIdentification.setDefaults() # will create a composer
         mxScore = musicxmlMod.Score()
         mxScore.setDefaults()
+
+        mxPartList = musicxmlMod.PartList()
         mxScore.set('partList', mxPartList)
+
+        mxIdentification = musicxmlMod.Identification()
+        mxIdentification.setDefaults() # will create a composer
         mxScore.set('identification', mxIdentification)
 
         for mxScorePart, mxPart in mxComponents:
@@ -3960,12 +3962,12 @@ class Stream(music21.Music21Object):
                 environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
                 streamPart.measures[0].shiftElementsAsAnacrusis()
 
-
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
 
-        # add to this stream
+        # add to this Stream
         # this assumes all start at the same place
+        # even if there is only one part, it will be placed in a Stream
         self.insert(0, streamPart)
 
 
@@ -3977,6 +3979,13 @@ class Stream(music21.Music21Object):
         for partName in partNames: # part names are part ids
             self._setMXPart(mxScore, partName)
 
+        # add metadata object; this is placed after all other parts now
+        # these means that both Parts and other objects live on Stream.
+        md = metadata.Metadata()
+        md.mx = mxScore
+        self.insert(0, md)
+
+    
     mx = property(_getMX, _setMX)
         
 

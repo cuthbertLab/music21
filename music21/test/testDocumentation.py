@@ -121,7 +121,7 @@ class Test(unittest.TestCase):
 
 
         sRebar = stream.Stream()
-        for part in sSrc:
+        for part in sSrc.getElementsByClass(stream.Part):
             newPart = part.flat.notes.makeMeasures(tsStream)
             newPart.makeTies(inPlace=True)
             sRebar.insert(0, newPart)

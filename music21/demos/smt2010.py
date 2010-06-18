@@ -153,7 +153,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
     #ts.beat.partition(3)
     
     found = stream.Stream()
-    for part in score:
+    for part in score.getElementsByClass(stream.Part):
         found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
         highestNoteNum = 0
         for m in part.measures:

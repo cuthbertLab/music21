@@ -312,9 +312,11 @@ class ConverterTinyNotation(object):
 
 #-------------------------------------------------------------------------------
 class ConverterMusicXML(object):
+    '''Converter for MusicXML
+    '''
 
     def __init__(self, forceSource):
-        self._mxScore = None
+        self._mxScore = None # store the musicxml object representation
         self._stream = stream.Score()
         self.forceSource = forceSource
 
@@ -346,7 +348,7 @@ class ConverterMusicXML(object):
         '''Open MusicXML data from a string.'''
         c = musicxml.Document()
         c.read(xmlString)
-        self._mxScore = c.score
+        self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
             raise ConverterException('score from xmlString (%s...) has no parts defined' % xmlString[:30])
         self.load()
@@ -742,8 +744,9 @@ class Test(unittest.TestCase):
         
         mxString = testPrimitive.rhythmDurations03a
         a = parse(mxString)
-        self.assertEqual(len(a), 1) # one part
-        for part in a:
+        #a.show('t')
+        self.assertEqual(len(a), 2) # one part, plus metadata
+        for part in a.getElementsByClass(stream.Part):
             self.assertEqual(len(part), 7) # seven measures
             measures = part.getElementsByClass(stream.Measure)
             self.assertEqual(int(measures[0].measureNumber), 1)
@@ -775,7 +778,7 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.chordsThreeNotesDuration21c
         a = parse(mxString)
-        for part in a:
+        for part in a.getElementsByClass(stream.Part):
             chords = part.flat.getElementsByClass(chord.Chord)
             self.assertEqual(len(chords), 7)
             knownSize = [3, 2, 3, 3, 3, 3, 3]
@@ -902,6 +905,23 @@ class Test(unittest.TestCase):
 
         keyList = part.flat.getElementsByClass(key.KeySignature)
         self.assertEqual(len(keyList), 46)
+
+
+    def testConversionMXMetadata(self):
+
+        from music21.musicxml import testPrimitive
+        from music21.musicxml import testFiles
+
+        a = parse(testFiles.mozartTrioK581Excerpt)
+        self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
+        self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
+        self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
+
+        a = parse(testFiles.binchoisMagnificat)
+        self.assertEqual(a.metadata.composer, 'Gilles Binchois')
+        # this gets the best title available, even though this is movement title
+        self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
+
 
 
 
