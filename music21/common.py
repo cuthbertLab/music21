@@ -420,13 +420,13 @@ def getNumFromStr(usrStr):
 def numToIntOrFloat(value):
     '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
 
-    >>> getIntOrFloat(1.0)
+    >>> numToIntOrFloat(1.0)
     1
-    >>> getIntOrFloat(1.00003)
+    >>> numToIntOrFloat(1.00003)
     1.00003
-    >>> getIntOrFloat(1.5)
+    >>> numToIntOrFloat(1.5)
     1.5
-    >>> getIntOrFloat(1.0000000005)
+    >>> numToIntOrFloat(1.0000000005)
     1
     '''
     intVal = int(round(value))
