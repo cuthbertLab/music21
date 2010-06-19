@@ -3768,7 +3768,7 @@ class Stream(music21.Music21Object):
 
 
     def _getMX(self):
-        '''Create and return a musicxml score.
+        '''Create and return a musicxml Score object. 
 
         >>> n1 = note.Note()
         >>> measure1 = Measure()
@@ -3877,8 +3877,17 @@ class Stream(music21.Music21Object):
             mxComponents.append(self._getMXPart(None, meterStream))
 
         # create score and part list
+        # try to get mxScore from lead meta data first
+        if self.metadata != None:
+            mxScore = self.metadata.mx # returns an mx score
+        else:
+            mxScore = musicxmlMod.Score()
+
         mxScore = musicxmlMod.Score()
-        mxScore.setDefaults()
+        mxScoreDefault = musicxmlMod.Score()
+        mxScoreDefault.setDefaults()
+        # merge
+        mxScore = mxScore.merge(mxScoreDefault)
 
         mxPartList = musicxmlMod.PartList()
         mxScore.set('partList', mxPartList)
