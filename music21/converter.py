@@ -896,6 +896,8 @@ class Test(unittest.TestCase):
             post.append(str(notes[i].articulations[0].__class__))
         self.assertEqual(post, match)
 
+        # try to go the other way
+        post = a.musicxml
 
     def testConversionMXKey(self):
         from music21.musicxml import testPrimitive

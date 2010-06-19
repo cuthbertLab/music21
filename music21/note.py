@@ -1164,11 +1164,11 @@ class Note(NotRest):
 
         # if we have any articulations, they only go on the first of any 
         # component notes
-        mxArticulations = []
+        mxArticulations = musicxml.Articulations()
         for i in range(len(self.articulations)):
-            obj = self.articulations[i] # assuming all return a list
-            mxArticulations += obj.mx
-        if mxArticulations != []:
+            obj = self.articulations[i] # returns mxArticulationMark
+            mxArticulations.append(obj.mx) # append to mxArticulations
+        if len(mxArticulations) > 0:
             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
         # notations and articulations are mixed in musicxml

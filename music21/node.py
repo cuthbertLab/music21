@@ -391,6 +391,9 @@ class Node(object):
                 # if we have sub objects, we need to attach them to caller node
                 component.toxml(doc, node, 0)
             elif isinstance(component, list):
+                # TODO: this error is raised in a few cases that objects
+                # are not properly organized in the resulting xml object; 
+                # the problem is generally not here, but in the higher-level
                 print(['cannot process component object', component, 'doc', doc, 'parent', parent])
             else:
                 raise NodeException(

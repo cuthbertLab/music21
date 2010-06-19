@@ -37,19 +37,19 @@ class Articulation(music21.Music21Object):
         self.placement = 'above'
 
     def _getMX(self):
-        '''
+        '''Return an mxArticulationMark
+
         >>> a = Accent()
-        >>> mxArticulations = a.mx
-        >>> mxArticulations.componentList[0].tag
-        'accent'
+        >>> mxArticulationMark = a.mx
+        >>> mxArticulationMark
+        <accent placement=above>
         '''
 
-        mxArticulations = musicxml.Articulations()
+        #mxArticulations = musicxml.Articulations()
         mxArticulationMark = musicxml.ArticulationMark(self._mxName)
         mxArticulationMark.set('placement', self.placement)
-
-        mxArticulations.append(mxArticulationMark)
-        return mxArticulations
+        #mxArticulations.append(mxArticulationMark)
+        return mxArticulationMark
 
 
     def _setMX(self, mxArticulationMark):

@@ -163,10 +163,10 @@ def oldAccent(show=True):
                 n.articulations.append(mark)
                 lastBeat = beat
             m = m.sorted
-    
     if show:
-        partBass.measures[0:8].show('musicxml')
-
+        partBass.getMeasureRange(1,8).show('musicxml')
+    else:
+        post = partBass.musicxml
 
 
 class Test(unittest.TestCase):
@@ -177,7 +177,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         '''Test non-showing functions
         '''
-        for func in [bergEx01, showDots, findRaisedSevenths]:
+        for func in [bergEx01, showDots, findRaisedSevenths, oldAccent]:
             func(show=False)
 
 class TestExternal(unittest.TestCase):
