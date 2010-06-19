@@ -3883,18 +3883,17 @@ class Stream(music21.Music21Object):
         else:
             mxScore = musicxmlMod.Score()
 
-        mxScore = musicxmlMod.Score()
         mxScoreDefault = musicxmlMod.Score()
         mxScoreDefault.setDefaults()
-        # merge
+        mxIdDefault = musicxmlMod.Identification()
+        mxIdDefault.setDefaults() # will create a composer
+        mxScoreDefault.set('identification', mxIdDefault)
+
+        # merge metadata derived with default created
         mxScore = mxScore.merge(mxScoreDefault)
 
         mxPartList = musicxmlMod.PartList()
         mxScore.set('partList', mxPartList)
-
-        mxIdentification = musicxmlMod.Identification()
-        mxIdentification.setDefaults() # will create a composer
-        mxScore.set('identification', mxIdentification)
 
         for mxScorePart, mxPart in mxComponents:
             mxPartList.append(mxScorePart)
@@ -8137,6 +8136,21 @@ class Test(unittest.TestCase):
             self.assertEqual(len(sProc), len(s)+len(itemList) / 2)
 
 
+    def testMetadataOnStream(self):
+        from music21 import note
+        s = Stream()
+        n1 = note.Note()
+        s.append(n1)
+
+        s.metadata = metadata.Metadata()
+        s.metadata.composer = 'Frank the Composer'
+        s.metadata.title = 'work title' # will get as movement name if not set
+        #s.metadata.movementName = 'movement name'
+        post = s.musicxml
+        #s.show()
+
+        
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -8157,4 +8171,6 @@ if __name__ == "__main__":
 
         #a.testInsertAndShiftBasic()
         #a.testInsertAndShiftNoDuration()
-        a.testInsertAndShiftMultipleElements()
+        #a.testInsertAndShiftMultipleElements()
+
+        a.testMetadataOnStream()

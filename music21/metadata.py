@@ -1099,12 +1099,48 @@ class Metadata(music21.Music21Object):
     def _getMX(self):
         '''Return a mxScore object, to be merged or used in final musicxml output
         '''
-        pass
+        mxScore = musicxml.Score()
+
+        # create and add work obj
+        mxWork = musicxml.Work()
+        match = False
+        if self.title != None:
+            match = True
+            mxWork.set('workTitle', str(self.title))
+            #mxWork.set('workNumber', None)
+        if match == True: # only attach if needed
+            mxScore.set('workObj', mxWork)
+
+        # musicxml often defaults to show only movement title       
+        # if no movement title is found, get the .title attr
+        if self.movementName != None:
+            mxScore.set('movementTitle', str(self.movementName))
+        else: # it is none
+            if self.title != None:
+                mxScore.set('movementTitle', str(self.title))
+
+        if self.movementNumber != None:
+            mxScore.set('movementNumber', str(self.movementNumber))
+
+
+        # create and add identification obj
+        mxId = musicxml.Identification()
+        match = False
+        mxCreatorList = []
+        for c in self._contributors: # look at each contributor
+            match = True # if more than zero
+            # get an mx object
+            mxCreatorList.append(c.mx)
+        if match == True: # only attach if needed
+            mxId.set('creatorList', mxCreatorList)        
+            mxScore.set('identificationObj', mxId)
+
+        return mxScore
+
 
     def _setMX(self, mxScore):
         '''Given an msScore, fill the necessary parameters of a Metadata.
         '''
-
         self.movementNumber = mxScore.get('movementNumber')
         # xml calls this title not name
         self.movementName = mxScore.get('movementTitle')
