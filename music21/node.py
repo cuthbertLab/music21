@@ -229,6 +229,7 @@ class Node(object):
                     new.set(otherAttr[i], other.get(otherAttr[i]))
 
                 # other is defined as an empty list
+                # note that this may contain component objects
                 elif (self.get(localAttr[i]) == [] and 
                     other.get(otherAttr[i]) != []):
                     new.set(otherAttr[i], other.get(otherAttr[i]))

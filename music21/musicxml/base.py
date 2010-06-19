@@ -3531,6 +3531,54 @@ class Test(unittest.TestCase):
         self.assertEqual(mxAttributes.divisions, '4')
 
 
+
+    def testMergeScore(self):
+
+        mxScore1 = Score()
+        mxScore1.set('movementTitle', 'mvt title')
+        mxScore1.set('movementNumber', 'third')
+
+        mxWork = Work()
+        mxWork.set('workTitle', 'work title')
+        mxScore1.set('workObj', mxWork)
+
+        mxId = Identification()
+        mxCreator = Creator()
+        mxCreator.set('charData', 'creator name')
+        mxCreator.set('type', 'composer')
+
+        mxId.set('creatorList', [mxCreator])
+        mxScore1.set('identificationObj', mxId)
+
+        mxScore1XMLStr = """<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<score-partwise>
+  <work>
+    <work-title>work title</work-title>
+  </work>
+  <movement-number>third</movement-number>
+  <movement-title>mvt title</movement-title>
+  <identification>
+    <creator type="composer">creator name</creator>
+  </identification>
+</score-partwise>
+"""
+        self._compareXml(mxScore1, mxScore1XMLStr)
+
+
+        mxScore2 = Score()
+        self.assertEqual(mxScore2.get('movementNumber'), None)
+        mxScore2 = mxScore2.merge(mxScore1)
+        self.assertEqual(mxScore2.get('movementNumber'), 'third')
+
+
+        #print mxScore2.xmlStr()
+        # if we get the same thing out of the xml, we have merged
+        self._compareXml(mxScore2, mxScore1XMLStr)
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
