@@ -416,6 +416,26 @@ def getNumFromStr(usrStr):
     # returns numbers, and then characeters
     return ''.join(found), ''.join(remain)
 
+
+def numToIntOrFloat(value):
+    '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
+
+    >>> getIntOrFloat(1.0)
+    1
+    >>> getIntOrFloat(1.00003)
+    1.00003
+    >>> getIntOrFloat(1.5)
+    1.5
+    >>> getIntOrFloat(1.0000000005)
+    1
+    '''
+    intVal = int(round(value))
+    if almostEquals(intVal, value, 1e-6):
+        return intVal
+    else: # source
+        return value
+
+
 def spaceCamelCase(usrStr, replaceUnderscore=True):
     '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
 

@@ -1102,7 +1102,9 @@ class Pitch(music21.Music21Object):
         mxPitch = musicxmlMod.Pitch()
         mxPitch.set('step', self.step)
         if self.accidental is not None:
-            mxPitch.set('alter', self.accidental.alter)
+            # need to use integers when possible in order to support
+            # xml readers that force alter to be an integer
+            mxPitch.set('alter', common.numToIntOrFloat(self.accidental.alter))
         mxPitch.set('octave', self.implicitOctave)
 
         mxNote = musicxmlMod.Note()
